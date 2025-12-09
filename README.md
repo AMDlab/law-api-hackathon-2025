@@ -1,36 +1,56 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 法令フロー図生成アプリ (Law API Hackathon 2025)
 
-## Getting Started
+建築基準法をe-Gov法令APIから取得し、ツリー形式で閲覧および条文内容のフロー図（Mermaid記法）を自動生成するWebアプリケーションです。
 
-First, run the development server:
+## 機能
+
+- **建築基準法の取得**: e-Gov法令API (v2) を使用して最新の法令データを取得。
+- **ツリー表示**: 編・章・節・条の階層構造をサイドバーでツリー表示。
+- **フロー図生成**:
+  - 選択した条文を解析し、Mermaid.jsを用いてフローチャート化。
+  - 条文内の「第X条」等の参照を検出し、リンクまたはサブグラフとして図に統合。
+  - 参照先が他の法令である場合も、APIを通じて動的に取得・解析。
+
+## 環境構築手順
+
+### 前提条件
+
+- Node.js (v18以上推奨)
+- npm
+
+### インストール
+
+リポジトリをクローンした後、依存パッケージをインストールしてください。
+
+```bash
+npm install
+```
+
+### 開発サーバーの起動
+
+以下のコマンドでローカルサーバーを起動します。
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+ブラウザで [http://localhost:3000](http://localhost:3000) にアクセスしてください。
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 技術スタック
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **Framework**: [Next.js](https://nextjs.org/) (App Router)
+- **Language**: TypeScript
+- **Styling**: [Tailwind CSS](https://tailwindcss.com/)
+- **UI Library**: [shadcn/ui](https://ui.shadcn.com/)
+- **Diagrams**: [Mermaid.js](https://mermaid.js.org/)
+- **Data Source**: [e-Gov 法令API v2](https://laws.e-gov.go.jp/api/2/swagger-ui/)
 
-## Learn More
+## ディレクトリ構成
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `src/app`: Next.jsのApp Routerページコンポーネント。
+- `src/components`: UIコンポーネント。
+  - `law-tree.tsx`: 法令ツリー表示コンポーネント。
+  - `mermaid-view.tsx`: フロー図レンダリングコンポーネント。
+- `src/lib`: ユーティリティ・ロジック。
+  - `api.ts`: e-Gov APIとの通信ロジック。
+  - `parser.ts`: 法令JSONデータの解析、テキスト抽出、参照解決、Mermaid生成ロジック。
