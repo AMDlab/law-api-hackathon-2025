@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ChevronRight, ChevronDown, FileText, Folder, CheckCircle, AlertCircle } from 'lucide-react';
 import type { LawNode } from '@/lib/parser';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -84,15 +84,22 @@ function hasDescendantWithDiagram(node: LawNode, availableDiagramIds?: Set<strin
 
 function TreeNode({ node, depth, onSelect, selectedDiagramId, availableDiagramIds, showOnlyWithDiagram, searchQuery }: TreeNodeProps) {
   const hasSearchQuery = searchQuery && searchQuery.length > 0;
-  const [isExpanded, setIsExpanded] = useState(depth < 1 || hasSearchQuery);
+  const [isExpanded, setIsExpanded] = useState(depth < 1);
   const hasChildren = node.children && node.children.length > 0;
   const isSelectable = node.type === 'Paragraph' || node.type === 'Item';
   const isSelected = selectedDiagramId && node.diagramId === selectedDiagramId;
   const hasDiagram = availableDiagramIds && node.diagramId && availableDiagramIds.has(node.diagramId);
   const hasChildWithDiagram = hasDescendantWithDiagram(node, availableDiagramIds);
 
+  // 検索時は自動展開
+  useEffect(() => {
+    if (hasSearchQuery) {
+      setIsExpanded(true);
+    }
+  }, [hasSearchQuery]);
+
   // 検索フィルタリング
-  if (searchQuery && searchQuery.length > 0) {
+  if (hasSearchQuery) {
     if (!hasDescendantMatchingSearch(node, searchQuery)) {
       return null;
     }
@@ -103,8 +110,8 @@ function TreeNode({ node, depth, onSelect, selectedDiagramId, availableDiagramId
     if (isSelectable && !hasDiagram) {
       return null;
     }
-    // 親ノードは、子孫に機序図があれば表示
-    if (!isSelectable && !hasDescendantWithDiagram(node, availableDiagramIds)) {
+    // 親ノードは、子孫に機序図があれば表示（hasChildWithDiagramを再利用）
+    if (!isSelectable && !hasChildWithDiagram) {
       return null;
     }
   }
