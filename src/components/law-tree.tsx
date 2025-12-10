@@ -11,9 +11,37 @@ interface LawTreeProps {
   selectedDiagramId?: string;
   availableDiagramIds?: Set<string>;
   showOnlyWithDiagram?: boolean;
+  searchQuery?: string;
 }
 
-export function LawTree({ nodes, onSelect, selectedDiagramId, availableDiagramIds, showOnlyWithDiagram }: LawTreeProps) {
+// ノードが検索クエリにマッチするか（タイトル、条番号、内容で検索）
+function nodeMatchesSearch(node: LawNode, query: string): boolean {
+  if (!query) return true;
+  const lowerQuery = query.toLowerCase();
+
+  // タイトルでマッチ
+  if (node.title?.toLowerCase().includes(lowerQuery)) return true;
+  // キャプション（条文見出し）でマッチ
+  if (node.caption?.toLowerCase().includes(lowerQuery)) return true;
+  // 条番号でマッチ（例: "43" で第43条を検索）
+  if (node.articleNum?.includes(query)) return true;
+  // 内容でマッチ
+  if (node.content?.toLowerCase().includes(lowerQuery)) return true;
+
+  return false;
+}
+
+// ノードまたはその子孫が検索クエリにマッチするかを再帰的にチェック
+function hasDescendantMatchingSearch(node: LawNode, query: string): boolean {
+  if (!query) return true;
+  if (nodeMatchesSearch(node, query)) return true;
+  if (node.children) {
+    return node.children.some(child => hasDescendantMatchingSearch(child, query));
+  }
+  return false;
+}
+
+export function LawTree({ nodes, onSelect, selectedDiagramId, availableDiagramIds, showOnlyWithDiagram, searchQuery }: LawTreeProps) {
   return (
     <ScrollArea className="h-full">
       <div className="p-2">
@@ -26,6 +54,7 @@ export function LawTree({ nodes, onSelect, selectedDiagramId, availableDiagramId
             selectedDiagramId={selectedDiagramId}
             availableDiagramIds={availableDiagramIds}
             showOnlyWithDiagram={showOnlyWithDiagram}
+            searchQuery={searchQuery}
           />
         ))}
       </div>
@@ -40,6 +69,7 @@ interface TreeNodeProps {
   selectedDiagramId?: string;
   availableDiagramIds?: Set<string>;
   showOnlyWithDiagram?: boolean;
+  searchQuery?: string;
 }
 
 // ノードまたはその子孫に機序図があるかを再帰的にチェック
@@ -52,13 +82,21 @@ function hasDescendantWithDiagram(node: LawNode, availableDiagramIds?: Set<strin
   return false;
 }
 
-function TreeNode({ node, depth, onSelect, selectedDiagramId, availableDiagramIds, showOnlyWithDiagram }: TreeNodeProps) {
-  const [isExpanded, setIsExpanded] = useState(depth < 1);
+function TreeNode({ node, depth, onSelect, selectedDiagramId, availableDiagramIds, showOnlyWithDiagram, searchQuery }: TreeNodeProps) {
+  const hasSearchQuery = searchQuery && searchQuery.length > 0;
+  const [isExpanded, setIsExpanded] = useState(depth < 1 || hasSearchQuery);
   const hasChildren = node.children && node.children.length > 0;
   const isSelectable = node.type === 'Paragraph' || node.type === 'Item';
   const isSelected = selectedDiagramId && node.diagramId === selectedDiagramId;
   const hasDiagram = availableDiagramIds && node.diagramId && availableDiagramIds.has(node.diagramId);
   const hasChildWithDiagram = hasDescendantWithDiagram(node, availableDiagramIds);
+
+  // 検索フィルタリング
+  if (searchQuery && searchQuery.length > 0) {
+    if (!hasDescendantMatchingSearch(node, searchQuery)) {
+      return null;
+    }
+  }
 
   // フィルタリング: 機序図ありのみ表示の場合、機序図がない項目は非表示
   if (showOnlyWithDiagram) {
@@ -172,6 +210,7 @@ function TreeNode({ node, depth, onSelect, selectedDiagramId, availableDiagramId
               selectedDiagramId={selectedDiagramId}
               availableDiagramIds={availableDiagramIds}
               showOnlyWithDiagram={showOnlyWithDiagram}
+              searchQuery={searchQuery}
             />
           ))}
         </div>

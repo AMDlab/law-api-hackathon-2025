@@ -41,6 +41,7 @@ export default function Home() {
   const [availableDiagrams, setAvailableDiagrams] = useState<DiagramFile[]>([]);
   const [availableDiagramIds, setAvailableDiagramIds] = useState<Set<string>>(new Set());
   const [showOnlyWithDiagram, setShowOnlyWithDiagram] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
 
   // 初期化: 法令データと機序図一覧を読み込む
   useEffect(() => {
@@ -116,8 +117,14 @@ export default function Home() {
         <ResizablePanelGroup direction="horizontal">
           <ResizablePanel defaultSize={25} minSize={20}>
             <div className="h-full flex flex-col p-2">
-              <div className="flex items-center justify-between mb-2 px-2">
-                <h2 className="text-sm font-semibold">目次</h2>
+              <div className="flex flex-col gap-2 mb-2 px-2">
+                <input
+                  type="text"
+                  placeholder="条文を検索... (例: 43, 接道)"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full px-2 py-1 text-sm border rounded bg-background"
+                />
                 <label className="flex items-center gap-1 text-xs cursor-pointer">
                   <input
                     type="checkbox"
@@ -141,6 +148,7 @@ export default function Home() {
                   selectedDiagramId={selectedNode?.diagramId}
                   availableDiagramIds={availableDiagramIds}
                   showOnlyWithDiagram={showOnlyWithDiagram}
+                  searchQuery={searchQuery}
                 />
               )}
             </div>
