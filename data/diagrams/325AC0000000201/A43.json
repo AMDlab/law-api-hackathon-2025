@@ -1,0 +1,164 @@
+{
+  "id": "kijo-law-A43",
+  "version": "1.0.0",
+  "pageTitle": {
+    "title": "建築物の接道義務判定",
+    "targetSubject": "建築物",
+    "description": "建築物の敷地が道路に2m以上接しているかを判定する",
+    "relatedArticles": ["法::A43:P1"]
+  },
+  "nodes": [
+    {
+      "id": "info-001",
+      "type": "information",
+      "title": "敷地",
+      "subject": "建築物",
+      "property": "当該建築物の敷地",
+      "propertyType": "set_definition",
+      "description": "建築物が存在する敷地の範囲",
+      "relatedArticles": ["法::A43:P1"]
+    },
+    {
+      "id": "info-002",
+      "type": "information",
+      "title": "道路",
+      "symbol": "R",
+      "subject": "敷地",
+      "property": "敷地に接する道路",
+      "propertyType": "set_definition",
+      "description": "建築基準法上の道路（法第42条に規定する道路）",
+      "relatedArticles": ["法::A42", "法::A43:P1"]
+    },
+    {
+      "id": "info-003",
+      "type": "information",
+      "title": "接道長さ",
+      "symbol": "L",
+      "subject": "敷地",
+      "property": "道路に接する長さ",
+      "propertyType": "numeric",
+      "description": "敷地が道路に接している部分の長さ（メートル）",
+      "relatedArticles": ["法::A43:P1"]
+    },
+    {
+      "id": "info-004",
+      "type": "information",
+      "title": "接道義務適合",
+      "symbol": "J",
+      "subject": "建築物",
+      "property": "法43条1項への適合",
+      "propertyType": "proposition",
+      "description": "建築物の敷地が道路に2m以上接しているか否か",
+      "relatedArticles": ["法::A43:P1"]
+    },
+    {
+      "id": "proc-001",
+      "type": "process",
+      "title": "道路の特定",
+      "processType": "human_judgment",
+      "targetSubject": "敷地",
+      "iteration": "single",
+      "description": "敷地に接する道路を特定する（法42条に規定する道路に該当するか判断を含む）",
+      "relatedArticles": ["法::A42", "法::A43:P1"],
+      "softwareFunctions": [
+        {
+          "category": "graphic_display",
+          "description": "敷地と周辺道路の平面図表示"
+        },
+        {
+          "category": "user_input",
+          "description": "道路の指定"
+        }
+      ]
+    },
+    {
+      "id": "proc-002",
+      "type": "process",
+      "title": "接道長さ算出",
+      "processType": "mechanical",
+      "targetSubject": "敷地",
+      "iteration": "single",
+      "description": "敷地境界線のうち道路に接する部分の長さを算出する",
+      "logicExpression": "L = length(intersection(敷地境界, R))",
+      "relatedArticles": ["法::A43:P1"],
+      "softwareFunctions": [
+        {
+          "category": "program_processing",
+          "description": "幾何学的演算による長さ算出"
+        }
+      ]
+    },
+    {
+      "id": "proc-003",
+      "type": "process",
+      "title": "接道義務判定",
+      "processType": "mechanical",
+      "targetSubject": "建築物",
+      "iteration": "single",
+      "description": "接道長さが2m以上であるかを判定する",
+      "logicExpression": "J = (L >= 2)",
+      "relatedArticles": ["法::A43:P1"],
+      "softwareFunctions": [
+        {
+          "category": "program_processing",
+          "description": "数値比較処理"
+        },
+        {
+          "category": "text_display",
+          "description": "判定結果の表示"
+        }
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge-001",
+      "from": "info-001",
+      "to": "proc-001",
+      "role": "input"
+    },
+    {
+      "id": "edge-002",
+      "from": "proc-001",
+      "to": "info-002",
+      "role": "output"
+    },
+    {
+      "id": "edge-003",
+      "from": "info-001",
+      "to": "proc-002",
+      "role": "input"
+    },
+    {
+      "id": "edge-004",
+      "from": "info-002",
+      "to": "proc-002",
+      "role": "input"
+    },
+    {
+      "id": "edge-005",
+      "from": "proc-002",
+      "to": "info-003",
+      "role": "output"
+    },
+    {
+      "id": "edge-006",
+      "from": "info-003",
+      "to": "proc-003",
+      "role": "input"
+    },
+    {
+      "id": "edge-007",
+      "from": "proc-003",
+      "to": "info-004",
+      "role": "output"
+    }
+  ],
+  "metadata": {
+    "createdAt": "2025-12-10T00:00:00Z",
+    "author": "サンプル",
+    "generator": "manual",
+    "lawId": "325AC0000000201",
+    "lawName": "建築基準法"
+  }
+}

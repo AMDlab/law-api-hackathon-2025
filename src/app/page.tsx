@@ -102,7 +102,7 @@ export default function Home() {
   return (
     <div className="h-screen w-full flex flex-col overflow-hidden bg-background">
       <header className="p-4 border-b">
-        <h1 className="text-xl font-bold">法令フロー図生成 (建築基準法)</h1>
+        <h1 className="text-xl font-bold">審査機序図生成システム (建築基準法)</h1>
       </header>
       
       <main className="flex-1 overflow-hidden">
@@ -141,7 +141,7 @@ export default function Home() {
                    
                    <Card className="flex-1 min-h-[400px]">
                      <CardHeader>
-                       <CardTitle>フロー図</CardTitle>
+                       <CardTitle>審査機序図</CardTitle>
                      </CardHeader>
                      <CardContent className="h-full">
                        {generating ? (

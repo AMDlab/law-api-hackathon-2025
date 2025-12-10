@@ -5,6 +5,18 @@ export interface LawNode {
   children: LawNode[];
   content?: string;
   articleTitle?: string; // For articles, e.g., "第一条"
+  /** 条番号 (例: "1", "20_3") */
+  articleNum?: string;
+  /** 項番号 (例: "1", "2") */
+  paragraphNum?: string;
+  /** 号番号 (例: "1", "2") */
+  itemNum?: string;
+  /** 機序図用のID (例: "A43_P1", "A20_3_P2_I1") */
+  diagramId?: string;
+  /** 規制文かどうか */
+  isRegulation?: boolean;
+  /** 条文の見出し (例: "（目的）") */
+  caption?: string;
 }
 
 interface XmlNode {
@@ -67,17 +79,17 @@ function traverse(node: XmlNode): LawNode[] {
     if (!node.children) return nodes;
 
     const containerTags = ['Part', 'Chapter', 'Section', 'Subsection', 'Division', 'Article'];
-    
+
     node.children.forEach(child => {
         if (typeof child === 'string') return;
-        
+
         if (containerTags.includes(child.tag)) {
             // Find title
             // e.g. Chapter -> ChapterTitle
             const titleTag = child.tag === 'Article' ? 'ArticleTitle' : `${child.tag}Title`;
             const titleNode = findChild(child, titleTag);
             const title = titleNode ? getText(titleNode) : '';
-            
+
             const newNode: LawNode = {
                 type: child.tag,
                 title: title,
@@ -86,16 +98,147 @@ function traverse(node: XmlNode): LawNode[] {
 
             if (child.tag === 'Article') {
                 newNode.articleTitle = title;
+                // 条番号を取得 (例: "1", "20" など Num属性から)
+                const articleNum = child.attr?.Num || '';
+                newNode.articleNum = articleNum;
+
+                // 見出し取得
+                const captionNode = findChild(child, 'ArticleCaption');
+                if (captionNode) {
+                    newNode.caption = getText(captionNode);
+                }
+
+                // 条の下に項を展開
+                newNode.children = extractParagraphs(child, articleNum);
                 newNode.content = extractArticleContent(child);
             } else {
                 newNode.children = traverse(child);
             }
-            
+
             nodes.push(newNode);
         }
     });
-    
+
     return nodes;
+}
+
+/**
+ * 規制文かどうかを判定
+ * 「〜しなければならない」「〜してはならない」で終わる文を規制文とする
+ */
+function isRegulationText(text: string): boolean {
+    const patterns = [
+        /しなければならない[。]?$/,
+        /してはならない[。]?$/,
+        /することができない[。]?$/,
+        /ものとする[。]?$/,
+    ];
+    return patterns.some(p => p.test(text.trim()));
+}
+
+/**
+ * 条から項を抽出
+ */
+function extractParagraphs(article: XmlNode, articleNum: string): LawNode[] {
+    const paragraphs = findChildren(article, 'Paragraph');
+    const nodes: LawNode[] = [];
+
+    paragraphs.forEach(p => {
+        const pNumAttr = p.attr?.Num || '1';
+        const pNumNode = findChild(p, 'ParagraphNum');
+        const pNumText = pNumNode ? getText(pNumNode) : '';
+
+        // 項の本文を取得
+        const pSentence = findChild(p, 'ParagraphSentence');
+        const sentenceText = pSentence ? extractSentenceText(pSentence) : '';
+
+        // diagramId生成 (例: A43_P1)
+        const diagramId = `A${articleNum.replace(/の/g, '_')}_P${pNumAttr}`;
+
+        // 規制文判定
+        const isRegulation = isRegulationText(sentenceText);
+
+        const paragraphNode: LawNode = {
+            type: 'Paragraph',
+            title: pNumText ? `第${pNumText}項` : '第1項',
+            paragraphNum: pNumAttr,
+            articleNum: articleNum,
+            diagramId: diagramId,
+            isRegulation: isRegulation,
+            content: sentenceText,
+            children: extractItems(p, articleNum, pNumAttr)
+        };
+
+        nodes.push(paragraphNode);
+    });
+
+    return nodes;
+}
+
+/**
+ * 項から号を抽出
+ */
+function extractItems(paragraph: XmlNode, articleNum: string, paragraphNum: string): LawNode[] {
+    const items = findChildren(paragraph, 'Item');
+    const nodes: LawNode[] = [];
+
+    items.forEach(item => {
+        const itemNumAttr = item.attr?.Num || '';
+        const itemTitleNode = findChild(item, 'ItemTitle');
+        const itemTitle = itemTitleNode ? getText(itemTitleNode) : '';
+
+        // 号の本文を取得
+        const itemSentence = findChild(item, 'ItemSentence');
+        const sentenceText = itemSentence ? extractSentenceText(itemSentence) : '';
+
+        // diagramId生成 (例: A43_P1_I1)
+        const diagramId = `A${articleNum.replace(/の/g, '_')}_P${paragraphNum}_I${itemNumAttr}`;
+
+        // 規制文判定
+        const isRegulation = isRegulationText(sentenceText);
+
+        const itemNode: LawNode = {
+            type: 'Item',
+            title: itemTitle,
+            itemNum: itemNumAttr,
+            paragraphNum: paragraphNum,
+            articleNum: articleNum,
+            diagramId: diagramId,
+            isRegulation: isRegulation,
+            content: sentenceText,
+            children: [] // Subitem1などはここでは展開しない
+        };
+
+        nodes.push(itemNode);
+    });
+
+    return nodes;
+}
+
+/**
+ * Sentence要素からテキストを抽出
+ */
+function extractSentenceText(sentenceContainer: XmlNode): string {
+    const sentences: string[] = [];
+
+    // Sentence子要素から
+    const sentNodes = findChildren(sentenceContainer, 'Sentence');
+    sentNodes.forEach(s => {
+        sentences.push(getText(s));
+    });
+
+    // Column子要素から（定義文などで使用）
+    const columnNodes = findChildren(sentenceContainer, 'Column');
+    columnNodes.forEach(col => {
+        sentences.push(getText(col));
+    });
+
+    // 直接のテキストも
+    if (sentences.length === 0) {
+        sentences.push(getText(sentenceContainer));
+    }
+
+    return sentences.join('');
 }
 
 

@@ -1,0 +1,291 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://example.com/kijo-diagram.schema.json",
+  "title": "審査機序図スキーマ",
+  "description": "buildingSMART Japan 審査機序図作成手引書に基づく機序図データ形式",
+  "type": "object",
+  "required": ["id", "pageTitle", "nodes", "edges"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "機序図の一意識別子"
+    },
+    "version": {
+      "type": "string",
+      "description": "スキーマバージョン",
+      "default": "1.0.0"
+    },
+    "pageTitle": {
+      "$ref": "#/definitions/PageTitle"
+    },
+    "nodes": {
+      "type": "array",
+      "description": "[情報]と[処理]のノード一覧",
+      "items": {
+        "oneOf": [
+          { "$ref": "#/definitions/InformationNode" },
+          { "$ref": "#/definitions/ProcessNode" }
+        ]
+      }
+    },
+    "edges": {
+      "type": "array",
+      "description": "ノード間の接続（矢印）",
+      "items": {
+        "$ref": "#/definitions/Edge"
+      }
+    },
+    "metadata": {
+      "$ref": "#/definitions/Metadata"
+    }
+  },
+  "definitions": {
+    "PageTitle": {
+      "type": "object",
+      "description": "ページタイトル図形の情報",
+      "required": ["title"],
+      "properties": {
+        "title": {
+          "type": "string",
+          "description": "図形上に表示するタイトル"
+        },
+        "targetSubject": {
+          "type": "string",
+          "description": "ページ全体が対象とする主体"
+        },
+        "description": {
+          "type": "string",
+          "description": "ページ全体の処理内容"
+        },
+        "relatedArticles": {
+          "type": "array",
+          "description": "関連条項（法令識別文字列:条識別文字列:項識別文字列:号識別文字列）",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "InformationNode": {
+      "type": "object",
+      "description": "[情報]ノード - 法適合判定に関与する情報を表す矩形",
+      "required": ["id", "type", "title"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "ノードの一意識別子"
+        },
+        "type": {
+          "type": "string",
+          "const": "information"
+        },
+        "title": {
+          "type": "string",
+          "description": "図形上に表示するタイトル"
+        },
+        "symbol": {
+          "type": "string",
+          "description": "論理式等で用いる記号（例: A, B, X1）",
+          "pattern": "^[A-Za-z][A-Za-z0-9]*$"
+        },
+        "subject": {
+          "type": "string",
+          "description": "情報を保持する主体（例: 建築物, 室, 敷地）"
+        },
+        "plurality": {
+          "type": "string",
+          "description": "単数か複数か",
+          "enum": ["single", "multiple"],
+          "default": "single"
+        },
+        "property": {
+          "type": "string",
+          "description": "主体がもつ性質"
+        },
+        "propertyType": {
+          "type": "string",
+          "description": "性質の型",
+          "enum": [
+            "proposition",
+            "classification",
+            "numeric",
+            "geometric_point",
+            "geometric_direction",
+            "geometric_line",
+            "geometric_surface",
+            "geometric_solid",
+            "set_definition",
+            "visual"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "description": "情報内容の説明"
+        },
+        "relatedArticles": {
+          "type": "array",
+          "description": "関連法令条項",
+          "items": {
+            "type": "string"
+          }
+        },
+        "remarks": {
+          "type": "string",
+          "description": "備考"
+        },
+        "mvdRelated": {
+          "type": "string",
+          "description": "IFC適用クラスやPropertySet情報"
+        }
+      }
+    },
+    "ProcessNode": {
+      "type": "object",
+      "description": "[処理]ノード - 情報を処理して別の情報を導出する角丸矩形",
+      "required": ["id", "type", "title", "processType"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "ノードの一意識別子"
+        },
+        "type": {
+          "type": "string",
+          "const": "process"
+        },
+        "title": {
+          "type": "string",
+          "description": "図形上に表示するタイトル"
+        },
+        "processType": {
+          "type": "string",
+          "description": "処理の種類",
+          "enum": [
+            "mechanical",
+            "human_judgment",
+            "consistency_check",
+            "sub_diagram_reference",
+            "undefined_input"
+          ]
+        },
+        "targetSubject": {
+          "type": "string",
+          "description": "処理対象となる主体の型"
+        },
+        "iteration": {
+          "type": "string",
+          "description": "単体処理か反復処理か",
+          "enum": ["single", "iterative"],
+          "default": "single"
+        },
+        "description": {
+          "type": "string",
+          "description": "処理の概要説明"
+        },
+        "relatedArticles": {
+          "type": "array",
+          "description": "関連法令条項",
+          "items": {
+            "type": "string"
+          }
+        },
+        "remarks": {
+          "type": "string",
+          "description": "備考"
+        },
+        "logicExpression": {
+          "type": "string",
+          "description": "論理式等（入力情報の記号を用いた処理内容の表現）"
+        },
+        "softwareFunctions": {
+          "type": "array",
+          "description": "ソフトウェア機能（最大3つ）",
+          "maxItems": 3,
+          "items": {
+            "$ref": "#/definitions/SoftwareFunction"
+          }
+        },
+        "subDiagramRef": {
+          "type": "string",
+          "description": "参照する部分審査機序図のID（processType=sub_diagram_referenceの場合）"
+        }
+      }
+    },
+    "SoftwareFunction": {
+      "type": "object",
+      "description": "ソフトウェア機能定義",
+      "properties": {
+        "category": {
+          "type": "string",
+          "description": "機能区分",
+          "enum": [
+            "user_input",
+            "graphic_display",
+            "text_display",
+            "program_processing"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "description": "機能概要"
+        }
+      }
+    },
+    "Edge": {
+      "type": "object",
+      "description": "ノード間の接続（矢印）",
+      "required": ["id", "from", "to"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "エッジの一意識別子"
+        },
+        "from": {
+          "type": "string",
+          "description": "始点ノードのID"
+        },
+        "to": {
+          "type": "string",
+          "description": "終点ノードのID"
+        },
+        "role": {
+          "type": "string",
+          "description": "エッジの役割",
+          "enum": ["input", "output", "primary", "supporting"],
+          "default": "input"
+        }
+      }
+    },
+    "Metadata": {
+      "type": "object",
+      "description": "メタデータ",
+      "properties": {
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "作成日時"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "更新日時"
+        },
+        "author": {
+          "type": "string",
+          "description": "作成者"
+        },
+        "generator": {
+          "type": "string",
+          "description": "生成ツール（例: law-mcp-v1.0）"
+        },
+        "lawId": {
+          "type": "string",
+          "description": "対象法令ID（e-Gov法令API準拠）"
+        },
+        "lawName": {
+          "type": "string",
+          "description": "対象法令名"
+        }
+      }
+    }
+  }
+}
