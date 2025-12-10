@@ -25,7 +25,7 @@ export default function Home() {
   const [diagramLoading, setDiagramLoading] = useState(false);
   const [availableDiagrams, setAvailableDiagrams] = useState<DiagramFile[]>([]);
   const [availableDiagramIds, setAvailableDiagramIds] = useState<Set<string>>(new Set());
-  const [showOnlyWithDiagram, setShowOnlyWithDiagram] = useState(false);
+  const [showOnlyWithDiagram, setShowOnlyWithDiagram] = useState(true);
 
   // 初期化: 法令データと機序図一覧を読み込む
   useEffect(() => {
@@ -94,7 +94,7 @@ export default function Home() {
   return (
     <div className="h-screen w-full flex flex-col overflow-hidden bg-background">
       <header className="p-4 border-b">
-        <h1 className="text-xl font-bold">審査機序図ビューアー（建築基準法）</h1>
+        <h1 className="text-xl font-bold">審査機序図自動生成システム</h1>
       </header>
 
       <main className="flex-1 overflow-hidden">
@@ -149,16 +149,32 @@ export default function Home() {
                   </Card>
 
                   <Card className="flex-1 min-h-[400px]">
-                    <CardHeader>
-                      <CardTitle>審査機序図</CardTitle>
+                    <CardHeader className="pb-2">
+                      {diagram ? (
+                        <div>
+                          <CardTitle>{diagram.pageTitle.title}</CardTitle>
+                          {diagram.pageTitle.targetSubject && (
+                            <div className="text-sm text-muted-foreground mt-1">
+                              対象主体: {diagram.pageTitle.targetSubject}
+                            </div>
+                          )}
+                          {diagram.pageTitle.description && (
+                            <div className="text-sm text-muted-foreground mt-1">
+                              {diagram.pageTitle.description}
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        <CardTitle>審査機序図</CardTitle>
+                      )}
                     </CardHeader>
-                    <CardContent className="h-[calc(100%-60px)]">
+                    <CardContent className="h-[calc(100%-80px)]">
                       {diagramLoading ? (
                         <div className="flex items-center justify-center h-64">
                           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
                         </div>
                       ) : diagram ? (
-                        <KijoDiagramViewer diagram={diagram} />
+                        <KijoDiagramViewer diagram={diagram} articleContent={selectedNode?.content} />
                       ) : (
                         <div className="flex items-center justify-center h-64 text-muted-foreground">
                           この条文の機序図はまだ作成されていません

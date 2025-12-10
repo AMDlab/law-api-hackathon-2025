@@ -1,11 +1,10 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useState, useRef } from "react";
 import {
   ReactFlow,
   Background,
   Controls,
-  MiniMap,
   useNodesState,
   useEdgesState,
   type Node,
@@ -16,11 +15,11 @@ import {
 import "@xyflow/react/dist/style.css";
 
 import type { KijoDiagram, DiagramNode } from "@/types/diagram";
-import { isInformationNode } from "@/types/diagram";
 import { detectCycle, validateEdgeReferences } from "@/lib/validation";
 import { InformationNode } from "./information-node";
 import { ProcessNode } from "./process-node";
 import { NodeDetailPanel } from "./node-detail-panel";
+import { ExportButton } from "./export-button";
 
 // カスタムノードタイプの登録
 const nodeTypes = {
@@ -31,6 +30,7 @@ const nodeTypes = {
 interface KijoDiagramViewerProps {
   diagram: KijoDiagram;
   className?: string;
+  articleContent?: string;
 }
 
 /**
@@ -163,8 +163,9 @@ function validateGraph(diagram: KijoDiagram): { valid: boolean; warnings: string
 /**
  * 機序図ビューアーコンポーネント
  */
-export function KijoDiagramViewer({ diagram, className }: KijoDiagramViewerProps) {
+export function KijoDiagramViewer({ diagram, className, articleContent }: KijoDiagramViewerProps) {
   const [selectedNode, setSelectedNode] = useState<DiagramNode | null>(null);
+  const flowRef = useRef<HTMLDivElement>(null);
 
   // グラフの検証
   const validation = useMemo(() => validateGraph(diagram), [diagram]);
@@ -191,33 +192,15 @@ export function KijoDiagramViewer({ diagram, className }: KijoDiagramViewerProps
     []
   );
 
-  // MiniMapのノード色
-  const nodeColor = useCallback((node: Node) => {
-    const diagramNode = (node.data as { node: DiagramNode }).node;
-    if (isInformationNode(diagramNode)) {
-      return diagramNode.propertyType === "visual" ? "#fed7aa" : "#fff";
-    }
-    // ProcessNode
-    switch (diagramNode.processType) {
-      case "mechanical":
-        return "#bae6fd";
-      case "human_judgment":
-        return "#fed7aa";
-      case "consistency_check":
-        return "#bbf7d0";
-      case "sub_diagram_reference":
-        return "#e5e7eb";
-      case "undefined_input":
-        return "#fdba74";
-      default:
-        return "#fff";
-    }
-  }, []);
 
   return (
     <div className={`flex h-full ${className || ""}`}>
       {/* メイン図 */}
-      <div className="flex-1 h-full relative">
+      <div className="flex-1 h-full relative" ref={flowRef}>
+        {/* エクスポートボタン */}
+        <div className="absolute top-2 right-2 z-10">
+          <ExportButton diagram={diagram} articleContent={articleContent} flowRef={flowRef} />
+        </div>
         {/* 警告表示 */}
         {!validation.valid && (
           <div className="absolute top-2 left-2 z-10 bg-yellow-50 border border-yellow-300 rounded-md p-3 max-w-md shadow-sm">
@@ -240,35 +223,15 @@ export function KijoDiagramViewer({ diagram, className }: KijoDiagramViewerProps
           fitViewOptions={{ padding: 0.2 }}
           minZoom={0.1}
           maxZoom={2}
+          proOptions={{ hideAttribution: true }}
         >
           <Background />
           <Controls />
-          <MiniMap
-            nodeColor={nodeColor}
-            nodeStrokeWidth={3}
-            zoomable
-            pannable
-          />
         </ReactFlow>
       </div>
 
       {/* 詳細パネル */}
       <div className="w-80 border-l bg-white overflow-y-auto">
-        {/* ページタイトル */}
-        <div className="p-4 border-b bg-gray-50">
-          <div className="font-bold text-lg">{diagram.pageTitle.title}</div>
-          {diagram.pageTitle.targetSubject && (
-            <div className="text-sm text-gray-600">
-              対象主体: {diagram.pageTitle.targetSubject}
-            </div>
-          )}
-          {diagram.pageTitle.description && (
-            <div className="text-sm text-gray-500 mt-1">
-              {diagram.pageTitle.description}
-            </div>
-          )}
-        </div>
-
         {/* 選択ノード詳細 */}
         <NodeDetailPanel node={selectedNode} />
       </div>
