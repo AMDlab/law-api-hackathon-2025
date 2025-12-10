@@ -15,6 +15,21 @@ interface DiagramFile {
   path: string;
 }
 
+// 条文タイトルを生成（例: "第21条第2項" or "第21条第1項第3号"）
+function formatArticleTitle(node: LawNode): string {
+  const parts: string[] = [];
+  if (node.articleNum) {
+    parts.push(`第${node.articleNum}条`);
+  }
+  if (node.paragraphNum) {
+    parts.push(`第${node.paragraphNum}項`);
+  }
+  if (node.itemNum) {
+    parts.push(`第${node.itemNum}号`);
+  }
+  return parts.join('');
+}
+
 export default function Home() {
   const [treeData, setTreeData] = useState<LawNode[]>([]);
   const [selectedNode, setSelectedNode] = useState<LawNode | null>(null);
@@ -139,7 +154,7 @@ export default function Home() {
                 <>
                   <Card>
                     <CardHeader>
-                      <CardTitle>{selectedNode.title}</CardTitle>
+                      <CardTitle>{formatArticleTitle(selectedNode)}</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="whitespace-pre-wrap text-sm leading-relaxed">
@@ -174,7 +189,7 @@ export default function Home() {
                           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
                         </div>
                       ) : diagram ? (
-                        <KijoDiagramViewer diagram={diagram} articleContent={selectedNode?.content} />
+                        <KijoDiagramViewer diagram={diagram} articleContent={selectedNode?.content} articleTitle={selectedNode ? formatArticleTitle(selectedNode) : undefined} />
                       ) : (
                         <div className="flex items-center justify-center h-64 text-muted-foreground">
                           この条文の機序図はまだ作成されていません
