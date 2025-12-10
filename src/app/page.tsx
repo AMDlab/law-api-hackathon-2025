@@ -15,6 +15,21 @@ interface DiagramFile {
   path: string;
 }
 
+// 条文タイトルを生成（例: "第21条第2項" or "第21条第1項第3号"）
+function formatArticleTitle(node: LawNode): string {
+  const parts: string[] = [];
+  if (node.articleNum) {
+    parts.push(`第${node.articleNum}条`);
+  }
+  if (node.paragraphNum) {
+    parts.push(`第${node.paragraphNum}項`);
+  }
+  if (node.itemNum) {
+    parts.push(`第${node.itemNum}号`);
+  }
+  return parts.join('');
+}
+
 export default function Home() {
   const [treeData, setTreeData] = useState<LawNode[]>([]);
   const [selectedNode, setSelectedNode] = useState<LawNode | null>(null);
@@ -26,6 +41,7 @@ export default function Home() {
   const [availableDiagrams, setAvailableDiagrams] = useState<DiagramFile[]>([]);
   const [availableDiagramIds, setAvailableDiagramIds] = useState<Set<string>>(new Set());
   const [showOnlyWithDiagram, setShowOnlyWithDiagram] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
 
   // 初期化: 法令データと機序図一覧を読み込む
   useEffect(() => {
@@ -101,8 +117,14 @@ export default function Home() {
         <ResizablePanelGroup direction="horizontal">
           <ResizablePanel defaultSize={25} minSize={20}>
             <div className="h-full flex flex-col p-2">
-              <div className="flex items-center justify-between mb-2 px-2">
-                <h2 className="text-sm font-semibold">目次</h2>
+              <div className="flex flex-col gap-2 mb-2 px-2">
+                <input
+                  type="text"
+                  placeholder="条文を検索... (例: 43, 接道)"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full px-2 py-1 text-sm border rounded bg-background"
+                />
                 <label className="flex items-center gap-1 text-xs cursor-pointer">
                   <input
                     type="checkbox"
@@ -126,6 +148,7 @@ export default function Home() {
                   selectedDiagramId={selectedNode?.diagramId}
                   availableDiagramIds={availableDiagramIds}
                   showOnlyWithDiagram={showOnlyWithDiagram}
+                  searchQuery={searchQuery}
                 />
               )}
             </div>
@@ -139,7 +162,7 @@ export default function Home() {
                 <>
                   <Card>
                     <CardHeader>
-                      <CardTitle>{selectedNode.title}</CardTitle>
+                      <CardTitle>{formatArticleTitle(selectedNode)}</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="whitespace-pre-wrap text-sm leading-relaxed">
@@ -174,7 +197,7 @@ export default function Home() {
                           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
                         </div>
                       ) : diagram ? (
-                        <KijoDiagramViewer diagram={diagram} articleContent={selectedNode?.content} />
+                        <KijoDiagramViewer diagram={diagram} articleContent={selectedNode?.content} articleTitle={selectedNode ? formatArticleTitle(selectedNode) : undefined} />
                       ) : (
                         <div className="flex items-center justify-center h-64 text-muted-foreground">
                           この条文の機序図はまだ作成されていません
