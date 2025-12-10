@@ -1,0 +1,208 @@
+{
+  "id": "kijo-law-A43_P1",
+  "version": "1.0.0",
+  "pageTitle": {
+    "title": "建築物の接道義務判定",
+    "targetSubject": "建築物",
+    "description": "建築物の敷地が道路に2m以上接しているかを判定する（法43条1項）",
+    "relatedArticles": ["法::A43:P1"]
+  },
+  "nodes": [
+    {
+      "id": "info-001",
+      "type": "information",
+      "title": "敷地",
+      "subject": "建築物",
+      "plurality": "single",
+      "property": "当該建築物の敷地",
+      "propertyType": "geometric_surface",
+      "description": "建築物が存在する敷地の範囲",
+      "relatedArticles": ["法::A43:P1"]
+    },
+    {
+      "id": "info-002",
+      "type": "information",
+      "title": "隣接する道路",
+      "symbol": "R0",
+      "subject": "敷地",
+      "plurality": "multiple",
+      "property": "敷地に隣接する道路の集合",
+      "propertyType": "set_definition",
+      "description": "敷地境界に接するすべての道路",
+      "relatedArticles": ["法::A43:P1"]
+    },
+    {
+      "id": "info-003",
+      "type": "information",
+      "title": "自動車専用道路",
+      "symbol": "Ra",
+      "subject": "道路",
+      "plurality": "multiple",
+      "property": "自動車のみの交通の用に供する道路",
+      "propertyType": "proposition",
+      "description": "法43条1項一号に規定する除外道路",
+      "relatedArticles": ["法::A43:P1:I1"]
+    },
+    {
+      "id": "info-004",
+      "type": "information",
+      "title": "地区計画区域内道路",
+      "symbol": "Rb",
+      "subject": "道路",
+      "plurality": "multiple",
+      "property": "地区計画の区域内の道路",
+      "propertyType": "proposition",
+      "description": "法43条1項二号に規定する除外道路（地区整備計画で敷地として併せて利用すべき区域に限る）",
+      "relatedArticles": ["法::A43:P1:I2"]
+    },
+    {
+      "id": "info-005",
+      "type": "information",
+      "title": "有効道路",
+      "symbol": "R",
+      "subject": "敷地",
+      "plurality": "multiple",
+      "property": "接道義務の対象となる道路",
+      "propertyType": "set_definition",
+      "description": "法42条に規定する道路から、一号・二号の除外道路を除いたもの",
+      "relatedArticles": ["法::A42", "法::A43:P1"]
+    },
+    {
+      "id": "info-006",
+      "type": "information",
+      "title": "接道長さ",
+      "symbol": "L",
+      "subject": "敷地",
+      "plurality": "single",
+      "property": "道路に接する長さ",
+      "propertyType": "numeric",
+      "description": "敷地が有効道路に接している部分の長さ（メートル）",
+      "relatedArticles": ["法::A43:P1"]
+    },
+    {
+      "id": "info-007",
+      "type": "information",
+      "title": "接道義務適合",
+      "symbol": "J",
+      "subject": "建築物",
+      "plurality": "single",
+      "property": "法43条1項への適合",
+      "propertyType": "proposition",
+      "description": "建築物の敷地が道路に2m以上接しているか否か",
+      "relatedArticles": ["法::A43:P1"]
+    },
+    {
+      "id": "proc-001",
+      "type": "process",
+      "title": "隣接道路の特定",
+      "processType": "human_judgment",
+      "targetSubject": "敷地",
+      "iteration": "single",
+      "description": "敷地に隣接する道路を特定する（法42条に規定する道路に該当するか判断を含む）",
+      "relatedArticles": ["法::A42", "法::A43:P1"],
+      "softwareFunctions": [
+        {
+          "category": "graphic_display",
+          "description": "敷地と周辺道路の平面図表示"
+        },
+        {
+          "category": "user_input",
+          "description": "道路の指定・法42条該当性の入力"
+        }
+      ]
+    },
+    {
+      "id": "proc-002",
+      "type": "process",
+      "title": "除外道路の判定",
+      "processType": "human_judgment",
+      "targetSubject": "道路",
+      "iteration": "iterative",
+      "description": "各道路が自動車専用道路（一号）または地区計画区域内道路（二号）に該当するか判定",
+      "relatedArticles": ["法::A43:P1:I1", "法::A43:P1:I2"],
+      "softwareFunctions": [
+        {
+          "category": "user_input",
+          "description": "道路種別の入力"
+        }
+      ]
+    },
+    {
+      "id": "proc-003",
+      "type": "process",
+      "title": "有効道路の抽出",
+      "processType": "mechanical",
+      "targetSubject": "敷地",
+      "iteration": "single",
+      "description": "隣接道路から除外道路を除いた有効道路を抽出",
+      "logicExpression": "R = R0 - Ra - Rb",
+      "relatedArticles": ["法::A43:P1"],
+      "softwareFunctions": [
+        {
+          "category": "program_processing",
+          "description": "集合演算処理"
+        }
+      ]
+    },
+    {
+      "id": "proc-004",
+      "type": "process",
+      "title": "接道長さ算出",
+      "processType": "mechanical",
+      "targetSubject": "敷地",
+      "iteration": "single",
+      "description": "敷地境界線のうち有効道路に接する部分の長さを算出する",
+      "logicExpression": "L = length(intersection(敷地境界, R))",
+      "relatedArticles": ["法::A43:P1"],
+      "softwareFunctions": [
+        {
+          "category": "program_processing",
+          "description": "幾何学的演算による長さ算出"
+        }
+      ]
+    },
+    {
+      "id": "proc-005",
+      "type": "process",
+      "title": "接道義務判定",
+      "processType": "mechanical",
+      "targetSubject": "建築物",
+      "iteration": "single",
+      "description": "接道長さが2m以上であるかを判定する",
+      "logicExpression": "J = (L >= 2)",
+      "relatedArticles": ["法::A43:P1"],
+      "softwareFunctions": [
+        {
+          "category": "program_processing",
+          "description": "数値比較処理"
+        },
+        {
+          "category": "text_display",
+          "description": "判定結果の表示"
+        }
+      ]
+    }
+  ],
+  "edges": [
+    { "id": "edge-001", "from": "info-001", "to": "proc-001", "role": "input" },
+    { "id": "edge-002", "from": "proc-001", "to": "info-002", "role": "output" },
+    { "id": "edge-003", "from": "info-002", "to": "proc-002", "role": "input" },
+    { "id": "edge-004", "from": "proc-002", "to": "info-003", "role": "output" },
+    { "id": "edge-005", "from": "proc-002", "to": "info-004", "role": "output" },
+    { "id": "edge-006", "from": "info-002", "to": "proc-003", "role": "input" },
+    { "id": "edge-007", "from": "info-003", "to": "proc-003", "role": "input" },
+    { "id": "edge-008", "from": "info-004", "to": "proc-003", "role": "input" },
+    { "id": "edge-009", "from": "proc-003", "to": "info-005", "role": "output" },
+    { "id": "edge-010", "from": "info-001", "to": "proc-004", "role": "input" },
+    { "id": "edge-011", "from": "info-005", "to": "proc-004", "role": "input" },
+    { "id": "edge-012", "from": "proc-004", "to": "info-006", "role": "output" },
+    { "id": "edge-013", "from": "info-006", "to": "proc-005", "role": "input" },
+    { "id": "edge-014", "from": "proc-005", "to": "info-007", "role": "output" }
+  ],
+  "metadata": {
+    "createdAt": "2025-12-10T12:00:00Z",
+    "generator": "law-mcp",
+    "lawId": "325AC0000000201",
+    "lawName": "建築基準法"
+  }
+}
