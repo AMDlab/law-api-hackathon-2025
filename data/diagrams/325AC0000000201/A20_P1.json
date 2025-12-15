@@ -1,6 +1,6 @@
 {
   "id": "CHK-BSL-A20-P1",
-  "version": "3.0.0",
+  "version": "3.2.0",
 
   "page_title": {
     "title": "構造耐力",
@@ -20,19 +20,63 @@
 
   "labels": ["単体規定", "構造"],
 
-  "text_raw": "建築物は、自重、積載荷重、積雪荷重、風圧、土圧及び水圧並びに地震その他の震動及び衝撃に対して安全な構造のものとして、次の各号に掲げる建築物の区分に応じ、当該各号に定める基準に適合するものでなければならない。",
+  "text_raw": "建築物は、自重、積載荷重、積雪荷重、風圧、土圧及び水圧並びに地震その他の震動及び衝撃に対して安全な構造のものとして、次の各号に掲げる建築物の区分に応じ、当該各号に定める基準に適合するものでなければならない。一　高さが六十メートルを超える建築物　当該建築物の安全上必要な構造方法に関して政令で定める技術的基準に適合するものであること。この場合において、その構造方法は、荷重及び外力によつて建築物の各部分に連続的に生ずる力及び変形を把握することその他の政令で定める基準に従つた構造計算によつて安全性が確かめられたものとして国土交通大臣の認定を受けたものであること。二　高さが六十メートル以下の建築物のうち、第六条第一項第二号に掲げる建築物（高さが十三メートル又は軒の高さが九メートルを超えるものに限る。）又は同項第三号に掲げる建築物（地階を除く階数が四以上である鉄骨造の建築物、高さが二十メートルを超える鉄筋コンクリート造又は鉄骨鉄筋コンクリート造の建築物その他これらの建築物に準ずるものとして政令で定める建築物に限る。）　次に掲げる基準のいずれかに適合するものであること。三　高さが六十メートル以下の建築物のうち、第六条第一項第二号又は第三号に掲げる建築物その他その主要構造部（床、屋根及び階段を除く。）を石造、れんが造、コンクリートブロック造、無筋コンクリート造その他これらに類する構造とした建築物で高さが十三メートル又は軒の高さが九メートルを超えるもの（前号に掲げる建築物を除く。）　次に掲げる基準のいずれかに適合するものであること。四　前三号に掲げる建築物以外の建築物　次に掲げる基準のいずれかに適合するものであること。",
 
   "compliance_logic": {
     "scope_condition": {
       "operator": "ALWAYS",
-      "value": true
+      "value": true,
+      "desc": "すべての建築物に適用"
     },
     "judgment_rule": {
-      "operator": "EQ",
-      "lhs": { "var": "route_compliance", "desc": "該当区分の基準に適合", "property_type": "proposition" },
-      "rhs": { "value": true }
+      "operator": "AND_GLOBAL",
+      "desc": "区分に応じた基準への適合",
+      "conditions": [
+        {
+          "id": "cond-route",
+          "operator": "EQ",
+          "lhs": { "var": "route_determined", "desc": "区分が特定されている", "property_type": "proposition" },
+          "rhs": { "value": true }
+        },
+        {
+          "id": "cond-comply",
+          "operator": "EQ",
+          "lhs": { "var": "route_compliance", "desc": "該当区分の基準に適合", "property_type": "proposition" },
+          "rhs": { "value": true }
+        }
+      ]
     },
-    "exceptions": null
+    "exceptions": null,
+    "items": [
+      {
+        "item_number": "1",
+        "desc": "高さが60mを超える建築物",
+        "related_article": "法::A20:P1:I1",
+        "keywords": ["高さ", "60m超"],
+        "criteria": "政令で定める技術的基準に適合 + 時刻歴応答解析による国土交通大臣認定"
+      },
+      {
+        "item_number": "2",
+        "desc": "高さ60m以下の大規模建築物",
+        "related_article": "法::A20:P1:I2",
+        "keywords": ["高さ60m以下", "大規模", "H>13m", "軒高>9m", "4階以上鉄骨造", "H>20m RC/SRC"],
+        "criteria": "保有水平耐力計算等（ルート3）または限界耐力計算等"
+      },
+      {
+        "item_number": "3",
+        "desc": "高さ60m以下の中規模建築物",
+        "related_article": "法::A20:P1:I3",
+        "keywords": ["高さ60m以下", "中規模", "石造・れんが造等でH>13mまたは軒高>9m"],
+        "criteria": "許容応力度等計算（ルート2）以上"
+      },
+      {
+        "item_number": "4",
+        "desc": "上記以外の建築物（小規模）",
+        "related_article": "法::A20:P1:I4",
+        "keywords": ["小規模", "4号建築物"],
+        "criteria": "仕様規定または許容応力度計算（ルート1）以上"
+      }
+    ]
   },
 
   "diagram": {
@@ -91,17 +135,78 @@
       {
         "id": "info-005",
         "type": "information",
+        "title": "軒の高さ",
+        "symbol": "Hk",
+        "subject": "建築物",
+        "plurality": "single",
+        "property": "軒の高さ",
+        "property_type": "numeric",
+        "unit": "m",
+        "description": "建築物の軒の高さ",
+        "related_articles": ["法::A20:P1"]
+      },
+      {
+        "id": "info-route1-match",
+        "type": "information",
+        "title": "第1号該当",
+        "symbol": "R1",
+        "subject": "建築物",
+        "plurality": "single",
+        "property": "第1号（高さ60m超）該当",
+        "property_type": "proposition",
+        "description": "高さ60mを超える建築物に該当",
+        "related_articles": ["法::A20:P1:I1"]
+      },
+      {
+        "id": "info-route2-match",
+        "type": "information",
+        "title": "第2号該当",
+        "symbol": "R2",
+        "subject": "建築物",
+        "plurality": "single",
+        "property": "第2号（大規模）該当",
+        "property_type": "proposition",
+        "description": "高さ60m以下の大規模建築物に該当",
+        "related_articles": ["法::A20:P1:I2"]
+      },
+      {
+        "id": "info-route3-match",
+        "type": "information",
+        "title": "第3号該当",
+        "symbol": "R3",
+        "subject": "建築物",
+        "plurality": "single",
+        "property": "第3号（中規模）該当",
+        "property_type": "proposition",
+        "description": "高さ60m以下の中規模建築物に該当",
+        "related_articles": ["法::A20:P1:I3"]
+      },
+      {
+        "id": "info-route4-match",
+        "type": "information",
+        "title": "第4号該当",
+        "symbol": "R4",
+        "subject": "建築物",
+        "plurality": "single",
+        "property": "第4号（小規模）該当",
+        "property_type": "proposition",
+        "description": "上記以外の建築物（小規模）に該当",
+        "related_articles": ["法::A20:P1:I4"]
+      },
+      {
+        "id": "info-006",
+        "type": "information",
         "title": "該当区分",
         "symbol": "R",
         "subject": "建築物",
         "plurality": "single",
         "property": "法20条1項の区分",
         "property_type": "classification",
-        "description": "第1号（60m超）、第2号（大規模）、第3号（中規模）、第4号（小規模）のいずれか",
+        "description": "第1号〜第4号のいずれか",
         "related_articles": ["法::A20:P1"]
       },
       {
-        "id": "info-006",
+        "id": "info-007",
         "type": "information",
         "title": "基準適合",
         "symbol": "C",
@@ -113,7 +218,7 @@
         "related_articles": ["法::A20:P1", "令::A81"]
       },
       {
-        "id": "info-007",
+        "id": "info-008",
         "type": "information",
         "title": "法20条1項適合",
         "symbol": "J",
@@ -177,14 +282,27 @@
         ]
       },
       {
+        "id": "proc-004b",
+        "type": "process",
+        "title": "軒の高さの特定",
+        "process_type": "human_judgment",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "軒の高さを特定する",
+        "related_articles": ["法::A20:P1"],
+        "software_functions": [
+          { "category": "user_input", "description": "軒の高さの入力" }
+        ]
+      },
+      {
         "id": "proc-005",
         "type": "process",
         "title": "区分判定",
         "process_type": "mechanical",
         "target_subject": "建築物",
         "iteration": "single",
-        "description": "高さ・構造種別・階数・延べ面積から第1号〜第4号のいずれに該当するかを判定する",
-        "logic_expression": "R = (H>60) ? 第1号 : (大規模条件) ? 第2号 : (中規模条件) ? 第3号 : 第4号",
+        "description": "高さ・構造種別・階数・延べ面積・軒高から第1号〜第4号のいずれに該当するかを判定する",
+        "logic_expression": "R = IF(H>60, 第1号, IF(大規模条件, 第2号, IF(中規模条件, 第3号, 第4号)))",
         "related_articles": ["法::A20:P1:I1", "法::A20:P1:I2", "法::A20:P1:I3", "法::A20:P1:I4"],
         "software_functions": [
           { "category": "program_processing", "description": "区分判定ロジック" }
@@ -223,19 +341,192 @@
       {"id": "e-002", "from": "proc-002", "to": "info-002", "role": "output"},
       {"id": "e-003", "from": "proc-003", "to": "info-003", "role": "output"},
       {"id": "e-004", "from": "proc-004", "to": "info-004", "role": "output"},
+      {"id": "e-004b", "from": "proc-004b", "to": "info-005", "role": "output"},
       {"id": "e-005", "from": "info-001", "to": "proc-005", "role": "input"},
       {"id": "e-006", "from": "info-002", "to": "proc-005", "role": "input"},
       {"id": "e-007", "from": "info-003", "to": "proc-005", "role": "input"},
       {"id": "e-008", "from": "info-004", "to": "proc-005", "role": "input"},
-      {"id": "e-009", "from": "proc-005", "to": "info-005", "role": "output"},
-      {"id": "e-010", "from": "info-005", "to": "proc-006", "role": "input"},
-      {"id": "e-011", "from": "proc-006", "to": "info-006", "role": "output"},
-      {"id": "e-012", "from": "info-006", "to": "proc-007", "role": "input"},
-      {"id": "e-013", "from": "proc-007", "to": "info-007", "role": "output"}
+      {"id": "e-008b", "from": "info-005", "to": "proc-005", "role": "input"},
+      {"id": "e-009", "from": "proc-005", "to": "info-006", "role": "output"},
+      {"id": "e-010", "from": "info-006", "to": "proc-006", "role": "input"},
+      {"id": "e-011", "from": "proc-006", "to": "info-007", "role": "output"},
+      {"id": "e-012", "from": "info-007", "to": "proc-007", "role": "input"},
+      {"id": "e-013", "from": "proc-007", "to": "info-008", "role": "output"}
+    ]
+  },
+
+  "flow_diagram": {
+    "title": "構造耐力適合判定フロー",
+    "description": "法20条1項の各号に基づく構造計算ルートの判定と基準適合判定のフローチャート",
+    "nodes": [
+      {
+        "id": "term-start",
+        "type": "terminal",
+        "title": "審査開始",
+        "result": "start",
+        "description": "法第20条第1項の審査を開始"
+      },
+      {
+        "id": "dec-height-60",
+        "type": "decision",
+        "title": "高さ > 60m？",
+        "description": "【第1号判定】建築物の高さが60mを超えるか",
+        "condition": {
+          "operator": "GT",
+          "lhs": { "var": "height", "desc": "高さ [H]" },
+          "rhs": { "value": 60, "unit": "m" }
+        },
+        "related_articles": ["法::A20:P1:I1"]
+      },
+      {
+        "id": "proc-route1-match",
+        "type": "process",
+        "title": "第1号該当",
+        "process_type": "mechanical",
+        "description": "高さ60m超の建築物（超高層）",
+        "related_articles": ["法::A20:P1:I1"]
+      },
+      {
+        "id": "dec-large-scale",
+        "type": "decision",
+        "title": "大規模建築物？",
+        "description": "【第2号判定】H>13m/軒高>9mで法6条1項2号該当、または4階以上鉄骨造/H>20mのRC・SRC等",
+        "condition": {
+          "operator": "OR_GLOBAL",
+          "lhs": { "var": "large_scale_condition", "desc": "大規模条件" }
+        },
+        "related_articles": ["法::A20:P1:I2", "法::A6:P1:I2", "法::A6:P1:I3"]
+      },
+      {
+        "id": "proc-route2-match",
+        "type": "process",
+        "title": "第2号該当",
+        "process_type": "mechanical",
+        "description": "大規模建築物（ルート3適用）",
+        "related_articles": ["法::A20:P1:I2"]
+      },
+      {
+        "id": "dec-medium-scale",
+        "type": "decision",
+        "title": "中規模建築物？",
+        "description": "【第3号判定】石造・れんが造等でH>13mまたは軒高>9m",
+        "condition": {
+          "operator": "AND_GLOBAL",
+          "lhs": { "var": "medium_scale_condition", "desc": "中規模条件" }
+        },
+        "related_articles": ["法::A20:P1:I3"]
+      },
+      {
+        "id": "proc-route3-match",
+        "type": "process",
+        "title": "第3号該当",
+        "process_type": "mechanical",
+        "description": "中規模建築物（ルート2適用）",
+        "related_articles": ["法::A20:P1:I3"]
+      },
+      {
+        "id": "proc-route4-match",
+        "type": "process",
+        "title": "第4号該当",
+        "process_type": "mechanical",
+        "description": "小規模建築物（4号建築物、ルート1または仕様規定）",
+        "related_articles": ["法::A20:P1:I4"]
+      },
+      {
+        "id": "dec-route1-comply",
+        "type": "decision",
+        "title": "時刻歴応答解析で大臣認定？",
+        "description": "政令技術基準適合 + 時刻歴応答解析により安全性確認 + 国土交通大臣認定",
+        "condition": {
+          "operator": "EQ",
+          "lhs": { "var": "minister_approval", "desc": "大臣認定" },
+          "rhs": { "value": true }
+        },
+        "related_articles": ["法::A20:P1:I1", "令::A81:P1"]
+      },
+      {
+        "id": "dec-route2-comply",
+        "type": "decision",
+        "title": "保有水平耐力計算等？",
+        "description": "保有水平耐力計算（ルート3）または限界耐力計算等に適合",
+        "condition": {
+          "operator": "EQ",
+          "lhs": { "var": "route3_compliance", "desc": "ルート3適合" },
+          "rhs": { "value": true }
+        },
+        "related_articles": ["法::A20:P1:I2", "令::A81:P2", "令::A82_3"]
+      },
+      {
+        "id": "dec-route3-comply",
+        "type": "decision",
+        "title": "許容応力度等計算？",
+        "description": "許容応力度等計算（ルート2）以上に適合",
+        "condition": {
+          "operator": "EQ",
+          "lhs": { "var": "route2_compliance", "desc": "ルート2適合" },
+          "rhs": { "value": true }
+        },
+        "related_articles": ["法::A20:P1:I3", "令::A81:P3", "令::A82_2"]
+      },
+      {
+        "id": "dec-route4-comply",
+        "type": "decision",
+        "title": "仕様規定または許容応力度計算？",
+        "description": "仕様規定または許容応力度計算（ルート1）以上に適合",
+        "condition": {
+          "operator": "EQ",
+          "lhs": { "var": "route1_compliance", "desc": "ルート1/仕様規定適合" },
+          "rhs": { "value": true }
+        },
+        "related_articles": ["法::A20:P1:I4", "令::A81:P4"]
+      },
+      {
+        "id": "term-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "構造耐力に関する基準に適合"
+      },
+      {
+        "id": "term-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "構造耐力に関する基準に不適合"
+      }
+    ],
+    "edges": [
+      { "id": "f-001", "from": "term-start", "to": "dec-height-60", "role": "flow" },
+      { "id": "f-002", "from": "dec-height-60", "to": "proc-route1-match", "role": "yes" },
+      { "id": "f-003", "from": "proc-route1-match", "to": "dec-route1-comply", "role": "flow" },
+      { "id": "f-004", "from": "dec-height-60", "to": "dec-large-scale", "role": "no" },
+      { "id": "f-005", "from": "dec-large-scale", "to": "proc-route2-match", "role": "yes" },
+      { "id": "f-006", "from": "proc-route2-match", "to": "dec-route2-comply", "role": "flow" },
+      { "id": "f-007", "from": "dec-large-scale", "to": "dec-medium-scale", "role": "no" },
+      { "id": "f-008", "from": "dec-medium-scale", "to": "proc-route3-match", "role": "yes" },
+      { "id": "f-009", "from": "proc-route3-match", "to": "dec-route3-comply", "role": "flow" },
+      { "id": "f-010", "from": "dec-medium-scale", "to": "proc-route4-match", "role": "no" },
+      { "id": "f-011", "from": "proc-route4-match", "to": "dec-route4-comply", "role": "flow" },
+      { "id": "f-012", "from": "dec-route1-comply", "to": "term-pass", "role": "yes" },
+      { "id": "f-013", "from": "dec-route1-comply", "to": "term-fail", "role": "no" },
+      { "id": "f-014", "from": "dec-route2-comply", "to": "term-pass", "role": "yes" },
+      { "id": "f-015", "from": "dec-route2-comply", "to": "term-fail", "role": "no" },
+      { "id": "f-016", "from": "dec-route3-comply", "to": "term-pass", "role": "yes" },
+      { "id": "f-017", "from": "dec-route3-comply", "to": "term-fail", "role": "no" },
+      { "id": "f-018", "from": "dec-route4-comply", "to": "term-pass", "role": "yes" },
+      { "id": "f-019", "from": "dec-route4-comply", "to": "term-fail", "role": "no" }
     ]
   },
 
   "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A6:P1:I2", "A6:P1:I3"],
+      "description": "法6条1項2号・3号の建築物（確認申請対象）の定義"
+    },
     {
       "law_id": "325CO0000000338",
       "law_name": "建築基準法施行令",
@@ -248,6 +539,8 @@
 
   "metadata": {
     "created_at": "2025-12-15",
-    "generator": "multi-agent-v4"
+    "updated_at": "2025-12-15",
+    "generator": "multi-agent-v4.2",
+    "notes": "各号への該当判定 → 該当区分の基準適合判定の2段階構造"
   }
 }
