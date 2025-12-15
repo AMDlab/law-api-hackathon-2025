@@ -129,11 +129,59 @@ const article = articles.find(a => a.attr && a.attr.Num === '条番号');
 }
 ```
 
+### 判定ノード（適合判定フロー用）
+
+```json
+{
+  "id": "dec-001",
+  "type": "decision",
+  "title": "適用対象か？",
+  "description": "準耐火建築物等かつ延べ面積1500㎡超か",
+  "condition": {
+    "operator": "AND_GLOBAL",
+    "lhs": { "var": "structure_type", "desc": "構造種別" },
+    "rhs": { "value": "準耐火", "desc": "準耐火建築物等" }
+  },
+  "related_articles": ["令::A112:P1"]
+}
+```
+
+### 端子ノード（適合判定フロー用）
+
+```json
+{
+  "id": "term-001",
+  "type": "terminal",
+  "title": "適合",
+  "result": "pass|fail|start|end",
+  "description": "規定に適合",
+  "related_articles": ["令::A112:P1"]
+}
+```
+
 ### エッジ
 
 ```json
-{ "id": "e-001", "from": "info-001", "to": "proc-001", "role": "input|output|primary|supporting" }
+{ "id": "e-001", "from": "info-001", "to": "proc-001", "role": "input|output|primary|supporting|yes|no|flow", "label": "Yes" }
 ```
+
+---
+
+## ノードタイプの使い分け
+
+| ノードタイプ | 用途 | 形状 |
+|-------------|------|------|
+| `information` | 入力データ・中間結果 | 白い角丸長方形 |
+| `process` | 処理・計算・判定 | 色付き角丸長方形 |
+| `decision` | 条件分岐（Yes/No判定） | 黄色の角丸長方形 |
+| `terminal` | 開始/終了/結果 | 色付き楕円 |
+
+### 図の種類とノードの組み合わせ
+
+| 図の種類 | 使用ノード | 説明 |
+|----------|-----------|------|
+| **機序図** | `information` + `process` | 審査の情報処理フロー |
+| **適合判定フロー** | `decision` + `terminal` | 適合/不適合の判定フロー |
 
 ---
 
@@ -168,12 +216,15 @@ const article = articles.find(a => a.attr && a.attr.Num === '条番号');
 
 ## エッジの役割（role）
 
-| 役割 | 説明 | 色 |
-|------|------|-----|
-| input | 情報→処理 | 青 |
-| output | 処理→情報 | 赤 |
-| primary | 整合確認の正規情報 | 青 |
-| supporting | 整合確認の裏付け情報 | 緑 |
+| 役割 | 説明 | 色 | 用途 |
+|------|------|-----|------|
+| input | 情報→処理 | 青 | 機序図 |
+| output | 処理→情報 | 赤 | 機序図 |
+| primary | 整合確認の正規情報 | 青 | 機序図 |
+| supporting | 整合確認の裏付け情報 | 緑 | 機序図 |
+| yes | 条件がTrue | 緑 | 適合判定フロー |
+| no | 条件がFalse | 赤 | 適合判定フロー |
+| flow | 単純なフロー接続 | グレー | 両方 |
 
 ---
 

@@ -15,10 +15,10 @@ export function isValidLawId(id: string): boolean {
 
 /**
  * 条文ID形式のバリデーション
- * 例: A43, A20_3, A43_P1, A112_P1_I2
+ * 例: A43, A20_3, A43_P1, A112_P1_I2, A112_P1_flow
  */
 export function isValidArticleId(id: string): boolean {
-  return /^A\d+(?:_\d+)*(?:_P\d+)?(?:_I\d+)?$/.test(id);
+  return /^A\d+(?:_\d+)*(?:_P\d+)?(?:_I\d+)?(?:_flow)?$/.test(id);
 }
 
 // ========================================
@@ -55,7 +55,10 @@ export const PluralitySchema = z.enum(["single", "multiple"]);
 export const IterationSchema = z.enum(["single", "iterative"]);
 
 /** エッジの役割 */
-export const EdgeRoleSchema = z.enum(["input", "output", "primary", "supporting"]);
+export const EdgeRoleSchema = z.enum(["input", "output", "primary", "supporting", "yes", "no", "flow"]);
+
+/** 端子ノードの結果 */
+export const TerminalResultSchema = z.enum(["pass", "fail", "start", "end"]);
 
 /** ソフトウェア機能区分 */
 export const SoftwareFunctionCategorySchema = z.enum([
@@ -139,10 +142,48 @@ export const ProcessNodeSchema = z.object({
   sub_diagram_ref: z.string().optional(),
 });
 
-/** ノード（情報または処理） */
+/** [判定]ノード - 条件分岐（適合判定フロー用） */
+export const DecisionNodeSchema = z.object({
+  id: z.string().min(1),
+  type: z.literal("decision"),
+  title: z.string().min(1),
+  description: z.string().optional(),
+  condition: z.object({
+    operator: z.string(),
+    lhs: z.object({
+      var: z.string(),
+      desc: z.string(),
+    }).optional(),
+    // rhsは オブジェクト形式 または 配列形式（IN演算子用）を許容
+    rhs: z.union([
+      z.object({
+        value: z.union([z.number(), z.boolean(), z.string()]).optional(),
+        var: z.string().optional(),
+        desc: z.string().optional(),
+        unit: z.string().optional(),
+      }),
+      z.array(z.string()), // IN演算子用の配列
+    ]).optional(),
+  }).optional(),
+  related_articles: z.array(z.string()).optional(),
+});
+
+/** [端子]ノード - 開始/終了/結果（適合判定フロー用） */
+export const TerminalNodeSchema = z.object({
+  id: z.string().min(1),
+  type: z.literal("terminal"),
+  title: z.string().min(1),
+  result: TerminalResultSchema,
+  description: z.string().optional(),
+  related_articles: z.array(z.string()).optional(),
+});
+
+/** ノード（情報・処理・判定・端子） */
 export const DiagramNodeSchema = z.discriminatedUnion("type", [
   InformationNodeSchema,
   ProcessNodeSchema,
+  DecisionNodeSchema,
+  TerminalNodeSchema,
 ]);
 
 /** エッジ */
@@ -151,6 +192,7 @@ export const EdgeSchema = z.object({
   from: z.string().min(1),
   to: z.string().min(1),
   role: EdgeRoleSchema.optional(),
+  label: z.string().optional(),
 });
 
 /** メタデータ */
@@ -230,7 +272,15 @@ export const ComplianceLogicSchema = z.object({
   exceptions: ExceptionsSchema.optional(),
 });
 
-/** 審査機序図 (v3) */
+/** 適合判定フロー図 */
+export const FlowDiagramSchema = z.object({
+  title: z.string().optional(),
+  description: z.string().optional(),
+  nodes: z.array(DiagramNodeSchema).min(1),
+  edges: z.array(EdgeSchema),
+});
+
+/** 審査機序図 (v3.1) - 統合形式 */
 export const KijoDiagramSchema = z.object({
   id: z.string().min(1),
   version: z.string(),
@@ -239,6 +289,11 @@ export const KijoDiagramSchema = z.object({
   labels: z.array(z.string()).optional(),
   text_raw: z.string().optional(),
   compliance_logic: ComplianceLogicSchema.optional(),
+  // 機序図（kijo_diagramまたはdiagramで指定）
+  kijo_diagram: DiagramSchema.optional(),
+  // 適合判定フロー図（オプション）
+  flow_diagram: FlowDiagramSchema.optional(),
+  // 後方互換性のためのdiagram（必須）
   diagram: DiagramSchema,
   related_laws: z.array(RelatedLawSchema).optional(),
   metadata: DiagramMetadataSchema.optional(),

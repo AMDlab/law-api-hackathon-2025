@@ -39,7 +39,8 @@ function parseDisplayTitle(filename: string): string {
   // A43_P1.json -> 第43条第1項
   // A43_P1_I2.json -> 第43条第1項第2号
   // A20_3_P2.json -> 第20条の3第2項
-  const match = filename.match(/^A(\d+(?:_\d+)?)(?:_P(\d+))?(?:_I(\d+))?\.json$/);
+  // A112_P1_flow.json -> 第112条第1項（適合判定フロー）
+  const match = filename.match(/^A(\d+(?:_\d+)?)(?:_P(\d+))?(?:_I(\d+))?(?:_flow)?\.json$/);
   if (!match) return filename;
 
   const article = match[1].replace(/_/g, "の");
@@ -50,14 +51,20 @@ function parseDisplayTitle(filename: string): string {
   if (match[3]) {
     result += `第${match[3]}号`;
   }
+  // _flow サフィックスがある場合
+  if (filename.includes("_flow.json")) {
+    result += "（適合判定フロー）";
+  }
   return result;
 }
 
 /**
  * ファイル名からarticleIdを抽出
+ * 例: A43_P1.json -> A43_P1
+ *     A112_P1_flow.json -> A112_P1_flow
  */
 function extractArticleIdFromFilename(filename: string): string | null {
-  const match = filename.match(/^(A\d+(?:_\d+)*(?:_P\d+)?(?:_I\d+)?)\.json$/);
+  const match = filename.match(/^(A\d+(?:_\d+)*(?:_P\d+)?(?:_I\d+)?(?:_flow)?)\.json$/);
   return match ? match[1] : null;
 }
 

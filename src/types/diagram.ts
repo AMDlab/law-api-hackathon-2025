@@ -35,7 +35,13 @@ export type EdgeRole =
   | "input" // 通常の入力
   | "output" // 出力
   | "primary" // 整合確認の正規情報
-  | "supporting"; // 整合確認の裏付け情報
+  | "supporting" // 整合確認の裏付け情報
+  | "yes" // 条件分岐: Yes
+  | "no" // 条件分岐: No
+  | "flow"; // 単純なフロー接続
+
+/** 結果ノードの判定結果 */
+export type TerminalResult = "pass" | "fail" | "start" | "end";
 
 /** ソフトウェア機能区分 */
 export type SoftwareFunctionCategory =
@@ -139,8 +145,34 @@ export interface ProcessNode {
   sub_diagram_ref?: string;
 }
 
-/** ノード (情報または処理) */
-export type DiagramNode = InformationNode | ProcessNode;
+/** [判定]ノード - 条件分岐（適合判定フロー用） */
+export interface DecisionNode {
+  id: string;
+  type: "decision";
+  title: string;
+  description?: string;
+  /** 判定条件の論理式 */
+  condition?: {
+    operator: string;
+    lhs?: { var: string; desc: string };
+    rhs?: { value?: number | boolean | string; var?: string; desc?: string; unit?: string };
+  };
+  related_articles?: string[];
+}
+
+/** [端子]ノード - 開始/終了/結果（適合判定フロー用） */
+export interface TerminalNode {
+  id: string;
+  type: "terminal";
+  title: string;
+  /** 結果の種類: pass=適合, fail=不適合, start=開始, end=終了 */
+  result: TerminalResult;
+  description?: string;
+  related_articles?: string[];
+}
+
+/** ノード (情報・処理・判定・端子) */
+export type DiagramNode = InformationNode | ProcessNode | DecisionNode | TerminalNode;
 
 /** エッジ (ノード間の接続) */
 export interface Edge {
@@ -148,6 +180,7 @@ export interface Edge {
   from: string;
   to: string;
   role?: EdgeRole;
+  label?: string; // エッジラベル（Yes/No等）
 }
 
 /** メタデータ */
@@ -161,7 +194,21 @@ export interface DiagramMetadata {
   checklist_ref?: string;
 }
 
-/** 審査機序図 (v3) */
+/** 図のノード・エッジ構造 */
+export interface DiagramStructure {
+  nodes: DiagramNode[];
+  edges: Edge[];
+}
+
+/** 適合判定フロー図の追加情報 */
+export interface FlowDiagramInfo {
+  title?: string;
+  description?: string;
+  nodes: DiagramNode[];
+  edges: Edge[];
+}
+
+/** 審査機序図 (v3.1) - 統合形式 */
 export interface KijoDiagram {
   id: string;
   version: string;
@@ -170,10 +217,16 @@ export interface KijoDiagram {
   labels?: string[];
   text_raw?: string;
   compliance_logic?: ComplianceLogic;
-  diagram: {
-    nodes: DiagramNode[];
-    edges: Edge[];
-  };
+  
+  /** 機序図（v3.0互換: diagramと同義） */
+  kijo_diagram?: DiagramStructure;
+  
+  /** 適合判定フロー図（オプション） */
+  flow_diagram?: FlowDiagramInfo;
+  
+  /** 後方互換性のためのdiagramフィールド（kijo_diagramと同義） */
+  diagram: DiagramStructure;
+  
   related_laws?: RelatedLaw[];
   metadata?: DiagramMetadata;
 }
@@ -186,6 +239,16 @@ export function isInformationNode(node: DiagramNode): node is InformationNode {
 /** 型ガード: ProcessNodeかどうか */
 export function isProcessNode(node: DiagramNode): node is ProcessNode {
   return node.type === "process";
+}
+
+/** 型ガード: DecisionNodeかどうか */
+export function isDecisionNode(node: DiagramNode): node is DecisionNode {
+  return node.type === "decision";
+}
+
+/** 型ガード: TerminalNodeかどうか */
+export function isTerminalNode(node: DiagramNode): node is TerminalNode {
+  return node.type === "terminal";
 }
 
 /**

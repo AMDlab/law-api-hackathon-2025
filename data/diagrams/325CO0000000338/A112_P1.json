@@ -1,6 +1,6 @@
 {
   "id": "CHK-BSL-O-A112-P1",
-  "version": "3.0.0",
+  "version": "3.1.0",
 
   "page_title": {
     "title": "防火区画（面積区画）",
@@ -52,8 +52,34 @@
       "operator": "AND_GLOBAL",
       "effect": "exempt",
       "conditions": [
-        { "id": "ex-001", "desc": "各号のいずれかに該当する建築物の部分" },
-        { "id": "ex-002", "desc": "その用途上やむを得ないもの" }
+        {
+          "id": "ex-items",
+          "operator": "OR_GLOBAL",
+          "desc": "次の各号のいずれかに該当する建築物の部分",
+          "items": [
+            {
+              "item_number": "1",
+              "desc": "劇場、映画館、演芸場、観覧場、公会堂又は集会場の客席、体育館、工場その他これらに類する用途に供する建築物の部分",
+              "related_article": "令::A112:P1:I1",
+              "keywords": ["劇場", "映画館", "演芸場", "観覧場", "公会堂", "集会場", "客席", "体育館", "工場"]
+            },
+            {
+              "item_number": "2",
+              "desc": "階段室の部分又は昇降機の昇降路の部分（当該部分からのみ人が出入りすることのできる便所、公衆電話所その他これらに類するものを含む。）で一時間準耐火基準に適合する準耐火構造の床若しくは壁又は特定防火設備で区画されたもの",
+              "related_article": "令::A112:P1:I2",
+              "keywords": ["階段室", "昇降機", "昇降路", "便所", "公衆電話所"],
+              "sub_conditions": [
+                { "desc": "一時間準耐火基準に適合する準耐火構造の床・壁で区画", "operator": "OR" },
+                { "desc": "特定防火設備で区画", "operator": "OR" }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ex-use",
+          "desc": "その用途上やむを得ないもの",
+          "note": "当該部分の機能上、防火区画を設けることが困難な場合"
+        }
       ]
     }
   },
@@ -288,6 +314,201 @@
     ]
   },
 
+  "flow_diagram": {
+    "title": "防火区画（面積区画）適合判定フロー",
+    "description": "機序図の情報処理フローに基づく適合判定フローチャート",
+    "nodes": [
+      {
+        "id": "term-start",
+        "type": "terminal",
+        "title": "審査開始",
+        "result": "start",
+        "description": "令第112条第1項の審査を開始"
+      },
+      {
+        "id": "dec-structure",
+        "type": "decision",
+        "title": "準耐火建築物等か？",
+        "description": "構造種別を確認：法2条9号の3イ・ロ該当、特定主要構造部を耐火構造、令136条の2第1号ロ・第2号ロ適合のいずれか",
+        "condition": {
+          "operator": "OR_GLOBAL",
+          "lhs": { "var": "structure_type", "desc": "構造種別 [T]" }
+        },
+        "related_articles": ["法::A2:I9_3", "令::A136_2"]
+      },
+      {
+        "id": "dec-sprinkler",
+        "type": "decision",
+        "title": "スプリンクラー等あり？",
+        "description": "スプリンクラー設備、水噴霧消火設備等で自動式のものが設置されているか",
+        "condition": {
+          "operator": "GT",
+          "lhs": { "var": "sprinkler_area", "desc": "スプリンクラー設置面積 [Asp]" },
+          "rhs": { "value": 0, "unit": "㎡" }
+        },
+        "related_articles": ["令::A112:P1"]
+      },
+      {
+        "id": "dec-area-with-sp",
+        "type": "decision",
+        "title": "算定延べ面積 > 1500㎡？",
+        "description": "延べ面積からスプリンクラー等設置部分の1/2を控除した面積が1500㎡を超えるか（Ac = A - Asp×0.5）",
+        "condition": {
+          "operator": "GT",
+          "lhs": { "var": "adjusted_floor_area", "desc": "算定延べ面積 [Ac]" },
+          "rhs": { "value": 1500, "unit": "㎡" }
+        },
+        "related_articles": ["令::A112:P1"]
+      },
+      {
+        "id": "dec-area-no-sp",
+        "type": "decision",
+        "title": "延べ面積 > 1500㎡？",
+        "description": "延べ面積が1500㎡を超えるか",
+        "condition": {
+          "operator": "GT",
+          "lhs": { "var": "floor_area", "desc": "延べ面積 [A]" },
+          "rhs": { "value": 1500, "unit": "㎡" }
+        },
+        "related_articles": ["令::A112:P1"]
+      },
+      {
+        "id": "dec-item1",
+        "type": "decision",
+        "title": "劇場・体育館・工場等か？",
+        "description": "【第1号】劇場、映画館、演芸場、観覧場、公会堂、集会場の客席、体育館、工場その他これらに類する用途に供する建築物の部分か",
+        "condition": {
+          "operator": "IN",
+          "lhs": { "var": "building_use", "desc": "建築物の用途" },
+          "rhs": ["劇場", "映画館", "演芸場", "観覧場", "公会堂", "集会場", "客席", "体育館", "工場"]
+        },
+        "related_articles": ["令::A112:P1:I1"]
+      },
+      {
+        "id": "proc-item1-match",
+        "type": "process",
+        "title": "1号該当",
+        "process_type": "mechanical",
+        "description": "第1号に該当する建築物の部分",
+        "related_articles": ["令::A112:P1:I1"]
+      },
+      {
+        "id": "dec-item2",
+        "type": "decision",
+        "title": "階段室・昇降路の部分か？",
+        "description": "【第2号】階段室の部分又は昇降機の昇降路の部分（便所・公衆電話所等を含む）か",
+        "condition": {
+          "operator": "IN",
+          "lhs": { "var": "building_part", "desc": "建築物の部分" },
+          "rhs": ["階段室", "昇降機昇降路", "便所", "公衆電話所"]
+        },
+        "related_articles": ["令::A112:P1:I2"]
+      },
+      {
+        "id": "proc-item2-match",
+        "type": "process",
+        "title": "2号該当",
+        "process_type": "mechanical",
+        "description": "第2号に該当する建築物の部分（区画済み）",
+        "related_articles": ["令::A112:P1:I2"]
+      },
+      {
+        "id": "dec-item2-compartment",
+        "type": "decision",
+        "title": "1時間準耐火構造で区画？",
+        "description": "当該部分が一時間準耐火基準に適合する準耐火構造の床・壁又は特定防火設備で区画されているか",
+        "condition": {
+          "operator": "EQ",
+          "lhs": { "var": "item2_compartmented", "desc": "第2号区画" },
+          "rhs": { "value": true }
+        },
+        "related_articles": ["令::A112:P1:I2"]
+      },
+      {
+        "id": "dec-exception-use",
+        "type": "decision",
+        "title": "用途上やむを得ない？",
+        "description": "当該部分が用途上やむを得ないものか（機能上区画できない等）",
+        "condition": {
+          "operator": "EQ",
+          "lhs": { "var": "use_unavoidable", "desc": "用途上やむを得ない" },
+          "rhs": { "value": true }
+        },
+        "related_articles": ["令::A112:P1"]
+      },
+      {
+        "id": "dec-compartment",
+        "type": "decision",
+        "title": "1500㎡以内ごとに区画？",
+        "description": "一時間準耐火基準適合の床・壁または特定防火設備で1500㎡以内ごとに区画されているか",
+        "condition": {
+          "operator": "EQ",
+          "lhs": { "var": "compartment_provided", "desc": "区画設置 [C]" },
+          "rhs": { "value": true }
+        },
+        "related_articles": ["令::A112:P1"]
+      },
+      {
+        "id": "term-pass-structure",
+        "type": "terminal",
+        "title": "適合（対象外）",
+        "result": "pass",
+        "description": "準耐火建築物等でないため規定対象外"
+      },
+      {
+        "id": "term-pass-area",
+        "type": "terminal",
+        "title": "適合（面積要件外）",
+        "result": "pass",
+        "description": "算定延べ面積1500㎡以下のため規定対象外"
+      },
+      {
+        "id": "term-pass-exception",
+        "type": "terminal",
+        "title": "適合（例外）",
+        "result": "pass",
+        "description": "ただし書きの例外に該当（各号該当かつ用途上やむを得ない）"
+      },
+      {
+        "id": "term-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "防火区画の規定に適合"
+      },
+      {
+        "id": "term-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "防火区画の規定に不適合"
+      }
+    ],
+    "edges": [
+      { "id": "f-001", "from": "term-start", "to": "dec-structure", "role": "flow" },
+      { "id": "f-002", "from": "dec-structure", "to": "term-pass-structure", "role": "no" },
+      { "id": "f-003", "from": "dec-structure", "to": "dec-sprinkler", "role": "yes" },
+      { "id": "f-004", "from": "dec-sprinkler", "to": "dec-area-with-sp", "role": "yes" },
+      { "id": "f-005", "from": "dec-sprinkler", "to": "dec-area-no-sp", "role": "no" },
+      { "id": "f-006", "from": "dec-area-with-sp", "to": "term-pass-area", "role": "no" },
+      { "id": "f-007", "from": "dec-area-with-sp", "to": "dec-item1", "role": "yes" },
+      { "id": "f-008", "from": "dec-area-no-sp", "to": "term-pass-area", "role": "no" },
+      { "id": "f-009", "from": "dec-area-no-sp", "to": "dec-item1", "role": "yes" },
+      { "id": "f-010", "from": "dec-item1", "to": "proc-item1-match", "role": "yes" },
+      { "id": "f-010b", "from": "proc-item1-match", "to": "dec-exception-use", "role": "flow" },
+      { "id": "f-011", "from": "dec-item1", "to": "dec-item2", "role": "no" },
+      { "id": "f-012", "from": "dec-item2", "to": "dec-item2-compartment", "role": "yes" },
+      { "id": "f-013", "from": "dec-item2", "to": "dec-compartment", "role": "no" },
+      { "id": "f-014", "from": "dec-item2-compartment", "to": "proc-item2-match", "role": "yes" },
+      { "id": "f-014b", "from": "proc-item2-match", "to": "term-pass-exception", "role": "flow" },
+      { "id": "f-015", "from": "dec-item2-compartment", "to": "dec-compartment", "role": "no" },
+      { "id": "f-016", "from": "dec-exception-use", "to": "term-pass-exception", "role": "yes" },
+      { "id": "f-017", "from": "dec-exception-use", "to": "dec-compartment", "role": "no" },
+      { "id": "f-018", "from": "dec-compartment", "to": "term-pass", "role": "yes" },
+      { "id": "f-019", "from": "dec-compartment", "to": "term-fail", "role": "no" }
+    ]
+  },
+
   "related_laws": [
     {
       "law_id": "325AC0000000201",
@@ -301,6 +522,7 @@
 
   "metadata": {
     "created_at": "2025-12-15",
+    "updated_at": "2025-12-15",
     "generator": "multi-agent-v4"
   }
 }

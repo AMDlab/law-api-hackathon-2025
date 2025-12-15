@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useState, useRef } from "react";
+import { useCallback, useMemo, useState, useRef, useEffect } from "react";
 import {
   ReactFlow,
   ReactFlowProvider,
@@ -21,15 +21,28 @@ import type { KijoDiagram, DiagramNode } from "@/types/diagram";
 import { detectCycle, validateEdgeReferences } from "@/lib/validation";
 import { InformationNode } from "./information-node";
 import { ProcessNode } from "./process-node";
+import { FlowDecisionNode } from "./flow-decision-node";
+import { FlowTerminalNode } from "./flow-terminal-node";
 import { NodeDetailPanel } from "./node-detail-panel";
 import { ExportButton } from "./export-button";
 import { HelpButton } from "./help-button";
 import { FloatingEdge } from "./floating-edge";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-// カスタムノードタイプの登録
-const nodeTypes = {
+// 機序図用カスタムノードタイプ
+const kijoNodeTypes = {
   information: InformationNode,
   process: ProcessNode,
+  decision: FlowDecisionNode,
+  terminal: FlowTerminalNode,
+};
+
+// フロー図用カスタムノードタイプ（シンプル版）
+const flowNodeTypes = {
+  information: InformationNode,
+  process: ProcessNode,
+  decision: FlowDecisionNode,
+  terminal: FlowTerminalNode,
 };
 
 // カスタムエッジタイプの登録
@@ -46,7 +59,7 @@ interface KijoDiagramViewerProps {
 }
 
 // ノードサイズ定数
-const NODE_HEIGHT = 60;
+const NODE_HEIGHT = 50;
 const MIN_NODE_WIDTH = 120;
 const CHAR_WIDTH = 14; // 日本語文字の概算幅
 const PADDING = 40; // 左右のパディング
@@ -68,11 +81,6 @@ function calculateNodeWidth(node: DiagramNode): number {
 
 /**
  * エッジの色を役割に応じて決定
- * 手引書の色分け規則:
- * - input: 青 ([情報]から[処理]へのインプット)
- * - output: 赤 ([処理]から[情報]へのアウトプット)
- * - primary: 青 (整合確認の正規情報)
- * - supporting: 緑 (整合確認の裏付け情報)
  */
 function getEdgeColor(role?: string): string {
   switch (role) {
@@ -84,6 +92,12 @@ function getEdgeColor(role?: string): string {
       return "#3b82f6"; // 青（正規情報）
     case "supporting":
       return "#22c55e"; // 緑（裏付け情報）
+    case "yes":
+      return "#10b981"; // 緑（Yes）
+    case "no":
+      return "#ef4444"; // 赤（No）
+    case "flow":
+      return "#6b7280"; // グレー（フロー）
     default:
       return "#666";
   }
@@ -101,8 +115,8 @@ function getLayoutedElements(
 
   g.setGraph({
     rankdir: direction,
-    nodesep: 80,    // ノード間の垂直方向の間隔
-    ranksep: 120,   // ランク（列）間の水平方向の間隔
+    nodesep: direction === "TB" ? 60 : 80,
+    ranksep: direction === "TB" ? 80 : 120,
     marginx: 50,
     marginy: 50,
   });
@@ -139,54 +153,76 @@ function getLayoutedElements(
 }
 
 /**
+ * 図のノード・エッジ構造
+ */
+interface DiagramStructureLocal {
+  nodes: DiagramNode[];
+  edges: import("@/types/diagram").Edge[];
+}
+
+/**
  * 機序図JSONからReact Flowのノード・エッジに変換
  */
-function convertToFlowElements(diagram: KijoDiagram): {
+function convertToFlowElements(
+  diagramStructure: DiagramStructureLocal,
+  isFlowDiagram: boolean = false
+): {
   nodes: Node[];
   edges: Edge[];
 } {
-  const diagramNodes = diagram.diagram.nodes;
-  const diagramEdges = diagram.diagram.edges;
+  const diagramNodes = diagramStructure.nodes;
+  const diagramEdges = diagramStructure.edges;
 
   // ノードの初期変換（位置は後でDagreが決定）
-  const nodes: Node[] = diagramNodes.map((node) => ({
-    id: node.id,
-    type: node.type,
-    position: { x: 0, y: 0 }, // 仮の位置
-    data: { node },
-    width: calculateNodeWidth(node),
-    height: NODE_HEIGHT,
-  }));
+  const nodes: Node[] = diagramNodes.map((node) => {
+    // フロー図のdecisionノードはダイアモンド形（80x80）
+    const isDecisionInFlow = isFlowDiagram && node.type === "decision";
+    return {
+      id: node.id,
+      type: node.type,
+      position: { x: 0, y: 0 }, // 仮の位置
+      data: { node, isFlowDiagram },
+      width: isDecisionInFlow ? 120 : calculateNodeWidth(node),
+      height: isDecisionInFlow ? 50 : NODE_HEIGHT,
+    };
+  });
 
   // エッジの変換
+  // フロー図の場合はグレーで統一
+  const flowEdgeColor = "#6b7280";
+  
   const edges: Edge[] = diagramEdges.map((edge) => ({
     id: edge.id,
     source: edge.from,
     target: edge.to,
     type: "floating",
+    label: edge.label || (edge.role === "yes" ? "はい" : edge.role === "no" ? "いいえ" : undefined),
+    labelStyle: { fontSize: 11, fontWeight: 600 },
+    labelBgStyle: { fill: "#fff", fillOpacity: 0.9 },
     markerEnd: {
       type: MarkerType.ArrowClosed,
       width: 20,
       height: 20,
-      color: getEdgeColor(edge.role),
+      color: isFlowDiagram ? flowEdgeColor : getEdgeColor(edge.role),
     },
     style: {
-      stroke: getEdgeColor(edge.role),
+      stroke: isFlowDiagram ? flowEdgeColor : getEdgeColor(edge.role),
       strokeWidth: 2,
     },
   }));
 
-  // Dagreでレイアウトを計算して適用
-  return getLayoutedElements(nodes, edges, "LR");
+  // レイアウト方向: 機序図はLR、フロー図はTB
+  const direction = isFlowDiagram ? "TB" : "LR";
+  return getLayoutedElements(nodes, edges, direction);
 }
 
 /**
  * グラフの整合性を検証
  */
-function validateGraph(diagram: KijoDiagram): { valid: boolean; warnings: string[] } {
+function validateGraph(diagramStructure: DiagramStructureLocal): { valid: boolean; warnings: string[] } {
   const warnings: string[] = [];
-  const nodes = diagram.diagram.nodes;
-  const edges = diagram.diagram.edges;
+  const nodes = diagramStructure.nodes;
+  const edges = diagramStructure.edges;
 
   // エッジ参照の検証
   const edgeValidation = validateEdgeReferences(nodes, edges);
@@ -214,20 +250,47 @@ function validateGraph(diagram: KijoDiagram): { valid: boolean; warnings: string
  */
 function KijoDiagramViewerInner({ diagram, className, articleContent, articleTitle, onNavigate }: KijoDiagramViewerProps) {
   const [selectedNode, setSelectedNode] = useState<DiagramNode | null>(null);
+  const [activeTab, setActiveTab] = useState<"kijo" | "flow">("kijo");
   const flowRef = useRef<HTMLDivElement>(null);
   const { fitView } = useReactFlow();
 
+  // 統合されたJSONからflow_diagramを取得
+  const hasFlowDiagram = diagram.flow_diagram !== undefined;
+  
+  // 現在表示中の図のノード・エッジを取得
+  const isFlowDiagram = activeTab === "flow" && hasFlowDiagram;
+  
+  // 表示用のダイアグラム構造を取得（メモ化して無限ループを防止）
+  const currentDiagramStructure = useMemo(() => {
+    if (isFlowDiagram && diagram.flow_diagram) {
+      return { nodes: diagram.flow_diagram.nodes, edges: diagram.flow_diagram.edges };
+    }
+    return diagram.diagram;
+  }, [isFlowDiagram, diagram.flow_diagram, diagram.diagram]);
+
   // グラフの検証
-  const validation = useMemo(() => validateGraph(diagram), [diagram]);
+  const validation = useMemo(() => validateGraph(currentDiagramStructure), [currentDiagramStructure]);
 
   // 初期ノード・エッジを計算
   const initialElements = useMemo(
-    () => convertToFlowElements(diagram),
-    [diagram]
+    () => convertToFlowElements(currentDiagramStructure, isFlowDiagram),
+    [currentDiagramStructure, isFlowDiagram]
   );
 
-  const [nodes, , onNodesChange] = useNodesState(initialElements.nodes);
-  const [edges, , onEdgesChange] = useEdgesState(initialElements.edges);
+  const [nodes, setNodes, onNodesChange] = useNodesState(initialElements.nodes);
+  const [edges, setEdges, onEdgesChange] = useEdgesState(initialElements.edges);
+
+  // タブ切り替え時にノード・エッジを更新
+  useEffect(() => {
+    const elements = convertToFlowElements(currentDiagramStructure, isFlowDiagram);
+    setNodes(elements.nodes);
+    setEdges(elements.edges);
+    setSelectedNode(null);
+    // 少し遅延させてfitViewを実行
+    setTimeout(() => {
+      fitView({ padding: 0.2 });
+    }, 50);
+  }, [currentDiagramStructure, isFlowDiagram, setNodes, setEdges, fitView]);
 
   // 選択変更時のハンドラ
   const onSelectionChange: OnSelectionChangeFunc = useCallback(
@@ -247,13 +310,30 @@ function KijoDiagramViewerInner({ diagram, className, articleContent, articleTit
     fitView({ padding: 0.2 });
   }, [fitView]);
 
+  // 使用するノードタイプ
+  const nodeTypes = isFlowDiagram ? flowNodeTypes : kijoNodeTypes;
 
   return (
     <div className={`flex h-full ${className || ""}`}>
       {/* メイン図 */}
       <div className="flex-1 h-full relative" ref={flowRef}>
-        {/* ヘルプ・エクスポートボタン */}
-        <div className="absolute top-2 right-2 z-10 flex gap-1">
+        {/* 左上のタブ切り替え（フロー図がある場合のみ表示） */}
+        {hasFlowDiagram && (
+          <div className="absolute top-2 left-2 z-10">
+            <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "kijo" | "flow")}>
+              <TabsList className="h-8">
+                <TabsTrigger value="kijo" className="text-xs px-3 h-7">
+                  機序図
+                </TabsTrigger>
+                <TabsTrigger value="flow" className="text-xs px-3 h-7">
+                  適合判定フロー図
+                </TabsTrigger>
+              </TabsList>
+            </Tabs>
+          </div>
+        )}
+        {/* 右上のボタン */}
+        <div className="absolute top-2 right-2 z-10 flex items-center gap-1">
           <HelpButton />
           <ExportButton
             diagram={diagram}
@@ -295,7 +375,6 @@ function KijoDiagramViewerInner({ diagram, className, articleContent, articleTit
 
       {/* 詳細パネル */}
       <div className="w-80 border-l bg-white overflow-y-auto">
-        {/* 選択ノード詳細 */}
         <NodeDetailPanel node={selectedNode} onNavigate={onNavigate} />
       </div>
     </div>

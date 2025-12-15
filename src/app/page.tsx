@@ -289,11 +289,6 @@ function HomeContent() {
                               対象主体: {diagram.page_title.target_subject}
                             </div>
                           )}
-                          {diagram.page_title.description && (
-                            <div className="text-sm text-muted-foreground mt-1">
-                              {diagram.page_title.description}
-                            </div>
-                          )}
                         </div>
                       ) : (
                         <CardTitle>審査機序図</CardTitle>
