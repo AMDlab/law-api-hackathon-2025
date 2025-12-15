@@ -127,16 +127,22 @@ export function HelpButton() {
                 <h3 className="font-semibold mb-3">矢印（エッジ）</h3>
                 <div className="space-y-2">
                   <div className="flex items-center gap-3">
-                    <div className="w-16 h-0.5 bg-gray-500 relative">
-                      <div className="absolute right-0 top-1/2 -translate-y-1/2 w-0 h-0 border-l-4 border-l-gray-500 border-y-4 border-y-transparent"></div>
+                    <div className="w-16 h-0.5 bg-blue-500 relative">
+                      <div className="absolute right-0 top-1/2 -translate-y-1/2 w-0 h-0 border-l-4 border-l-blue-500 border-y-4 border-y-transparent"></div>
                     </div>
-                    <span className="text-sm">通常の入力（処理への入力）</span>
+                    <span className="text-sm">入力（[情報]→[処理]へのインプット）</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="w-16 h-0.5 bg-red-500 relative">
+                      <div className="absolute right-0 top-1/2 -translate-y-1/2 w-0 h-0 border-l-4 border-l-red-500 border-y-4 border-y-transparent"></div>
+                    </div>
+                    <span className="text-sm">出力（[処理]→[情報]へのアウトプット）</span>
                   </div>
                   <div className="flex items-center gap-3">
                     <div className="w-16 h-0.5 bg-green-500 relative">
                       <div className="absolute right-0 top-1/2 -translate-y-1/2 w-0 h-0 border-l-4 border-l-green-500 border-y-4 border-y-transparent"></div>
                     </div>
-                    <span className="text-sm">補助入力（参照情報）</span>
+                    <span className="text-sm">裏付け情報（整合確認の補助入力）</span>
                   </div>
                 </div>
               </section>

@@ -22,7 +22,7 @@ export function isValidArticleId(id: string): boolean {
 }
 
 // ========================================
-// Zod スキーマ定義
+// Zod スキーマ定義 (v3形式)
 // ========================================
 
 /** 性質の型 */
@@ -68,15 +68,41 @@ export const SoftwareFunctionCategorySchema = z.enum([
 /** ページタイトル */
 export const PageTitleSchema = z.object({
   title: z.string().min(1),
-  targetSubject: z.string().optional(),
+  target_subject: z.string().optional(),
   description: z.string().optional(),
-  relatedArticles: z.array(z.string()).optional(),
+});
+
+/** 法令参照 */
+export const LegalRefSchema = z.object({
+  law_id: z.string().min(1),
+  law_type: z.enum(["act", "order", "regulation", "notice"]),
+  law_name: z.string().min(1),
+  law_abbrev: z.string().min(1),
+  article: z.string().min(1),
+  paragraph: z.string().nullable().optional(),
+  item: z.string().nullable().optional(),
+});
+
+/** 関連法令 */
+export const RelatedLawSchema = z.object({
+  law_id: z.string().min(1),
+  law_name: z.string().min(1),
+  law_type: z.enum(["act", "order", "regulation", "notice"]),
+  relationship: z.enum(["delegates_to", "delegated_from", "defines_detail", "references", "supersedes"]),
+  articles: z.array(z.string()).optional(),
+  description: z.string().optional(),
 });
 
 /** ソフトウェア機能 */
 export const SoftwareFunctionSchema = z.object({
   category: SoftwareFunctionCategorySchema,
   description: z.string().optional(),
+});
+
+/** 委任先法令の要件詳細 */
+export const DelegatedRequirementSchema = z.object({
+  article_ref: z.string().min(1),
+  requirement: z.string().min(1),
 });
 
 /** [情報]ノード */
@@ -88,11 +114,13 @@ export const InformationNodeSchema = z.object({
   subject: z.string().optional(),
   plurality: PluralitySchema.optional(),
   property: z.string().optional(),
-  propertyType: PropertyTypeSchema.optional(),
+  property_type: PropertyTypeSchema.optional(),
+  unit: z.string().optional(),
   description: z.string().optional(),
-  relatedArticles: z.array(z.string()).optional(),
+  related_articles: z.array(z.string()).optional(),
+  delegated_requirements: z.array(DelegatedRequirementSchema).optional(),
   remarks: z.string().optional(),
-  mvdRelated: z.string().optional(),
+  mvd_related: z.string().optional(),
 });
 
 /** [処理]ノード */
@@ -100,15 +128,15 @@ export const ProcessNodeSchema = z.object({
   id: z.string().min(1),
   type: z.literal("process"),
   title: z.string().min(1),
-  processType: ProcessTypeSchema,
-  targetSubject: z.string().optional(),
+  process_type: ProcessTypeSchema,
+  target_subject: z.string().optional(),
   iteration: IterationSchema.optional(),
   description: z.string().optional(),
-  relatedArticles: z.array(z.string()).optional(),
+  related_articles: z.array(z.string()).optional(),
   remarks: z.string().optional(),
-  logicExpression: z.string().optional(),
-  softwareFunctions: z.array(SoftwareFunctionSchema).max(3).optional(),
-  subDiagramRef: z.string().optional(),
+  logic_expression: z.string().optional(),
+  software_functions: z.array(SoftwareFunctionSchema).max(3).optional(),
+  sub_diagram_ref: z.string().optional(),
 });
 
 /** ノード（情報または処理） */
@@ -127,21 +155,92 @@ export const EdgeSchema = z.object({
 
 /** メタデータ */
 export const DiagramMetadataSchema = z.object({
-  createdAt: z.string().optional(),
-  updatedAt: z.string().optional(),
+  created_at: z.string().optional(),
+  updated_at: z.string().optional(),
   author: z.string().optional(),
   generator: z.string().optional(),
-  lawId: z.string().optional(),
-  lawName: z.string().optional(),
+  law_id: z.string().optional(),
+  law_name: z.string().optional(),
+  checklist_ref: z.string().optional(),
+  source: z.string().optional(),
 });
 
-/** 審査機序図 */
-export const KijoDiagramSchema = z.object({
-  id: z.string().min(1),
-  version: z.string().optional(),
-  pageTitle: PageTitleSchema,
+/** 図 */
+export const DiagramSchema = z.object({
   nodes: z.array(DiagramNodeSchema).min(1),
   edges: z.array(EdgeSchema),
+});
+
+/** 適合判定条件（再帰的構造に対応） */
+const BaseConditionSchema = z.object({
+  id: z.string().optional(),
+  var: z.string().optional(),
+  desc: z.string().optional(),
+  operator: z.string().optional(),
+  value: z.union([z.boolean(), z.number(), z.string(), z.array(z.string())]).optional(),
+  unit: z.string().optional(),
+  property_type: z.string().optional(),
+});
+
+// 再帰的なconditionsを含む条件
+type Condition = z.infer<typeof BaseConditionSchema> & {
+  conditions?: Condition[];
+};
+
+const ConditionSchema: z.ZodType<Condition> = BaseConditionSchema.extend({
+  conditions: z.lazy(() => z.array(ConditionSchema)).optional(),
+});
+
+/** 適用範囲条件 */
+export const ScopeConditionSchema = z.object({
+  operator: z.string(),
+  value: z.boolean().optional(),
+  conditions: z.array(ConditionSchema).optional(),
+  note: z.string().optional(),
+});
+
+/** 判定ルールの左辺・右辺 */
+const JudgmentOperandSchema = z.object({
+  var: z.string().optional(),
+  val: z.union([z.number(), z.boolean(), z.string()]).optional(),
+  desc: z.string().optional(),
+  property_type: z.string().optional(),
+  unit: z.string().optional(),
+});
+
+/** 判定ルール */
+export const JudgmentRuleSchema = z.object({
+  operator: z.string(),
+  lhs: JudgmentOperandSchema.optional(),
+  rhs: JudgmentOperandSchema.optional(),
+  conditions: z.array(ConditionSchema).optional(),
+});
+
+/** 例外条件 */
+export const ExceptionsSchema = z.object({
+  operator: z.string(),
+  conditions: z.array(ConditionSchema).optional(),
+  effect: z.string(),
+}).nullable();
+
+/** 適合判定ロジック */
+export const ComplianceLogicSchema = z.object({
+  scope_condition: ScopeConditionSchema.optional(),
+  judgment_rule: JudgmentRuleSchema.optional(),
+  exceptions: ExceptionsSchema.optional(),
+});
+
+/** 審査機序図 (v3) */
+export const KijoDiagramSchema = z.object({
+  id: z.string().min(1),
+  version: z.string(),
+  page_title: PageTitleSchema,
+  legal_ref: LegalRefSchema,
+  labels: z.array(z.string()).optional(),
+  text_raw: z.string().optional(),
+  compliance_logic: ComplianceLogicSchema.optional(),
+  diagram: DiagramSchema,
+  related_laws: z.array(RelatedLawSchema).optional(),
   metadata: DiagramMetadataSchema.optional(),
 });
 

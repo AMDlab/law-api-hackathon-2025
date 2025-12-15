@@ -1,126 +1,445 @@
 {
-  "id": "kijo-law-A53_P1",
-  "version": "1.0.0",
-  "pageTitle": {
-    "title": "建蔽率の制限",
-    "targetSubject": "建築物",
-    "description": "建築物の建築面積の敷地面積に対する割合（建蔽率）は、用途地域の区分に従い、定められた数値を超えてはならない",
-    "relatedArticles": ["法::A53:P1"]
+  "id": "CHK-BSL-A53-P1",
+  "version": "3.0.0",
+
+  "page_title": {
+    "title": "建蔽率制限判定（3項緩和含む）",
+    "target_subject": "建築物",
+    "description": "建築物の建蔽率が用途地域ごとに定められた上限値（3項緩和適用後）を超えていないかを判定する"
   },
-  "nodes": [
-    {
-      "id": "info-001",
-      "type": "information",
-      "title": "建築物",
-      "subject": "対象",
-      "property": "判定対象となる建築物",
-      "propertyType": "set_definition",
-      "description": "建築しようとする建築物"
+
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "53",
+    "paragraph": "1",
+    "item": null
+  },
+
+  "labels": ["集団規定", "形態制限", "建蔽率"],
+
+  "text_raw": "建築物の建築面積（同一敷地内に二以上の建築物がある場合においては、その建築面積の合計）の敷地面積に対する割合（以下「建蔽率」という。）は、次の各号に掲げる区分に従い、当該各号に定める数値を超えてはならない。",
+
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "ALWAYS",
+      "value": true
     },
-    {
-      "id": "info-002",
-      "type": "information",
-      "title": "建築面積",
-      "symbol": "B",
-      "subject": "建築物",
-      "property": "建築面積",
-      "propertyType": "numeric",
-      "description": "建築物の建築面積（同一敷地内に二以上の建築物がある場合はその合計）（㎡）"
+    "judgment_rule": {
+      "operator": "AND_GLOBAL",
+      "conditions": [
+        {
+          "id": "cond-001",
+          "operator": "LTE",
+          "lhs": { "var": "building_coverage_ratio", "desc": "建蔽率", "property_type": "numeric" },
+          "rhs": { "var": "max_coverage_ratio_after_relaxation", "desc": "緩和後建蔽率上限", "property_type": "numeric" }
+        }
+      ]
     },
+    "exceptions": null
+  },
+
+  "diagram": {
+    "nodes": [
+      {
+        "id": "info-001",
+        "type": "information",
+        "title": "敷地面積",
+        "symbol": "S",
+        "subject": "敷地",
+        "plurality": "single",
+        "property": "敷地面積",
+        "property_type": "numeric",
+        "unit": "㎡",
+        "description": "敷地の面積",
+        "related_articles": ["法::A53:P1"]
+      },
+      {
+        "id": "info-002",
+        "type": "information",
+        "title": "建築面積",
+        "symbol": "B",
+        "subject": "建築物",
+        "plurality": "single",
+        "property": "建築面積",
+        "property_type": "numeric",
+        "unit": "㎡",
+        "description": "建築物の建築面積（同一敷地内に二以上の建築物がある場合はその合計）",
+        "related_articles": ["法::A53:P1", "令::A2:P1:I2"]
+      },
+      {
+        "id": "info-003",
+        "type": "information",
+        "title": "建蔽率",
+        "symbol": "R",
+        "subject": "敷地",
+        "plurality": "single",
+        "property": "建蔽率",
+        "property_type": "numeric",
+        "unit": "%",
+        "description": "建築面積の敷地面積に対する割合（B / S × 100）",
+        "related_articles": ["法::A53:P1"]
+      },
+      {
+        "id": "info-004",
+        "type": "information",
+        "title": "用途地域",
+        "symbol": "Z",
+        "subject": "敷地",
+        "plurality": "single",
+        "property": "用途地域",
+        "property_type": "classification",
+        "description": "敷地が属する用途地域の区分",
+        "related_articles": ["法::A53:P1"]
+      },
+      {
+        "id": "info-005",
+        "type": "information",
+        "title": "基準建蔽率",
+        "symbol": "R0",
+        "subject": "敷地",
+        "plurality": "single",
+        "property": "基準建蔽率",
+        "property_type": "numeric",
+        "unit": "%",
+        "description": "1項各号に定められた建蔽率の基準値（緩和前）",
+        "related_articles": ["法::A53:P1"],
+        "delegated_requirements": [
+          {
+            "article_ref": "法::A53:P1:I1",
+            "requirement": "低層住居専用地域・中高層住居専用地域・田園住居地域・工業専用地域：30%,40%,50%,60%"
+          },
+          {
+            "article_ref": "法::A53:P1:I2",
+            "requirement": "住居地域・準住居地域・準工業地域：50%,60%,80%"
+          },
+          {
+            "article_ref": "法::A53:P1:I3",
+            "requirement": "近隣商業地域：60%,80%"
+          },
+          {
+            "article_ref": "法::A53:P1:I4",
+            "requirement": "商業地域：80%"
+          },
+          {
+            "article_ref": "法::A53:P1:I5",
+            "requirement": "工業地域：50%,60%"
+          },
+          {
+            "article_ref": "法::A53:P1:I6",
+            "requirement": "用途地域指定なし：30%,40%,50%,60%,70%"
+          }
+        ]
+      },
+      {
+        "id": "info-006",
+        "type": "information",
+        "title": "防火地域区分",
+        "symbol": "F",
+        "subject": "敷地",
+        "plurality": "single",
+        "property": "防火地域区分",
+        "property_type": "classification",
+        "description": "敷地が属する防火地域の区分（防火地域/準防火地域/指定なし）",
+        "related_articles": ["法::A53:P3:I1"]
+      },
+      {
+        "id": "info-007",
+        "type": "information",
+        "title": "建築物構造区分",
+        "symbol": "C",
+        "subject": "建築物",
+        "plurality": "single",
+        "property": "構造区分",
+        "property_type": "classification",
+        "description": "建築物の構造区分（耐火建築物等/準耐火建築物等/その他）",
+        "related_articles": ["法::A53:P3:I1"]
+      },
+      {
+        "id": "info-008",
+        "type": "information",
+        "title": "3項1号該当",
+        "symbol": "Q1",
+        "subject": "建築物",
+        "plurality": "single",
+        "property": "3項1号該当",
+        "property_type": "proposition",
+        "description": "53条3項1号に該当するか（防火地域内の耐火建築物等、または準防火地域内の耐火・準耐火建築物等）",
+        "related_articles": ["法::A53:P3:I1"]
+      },
+      {
+        "id": "info-009",
+        "type": "information",
+        "title": "角地該当",
+        "symbol": "Q2",
+        "subject": "敷地",
+        "plurality": "single",
+        "property": "3項2号該当",
+        "property_type": "proposition",
+        "description": "53条3項2号に該当するか（街区の角にある敷地等で特定行政庁が指定するもの）",
+        "related_articles": ["法::A53:P3:I2"]
+      },
+      {
+        "id": "info-010",
+        "type": "information",
+        "title": "緩和率",
+        "symbol": "D",
+        "subject": "建築物",
+        "plurality": "single",
+        "property": "緩和率",
+        "property_type": "numeric",
+        "unit": "%",
+        "description": "3項による緩和率（0%/10%/20%）",
+        "related_articles": ["法::A53:P3"]
+      },
+      {
+        "id": "info-011",
+        "type": "information",
+        "title": "建蔽率上限",
+        "symbol": "Rmax",
+        "subject": "敷地",
+        "plurality": "single",
+        "property": "建蔽率上限",
+        "property_type": "numeric",
+        "unit": "%",
+        "description": "緩和適用後の建蔽率上限（R0 + D）",
+        "related_articles": ["法::A53:P1", "法::A53:P3"]
+      },
+      {
+        "id": "info-012",
+        "type": "information",
+        "title": "法53条適否",
+        "symbol": "J",
+        "subject": "建築物",
+        "plurality": "single",
+        "property": "法53条1項への適合",
+        "property_type": "proposition",
+        "description": "建蔽率が上限値以下であるか",
+        "related_articles": ["法::A53:P1"]
+      },
+      {
+        "id": "proc-001",
+        "type": "process",
+        "title": "建蔽率算定",
+        "process_type": "mechanical",
+        "target_subject": "敷地",
+        "iteration": "single",
+        "description": "建蔽率を算定する（建築面積 ÷ 敷地面積 × 100）",
+        "logic_expression": "R = B / S × 100",
+        "related_articles": ["法::A53:P1"],
+        "software_functions": [
+          {
+            "category": "program_processing",
+            "description": "建築面積 ÷ 敷地面積 × 100 の計算"
+          }
+        ]
+      },
+      {
+        "id": "proc-002",
+        "type": "process",
+        "title": "用途地域特定",
+        "process_type": "human_judgment",
+        "target_subject": "敷地",
+        "iteration": "single",
+        "description": "敷地が属する用途地域を特定する",
+        "related_articles": ["法::A53:P1"],
+        "software_functions": [
+          {
+            "category": "graphic_display",
+            "description": "敷地位置と用途地域図の重畳表示"
+          },
+          {
+            "category": "user_input",
+            "description": "用途地域の選択入力"
+          }
+        ]
+      },
+      {
+        "id": "proc-003",
+        "type": "process",
+        "title": "基準建蔽率特定",
+        "process_type": "human_judgment",
+        "target_subject": "敷地",
+        "iteration": "single",
+        "description": "用途地域に応じて1項各号に定められた基準建蔽率を特定する",
+        "related_articles": ["法::A53:P1"],
+        "software_functions": [
+          {
+            "category": "text_display",
+            "description": "用途地域ごとの建蔽率選択肢を表示"
+          },
+          {
+            "category": "user_input",
+            "description": "都市計画で定められた建蔽率の入力"
+          }
+        ]
+      },
+      {
+        "id": "proc-004",
+        "type": "process",
+        "title": "防火地域特定",
+        "process_type": "human_judgment",
+        "target_subject": "敷地",
+        "iteration": "single",
+        "description": "敷地が属する防火地域区分を特定する",
+        "related_articles": ["法::A53:P3:I1"],
+        "software_functions": [
+          {
+            "category": "graphic_display",
+            "description": "敷地位置と防火地域図の重畳表示"
+          },
+          {
+            "category": "user_input",
+            "description": "防火地域区分の選択入力"
+          }
+        ]
+      },
+      {
+        "id": "proc-005",
+        "type": "process",
+        "title": "建築物構造特定",
+        "process_type": "human_judgment",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "建築物の構造区分（耐火建築物等/準耐火建築物等/その他）を特定する",
+        "related_articles": ["法::A53:P3:I1"],
+        "software_functions": [
+          {
+            "category": "user_input",
+            "description": "構造区分の選択入力"
+          }
+        ]
+      },
+      {
+        "id": "proc-006",
+        "type": "process",
+        "title": "3項1号該当判定",
+        "process_type": "mechanical",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "53条3項1号に該当するかを判定する",
+        "logic_expression": "Q1 = (F=防火地域 AND C=耐火建築物等) OR (F=準防火地域 AND (C=耐火建築物等 OR C=準耐火建築物等))",
+        "related_articles": ["法::A53:P3:I1"],
+        "software_functions": [
+          {
+            "category": "program_processing",
+            "description": "防火地域区分と構造区分の組み合わせ判定"
+          }
+        ]
+      },
+      {
+        "id": "proc-007",
+        "type": "process",
+        "title": "角地判定",
+        "process_type": "human_judgment",
+        "target_subject": "敷地",
+        "iteration": "single",
+        "description": "53条3項2号に該当するか（角地等で特定行政庁が指定するもの）を判定する",
+        "related_articles": ["法::A53:P3:I2"],
+        "software_functions": [
+          {
+            "category": "graphic_display",
+            "description": "敷地と道路の位置関係表示"
+          },
+          {
+            "category": "user_input",
+            "description": "角地該当の判定結果入力"
+          }
+        ]
+      },
+      {
+        "id": "proc-008",
+        "type": "process",
+        "title": "緩和率算定",
+        "process_type": "mechanical",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "3項による緩和率を算定する",
+        "logic_expression": "D = (Q1 AND Q2) ? 20% : (Q1 OR Q2) ? 10% : 0%",
+        "related_articles": ["法::A53:P3"],
+        "software_functions": [
+          {
+            "category": "program_processing",
+            "description": "1号・2号該当状況から緩和率を算定"
+          }
+        ]
+      },
+      {
+        "id": "proc-009",
+        "type": "process",
+        "title": "建蔽率上限算定",
+        "process_type": "mechanical",
+        "target_subject": "敷地",
+        "iteration": "single",
+        "description": "緩和適用後の建蔽率上限を算定する",
+        "logic_expression": "Rmax = R0 + D",
+        "related_articles": ["法::A53:P1", "法::A53:P3"],
+        "software_functions": [
+          {
+            "category": "program_processing",
+            "description": "基準建蔽率 + 緩和率 の計算"
+          }
+        ]
+      },
+      {
+        "id": "proc-010",
+        "type": "process",
+        "title": "建蔽率制限判定",
+        "process_type": "mechanical",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "建蔽率が上限値を超えていないかを判定する",
+        "logic_expression": "J = (R <= Rmax)",
+        "related_articles": ["法::A53:P1"],
+        "software_functions": [
+          {
+            "category": "program_processing",
+            "description": "建蔽率 <= 建蔽率上限 の比較"
+          }
+        ]
+      }
+    ],
+    "edges": [
+      {"id": "e-001", "from": "info-001", "to": "proc-001", "role": "input"},
+      {"id": "e-002", "from": "info-002", "to": "proc-001", "role": "input"},
+      {"id": "e-003", "from": "proc-001", "to": "info-003", "role": "output"},
+      {"id": "e-004", "from": "proc-002", "to": "info-004", "role": "output"},
+      {"id": "e-005", "from": "info-004", "to": "proc-003", "role": "input"},
+      {"id": "e-006", "from": "proc-003", "to": "info-005", "role": "output"},
+      {"id": "e-007", "from": "proc-004", "to": "info-006", "role": "output"},
+      {"id": "e-008", "from": "proc-005", "to": "info-007", "role": "output"},
+      {"id": "e-009", "from": "info-006", "to": "proc-006", "role": "input"},
+      {"id": "e-010", "from": "info-007", "to": "proc-006", "role": "input"},
+      {"id": "e-011", "from": "proc-006", "to": "info-008", "role": "output"},
+      {"id": "e-012", "from": "proc-007", "to": "info-009", "role": "output"},
+      {"id": "e-013", "from": "info-008", "to": "proc-008", "role": "input"},
+      {"id": "e-014", "from": "info-009", "to": "proc-008", "role": "input"},
+      {"id": "e-015", "from": "proc-008", "to": "info-010", "role": "output"},
+      {"id": "e-016", "from": "info-005", "to": "proc-009", "role": "input"},
+      {"id": "e-017", "from": "info-010", "to": "proc-009", "role": "input"},
+      {"id": "e-018", "from": "proc-009", "to": "info-011", "role": "output"},
+      {"id": "e-019", "from": "info-003", "to": "proc-010", "role": "input"},
+      {"id": "e-020", "from": "info-011", "to": "proc-010", "role": "input"},
+      {"id": "e-021", "from": "proc-010", "to": "info-012", "role": "output"}
+    ]
+  },
+
+  "related_laws": [
     {
-      "id": "info-003",
-      "type": "information",
-      "title": "敷地面積",
-      "symbol": "A",
-      "subject": "敷地",
-      "property": "敷地面積",
-      "propertyType": "numeric",
-      "description": "建築物の敷地面積（㎡）"
-    },
-    {
-      "id": "info-004",
-      "type": "information",
-      "title": "建蔽率",
-      "symbol": "C",
-      "subject": "建築物",
-      "property": "建蔽率",
-      "propertyType": "numeric",
-      "description": "建築面積の敷地面積に対する割合（B/A）"
-    },
-    {
-      "id": "info-005",
-      "type": "information",
-      "title": "用途地域",
-      "symbol": "Z",
-      "subject": "敷地",
-      "property": "用途地域",
-      "propertyType": "classification",
-      "description": "建築物の敷地が属する用途地域"
-    },
-    {
-      "id": "info-006",
-      "type": "information",
-      "title": "指定建蔽率",
-      "symbol": "Cmax",
-      "subject": "敷地",
-      "property": "都市計画で定められた建蔽率の限度",
-      "propertyType": "numeric",
-      "description": "用途地域の区分に応じて都市計画において定められた建蔽率の限度"
-    },
-    {
-      "id": "info-007",
-      "type": "information",
-      "title": "適合判定",
-      "symbol": "J",
-      "subject": "建築物",
-      "property": "法53条1項への適合",
-      "propertyType": "proposition",
-      "description": "建蔽率の制限を遵守しているか否か"
-    },
-    {
-      "id": "proc-001",
-      "type": "process",
-      "title": "建蔽率算出",
-      "processType": "mechanical",
-      "targetSubject": "建築物",
-      "description": "建蔽率を算出する",
-      "logicExpression": "C = B / A"
-    },
-    {
-      "id": "proc-002",
-      "type": "process",
-      "title": "指定建蔽率特定",
-      "processType": "sub_diagram_reference",
-      "targetSubject": "敷地",
-      "description": "用途地域の区分に応じた指定建蔽率を特定",
-      "relatedArticles": ["法::A53:P1:I1", "法::A53:P1:I2", "法::A53:P1:I3", "法::A53:P1:I4", "法::A53:P1:I5", "法::A53:P1:I6"]
-    },
-    {
-      "id": "proc-003",
-      "type": "process",
-      "title": "適合判定",
-      "processType": "mechanical",
-      "targetSubject": "建築物",
-      "description": "建蔽率が指定建蔽率以下かを判定",
-      "logicExpression": "J = (C <= Cmax)",
-      "relatedArticles": ["法::A53:P1"]
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "defines_detail",
+      "articles": ["A2:P1:I2"],
+      "description": "建築面積の定義（令第2条第1項第2号）"
     }
   ],
-  "edges": [
-    { "id": "edge-001", "from": "info-001", "to": "proc-001", "role": "input" },
-    { "id": "edge-002", "from": "info-002", "to": "proc-001", "role": "input" },
-    { "id": "edge-003", "from": "info-003", "to": "proc-001", "role": "input" },
-    { "id": "edge-004", "from": "proc-001", "to": "info-004", "role": "output" },
-    { "id": "edge-005", "from": "info-005", "to": "proc-002", "role": "input" },
-    { "id": "edge-006", "from": "proc-002", "to": "info-006", "role": "output" },
-    { "id": "edge-007", "from": "info-004", "to": "proc-003", "role": "input" },
-    { "id": "edge-008", "from": "info-006", "to": "proc-003", "role": "input" },
-    { "id": "edge-009", "from": "proc-003", "to": "info-007", "role": "output" }
-  ],
+
   "metadata": {
-    "createdAt": "2025-12-10T00:00:00Z",
-    "generator": "law-mcp",
-    "lawId": "325AC0000000201",
-    "lawName": "建築基準法"
+    "created_at": "2025-12-15T18:30:00+09:00",
+    "generator": "multi-agent-v4",
+    "notes": "本図は53条1項+3項の判定。2項（敷地が複数地域にわたる場合の加重平均）、6項（適用除外）は別図で扱う"
   }
 }

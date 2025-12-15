@@ -15,6 +15,28 @@ interface ProcessNodeProps {
 }
 
 /**
+ * 関連条項を短い表示形式に変換
+ * "法::A22:P1" → "法22条1項"
+ */
+function formatRelatedArticle(article: string): string {
+  const match = article.match(/^([^:]+)::A([^:]+)(?::P(\d+))?(?::I(\d+))?$/);
+  if (!match) return article;
+
+  const [, lawAbbrev, articleNum, paragraphNum, itemNum] = match;
+
+  // 条番号の表示（例: 109_9 → 109条の9）
+  const articleDisplay = articleNum.includes("_")
+    ? articleNum.replace(/_/g, "条の")
+    : articleNum + "条";
+
+  let display = `${lawAbbrev}${articleDisplay}`;
+  if (paragraphNum) display += `${paragraphNum}項`;
+  if (itemNum) display += `${itemNum}号`;
+
+  return display;
+}
+
+/**
  * [処理]ノード - 角丸矩形で表示
  */
 export const ProcessNode = memo(function ProcessNode({
@@ -22,40 +44,41 @@ export const ProcessNode = memo(function ProcessNode({
   selected,
 }: ProcessNodeProps) {
   const { node } = data;
-  const colorClass = getProcessTailwindClass(node.processType);
+  const colorClass = getProcessTailwindClass(node.process_type);
 
   return (
     <div
       className={`
-        px-4 py-3 min-w-[120px] max-w-[200px]
+        px-4 py-2 h-[60px]
+        flex flex-col justify-center
         border-2 rounded-xl
         shadow-sm
         transition-all
+        whitespace-nowrap
         ${colorClass}
         ${selected ? "ring-2 ring-blue-500 ring-offset-2" : ""}
       `}
     >
-      <Handle
-        type="target"
-        position={Position.Left}
-        className="w-3 h-3 !bg-gray-500"
-      />
+      <Handle type="target" position={Position.Left} className="!opacity-0" />
 
       {/* タイトル */}
       <div className="font-medium text-sm text-center text-gray-800">
         {node.title}
       </div>
 
+      {/* 関連条項（あれば表示） */}
+      {node.related_articles && node.related_articles.length > 0 && (
+        <div className="mt-1 text-xs text-gray-500 text-center">
+          {node.related_articles.map(formatRelatedArticle).join(", ")}
+        </div>
+      )}
+
       {/* 反復マーク */}
       {node.iteration === "iterative" && (
         <div className="absolute -top-1 -right-1 w-4 h-4 bg-gray-200 border border-gray-400 rounded-full" />
       )}
 
-      <Handle
-        type="source"
-        position={Position.Right}
-        className="w-3 h-3 !bg-gray-500"
-      />
+      <Handle type="source" position={Position.Right} className="!opacity-0" />
     </div>
   );
 });

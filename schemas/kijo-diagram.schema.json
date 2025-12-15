@@ -1,38 +1,48 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://example.com/kijo-diagram.schema.json",
-  "title": "審査機序図スキーマ",
-  "description": "buildingSMART Japan 審査機序図作成手引書に基づく機序図データ形式",
+  "title": "審査機序図スキーマ v3",
+  "description": "buildingSMART Japan 審査機序図作成手引書に基づく機序図データ形式 (v3.0.0)",
   "type": "object",
-  "required": ["id", "pageTitle", "nodes", "edges"],
+  "required": ["id", "version", "page_title", "legal_ref", "diagram"],
   "properties": {
     "id": {
       "type": "string",
-      "description": "機序図の一意識別子"
+      "description": "機序図の一意識別子（例: CHK-BSL-A22-P1）"
     },
     "version": {
       "type": "string",
       "description": "スキーマバージョン",
-      "default": "1.0.0"
+      "default": "3.0.0"
     },
-    "pageTitle": {
+    "page_title": {
       "$ref": "#/definitions/PageTitle"
     },
-    "nodes": {
+    "legal_ref": {
+      "$ref": "#/definitions/LegalRef"
+    },
+    "labels": {
       "type": "array",
-      "description": "[情報]と[処理]のノード一覧",
+      "description": "ラベル（単体規定/集団規定、カテゴリ等）",
       "items": {
-        "oneOf": [
-          { "$ref": "#/definitions/InformationNode" },
-          { "$ref": "#/definitions/ProcessNode" }
-        ]
+        "type": "string"
       }
     },
-    "edges": {
+    "text_raw": {
+      "type": "string",
+      "description": "条文の原文テキスト"
+    },
+    "compliance_logic": {
+      "$ref": "#/definitions/ComplianceLogic"
+    },
+    "diagram": {
+      "$ref": "#/definitions/Diagram"
+    },
+    "related_laws": {
       "type": "array",
-      "description": "ノード間の接続（矢印）",
+      "description": "関連法令（法→令→規則の参照関係）",
       "items": {
-        "$ref": "#/definitions/Edge"
+        "$ref": "#/definitions/RelatedLaw"
       }
     },
     "metadata": {
@@ -49,19 +59,141 @@
           "type": "string",
           "description": "図形上に表示するタイトル"
         },
-        "targetSubject": {
+        "target_subject": {
           "type": "string",
           "description": "ページ全体が対象とする主体"
         },
         "description": {
           "type": "string",
           "description": "ページ全体の処理内容"
+        }
+      }
+    },
+    "LegalRef": {
+      "type": "object",
+      "description": "法令参照情報",
+      "required": ["law_id", "law_type", "law_name", "law_abbrev", "article"],
+      "properties": {
+        "law_id": {
+          "type": "string",
+          "description": "法令ID（e-Gov法令API準拠）"
         },
-        "relatedArticles": {
+        "law_type": {
+          "type": "string",
+          "description": "法令種別",
+          "enum": ["act", "order", "regulation", "notice"]
+        },
+        "law_name": {
+          "type": "string",
+          "description": "法令名"
+        },
+        "law_abbrev": {
+          "type": "string",
+          "description": "法令略称（法、令、規則等）"
+        },
+        "article": {
+          "type": "string",
+          "description": "条番号"
+        },
+        "paragraph": {
+          "type": ["string", "null"],
+          "description": "項番号"
+        },
+        "item": {
+          "type": ["string", "null"],
+          "description": "号番号"
+        }
+      }
+    },
+    "ComplianceLogic": {
+      "type": "object",
+      "description": "適合判定ロジック",
+      "properties": {
+        "scope_condition": {
+          "type": "object",
+          "description": "適用範囲条件",
+          "properties": {
+            "operator": {
+              "type": "string",
+              "description": "論理演算子"
+            },
+            "value": {
+              "type": "boolean"
+            },
+            "conditions": {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
+            },
+            "note": {
+              "type": "string"
+            }
+          }
+        },
+        "judgment_rule": {
+          "type": "object",
+          "description": "判定ルール",
+          "properties": {
+            "operator": {
+              "type": "string"
+            },
+            "lhs": {
+              "type": "object"
+            },
+            "rhs": {
+              "type": "object"
+            },
+            "conditions": {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "exceptions": {
+          "type": ["object", "null"],
+          "description": "例外条件（ただし書き等）",
+          "properties": {
+            "operator": {
+              "type": "string"
+            },
+            "conditions": {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
+            },
+            "effect": {
+              "type": "string",
+              "description": "例外の効果（EXEMPT等）"
+            }
+          }
+        }
+      }
+    },
+    "Diagram": {
+      "type": "object",
+      "description": "機序図のノードとエッジ",
+      "required": ["nodes", "edges"],
+      "properties": {
+        "nodes": {
           "type": "array",
-          "description": "関連条項（法令識別文字列:条識別文字列:項識別文字列:号識別文字列）",
+          "description": "[情報]と[処理]のノード一覧",
           "items": {
-            "type": "string"
+            "oneOf": [
+              { "$ref": "#/definitions/InformationNode" },
+              { "$ref": "#/definitions/ProcessNode" }
+            ]
+          },
+          "minItems": 1
+        },
+        "edges": {
+          "type": "array",
+          "description": "ノード間の接続（矢印）",
+          "items": {
+            "$ref": "#/definitions/Edge"
           }
         }
       }
@@ -102,7 +234,7 @@
           "type": "string",
           "description": "主体がもつ性質"
         },
-        "propertyType": {
+        "property_type": {
           "type": "string",
           "description": "性質の型",
           "enum": [
@@ -118,31 +250,57 @@
             "visual"
           ]
         },
+        "unit": {
+          "type": "string",
+          "description": "数値の単位（property_type=numericの場合）"
+        },
         "description": {
           "type": "string",
           "description": "情報内容の説明"
         },
-        "relatedArticles": {
+        "related_articles": {
           "type": "array",
-          "description": "関連法令条項",
+          "description": "関連法令条項（例: 令::A109_9）",
           "items": {
             "type": "string"
+          }
+        },
+        "delegated_requirements": {
+          "type": "array",
+          "description": "委任先法令の要件詳細（号単位）",
+          "items": {
+            "$ref": "#/definitions/DelegatedRequirement"
           }
         },
         "remarks": {
           "type": "string",
           "description": "備考"
         },
-        "mvdRelated": {
+        "mvd_related": {
           "type": "string",
           "description": "IFC適用クラスやPropertySet情報"
+        }
+      }
+    },
+    "DelegatedRequirement": {
+      "type": "object",
+      "description": "委任先法令の要件詳細",
+      "required": ["article_ref", "requirement"],
+      "properties": {
+        "article_ref": {
+          "type": "string",
+          "description": "条項参照（例: 令::A109_9:P1:I1）"
+        },
+        "requirement": {
+          "type": "string",
+          "description": "要件の内容"
         }
       }
     },
     "ProcessNode": {
       "type": "object",
       "description": "[処理]ノード - 情報を処理して別の情報を導出する角丸矩形",
-      "required": ["id", "type", "title", "processType"],
+      "required": ["id", "type", "title", "process_type"],
       "properties": {
         "id": {
           "type": "string",
@@ -156,7 +314,7 @@
           "type": "string",
           "description": "図形上に表示するタイトル"
         },
-        "processType": {
+        "process_type": {
           "type": "string",
           "description": "処理の種類",
           "enum": [
@@ -167,7 +325,7 @@
             "undefined_input"
           ]
         },
-        "targetSubject": {
+        "target_subject": {
           "type": "string",
           "description": "処理対象となる主体の型"
         },
@@ -181,7 +339,7 @@
           "type": "string",
           "description": "処理の概要説明"
         },
-        "relatedArticles": {
+        "related_articles": {
           "type": "array",
           "description": "関連法令条項",
           "items": {
@@ -192,11 +350,11 @@
           "type": "string",
           "description": "備考"
         },
-        "logicExpression": {
+        "logic_expression": {
           "type": "string",
           "description": "論理式等（入力情報の記号を用いた処理内容の表現）"
         },
-        "softwareFunctions": {
+        "software_functions": {
           "type": "array",
           "description": "ソフトウェア機能（最大3つ）",
           "maxItems": 3,
@@ -204,9 +362,9 @@
             "$ref": "#/definitions/SoftwareFunction"
           }
         },
-        "subDiagramRef": {
+        "sub_diagram_ref": {
           "type": "string",
-          "description": "参照する部分審査機序図のID（processType=sub_diagram_referenceの場合）"
+          "description": "参照する部分審査機序図のID（process_type=sub_diagram_referenceの場合）"
         }
       }
     },
@@ -255,16 +413,58 @@
         }
       }
     },
+    "RelatedLaw": {
+      "type": "object",
+      "description": "関連法令情報",
+      "required": ["law_id", "law_name", "law_type", "relationship"],
+      "properties": {
+        "law_id": {
+          "type": "string",
+          "description": "関連法令ID（e-Gov法令API準拠）"
+        },
+        "law_name": {
+          "type": "string",
+          "description": "関連法令名"
+        },
+        "law_type": {
+          "type": "string",
+          "description": "法令種別",
+          "enum": ["act", "order", "regulation", "notice"]
+        },
+        "relationship": {
+          "type": "string",
+          "description": "関係性の種類",
+          "enum": [
+            "delegates_to",
+            "delegated_from",
+            "defines_detail",
+            "references",
+            "supersedes"
+          ]
+        },
+        "articles": {
+          "type": "array",
+          "description": "関連する条項（例: A112:P1）",
+          "items": {
+            "type": "string"
+          }
+        },
+        "description": {
+          "type": "string",
+          "description": "関係性の説明"
+        }
+      }
+    },
     "Metadata": {
       "type": "object",
       "description": "メタデータ",
       "properties": {
-        "createdAt": {
+        "created_at": {
           "type": "string",
           "format": "date-time",
           "description": "作成日時"
         },
-        "updatedAt": {
+        "updated_at": {
           "type": "string",
           "format": "date-time",
           "description": "更新日時"
@@ -275,15 +475,23 @@
         },
         "generator": {
           "type": "string",
-          "description": "生成ツール（例: law-mcp-v1.0）"
+          "description": "生成ツール（例: kijo-orchestrator-v1）"
         },
-        "lawId": {
+        "law_id": {
           "type": "string",
           "description": "対象法令ID（e-Gov法令API準拠）"
         },
-        "lawName": {
+        "law_name": {
           "type": "string",
           "description": "対象法令名"
+        },
+        "checklist_ref": {
+          "type": "string",
+          "description": "チェックリスト参照"
+        },
+        "source": {
+          "type": "string",
+          "description": "データソース情報"
         }
       }
     }

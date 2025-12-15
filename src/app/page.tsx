@@ -1,10 +1,12 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { Suspense, useEffect, useState, useCallback } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { LawTree } from '@/components/law-tree';
 import { KijoDiagramViewer } from '@/components/kijo-diagram';
 import { LawNode, parseLawData } from '@/lib/parser';
-import { getBuildingStandardsAct } from '@/lib/api';
+import { getLawData, LAW_IDS, LAW_INFO, LawInfo } from '@/lib/api';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/components/ui/resizable';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -30,7 +32,18 @@ function formatArticleTitle(node: LawNode): string {
   return parts.join('');
 }
 
-export default function Home() {
+// 法令タブ定義
+const LAW_TABS = [
+  { id: LAW_IDS.BUILDING_STANDARDS_ACT, label: '法' },
+  { id: LAW_IDS.BUILDING_STANDARDS_ORDER, label: '令' },
+  { id: LAW_IDS.BUILDING_STANDARDS_REGULATION, label: '規則' },
+];
+
+function HomeContent() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  const [currentLawId, setCurrentLawId] = useState<string>(LAW_IDS.BUILDING_STANDARDS_ACT);
   const [treeData, setTreeData] = useState<LawNode[]>([]);
   const [selectedNode, setSelectedNode] = useState<LawNode | null>(null);
   const [loading, setLoading] = useState(true);
@@ -43,24 +56,61 @@ export default function Home() {
   const [showOnlyWithDiagram, setShowOnlyWithDiagram] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
 
-  // 初期化: 法令データと機序図一覧を読み込む
+  // 現在の法令情報
+  const currentLawInfo = LAW_INFO[currentLawId];
+
+  // URLパラメータから初期値を取得
   useEffect(() => {
-    async function init() {
+    const lawIdParam = searchParams.get('lawId');
+    const diagramIdParam = searchParams.get('diagramId');
+
+    if (lawIdParam && LAW_INFO[lawIdParam]) {
+      setCurrentLawId(lawIdParam);
+    }
+  }, [searchParams]);
+
+  // URLを更新する関数
+  const updateUrl = useCallback((lawId: string, diagramId?: string) => {
+    const params = new URLSearchParams();
+    params.set('lawId', lawId);
+    if (diagramId) {
+      params.set('diagramId', diagramId);
+    }
+    router.push(`?${params.toString()}`, { scroll: false });
+  }, [router]);
+
+  // 機序図を指定のdiagramIdにナビゲート（関連条項リンク用）
+  const navigateToDiagram = useCallback((targetLawId: string, targetDiagramId: string) => {
+    // 法令を切り替え
+    if (targetLawId !== currentLawId) {
+      setCurrentLawId(targetLawId);
+    }
+    updateUrl(targetLawId, targetDiagramId);
+  }, [currentLawId, updateUrl]);
+
+  // 法令データと機序図一覧を読み込む（法令ID変更時のみ）
+  useEffect(() => {
+    async function loadLawData() {
+      setLoading(true);
+      setSelectedNode(null);
+      setDiagram(null);
+
       try {
         // 法令データ取得
-        const data = await getBuildingStandardsAct();
+        const data = await getLawData(currentLawId);
         const nodes = parseLawData(data);
         setTreeData(nodes);
 
         // 機序図一覧取得
         const res = await fetch('/api/diagrams');
+        let diagrams: DiagramFile[] = [];
         if (res.ok) {
           const diagramData = await res.json();
           const lawDiagrams = diagramData.diagrams.find(
-            (d: { lawId: string }) => d.lawId === '325AC0000000201'
+            (d: { lawId: string }) => d.lawId === currentLawId
           );
           if (lawDiagrams) {
-            const diagrams = lawDiagrams.files.map(
+            diagrams = lawDiagrams.files.map(
               (f: { diagramId: string; path: string }) => ({
                 diagramId: f.diagramId,
                 path: f.path,
@@ -68,23 +118,65 @@ export default function Home() {
             );
             setAvailableDiagrams(diagrams);
             setAvailableDiagramIds(new Set(diagrams.map((d: DiagramFile) => d.diagramId)));
+          } else {
+            setAvailableDiagrams([]);
+            setAvailableDiagramIds(new Set());
+          }
+        }
+
+        // URLパラメータからdiagramIdを取得してロード（初期ロード時のみ）
+        const diagramIdParam = searchParams.get('diagramId');
+        if (diagramIdParam && diagrams.length > 0) {
+          const targetDiagram = diagrams.find(d => d.diagramId === diagramIdParam);
+          if (targetDiagram) {
+            // 対応するノードを探して選択
+            const findNodeByDiagramId = (nodes: LawNode[], id: string): LawNode | null => {
+              for (const node of nodes) {
+                if (node.diagramId === id) return node;
+                if (node.children) {
+                  const found = findNodeByDiagramId(node.children, id);
+                  if (found) return found;
+                }
+              }
+              return null;
+            };
+            const targetNode = findNodeByDiagramId(nodes, diagramIdParam);
+            if (targetNode) {
+              setSelectedNode(targetNode);
+              // 機序図をロード
+              try {
+                const diagramRes = await fetch(targetDiagram.path);
+                if (diagramRes.ok) {
+                  const diagramJson: KijoDiagram = await diagramRes.json();
+                  setDiagram(diagramJson);
+                }
+              } catch (err) {
+                console.error('Failed to load diagram from URL param:', err);
+              }
+            }
           }
         }
       } catch (err) {
-        console.error('Failed to load initial data:', err);
+        console.error('Failed to load law data:', err);
       } finally {
         setLoading(false);
       }
     }
-    init();
-  }, []);
+    loadLawData();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentLawId]);
 
   // ノード選択時の処理
   const handleSelect = useCallback(async (node: LawNode) => {
     setSelectedNode(node);
 
     // 機序図があるか確認
-    const diagramFile = availableDiagrams.find(d => d.diagramId === node.diagramId);
+    const diagramFile = node.diagramId
+      ? availableDiagrams.find(d => d.diagramId === node.diagramId)
+      : undefined;
+
+    // URLを更新（機序図がある場合のみdiagramIdを設定）
+    updateUrl(currentLawId, diagramFile ? node.diagramId : undefined);
 
     if (diagramFile) {
       setDiagramLoading(true);
@@ -105,7 +197,7 @@ export default function Home() {
     } else {
       setDiagram(null);
     }
-  }, [availableDiagrams]);
+  }, [availableDiagrams, currentLawId, updateUrl]);
 
   return (
     <div className="h-screen w-full flex flex-col overflow-hidden bg-background">
@@ -117,6 +209,22 @@ export default function Home() {
         <ResizablePanelGroup direction="horizontal">
           <ResizablePanel defaultSize={25} minSize={20}>
             <div className="h-full flex flex-col p-2">
+              {/* 法令切り替えタブ */}
+              <div className="px-2 mb-2">
+                <Tabs value={currentLawId} onValueChange={setCurrentLawId}>
+                  <TabsList className="w-full grid grid-cols-3">
+                    {LAW_TABS.map((tab) => (
+                      <TabsTrigger key={tab.id} value={tab.id} className="text-xs">
+                        {tab.label}
+                      </TabsTrigger>
+                    ))}
+                  </TabsList>
+                </Tabs>
+                <div className="text-xs text-muted-foreground mt-1 text-center">
+                  {currentLawInfo?.name}
+                </div>
+              </div>
+
               <div className="flex flex-col gap-2 mb-2 px-2">
                 <input
                   type="text"
@@ -175,15 +283,15 @@ export default function Home() {
                     <CardHeader className="pb-2">
                       {diagram ? (
                         <div>
-                          <CardTitle>{diagram.pageTitle.title}</CardTitle>
-                          {diagram.pageTitle.targetSubject && (
+                          <CardTitle>{diagram.page_title.title}</CardTitle>
+                          {diagram.page_title.target_subject && (
                             <div className="text-sm text-muted-foreground mt-1">
-                              対象主体: {diagram.pageTitle.targetSubject}
+                              対象主体: {diagram.page_title.target_subject}
                             </div>
                           )}
-                          {diagram.pageTitle.description && (
+                          {diagram.page_title.description && (
                             <div className="text-sm text-muted-foreground mt-1">
-                              {diagram.pageTitle.description}
+                              {diagram.page_title.description}
                             </div>
                           )}
                         </div>
@@ -197,7 +305,12 @@ export default function Home() {
                           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
                         </div>
                       ) : diagram ? (
-                        <KijoDiagramViewer diagram={diagram} articleContent={selectedNode?.content} articleTitle={selectedNode ? formatArticleTitle(selectedNode) : undefined} />
+                        <KijoDiagramViewer
+                          diagram={diagram}
+                          articleContent={selectedNode?.content}
+                          articleTitle={selectedNode ? formatArticleTitle(selectedNode) : undefined}
+                          onNavigate={navigateToDiagram}
+                        />
                       ) : (
                         <div className="flex items-center justify-center h-64 text-muted-foreground">
                           この条文の機序図はまだ作成されていません
@@ -216,5 +329,17 @@ export default function Home() {
         </ResizablePanelGroup>
       </main>
     </div>
+  );
+}
+
+export default function Home() {
+  return (
+    <Suspense fallback={
+      <div className="h-screen w-full flex items-center justify-center bg-background">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    }>
+      <HomeContent />
+    </Suspense>
   );
 }

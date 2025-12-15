@@ -1,5 +1,5 @@
 /**
- * 審査機序図 型定義
+ * 審査機序図 型定義 (v3)
  * buildingSMART Japan 審査機序図作成手引書に基づく
  */
 
@@ -46,78 +46,97 @@ export type SoftwareFunctionCategory =
 
 /** ページタイトル */
 export interface PageTitle {
-  /** 図形上に表示するタイトル */
   title: string;
-  /** ページ全体が対象とする主体 */
-  targetSubject?: string;
-  /** ページ全体の処理内容 */
+  target_subject?: string;
   description?: string;
-  /** 関連条項 (例: "法::A43:P1") */
-  relatedArticles?: string[];
 }
 
-/** [情報]ノード */
-export interface InformationNode {
-  /** ノードの一意識別子 */
-  id: string;
-  /** ノードタイプ */
-  type: "information";
-  /** 図形上に表示するタイトル */
-  title: string;
-  /** 論理式等で用いる記号 (例: A, B, X1) */
-  symbol?: string;
-  /** 情報を保持する主体 (例: 建築物, 室, 敷地) */
-  subject?: string;
-  /** 単数か複数か */
-  plurality?: Plurality;
-  /** 主体がもつ性質 */
-  property?: string;
-  /** 性質の型 */
-  propertyType?: PropertyType;
-  /** 情報内容の説明 */
+/** 法令参照 */
+export interface LegalRef {
+  law_id: string;
+  law_type: "act" | "order" | "regulation" | "notice";
+  law_name: string;
+  law_abbrev: string;
+  article: string;
+  paragraph?: string | null;
+  item?: string | null;
+}
+
+/** 関連法令 */
+export interface RelatedLaw {
+  law_id: string;
+  law_name: string;
+  law_type: "act" | "order" | "regulation" | "notice";
+  relationship: "delegates_to" | "delegated_from" | "defines_detail" | "references" | "supersedes";
+  articles?: string[];
   description?: string;
-  /** 関連法令条項 */
-  relatedArticles?: string[];
-  /** 備考 */
-  remarks?: string;
-  /** IFC適用クラスやPropertySet情報 */
-  mvdRelated?: string;
+}
+
+/** 適合判定ロジック */
+export interface ComplianceLogic {
+  scope_condition?: {
+    operator: string;
+    value?: boolean;
+    conditions?: unknown[];
+    note?: string;
+  };
+  judgment_rule?: {
+    operator: string;
+    lhs?: { var: string; desc: string; property_type?: string; unit?: string };
+    rhs?: { val?: number | boolean; var?: string; desc?: string; unit?: string };
+    conditions?: unknown[];
+  };
+  exceptions?: {
+    operator: string;
+    conditions?: { id: string; desc: string; related_article?: string }[];
+    effect: string;
+  } | null;
 }
 
 /** ソフトウェア機能 */
 export interface SoftwareFunction {
-  /** 機能区分 */
   category: SoftwareFunctionCategory;
-  /** 機能概要 */
   description?: string;
+}
+
+/** 委任先法令の要件詳細 */
+export interface DelegatedRequirement {
+  article_ref: string;
+  requirement: string;
+}
+
+/** [情報]ノード */
+export interface InformationNode {
+  id: string;
+  type: "information";
+  title: string;
+  symbol?: string;
+  subject?: string;
+  plurality?: Plurality;
+  property?: string;
+  property_type?: PropertyType;
+  unit?: string;
+  description?: string;
+  related_articles?: string[];
+  delegated_requirements?: DelegatedRequirement[];
+  remarks?: string;
+  mvd_related?: string;
 }
 
 /** [処理]ノード */
 export interface ProcessNode {
-  /** ノードの一意識別子 */
   id: string;
-  /** ノードタイプ */
   type: "process";
-  /** 図形上に表示するタイトル */
   title: string;
-  /** 処理の種類 */
-  processType: ProcessType;
-  /** 処理対象となる主体の型 */
-  targetSubject?: string;
-  /** 単体処理か反復処理か */
+  process_type: ProcessType;
+  target_subject?: string;
   iteration?: Iteration;
-  /** 処理の概要説明 */
   description?: string;
-  /** 関連法令条項 */
-  relatedArticles?: string[];
-  /** 備考 */
+  related_articles?: string[];
   remarks?: string;
-  /** 論理式等 (入力情報の記号を用いた処理内容の表現) */
-  logicExpression?: string;
-  /** ソフトウェア機能 (最大3つ) */
-  softwareFunctions?: SoftwareFunction[];
-  /** 参照する部分審査機序図のID */
-  subDiagramRef?: string;
+  logic_expression?: string;
+  software_functions?: SoftwareFunction[];
+  sub_diagram_ref?: string;
 }
 
 /** ノード (情報または処理) */
@@ -125,45 +144,37 @@ export type DiagramNode = InformationNode | ProcessNode;
 
 /** エッジ (ノード間の接続) */
 export interface Edge {
-  /** エッジの一意識別子 */
   id: string;
-  /** 始点ノードのID */
   from: string;
-  /** 終点ノードのID */
   to: string;
-  /** エッジの役割 */
   role?: EdgeRole;
 }
 
 /** メタデータ */
 export interface DiagramMetadata {
-  /** 作成日時 */
-  createdAt?: string;
-  /** 更新日時 */
-  updatedAt?: string;
-  /** 作成者 */
+  created_at?: string;
+  updated_at?: string;
   author?: string;
-  /** 生成ツール (例: law-mcp-v1.0) */
   generator?: string;
-  /** 対象法令ID (e-Gov法令API準拠) */
-  lawId?: string;
-  /** 対象法令名 */
-  lawName?: string;
+  law_id?: string;
+  law_name?: string;
+  checklist_ref?: string;
 }
 
-/** 審査機序図 */
+/** 審査機序図 (v3) */
 export interface KijoDiagram {
-  /** 機序図の一意識別子 */
   id: string;
-  /** スキーマバージョン */
-  version?: string;
-  /** ページタイトル */
-  pageTitle: PageTitle;
-  /** ノード一覧 */
-  nodes: DiagramNode[];
-  /** エッジ一覧 */
-  edges: Edge[];
-  /** メタデータ */
+  version: string;
+  page_title: PageTitle;
+  legal_ref: LegalRef;
+  labels?: string[];
+  text_raw?: string;
+  compliance_logic?: ComplianceLogic;
+  diagram: {
+    nodes: DiagramNode[];
+    edges: Edge[];
+  };
+  related_laws?: RelatedLaw[];
   metadata?: DiagramMetadata;
 }
 

@@ -140,22 +140,22 @@ export function ExportButton({ diagram, articleContent, articleTitle, flowRef, o
     // タイトル
     const title = document.createElement('div');
     title.style.cssText = 'font-size: 18px; font-weight: bold; margin-bottom: 8px;';
-    title.textContent = diagram.pageTitle.title;
+    title.textContent = diagram.page_title.title;
     header.appendChild(title);
 
     // 対象主体
-    if (diagram.pageTitle.targetSubject) {
+    if (diagram.page_title.target_subject) {
       const subject = document.createElement('div');
       subject.style.cssText = 'font-size: 12px; color: #6b7280; margin-bottom: 4px;';
-      subject.textContent = `対象主体: ${diagram.pageTitle.targetSubject}`;
+      subject.textContent = `対象主体: ${diagram.page_title.target_subject}`;
       header.appendChild(subject);
     }
 
     // 説明
-    if (diagram.pageTitle.description) {
+    if (diagram.page_title.description) {
       const desc = document.createElement('div');
       desc.style.cssText = 'font-size: 12px; color: #6b7280;';
-      desc.textContent = diagram.pageTitle.description;
+      desc.textContent = diagram.page_title.description;
       header.appendChild(desc);
     }
 

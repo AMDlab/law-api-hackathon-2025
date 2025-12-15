@@ -15,6 +15,7 @@ import {
   MarkerType,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
+import Dagre from "@dagrejs/dagre";
 
 import type { KijoDiagram, DiagramNode } from "@/types/diagram";
 import { detectCycle, validateEdgeReferences } from "@/lib/validation";
@@ -35,6 +36,100 @@ interface KijoDiagramViewerProps {
   className?: string;
   articleContent?: string;
   articleTitle?: string;
+  onNavigate?: (lawId: string, diagramId: string) => void;
+}
+
+// ノードサイズ定数
+const NODE_HEIGHT = 60;
+const MIN_NODE_WIDTH = 120;
+const CHAR_WIDTH = 14; // 日本語文字の概算幅
+const PADDING = 40; // 左右のパディング
+
+/**
+ * ノードの幅をタイトルから計算
+ */
+function calculateNodeWidth(node: DiagramNode): number {
+  let titleLength = node.title.length;
+  
+  // 情報ノードの場合、シンボルの分を追加
+  if (node.type === "information" && node.symbol) {
+    titleLength += node.symbol.length + 3; // "[X] " の分
+  }
+  
+  const calculatedWidth = titleLength * CHAR_WIDTH + PADDING;
+  return Math.max(MIN_NODE_WIDTH, calculatedWidth);
+}
+
+/**
+ * エッジの色を役割に応じて決定
+ * 手引書の色分け規則:
+ * - input: 青 ([情報]から[処理]へのインプット)
+ * - output: 赤 ([処理]から[情報]へのアウトプット)
+ * - primary: 青 (整合確認の正規情報)
+ * - supporting: 緑 (整合確認の裏付け情報)
+ */
+function getEdgeColor(role?: string): string {
+  switch (role) {
+    case "input":
+      return "#3b82f6"; // 青
+    case "output":
+      return "#ef4444"; // 赤
+    case "primary":
+      return "#3b82f6"; // 青（正規情報）
+    case "supporting":
+      return "#22c55e"; // 緑（裏付け情報）
+    default:
+      return "#666";
+  }
+}
+
+/**
+ * Dagreを使用してグラフレイアウトを計算
+ */
+function getLayoutedElements(
+  nodes: Node[],
+  edges: Edge[],
+  direction: "LR" | "TB" = "LR"
+): { nodes: Node[]; edges: Edge[] } {
+  const g = new Dagre.graphlib.Graph().setDefaultEdgeLabel(() => ({}));
+
+  g.setGraph({
+    rankdir: direction,
+    nodesep: 80,    // ノード間の垂直方向の間隔
+    ranksep: 120,   // ランク（列）間の水平方向の間隔
+    marginx: 50,
+    marginy: 50,
+  });
+
+  // ノードをDagreグラフに追加
+  nodes.forEach((node) => {
+    g.setNode(node.id, {
+      width: node.width ?? MIN_NODE_WIDTH,
+      height: node.height ?? NODE_HEIGHT,
+    });
+  });
+
+  // エッジをDagreグラフに追加
+  edges.forEach((edge) => {
+    g.setEdge(edge.source, edge.target);
+  });
+
+  // レイアウトを計算
+  Dagre.layout(g);
+
+  // 計算された位置を適用
+  const layoutedNodes = nodes.map((node) => {
+    const nodeWithPosition = g.node(node.id);
+    return {
+      ...node,
+      position: {
+        x: nodeWithPosition.x - (node.width ?? MIN_NODE_WIDTH) / 2,
+        y: nodeWithPosition.y - (node.height ?? NODE_HEIGHT) / 2,
+      },
+    };
+  });
+
+  return { nodes: layoutedNodes, edges };
 }
 
 /**
@@ -44,152 +139,39 @@ function convertToFlowElements(diagram: KijoDiagram): {
   nodes: Node[];
   edges: Edge[];
 } {
-  // ノードの変換
-  // 自動レイアウト: 情報と処理を交互に配置
-  const nodes: Node[] = [];
-  const nodeMap = new Map<string, DiagramNode>();
+  const diagramNodes = diagram.diagram.nodes;
+  const diagramEdges = diagram.diagram.edges;
 
-  // ノードマップを作成
-  diagram.nodes.forEach((node) => {
-    nodeMap.set(node.id, node);
-  });
-
-  // トポロジカルソートでノードの順序を決定
-  const visited = new Set<string>();
-  const order: string[] = [];
-
-  function visit(nodeId: string) {
-    if (visited.has(nodeId)) return;
-    visited.add(nodeId);
-
-    // このノードへの入力エッジを探す
-    diagram.edges
-      .filter((e) => e.to === nodeId)
-      .forEach((e) => visit(e.from));
-
-    order.push(nodeId);
-  }
-
-  diagram.nodes.forEach((node) => visit(node.id));
-
-  // 列ごとにノードをグループ化
-  const columns: string[][] = [];
-  const nodeColumn = new Map<string, number>();
-
-  order.forEach((nodeId) => {
-    // 入力ノードの最大列 + 1
-    const inputEdges = diagram.edges.filter((e) => e.to === nodeId);
-    let col = 0;
-    inputEdges.forEach((e) => {
-      const inputCol = nodeColumn.get(e.from) ?? -1;
-      col = Math.max(col, inputCol + 1);
-    });
-
-    nodeColumn.set(nodeId, col);
-    if (!columns[col]) columns[col] = [];
-    columns[col].push(nodeId);
-  });
-
-  // バリセンター法で列内のノード順序を最適化（エッジ交差を減らす）
-  const nodeRow = new Map<string, number>();
-
-  // 初期行位置を設定
-  columns.forEach((columnNodes, colIndex) => {
-    columnNodes.forEach((nodeId, rowIndex) => {
-      nodeRow.set(nodeId, rowIndex);
-    });
-  });
-
-  // 数回繰り返して最適化
-  for (let iter = 0; iter < 4; iter++) {
-    // 左から右へ（前の列の位置に基づいてソート）
-    columns.forEach((columnNodes, colIndex) => {
-      if (colIndex === 0) return;
-
-      columnNodes.sort((a, b) => {
-        // 入力ノードの平均行位置を計算
-        const getAvgInputRow = (nodeId: string) => {
-          const inputs = diagram.edges.filter(e => e.to === nodeId);
-          if (inputs.length === 0) return nodeRow.get(nodeId) ?? 0;
-          const sum = inputs.reduce((acc, e) => acc + (nodeRow.get(e.from) ?? 0), 0);
-          return sum / inputs.length;
-        };
-        return getAvgInputRow(a) - getAvgInputRow(b);
-      });
-
-      // 新しい行位置を更新
-      columnNodes.forEach((nodeId, rowIndex) => {
-        nodeRow.set(nodeId, rowIndex);
-      });
-    });
-
-    // 右から左へ（後の列の位置に基づいてソート）
-    for (let colIndex = columns.length - 2; colIndex >= 0; colIndex--) {
-      const columnNodes = columns[colIndex];
-
-      columnNodes.sort((a, b) => {
-        // 出力ノードの平均行位置を計算
-        const getAvgOutputRow = (nodeId: string) => {
-          const outputs = diagram.edges.filter(e => e.from === nodeId);
-          if (outputs.length === 0) return nodeRow.get(nodeId) ?? 0;
-          const sum = outputs.reduce((acc, e) => acc + (nodeRow.get(e.to) ?? 0), 0);
-          return sum / outputs.length;
-        };
-        return getAvgOutputRow(a) - getAvgOutputRow(b);
-      });
-
-      // 新しい行位置を更新
-      columnNodes.forEach((nodeId, rowIndex) => {
-        nodeRow.set(nodeId, rowIndex);
-      });
-    }
-  }
-
-  // 位置を計算
-  const NODE_WIDTH = 160;
-  const NODE_HEIGHT = 60;
-  const COL_GAP = 200;
-  const ROW_GAP = 100;
-
-  columns.forEach((columnNodes, colIndex) => {
-    columnNodes.forEach((nodeId, rowIndex) => {
-      const diagramNode = nodeMap.get(nodeId);
-      if (!diagramNode) return;
-
-      const x = colIndex * COL_GAP + 50;
-      const y = rowIndex * ROW_GAP + 50;
-
-      nodes.push({
-        id: nodeId,
-        type: diagramNode.type,
-        position: { x, y },
-        data: { node: diagramNode },
-        width: NODE_WIDTH,
-        height: NODE_HEIGHT,
-      });
-    });
-  });
+  // ノードの初期変換（位置は後でDagreが決定）
+  const nodes: Node[] = diagramNodes.map((node) => ({
+    id: node.id,
+    type: node.type,
+    position: { x: 0, y: 0 }, // 仮の位置
+    data: { node },
+    width: calculateNodeWidth(node),
+    height: NODE_HEIGHT,
+  }));
 
   // エッジの変換
-  const edges: Edge[] = diagram.edges.map((edge) => ({
+  const edges: Edge[] = diagramEdges.map((edge) => ({
     id: edge.id,
     source: edge.from,
     target: edge.to,
     type: "smoothstep",
-    animated: edge.role === "output",
     markerEnd: {
       type: MarkerType.ArrowClosed,
       width: 20,
       height: 20,
-      color: "#666",
+      color: getEdgeColor(edge.role),
     },
     style: {
-      stroke: edge.role === "supporting" ? "#22c55e" : "#666",
+      stroke: getEdgeColor(edge.role),
       strokeWidth: 2,
     },
   }));
 
-  return { nodes, edges };
+  // Dagreでレイアウトを計算して適用
+  return getLayoutedElements(nodes, edges, "LR");
 }
 
 /**
@@ -197,9 +179,11 @@ function convertToFlowElements(diagram: KijoDiagram): {
  */
 function validateGraph(diagram: KijoDiagram): { valid: boolean; warnings: string[] } {
   const warnings: string[] = [];
+  const nodes = diagram.diagram.nodes;
+  const edges = diagram.diagram.edges;
 
   // エッジ参照の検証
-  const edgeValidation = validateEdgeReferences(diagram.nodes, diagram.edges);
+  const edgeValidation = validateEdgeReferences(nodes, edges);
   if (!edgeValidation.valid) {
     warnings.push(
       `存在しないノードへの参照があります: ${edgeValidation.invalidEdges
@@ -209,7 +193,7 @@ function validateGraph(diagram: KijoDiagram): { valid: boolean; warnings: string
   }
 
   // 循環参照の検出
-  if (detectCycle(diagram.nodes, diagram.edges)) {
+  if (detectCycle(nodes, edges)) {
     warnings.push("グラフに循環参照が含まれています");
   }
 
@@ -222,7 +206,7 @@ function validateGraph(diagram: KijoDiagram): { valid: boolean; warnings: string
 /**
  * 内部コンポーネント（ReactFlowコンテキスト内で使用）
  */
-function KijoDiagramViewerInner({ diagram, className, articleContent, articleTitle }: KijoDiagramViewerProps) {
+function KijoDiagramViewerInner({ diagram, className, articleContent, articleTitle, onNavigate }: KijoDiagramViewerProps) {
   const [selectedNode, setSelectedNode] = useState<DiagramNode | null>(null);
   const flowRef = useRef<HTMLDivElement>(null);
   const { fitView } = useReactFlow();
@@ -236,8 +220,8 @@ function KijoDiagramViewerInner({ diagram, className, articleContent, articleTit
     [diagram]
   );
 
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialElements.nodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState(initialElements.edges);
+  const [nodes, , onNodesChange] = useNodesState(initialElements.nodes);
+  const [edges, , onEdgesChange] = useEdgesState(initialElements.edges);
 
   // 選択変更時のハンドラ
   const onSelectionChange: OnSelectionChangeFunc = useCallback(
@@ -305,7 +289,7 @@ function KijoDiagramViewerInner({ diagram, className, articleContent, articleTit
       {/* 詳細パネル */}
       <div className="w-80 border-l bg-white overflow-y-auto">
         {/* 選択ノード詳細 */}
-        <NodeDetailPanel node={selectedNode} />
+        <NodeDetailPanel node={selectedNode} onNavigate={onNavigate} />
       </div>
     </div>
   );

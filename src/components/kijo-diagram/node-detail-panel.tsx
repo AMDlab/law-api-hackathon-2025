@@ -1,10 +1,11 @@
 "use client";
 
-import type { DiagramNode, InformationNode, ProcessNode } from "@/types/diagram";
+import type { DiagramNode, InformationNode, ProcessNode, DelegatedRequirement } from "@/types/diagram";
 import { isInformationNode, isProcessNode } from "@/types/diagram";
 
 interface NodeDetailPanelProps {
   node: DiagramNode | null;
+  onNavigate?: (lawId: string, diagramId: string) => void;
 }
 
 /**
@@ -41,9 +42,155 @@ function getProcessTypeLabel(processType: string): string {
 }
 
 /**
+ * 法令ID定義
+ */
+const LAW_IDS: Record<string, string> = {
+  "法": "325AC0000000201",
+  "令": "325CO0000000338",
+  "規則": "325M50004000040",
+};
+
+/**
+ * 関連条項をパースしてサービス内リンク情報を生成
+ * 形式: "法::A43:P1" → 建築基準法第43条第1項
+ * 形式: "令::A109_9:P1:I1" → 施行令第109条の9第1項第1号
+ */
+function parseRelatedArticle(article: string): {
+  lawName: string;
+  lawId: string;
+  articleNum: string;
+  paragraphNum?: string;
+  itemNum?: string;
+  display: string;
+  diagramId: string;
+} | null {
+  // 形式: 法令名::A条番号:P項番号:I号番号
+  const match = article.match(/^([^:]+)::A([^:]+)(?::P(\d+))?(?::I(\d+))?$/);
+  if (!match) return null;
+
+  const [, lawAbbrev, articleNum, paragraphNum, itemNum] = match;
+  const lawId = LAW_IDS[lawAbbrev];
+  if (!lawId) return null;
+
+  // 条番号の表示（例: 109_9 → 第109条の9）
+  // 「_」は「条の」に変換
+  const articleDisplay = articleNum.includes("_")
+    ? articleNum.replace(/_/g, "条の")
+    : articleNum + "条";
+
+  // 表示テキスト
+  let display = `${lawAbbrev}第${articleDisplay}`;
+  if (paragraphNum) display += `第${paragraphNum}項`;
+  if (itemNum) display += `第${itemNum}号`;
+
+  // 機序図ID（例: A43_P1, A43_P1_I2）
+  let diagramId = `A${articleNum}`;
+  if (paragraphNum) diagramId += `_P${paragraphNum}`;
+  if (itemNum) diagramId += `_I${itemNum}`;
+
+  return { lawName: lawAbbrev, lawId, articleNum, paragraphNum, itemNum, display, diagramId };
+}
+
+/**
+ * 関連条項のリンクリスト
+ */
+function RelatedArticlesLinks({
+  articles,
+  onNavigate,
+}: {
+  articles: string[];
+  onNavigate?: (lawId: string, diagramId: string) => void;
+}) {
+  return (
+    <div className="flex flex-wrap gap-1">
+      {articles.map((article, i) => {
+        const parsed = parseRelatedArticle(article);
+        if (parsed) {
+          if (onNavigate) {
+            return (
+              <button
+                key={i}
+                onClick={() => onNavigate(parsed.lawId, parsed.diagramId)}
+                className="text-sm text-blue-600 hover:text-blue-800 hover:underline cursor-pointer"
+              >
+                {parsed.display}
+              </button>
+            );
+          }
+          // onNavigateがない場合はURLパラメータ付きリンク
+          const url = `/?lawId=${parsed.lawId}&diagramId=${parsed.diagramId}`;
+          return (
+            <a
+              key={i}
+              href={url}
+              className="text-sm text-blue-600 hover:text-blue-800 hover:underline"
+            >
+              {parsed.display}
+            </a>
+          );
+        }
+        // パースできない場合はそのまま表示
+        return <span key={i} className="text-sm">{article}</span>;
+      })}
+    </div>
+  );
+}
+
+/**
+ * 委任先法令の要件詳細表示
+ */
+function DelegatedRequirementsList({
+  requirements,
+  onNavigate,
+}: {
+  requirements: DelegatedRequirement[];
+  onNavigate?: (lawId: string, diagramId: string) => void;
+}) {
+  return (
+    <div className="space-y-2">
+      {requirements.map((req, i) => {
+        const parsed = parseRelatedArticle(req.article_ref);
+        return (
+          <div key={i} className="bg-gray-50 p-2 rounded text-sm">
+            <div className="font-medium text-gray-700 mb-1">
+              {parsed ? (
+                onNavigate ? (
+                  <button
+                    onClick={() => onNavigate(parsed.lawId, parsed.diagramId)}
+                    className="text-blue-600 hover:text-blue-800 hover:underline cursor-pointer"
+                  >
+                    {parsed.display}
+                  </button>
+                ) : (
+                  <a
+                    href={`/?lawId=${parsed.lawId}&diagramId=${parsed.diagramId}`}
+                    className="text-blue-600 hover:text-blue-800 hover:underline"
+                  >
+                    {parsed.display}
+                  </a>
+                )
+              ) : (
+                <span>{req.article_ref}</span>
+              )}
+            </div>
+            <div className="text-gray-600">{req.requirement}</div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+/**
  * [情報]ノードの詳細表示
  */
-function InformationDetail({ node }: { node: InformationNode }) {
+function InformationDetail({
+  node,
+  onNavigate,
+}: {
+  node: InformationNode;
+  onNavigate?: (lawId: string, diagramId: string) => void;
+}) {
   return (
     <div className="space-y-3">
       <div>
@@ -57,17 +204,23 @@ function InformationDetail({ node }: { node: InformationNode }) {
       <div>
         <div className="text-xs text-gray-500">性質の型</div>
         <div className="text-sm">
-          {node.propertyType ? getPropertyTypeLabel(node.propertyType) : "-"}
+          {node.property_type ? getPropertyTypeLabel(node.property_type) : "-"}
         </div>
       </div>
       <div>
         <div className="text-xs text-gray-500">説明</div>
         <div className="text-sm">{node.description || "-"}</div>
       </div>
-      {node.relatedArticles && node.relatedArticles.length > 0 && (
+      {node.related_articles && node.related_articles.length > 0 && (
         <div>
           <div className="text-xs text-gray-500">関連条項</div>
-          <div className="text-sm">{node.relatedArticles.join(", ")}</div>
+          <RelatedArticlesLinks articles={node.related_articles} onNavigate={onNavigate} />
+        </div>
+      )}
+      {node.delegated_requirements && node.delegated_requirements.length > 0 && (
+        <div>
+          <div className="text-xs text-gray-500 mb-1">委任先法令の要件</div>
+          <DelegatedRequirementsList requirements={node.delegated_requirements} onNavigate={onNavigate} />
         </div>
       )}
       {node.remarks && (
@@ -83,16 +236,22 @@ function InformationDetail({ node }: { node: InformationNode }) {
 /**
  * [処理]ノードの詳細表示
  */
-function ProcessDetail({ node }: { node: ProcessNode }) {
+function ProcessDetail({
+  node,
+  onNavigate,
+}: {
+  node: ProcessNode;
+  onNavigate?: (lawId: string, diagramId: string) => void;
+}) {
   return (
     <div className="space-y-3">
       <div>
         <div className="text-xs text-gray-500">処理の種類</div>
-        <div className="text-sm">{getProcessTypeLabel(node.processType)}</div>
+        <div className="text-sm">{getProcessTypeLabel(node.process_type)}</div>
       </div>
       <div>
         <div className="text-xs text-gray-500">対象主体</div>
-        <div className="text-sm">{node.targetSubject || "-"}</div>
+        <div className="text-sm">{node.target_subject || "-"}</div>
       </div>
       <div>
         <div className="text-xs text-gray-500">単体/反復</div>
@@ -104,25 +263,25 @@ function ProcessDetail({ node }: { node: ProcessNode }) {
         <div className="text-xs text-gray-500">説明</div>
         <div className="text-sm">{node.description || "-"}</div>
       </div>
-      {node.logicExpression && (
+      {node.logic_expression && (
         <div>
           <div className="text-xs text-gray-500">論理式等</div>
           <div className="text-sm font-mono bg-gray-100 p-2 rounded">
-            {node.logicExpression}
+            {node.logic_expression}
           </div>
         </div>
       )}
-      {node.relatedArticles && node.relatedArticles.length > 0 && (
+      {node.related_articles && node.related_articles.length > 0 && (
         <div>
           <div className="text-xs text-gray-500">関連条項</div>
-          <div className="text-sm">{node.relatedArticles.join(", ")}</div>
+          <RelatedArticlesLinks articles={node.related_articles} onNavigate={onNavigate} />
         </div>
       )}
-      {node.softwareFunctions && node.softwareFunctions.length > 0 && (
+      {node.software_functions && node.software_functions.length > 0 && (
         <div>
           <div className="text-xs text-gray-500">ソフトウェア機能</div>
           <ul className="text-sm list-disc list-inside">
-            {node.softwareFunctions.map((func, i) => (
+            {node.software_functions.map((func, i) => (
               <li key={i}>
                 {func.category}: {func.description || "-"}
               </li>
@@ -137,7 +296,7 @@ function ProcessDetail({ node }: { node: ProcessNode }) {
 /**
  * ノード詳細パネル
  */
-export function NodeDetailPanel({ node }: NodeDetailPanelProps) {
+export function NodeDetailPanel({ node, onNavigate }: NodeDetailPanelProps) {
   if (!node) {
     return (
       <div className="p-4 text-gray-500 text-sm">
@@ -160,8 +319,8 @@ export function NodeDetailPanel({ node }: NodeDetailPanelProps) {
       </div>
 
       {/* 詳細 */}
-      {isInformationNode(node) && <InformationDetail node={node} />}
-      {isProcessNode(node) && <ProcessDetail node={node} />}
+      {isInformationNode(node) && <InformationDetail node={node} onNavigate={onNavigate} />}
+      {isProcessNode(node) && <ProcessDetail node={node} onNavigate={onNavigate} />}
     </div>
   );
 }
