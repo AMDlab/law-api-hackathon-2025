@@ -1,0 +1,306 @@
+{
+  "id": "CHK-BSL-O-A112-P1",
+  "version": "3.0.0",
+
+  "page_title": {
+    "title": "防火区画（面積区画）",
+    "target_subject": "建築物",
+    "description": "準耐火建築物等で延べ面積1500㎡超のものについて、1500㎡以内ごとに防火区画を設けているかを判定する"
+  },
+
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "112",
+    "paragraph": "1",
+    "item": null
+  },
+
+  "labels": ["単体規定", "防火", "防火区画"],
+
+  "text_raw": "法第二条第九号の三イ若しくはロのいずれかに該当する建築物（特定主要構造部を耐火構造とした建築物を含む。）又は第百三十六条の二第一号ロ若しくは第二号ロに掲げる基準に適合する建築物で、延べ面積（スプリンクラー設備、水噴霧消火設備、泡消火設備その他これらに類するもので自動式のものを設けた部分の床面積の二分の一に相当する床面積を除く。以下この条において同じ。）が千五百平方メートルを超えるものは、床面積の合計千五百平方メートル以内ごとに一時間準耐火基準に適合する準耐火構造の床若しくは壁又は特定防火設備で区画しなければならない。",
+
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND_GLOBAL",
+      "conditions": [
+        {
+          "id": "scope-001",
+          "operator": "OR_GLOBAL",
+          "conditions": [
+            { "id": "s-001a", "desc": "法2条9号の3イ・ロ該当建築物" },
+            { "id": "s-001b", "desc": "特定主要構造部を耐火構造とした建築物" },
+            { "id": "s-001c", "desc": "令136条の2第1号ロ・第2号ロ適合建築物" }
+          ]
+        },
+        {
+          "id": "scope-002",
+          "operator": "GT",
+          "lhs": { "var": "total_floor_area", "desc": "延べ面積（スプリンクラー等設置部分1/2控除後）", "property_type": "numeric" },
+          "rhs": { "value": 1500, "unit": "㎡" }
+        }
+      ]
+    },
+    "judgment_rule": {
+      "operator": "EQ",
+      "lhs": { "var": "compartment_provided", "desc": "1500㎡以内ごとに区画されている", "property_type": "proposition" },
+      "rhs": { "value": true }
+    },
+    "exceptions": {
+      "operator": "AND_GLOBAL",
+      "effect": "exempt",
+      "conditions": [
+        { "id": "ex-001", "desc": "各号のいずれかに該当する建築物の部分" },
+        { "id": "ex-002", "desc": "その用途上やむを得ないもの" }
+      ]
+    }
+  },
+
+  "diagram": {
+    "nodes": [
+      {
+        "id": "info-001",
+        "type": "information",
+        "title": "構造種別",
+        "symbol": "T",
+        "subject": "建築物",
+        "plurality": "single",
+        "property": "構造種別",
+        "property_type": "classification",
+        "description": "準耐火建築物、耐火建築物、その他の区分",
+        "related_articles": ["法::A2:I9_3", "令::A112:P1"]
+      },
+      {
+        "id": "info-002",
+        "type": "information",
+        "title": "延べ面積",
+        "symbol": "A",
+        "subject": "建築物",
+        "plurality": "single",
+        "property": "延べ面積",
+        "property_type": "numeric",
+        "unit": "㎡",
+        "description": "建築物の延べ面積",
+        "related_articles": ["令::A112:P1"]
+      },
+      {
+        "id": "info-003",
+        "type": "information",
+        "title": "スプリンクラー設置面積",
+        "symbol": "Asp",
+        "subject": "建築物",
+        "plurality": "single",
+        "property": "スプリンクラー等設置部分の床面積",
+        "property_type": "numeric",
+        "unit": "㎡",
+        "description": "スプリンクラー設備、水噴霧消火設備等で自動式のものを設けた部分の床面積",
+        "related_articles": ["令::A112:P1"]
+      },
+      {
+        "id": "info-004",
+        "type": "information",
+        "title": "算定延べ面積",
+        "symbol": "Ac",
+        "subject": "建築物",
+        "plurality": "single",
+        "property": "算定延べ面積",
+        "property_type": "numeric",
+        "unit": "㎡",
+        "description": "延べ面積 - スプリンクラー等設置部分×1/2",
+        "related_articles": ["令::A112:P1"]
+      },
+      {
+        "id": "info-005",
+        "type": "information",
+        "title": "適用対象",
+        "symbol": "Q",
+        "subject": "建築物",
+        "plurality": "single",
+        "property": "令112条1項の適用対象",
+        "property_type": "proposition",
+        "description": "準耐火建築物等かつ算定延べ面積1500㎡超か",
+        "related_articles": ["令::A112:P1"]
+      },
+      {
+        "id": "info-006",
+        "type": "information",
+        "title": "区画設置状況",
+        "symbol": "C",
+        "subject": "建築物",
+        "plurality": "single",
+        "property": "面積区画の設置",
+        "property_type": "proposition",
+        "description": "1500㎡以内ごとに一時間準耐火基準適合の床・壁または特定防火設備で区画されているか",
+        "related_articles": ["令::A112:P1"]
+      },
+      {
+        "id": "info-007",
+        "type": "information",
+        "title": "例外該当",
+        "symbol": "E",
+        "subject": "建築物の部分",
+        "plurality": "single",
+        "property": "ただし書き例外該当",
+        "property_type": "proposition",
+        "description": "各号のいずれかに該当し用途上やむを得ないものか",
+        "related_articles": ["令::A112:P1"]
+      },
+      {
+        "id": "info-008",
+        "type": "information",
+        "title": "令112条1項適合",
+        "symbol": "J",
+        "subject": "建築物",
+        "plurality": "single",
+        "property": "令112条1項への適合",
+        "property_type": "proposition",
+        "description": "防火区画（面積区画）の規定に適合するか",
+        "related_articles": ["令::A112:P1"]
+      },
+      {
+        "id": "proc-001",
+        "type": "process",
+        "title": "構造種別の特定",
+        "process_type": "human_judgment",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "建築物が準耐火建築物、耐火建築物等のいずれかを特定する",
+        "related_articles": ["法::A2:I9_3", "令::A112:P1"],
+        "software_functions": [
+          { "category": "user_input", "description": "構造種別の選択" }
+        ]
+      },
+      {
+        "id": "proc-002",
+        "type": "process",
+        "title": "延べ面積の特定",
+        "process_type": "human_judgment",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "延べ面積を特定する",
+        "related_articles": ["令::A112:P1"],
+        "software_functions": [
+          { "category": "user_input", "description": "延べ面積の入力" }
+        ]
+      },
+      {
+        "id": "proc-003",
+        "type": "process",
+        "title": "スプリンクラー設置面積の特定",
+        "process_type": "human_judgment",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "スプリンクラー等を設けた部分の床面積を特定する",
+        "related_articles": ["令::A112:P1"],
+        "software_functions": [
+          { "category": "user_input", "description": "スプリンクラー設置面積の入力" }
+        ]
+      },
+      {
+        "id": "proc-004",
+        "type": "process",
+        "title": "算定延べ面積の計算",
+        "process_type": "mechanical",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "延べ面積からスプリンクラー等設置部分の1/2を控除して算定延べ面積を求める",
+        "logic_expression": "Ac = A - Asp × 0.5",
+        "related_articles": ["令::A112:P1"],
+        "software_functions": [
+          { "category": "program_processing", "description": "算定延べ面積の計算" }
+        ]
+      },
+      {
+        "id": "proc-005",
+        "type": "process",
+        "title": "適用判定",
+        "process_type": "mechanical",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "準耐火建築物等かつ算定延べ面積1500㎡超かを判定する",
+        "logic_expression": "Q = (T ∈ {準耐火,耐火,令136条の2適合}) AND (Ac > 1500)",
+        "related_articles": ["令::A112:P1"],
+        "software_functions": [
+          { "category": "program_processing", "description": "適用判定ロジック" }
+        ]
+      },
+      {
+        "id": "proc-006",
+        "type": "process",
+        "title": "区画設置確認",
+        "process_type": "human_judgment",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "1500㎡以内ごとに一時間準耐火基準適合の床・壁または特定防火設備で区画されているかを確認する",
+        "related_articles": ["令::A112:P1"],
+        "software_functions": [
+          { "category": "user_input", "description": "区画設置状況の確認" }
+        ]
+      },
+      {
+        "id": "proc-007",
+        "type": "process",
+        "title": "例外該当確認",
+        "process_type": "human_judgment",
+        "target_subject": "建築物の部分",
+        "iteration": "single",
+        "description": "ただし書きの例外に該当するかを確認する（各号のいずれかに該当し用途上やむを得ないもの）",
+        "related_articles": ["令::A112:P1"],
+        "software_functions": [
+          { "category": "user_input", "description": "例外該当の確認" }
+        ]
+      },
+      {
+        "id": "proc-008",
+        "type": "process",
+        "title": "令112条1項適合判定",
+        "process_type": "mechanical",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "適用対象外、例外該当、または区画設置されていれば適合",
+        "logic_expression": "J = NOT(Q) OR E OR C",
+        "related_articles": ["令::A112:P1"],
+        "software_functions": [
+          { "category": "program_processing", "description": "最終適合判定" }
+        ]
+      }
+    ],
+    "edges": [
+      {"id": "e-001", "from": "proc-001", "to": "info-001", "role": "output"},
+      {"id": "e-002", "from": "proc-002", "to": "info-002", "role": "output"},
+      {"id": "e-003", "from": "proc-003", "to": "info-003", "role": "output"},
+      {"id": "e-004", "from": "info-002", "to": "proc-004", "role": "input"},
+      {"id": "e-005", "from": "info-003", "to": "proc-004", "role": "input"},
+      {"id": "e-006", "from": "proc-004", "to": "info-004", "role": "output"},
+      {"id": "e-007", "from": "info-001", "to": "proc-005", "role": "input"},
+      {"id": "e-008", "from": "info-004", "to": "proc-005", "role": "input"},
+      {"id": "e-009", "from": "proc-005", "to": "info-005", "role": "output"},
+      {"id": "e-010", "from": "info-005", "to": "proc-006", "role": "input"},
+      {"id": "e-011", "from": "proc-006", "to": "info-006", "role": "output"},
+      {"id": "e-012", "from": "info-005", "to": "proc-007", "role": "input"},
+      {"id": "e-013", "from": "proc-007", "to": "info-007", "role": "output"},
+      {"id": "e-014", "from": "info-005", "to": "proc-008", "role": "input"},
+      {"id": "e-015", "from": "info-006", "to": "proc-008", "role": "input"},
+      {"id": "e-016", "from": "info-007", "to": "proc-008", "role": "input"},
+      {"id": "e-017", "from": "proc-008", "to": "info-008", "role": "output"}
+    ]
+  },
+
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A2:I9_3"],
+      "description": "準耐火建築物の定義を参照"
+    }
+  ],
+
+  "metadata": {
+    "created_at": "2025-12-15",
+    "generator": "multi-agent-v4"
+  }
+}

@@ -24,11 +24,17 @@ import { ProcessNode } from "./process-node";
 import { NodeDetailPanel } from "./node-detail-panel";
 import { ExportButton } from "./export-button";
 import { HelpButton } from "./help-button";
+import { FloatingEdge } from "./floating-edge";
 
 // カスタムノードタイプの登録
 const nodeTypes = {
   information: InformationNode,
   process: ProcessNode,
+};
+
+// カスタムエッジタイプの登録
+const edgeTypes = {
+  floating: FloatingEdge,
 };
 
 interface KijoDiagramViewerProps {
@@ -157,7 +163,7 @@ function convertToFlowElements(diagram: KijoDiagram): {
     id: edge.id,
     source: edge.from,
     target: edge.to,
-    type: "smoothstep",
+    type: "floating",
     markerEnd: {
       type: MarkerType.ArrowClosed,
       width: 20,
@@ -275,6 +281,7 @@ function KijoDiagramViewerInner({ diagram, className, articleContent, articleTit
           onEdgesChange={onEdgesChange}
           onSelectionChange={onSelectionChange}
           nodeTypes={nodeTypes}
+          edgeTypes={edgeTypes}
           fitView
           fitViewOptions={{ padding: 0.2 }}
           minZoom={0.1}
