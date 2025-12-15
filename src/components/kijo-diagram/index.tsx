@@ -175,14 +175,17 @@ function convertToFlowElements(
 
   // ノードの初期変換（位置は後でDagreが決定）
   const nodes: Node[] = diagramNodes.map((node) => {
-    // フロー図のdecisionノードはダイアモンド形（80x80）
+    // フロー図のdecisionノードはタイトルの長さに応じた幅
     const isDecisionInFlow = isFlowDiagram && node.type === "decision";
+    const nodeWidth = calculateNodeWidth(node);
+    // フロー図のdecisionは最低180px、それ以外は計算値
+    const finalWidth = isDecisionInFlow ? Math.max(180, nodeWidth) : nodeWidth;
     return {
       id: node.id,
       type: node.type,
       position: { x: 0, y: 0 }, // 仮の位置
-      data: { node, isFlowDiagram },
-      width: isDecisionInFlow ? 120 : calculateNodeWidth(node),
+      data: { node, isFlowDiagram, nodeWidth: finalWidth },
+      width: finalWidth,
       height: isDecisionInFlow ? 50 : NODE_HEIGHT,
     };
   });

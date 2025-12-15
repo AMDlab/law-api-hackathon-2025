@@ -7,20 +7,24 @@ import type { DecisionNode as DecisionNodeType } from "@/types/diagram";
 interface FlowDecisionNodeData {
   node: DecisionNodeType;
   isFlowDiagram?: boolean;
+  nodeWidth?: number;
 }
 
 /**
  * 判定ノード - フローチャート用六角形スタイル
  */
 function FlowDecisionNodeComponent({ data, selected }: NodeProps) {
-  const node = (data as FlowDecisionNodeData).node;
-  const isFlowDiagram = (data as FlowDecisionNodeData).isFlowDiagram;
+  const nodeData = data as FlowDecisionNodeData;
+  const node = nodeData.node;
+  const isFlowDiagram = nodeData.isFlowDiagram;
+  const nodeWidth = nodeData.nodeWidth;
 
   if (isFlowDiagram) {
     // フローチャート用：六角形（hexagon）- SVGで描画
-    const width = 120;
+    // 幅はpropsから取得、デフォルトは180
+    const width = nodeWidth || 180;
     const height = 50;
-    const inset = 12; // 左右の尖り具合
+    const inset = 15; // 左右の尖り具合
     
     // 六角形のポイント: 左尖り → 上辺 → 右尖り → 下辺
     const points = `${inset},0 ${width - inset},0 ${width},${height / 2} ${width - inset},${height} ${inset},${height} 0,${height / 2}`;
@@ -60,8 +64,11 @@ function FlowDecisionNodeComponent({ data, selected }: NodeProps) {
         <Handle type="source" position={Position.Bottom} className="!opacity-0 !w-0 !h-0" style={{ bottom: 0 }} />
         <Handle type="source" position={Position.Right} className="!opacity-0 !w-0 !h-0" style={{ right: 0 }} />
 
-        {/* コンテンツ */}
-        <div className="relative z-10 text-center text-[10px] font-medium text-amber-900 leading-tight px-4 max-w-[100px]">
+        {/* コンテンツ - 折り返しなし */}
+        <div 
+          className="relative z-10 text-center text-[11px] font-medium text-amber-900 leading-tight px-4 whitespace-nowrap"
+          style={{ maxWidth: width - 30 }}
+        >
           {node.title}
         </div>
       </div>
