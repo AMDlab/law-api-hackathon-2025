@@ -1,0 +1,295 @@
+{
+  "id": "CHK-BSL-A24-P1",
+  "version": "3.2.0",
+
+  "page_title": {
+    "title": "建築物が法22条区域の内外にわたる場合の措置",
+    "target_subject": "建築物",
+    "description": "建築物が法22条区域の内外にわたる場合に、その全部について法22条・23条の規定を適用することを判定する"
+  },
+
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "24",
+    "paragraph": "1",
+    "item": null
+  },
+
+  "labels": ["単体規定", "防火", "区域またがり"],
+
+  "text_raw": "建築物が第二十二条第一項の市街地の区域の内外にわたる場合においては、その全部について同条の市街地の区域内の建築物に関する規定を適用する。",
+
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "EQ",
+      "lhs": { "var": "straddles_article22_zone", "desc": "建築物が法22条区域の内外にわたる", "property_type": "proposition" },
+      "rhs": { "value": true }
+    },
+    "judgment_rule": {
+      "operator": "AND_GLOBAL",
+      "desc": "全部について法22条区域内の規定を適用",
+      "conditions": [
+        {
+          "id": "cond-001",
+          "operator": "EQ",
+          "lhs": { "var": "article22_compliance", "desc": "法22条（屋根）適合", "property_type": "proposition" },
+          "rhs": { "value": true }
+        },
+        {
+          "id": "cond-002",
+          "operator": "EQ",
+          "lhs": { "var": "article23_compliance", "desc": "法23条（外壁）適合", "property_type": "proposition" },
+          "rhs": { "value": true }
+        }
+      ]
+    },
+    "exceptions": null
+  },
+
+  "diagram": {
+    "nodes": [
+      {
+        "id": "info-001",
+        "type": "information",
+        "title": "法22条区域との関係",
+        "symbol": "Z",
+        "subject": "建築物",
+        "plurality": "single",
+        "property": "法22条区域の内外にわたるか",
+        "property_type": "classification",
+        "description": "建築物が法22条区域の内のみ/外のみ/内外にわたるか",
+        "related_articles": ["法::A24"]
+      },
+      {
+        "id": "info-002",
+        "type": "information",
+        "title": "適用対象",
+        "symbol": "T",
+        "subject": "建築物",
+        "plurality": "single",
+        "property": "法24条の適用対象",
+        "property_type": "proposition",
+        "description": "建築物が法22条区域の内外にわたるか",
+        "related_articles": ["法::A24"]
+      },
+      {
+        "id": "info-003",
+        "type": "information",
+        "title": "法22条適合",
+        "symbol": "C22",
+        "subject": "建築物",
+        "plurality": "single",
+        "property": "法22条（屋根）への適合",
+        "property_type": "proposition",
+        "description": "建築物全体が法22条（屋根の不燃性能）に適合するか",
+        "related_articles": ["法::A22"]
+      },
+      {
+        "id": "info-004",
+        "type": "information",
+        "title": "法23条適合",
+        "symbol": "C23",
+        "subject": "建築物",
+        "plurality": "single",
+        "property": "法23条（外壁）への適合",
+        "property_type": "proposition",
+        "description": "建築物全体が法23条（外壁の準防火性能）に適合するか",
+        "related_articles": ["法::A23"]
+      },
+      {
+        "id": "info-005",
+        "type": "information",
+        "title": "法24条適合",
+        "symbol": "J",
+        "subject": "建築物",
+        "plurality": "single",
+        "property": "法24条への適合",
+        "property_type": "proposition",
+        "description": "法第24条に適合するか",
+        "related_articles": ["法::A24"]
+      },
+      {
+        "id": "proc-001",
+        "type": "process",
+        "title": "区域関係の確認",
+        "process_type": "human_judgment",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "建築物が法22条区域の内のみ/外のみ/内外にわたるかを確認する",
+        "related_articles": ["法::A24"],
+        "software_functions": [
+          { "category": "graphic_display", "description": "建築物と法22条区域の重畳表示" },
+          { "category": "user_input", "description": "区域関係の判定" }
+        ]
+      },
+      {
+        "id": "proc-002",
+        "type": "process",
+        "title": "適用判定",
+        "process_type": "mechanical",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "建築物が法22条区域の内外にわたるかを判定する",
+        "logic_expression": "T = (Z = 内外にわたる)",
+        "related_articles": ["法::A24"],
+        "software_functions": [
+          { "category": "program_processing", "description": "適用判定" }
+        ]
+      },
+      {
+        "id": "proc-003",
+        "type": "process",
+        "title": "法22条適合確認",
+        "process_type": "sub_diagram_reference",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "建築物全体について法22条（屋根）への適合を確認する",
+        "related_articles": ["法::A22"],
+        "software_functions": [
+          { "category": "program_processing", "description": "法22条機序図を参照" }
+        ]
+      },
+      {
+        "id": "proc-004",
+        "type": "process",
+        "title": "法23条適合確認",
+        "process_type": "sub_diagram_reference",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "建築物全体について法23条（外壁）への適合を確認する",
+        "related_articles": ["法::A23"],
+        "software_functions": [
+          { "category": "program_processing", "description": "法23条機序図を参照" }
+        ]
+      },
+      {
+        "id": "proc-005",
+        "type": "process",
+        "title": "法24条適合判定",
+        "process_type": "mechanical",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "適用対象外または法22条・23条の両方に適合であれば適合",
+        "logic_expression": "J = NOT(T) OR (C22 AND C23)",
+        "related_articles": ["法::A24"],
+        "software_functions": [
+          { "category": "program_processing", "description": "最終適合判定" }
+        ]
+      }
+    ],
+    "edges": [
+      {"id": "e-001", "from": "proc-001", "to": "info-001", "role": "output"},
+      {"id": "e-002", "from": "info-001", "to": "proc-002", "role": "input"},
+      {"id": "e-003", "from": "proc-002", "to": "info-002", "role": "output"},
+      {"id": "e-004", "from": "info-002", "to": "proc-003", "role": "input"},
+      {"id": "e-005", "from": "proc-003", "to": "info-003", "role": "output"},
+      {"id": "e-006", "from": "info-002", "to": "proc-004", "role": "input"},
+      {"id": "e-007", "from": "proc-004", "to": "info-004", "role": "output"},
+      {"id": "e-008", "from": "info-002", "to": "proc-005", "role": "input"},
+      {"id": "e-009", "from": "info-003", "to": "proc-005", "role": "input"},
+      {"id": "e-010", "from": "info-004", "to": "proc-005", "role": "input"},
+      {"id": "e-011", "from": "proc-005", "to": "info-005", "role": "output"}
+    ]
+  },
+
+  "flow_diagram": {
+    "title": "法22条区域内外にわたる場合の措置適合判定フロー",
+    "description": "法24条の適用対象判定と法22条・23条の全体適用判定のフローチャート",
+    "nodes": [
+      {
+        "id": "term-start",
+        "type": "terminal",
+        "title": "審査開始",
+        "result": "start",
+        "description": "法第24条の審査を開始"
+      },
+      {
+        "id": "dec-straddle",
+        "type": "decision",
+        "title": "区域の内外にわたる？",
+        "description": "建築物が法22条区域の内外にわたるか",
+        "condition": {
+          "operator": "EQ",
+          "lhs": { "var": "straddles_zone", "desc": "内外にわたる [Z]" },
+          "rhs": { "value": true }
+        },
+        "related_articles": ["法::A24"]
+      },
+      {
+        "id": "dec-article22",
+        "type": "decision",
+        "title": "法22条（屋根）に適合？",
+        "description": "建築物全体が法22条（屋根の不燃性能）に適合するか",
+        "condition": {
+          "operator": "EQ",
+          "lhs": { "var": "article22_compliance", "desc": "法22条適合 [C22]" },
+          "rhs": { "value": true }
+        },
+        "related_articles": ["法::A22"]
+      },
+      {
+        "id": "dec-article23",
+        "type": "decision",
+        "title": "法23条（外壁）に適合？",
+        "description": "建築物全体が法23条（外壁の準防火性能）に適合するか",
+        "condition": {
+          "operator": "EQ",
+          "lhs": { "var": "article23_compliance", "desc": "法23条適合 [C23]" },
+          "rhs": { "value": true }
+        },
+        "related_articles": ["法::A23"]
+      },
+      {
+        "id": "term-pass-not-straddle",
+        "type": "terminal",
+        "title": "適合（対象外）",
+        "result": "pass",
+        "description": "区域の内外にわたらないため本条対象外（個別に法22条・23条を適用）"
+      },
+      {
+        "id": "term-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "建築物全体が法22条・23条に適合"
+      },
+      {
+        "id": "term-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "法22条または法23条に不適合"
+      }
+    ],
+    "edges": [
+      { "id": "f-001", "from": "term-start", "to": "dec-straddle", "role": "flow" },
+      { "id": "f-002", "from": "dec-straddle", "to": "dec-article22", "role": "yes" },
+      { "id": "f-003", "from": "dec-straddle", "to": "term-pass-not-straddle", "role": "no" },
+      { "id": "f-004", "from": "dec-article22", "to": "dec-article23", "role": "yes" },
+      { "id": "f-005", "from": "dec-article22", "to": "term-fail", "role": "no" },
+      { "id": "f-006", "from": "dec-article23", "to": "term-pass", "role": "yes" },
+      { "id": "f-007", "from": "dec-article23", "to": "term-fail", "role": "no" }
+    ]
+  },
+
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A22", "A23"],
+      "description": "法22条（屋根）・法23条（外壁）の規定を全体適用"
+    }
+  ],
+
+  "metadata": {
+    "created_at": "2025-12-15",
+    "updated_at": "2025-12-15",
+    "generator": "multi-agent-v4.2",
+    "notes": "法22条区域の内外にわたる場合 → 全部について区域内の規定（法22条・23条）を適用"
+  }
+}

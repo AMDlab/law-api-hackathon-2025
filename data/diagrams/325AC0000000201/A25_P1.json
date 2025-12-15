@@ -1,0 +1,454 @@
+{
+  "id": "CHK-BSL-A25-P1",
+  "version": "3.2.0",
+
+  "page_title": {
+    "title": "大規模の木造建築物等の外壁等",
+    "target_subject": "建築物",
+    "description": "延べ面積1000㎡超の木造建築物等について、外壁・軒裏で延焼のおそれのある部分が防火構造等に適合するかを判定する"
+  },
+
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "25",
+    "paragraph": "1",
+    "item": null
+  },
+
+  "labels": ["単体規定", "防火", "外壁", "軒裏"],
+
+  "text_raw": "延べ面積（同一敷地内に二以上の木造建築物等がある場合においては、その延べ面積の合計）が千平方メートルを超える木造建築物等は、その外壁及び軒裏で延焼のおそれのある部分を防火構造とし、その屋根の構造を第二十二条第一項に規定する構造としなければならない。",
+
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND_GLOBAL",
+      "desc": "適用対象の判定",
+      "conditions": [
+        {
+          "id": "scope-wood",
+          "operator": "EQ",
+          "lhs": { "var": "is_wooden_building", "desc": "木造建築物等", "property_type": "proposition" },
+          "rhs": { "value": true }
+        },
+        {
+          "id": "scope-area",
+          "operator": "GT",
+          "lhs": { "var": "total_floor_area", "desc": "延べ面積（同一敷地内合計）", "property_type": "numeric" },
+          "rhs": { "value": 1000, "unit": "㎡" }
+        }
+      ]
+    },
+    "judgment_rule": {
+      "operator": "AND_GLOBAL",
+      "desc": "外壁・軒裏・屋根の要件",
+      "conditions": [
+        {
+          "id": "cond-001",
+          "operator": "EQ",
+          "lhs": { "var": "exterior_wall_fire_prevention", "desc": "外壁（延焼部分）が防火構造", "property_type": "proposition" },
+          "rhs": { "value": true }
+        },
+        {
+          "id": "cond-002",
+          "operator": "EQ",
+          "lhs": { "var": "eaves_fire_prevention", "desc": "軒裏（延焼部分）が防火構造", "property_type": "proposition" },
+          "rhs": { "value": true }
+        },
+        {
+          "id": "cond-003",
+          "operator": "EQ",
+          "lhs": { "var": "roof_article22_compliance", "desc": "屋根が法22条構造", "property_type": "proposition" },
+          "rhs": { "value": true }
+        }
+      ]
+    },
+    "exceptions": null
+  },
+
+  "diagram": {
+    "nodes": [
+      {
+        "id": "info-001",
+        "type": "information",
+        "title": "木造建築物等",
+        "symbol": "M",
+        "subject": "建築物",
+        "plurality": "single",
+        "property": "木造建築物等か",
+        "property_type": "proposition",
+        "description": "主要構造部が可燃材料で造られているか",
+        "related_articles": ["法::A25"]
+      },
+      {
+        "id": "info-002",
+        "type": "information",
+        "title": "延べ面積",
+        "symbol": "A",
+        "subject": "建築物",
+        "plurality": "single",
+        "property": "延べ面積",
+        "property_type": "numeric",
+        "unit": "㎡",
+        "description": "延べ面積（同一敷地内に複数ある場合は合計）",
+        "related_articles": ["法::A25"]
+      },
+      {
+        "id": "info-003",
+        "type": "information",
+        "title": "適用対象",
+        "symbol": "T",
+        "subject": "建築物",
+        "plurality": "single",
+        "property": "法25条の適用対象",
+        "property_type": "proposition",
+        "description": "木造建築物等かつ延べ面積1000㎡超か",
+        "related_articles": ["法::A25"]
+      },
+      {
+        "id": "info-004",
+        "type": "information",
+        "title": "延焼のおそれのある部分",
+        "symbol": "E",
+        "subject": "建築物",
+        "plurality": "single",
+        "property": "延焼のおそれのある部分の有無",
+        "property_type": "proposition",
+        "description": "外壁・軒裏に延焼のおそれのある部分があるか",
+        "related_articles": ["法::A2:I6"]
+      },
+      {
+        "id": "info-005",
+        "type": "information",
+        "title": "外壁の構造",
+        "symbol": "W",
+        "subject": "建築物",
+        "plurality": "single",
+        "property": "外壁（延焼部分）の構造",
+        "property_type": "proposition",
+        "description": "延焼のおそれのある部分の外壁が防火構造か",
+        "related_articles": ["法::A25"]
+      },
+      {
+        "id": "info-006",
+        "type": "information",
+        "title": "軒裏の構造",
+        "symbol": "S",
+        "subject": "建築物",
+        "plurality": "single",
+        "property": "軒裏（延焼部分）の構造",
+        "property_type": "proposition",
+        "description": "延焼のおそれのある部分の軒裏が防火構造か",
+        "related_articles": ["法::A25"]
+      },
+      {
+        "id": "info-007",
+        "type": "information",
+        "title": "屋根の構造",
+        "symbol": "R",
+        "subject": "建築物",
+        "plurality": "single",
+        "property": "屋根の構造",
+        "property_type": "proposition",
+        "description": "屋根が法22条1項に規定する構造か",
+        "related_articles": ["法::A22:P1", "法::A25"]
+      },
+      {
+        "id": "info-008",
+        "type": "information",
+        "title": "法25条適合",
+        "symbol": "J",
+        "subject": "建築物",
+        "plurality": "single",
+        "property": "法25条への適合",
+        "property_type": "proposition",
+        "description": "法第25条に適合するか",
+        "related_articles": ["法::A25"]
+      },
+      {
+        "id": "proc-001",
+        "type": "process",
+        "title": "構造の確認",
+        "process_type": "human_judgment",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "木造建築物等かを確認する",
+        "related_articles": ["法::A25"],
+        "software_functions": [
+          { "category": "user_input", "description": "木造建築物等の判定" }
+        ]
+      },
+      {
+        "id": "proc-002",
+        "type": "process",
+        "title": "延べ面積の確認",
+        "process_type": "human_judgment",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "延べ面積（同一敷地内合計）を確認する",
+        "related_articles": ["法::A25"],
+        "software_functions": [
+          { "category": "user_input", "description": "延べ面積の入力" }
+        ]
+      },
+      {
+        "id": "proc-003",
+        "type": "process",
+        "title": "適用判定",
+        "process_type": "mechanical",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "木造建築物等かつ延べ面積1000㎡超かを判定する",
+        "logic_expression": "T = M AND (A > 1000)",
+        "related_articles": ["法::A25"],
+        "software_functions": [
+          { "category": "program_processing", "description": "適用判定ロジック" }
+        ]
+      },
+      {
+        "id": "proc-004",
+        "type": "process",
+        "title": "延焼部分の特定",
+        "process_type": "human_judgment",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "外壁・軒裏の延焼のおそれのある部分を特定する",
+        "related_articles": ["法::A2:I6"],
+        "software_functions": [
+          { "category": "graphic_display", "description": "延焼ライン表示" }
+        ]
+      },
+      {
+        "id": "proc-005",
+        "type": "process",
+        "title": "外壁構造の確認",
+        "process_type": "human_judgment",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "延焼のおそれのある部分の外壁が防火構造かを確認する",
+        "related_articles": ["法::A25", "令::A108"],
+        "software_functions": [
+          { "category": "user_input", "description": "外壁構造の確認" }
+        ]
+      },
+      {
+        "id": "proc-006",
+        "type": "process",
+        "title": "軒裏構造の確認",
+        "process_type": "human_judgment",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "延焼のおそれのある部分の軒裏が防火構造かを確認する",
+        "related_articles": ["法::A25", "令::A108"],
+        "software_functions": [
+          { "category": "user_input", "description": "軒裏構造の確認" }
+        ]
+      },
+      {
+        "id": "proc-007",
+        "type": "process",
+        "title": "屋根構造の確認",
+        "process_type": "human_judgment",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "屋根が法22条1項に規定する構造かを確認する",
+        "related_articles": ["法::A22:P1"],
+        "software_functions": [
+          { "category": "user_input", "description": "屋根構造の確認" }
+        ]
+      },
+      {
+        "id": "proc-008",
+        "type": "process",
+        "title": "法25条適合判定",
+        "process_type": "mechanical",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "適用対象外、または外壁・軒裏・屋根がすべて基準適合であれば適合",
+        "logic_expression": "J = NOT(T) OR (NOT(E) OR (W AND S)) AND R",
+        "related_articles": ["法::A25"],
+        "software_functions": [
+          { "category": "program_processing", "description": "最終適合判定" }
+        ]
+      }
+    ],
+    "edges": [
+      {"id": "e-001", "from": "proc-001", "to": "info-001", "role": "output"},
+      {"id": "e-002", "from": "proc-002", "to": "info-002", "role": "output"},
+      {"id": "e-003", "from": "info-001", "to": "proc-003", "role": "input"},
+      {"id": "e-004", "from": "info-002", "to": "proc-003", "role": "input"},
+      {"id": "e-005", "from": "proc-003", "to": "info-003", "role": "output"},
+      {"id": "e-006", "from": "info-003", "to": "proc-004", "role": "input"},
+      {"id": "e-007", "from": "proc-004", "to": "info-004", "role": "output"},
+      {"id": "e-008", "from": "info-004", "to": "proc-005", "role": "input"},
+      {"id": "e-009", "from": "proc-005", "to": "info-005", "role": "output"},
+      {"id": "e-010", "from": "info-004", "to": "proc-006", "role": "input"},
+      {"id": "e-011", "from": "proc-006", "to": "info-006", "role": "output"},
+      {"id": "e-012", "from": "info-003", "to": "proc-007", "role": "input"},
+      {"id": "e-013", "from": "proc-007", "to": "info-007", "role": "output"},
+      {"id": "e-014", "from": "info-003", "to": "proc-008", "role": "input"},
+      {"id": "e-015", "from": "info-004", "to": "proc-008", "role": "input"},
+      {"id": "e-016", "from": "info-005", "to": "proc-008", "role": "input"},
+      {"id": "e-017", "from": "info-006", "to": "proc-008", "role": "input"},
+      {"id": "e-018", "from": "info-007", "to": "proc-008", "role": "input"},
+      {"id": "e-019", "from": "proc-008", "to": "info-008", "role": "output"}
+    ]
+  },
+
+  "flow_diagram": {
+    "title": "大規模の木造建築物等の外壁等適合判定フロー",
+    "description": "法25条の適用対象判定と外壁・軒裏・屋根の基準適合判定のフローチャート",
+    "nodes": [
+      {
+        "id": "term-start",
+        "type": "terminal",
+        "title": "審査開始",
+        "result": "start",
+        "description": "法第25条の審査を開始"
+      },
+      {
+        "id": "dec-wood",
+        "type": "decision",
+        "title": "木造建築物等？",
+        "description": "主要構造部が可燃材料で造られているか",
+        "condition": {
+          "operator": "EQ",
+          "lhs": { "var": "is_wooden_building", "desc": "木造建築物等 [M]" },
+          "rhs": { "value": true }
+        },
+        "related_articles": ["法::A25"]
+      },
+      {
+        "id": "dec-area",
+        "type": "decision",
+        "title": "延べ面積 > 1000㎡？",
+        "description": "延べ面積（同一敷地内合計）が1000㎡を超えるか",
+        "condition": {
+          "operator": "GT",
+          "lhs": { "var": "total_floor_area", "desc": "延べ面積 [A]" },
+          "rhs": { "value": 1000, "unit": "㎡" }
+        },
+        "related_articles": ["法::A25"]
+      },
+      {
+        "id": "dec-fire-spread",
+        "type": "decision",
+        "title": "延焼部分あり？",
+        "description": "外壁・軒裏に延焼のおそれのある部分があるか",
+        "condition": {
+          "operator": "EQ",
+          "lhs": { "var": "has_fire_spread_risk", "desc": "延焼のおそれ [E]" },
+          "rhs": { "value": true }
+        },
+        "related_articles": ["法::A2:I6"]
+      },
+      {
+        "id": "dec-wall",
+        "type": "decision",
+        "title": "外壁が防火構造？",
+        "description": "延焼のおそれのある部分の外壁が防火構造か",
+        "condition": {
+          "operator": "EQ",
+          "lhs": { "var": "exterior_wall_fire_prevention", "desc": "外壁防火構造 [W]" },
+          "rhs": { "value": true }
+        },
+        "related_articles": ["法::A25"]
+      },
+      {
+        "id": "dec-eaves",
+        "type": "decision",
+        "title": "軒裏が防火構造？",
+        "description": "延焼のおそれのある部分の軒裏が防火構造か",
+        "condition": {
+          "operator": "EQ",
+          "lhs": { "var": "eaves_fire_prevention", "desc": "軒裏防火構造 [S]" },
+          "rhs": { "value": true }
+        },
+        "related_articles": ["法::A25"]
+      },
+      {
+        "id": "dec-roof",
+        "type": "decision",
+        "title": "屋根が法22条構造？",
+        "description": "屋根が法22条1項に規定する構造か",
+        "condition": {
+          "operator": "EQ",
+          "lhs": { "var": "roof_article22_compliance", "desc": "屋根構造 [R]" },
+          "rhs": { "value": true }
+        },
+        "related_articles": ["法::A22:P1"]
+      },
+      {
+        "id": "term-pass-non-wood",
+        "type": "terminal",
+        "title": "適合（対象外）",
+        "result": "pass",
+        "description": "木造建築物等でないため規定対象外"
+      },
+      {
+        "id": "term-pass-area",
+        "type": "terminal",
+        "title": "適合（面積外）",
+        "result": "pass",
+        "description": "延べ面積1000㎡以下のため規定対象外"
+      },
+      {
+        "id": "term-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "外壁・軒裏・屋根がすべて基準に適合"
+      },
+      {
+        "id": "term-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "外壁・軒裏・屋根のいずれかが基準に不適合"
+      }
+    ],
+    "edges": [
+      { "id": "f-001", "from": "term-start", "to": "dec-wood", "role": "flow" },
+      { "id": "f-002", "from": "dec-wood", "to": "dec-area", "role": "yes" },
+      { "id": "f-003", "from": "dec-wood", "to": "term-pass-non-wood", "role": "no" },
+      { "id": "f-004", "from": "dec-area", "to": "dec-fire-spread", "role": "yes" },
+      { "id": "f-005", "from": "dec-area", "to": "term-pass-area", "role": "no" },
+      { "id": "f-006", "from": "dec-fire-spread", "to": "dec-wall", "role": "yes" },
+      { "id": "f-007", "from": "dec-fire-spread", "to": "dec-roof", "role": "no" },
+      { "id": "f-008", "from": "dec-wall", "to": "dec-eaves", "role": "yes" },
+      { "id": "f-009", "from": "dec-wall", "to": "term-fail", "role": "no" },
+      { "id": "f-010", "from": "dec-eaves", "to": "dec-roof", "role": "yes" },
+      { "id": "f-011", "from": "dec-eaves", "to": "term-fail", "role": "no" },
+      { "id": "f-012", "from": "dec-roof", "to": "term-pass", "role": "yes" },
+      { "id": "f-013", "from": "dec-roof", "to": "term-fail", "role": "no" }
+    ]
+  },
+
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A22:P1", "A2:I6"],
+      "description": "法22条構造（屋根）、延焼のおそれのある部分の定義"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "defines_detail",
+      "articles": ["A108"],
+      "description": "防火構造の技術的基準"
+    }
+  ],
+
+  "metadata": {
+    "created_at": "2025-12-15",
+    "updated_at": "2025-12-15",
+    "generator": "multi-agent-v4.2",
+    "notes": "木造建築物等 AND 延べ面積1000㎡超 → 外壁・軒裏（延焼部分）は防火構造、屋根は法22条構造"
+  }
+}

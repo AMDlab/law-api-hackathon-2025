@@ -1,0 +1,543 @@
+{
+  "id": "CHK-BSL-A21-P1",
+  "version": "3.2.0",
+
+  "page_title": {
+    "title": "大規模の建築物の主要構造部等",
+    "target_subject": "建築物",
+    "description": "大規模木造建築物等の主要構造部について、通常火災終了時間耐火構造等の基準に適合するかを判定する"
+  },
+
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "21",
+    "paragraph": "1",
+    "item": null
+  },
+
+  "labels": ["単体規定", "防火", "主要構造部"],
+
+  "text_raw": "次の各号のいずれかに該当する建築物（その主要構造部（床、屋根及び階段を除く。）の政令で定める部分の全部又は一部に木材、プラスチックその他の可燃材料を用いたものに限る。）は、その主要構造部（床、屋根及び階段を除く。）を通常火災終了時間（建築物の構造、建築設備及び用途に応じて通常の火災が消火の措置により終了するまでに通常要する時間をいう。）が経過するまでの間当該火災による建築物の倒壊及び延焼を防止するために主要構造部に必要とされる性能に関して政令で定める技術的基準に適合するもので、国土交通大臣が定めた構造方法を用いるもの又は国土交通大臣の認定を受けたものとしなければならない。一　地階を除く階数が四以上である建築物　二　高さが十六メートルを超える建築物　三　別表第一（い）欄（五）項又は（六）項に掲げる用途に供する特殊建築物で、高さが十三メートルを超えるもの",
+
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND_GLOBAL",
+      "desc": "適用対象の判定",
+      "conditions": [
+        {
+          "id": "scope-combustible",
+          "operator": "EQ",
+          "lhs": { "var": "has_combustible_material", "desc": "主要構造部に可燃材料を使用", "property_type": "proposition" },
+          "rhs": { "value": true }
+        },
+        {
+          "id": "scope-scale",
+          "operator": "OR_GLOBAL",
+          "desc": "次の各号のいずれかに該当",
+          "conditions": [
+            { "id": "s-001", "desc": "地階を除く階数が4以上", "related_article": "法::A21:P1:I1" },
+            { "id": "s-002", "desc": "高さが16mを超える", "related_article": "法::A21:P1:I2" },
+            { "id": "s-003", "desc": "別表1(5)項・(6)項の特殊建築物で高さ13m超", "related_article": "法::A21:P1:I3" }
+          ]
+        }
+      ]
+    },
+    "judgment_rule": {
+      "operator": "EQ",
+      "lhs": { "var": "fire_endurance_compliance", "desc": "通常火災終了時間耐火構造等に適合", "property_type": "proposition" },
+      "rhs": { "value": true }
+    },
+    "exceptions": null,
+    "items": [
+      {
+        "item_number": "1",
+        "desc": "地階を除く階数が4以上である建築物",
+        "related_article": "法::A21:P1:I1",
+        "keywords": ["階数", "4以上"]
+      },
+      {
+        "item_number": "2",
+        "desc": "高さが16mを超える建築物",
+        "related_article": "法::A21:P1:I2",
+        "keywords": ["高さ", "16m超"]
+      },
+      {
+        "item_number": "3",
+        "desc": "別表第1(い)欄(5)項又は(6)項に掲げる用途に供する特殊建築物で、高さが13mを超えるもの",
+        "related_article": "法::A21:P1:I3",
+        "keywords": ["倉庫", "自動車車庫", "危険物貯蔵所", "高さ13m超"],
+        "note": "(5)項：倉庫・自動車車庫等、(6)項：自動車修理工場等"
+      }
+    ]
+  },
+
+  "diagram": {
+    "nodes": [
+      {
+        "id": "info-001",
+        "type": "information",
+        "title": "主要構造部の材料",
+        "symbol": "M",
+        "subject": "建築物",
+        "plurality": "single",
+        "property": "主要構造部の材料",
+        "property_type": "classification",
+        "description": "主要構造部（床・屋根・階段除く）の政令で定める部分に可燃材料を使用しているか",
+        "related_articles": ["法::A21:P1"]
+      },
+      {
+        "id": "info-002",
+        "type": "information",
+        "title": "階数",
+        "symbol": "N",
+        "subject": "建築物",
+        "plurality": "single",
+        "property": "地階を除く階数",
+        "property_type": "numeric",
+        "unit": "階",
+        "description": "地階を除く階数",
+        "related_articles": ["法::A21:P1:I1"]
+      },
+      {
+        "id": "info-003",
+        "type": "information",
+        "title": "高さ",
+        "symbol": "H",
+        "subject": "建築物",
+        "plurality": "single",
+        "property": "高さ",
+        "property_type": "numeric",
+        "unit": "m",
+        "description": "建築物の高さ",
+        "related_articles": ["法::A21:P1:I2"]
+      },
+      {
+        "id": "info-004",
+        "type": "information",
+        "title": "用途",
+        "symbol": "U",
+        "subject": "建築物",
+        "plurality": "single",
+        "property": "用途",
+        "property_type": "classification",
+        "description": "建築物の用途（別表1との照合用）",
+        "related_articles": ["法::A21:P1:I3"]
+      },
+      {
+        "id": "info-i1-match",
+        "type": "information",
+        "title": "第1号該当",
+        "symbol": "Q1",
+        "subject": "建築物",
+        "plurality": "single",
+        "property": "第1号（階数4以上）該当",
+        "property_type": "proposition",
+        "description": "地階を除く階数が4以上に該当",
+        "related_articles": ["法::A21:P1:I1"]
+      },
+      {
+        "id": "info-i2-match",
+        "type": "information",
+        "title": "第2号該当",
+        "symbol": "Q2",
+        "subject": "建築物",
+        "plurality": "single",
+        "property": "第2号（高さ16m超）該当",
+        "property_type": "proposition",
+        "description": "高さが16mを超えるに該当",
+        "related_articles": ["法::A21:P1:I2"]
+      },
+      {
+        "id": "info-i3-match",
+        "type": "information",
+        "title": "第3号該当",
+        "symbol": "Q3",
+        "subject": "建築物",
+        "plurality": "single",
+        "property": "第3号（特殊建築物・高さ13m超）該当",
+        "property_type": "proposition",
+        "description": "別表1(5)項・(6)項の特殊建築物で高さ13m超に該当",
+        "related_articles": ["法::A21:P1:I3"]
+      },
+      {
+        "id": "info-005",
+        "type": "information",
+        "title": "適用対象",
+        "symbol": "T",
+        "subject": "建築物",
+        "plurality": "single",
+        "property": "法21条1項の適用対象",
+        "property_type": "proposition",
+        "description": "可燃材料使用かつ各号のいずれかに該当",
+        "related_articles": ["法::A21:P1"]
+      },
+      {
+        "id": "info-006",
+        "type": "information",
+        "title": "主要構造部の適合",
+        "symbol": "C",
+        "subject": "建築物",
+        "plurality": "single",
+        "property": "通常火災終了時間耐火構造等への適合",
+        "property_type": "proposition",
+        "description": "政令技術基準適合の構造方法または大臣認定を受けているか",
+        "related_articles": ["法::A21:P1", "令::A109条の5"]
+      },
+      {
+        "id": "info-007",
+        "type": "information",
+        "title": "法21条1項適合",
+        "symbol": "J",
+        "subject": "建築物",
+        "plurality": "single",
+        "property": "法21条1項への適合",
+        "property_type": "proposition",
+        "description": "適用対象外または主要構造部が基準適合",
+        "related_articles": ["法::A21:P1"]
+      },
+      {
+        "id": "proc-001",
+        "type": "process",
+        "title": "材料の特定",
+        "process_type": "human_judgment",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "主要構造部に可燃材料を使用しているかを確認する",
+        "related_articles": ["法::A21:P1"],
+        "software_functions": [
+          { "category": "user_input", "description": "可燃材料使用有無の確認" }
+        ]
+      },
+      {
+        "id": "proc-002",
+        "type": "process",
+        "title": "階数の特定",
+        "process_type": "human_judgment",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "地階を除く階数を特定する",
+        "related_articles": ["法::A21:P1:I1"],
+        "software_functions": [
+          { "category": "user_input", "description": "階数の入力" }
+        ]
+      },
+      {
+        "id": "proc-003",
+        "type": "process",
+        "title": "高さの特定",
+        "process_type": "human_judgment",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "建築物の高さを特定する",
+        "related_articles": ["法::A21:P1:I2"],
+        "software_functions": [
+          { "category": "user_input", "description": "高さの入力" }
+        ]
+      },
+      {
+        "id": "proc-004",
+        "type": "process",
+        "title": "用途の特定",
+        "process_type": "human_judgment",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "建築物の用途を特定する",
+        "related_articles": ["法::A21:P1:I3"],
+        "software_functions": [
+          { "category": "user_input", "description": "用途の選択" }
+        ]
+      },
+      {
+        "id": "proc-i1-check",
+        "type": "process",
+        "title": "第1号該当判定",
+        "process_type": "mechanical",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "地階を除く階数が4以上かを判定する",
+        "logic_expression": "Q1 = (N >= 4)",
+        "related_articles": ["法::A21:P1:I1"],
+        "software_functions": [
+          { "category": "program_processing", "description": "階数判定" }
+        ]
+      },
+      {
+        "id": "proc-i2-check",
+        "type": "process",
+        "title": "第2号該当判定",
+        "process_type": "mechanical",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "高さが16mを超えるかを判定する",
+        "logic_expression": "Q2 = (H > 16)",
+        "related_articles": ["法::A21:P1:I2"],
+        "software_functions": [
+          { "category": "program_processing", "description": "高さ判定" }
+        ]
+      },
+      {
+        "id": "proc-i3-check",
+        "type": "process",
+        "title": "第3号該当判定",
+        "process_type": "mechanical",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "別表1(5)項・(6)項の特殊建築物で高さ13m超かを判定する",
+        "logic_expression": "Q3 = (U ∈ {別表1(5)項, 別表1(6)項}) AND (H > 13)",
+        "related_articles": ["法::A21:P1:I3"],
+        "software_functions": [
+          { "category": "program_processing", "description": "用途・高さ複合判定" }
+        ]
+      },
+      {
+        "id": "proc-005",
+        "type": "process",
+        "title": "適用判定",
+        "process_type": "mechanical",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "可燃材料使用かつ各号のいずれかに該当するかを判定する",
+        "logic_expression": "T = M AND (Q1 OR Q2 OR Q3)",
+        "related_articles": ["法::A21:P1"],
+        "software_functions": [
+          { "category": "program_processing", "description": "適用判定ロジック" }
+        ]
+      },
+      {
+        "id": "proc-006",
+        "type": "process",
+        "title": "主要構造部確認",
+        "process_type": "human_judgment",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "主要構造部が通常火災終了時間耐火構造等に適合しているかを確認する",
+        "related_articles": ["法::A21:P1", "令::A109条の5"],
+        "software_functions": [
+          { "category": "user_input", "description": "構造方法・大臣認定の確認" }
+        ]
+      },
+      {
+        "id": "proc-007",
+        "type": "process",
+        "title": "法21条1項適合判定",
+        "process_type": "mechanical",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "適用対象外または主要構造部が基準適合であれば適合",
+        "logic_expression": "J = NOT(T) OR C",
+        "related_articles": ["法::A21:P1"],
+        "software_functions": [
+          { "category": "program_processing", "description": "最終適合判定" }
+        ]
+      }
+    ],
+    "edges": [
+      {"id": "e-001", "from": "proc-001", "to": "info-001", "role": "output"},
+      {"id": "e-002", "from": "proc-002", "to": "info-002", "role": "output"},
+      {"id": "e-003", "from": "proc-003", "to": "info-003", "role": "output"},
+      {"id": "e-004", "from": "proc-004", "to": "info-004", "role": "output"},
+      {"id": "e-005", "from": "info-002", "to": "proc-i1-check", "role": "input"},
+      {"id": "e-006", "from": "proc-i1-check", "to": "info-i1-match", "role": "output"},
+      {"id": "e-007", "from": "info-003", "to": "proc-i2-check", "role": "input"},
+      {"id": "e-008", "from": "proc-i2-check", "to": "info-i2-match", "role": "output"},
+      {"id": "e-009", "from": "info-003", "to": "proc-i3-check", "role": "input"},
+      {"id": "e-010", "from": "info-004", "to": "proc-i3-check", "role": "input"},
+      {"id": "e-011", "from": "proc-i3-check", "to": "info-i3-match", "role": "output"},
+      {"id": "e-012", "from": "info-001", "to": "proc-005", "role": "input"},
+      {"id": "e-013", "from": "info-i1-match", "to": "proc-005", "role": "input"},
+      {"id": "e-014", "from": "info-i2-match", "to": "proc-005", "role": "input"},
+      {"id": "e-015", "from": "info-i3-match", "to": "proc-005", "role": "input"},
+      {"id": "e-016", "from": "proc-005", "to": "info-005", "role": "output"},
+      {"id": "e-017", "from": "info-005", "to": "proc-006", "role": "input"},
+      {"id": "e-018", "from": "proc-006", "to": "info-006", "role": "output"},
+      {"id": "e-019", "from": "info-005", "to": "proc-007", "role": "input"},
+      {"id": "e-020", "from": "info-006", "to": "proc-007", "role": "input"},
+      {"id": "e-021", "from": "proc-007", "to": "info-007", "role": "output"}
+    ]
+  },
+
+  "flow_diagram": {
+    "title": "大規模の建築物の主要構造部等適合判定フロー",
+    "description": "法21条1項の適用対象判定と主要構造部の基準適合判定のフローチャート",
+    "nodes": [
+      {
+        "id": "term-start",
+        "type": "terminal",
+        "title": "審査開始",
+        "result": "start",
+        "description": "法第21条第1項の審査を開始"
+      },
+      {
+        "id": "dec-combustible",
+        "type": "decision",
+        "title": "可燃材料を使用？",
+        "description": "主要構造部（床・屋根・階段除く）に木材・プラスチック等の可燃材料を使用しているか",
+        "condition": {
+          "operator": "EQ",
+          "lhs": { "var": "has_combustible_material", "desc": "可燃材料使用 [M]" },
+          "rhs": { "value": true }
+        },
+        "related_articles": ["法::A21:P1"]
+      },
+      {
+        "id": "dec-stories",
+        "type": "decision",
+        "title": "階数 ≥ 4？",
+        "description": "【第1号】地階を除く階数が4以上か",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "stories", "desc": "地階を除く階数 [N]" },
+          "rhs": { "value": 4 }
+        },
+        "related_articles": ["法::A21:P1:I1"]
+      },
+      {
+        "id": "proc-i1-match",
+        "type": "process",
+        "title": "第1号該当",
+        "process_type": "mechanical",
+        "description": "階数4以上に該当",
+        "related_articles": ["法::A21:P1:I1"]
+      },
+      {
+        "id": "dec-height-16",
+        "type": "decision",
+        "title": "高さ > 16m？",
+        "description": "【第2号】高さが16mを超えるか",
+        "condition": {
+          "operator": "GT",
+          "lhs": { "var": "height", "desc": "高さ [H]" },
+          "rhs": { "value": 16, "unit": "m" }
+        },
+        "related_articles": ["法::A21:P1:I2"]
+      },
+      {
+        "id": "proc-i2-match",
+        "type": "process",
+        "title": "第2号該当",
+        "process_type": "mechanical",
+        "description": "高さ16m超に該当",
+        "related_articles": ["法::A21:P1:I2"]
+      },
+      {
+        "id": "dec-special-use",
+        "type": "decision",
+        "title": "別表1(5)(6)項の用途？",
+        "description": "【第3号①】倉庫、自動車車庫、危険物貯蔵所等の用途か",
+        "condition": {
+          "operator": "IN",
+          "lhs": { "var": "use_category", "desc": "用途 [U]" },
+          "rhs": ["倉庫", "自動車車庫", "自動車修理工場", "危険物貯蔵所"]
+        },
+        "related_articles": ["法::A21:P1:I3"]
+      },
+      {
+        "id": "dec-height-13",
+        "type": "decision",
+        "title": "高さ > 13m？",
+        "description": "【第3号②】高さが13mを超えるか",
+        "condition": {
+          "operator": "GT",
+          "lhs": { "var": "height", "desc": "高さ [H]" },
+          "rhs": { "value": 13, "unit": "m" }
+        },
+        "related_articles": ["法::A21:P1:I3"]
+      },
+      {
+        "id": "proc-i3-match",
+        "type": "process",
+        "title": "第3号該当",
+        "process_type": "mechanical",
+        "description": "特殊建築物で高さ13m超に該当",
+        "related_articles": ["法::A21:P1:I3"]
+      },
+      {
+        "id": "dec-structure",
+        "type": "decision",
+        "title": "主要構造部が基準適合？",
+        "description": "通常火災終了時間耐火構造等（大臣告示構造方法または大臣認定）に適合するか",
+        "condition": {
+          "operator": "EQ",
+          "lhs": { "var": "fire_endurance_compliance", "desc": "基準適合 [C]" },
+          "rhs": { "value": true }
+        },
+        "related_articles": ["法::A21:P1", "令::A109条の5"]
+      },
+      {
+        "id": "term-pass-non-combustible",
+        "type": "terminal",
+        "title": "適合（対象外）",
+        "result": "pass",
+        "description": "可燃材料を使用していないため規定対象外"
+      },
+      {
+        "id": "term-pass-scale",
+        "type": "terminal",
+        "title": "適合（規模外）",
+        "result": "pass",
+        "description": "各号のいずれにも該当しないため規定対象外"
+      },
+      {
+        "id": "term-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "主要構造部が通常火災終了時間耐火構造等に適合"
+      },
+      {
+        "id": "term-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "主要構造部が基準に不適合"
+      }
+    ],
+    "edges": [
+      { "id": "f-001", "from": "term-start", "to": "dec-combustible", "role": "flow" },
+      { "id": "f-002", "from": "dec-combustible", "to": "dec-stories", "role": "yes" },
+      { "id": "f-003", "from": "dec-combustible", "to": "term-pass-non-combustible", "role": "no" },
+      { "id": "f-004", "from": "dec-stories", "to": "proc-i1-match", "role": "yes" },
+      { "id": "f-005", "from": "proc-i1-match", "to": "dec-structure", "role": "flow" },
+      { "id": "f-006", "from": "dec-stories", "to": "dec-height-16", "role": "no" },
+      { "id": "f-007", "from": "dec-height-16", "to": "proc-i2-match", "role": "yes" },
+      { "id": "f-008", "from": "proc-i2-match", "to": "dec-structure", "role": "flow" },
+      { "id": "f-009", "from": "dec-height-16", "to": "dec-special-use", "role": "no" },
+      { "id": "f-010", "from": "dec-special-use", "to": "dec-height-13", "role": "yes" },
+      { "id": "f-011", "from": "dec-special-use", "to": "term-pass-scale", "role": "no" },
+      { "id": "f-012", "from": "dec-height-13", "to": "proc-i3-match", "role": "yes" },
+      { "id": "f-013", "from": "proc-i3-match", "to": "dec-structure", "role": "flow" },
+      { "id": "f-014", "from": "dec-height-13", "to": "term-pass-scale", "role": "no" },
+      { "id": "f-015", "from": "dec-structure", "to": "term-pass", "role": "yes" },
+      { "id": "f-016", "from": "dec-structure", "to": "term-fail", "role": "no" }
+    ]
+  },
+
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A21:P1:I1", "A21:P1:I2", "A21:P1:I3", "別表1"],
+      "description": "各号の規模要件および別表1の用途区分"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "delegates_to",
+      "articles": ["A109条の5"],
+      "description": "主要構造部に関する技術的基準"
+    }
+  ],
+
+  "metadata": {
+    "created_at": "2025-12-15",
+    "updated_at": "2025-12-15",
+    "generator": "multi-agent-v4.2",
+    "notes": "可燃材料使用 AND (階数4以上 OR 高さ16m超 OR 特殊建築物で高さ13m超) → 通常火災終了時間耐火構造等必要"
+  }
+}
