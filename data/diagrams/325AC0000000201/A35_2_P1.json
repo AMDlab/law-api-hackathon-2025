@@ -1,0 +1,511 @@
+{
+  "id": "CHK-BSL-A35_2-P1",
+  "version": "3.2.0",
+
+  "page_title": {
+    "title": "特殊建築物等の内装",
+    "target_subject": "建築物",
+    "description": "別表1(い)欄に掲げる用途の特殊建築物等について、内装の制限に関する政令技術基準への適合を判定する"
+  },
+
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "35",
+    "paragraph": "2",
+    "item": null
+  },
+
+  "labels": ["単体規定", "防火", "内装制限", "特殊建築物"],
+
+  "text_raw": "別表第一（い）欄に掲げる用途に供する特殊建築物、階数が三以上である建築物、政令で定める窓その他の開口部を有しない居室を有する建築物、延べ面積が千平方メートルをこえる建築物又は建築物の調理室、浴室その他の室でかまど、こんろその他火を使用する設備若しくは器具を設けたものは、政令で定めるものを除き、政令で定める技術的基準に従つて、その壁及び天井（天井のない場合においては、屋根）の室内に面する部分の仕上げを防火上支障がないようにしなければならない。",
+
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "OR_GLOBAL",
+      "desc": "適用対象の判定",
+      "conditions": [
+        {
+          "id": "scope-special",
+          "desc": "別表1(い)欄に掲げる用途に供する特殊建築物",
+          "related_article": "別表1"
+        },
+        {
+          "id": "scope-stories",
+          "operator": "GTE",
+          "lhs": { "var": "stories", "desc": "階数" },
+          "rhs": { "value": 3 }
+        },
+        {
+          "id": "scope-windowless",
+          "desc": "政令で定める無窓の居室を有する建築物",
+          "related_article": "令::A128条の3の2"
+        },
+        {
+          "id": "scope-area",
+          "operator": "GT",
+          "lhs": { "var": "total_floor_area", "desc": "延べ面積" },
+          "rhs": { "value": 1000, "unit": "㎡" }
+        },
+        {
+          "id": "scope-fire",
+          "desc": "火を使用する設備・器具を設けた室",
+          "related_article": "法::A35の2"
+        }
+      ]
+    },
+    "judgment_rule": {
+      "operator": "EQ",
+      "lhs": { "var": "interior_finish_compliance", "desc": "内装仕上げが政令技術基準に適合", "property_type": "proposition" },
+      "rhs": { "value": true }
+    },
+    "exceptions": {
+      "operator": "EQ",
+      "effect": "exempt",
+      "desc": "政令で定めるものを除く",
+      "items": [
+        {
+          "item_number": "1",
+          "desc": "政令で定める建築物・室",
+          "related_article": "令::A128条の4、A128条の5",
+          "keywords": ["スプリンクラー設備", "排煙設備"]
+        }
+      ]
+    }
+  },
+
+  "diagram": {
+    "nodes": [
+      {
+        "id": "info-001",
+        "type": "information",
+        "title": "建築物の用途",
+        "symbol": "U",
+        "subject": "建築物",
+        "plurality": "single",
+        "property": "用途",
+        "property_type": "classification",
+        "description": "別表1(い)欄との照合用",
+        "related_articles": ["法::A35の2", "別表1"]
+      },
+      {
+        "id": "info-002",
+        "type": "information",
+        "title": "階数",
+        "symbol": "N",
+        "subject": "建築物",
+        "plurality": "single",
+        "property": "階数",
+        "property_type": "numeric",
+        "unit": "階",
+        "description": "建築物の階数",
+        "related_articles": ["法::A35の2"]
+      },
+      {
+        "id": "info-003",
+        "type": "information",
+        "title": "無窓居室",
+        "symbol": "W",
+        "subject": "建築物",
+        "plurality": "single",
+        "property": "無窓の居室の有無",
+        "property_type": "proposition",
+        "description": "政令で定める無窓の居室を有するか",
+        "related_articles": ["令::A128条の3の2"]
+      },
+      {
+        "id": "info-004",
+        "type": "information",
+        "title": "延べ面積",
+        "symbol": "A",
+        "subject": "建築物",
+        "plurality": "single",
+        "property": "延べ面積",
+        "property_type": "numeric",
+        "unit": "㎡",
+        "description": "延べ面積",
+        "related_articles": ["法::A35の2"]
+      },
+      {
+        "id": "info-005",
+        "type": "information",
+        "title": "火気使用室",
+        "symbol": "F",
+        "subject": "建築物",
+        "plurality": "single",
+        "property": "火を使用する設備・器具を設けた室の有無",
+        "property_type": "proposition",
+        "description": "調理室、浴室その他の火を使用する設備・器具を設けた室を有するか",
+        "related_articles": ["法::A35の2"]
+      },
+      {
+        "id": "info-006",
+        "type": "information",
+        "title": "適用対象",
+        "symbol": "T",
+        "subject": "建築物",
+        "plurality": "single",
+        "property": "法35条の2の適用対象",
+        "property_type": "proposition",
+        "description": "特殊建築物/階数3以上/無窓居室/延べ面積1000㎡超/火気使用室のいずれかに該当",
+        "related_articles": ["法::A35の2"]
+      },
+      {
+        "id": "info-007",
+        "type": "information",
+        "title": "政令除外",
+        "symbol": "Ex",
+        "subject": "建築物",
+        "plurality": "single",
+        "property": "政令で定める除外対象",
+        "property_type": "proposition",
+        "description": "令128条の4等の除外対象に該当するか",
+        "related_articles": ["令::A128条の4", "令::A128条の5"]
+      },
+      {
+        "id": "info-008",
+        "type": "information",
+        "title": "内装仕上げ",
+        "symbol": "I",
+        "subject": "室",
+        "plurality": "multiple",
+        "property": "壁・天井の仕上げ",
+        "property_type": "classification",
+        "description": "壁及び天井の室内に面する部分の仕上げの種類",
+        "related_articles": ["法::A35の2", "令::A128条の4", "令::A129"]
+      },
+      {
+        "id": "info-009",
+        "type": "information",
+        "title": "法35条の2適合",
+        "symbol": "J",
+        "subject": "建築物",
+        "plurality": "single",
+        "property": "法35条の2への適合",
+        "property_type": "proposition",
+        "description": "法第35条の2に適合するか",
+        "related_articles": ["法::A35の2"]
+      },
+      {
+        "id": "proc-001",
+        "type": "process",
+        "title": "用途の確認",
+        "process_type": "human_judgment",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "建築物の用途を確認する",
+        "related_articles": ["法::A35の2", "別表1"],
+        "software_functions": [
+          { "category": "user_input", "description": "用途の選択" }
+        ]
+      },
+      {
+        "id": "proc-002",
+        "type": "process",
+        "title": "階数の確認",
+        "process_type": "human_judgment",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "建築物の階数を確認する",
+        "related_articles": ["法::A35の2"],
+        "software_functions": [
+          { "category": "user_input", "description": "階数の入力" }
+        ]
+      },
+      {
+        "id": "proc-003",
+        "type": "process",
+        "title": "無窓居室の確認",
+        "process_type": "human_judgment",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "政令で定める無窓の居室を有するかを確認する",
+        "related_articles": ["令::A128条の3の2"],
+        "software_functions": [
+          { "category": "user_input", "description": "無窓居室の確認" }
+        ]
+      },
+      {
+        "id": "proc-004",
+        "type": "process",
+        "title": "延べ面積の確認",
+        "process_type": "human_judgment",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "延べ面積を確認する",
+        "related_articles": ["法::A35の2"],
+        "software_functions": [
+          { "category": "user_input", "description": "延べ面積の入力" }
+        ]
+      },
+      {
+        "id": "proc-005",
+        "type": "process",
+        "title": "火気使用室の確認",
+        "process_type": "human_judgment",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "火を使用する設備・器具を設けた室を有するかを確認する",
+        "related_articles": ["法::A35の2"],
+        "software_functions": [
+          { "category": "user_input", "description": "火気使用室の確認" }
+        ]
+      },
+      {
+        "id": "proc-006",
+        "type": "process",
+        "title": "適用判定",
+        "process_type": "mechanical",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "適用対象に該当するかを判定する",
+        "logic_expression": "T = (U ∈ 別表1) OR (N >= 3) OR W OR (A > 1000) OR F",
+        "related_articles": ["法::A35の2"],
+        "software_functions": [
+          { "category": "program_processing", "description": "適用判定" }
+        ]
+      },
+      {
+        "id": "proc-007",
+        "type": "process",
+        "title": "政令除外確認",
+        "process_type": "human_judgment",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "政令で定める除外対象に該当するかを確認する",
+        "related_articles": ["令::A128条の4", "令::A128条の5"],
+        "software_functions": [
+          { "category": "user_input", "description": "政令除外の確認" }
+        ]
+      },
+      {
+        "id": "proc-008",
+        "type": "process",
+        "title": "内装仕上げ確認",
+        "process_type": "human_judgment",
+        "target_subject": "室",
+        "iteration": "multiple",
+        "description": "壁及び天井の室内に面する部分の仕上げを確認する",
+        "related_articles": ["法::A35の2", "令::A129"],
+        "software_functions": [
+          { "category": "user_input", "description": "内装仕上げの確認" }
+        ]
+      },
+      {
+        "id": "proc-009",
+        "type": "process",
+        "title": "法35条の2適合判定",
+        "process_type": "mechanical",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "適用対象外、政令除外、または内装仕上げが基準適合であれば適合",
+        "logic_expression": "J = NOT(T) OR Ex OR I適合",
+        "related_articles": ["法::A35の2"],
+        "software_functions": [
+          { "category": "program_processing", "description": "最終適合判定" }
+        ]
+      }
+    ],
+    "edges": [
+      {"id": "e-001", "from": "proc-001", "to": "info-001", "role": "output"},
+      {"id": "e-002", "from": "proc-002", "to": "info-002", "role": "output"},
+      {"id": "e-003", "from": "proc-003", "to": "info-003", "role": "output"},
+      {"id": "e-004", "from": "proc-004", "to": "info-004", "role": "output"},
+      {"id": "e-005", "from": "proc-005", "to": "info-005", "role": "output"},
+      {"id": "e-006", "from": "info-001", "to": "proc-006", "role": "input"},
+      {"id": "e-007", "from": "info-002", "to": "proc-006", "role": "input"},
+      {"id": "e-008", "from": "info-003", "to": "proc-006", "role": "input"},
+      {"id": "e-009", "from": "info-004", "to": "proc-006", "role": "input"},
+      {"id": "e-010", "from": "info-005", "to": "proc-006", "role": "input"},
+      {"id": "e-011", "from": "proc-006", "to": "info-006", "role": "output"},
+      {"id": "e-012", "from": "info-006", "to": "proc-007", "role": "input"},
+      {"id": "e-013", "from": "proc-007", "to": "info-007", "role": "output"},
+      {"id": "e-014", "from": "info-006", "to": "proc-008", "role": "input"},
+      {"id": "e-015", "from": "proc-008", "to": "info-008", "role": "output"},
+      {"id": "e-016", "from": "info-006", "to": "proc-009", "role": "input"},
+      {"id": "e-017", "from": "info-007", "to": "proc-009", "role": "input"},
+      {"id": "e-018", "from": "info-008", "to": "proc-009", "role": "input"},
+      {"id": "e-019", "from": "proc-009", "to": "info-009", "role": "output"}
+    ]
+  },
+
+  "flow_diagram": {
+    "title": "特殊建築物等の内装適合判定フロー",
+    "description": "法35条の2の適用対象判定と内装仕上げの基準適合判定のフローチャート",
+    "nodes": [
+      {
+        "id": "term-start",
+        "type": "terminal",
+        "title": "審査開始",
+        "result": "start",
+        "description": "法第35条の2の審査を開始"
+      },
+      {
+        "id": "dec-special",
+        "type": "decision",
+        "title": "別表1(い)欄の用途？",
+        "description": "別表1(い)欄に掲げる用途に供する特殊建築物か",
+        "condition": {
+          "operator": "IN",
+          "lhs": { "var": "use_category", "desc": "用途 [U]" },
+          "rhs": ["劇場", "映画館", "病院", "ホテル", "共同住宅", "学校", "百貨店", "倉庫"]
+        },
+        "related_articles": ["別表1"]
+      },
+      {
+        "id": "dec-stories",
+        "type": "decision",
+        "title": "階数 ≥ 3？",
+        "description": "階数が3以上か",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "stories", "desc": "階数 [N]" },
+          "rhs": { "value": 3 }
+        },
+        "related_articles": ["法::A35の2"]
+      },
+      {
+        "id": "dec-windowless",
+        "type": "decision",
+        "title": "無窓居室あり？",
+        "description": "政令で定める無窓の居室を有するか",
+        "condition": {
+          "operator": "EQ",
+          "lhs": { "var": "has_windowless_room", "desc": "無窓居室 [W]" },
+          "rhs": { "value": true }
+        },
+        "related_articles": ["令::A128条の3の2"]
+      },
+      {
+        "id": "dec-area",
+        "type": "decision",
+        "title": "延べ面積 > 1000㎡？",
+        "description": "延べ面積が1000㎡を超えるか",
+        "condition": {
+          "operator": "GT",
+          "lhs": { "var": "total_floor_area", "desc": "延べ面積 [A]" },
+          "rhs": { "value": 1000, "unit": "㎡" }
+        },
+        "related_articles": ["法::A35の2"]
+      },
+      {
+        "id": "dec-fire",
+        "type": "decision",
+        "title": "火気使用室あり？",
+        "description": "調理室、浴室その他の火を使用する設備・器具を設けた室を有するか",
+        "condition": {
+          "operator": "EQ",
+          "lhs": { "var": "has_fire_use_room", "desc": "火気使用室 [F]" },
+          "rhs": { "value": true }
+        },
+        "related_articles": ["法::A35の2"]
+      },
+      {
+        "id": "dec-exempt",
+        "type": "decision",
+        "title": "政令除外対象？",
+        "description": "政令で定める除外対象に該当するか",
+        "condition": {
+          "operator": "EQ",
+          "lhs": { "var": "exempt", "desc": "政令除外 [Ex]" },
+          "rhs": { "value": true }
+        },
+        "related_articles": ["令::A128条の4", "令::A128条の5"]
+      },
+      {
+        "id": "proc-exempt-match",
+        "type": "process",
+        "title": "政令除外該当",
+        "process_type": "mechanical",
+        "description": "内装制限対象外",
+        "related_articles": ["令::A128条の4"]
+      },
+      {
+        "id": "dec-interior",
+        "type": "decision",
+        "title": "内装仕上げが基準に適合？",
+        "description": "壁及び天井の室内に面する部分の仕上げが政令技術基準に適合するか",
+        "condition": {
+          "operator": "EQ",
+          "lhs": { "var": "interior_finish_compliance", "desc": "内装適合 [I]" },
+          "rhs": { "value": true }
+        },
+        "related_articles": ["法::A35の2", "令::A129"]
+      },
+      {
+        "id": "term-pass-not-applicable",
+        "type": "terminal",
+        "title": "適合（対象外）",
+        "result": "pass",
+        "description": "法35条の2の適用対象外"
+      },
+      {
+        "id": "term-pass-exempt",
+        "type": "terminal",
+        "title": "適合（除外）",
+        "result": "pass",
+        "description": "政令除外により内装制限対象外"
+      },
+      {
+        "id": "term-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "内装仕上げが技術基準に適合"
+      },
+      {
+        "id": "term-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "内装仕上げが技術基準に不適合"
+      }
+    ],
+    "edges": [
+      { "id": "f-001", "from": "term-start", "to": "dec-special", "role": "flow" },
+      { "id": "f-002", "from": "dec-special", "to": "dec-exempt", "role": "yes" },
+      { "id": "f-003", "from": "dec-special", "to": "dec-stories", "role": "no" },
+      { "id": "f-004", "from": "dec-stories", "to": "dec-exempt", "role": "yes" },
+      { "id": "f-005", "from": "dec-stories", "to": "dec-windowless", "role": "no" },
+      { "id": "f-006", "from": "dec-windowless", "to": "dec-exempt", "role": "yes" },
+      { "id": "f-007", "from": "dec-windowless", "to": "dec-area", "role": "no" },
+      { "id": "f-008", "from": "dec-area", "to": "dec-exempt", "role": "yes" },
+      { "id": "f-009", "from": "dec-area", "to": "dec-fire", "role": "no" },
+      { "id": "f-010", "from": "dec-fire", "to": "dec-exempt", "role": "yes" },
+      { "id": "f-011", "from": "dec-fire", "to": "term-pass-not-applicable", "role": "no" },
+      { "id": "f-012", "from": "dec-exempt", "to": "proc-exempt-match", "role": "yes" },
+      { "id": "f-013", "from": "proc-exempt-match", "to": "term-pass-exempt", "role": "flow" },
+      { "id": "f-014", "from": "dec-exempt", "to": "dec-interior", "role": "no" },
+      { "id": "f-015", "from": "dec-interior", "to": "term-pass", "role": "yes" },
+      { "id": "f-016", "from": "dec-interior", "to": "term-fail", "role": "no" }
+    ]
+  },
+
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["別表1"],
+      "description": "特殊建築物の用途区分"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "defines_detail",
+      "articles": ["A128条の3の2", "A128条の4", "A128条の5", "A129"],
+      "description": "無窓居室、内装制限の除外、内装の制限を受ける建築物・室、内装材料の技術基準"
+    }
+  ],
+
+  "metadata": {
+    "created_at": "2025-12-15",
+    "updated_at": "2025-12-15",
+    "generator": "multi-agent-v4.2",
+    "notes": "特殊建築物/階数3以上/無窓居室/延べ面積1000㎡超/火気使用室 → 内装仕上げの技術基準適合必要（政令除外あり）"
+  }
+}

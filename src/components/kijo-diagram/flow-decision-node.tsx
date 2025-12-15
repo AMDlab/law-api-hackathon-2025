@@ -1,23 +1,24 @@
 "use client";
 
 import { memo } from "react";
-import { Handle, Position, type NodeProps } from "@xyflow/react";
+import { Handle, Position, type NodeProps, type Node } from "@xyflow/react";
 import type { DecisionNode as DecisionNodeType } from "@/types/diagram";
 
-interface FlowDecisionNodeData {
+interface FlowDecisionNodeData extends Record<string, unknown> {
   node: DecisionNodeType;
   isFlowDiagram?: boolean;
   nodeWidth?: number;
 }
 
+type FlowDecisionNodeProps = NodeProps<Node<FlowDecisionNodeData>>;
+
 /**
  * 判定ノード - フローチャート用六角形スタイル
  */
-function FlowDecisionNodeComponent({ data, selected }: NodeProps) {
-  const nodeData = data as FlowDecisionNodeData;
-  const node = nodeData.node;
-  const isFlowDiagram = nodeData.isFlowDiagram;
-  const nodeWidth = nodeData.nodeWidth;
+function FlowDecisionNodeComponent({ data, selected }: FlowDecisionNodeProps) {
+  const node = data.node;
+  const isFlowDiagram = data.isFlowDiagram;
+  const nodeWidth = data.nodeWidth;
 
   if (isFlowDiagram) {
     // フローチャート用：六角形（hexagon）- SVGで描画

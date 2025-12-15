@@ -1,13 +1,15 @@
 "use client";
 
 import { memo } from "react";
-import { Handle, Position, type NodeProps } from "@xyflow/react";
+import { Handle, Position, type NodeProps, type Node } from "@xyflow/react";
 import type { TerminalNode as TerminalNodeType } from "@/types/diagram";
 
-interface FlowTerminalNodeData {
+interface FlowTerminalNodeData extends Record<string, unknown> {
   node: TerminalNodeType;
   isFlowDiagram?: boolean;
 }
+
+type FlowTerminalNodeProps = NodeProps<Node<FlowTerminalNodeData>>;
 
 /**
  * 結果に応じたスタイルを取得（フロー図用）
@@ -98,9 +100,9 @@ function getKijoResultStyle(result: TerminalNodeType["result"]) {
 /**
  * 端子ノード - フローチャート用角丸長方形
  */
-function FlowTerminalNodeComponent({ data, selected }: NodeProps) {
-  const node = (data as FlowTerminalNodeData).node;
-  const isFlowDiagram = (data as FlowTerminalNodeData).isFlowDiagram;
+function FlowTerminalNodeComponent({ data, selected }: FlowTerminalNodeProps) {
+  const node = data.node;
+  const isFlowDiagram = data.isFlowDiagram;
   const isStart = node.result === "start";
   const isEnd = node.result === "end" || node.result === "pass" || node.result === "fail";
 

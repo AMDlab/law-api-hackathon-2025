@@ -1,18 +1,22 @@
 "use client";
 
 import { memo } from "react";
-import { Handle, Position, type NodeProps } from "@xyflow/react";
+import { Handle, Position, type NodeProps, type Node } from "@xyflow/react";
 import type { DecisionNode as DecisionNodeType } from "@/types/diagram";
 
-interface DecisionNodeData {
+interface DecisionNodeData extends Record<string, unknown> {
   node: DecisionNodeType;
+  isFlowDiagram?: boolean;
+  nodeWidth?: number;
 }
+
+type DecisionNodeProps = NodeProps<Node<DecisionNodeData>>;
 
 /**
  * 判定ノード - 条件分岐（ひし形）
  */
-function DecisionNodeComponent({ data, selected }: NodeProps) {
-  const node = (data as DecisionNodeData).node;
+function DecisionNodeComponent({ data, selected }: DecisionNodeProps) {
+  const node = data.node;
 
   return (
     <div
@@ -45,8 +49,8 @@ function DecisionNodeComponent({ data, selected }: NodeProps) {
 }
 
 // ひし形は複雑なので、シンプルな角丸ボックスに変更
-function DecisionNodeSimple({ data, selected }: NodeProps) {
-  const node = (data as DecisionNodeData).node;
+function DecisionNodeSimple({ data, selected }: DecisionNodeProps) {
+  const node = data.node;
 
   return (
     <div
