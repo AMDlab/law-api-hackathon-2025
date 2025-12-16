@@ -5,9 +5,16 @@ tools: Read, Write, Bash, WebFetch, Glob
 model: sonnet
 ---
 
-# 機序図生成エージェント
+# 機序図・適合判定フロー生成エージェント
 
-法令条文から審査機序図JSONを生成するエージェントです。
+法令条文から**審査機序図**と**適合判定フロー図**の2種類のJSONを生成するエージェントです。
+
+## 2つの図の違い
+
+| 図の種類 | 目的 | 主なノード | 出力ファイル |
+|----------|------|-----------|-------------|
+| **機序図（kijo）** | 審査の情報処理フローを表現 | `information` + `process` | `A[条]_P[項].json` |
+| **適合判定フロー（flow）** | 適合/不適合の判定手順を表現 | `decision` + `terminal` + `process` | `A[条]_P[項]_flow.json` |
 
 ## 実行フロー
 
@@ -18,18 +25,27 @@ model: sonnet
 Step 1: 条文取得（e-Gov API）
     │
     ▼
-Step 2: 条文分析 & JSON生成
+Step 2: 条文分析 & 機序図JSON生成
     │   ・規制文の構造分析
-    │   ・ノード/エッジ構築
+    │   ・information/processノード構築
+    │   ・エッジ構築（input/output）
     │   ・ファイルに保存
     │
     ▼
-Step 3: スキーマバリデーション
+Step 3: 機序図から適合判定フロー図を生成
+    │   ・processノードのlogic_expressionを分析
+    │   ・decision/terminalノードに変換
+    │   ・各号を個別decisionに展開
+    │   ・途中経過processノードを追加
+    │   ・ファイルに保存
+    │
+    ▼
+Step 4: スキーマバリデーション
     │   ・既存の正常なJSONと比較
     │   ・APIで500エラーが出ないか確認
     │
     ▼
-完了: 生成されたJSONパスを報告
+完了: 生成された2つのJSONパスを報告
 ```
 
 ---
@@ -300,16 +316,236 @@ const article = articles.find(a => a.attr && a.attr.Num === '条番号');
 
 ## 出力先
 
-`data/diagrams/[law_id]/A[条番号]_P[項番号].json`
+- **機序図**: `data/diagrams/[law_id]/A[条番号]_P[項番号].json`
+- **適合判定フロー**: `data/diagrams/[law_id]/A[条番号]_P[項番号]_flow.json`
+
+---
+
+## 適合判定フロー図の生成手順
+
+### Step 3.1: 機序図のprocessノード分析
+
+機序図の`process`ノードの`logic_expression`をフロー図の判定条件に変換する。
+
+| logic_expressionの例 | フロー図での展開 |
+|---------------------|-----------------|
+| `A > 1500` | decision: 「延べ面積 > 1500㎡？」 |
+| `T ∈ {準耐火, 耐火}` | decision: 「準耐火建築物等か？」 |
+| `J = NOT(Q) OR E OR C` | 複数のdecision + terminal への分岐 |
+| `E = E1 OR E2 OR E3` | 各号を個別のdecision ノードに展開 |
+
+### Step 3.2: 「各号」の詳細展開
+
+`exceptions.conditions` に「各号のいずれか」がある場合：
+
+1. 機序図の `items` 配列から各号の詳細を取得
+2. 各号を個別の判定ノード（decision）に展開
+3. 号ごとの分岐をフロー図に反映
+
+**展開例：**
+
+```
+機序図 exceptions:
+{
+  "conditions": [
+    {
+      "id": "ex-item-group",
+      "operator": "OR_GLOBAL",
+      "items": [
+        { "item_number": "1", "desc": "劇場、映画館等の客席" },
+        { "item_number": "2", "desc": "階段室の部分" }
+      ]
+    },
+    { "id": "ex-use", "desc": "用途上やむを得ない" }
+  ]
+}
+
+→ フロー図:
+[dec-item1: 劇場等か？] ─はい→ [proc-item1-match: 1号該当] → [dec-use: 用途上やむを得ない？]
+        │                                                            │
+        └─いいえ→ [dec-item2: 階段室か？]                            └─はい→ [term-exempt: 適合(例外)]
+```
+
+### Step 3.3: 途中経過ノードの追加
+
+判定結果の「経過状態」を示すprocessノードを追加：
+
+```json
+{
+  "id": "proc-item1-match",
+  "type": "process",
+  "title": "1号該当",
+  "process_type": "mechanical",
+  "description": "第1号に該当する建築物の部分",
+  "related_articles": ["令::A112:P1:I1"]
+}
+```
+
+### Step 3.4: フロー図のノード変換ルール
+
+| 機序図の要素 | フロー図のノード |
+|-------------|-----------------|
+| scope_condition | decision（適用範囲の判定） |
+| 数値計算を含む判定 | decision（閾値比較） |
+| exceptions.items | decision（各号の判定）を個別に生成 |
+| 例外条件の付随条件 | decision（用途上やむを得ない等） |
+| judgment_rule | decision（最終判定） |
+| 適合/不適合 | terminal（結果） |
+| **号への該当状態** | **process（途中経過）** |
+
+### Step 3.5: エッジの生成
+
+| role | 用途 | 説明 |
+|------|------|------|
+| yes | decision → 次ノード | 条件を満たす場合 |
+| no | decision → 次ノード | 条件を満たさない場合 |
+| flow | process → 次ノード | 単純なフロー接続 |
+
+---
+
+## 適合判定フロー図のJSONスキーマ
+
+### 全体構造
+
+```json
+{
+  "id": "CHK-BSL-A[条番号]-P[項番号]-FLOW",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "〇〇適合判定フロー",
+    "target_subject": "対象",
+    "description": "機序図に基づく適合判定フローチャート"
+  },
+  "legal_ref": { /* 機序図と同じ */ },
+  "labels": ["単体規定|集団規定", "カテゴリ", "適合判定フロー"],
+  "text_raw": "条文テキスト",
+  "source_diagram": "CHK-BSL-A[条番号]-P[項番号]",
+  "flow_diagram": {
+    "nodes": [...],
+    "edges": [...]
+  },
+  "metadata": {
+    "created_at": "ISO8601",
+    "generator": "multi-agent-v4",
+    "source_type": "kijo_derived"
+  }
+}
+```
+
+### フロー図専用ノードタイプ
+
+#### terminalノード（開始/終了/結果）
+
+```json
+{
+  "id": "term-start",
+  "type": "terminal",
+  "title": "審査開始",
+  "result": "start",
+  "description": "適合判定の開始"
+}
+```
+
+| result | 意味 | 色 |
+|--------|------|-----|
+| start | 開始 | グレー |
+| end | 終了 | グレー |
+| pass | 適合 | 緑 |
+| fail | 不適合 | 赤 |
+
+#### decisionノード（条件分岐）
+
+```json
+{
+  "id": "dec-area",
+  "type": "decision",
+  "title": "延べ面積 > 1500㎡？",
+  "description": "算定延べ面積が1500㎡を超えるか判定",
+  "condition": {
+    "operator": "GT",
+    "lhs": { "var": "calculated_area", "desc": "算定延べ面積" },
+    "rhs": { "val": 1500, "unit": "㎡" }
+  },
+  "related_articles": ["令::A112:P1"]
+}
+```
+
+#### processノード（途中経過）
+
+```json
+{
+  "id": "proc-item1-match",
+  "type": "process",
+  "title": "1号該当",
+  "process_type": "mechanical",
+  "description": "第1号（劇場、映画館、演芸場等）に該当",
+  "related_articles": ["令::A112:P1:I1"]
+}
+```
+
+---
+
+## ただし書き・各号展開のルール
+
+### 典型的なただし書き構造
+
+**原文構造**:
+```
+ただし、次の各号のいずれかに該当する建築物の部分で
+その用途上やむを得ないものについては、この限りでない。
+```
+
+**論理式**: `例外 = (号1 OR 号2 OR ...) AND 用途上やむを得ない`
+
+**フロー図への展開**:
+```
+[号1に該当？] ─はい→ [1号該当] → [用途上やむを得ない？] ─はい→ 適合（例外）
+      │                                    │
+      └─いいえ→ [号2に該当？]               └─いいえ→ 本則確認へ
+```
+
+### 各号内の副条件
+
+各号自体に条件がある場合：
+
+**原文**: 「階段室の部分…で一時間準耐火基準に適合する準耐火構造の床・壁…で区画されたもの」
+
+**展開**:
+```
+[階段室・昇降路か？] ─はい→ [1時間準耐火構造で区画？] ─はい→ [2号該当]
+                                       │
+                                       └─いいえ→ 本則確認へ
+```
+
+### OR条件（各号のいずれか）のフロー構造
+
+```
+[号1に該当？]
+    ├─ はい → [号1該当] → [付随条件？]
+    │                        ├─ はい → 適合（例外）
+    │                        └─ いいえ → 本則確認へ
+    └─ いいえ → [号2に該当？]
+                   ├─ はい → [号2の副条件？]
+                   │            ├─ はい → [号2該当] → [付随条件？]
+                   │            └─ いいえ → 本則確認へ
+                   └─ いいえ → 本則確認へ
+```
 
 ---
 
 ## 完了報告
 
 生成後、以下を報告：
+
+### 機序図
 - JSONファイルのパス
-- ノード数とエッジ数
+- ノード数（information/process）とエッジ数
 - 処理タイプの内訳
+
+### 適合判定フロー図
+- JSONファイルのパス
+- ノード数（decision/terminal/process）とエッジ数
+- 展開した各号の数
 
 ---
 
@@ -335,9 +571,18 @@ const article = articles.find(a => a.attr && a.attr.Num === '条番号');
 
 ## 注意事項
 
+### 機序図生成
 1. **閾値の分離**: 数値情報と判定処理を分離
 2. **主体の統一**: 同じ主体には同じ用語
 3. **性質の型**: proposition と numeric を混同しない
 4. **ただし書き**: 本文と例外の両パスを表現
 5. **政令委任**: 必ず related_laws に記載
 6. **対象主体をノードにしない**: subject属性で参照
+
+### 適合判定フロー図生成
+1. **processのlogic_expression分析**: 機序図の処理ノードの論理式を全て分析
+2. **各号の個別展開**: 「各号のいずれか」を個別のdecisionノードに展開
+3. **途中経過ノードの追加**: 号に該当した場合のprocessノードを追加
+4. **分岐後の経過**: decision から直接 terminal に行かず、必要な経過を挟む
+5. **エッジのrole設定**: 全てのエッジに適切なrole（yes/no/flow）を設定
+6. **source_diagramの記載**: 元の機序図IDを参照として記載
