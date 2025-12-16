@@ -280,7 +280,7 @@ export const FlowDiagramSchema = z.object({
   edges: z.array(EdgeSchema),
 });
 
-/** 審査機序図 (v3.1) - 統合形式 */
+/** 審査機序図 (v3.2) - 統合形式 */
 export const KijoDiagramSchema = z.object({
   id: z.string().min(1),
   version: z.string(),
@@ -289,12 +289,10 @@ export const KijoDiagramSchema = z.object({
   labels: z.array(z.string()).optional(),
   text_raw: z.string().optional(),
   compliance_logic: ComplianceLogicSchema.optional(),
-  // 機序図（kijo_diagramまたはdiagramで指定）
-  kijo_diagram: DiagramSchema.optional(),
+  // 機序図（必須）
+  kijo_diagram: DiagramSchema,
   // 適合判定フロー図（オプション）
   flow_diagram: FlowDiagramSchema.optional(),
-  // 後方互換性のためのdiagram（必須）
-  diagram: DiagramSchema,
   related_laws: z.array(RelatedLawSchema).optional(),
   metadata: DiagramMetadataSchema.optional(),
 });

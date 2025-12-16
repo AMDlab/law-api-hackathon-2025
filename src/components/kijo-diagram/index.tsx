@@ -268,8 +268,8 @@ function KijoDiagramViewerInner({ diagram, className, articleContent, articleTit
     if (isFlowDiagram && diagram.flow_diagram) {
       return { nodes: diagram.flow_diagram.nodes, edges: diagram.flow_diagram.edges };
     }
-    return diagram.diagram;
-  }, [isFlowDiagram, diagram.flow_diagram, diagram.diagram]);
+    return diagram.kijo_diagram;
+  }, [isFlowDiagram, diagram.flow_diagram, diagram.kijo_diagram]);
 
   // グラフの検証
   const validation = useMemo(() => validateGraph(currentDiagramStructure), [currentDiagramStructure]);

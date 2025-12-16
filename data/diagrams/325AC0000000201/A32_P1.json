@@ -1,13 +1,11 @@
 {
   "id": "CHK-BSL-A32-P1",
   "version": "3.2.0",
-
   "page_title": {
-    "title": "電気設備",
+    "title": "電気設備の技術基準適合",
     "target_subject": "建築物",
-    "description": "建築物の電気設備について、法律又は政令で定める技術的基準に適合するかを判定する"
+    "description": "建築物の電気設備が電気工作物に係る建築物の安全及び防火に関する法令で定める工法に適合するかを判定する"
   },
-
   "legal_ref": {
     "law_id": "325AC0000000201",
     "law_type": "act",
@@ -17,11 +15,12 @@
     "paragraph": "1",
     "item": null
   },
-
-  "labels": ["単体規定", "設備", "電気設備"],
-
+  "labels": [
+    "単体規定",
+    "設備",
+    "電気設備"
+  ],
   "text_raw": "建築物の電気設備は、法律又はこれに基づく命令の規定で電気工作物に係る建築物の安全及び防火に関するものに定める工法によつて設けなければならない。",
-
   "compliance_logic": {
     "scope_condition": {
       "operator": "ALWAYS",
@@ -30,13 +29,20 @@
     },
     "judgment_rule": {
       "operator": "EQ",
-      "lhs": { "var": "electrical_installation_compliance", "desc": "電気設備が法令で定める工法に適合", "property_type": "proposition" },
-      "rhs": { "value": true }
+      "lhs": {
+        "var": "electrical_installation_compliance",
+        "desc": "電気設備が法令で定める工法に適合",
+        "property_type": "proposition"
+      },
+      "rhs": {
+        "value": true
+      }
     },
     "exceptions": null
   },
-
-  "diagram": {
+  "kijo_diagram": {
+    "title": "電気設備適合審査機序",
+    "description": "法32条の電気設備に関する工法適合判定の情報処理フロー",
     "nodes": [
       {
         "id": "info-001",
@@ -45,25 +51,57 @@
         "symbol": "E",
         "subject": "建築物",
         "plurality": "single",
-        "property": "電気設備の有無",
+        "property": "電気設備が設けられているか",
         "property_type": "proposition",
         "description": "建築物に電気設備が設けられているか",
-        "related_articles": ["法::A32"]
+        "related_articles": [
+          "法::A32:P1"
+        ]
       },
       {
         "id": "info-002",
         "type": "information",
-        "title": "電気設備の工法",
-        "symbol": "M",
+        "title": "適用法令の特定",
+        "symbol": "L",
         "subject": "電気設備",
         "plurality": "single",
-        "property": "工法への適合",
-        "property_type": "proposition",
-        "description": "電気工作物に係る建築物の安全及び防火に関する法令の工法に適合しているか",
-        "related_articles": ["法::A32", "電気事業法", "電気設備技術基準"]
+        "property": "適用される法令",
+        "property_type": "set_definition",
+        "description": "電気工作物に係る建築物の安全及び防火に関する法令（電気事業法、電気設備技術基準等）",
+        "related_articles": [
+          "法::A32:P1"
+        ]
       },
       {
         "id": "info-003",
+        "type": "information",
+        "title": "電気設備の工法仕様",
+        "symbol": "M",
+        "subject": "電気設備",
+        "plurality": "single",
+        "property": "電気設備の設計・施工仕様",
+        "property_type": "visual",
+        "description": "電気設備の設計図書・施工仕様（配線、接地、保護装置等）",
+        "related_articles": [
+          "法::A32:P1"
+        ]
+      },
+      {
+        "id": "info-004",
+        "type": "information",
+        "title": "工法適合性",
+        "symbol": "C",
+        "subject": "電気設備",
+        "plurality": "single",
+        "property": "法令で定める工法への適合",
+        "property_type": "proposition",
+        "description": "電気設備が電気工作物に係る安全・防火の法令工法に適合しているか",
+        "related_articles": [
+          "法::A32:P1"
+        ]
+      },
+      {
+        "id": "info-005",
         "type": "information",
         "title": "法32条適合",
         "symbol": "J",
@@ -71,8 +109,10 @@
         "plurality": "single",
         "property": "法32条への適合",
         "property_type": "proposition",
-        "description": "法第32条に適合するか",
-        "related_articles": ["法::A32"]
+        "description": "建築物が法第32条に適合するか",
+        "related_articles": [
+          "法::A32:P1"
+        ]
       },
       {
         "id": "proc-001",
@@ -81,50 +121,176 @@
         "process_type": "human_judgment",
         "target_subject": "建築物",
         "iteration": "single",
-        "description": "建築物に電気設備が設けられているかを確認する",
-        "related_articles": ["法::A32"],
+        "description": "建築物に電気設備が設けられているかを設計図書で確認する",
+        "related_articles": [
+          "法::A32:P1"
+        ],
         "software_functions": [
-          { "category": "user_input", "description": "電気設備有無の確認" }
+          {
+            "category": "graphic_display",
+            "description": "電気設備図面の表示"
+          },
+          {
+            "category": "user_input",
+            "description": "電気設備有無の判定入力"
+          }
         ]
       },
       {
         "id": "proc-002",
         "type": "process",
-        "title": "工法の確認",
-        "process_type": "human_judgment",
+        "title": "適用法令の特定",
+        "process_type": "mechanical",
         "target_subject": "電気設備",
         "iteration": "single",
-        "description": "電気設備が法令で定める工法に適合しているかを確認する",
-        "related_articles": ["法::A32", "電気事業法", "電気設備技術基準"],
+        "description": "電気工作物に係る安全・防火に関する法令を特定する（電気事業法、電気設備技術基準等）",
+        "related_articles": [
+          "法::A32:P1"
+        ],
         "software_functions": [
-          { "category": "user_input", "description": "工法適合の確認" }
+          {
+            "category": "text_display",
+            "description": "適用法令リストの表示"
+          }
         ]
       },
       {
         "id": "proc-003",
         "type": "process",
+        "title": "電気設備仕様の取得",
+        "process_type": "human_judgment",
+        "target_subject": "電気設備",
+        "iteration": "single",
+        "description": "設計図書から電気設備の工法仕様（配線方法、接地方式、保護装置等）を取得する",
+        "related_articles": [
+          "法::A32:P1"
+        ],
+        "software_functions": [
+          {
+            "category": "graphic_display",
+            "description": "電気設備図面・仕様書の表示"
+          },
+          {
+            "category": "user_input",
+            "description": "工法仕様情報の入力"
+          }
+        ]
+      },
+      {
+        "id": "proc-004",
+        "type": "process",
+        "title": "工法適合性の確認",
+        "process_type": "human_judgment",
+        "target_subject": "電気設備",
+        "iteration": "single",
+        "description": "電気設備の工法が法令で定める技術基準（配線の太さ、絶縁性能、接地抵抗値、遮断器の容量等）に適合しているかを確認する",
+        "related_articles": [
+          "法::A32:P1"
+        ],
+        "software_functions": [
+          {
+            "category": "text_display",
+            "description": "技術基準チェックリストの表示"
+          },
+          {
+            "category": "user_input",
+            "description": "適合性判定結果の入力"
+          }
+        ]
+      },
+      {
+        "id": "proc-005",
+        "type": "process",
         "title": "法32条適合判定",
         "process_type": "mechanical",
         "target_subject": "建築物",
         "iteration": "single",
-        "description": "電気設備なし、または法令工法に適合であれば適合",
-        "logic_expression": "J = NOT(E) OR M",
-        "related_articles": ["法::A32"],
+        "description": "電気設備なし、または電気設備が法令工法に適合であれば適合",
+        "logic_expression": "J = NOT(E) OR C",
+        "related_articles": [
+          "法::A32:P1"
+        ],
         "software_functions": [
-          { "category": "program_processing", "description": "最終適合判定" }
+          {
+            "category": "program_processing",
+            "description": "最終適合判定（論理演算）"
+          },
+          {
+            "category": "text_display",
+            "description": "判定結果の表示"
+          }
         ]
       }
     ],
     "edges": [
-      {"id": "e-001", "from": "proc-001", "to": "info-001", "role": "output"},
-      {"id": "e-002", "from": "info-001", "to": "proc-002", "role": "input"},
-      {"id": "e-003", "from": "proc-002", "to": "info-002", "role": "output"},
-      {"id": "e-004", "from": "info-001", "to": "proc-003", "role": "input"},
-      {"id": "e-005", "from": "info-002", "to": "proc-003", "role": "input"},
-      {"id": "e-006", "from": "proc-003", "to": "info-003", "role": "output"}
+      {
+        "id": "e-001",
+        "from": "proc-001",
+        "to": "info-001",
+        "role": "output"
+      },
+      {
+        "id": "e-002",
+        "from": "info-001",
+        "to": "proc-002",
+        "role": "input"
+      },
+      {
+        "id": "e-003",
+        "from": "proc-002",
+        "to": "info-002",
+        "role": "output"
+      },
+      {
+        "id": "e-004",
+        "from": "info-001",
+        "to": "proc-003",
+        "role": "input"
+      },
+      {
+        "id": "e-005",
+        "from": "proc-003",
+        "to": "info-003",
+        "role": "output"
+      },
+      {
+        "id": "e-006",
+        "from": "info-002",
+        "to": "proc-004",
+        "role": "input"
+      },
+      {
+        "id": "e-007",
+        "from": "info-003",
+        "to": "proc-004",
+        "role": "input"
+      },
+      {
+        "id": "e-008",
+        "from": "proc-004",
+        "to": "info-004",
+        "role": "output"
+      },
+      {
+        "id": "e-009",
+        "from": "info-001",
+        "to": "proc-005",
+        "role": "input"
+      },
+      {
+        "id": "e-010",
+        "from": "info-004",
+        "to": "proc-005",
+        "role": "input"
+      },
+      {
+        "id": "e-011",
+        "from": "proc-005",
+        "to": "info-005",
+        "role": "output"
+      }
     ]
   },
-
   "flow_diagram": {
     "title": "電気設備適合判定フロー",
     "description": "法32条の電気設備に関する工法適合判定のフローチャート",
@@ -143,54 +309,96 @@
         "description": "建築物に電気設備が設けられているか",
         "condition": {
           "operator": "EQ",
-          "lhs": { "var": "has_electrical", "desc": "電気設備 [E]" },
-          "rhs": { "value": true }
+          "lhs": {
+            "var": "has_electrical_equipment",
+            "desc": "電気設備の有無 [E]"
+          },
+          "rhs": {
+            "value": true
+          }
         },
-        "related_articles": ["法::A32"]
+        "related_articles": [
+          "法::A32:P1"
+        ]
       },
       {
-        "id": "dec-method",
+        "id": "dec-method-compliance",
         "type": "decision",
         "title": "法令工法に適合？",
-        "description": "電気工作物に係る建築物の安全及び防火に関する法令の工法に適合しているか",
+        "description": "電気設備が電気工作物に係る建築物の安全及び防火に関する法令の工法に適合しているか",
         "condition": {
           "operator": "EQ",
-          "lhs": { "var": "electrical_method_compliance", "desc": "工法適合 [M]" },
-          "rhs": { "value": true }
+          "lhs": {
+            "var": "electrical_method_compliance",
+            "desc": "工法適合性 [C]"
+          },
+          "rhs": {
+            "value": true
+          }
         },
-        "related_articles": ["法::A32"]
+        "related_articles": [
+          "法::A32:P1"
+        ]
       },
       {
         "id": "term-pass-no-equipment",
         "type": "terminal",
         "title": "適合（設備なし）",
         "result": "pass",
-        "description": "電気設備がないため規定対象外"
+        "description": "電気設備がないため法32条の規定対象外"
       },
       {
         "id": "term-pass",
         "type": "terminal",
         "title": "適合",
         "result": "pass",
-        "description": "電気設備が法令工法に適合"
+        "description": "電気設備が法令で定める工法に適合"
       },
       {
         "id": "term-fail",
         "type": "terminal",
         "title": "不適合",
         "result": "fail",
-        "description": "電気設備が法令工法に不適合"
+        "description": "電気設備が法令で定める工法に不適合"
       }
     ],
     "edges": [
-      { "id": "f-001", "from": "term-start", "to": "dec-exists", "role": "flow" },
-      { "id": "f-002", "from": "dec-exists", "to": "dec-method", "role": "yes" },
-      { "id": "f-003", "from": "dec-exists", "to": "term-pass-no-equipment", "role": "no" },
-      { "id": "f-004", "from": "dec-method", "to": "term-pass", "role": "yes" },
-      { "id": "f-005", "from": "dec-method", "to": "term-fail", "role": "no" }
+      {
+        "id": "f-001",
+        "from": "term-start",
+        "to": "dec-exists",
+        "role": "flow"
+      },
+      {
+        "id": "f-002",
+        "from": "dec-exists",
+        "to": "dec-method-compliance",
+        "role": "yes",
+        "label": "Yes"
+      },
+      {
+        "id": "f-003",
+        "from": "dec-exists",
+        "to": "term-pass-no-equipment",
+        "role": "no",
+        "label": "No"
+      },
+      {
+        "id": "f-004",
+        "from": "dec-method-compliance",
+        "to": "term-pass",
+        "role": "yes",
+        "label": "Yes"
+      },
+      {
+        "id": "f-005",
+        "from": "dec-method-compliance",
+        "to": "term-fail",
+        "role": "no",
+        "label": "No"
+      }
     ]
   },
-
   "related_laws": [
     {
       "law_id": null,
@@ -198,7 +406,7 @@
       "law_type": "act",
       "relationship": "references",
       "articles": [],
-      "description": "電気工作物に係る技術基準"
+      "description": "電気工作物に係る技術基準を規定"
     },
     {
       "law_id": null,
@@ -206,14 +414,21 @@
       "law_type": "ministerial_order",
       "relationship": "references",
       "articles": [],
-      "description": "電気設備の技術基準"
+      "description": "電気設備の技術基準の詳細を規定"
+    },
+    {
+      "law_id": null,
+      "law_name": "電気設備の技術基準の解釈",
+      "law_type": "interpretation",
+      "relationship": "references",
+      "articles": [],
+      "description": "技術基準の具体的な解釈指針"
     }
   ],
-
   "metadata": {
-    "created_at": "2025-12-15",
-    "updated_at": "2025-12-15",
-    "generator": "multi-agent-v4.2",
-    "notes": "電気設備 → 電気工作物に係る安全・防火の法令工法に適合必要"
+    "created_at": "2025-12-16",
+    "updated_at": "2025-12-16",
+    "generator": "multi-agent-v4.3",
+    "notes": "電気設備は電気事業法等で定める工法に適合必要。配線方法、接地方式、保護装置等の技術基準を確認。"
   }
 }

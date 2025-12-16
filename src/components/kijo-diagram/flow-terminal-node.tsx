@@ -11,6 +11,25 @@ interface FlowTerminalNodeData extends Record<string, unknown> {
 
 type FlowTerminalNodeProps = NodeProps<Node<FlowTerminalNodeData>>;
 
+/**
+ * 関連条項を短い表示形式に変換
+ */
+function formatRelatedArticle(article: string): string {
+  const match = article.match(/^([^:]+)::A([^:]+)(?::P(\d+))?(?::I(\d+))?$/);
+  if (!match) return article;
+
+  const [, lawAbbrev, articleNum, paragraphNum, itemNum] = match;
+  const articleDisplay = articleNum.includes("_")
+    ? articleNum.replace(/_/g, "条の")
+    : articleNum + "条";
+
+  let display = `${lawAbbrev}${articleDisplay}`;
+  if (paragraphNum) display += `${paragraphNum}項`;
+  if (itemNum) display += `${itemNum}号`;
+
+  return display;
+}
+
 /** 統合スタイル定義 */
 const TERMINAL_STYLES = {
   pass: {
@@ -61,11 +80,13 @@ function FlowTerminalNodeComponent({ data, selected }: FlowTerminalNodeProps) {
 
   // フローチャート用：シンプルな角丸ボックス（ハンドル非表示）
   if (isFlowDiagram) {
+    const hasRelatedArticles = node.related_articles && node.related_articles.length > 0;
+
     return (
       <div
         className={`
-          relative flex items-center justify-center
-          min-w-[120px] h-[50px] px-4
+          relative flex flex-col items-center justify-center
+          min-w-[120px] min-h-[50px] px-4 py-2
           border-2 rounded-full
           ${style.flow}
           ${selected ? "ring-2 ring-blue-500 ring-offset-2" : ""}
@@ -89,6 +110,15 @@ function FlowTerminalNodeComponent({ data, selected }: FlowTerminalNodeProps) {
         <div className="text-center text-xs font-medium leading-tight">
           {node.title}
         </div>
+
+        {/* 関連条項（あれば表示、複数の場合は改行） */}
+        {hasRelatedArticles && (
+          <div className="text-[9px] opacity-75 text-center flex flex-col mt-0.5">
+            {node.related_articles!.map((article, i) => (
+              <span key={i}>{formatRelatedArticle(article)}</span>
+            ))}
+          </div>
+        )}
       </div>
     );
   }
@@ -97,8 +127,8 @@ function FlowTerminalNodeComponent({ data, selected }: FlowTerminalNodeProps) {
   return (
     <div
       className={`
-        relative flex items-center justify-center
-        min-w-[120px] h-[50px] px-4 py-2
+        relative flex flex-col items-center justify-center
+        min-w-[120px] min-h-[50px] px-4 py-2
         border-2 rounded-full shadow-sm
         ${style.kijo}
         ${selected ? "ring-2 ring-blue-500 ring-offset-2" : ""}
@@ -130,6 +160,15 @@ function FlowTerminalNodeComponent({ data, selected }: FlowTerminalNodeProps) {
       <div className="text-center text-xs font-medium leading-tight">
         {node.title}
       </div>
+
+      {/* 関連条項（あれば表示、複数の場合は改行） */}
+      {node.related_articles && node.related_articles.length > 0 && (
+        <div className={`mt-1 text-[10px] opacity-75 text-center flex flex-col`}>
+          {node.related_articles.map((article, i) => (
+            <span key={i}>{formatRelatedArticle(article)}</span>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

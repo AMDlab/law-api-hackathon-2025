@@ -1,13 +1,11 @@
 {
   "id": "CHK-BSL-A23-P1",
   "version": "3.2.0",
-
   "page_title": {
-    "title": "外壁",
+    "title": "外壁（法22条区域内）",
     "target_subject": "建築物",
     "description": "法22条区域内の木造建築物等の外壁で延焼のおそれのある部分について、準防火性能を有する構造への適合を判定する"
   },
-
   "legal_ref": {
     "law_id": "325AC0000000201",
     "law_type": "act",
@@ -17,11 +15,12 @@
     "paragraph": "1",
     "item": null
   },
-
-  "labels": ["単体規定", "防火", "外壁"],
-
+  "labels": [
+    "単体規定",
+    "防火",
+    "外壁"
+  ],
   "text_raw": "前条第一項の市街地の区域内にある建築物（その主要構造部の第二十一条第一項の政令で定める部分が木材、プラスチックその他の可燃材料で造られたもの（第二十五条及び第六十一条において「木造建築物等」という。）に限る。）は、その外壁で延焼のおそれのある部分の構造を、準防火性能（建築物の周囲において発生する通常の火災による延焼の抑制に一定の効果を発揮するために外壁に必要とされる性能をいう。）に関して政令で定める技術的基準に適合する土塗壁その他の構造で、国土交通大臣が定めた構造方法を用いるもの又は国土交通大臣の認定を受けたものとしなければならない。",
-
   "compliance_logic": {
     "scope_condition": {
       "operator": "AND_GLOBAL",
@@ -30,199 +29,65 @@
         {
           "id": "scope-zone",
           "operator": "EQ",
-          "lhs": { "var": "in_article22_zone", "desc": "法22条区域内", "property_type": "proposition" },
-          "rhs": { "value": true }
+          "lhs": {
+            "var": "in_article22_zone",
+            "desc": "法22条区域内",
+            "property_type": "proposition"
+          },
+          "rhs": {
+            "value": true
+          }
         },
         {
           "id": "scope-wood",
           "operator": "EQ",
-          "lhs": { "var": "is_wooden_building", "desc": "木造建築物等", "property_type": "proposition" },
-          "rhs": { "value": true }
+          "lhs": {
+            "var": "is_wooden_building",
+            "desc": "木造建築物等",
+            "property_type": "proposition"
+          },
+          "rhs": {
+            "value": true
+          }
         }
       ]
     },
     "judgment_rule": {
-      "operator": "EQ",
-      "lhs": { "var": "exterior_wall_compliance", "desc": "外壁（延焼部分）が準防火性能に適合", "property_type": "proposition" },
-      "rhs": { "value": true }
+      "operator": "AND_GLOBAL",
+      "desc": "外壁（延焼部分）が準防火性能に適合",
+      "conditions": [
+        {
+          "id": "main-001",
+          "desc": "政令基準に適合",
+          "operator": "EQ",
+          "lhs": {
+            "var": "meets_cabinet_order",
+            "desc": "令109条の6の技術的基準適合",
+            "property_type": "proposition"
+          },
+          "rhs": {
+            "value": true
+          }
+        },
+        {
+          "id": "main-002",
+          "desc": "告示構造方法または大臣認定",
+          "operator": "OR_LOCAL",
+          "conditions": [
+            {
+              "id": "main-002a",
+              "desc": "国土交通大臣が定めた構造方法を用いる"
+            },
+            {
+              "id": "main-002b",
+              "desc": "国土交通大臣の認定を受けたもの"
+            }
+          ]
+        }
+      ]
     },
     "exceptions": null
   },
-
-  "diagram": {
-    "nodes": [
-      {
-        "id": "info-001",
-        "type": "information",
-        "title": "敷地の位置",
-        "symbol": "L",
-        "subject": "敷地",
-        "plurality": "single",
-        "property": "法22条区域内か",
-        "property_type": "proposition",
-        "description": "敷地が法22条1項の市街地の区域内にあるか",
-        "related_articles": ["法::A22:P1", "法::A23"]
-      },
-      {
-        "id": "info-002",
-        "type": "information",
-        "title": "主要構造部の材料",
-        "symbol": "M",
-        "subject": "建築物",
-        "plurality": "single",
-        "property": "木造建築物等か",
-        "property_type": "proposition",
-        "description": "主要構造部（政令で定める部分）が可燃材料で造られているか",
-        "related_articles": ["法::A23"]
-      },
-      {
-        "id": "info-003",
-        "type": "information",
-        "title": "適用対象",
-        "symbol": "T",
-        "subject": "建築物",
-        "plurality": "single",
-        "property": "法23条の適用対象",
-        "property_type": "proposition",
-        "description": "法22条区域内かつ木造建築物等か",
-        "related_articles": ["法::A23"]
-      },
-      {
-        "id": "info-004",
-        "type": "information",
-        "title": "延焼のおそれのある部分",
-        "symbol": "E",
-        "subject": "建築物",
-        "plurality": "single",
-        "property": "延焼のおそれのある部分の有無",
-        "property_type": "proposition",
-        "description": "外壁に延焼のおそれのある部分があるか",
-        "related_articles": ["法::A2:I6", "法::A23"]
-      },
-      {
-        "id": "info-005",
-        "type": "information",
-        "title": "外壁の構造",
-        "symbol": "W",
-        "subject": "建築物",
-        "plurality": "single",
-        "property": "外壁（延焼部分）の構造",
-        "property_type": "classification",
-        "description": "延焼のおそれのある部分の外壁の構造（準防火性能適合/不適合）",
-        "related_articles": ["法::A23", "令::A109条の6"]
-      },
-      {
-        "id": "info-006",
-        "type": "information",
-        "title": "法23条適合",
-        "symbol": "J",
-        "subject": "建築物",
-        "plurality": "single",
-        "property": "法23条への適合",
-        "property_type": "proposition",
-        "description": "法第23条に適合するか",
-        "related_articles": ["法::A23"]
-      },
-      {
-        "id": "proc-001",
-        "type": "process",
-        "title": "区域の確認",
-        "process_type": "human_judgment",
-        "target_subject": "敷地",
-        "iteration": "single",
-        "description": "敷地が法22条1項の市街地の区域内にあるかを確認する",
-        "related_articles": ["法::A22:P1"],
-        "software_functions": [
-          { "category": "graphic_display", "description": "法22条区域図との重畳表示" },
-          { "category": "user_input", "description": "区域該当の確認" }
-        ]
-      },
-      {
-        "id": "proc-002",
-        "type": "process",
-        "title": "構造の確認",
-        "process_type": "human_judgment",
-        "target_subject": "建築物",
-        "iteration": "single",
-        "description": "主要構造部が可燃材料で造られているか（木造建築物等か）を確認する",
-        "related_articles": ["法::A23"],
-        "software_functions": [
-          { "category": "user_input", "description": "木造建築物等の判定" }
-        ]
-      },
-      {
-        "id": "proc-003",
-        "type": "process",
-        "title": "適用判定",
-        "process_type": "mechanical",
-        "target_subject": "建築物",
-        "iteration": "single",
-        "description": "法22条区域内かつ木造建築物等かを判定する",
-        "logic_expression": "T = L AND M",
-        "related_articles": ["法::A23"],
-        "software_functions": [
-          { "category": "program_processing", "description": "適用判定ロジック" }
-        ]
-      },
-      {
-        "id": "proc-004",
-        "type": "process",
-        "title": "延焼部分の特定",
-        "process_type": "human_judgment",
-        "target_subject": "建築物",
-        "iteration": "single",
-        "description": "外壁の延焼のおそれのある部分を特定する",
-        "related_articles": ["法::A2:I6"],
-        "software_functions": [
-          { "category": "graphic_display", "description": "隣地・道路境界線からの距離表示" },
-          { "category": "program_processing", "description": "延焼ライン計算" }
-        ]
-      },
-      {
-        "id": "proc-005",
-        "type": "process",
-        "title": "外壁構造の確認",
-        "process_type": "human_judgment",
-        "target_subject": "建築物",
-        "iteration": "single",
-        "description": "延焼のおそれのある部分の外壁が準防火性能に適合しているかを確認する",
-        "related_articles": ["法::A23", "令::A109条の6"],
-        "software_functions": [
-          { "category": "user_input", "description": "外壁構造の確認（大臣告示構造方法/大臣認定）" }
-        ]
-      },
-      {
-        "id": "proc-006",
-        "type": "process",
-        "title": "法23条適合判定",
-        "process_type": "mechanical",
-        "target_subject": "建築物",
-        "iteration": "single",
-        "description": "適用対象外、延焼部分なし、または外壁が準防火性能適合であれば適合",
-        "logic_expression": "J = NOT(T) OR NOT(E) OR W",
-        "related_articles": ["法::A23"],
-        "software_functions": [
-          { "category": "program_processing", "description": "最終適合判定" }
-        ]
-      }
-    ],
-    "edges": [
-      {"id": "e-001", "from": "proc-001", "to": "info-001", "role": "output"},
-      {"id": "e-002", "from": "proc-002", "to": "info-002", "role": "output"},
-      {"id": "e-003", "from": "info-001", "to": "proc-003", "role": "input"},
-      {"id": "e-004", "from": "info-002", "to": "proc-003", "role": "input"},
-      {"id": "e-005", "from": "proc-003", "to": "info-003", "role": "output"},
-      {"id": "e-006", "from": "info-003", "to": "proc-004", "role": "input"},
-      {"id": "e-007", "from": "proc-004", "to": "info-004", "role": "output"},
-      {"id": "e-008", "from": "info-004", "to": "proc-005", "role": "input"},
-      {"id": "e-009", "from": "proc-005", "to": "info-005", "role": "output"},
-      {"id": "e-010", "from": "info-003", "to": "proc-006", "role": "input"},
-      {"id": "e-011", "from": "info-004", "to": "proc-006", "role": "input"},
-      {"id": "e-012", "from": "info-005", "to": "proc-006", "role": "input"},
-      {"id": "e-013", "from": "proc-006", "to": "info-006", "role": "output"}
-    ]
-  },
-
   "flow_diagram": {
     "title": "外壁（法22条区域内）適合判定フロー",
     "description": "法23条の適用対象判定と外壁の準防火性能適合判定のフローチャート",
@@ -241,10 +106,17 @@
         "description": "敷地が法22条1項の市街地の区域内にあるか",
         "condition": {
           "operator": "EQ",
-          "lhs": { "var": "in_article22_zone", "desc": "法22条区域 [L]" },
-          "rhs": { "value": true }
+          "lhs": {
+            "var": "in_article22_zone",
+            "desc": "法22条区域 [L]"
+          },
+          "rhs": {
+            "value": true
+          }
         },
-        "related_articles": ["法::A22:P1"]
+        "related_articles": [
+          "法::A22:P1"
+        ]
       },
       {
         "id": "dec-wood",
@@ -253,10 +125,18 @@
         "description": "主要構造部が可燃材料で造られているか",
         "condition": {
           "operator": "EQ",
-          "lhs": { "var": "is_wooden_building", "desc": "木造建築物等 [M]" },
-          "rhs": { "value": true }
+          "lhs": {
+            "var": "is_wooden_building",
+            "desc": "木造建築物等 [M]"
+          },
+          "rhs": {
+            "value": true
+          }
         },
-        "related_articles": ["法::A23"]
+        "related_articles": [
+          "法::A21:P1",
+          "法::A23"
+        ]
       },
       {
         "id": "dec-fire-spread",
@@ -265,22 +145,55 @@
         "description": "外壁に延焼のおそれのある部分があるか",
         "condition": {
           "operator": "EQ",
-          "lhs": { "var": "has_fire_spread_risk", "desc": "延焼のおそれ [E]" },
-          "rhs": { "value": true }
+          "lhs": {
+            "var": "has_fire_spread_risk",
+            "desc": "延焼のおそれ [E]"
+          },
+          "rhs": {
+            "value": true
+          }
         },
-        "related_articles": ["法::A2:I6"]
+        "related_articles": [
+          "法::A2:I6"
+        ]
       },
       {
-        "id": "dec-wall-structure",
+        "id": "dec-cabinet-order",
         "type": "decision",
-        "title": "準防火性能に適合？",
-        "description": "延焼のおそれのある部分の外壁が準防火性能（大臣告示構造方法/大臣認定）に適合しているか",
+        "title": "政令基準に適合？",
+        "description": "令109条の6の技術的基準（準防火性能）に適合するか",
         "condition": {
           "operator": "EQ",
-          "lhs": { "var": "exterior_wall_compliance", "desc": "準防火性能適合 [W]" },
-          "rhs": { "value": true }
+          "lhs": {
+            "var": "meets_cabinet_order",
+            "desc": "政令基準適合 [T1]"
+          },
+          "rhs": {
+            "value": true
+          }
         },
-        "related_articles": ["法::A23", "令::A109条の6"]
+        "related_articles": [
+          "令::A109_6:P1"
+        ]
+      },
+      {
+        "id": "dec-notification",
+        "type": "decision",
+        "title": "告示/認定該当？",
+        "description": "国土交通大臣が定めた構造方法または大臣認定を受けたものか",
+        "condition": {
+          "operator": "EQ",
+          "lhs": {
+            "var": "is_notification_or_certified",
+            "desc": "告示/認定該当 [T2]"
+          },
+          "rhs": {
+            "value": true
+          }
+        },
+        "related_articles": [
+          "法::A23"
+        ]
       },
       {
         "id": "term-pass-zone",
@@ -319,41 +232,531 @@
       }
     ],
     "edges": [
-      { "id": "f-001", "from": "term-start", "to": "dec-zone", "role": "flow" },
-      { "id": "f-002", "from": "dec-zone", "to": "dec-wood", "role": "yes" },
-      { "id": "f-003", "from": "dec-zone", "to": "term-pass-zone", "role": "no" },
-      { "id": "f-004", "from": "dec-wood", "to": "dec-fire-spread", "role": "yes" },
-      { "id": "f-005", "from": "dec-wood", "to": "term-pass-structure", "role": "no" },
-      { "id": "f-006", "from": "dec-fire-spread", "to": "dec-wall-structure", "role": "yes" },
-      { "id": "f-007", "from": "dec-fire-spread", "to": "term-pass-no-risk", "role": "no" },
-      { "id": "f-008", "from": "dec-wall-structure", "to": "term-pass", "role": "yes" },
-      { "id": "f-009", "from": "dec-wall-structure", "to": "term-fail", "role": "no" }
+      {
+        "id": "f-001",
+        "from": "term-start",
+        "to": "dec-zone",
+        "role": "flow"
+      },
+      {
+        "id": "f-002",
+        "from": "dec-zone",
+        "to": "dec-wood",
+        "role": "yes"
+      },
+      {
+        "id": "f-003",
+        "from": "dec-zone",
+        "to": "term-pass-zone",
+        "role": "no"
+      },
+      {
+        "id": "f-004",
+        "from": "dec-wood",
+        "to": "dec-fire-spread",
+        "role": "yes"
+      },
+      {
+        "id": "f-005",
+        "from": "dec-wood",
+        "to": "term-pass-structure",
+        "role": "no"
+      },
+      {
+        "id": "f-006",
+        "from": "dec-fire-spread",
+        "to": "dec-cabinet-order",
+        "role": "yes"
+      },
+      {
+        "id": "f-007",
+        "from": "dec-fire-spread",
+        "to": "term-pass-no-risk",
+        "role": "no"
+      },
+      {
+        "id": "f-008",
+        "from": "dec-cabinet-order",
+        "to": "dec-notification",
+        "role": "yes"
+      },
+      {
+        "id": "f-009",
+        "from": "dec-cabinet-order",
+        "to": "term-fail",
+        "role": "no"
+      },
+      {
+        "id": "f-010",
+        "from": "dec-notification",
+        "to": "term-pass",
+        "role": "yes"
+      },
+      {
+        "id": "f-011",
+        "from": "dec-notification",
+        "to": "term-fail",
+        "role": "no"
+      }
     ]
   },
-
   "related_laws": [
     {
       "law_id": "325AC0000000201",
       "law_name": "建築基準法",
       "law_type": "act",
       "relationship": "references",
-      "articles": ["A22:P1", "A2:I6"],
-      "description": "法22条区域の定義、延焼のおそれのある部分の定義"
+      "articles": [
+        "A22:P1",
+        "A21:P1",
+        "A2:I6"
+      ],
+      "description": "法22条区域の定義、木造建築物等の定義、延焼のおそれのある部分の定義"
     },
     {
       "law_id": "325CO0000000338",
       "law_name": "建築基準法施行令",
       "law_type": "order",
       "relationship": "delegates_to",
-      "articles": ["A109条の6"],
+      "articles": [
+        "A109_6"
+      ],
       "description": "準防火性能に関する技術的基準"
     }
   ],
-
   "metadata": {
-    "created_at": "2025-12-15",
-    "updated_at": "2025-12-15",
-    "generator": "multi-agent-v4.2",
-    "notes": "法22条区域内 AND 木造建築物等 → 外壁（延焼部分）は準防火性能必要"
+    "created_at": "2025-12-16",
+    "updated_at": "2025-12-16",
+    "generator": "multi-agent-v4.3",
+    "notes": "法22条区域内 AND 木造建築物等 AND 延焼部分あり → 外壁は準防火性能必要（政令基準 + 告示/認定）"
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "info-001",
+        "type": "information",
+        "title": "敷地の位置",
+        "symbol": "L",
+        "subject": "敷地",
+        "plurality": "single",
+        "property": "法22条区域内か",
+        "property_type": "proposition",
+        "description": "敷地が法22条1項の市街地の区域内にあるか",
+        "related_articles": [
+          "法::A22:P1"
+        ]
+      },
+      {
+        "id": "info-002",
+        "type": "information",
+        "title": "主要構造部の材料",
+        "symbol": "M",
+        "subject": "建築物",
+        "plurality": "single",
+        "property": "木造建築物等か",
+        "property_type": "proposition",
+        "description": "主要構造部（政令で定める部分）が木材、プラスチックその他の可燃材料で造られているか",
+        "related_articles": [
+          "法::A21:P1",
+          "法::A23"
+        ]
+      },
+      {
+        "id": "info-003",
+        "type": "information",
+        "title": "適用対象",
+        "symbol": "T",
+        "subject": "建築物",
+        "plurality": "single",
+        "property": "法23条の適用対象",
+        "property_type": "proposition",
+        "description": "法22条区域内かつ木造建築物等か",
+        "related_articles": [
+          "法::A23"
+        ]
+      },
+      {
+        "id": "info-004",
+        "type": "information",
+        "title": "延焼のおそれのある部分",
+        "symbol": "E",
+        "subject": "建築物",
+        "plurality": "single",
+        "property": "延焼のおそれのある部分の有無",
+        "property_type": "proposition",
+        "description": "外壁に延焼のおそれのある部分があるか",
+        "related_articles": [
+          "法::A2:I6"
+        ]
+      },
+      {
+        "id": "info-005",
+        "type": "information",
+        "title": "外壁の構造仕様",
+        "symbol": "W",
+        "subject": "外壁",
+        "plurality": "single",
+        "property": "構造仕様",
+        "property_type": "classification",
+        "description": "延焼のおそれのある部分の外壁の構造仕様（告示仕様/大臣認定/その他）",
+        "related_articles": [
+          "法::A23"
+        ]
+      },
+      {
+        "id": "info-006",
+        "type": "information",
+        "title": "令109条の6適合",
+        "symbol": "T1",
+        "subject": "外壁",
+        "plurality": "single",
+        "property": "政令基準適合",
+        "property_type": "proposition",
+        "description": "令第109条の6の技術的基準（準防火性能）に適合するか",
+        "related_articles": [
+          "令::A109_6:P1"
+        ]
+      },
+      {
+        "id": "info-007",
+        "type": "information",
+        "title": "告示/認定該当",
+        "symbol": "T2",
+        "subject": "外壁",
+        "plurality": "single",
+        "property": "告示構造方法または大臣認定",
+        "property_type": "proposition",
+        "description": "国土交通大臣が定めた構造方法を用いるもの又は大臣認定を受けたもの",
+        "related_articles": [
+          "法::A23"
+        ]
+      },
+      {
+        "id": "info-008",
+        "type": "information",
+        "title": "準防火性能適合",
+        "symbol": "C",
+        "subject": "外壁",
+        "plurality": "single",
+        "property": "準防火性能への適合",
+        "property_type": "proposition",
+        "description": "延焼のおそれのある部分の外壁が準防火性能に適合するか"
+      },
+      {
+        "id": "info-009",
+        "type": "information",
+        "title": "法23条適合",
+        "symbol": "J",
+        "subject": "建築物",
+        "plurality": "single",
+        "property": "法23条への適合",
+        "property_type": "proposition",
+        "description": "法第23条に適合するか",
+        "related_articles": [
+          "法::A23"
+        ]
+      },
+      {
+        "id": "proc-001",
+        "type": "process",
+        "title": "区域の確認",
+        "process_type": "human_judgment",
+        "target_subject": "敷地",
+        "iteration": "single",
+        "description": "敷地が法22条1項の市街地の区域内にあるかを確認する",
+        "related_articles": [
+          "法::A22:P1"
+        ],
+        "software_functions": [
+          {
+            "category": "graphic_display",
+            "description": "法22条区域図との重畳表示"
+          },
+          {
+            "category": "user_input",
+            "description": "区域該当の確認"
+          }
+        ]
+      },
+      {
+        "id": "proc-002",
+        "type": "process",
+        "title": "構造の確認",
+        "process_type": "human_judgment",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "主要構造部が可燃材料で造られているか（木造建築物等か）を確認する",
+        "related_articles": [
+          "法::A21:P1",
+          "法::A23"
+        ],
+        "software_functions": [
+          {
+            "category": "user_input",
+            "description": "木造建築物等の判定"
+          }
+        ]
+      },
+      {
+        "id": "proc-003",
+        "type": "process",
+        "title": "適用判定",
+        "process_type": "mechanical",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "法22条区域内かつ木造建築物等かを判定する",
+        "logic_expression": "T = L AND M",
+        "related_articles": [
+          "法::A23"
+        ],
+        "software_functions": [
+          {
+            "category": "program_processing",
+            "description": "適用判定ロジック"
+          }
+        ]
+      },
+      {
+        "id": "proc-004",
+        "type": "process",
+        "title": "延焼部分の特定",
+        "process_type": "human_judgment",
+        "target_subject": "外壁",
+        "iteration": "single",
+        "description": "外壁の延焼のおそれのある部分を特定する",
+        "related_articles": [
+          "法::A2:I6"
+        ],
+        "software_functions": [
+          {
+            "category": "graphic_display",
+            "description": "隣地・道路境界線からの距離表示"
+          },
+          {
+            "category": "program_processing",
+            "description": "延焼ライン計算"
+          }
+        ]
+      },
+      {
+        "id": "proc-005",
+        "type": "process",
+        "title": "外壁構造仕様の特定",
+        "process_type": "human_judgment",
+        "target_subject": "外壁",
+        "iteration": "single",
+        "description": "延焼のおそれのある部分の外壁の構造仕様（告示仕様/大臣認定/その他）を特定する",
+        "related_articles": [
+          "法::A23"
+        ],
+        "software_functions": [
+          {
+            "category": "user_input",
+            "description": "告示番号または認定番号の入力"
+          }
+        ]
+      },
+      {
+        "id": "proc-006",
+        "type": "process",
+        "title": "政令基準適合判定",
+        "process_type": "human_judgment",
+        "target_subject": "外壁",
+        "iteration": "single",
+        "description": "令109条の6の技術的基準（準防火性能）への適合を判定する",
+        "related_articles": [
+          "令::A109_6:P1"
+        ],
+        "software_functions": [
+          {
+            "category": "text_display",
+            "description": "令109条の6の要件を表示"
+          },
+          {
+            "category": "user_input",
+            "description": "適合判定結果入力"
+          }
+        ]
+      },
+      {
+        "id": "proc-007",
+        "type": "process",
+        "title": "告示/認定判定",
+        "process_type": "mechanical",
+        "target_subject": "外壁",
+        "iteration": "single",
+        "description": "告示構造方法または大臣認定を用いているかを判定する",
+        "logic_expression": "T2 = (W = 告示仕様 OR W = 大臣認定)",
+        "related_articles": [
+          "法::A23"
+        ],
+        "software_functions": [
+          {
+            "category": "program_processing",
+            "description": "構造仕様区分から告示/認定該当を判定"
+          }
+        ]
+      },
+      {
+        "id": "proc-008",
+        "type": "process",
+        "title": "準防火性能適合判定",
+        "process_type": "mechanical",
+        "target_subject": "外壁",
+        "iteration": "single",
+        "description": "準防火性能への適合を判定する",
+        "logic_expression": "C = T1 AND T2",
+        "related_articles": [
+          "法::A23"
+        ],
+        "software_functions": [
+          {
+            "category": "program_processing",
+            "description": "政令基準適合 AND 告示/認定該当 の論理演算"
+          }
+        ]
+      },
+      {
+        "id": "proc-009",
+        "type": "process",
+        "title": "法23条適合判定",
+        "process_type": "mechanical",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "法23条への総合適否を判定する",
+        "logic_expression": "J = NOT(T) OR NOT(E) OR C",
+        "related_articles": [
+          "法::A23"
+        ],
+        "software_functions": [
+          {
+            "category": "program_processing",
+            "description": "適用対象外 OR 延焼部分なし OR 準防火性能適合 の論理演算"
+          }
+        ]
+      }
+    ],
+    "edges": [
+      {
+        "id": "e-001",
+        "from": "proc-001",
+        "to": "info-001",
+        "role": "output"
+      },
+      {
+        "id": "e-002",
+        "from": "proc-002",
+        "to": "info-002",
+        "role": "output"
+      },
+      {
+        "id": "e-003",
+        "from": "info-001",
+        "to": "proc-003",
+        "role": "input"
+      },
+      {
+        "id": "e-004",
+        "from": "info-002",
+        "to": "proc-003",
+        "role": "input"
+      },
+      {
+        "id": "e-005",
+        "from": "proc-003",
+        "to": "info-003",
+        "role": "output"
+      },
+      {
+        "id": "e-006",
+        "from": "info-003",
+        "to": "proc-004",
+        "role": "input"
+      },
+      {
+        "id": "e-007",
+        "from": "proc-004",
+        "to": "info-004",
+        "role": "output"
+      },
+      {
+        "id": "e-008",
+        "from": "info-004",
+        "to": "proc-005",
+        "role": "input"
+      },
+      {
+        "id": "e-009",
+        "from": "proc-005",
+        "to": "info-005",
+        "role": "output"
+      },
+      {
+        "id": "e-010",
+        "from": "info-005",
+        "to": "proc-006",
+        "role": "input"
+      },
+      {
+        "id": "e-011",
+        "from": "proc-006",
+        "to": "info-006",
+        "role": "output"
+      },
+      {
+        "id": "e-012",
+        "from": "info-005",
+        "to": "proc-007",
+        "role": "input"
+      },
+      {
+        "id": "e-013",
+        "from": "proc-007",
+        "to": "info-007",
+        "role": "output"
+      },
+      {
+        "id": "e-014",
+        "from": "info-006",
+        "to": "proc-008",
+        "role": "input"
+      },
+      {
+        "id": "e-015",
+        "from": "info-007",
+        "to": "proc-008",
+        "role": "input"
+      },
+      {
+        "id": "e-016",
+        "from": "proc-008",
+        "to": "info-008",
+        "role": "output"
+      },
+      {
+        "id": "e-017",
+        "from": "info-003",
+        "to": "proc-009",
+        "role": "input"
+      },
+      {
+        "id": "e-018",
+        "from": "info-004",
+        "to": "proc-009",
+        "role": "input"
+      },
+      {
+        "id": "e-019",
+        "from": "info-008",
+        "to": "proc-009",
+        "role": "input"
+      },
+      {
+        "id": "e-020",
+        "from": "proc-009",
+        "to": "info-009",
+        "role": "output"
+      }
+    ]
   }
 }

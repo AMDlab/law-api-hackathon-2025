@@ -92,7 +92,7 @@ function parseRelatedArticle(article: string): {
 }
 
 /**
- * 関連条項のリンクリスト
+ * 関連条項のリンクリスト（改行表示）
  */
 function RelatedArticlesLinks({
   articles,
@@ -102,7 +102,7 @@ function RelatedArticlesLinks({
   onNavigate?: (lawId: string, diagramId: string) => void;
 }) {
   return (
-    <div className="flex flex-wrap gap-1">
+    <div className="flex flex-col gap-0.5">
       {articles.map((article, i) => {
         const parsed = parseRelatedArticle(article);
         if (parsed) {
@@ -111,7 +111,7 @@ function RelatedArticlesLinks({
               <button
                 key={i}
                 onClick={() => onNavigate(parsed.lawId, parsed.diagramId)}
-                className="text-sm text-blue-600 hover:text-blue-800 hover:underline cursor-pointer"
+                className="text-sm text-blue-600 hover:text-blue-800 hover:underline cursor-pointer text-left"
               >
                 {parsed.display}
               </button>

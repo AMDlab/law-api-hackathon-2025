@@ -10,6 +10,25 @@ interface TerminalNodeData extends Record<string, unknown> {
 
 type TerminalNodeProps = NodeProps<Node<TerminalNodeData>>;
 
+/**
+ * 関連条項を短い表示形式に変換
+ */
+function formatRelatedArticle(article: string): string {
+  const match = article.match(/^([^:]+)::A([^:]+)(?::P(\d+))?(?::I(\d+))?$/);
+  if (!match) return article;
+
+  const [, lawAbbrev, articleNum, paragraphNum, itemNum] = match;
+  const articleDisplay = articleNum.includes("_")
+    ? articleNum.replace(/_/g, "条の")
+    : articleNum + "条";
+
+  let display = `${lawAbbrev}${articleDisplay}`;
+  if (paragraphNum) display += `${paragraphNum}項`;
+  if (itemNum) display += `${itemNum}号`;
+
+  return display;
+}
+
 /** 結果に応じたスタイル定義 */
 const RESULT_STYLES = {
   pass: {
@@ -65,7 +84,7 @@ function TerminalNodeComponent({ data, selected }: TerminalNodeProps) {
   return (
     <div
       className={`
-        relative flex items-center justify-center
+        relative flex flex-col items-center justify-center
         min-w-[120px] min-h-[40px] px-4 py-2
         border-2 rounded-full shadow-sm
         ${style.container}
@@ -103,6 +122,15 @@ function TerminalNodeComponent({ data, selected }: TerminalNodeProps) {
       <div className={`text-center text-xs font-medium ${style.text} leading-tight`}>
         {node.title}
       </div>
+
+      {/* 関連条項（あれば表示、複数の場合は改行） */}
+      {node.related_articles && node.related_articles.length > 0 && (
+        <div className={`mt-1 text-[10px] ${style.text} opacity-75 text-center flex flex-col`}>
+          {node.related_articles.map((article, i) => (
+            <span key={i}>{formatRelatedArticle(article)}</span>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

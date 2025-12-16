@@ -1,13 +1,11 @@
 {
   "id": "CHK-BSL-A31-P1",
   "version": "3.2.0",
-
   "page_title": {
     "title": "便所",
     "target_subject": "建築物",
     "description": "下水道処理区域内では水洗便所以外の便所設置禁止、区域外では政令基準適合の確認を行う"
   },
-
   "legal_ref": {
     "law_id": "325AC0000000201",
     "law_type": "act",
@@ -17,37 +15,167 @@
     "paragraph": "1",
     "item": null
   },
-
-  "labels": ["単体規定", "衛生", "便所", "下水道"],
-
-  "text_raw": "下水道法（昭和三十三年法律第七十九号）第二条第八号に規定する処理区域内においては、便所は、水洗便所（汚水管が下水道法第二条第三号に規定する公共下水道に連結されたものに限る。）以外の便所としてはならない。２　便所から排出する汚物を下水道法第二条第六号に規定する終末処理場を有する公共下水道以外に放流しようとする場合においては、屎尿浄化槽（その構造が汚物処理性能（当該汚物を衛生上支障がないように処理するために屎尿浄化槽に必要とされる性能をいう。）に関して政令で定める技術的基準に適合するもので、国土交通大臣が定めた構造方法を用いるもの又は国土交通大臣の認定を受けたものに限る。）を設けなければならない。",
-
+  "labels": [
+    "単体規定",
+    "衛生",
+    "便所",
+    "下水道"
+  ],
+  "text_raw": "下水道法（昭和三十三年法律第七十九号）第二条第八号に規定する処理区域内においては、便所は、水洗便所（汚水管が下水道法第二条第三号に規定する公共下水道に連結されたものに限る。）以外の便所としてはならない。",
   "compliance_logic": {
     "scope_condition": {
-      "operator": "ALWAYS",
-      "value": true,
-      "desc": "すべての建築物に適用"
+      "operator": "EQ",
+      "lhs": {
+        "var": "in_sewage_treatment_area",
+        "desc": "下水道法第2条第8号に規定する処理区域内",
+        "property_type": "proposition"
+      },
+      "rhs": {
+        "value": true
+      }
     },
     "judgment_rule": {
-      "operator": "AND_GLOBAL",
-      "desc": "便所の基準",
-      "conditions": [
-        {
-          "id": "cond-001",
-          "desc": "処理区域内は水洗便所（公共下水道接続）のみ",
-          "related_article": "法::A31:P1"
-        },
-        {
-          "id": "cond-002",
-          "desc": "終末処理場を有する公共下水道以外に放流する場合は屎尿浄化槽設置",
-          "related_article": "法::A31:P2"
-        }
-      ]
+      "operator": "EQ",
+      "desc": "処理区域内は水洗便所（公共下水道接続）のみ",
+      "lhs": {
+        "var": "toilet_type",
+        "desc": "便所の種類",
+        "property_type": "classification"
+      },
+      "rhs": {
+        "value": "水洗便所（公共下水道接続）"
+      }
     },
     "exceptions": null
   },
-
-  "diagram": {
+  "flow_diagram": {
+    "title": "便所適合判定フロー（法31条1項）",
+    "description": "下水道処理区域内における便所の基準適合判定のフローチャート",
+    "nodes": [
+      {
+        "id": "term-start",
+        "type": "terminal",
+        "title": "審査開始",
+        "result": "start",
+        "description": "法第31条第1項の審査を開始"
+      },
+      {
+        "id": "dec-area",
+        "type": "decision",
+        "title": "処理区域内？",
+        "description": "敷地が下水道法第2条第8号に規定する処理区域内にあるか",
+        "condition": {
+          "operator": "EQ",
+          "lhs": {
+            "var": "in_treatment_zone",
+            "desc": "処理区域内 [L]"
+          },
+          "rhs": {
+            "value": true
+          }
+        },
+        "related_articles": [
+          "法::A31:P1"
+        ]
+      },
+      {
+        "id": "dec-flush",
+        "type": "decision",
+        "title": "水洗便所（公共下水道接続）？",
+        "description": "水洗便所で、汚水管が下水道法第2条第3号の公共下水道に接続されているか",
+        "condition": {
+          "operator": "EQ",
+          "lhs": {
+            "var": "flush_toilet_connected",
+            "desc": "水洗便所（公共下水道接続） [T]"
+          },
+          "rhs": {
+            "value": true
+          }
+        },
+        "related_articles": [
+          "法::A31:P1"
+        ]
+      },
+      {
+        "id": "term-pass-not-applicable",
+        "type": "terminal",
+        "title": "適合（対象外）",
+        "result": "pass",
+        "description": "処理区域外のため第1項の規定対象外"
+      },
+      {
+        "id": "term-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "便所が基準に適合"
+      },
+      {
+        "id": "term-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "処理区域内で水洗便所（公共下水道接続）以外の便所"
+      }
+    ],
+    "edges": [
+      {
+        "id": "f-001",
+        "from": "term-start",
+        "to": "dec-area",
+        "role": "flow"
+      },
+      {
+        "id": "f-002",
+        "from": "dec-area",
+        "to": "dec-flush",
+        "role": "yes",
+        "label": "Yes"
+      },
+      {
+        "id": "f-003",
+        "from": "dec-area",
+        "to": "term-pass-not-applicable",
+        "role": "no",
+        "label": "No"
+      },
+      {
+        "id": "f-004",
+        "from": "dec-flush",
+        "to": "term-pass",
+        "role": "yes",
+        "label": "Yes"
+      },
+      {
+        "id": "f-005",
+        "from": "dec-flush",
+        "to": "term-fail",
+        "role": "no",
+        "label": "No"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "333AC0000000079",
+      "law_name": "下水道法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": [
+        "A2:I3",
+        "A2:I8"
+      ],
+      "description": "公共下水道及び処理区域の定義"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-16",
+    "updated_at": "2025-12-16",
+    "generator": "multi-agent-v4.2",
+    "notes": "法31条1項のみ。処理区域内→水洗便所(公共下水道接続)必須。第2項（屎尿浄化槽）は別機序図として分離可能"
+  },
+  "kijo_diagram": {
     "nodes": [
       {
         "id": "info-001",
@@ -59,7 +187,9 @@
         "property": "下水道処理区域内か",
         "property_type": "proposition",
         "description": "敷地が下水道法第2条第8号の処理区域内にあるか",
-        "related_articles": ["法::A31:P1"]
+        "related_articles": [
+          "法::A31:P1"
+        ]
       },
       {
         "id": "info-002",
@@ -71,67 +201,37 @@
         "property": "便所の種類",
         "property_type": "classification",
         "description": "水洗便所（公共下水道接続）/その他",
-        "related_articles": ["法::A31:P1"]
+        "related_articles": [
+          "法::A31:P1"
+        ]
       },
       {
         "id": "info-003",
         "type": "information",
-        "title": "処理区域内基準",
-        "symbol": "C1",
+        "title": "汚水管接続状況",
+        "symbol": "C",
         "subject": "便所",
         "plurality": "single",
-        "property": "処理区域内基準への適合",
+        "property": "公共下水道への接続",
         "property_type": "proposition",
-        "description": "処理区域内では水洗便所（公共下水道接続）であるか",
-        "related_articles": ["法::A31:P1"]
+        "description": "汚水管が下水道法第2条第3号の公共下水道に連結されているか",
+        "related_articles": [
+          "法::A31:P1"
+        ]
       },
       {
         "id": "info-004",
         "type": "information",
-        "title": "放流先",
-        "symbol": "D",
-        "subject": "便所",
-        "plurality": "single",
-        "property": "放流先",
-        "property_type": "classification",
-        "description": "終末処理場を有する公共下水道/その他",
-        "related_articles": ["法::A31:P2"]
-      },
-      {
-        "id": "info-005",
-        "type": "information",
-        "title": "屎尿浄化槽",
-        "symbol": "S",
-        "subject": "便所",
-        "plurality": "single",
-        "property": "屎尿浄化槽の設置",
-        "property_type": "proposition",
-        "description": "政令技術基準に適合する屎尿浄化槽が設けられているか",
-        "related_articles": ["法::A31:P2", "令::A32", "令::A35"]
-      },
-      {
-        "id": "info-006",
-        "type": "information",
-        "title": "処理区域外基準",
-        "symbol": "C2",
-        "subject": "便所",
-        "plurality": "single",
-        "property": "処理区域外基準への適合",
-        "property_type": "proposition",
-        "description": "終末処理場を有する公共下水道への放流または屎尿浄化槽設置",
-        "related_articles": ["法::A31:P2"]
-      },
-      {
-        "id": "info-007",
-        "type": "information",
-        "title": "法31条適合",
-        "symbol": "J",
+        "title": "第1項適合判定",
+        "symbol": "J1",
         "subject": "建築物",
         "plurality": "single",
-        "property": "法31条への適合",
+        "property": "法31条第1項への適合",
         "property_type": "proposition",
-        "description": "法第31条に適合するか",
-        "related_articles": ["法::A31"]
+        "description": "法第31条第1項に適合するか",
+        "related_articles": [
+          "法::A31:P1"
+        ]
       },
       {
         "id": "proc-001",
@@ -140,11 +240,19 @@
         "process_type": "human_judgment",
         "target_subject": "敷地",
         "iteration": "single",
-        "description": "敷地が下水道処理区域内にあるかを確認する",
-        "related_articles": ["法::A31:P1"],
+        "description": "敷地が下水道処理区域内にあるかを下水道台帳等で確認する",
+        "related_articles": [
+          "法::A31:P1"
+        ],
         "software_functions": [
-          { "category": "graphic_display", "description": "処理区域図との重畳表示" },
-          { "category": "user_input", "description": "区域該当の確認" }
+          {
+            "category": "graphic_display",
+            "description": "処理区域図との重畳表示"
+          },
+          {
+            "category": "user_input",
+            "description": "区域該当の確認"
+          }
         ]
       },
       {
@@ -154,208 +262,98 @@
         "process_type": "human_judgment",
         "target_subject": "便所",
         "iteration": "single",
-        "description": "便所の種類を確認する",
-        "related_articles": ["法::A31:P1"],
+        "description": "便所の種類を図面等で確認する",
+        "related_articles": [
+          "法::A31:P1"
+        ],
         "software_functions": [
-          { "category": "user_input", "description": "便所種類の選択" }
+          {
+            "category": "user_input",
+            "description": "便所種類の選択"
+          }
         ]
       },
       {
         "id": "proc-003",
         "type": "process",
-        "title": "処理区域内判定",
-        "process_type": "mechanical",
+        "title": "汚水管接続確認",
+        "process_type": "human_judgment",
         "target_subject": "便所",
         "iteration": "single",
-        "description": "処理区域内であれば水洗便所（公共下水道接続）かを判定する",
-        "logic_expression": "C1 = NOT(L) OR (T = 水洗便所(公共下水道接続))",
-        "related_articles": ["法::A31:P1"],
+        "description": "汚水管が公共下水道に接続されているかを確認する",
+        "related_articles": [
+          "法::A31:P1"
+        ],
         "software_functions": [
-          { "category": "program_processing", "description": "処理区域内判定" }
+          {
+            "category": "user_input",
+            "description": "接続状況の確認"
+          }
         ]
       },
       {
         "id": "proc-004",
         "type": "process",
-        "title": "放流先確認",
-        "process_type": "human_judgment",
-        "target_subject": "便所",
-        "iteration": "single",
-        "description": "汚物の放流先を確認する",
-        "related_articles": ["法::A31:P2"],
-        "software_functions": [
-          { "category": "user_input", "description": "放流先の選択" }
-        ]
-      },
-      {
-        "id": "proc-005",
-        "type": "process",
-        "title": "屎尿浄化槽確認",
-        "process_type": "human_judgment",
-        "target_subject": "便所",
-        "iteration": "single",
-        "description": "政令技術基準に適合する屎尿浄化槽が設けられているかを確認する",
-        "related_articles": ["法::A31:P2", "令::A32", "令::A35"],
-        "software_functions": [
-          { "category": "user_input", "description": "浄化槽の確認" }
-        ]
-      },
-      {
-        "id": "proc-006",
-        "type": "process",
-        "title": "処理区域外判定",
-        "process_type": "mechanical",
-        "target_subject": "便所",
-        "iteration": "single",
-        "description": "終末処理場を有する公共下水道への放流または屎尿浄化槽設置を判定する",
-        "logic_expression": "C2 = (D = 終末処理場有り公共下水道) OR S",
-        "related_articles": ["法::A31:P2"],
-        "software_functions": [
-          { "category": "program_processing", "description": "処理区域外判定" }
-        ]
-      },
-      {
-        "id": "proc-007",
-        "type": "process",
-        "title": "法31条適合判定",
+        "title": "第1項適合判定",
         "process_type": "mechanical",
         "target_subject": "建築物",
         "iteration": "single",
-        "description": "処理区域内基準と処理区域外基準の両方に適合であれば適合",
-        "logic_expression": "J = C1 AND C2",
-        "related_articles": ["法::A31"],
+        "description": "処理区域外、または処理区域内で水洗便所（公共下水道接続）であれば適合",
+        "logic_expression": "J1 = NOT(L) OR (T = 水洗便所 AND C)",
+        "related_articles": [
+          "法::A31:P1"
+        ],
         "software_functions": [
-          { "category": "program_processing", "description": "最終適合判定" }
+          {
+            "category": "program_processing",
+            "description": "適合判定"
+          }
         ]
       }
     ],
     "edges": [
-      {"id": "e-001", "from": "proc-001", "to": "info-001", "role": "output"},
-      {"id": "e-002", "from": "proc-002", "to": "info-002", "role": "output"},
-      {"id": "e-003", "from": "info-001", "to": "proc-003", "role": "input"},
-      {"id": "e-004", "from": "info-002", "to": "proc-003", "role": "input"},
-      {"id": "e-005", "from": "proc-003", "to": "info-003", "role": "output"},
-      {"id": "e-006", "from": "proc-004", "to": "info-004", "role": "output"},
-      {"id": "e-007", "from": "proc-005", "to": "info-005", "role": "output"},
-      {"id": "e-008", "from": "info-004", "to": "proc-006", "role": "input"},
-      {"id": "e-009", "from": "info-005", "to": "proc-006", "role": "input"},
-      {"id": "e-010", "from": "proc-006", "to": "info-006", "role": "output"},
-      {"id": "e-011", "from": "info-003", "to": "proc-007", "role": "input"},
-      {"id": "e-012", "from": "info-006", "to": "proc-007", "role": "input"},
-      {"id": "e-013", "from": "proc-007", "to": "info-007", "role": "output"}
-    ]
-  },
-
-  "flow_diagram": {
-    "title": "便所適合判定フロー",
-    "description": "法31条の処理区域内外に応じた便所・浄化槽の基準適合判定のフローチャート",
-    "nodes": [
       {
-        "id": "term-start",
-        "type": "terminal",
-        "title": "審査開始",
-        "result": "start",
-        "description": "法第31条の審査を開始"
+        "id": "e-001",
+        "from": "proc-001",
+        "to": "info-001",
+        "role": "output"
       },
       {
-        "id": "dec-area",
-        "type": "decision",
-        "title": "処理区域内？",
-        "description": "敷地が下水道処理区域内にあるか",
-        "condition": {
-          "operator": "EQ",
-          "lhs": { "var": "in_treatment_zone", "desc": "処理区域内 [L]" },
-          "rhs": { "value": true }
-        },
-        "related_articles": ["法::A31:P1"]
+        "id": "e-002",
+        "from": "proc-002",
+        "to": "info-002",
+        "role": "output"
       },
       {
-        "id": "dec-flush",
-        "type": "decision",
-        "title": "水洗便所（公共下水道接続）？",
-        "description": "【1項】水洗便所で公共下水道に接続されているか",
-        "condition": {
-          "operator": "EQ",
-          "lhs": { "var": "flush_toilet_connected", "desc": "水洗便所（公共下水道接続） [T]" },
-          "rhs": { "value": true }
-        },
-        "related_articles": ["法::A31:P1"]
+        "id": "e-003",
+        "from": "proc-003",
+        "to": "info-003",
+        "role": "output"
       },
       {
-        "id": "dec-discharge",
-        "type": "decision",
-        "title": "終末処理場有り公共下水道へ放流？",
-        "description": "【2項】終末処理場を有する公共下水道に放流するか",
-        "condition": {
-          "operator": "EQ",
-          "lhs": { "var": "discharge_to_treatment_plant", "desc": "終末処理場有り公共下水道放流 [D]" },
-          "rhs": { "value": true }
-        },
-        "related_articles": ["法::A31:P2"]
+        "id": "e-004",
+        "from": "info-001",
+        "to": "proc-004",
+        "role": "input"
       },
       {
-        "id": "dec-septic",
-        "type": "decision",
-        "title": "屎尿浄化槽設置？",
-        "description": "【2項】政令技術基準に適合する屎尿浄化槽が設けられているか",
-        "condition": {
-          "operator": "EQ",
-          "lhs": { "var": "septic_tank_installed", "desc": "屎尿浄化槽 [S]" },
-          "rhs": { "value": true }
-        },
-        "related_articles": ["法::A31:P2"]
+        "id": "e-005",
+        "from": "info-002",
+        "to": "proc-004",
+        "role": "input"
       },
       {
-        "id": "term-pass",
-        "type": "terminal",
-        "title": "適合",
-        "result": "pass",
-        "description": "便所・浄化槽が基準に適合"
+        "id": "e-006",
+        "from": "info-003",
+        "to": "proc-004",
+        "role": "input"
       },
       {
-        "id": "term-fail",
-        "type": "terminal",
-        "title": "不適合",
-        "result": "fail",
-        "description": "便所・浄化槽が基準に不適合"
+        "id": "e-007",
+        "from": "proc-004",
+        "to": "info-004",
+        "role": "output"
       }
-    ],
-    "edges": [
-      { "id": "f-001", "from": "term-start", "to": "dec-area", "role": "flow" },
-      { "id": "f-002", "from": "dec-area", "to": "dec-flush", "role": "yes" },
-      { "id": "f-003", "from": "dec-area", "to": "dec-discharge", "role": "no" },
-      { "id": "f-004", "from": "dec-flush", "to": "term-pass", "role": "yes" },
-      { "id": "f-005", "from": "dec-flush", "to": "term-fail", "role": "no" },
-      { "id": "f-006", "from": "dec-discharge", "to": "term-pass", "role": "yes" },
-      { "id": "f-007", "from": "dec-discharge", "to": "dec-septic", "role": "no" },
-      { "id": "f-008", "from": "dec-septic", "to": "term-pass", "role": "yes" },
-      { "id": "f-009", "from": "dec-septic", "to": "term-fail", "role": "no" }
     ]
-  },
-
-  "related_laws": [
-    {
-      "law_id": "325CO0000000338",
-      "law_name": "建築基準法施行令",
-      "law_type": "order",
-      "relationship": "defines_detail",
-      "articles": ["A32", "A35"],
-      "description": "屎尿浄化槽の構造に関する技術的基準"
-    },
-    {
-      "law_id": "333AC0000000079",
-      "law_name": "下水道法",
-      "law_type": "act",
-      "relationship": "references",
-      "articles": ["A2:I3", "A2:I6", "A2:I8"],
-      "description": "公共下水道、終末処理場、処理区域の定義"
-    }
-  ],
-
-  "metadata": {
-    "created_at": "2025-12-15",
-    "updated_at": "2025-12-15",
-    "generator": "multi-agent-v4.2",
-    "notes": "処理区域内→水洗便所(公共下水道接続)必須、処理区域外で終末処理場無し→屎尿浄化槽必須"
   }
 }

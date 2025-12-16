@@ -11,6 +11,25 @@ interface DecisionNodeData extends Record<string, unknown> {
 type DecisionNodeProps = NodeProps<Node<DecisionNodeData>>;
 
 /**
+ * 関連条項を短い表示形式に変換
+ */
+function formatRelatedArticle(article: string): string {
+  const match = article.match(/^([^:]+)::A([^:]+)(?::P(\d+))?(?::I(\d+))?$/);
+  if (!match) return article;
+
+  const [, lawAbbrev, articleNum, paragraphNum, itemNum] = match;
+  const articleDisplay = articleNum.includes("_")
+    ? articleNum.replace(/_/g, "条の")
+    : articleNum + "条";
+
+  let display = `${lawAbbrev}${articleDisplay}`;
+  if (paragraphNum) display += `${paragraphNum}項`;
+  if (itemNum) display += `${itemNum}号`;
+
+  return display;
+}
+
+/**
  * 判定ノード - 機序図用（アイコン付き角丸ボックス）
  */
 function DecisionNodeComponent({ data, selected }: DecisionNodeProps) {
@@ -19,7 +38,7 @@ function DecisionNodeComponent({ data, selected }: DecisionNodeProps) {
   return (
     <div
       className={`
-        relative flex items-center justify-center
+        relative flex flex-col items-center justify-center
         min-w-[140px] min-h-[50px] px-4 py-2
         bg-amber-100 border-2 border-amber-500 rounded-lg
         shadow-sm
@@ -41,6 +60,15 @@ function DecisionNodeComponent({ data, selected }: DecisionNodeProps) {
       <div className="text-center text-xs font-medium text-amber-900 leading-tight">
         {node.title}
       </div>
+
+      {/* 関連条項（あれば表示、複数の場合は改行） */}
+      {node.related_articles && node.related_articles.length > 0 && (
+        <div className="mt-1 text-[10px] text-amber-700 text-center flex flex-col">
+          {node.related_articles.map((article, i) => (
+            <span key={i}>{formatRelatedArticle(article)}</span>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

@@ -1,13 +1,11 @@
 {
   "id": "CHK-BSL-A33-P1",
   "version": "3.2.0",
-
   "page_title": {
-    "title": "避雷設備",
-    "target_subject": "建築物",
-    "description": "高さ20mを超える建築物について、政令技術基準に適合する避雷設備の設置を判定する"
+    "title": "下水道処理区域内における便所の規定",
+    "target_subject": "便所",
+    "description": "下水道法の処理区域内においては、公共下水道に連結された水洗便所以外の便所を設置してはならない"
   },
-
   "legal_ref": {
     "law_id": "325AC0000000201",
     "law_type": "act",
@@ -17,198 +15,40 @@
     "paragraph": "1",
     "item": null
   },
-
-  "labels": ["単体規定", "設備", "避雷設備"],
-
-  "text_raw": "高さ二十メートルをこえる建築物には、有効に避雷設備を設けなければならない。ただし、周囲の状況によつて安全上支障がない場合においては、この限りでない。",
-
+  "labels": [
+    "単体規定",
+    "設備",
+    "下水道"
+  ],
+  "text_raw": "下水道法第2条第8号に規定する処理区域内においては、便所は、水洗便所（汚水管が下水道法第2条第3号に規定する公共下水道に連結されたものに限る。）以外の便所としてはならない。",
   "compliance_logic": {
     "scope_condition": {
-      "operator": "GT",
-      "lhs": { "var": "building_height", "desc": "建築物の高さ", "property_type": "numeric" },
-      "rhs": { "value": 20, "unit": "m" }
+      "operator": "EQ",
+      "lhs": {
+        "var": "in_sewerage_treatment_area",
+        "desc": "下水道法処理区域内",
+        "property_type": "proposition"
+      },
+      "rhs": {
+        "value": true
+      }
     },
     "judgment_rule": {
       "operator": "EQ",
-      "lhs": { "var": "lightning_protection_installed", "desc": "有効に避雷設備を設けている", "property_type": "proposition" },
-      "rhs": { "value": true }
-    },
-    "exceptions": {
-      "operator": "EQ",
-      "effect": "exempt",
-      "desc": "ただし書き（周囲の状況によって安全上支障がない場合）",
-      "items": [
-        {
-          "item_number": "1",
-          "desc": "周囲の状況によって安全上支障がない場合",
-          "keywords": ["周囲の状況", "安全上支障がない"]
-        }
-      ]
-    }
-  },
-
-  "diagram": {
-    "nodes": [
-      {
-        "id": "info-001",
-        "type": "information",
-        "title": "建築物の高さ",
-        "symbol": "H",
-        "subject": "建築物",
-        "plurality": "single",
-        "property": "高さ",
-        "property_type": "numeric",
-        "unit": "m",
-        "description": "建築物の高さ",
-        "related_articles": ["法::A33"]
+      "lhs": {
+        "var": "is_flush_toilet_connected_to_public_sewerage",
+        "desc": "公共下水道に連結された水洗便所",
+        "property_type": "proposition"
       },
-      {
-        "id": "info-002",
-        "type": "information",
-        "title": "適用対象",
-        "symbol": "T",
-        "subject": "建築物",
-        "plurality": "single",
-        "property": "法33条の適用対象",
-        "property_type": "proposition",
-        "description": "高さが20mを超えるか",
-        "related_articles": ["法::A33"]
-      },
-      {
-        "id": "info-003",
-        "type": "information",
-        "title": "周囲の状況",
-        "symbol": "S",
-        "subject": "建築物",
-        "plurality": "single",
-        "property": "周囲の状況",
-        "property_type": "proposition",
-        "description": "周囲の状況によって安全上支障がないか",
-        "related_articles": ["法::A33"]
-      },
-      {
-        "id": "info-ex1-match",
-        "type": "information",
-        "title": "ただし書き該当",
-        "symbol": "Ex",
-        "subject": "建築物",
-        "plurality": "single",
-        "property": "ただし書き該当",
-        "property_type": "proposition",
-        "description": "周囲の状況により安全上支障がないとして例外適用",
-        "related_articles": ["法::A33"]
-      },
-      {
-        "id": "info-004",
-        "type": "information",
-        "title": "避雷設備",
-        "symbol": "L",
-        "subject": "建築物",
-        "plurality": "single",
-        "property": "避雷設備の設置",
-        "property_type": "proposition",
-        "description": "有効に避雷設備が設けられているか",
-        "related_articles": ["法::A33", "令::A129の14", "令::A129の15"]
-      },
-      {
-        "id": "info-005",
-        "type": "information",
-        "title": "法33条適合",
-        "symbol": "J",
-        "subject": "建築物",
-        "plurality": "single",
-        "property": "法33条への適合",
-        "property_type": "proposition",
-        "description": "法第33条に適合するか",
-        "related_articles": ["法::A33"]
-      },
-      {
-        "id": "proc-001",
-        "type": "process",
-        "title": "高さの確認",
-        "process_type": "human_judgment",
-        "target_subject": "建築物",
-        "iteration": "single",
-        "description": "建築物の高さを確認する",
-        "related_articles": ["法::A33"],
-        "software_functions": [
-          { "category": "user_input", "description": "高さの入力" }
-        ]
-      },
-      {
-        "id": "proc-002",
-        "type": "process",
-        "title": "適用判定",
-        "process_type": "mechanical",
-        "target_subject": "建築物",
-        "iteration": "single",
-        "description": "高さが20mを超えるかを判定する",
-        "logic_expression": "T = (H > 20)",
-        "related_articles": ["法::A33"],
-        "software_functions": [
-          { "category": "program_processing", "description": "高さ判定" }
-        ]
-      },
-      {
-        "id": "proc-003",
-        "type": "process",
-        "title": "周囲状況確認",
-        "process_type": "human_judgment",
-        "target_subject": "建築物",
-        "iteration": "single",
-        "description": "周囲の状況によって安全上支障がないかを確認する",
-        "related_articles": ["法::A33"],
-        "software_functions": [
-          { "category": "user_input", "description": "周囲状況の確認" }
-        ]
-      },
-      {
-        "id": "proc-004",
-        "type": "process",
-        "title": "避雷設備確認",
-        "process_type": "human_judgment",
-        "target_subject": "建築物",
-        "iteration": "single",
-        "description": "有効に避雷設備が設けられているかを確認する",
-        "related_articles": ["法::A33", "令::A129の14", "令::A129の15"],
-        "software_functions": [
-          { "category": "user_input", "description": "避雷設備の確認" }
-        ]
-      },
-      {
-        "id": "proc-005",
-        "type": "process",
-        "title": "法33条適合判定",
-        "process_type": "mechanical",
-        "target_subject": "建築物",
-        "iteration": "single",
-        "description": "適用対象外、ただし書き該当、または避雷設備設置であれば適合",
-        "logic_expression": "J = NOT(T) OR Ex OR L",
-        "related_articles": ["法::A33"],
-        "software_functions": [
-          { "category": "program_processing", "description": "最終適合判定" }
-        ]
+      "rhs": {
+        "value": true
       }
-    ],
-    "edges": [
-      {"id": "e-001", "from": "proc-001", "to": "info-001", "role": "output"},
-      {"id": "e-002", "from": "info-001", "to": "proc-002", "role": "input"},
-      {"id": "e-003", "from": "proc-002", "to": "info-002", "role": "output"},
-      {"id": "e-004", "from": "info-002", "to": "proc-003", "role": "input"},
-      {"id": "e-005", "from": "proc-003", "to": "info-003", "role": "output"},
-      {"id": "e-006", "from": "info-003", "to": "info-ex1-match", "role": "output"},
-      {"id": "e-007", "from": "info-002", "to": "proc-004", "role": "input"},
-      {"id": "e-008", "from": "proc-004", "to": "info-004", "role": "output"},
-      {"id": "e-009", "from": "info-002", "to": "proc-005", "role": "input"},
-      {"id": "e-010", "from": "info-ex1-match", "to": "proc-005", "role": "input"},
-      {"id": "e-011", "from": "info-004", "to": "proc-005", "role": "input"},
-      {"id": "e-012", "from": "proc-005", "to": "info-005", "role": "output"}
-    ]
+    },
+    "exceptions": null
   },
-
   "flow_diagram": {
-    "title": "避雷設備適合判定フロー",
-    "description": "法33条の高さ要件判定とただし書き・避雷設備設置判定のフローチャート",
+    "title": "下水道処理区域内便所適合判定フロー",
+    "description": "法33条の処理区域判定と水洗便所接続判定のフローチャート",
     "nodes": [
       {
         "id": "term-start",
@@ -218,105 +58,448 @@
         "description": "法第33条の審査を開始"
       },
       {
-        "id": "dec-height",
+        "id": "dec-treatment-area",
         "type": "decision",
-        "title": "高さ > 20m？",
-        "description": "建築物の高さが20mを超えるか",
-        "condition": {
-          "operator": "GT",
-          "lhs": { "var": "building_height", "desc": "高さ [H]" },
-          "rhs": { "value": 20, "unit": "m" }
-        },
-        "related_articles": ["法::A33"]
-      },
-      {
-        "id": "dec-surroundings",
-        "type": "decision",
-        "title": "周囲状況により安全上支障なし？",
-        "description": "【ただし書き】周囲の状況によって安全上支障がないか",
+        "title": "処理区域内？",
+        "description": "下水道法第2条第8号に規定する処理区域内か",
         "condition": {
           "operator": "EQ",
-          "lhs": { "var": "surroundings_safe", "desc": "周囲状況安全 [S]" },
-          "rhs": { "value": true }
+          "lhs": {
+            "var": "in_sewerage_treatment_area",
+            "desc": "処理区域 [A]"
+          },
+          "rhs": {
+            "value": true
+          }
         },
-        "related_articles": ["法::A33"]
+        "related_articles": [
+          "法::A33:P1",
+          "下水道法::A2:I8"
+        ]
       },
       {
-        "id": "proc-ex1-match",
-        "type": "process",
-        "title": "ただし書き該当",
-        "process_type": "mechanical",
-        "description": "周囲状況により安全上支障なし（例外適用）",
-        "related_articles": ["法::A33"]
-      },
-      {
-        "id": "dec-lightning",
+        "id": "dec-flush-toilet",
         "type": "decision",
-        "title": "避雷設備設置？",
-        "description": "有効に避雷設備が設けられているか",
+        "title": "公共下水道連結水洗便所？",
+        "description": "汚水管が公共下水道に連結された水洗便所か",
         "condition": {
           "operator": "EQ",
-          "lhs": { "var": "lightning_protection_installed", "desc": "避雷設備 [L]" },
-          "rhs": { "value": true }
+          "lhs": {
+            "var": "is_flush_toilet_connected_to_public_sewerage",
+            "desc": "水洗便所（公共下水道連結） [F]"
+          },
+          "rhs": {
+            "value": true
+          }
         },
-        "related_articles": ["法::A33", "令::A129の14"]
+        "related_articles": [
+          "法::A33:P1",
+          "下水道法::A2:I3"
+        ]
       },
       {
-        "id": "term-pass-height",
+        "id": "term-pass-outside",
         "type": "terminal",
-        "title": "適合（高さ外）",
+        "title": "適合（区域外）",
         "result": "pass",
-        "description": "高さ20m以下のため規定対象外"
-      },
-      {
-        "id": "term-pass-exception",
-        "type": "terminal",
-        "title": "適合（例外）",
-        "result": "pass",
-        "description": "ただし書きの例外に該当"
+        "description": "処理区域外のため規定対象外"
       },
       {
         "id": "term-pass",
         "type": "terminal",
         "title": "適合",
         "result": "pass",
-        "description": "避雷設備が設置されている"
+        "description": "公共下水道に連結された水洗便所である"
       },
       {
         "id": "term-fail",
         "type": "terminal",
         "title": "不適合",
         "result": "fail",
-        "description": "避雷設備が設置されていない"
+        "description": "公共下水道に連結された水洗便所ではない"
       }
     ],
     "edges": [
-      { "id": "f-001", "from": "term-start", "to": "dec-height", "role": "flow" },
-      { "id": "f-002", "from": "dec-height", "to": "dec-surroundings", "role": "yes" },
-      { "id": "f-003", "from": "dec-height", "to": "term-pass-height", "role": "no" },
-      { "id": "f-004", "from": "dec-surroundings", "to": "proc-ex1-match", "role": "yes" },
-      { "id": "f-005", "from": "proc-ex1-match", "to": "term-pass-exception", "role": "flow" },
-      { "id": "f-006", "from": "dec-surroundings", "to": "dec-lightning", "role": "no" },
-      { "id": "f-007", "from": "dec-lightning", "to": "term-pass", "role": "yes" },
-      { "id": "f-008", "from": "dec-lightning", "to": "term-fail", "role": "no" }
+      {
+        "id": "f-001",
+        "from": "term-start",
+        "to": "dec-treatment-area",
+        "role": "flow"
+      },
+      {
+        "id": "f-002",
+        "from": "dec-treatment-area",
+        "to": "dec-flush-toilet",
+        "role": "yes",
+        "label": "Yes"
+      },
+      {
+        "id": "f-003",
+        "from": "dec-treatment-area",
+        "to": "term-pass-outside",
+        "role": "no",
+        "label": "No"
+      },
+      {
+        "id": "f-004",
+        "from": "dec-flush-toilet",
+        "to": "term-pass",
+        "role": "yes",
+        "label": "Yes"
+      },
+      {
+        "id": "f-005",
+        "from": "dec-flush-toilet",
+        "to": "term-fail",
+        "role": "no",
+        "label": "No"
+      }
     ]
   },
-
   "related_laws": [
     {
-      "law_id": "325CO0000000338",
-      "law_name": "建築基準法施行令",
-      "law_type": "order",
-      "relationship": "defines_detail",
-      "articles": ["A129の14", "A129の15"],
-      "description": "避雷設備の構造に関する技術的基準"
+      "law_id": "334AC0000000079",
+      "law_name": "下水道法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": [
+        "A2:I3",
+        "A2:I8"
+      ],
+      "description": "処理区域と公共下水道の定義"
     }
   ],
-
   "metadata": {
-    "created_at": "2025-12-15",
-    "updated_at": "2025-12-15",
+    "created_at": "2025-12-16",
+    "updated_at": "2025-12-16",
     "generator": "multi-agent-v4.2",
-    "notes": "高さ20m超 → 避雷設備設置必要（周囲状況により安全上支障なしの場合は除外）"
+    "notes": "処理区域内 → 公共下水道連結水洗便所が必須"
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "info-001",
+        "type": "information",
+        "title": "敷地の所在地",
+        "symbol": "L",
+        "subject": "敷地",
+        "plurality": "single",
+        "property": "所在地",
+        "property_type": "geometric_point",
+        "description": "建築物の敷地の所在地",
+        "related_articles": [
+          "法::A33:P1"
+        ]
+      },
+      {
+        "id": "info-002",
+        "type": "information",
+        "title": "処理区域情報",
+        "symbol": "Ds",
+        "subject": "下水道",
+        "plurality": "single",
+        "property": "処理区域の範囲",
+        "property_type": "geometric_surface",
+        "description": "下水道法第2条第8号に規定する処理区域",
+        "related_articles": [
+          "法::A33:P1",
+          "下水道法::A2:I8"
+        ]
+      },
+      {
+        "id": "info-003",
+        "type": "information",
+        "title": "処理区域内判定",
+        "symbol": "A",
+        "subject": "敷地",
+        "plurality": "single",
+        "property": "処理区域内であるか",
+        "property_type": "proposition",
+        "description": "敷地が処理区域内にあるか",
+        "related_articles": [
+          "法::A33:P1"
+        ]
+      },
+      {
+        "id": "info-004",
+        "type": "information",
+        "title": "便所の種類",
+        "symbol": "T",
+        "subject": "便所",
+        "plurality": "single",
+        "property": "便所の種類",
+        "property_type": "classification",
+        "description": "便所の種類（水洗便所/非水洗便所）",
+        "related_articles": [
+          "法::A33:P1"
+        ]
+      },
+      {
+        "id": "info-005",
+        "type": "information",
+        "title": "汚水管の接続先",
+        "symbol": "C",
+        "subject": "便所",
+        "plurality": "single",
+        "property": "汚水管の接続先",
+        "property_type": "classification",
+        "description": "汚水管の接続先（公共下水道/浄化槽等）",
+        "related_articles": [
+          "法::A33:P1",
+          "下水道法::A2:I3"
+        ]
+      },
+      {
+        "id": "info-006",
+        "type": "information",
+        "title": "水洗便所適合性",
+        "symbol": "F",
+        "subject": "便所",
+        "plurality": "single",
+        "property": "公共下水道に連結された水洗便所であるか",
+        "property_type": "proposition",
+        "description": "汚水管が公共下水道に連結された水洗便所か",
+        "related_articles": [
+          "法::A33:P1"
+        ]
+      },
+      {
+        "id": "info-007",
+        "type": "information",
+        "title": "法33条適合",
+        "symbol": "J",
+        "subject": "便所",
+        "plurality": "single",
+        "property": "法33条への適合",
+        "property_type": "proposition",
+        "description": "法第33条に適合するか",
+        "related_articles": [
+          "法::A33:P1"
+        ]
+      },
+      {
+        "id": "proc-001",
+        "type": "process",
+        "title": "敷地位置取得",
+        "process_type": "human_judgment",
+        "target_subject": "敷地",
+        "iteration": "single",
+        "description": "敷地の所在地を取得する",
+        "related_articles": [
+          "法::A33:P1"
+        ],
+        "software_functions": [
+          {
+            "category": "user_input",
+            "description": "敷地の所在地入力"
+          }
+        ]
+      },
+      {
+        "id": "proc-002",
+        "type": "process",
+        "title": "処理区域情報取得",
+        "process_type": "human_judgment",
+        "target_subject": "下水道",
+        "iteration": "single",
+        "description": "下水道法の処理区域情報を取得する",
+        "related_articles": [
+          "法::A33:P1",
+          "下水道法::A2:I8"
+        ],
+        "software_functions": [
+          {
+            "category": "user_input",
+            "description": "処理区域情報の確認"
+          }
+        ]
+      },
+      {
+        "id": "proc-003",
+        "type": "process",
+        "title": "処理区域判定",
+        "process_type": "mechanical",
+        "target_subject": "敷地",
+        "iteration": "single",
+        "description": "敷地が処理区域内にあるかを判定する",
+        "logic_expression": "A = (L ∈ Ds)",
+        "related_articles": [
+          "法::A33:P1"
+        ],
+        "software_functions": [
+          {
+            "category": "program_processing",
+            "description": "地理的包含判定"
+          }
+        ]
+      },
+      {
+        "id": "proc-004",
+        "type": "process",
+        "title": "便所種類確認",
+        "process_type": "human_judgment",
+        "target_subject": "便所",
+        "iteration": "single",
+        "description": "便所の種類を確認する",
+        "related_articles": [
+          "法::A33:P1"
+        ],
+        "software_functions": [
+          {
+            "category": "user_input",
+            "description": "便所種類の入力"
+          }
+        ]
+      },
+      {
+        "id": "proc-005",
+        "type": "process",
+        "title": "接続先確認",
+        "process_type": "human_judgment",
+        "target_subject": "便所",
+        "iteration": "single",
+        "description": "汚水管の接続先を確認する",
+        "related_articles": [
+          "法::A33:P1",
+          "下水道法::A2:I3"
+        ],
+        "software_functions": [
+          {
+            "category": "user_input",
+            "description": "汚水管接続先の確認"
+          }
+        ]
+      },
+      {
+        "id": "proc-006",
+        "type": "process",
+        "title": "水洗便所適合判定",
+        "process_type": "mechanical",
+        "target_subject": "便所",
+        "iteration": "single",
+        "description": "水洗便所かつ公共下水道に連結されているかを判定",
+        "logic_expression": "F = (T = '水洗便所' AND C = '公共下水道')",
+        "related_articles": [
+          "法::A33:P1"
+        ],
+        "software_functions": [
+          {
+            "category": "program_processing",
+            "description": "論理判定"
+          }
+        ]
+      },
+      {
+        "id": "proc-007",
+        "type": "process",
+        "title": "法33条適合判定",
+        "process_type": "mechanical",
+        "target_subject": "便所",
+        "iteration": "single",
+        "description": "処理区域外であるか、または水洗便所適合であれば適合",
+        "logic_expression": "J = NOT(A) OR F",
+        "related_articles": [
+          "法::A33:P1"
+        ],
+        "software_functions": [
+          {
+            "category": "program_processing",
+            "description": "最終適合判定"
+          }
+        ]
+      }
+    ],
+    "edges": [
+      {
+        "id": "e-001",
+        "from": "proc-001",
+        "to": "info-001",
+        "role": "output"
+      },
+      {
+        "id": "e-002",
+        "from": "proc-002",
+        "to": "info-002",
+        "role": "output"
+      },
+      {
+        "id": "e-003",
+        "from": "info-001",
+        "to": "proc-003",
+        "role": "input"
+      },
+      {
+        "id": "e-004",
+        "from": "info-002",
+        "to": "proc-003",
+        "role": "input"
+      },
+      {
+        "id": "e-005",
+        "from": "proc-003",
+        "to": "info-003",
+        "role": "output"
+      },
+      {
+        "id": "e-006",
+        "from": "info-003",
+        "to": "proc-004",
+        "role": "input"
+      },
+      {
+        "id": "e-007",
+        "from": "proc-004",
+        "to": "info-004",
+        "role": "output"
+      },
+      {
+        "id": "e-008",
+        "from": "info-003",
+        "to": "proc-005",
+        "role": "input"
+      },
+      {
+        "id": "e-009",
+        "from": "proc-005",
+        "to": "info-005",
+        "role": "output"
+      },
+      {
+        "id": "e-010",
+        "from": "info-004",
+        "to": "proc-006",
+        "role": "input"
+      },
+      {
+        "id": "e-011",
+        "from": "info-005",
+        "to": "proc-006",
+        "role": "input"
+      },
+      {
+        "id": "e-012",
+        "from": "proc-006",
+        "to": "info-006",
+        "role": "output"
+      },
+      {
+        "id": "e-013",
+        "from": "info-003",
+        "to": "proc-007",
+        "role": "input"
+      },
+      {
+        "id": "e-014",
+        "from": "info-006",
+        "to": "proc-007",
+        "role": "input"
+      },
+      {
+        "id": "e-015",
+        "from": "proc-007",
+        "to": "info-007",
+        "role": "output"
+      }
+    ]
   }
 }
