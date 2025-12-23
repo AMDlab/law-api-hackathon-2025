@@ -25,7 +25,7 @@ schemas/flow-diagram.schema.json を読む
 
 ### STEP 2: 機序図読み込み
 
-対象ファイル: `data/diagrams/{法令ID}/{条番号}_kijo.json`
+対象ファイル: `data/diagrams/{法令ID}/A{条}_P{項}_kijo.json`
 
 抽出する情報:
 1. **kijo_diagram.nodes**: 情報ノード・処理ノード
@@ -52,7 +52,7 @@ schemas/flow-diagram.schema.json を読む
 ### STEP 5: JSON出力
 
 **分離ファイルとして出力:**
-- 出力先: `data/diagrams/{法令ID}/{条番号}_flow.json`
+- 出力先: `data/diagrams/{法令ID}/A{条}_P{項}_flow.json`
 - 例: `A22_P1_kijo.json` → `A22_P1_flow.json`
 
 **ファイル命名規則:**

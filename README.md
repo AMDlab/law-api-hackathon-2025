@@ -98,7 +98,7 @@ Claude Code で以下のように指示します。
 **生成される内容:**
 - e-Gov法令APIから条文を取得
 - 規制文を分析し、情報ノード・処理ノードを構造化
-- `data/diagrams/{法令ID}/{条番号}_kijo.json` にJSON形式で保存（例: `A22_P1_kijo.json`）
+- `data/diagrams/{法令ID}/A{条}_P{項}_kijo.json` にJSON形式で保存（例: `A22_P1_kijo.json`）
 
 ### フロー図の作成
 
@@ -117,7 +117,7 @@ Claude Code で以下のように指示します。
 **生成される内容:**
 - 既存の機序図JSON（`*_kijo.json`）を読み込み
 - 判定ノード・終端ノードを含むフローチャートを生成
-- 別ファイル `{条番号}_flow.json` として保存（例: `A22_P1_flow.json`）
+- 別ファイル `A{条}_P{項}_flow.json` として保存（例: `A22_P1_flow.json`）
 
 ### 使用例
 

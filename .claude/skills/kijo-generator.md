@@ -50,7 +50,7 @@ law.get_article(law_id="325AC0000000201", article="43", paragraph="1")
 
 ### STEP 4: JSON生成
 
-出力先: `data/diagrams/{法令ID}/{条番号}_kijo.json`
+出力先: `data/diagrams/{法令ID}/A{条}_P{項}_kijo.json`
 
 **ファイル命名規則:**
 - 機序図: `A{条}_P{項}_kijo.json`（例: `A22_P1_kijo.json`）
