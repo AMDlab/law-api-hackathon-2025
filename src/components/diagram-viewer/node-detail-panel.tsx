@@ -28,6 +28,25 @@ function getPropertyTypeLabel(propertyType: string): string {
 }
 
 /**
+ * 性質の型に応じた背景色クラスを取得
+ */
+function getPropertyTypeBgClass(propertyType: string): string {
+  const classes: Record<string, string> = {
+    proposition: "bg-blue-100",
+    classification: "bg-purple-100",
+    numeric: "bg-green-100",
+    geometric_point: "bg-cyan-100",
+    geometric_direction: "bg-cyan-100",
+    geometric_line: "bg-cyan-100",
+    geometric_surface: "bg-cyan-100",
+    geometric_solid: "bg-cyan-100",
+    set_definition: "bg-yellow-100",
+    visual: "bg-orange-100",
+  };
+  return classes[propertyType] || "bg-gray-100";
+}
+
+/**
  * 処理の種類を日本語で表示
  */
 function getProcessTypeLabel(processType: string): string {
@@ -192,45 +211,82 @@ function InformationDetail({
   onNavigate?: (lawId: string, diagramId: string) => void;
 }) {
   return (
-    <div className="space-y-3">
-      <div>
-        <div className="text-xs text-gray-500">主体</div>
-        <div className="text-sm">{node.subject || "-"}</div>
+    <div className="space-y-2">
+      {/* 基本情報（横並びレイアウト） */}
+      <div className="flex justify-between text-sm">
+        <span className="text-gray-500">主体</span>
+        <span>{node.subject || "-"}</span>
       </div>
-      <div>
-        <div className="text-xs text-gray-500">性質</div>
-        <div className="text-sm">{node.property || "-"}</div>
+      <div className="flex justify-between text-sm">
+        <span className="text-gray-500">性質</span>
+        <span>{node.property || "-"}</span>
       </div>
-      <div>
-        <div className="text-xs text-gray-500">性質の型</div>
-        <div className="text-sm">
+      <div className="flex justify-between text-sm">
+        <span className="text-gray-500">性質の型</span>
+        <span className={`${node.property_type ? getPropertyTypeBgClass(node.property_type) : ""} px-1.5 rounded`}>
           {node.property_type ? getPropertyTypeLabel(node.property_type) : "-"}
+        </span>
+      </div>
+      {node.plurality && (
+        <div className="flex justify-between text-sm">
+          <span className="text-gray-500">単数/複数</span>
+          <span>{node.plurality === "multiple" ? "複数" : "単数"}</span>
         </div>
-      </div>
-      <div>
-        <div className="text-xs text-gray-500">説明</div>
-        <div className="text-sm">{node.description || "-"}</div>
-      </div>
+      )}
+      {node.unit && (
+        <div className="flex justify-between text-sm">
+          <span className="text-gray-500">単位</span>
+          <span>{node.unit}</span>
+        </div>
+      )}
+
+      {/* 説明（区切り線の下） */}
+      {node.description && (
+        <div className="border-t pt-2 mt-2">
+          <div className="text-gray-500 text-xs mb-1">説明</div>
+          <div className="text-sm text-gray-700">{node.description}</div>
+        </div>
+      )}
+
+      {/* 関連条項 */}
       {node.related_articles && node.related_articles.length > 0 && (
-        <div>
-          <div className="text-xs text-gray-500">関連条項</div>
+        <div className="border-t pt-2 mt-2">
+          <div className="text-gray-500 text-xs mb-1">関連条項</div>
           <RelatedArticlesLinks articles={node.related_articles} onNavigate={onNavigate} />
         </div>
       )}
+
+      {/* 委任先法令の要件 */}
       {node.delegated_requirements && node.delegated_requirements.length > 0 && (
-        <div>
-          <div className="text-xs text-gray-500 mb-1">委任先法令の要件</div>
+        <div className="border-t pt-2 mt-2">
+          <div className="text-gray-500 text-xs mb-1">委任先法令の要件</div>
           <DelegatedRequirementsList requirements={node.delegated_requirements} onNavigate={onNavigate} />
         </div>
       )}
+
+      {/* 備考 */}
       {node.remarks && (
-        <div>
-          <div className="text-xs text-gray-500">備考</div>
-          <div className="text-sm">{node.remarks}</div>
+        <div className="border-t pt-2 mt-2">
+          <div className="text-gray-500 text-xs mb-1">備考</div>
+          <div className="text-sm text-gray-700">{node.remarks}</div>
         </div>
       )}
     </div>
   );
+}
+
+/**
+ * 処理の種類に応じた背景色クラスを取得
+ */
+function getProcessTypeBgClass(processType: string): string {
+  const classes: Record<string, string> = {
+    mechanical: "bg-sky-100",
+    human_judgment: "bg-orange-100",
+    consistency_check: "bg-green-100",
+    sub_diagram_reference: "bg-gray-200",
+    undefined_input: "bg-amber-100",
+  };
+  return classes[processType] || "bg-gray-100";
 }
 
 /**
@@ -244,42 +300,55 @@ function ProcessDetail({
   onNavigate?: (lawId: string, diagramId: string) => void;
 }) {
   return (
-    <div className="space-y-3">
-      <div>
-        <div className="text-xs text-gray-500">処理の種類</div>
-        <div className="text-sm">{getProcessTypeLabel(node.process_type)}</div>
+    <div className="space-y-2">
+      {/* 基本情報（横並びレイアウト） */}
+      <div className="flex justify-between text-sm">
+        <span className="text-gray-500">処理の種類</span>
+        <span className={`${getProcessTypeBgClass(node.process_type)} px-1.5 rounded`}>
+          {getProcessTypeLabel(node.process_type)}
+        </span>
       </div>
-      <div>
-        <div className="text-xs text-gray-500">対象主体</div>
-        <div className="text-sm">{node.target_subject || "-"}</div>
-      </div>
-      <div>
-        <div className="text-xs text-gray-500">単体/反復</div>
-        <div className="text-sm">
-          {node.iteration === "iterative" ? "反復処理" : "単体処理"}
+      {node.target_subject && (
+        <div className="flex justify-between text-sm">
+          <span className="text-gray-500">対象主体</span>
+          <span>{node.target_subject}</span>
         </div>
+      )}
+      <div className="flex justify-between text-sm">
+        <span className="text-gray-500">単体/反復</span>
+        <span>{node.iteration === "iterative" ? "反復処理" : "単体処理"}</span>
       </div>
-      <div>
-        <div className="text-xs text-gray-500">説明</div>
-        <div className="text-sm">{node.description || "-"}</div>
-      </div>
+
+      {/* 説明（区切り線の下） */}
+      {node.description && (
+        <div className="border-t pt-2 mt-2">
+          <div className="text-gray-500 text-xs mb-1">説明</div>
+          <div className="text-sm text-gray-700">{node.description}</div>
+        </div>
+      )}
+
+      {/* 論理式等 */}
       {node.logic_expression && (
-        <div>
-          <div className="text-xs text-gray-500">論理式等</div>
+        <div className="border-t pt-2 mt-2">
+          <div className="text-gray-500 text-xs mb-1">論理式等</div>
           <div className="text-sm font-mono bg-gray-100 p-2 rounded">
             {node.logic_expression}
           </div>
         </div>
       )}
+
+      {/* 関連条項 */}
       {node.related_articles && node.related_articles.length > 0 && (
-        <div>
-          <div className="text-xs text-gray-500">関連条項</div>
+        <div className="border-t pt-2 mt-2">
+          <div className="text-gray-500 text-xs mb-1">関連条項</div>
           <RelatedArticlesLinks articles={node.related_articles} onNavigate={onNavigate} />
         </div>
       )}
+
+      {/* ソフトウェア機能 */}
       {node.software_functions && node.software_functions.length > 0 && (
-        <div>
-          <div className="text-xs text-gray-500">ソフトウェア機能</div>
+        <div className="border-t pt-2 mt-2">
+          <div className="text-gray-500 text-xs mb-1">ソフトウェア機能</div>
           <ul className="text-sm list-disc list-inside">
             {node.software_functions.map((func, i) => (
               <li key={i}>
@@ -307,14 +376,18 @@ export function NodeDetailPanel({ node, onNavigate }: NodeDetailPanelProps) {
 
   return (
     <div className="p-4">
-      {/* ヘッダー */}
-      <div className="mb-4 pb-2 border-b">
-        <div className="text-xs text-gray-500">
-          {isInformationNode(node) ? "[情報]" : "[処理]"}
+      {/* ヘッダー: タイトルを一番上に */}
+      <div className="mb-4 pb-3 border-b space-y-2">
+        <div className="font-bold text-base">{node.title}</div>
+        <div className="flex justify-between text-sm">
+          <span className="text-gray-500">タイプ</span>
+          <span>{isInformationNode(node) ? "情報" : "処理"}</span>
         </div>
-        <div className="font-bold text-lg">{node.title}</div>
         {isInformationNode(node) && node.symbol && (
-          <div className="text-sm text-blue-600">記号: {node.symbol}</div>
+          <div className="flex justify-between text-sm">
+            <span className="text-gray-500">記号</span>
+            <span className="text-blue-600 font-medium">{node.symbol}</span>
+          </div>
         )}
       </div>
 

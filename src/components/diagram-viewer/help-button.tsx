@@ -273,6 +273,7 @@ export function HelpButton() {
                     <span className="text-xs text-gray-500">詳細パネルの例</span>
                   </div>
                   <div className="p-3 space-y-2 text-xs">
+                    <div className="font-bold text-sm mb-2">建築物の高さ</div>
                     <div className="flex justify-between">
                       <span className="text-gray-500">タイプ</span>
                       <span>情報</span>

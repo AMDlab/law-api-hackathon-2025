@@ -1,0 +1,551 @@
+{
+  "id": "CHK-BSL-A22-P1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "法22条区域内建築物の屋根構造",
+    "target_subject": "建築物",
+    "description": "法22条区域内の建築物の屋根が防火性能基準に適合することの確認"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "22",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "防火・避難"
+  ],
+  "text_raw": "特定行政庁が防火地域及び準防火地域以外の市街地について指定する区域内にある建築物の屋根の構造は、通常の火災を想定した火の粉による建築物の火災の発生を防止するために屋根に必要とされる性能に関して建築物の構造及び用途の区分に応じて政令で定める技術的基準に適合するもので、国土交通大臣が定めた構造方法を用いるもの又は国土交通大臣の認定を受けたものとしなければならない。ただし、茶室、あずまやその他これらに類する建築物又は延べ面積が十平方メートル以内の物置、納屋その他これらに類する建築物の屋根の延焼のおそれのある部分以外の部分については、この限りでない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND_GLOBAL",
+      "conditions": [
+        {
+          "id": "scope-area",
+          "desc": "法22条区域内に所在"
+        }
+      ]
+    },
+    "judgment_rule": {
+      "operator": "OR_GLOBAL",
+      "desc": "政令基準に適合し、かつ告示仕様または大臣認定を満たす",
+      "conditions": [
+        {
+          "id": "rule-standard",
+          "operator": "AND_GLOBAL",
+          "desc": "政令基準適合かつ告示仕様",
+          "conditions": [
+            { "id": "r-std-1", "desc": "政令で定める技術的基準に適合" },
+            { "id": "r-std-2", "desc": "国土交通大臣が定めた構造方法を用いる" }
+          ]
+        },
+        {
+          "id": "rule-certification",
+          "operator": "AND_GLOBAL",
+          "desc": "政令基準適合かつ大臣認定",
+          "conditions": [
+            { "id": "r-cert-1", "desc": "政令で定める技術的基準に適合" },
+            { "id": "r-cert-2", "desc": "国土交通大臣の認定を受けた" }
+          ]
+        }
+      ]
+    },
+    "exceptions": {
+      "operator": "AND_GLOBAL",
+      "effect": "exempt",
+      "desc": "ただし、茶室等または小規模物置等の屋根の延焼のおそれのある部分以外については適用しない",
+      "conditions": [
+        {
+          "id": "ex-type",
+          "operator": "OR_GLOBAL",
+          "desc": "茶室・あずまや等、または延べ面積10㎡以内の物置・納屋等",
+          "conditions": [
+            {
+              "id": "ex-type-1",
+              "desc": "茶室、あずまやその他これらに類する建築物"
+            },
+            {
+              "id": "ex-type-2",
+              "operator": "AND_GLOBAL",
+              "desc": "延べ面積10㎡以内の物置・納屋等",
+              "conditions": [
+                { "id": "ex-type-2a", "desc": "延べ面積≤10㎡" },
+                { "id": "ex-type-2b", "desc": "物置、納屋その他これらに類する建築物" }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ex-part",
+          "desc": "屋根の延焼のおそれのある部分以外の部分"
+        }
+      ]
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "info-001",
+        "type": "information",
+        "title": "建築物の所在地",
+        "symbol": "L",
+        "subject": "建築物",
+        "plurality": "single",
+        "property": "所在地（住所）",
+        "property_type": "classification",
+        "description": "建築物が所在する場所",
+        "related_articles": ["法::A22:P1"]
+      },
+      {
+        "id": "proc-001",
+        "type": "process",
+        "title": "所在地の特定",
+        "process_type": "human_judgment",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "建築物の所在地（住所）を特定する",
+        "related_articles": ["法::A22:P1"]
+      },
+      {
+        "id": "info-002",
+        "type": "information",
+        "title": "法22条区域指定",
+        "symbol": "Z",
+        "subject": "敷地",
+        "plurality": "single",
+        "property": "法22条区域に指定されているか",
+        "property_type": "proposition",
+        "description": "特定行政庁が防火地域及び準防火地域以外の市街地について指定する区域（法22条区域）に該当するか",
+        "related_articles": ["法::A22:P1"]
+      },
+      {
+        "id": "proc-002",
+        "type": "process",
+        "title": "法22条区域判定",
+        "process_type": "mechanical",
+        "target_subject": "敷地",
+        "iteration": "single",
+        "description": "所在地が法22条区域に指定されているかを都市計画情報等から判定",
+        "logic_expression": "Z = 所在地Lが法22条区域に該当するか",
+        "related_articles": ["法::A22:P1"]
+      },
+      {
+        "id": "info-003",
+        "type": "information",
+        "title": "建築物種類",
+        "symbol": "T",
+        "subject": "建築物",
+        "plurality": "single",
+        "property": "建築物の種類",
+        "property_type": "classification",
+        "description": "茶室・あずまや・物置・納屋等の区分",
+        "related_articles": ["法::A22:P1"]
+      },
+      {
+        "id": "proc-003",
+        "type": "process",
+        "title": "建築物種類の特定",
+        "process_type": "human_judgment",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "建築物の種類（茶室・あずまや・物置・納屋等）を特定する",
+        "related_articles": ["法::A22:P1"]
+      },
+      {
+        "id": "info-004",
+        "type": "information",
+        "title": "延べ面積",
+        "symbol": "A",
+        "subject": "建築物",
+        "plurality": "single",
+        "property": "延べ面積",
+        "property_type": "numeric",
+        "unit": "㎡",
+        "description": "建築物の延べ面積",
+        "related_articles": ["法::A22:P1"]
+      },
+      {
+        "id": "proc-004",
+        "type": "process",
+        "title": "延べ面積の算定",
+        "process_type": "mechanical",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "建築物の延べ面積を算定する",
+        "related_articles": ["法::A22:P1"]
+      },
+      {
+        "id": "info-005",
+        "type": "information",
+        "title": "例外建築物該当",
+        "symbol": "E",
+        "subject": "建築物",
+        "plurality": "single",
+        "property": "ただし書き例外建築物に該当するか",
+        "property_type": "proposition",
+        "description": "茶室・あずまや等または延べ面積10㎡以内の物置・納屋等に該当するか",
+        "related_articles": ["法::A22:P1"]
+      },
+      {
+        "id": "proc-005",
+        "type": "process",
+        "title": "例外建築物判定",
+        "process_type": "mechanical",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "ただし書きの例外建築物に該当するか判定",
+        "logic_expression": "E = (T ∈ {茶室, あずまや等}) OR ((T ∈ {物置, 納屋等}) AND (A ≤ 10))",
+        "related_articles": ["法::A22:P1"]
+      },
+      {
+        "id": "info-006",
+        "type": "information",
+        "title": "屋根の部分区分",
+        "symbol": "Rp",
+        "subject": "屋根",
+        "plurality": "single",
+        "property": "延焼のおそれのある部分か否か",
+        "property_type": "classification",
+        "description": "屋根が延焼のおそれのある部分に該当するか",
+        "related_articles": ["法::A22:P1"]
+      },
+      {
+        "id": "proc-006",
+        "type": "process",
+        "title": "屋根の部分区分判定",
+        "process_type": "mechanical",
+        "target_subject": "屋根",
+        "iteration": "single",
+        "description": "屋根が延焼のおそれのある部分に該当するか判定",
+        "related_articles": ["法::A22:P1"]
+      },
+      {
+        "id": "info-007",
+        "type": "information",
+        "title": "例外適用可否",
+        "symbol": "Ex",
+        "subject": "屋根",
+        "plurality": "single",
+        "property": "例外が適用されるか",
+        "property_type": "proposition",
+        "description": "ただし書きによる適用除外に該当するか（例外建築物かつ延焼のおそれのある部分以外）",
+        "related_articles": ["法::A22:P1"]
+      },
+      {
+        "id": "proc-007",
+        "type": "process",
+        "title": "例外適用判定",
+        "process_type": "mechanical",
+        "target_subject": "屋根",
+        "iteration": "single",
+        "description": "ただし書きの例外が適用されるか判定",
+        "logic_expression": "Ex = E AND (Rp = 延焼のおそれのある部分以外)",
+        "related_articles": ["法::A22:P1"]
+      },
+      {
+        "id": "info-008",
+        "type": "information",
+        "title": "建築物の構造区分",
+        "symbol": "S",
+        "subject": "建築物",
+        "plurality": "single",
+        "property": "構造の区分",
+        "property_type": "classification",
+        "description": "建築物の主要構造部の構造種別",
+        "related_articles": ["法::A22:P1", "令::A109_6"]
+      },
+      {
+        "id": "proc-008",
+        "type": "process",
+        "title": "構造区分の特定",
+        "process_type": "human_judgment",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "建築物の構造区分を特定する",
+        "related_articles": ["法::A22:P1", "令::A109_6"]
+      },
+      {
+        "id": "info-009",
+        "type": "information",
+        "title": "建築物の用途",
+        "symbol": "U",
+        "subject": "建築物",
+        "plurality": "single",
+        "property": "用途の区分",
+        "property_type": "classification",
+        "description": "建築物の用途区分",
+        "related_articles": ["法::A22:P1"]
+      },
+      {
+        "id": "proc-009",
+        "type": "process",
+        "title": "用途の特定",
+        "process_type": "human_judgment",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "建築物の用途を特定する",
+        "related_articles": ["法::A22:P1"]
+      },
+      {
+        "id": "info-010",
+        "type": "information",
+        "title": "政令基準適合",
+        "symbol": "Pc",
+        "subject": "屋根",
+        "plurality": "single",
+        "property": "政令で定める技術的基準への適合",
+        "property_type": "proposition",
+        "description": "通常の火災を想定した火の粉による建築物の火災の発生を防止するために屋根に必要とされる性能に関して建築物の構造及び用途の区分に応じて政令で定める技術的基準に適合するか",
+        "related_articles": ["法::A22:P1", "令::A109_6"]
+      },
+      {
+        "id": "proc-010",
+        "type": "process",
+        "title": "政令基準適合確認",
+        "process_type": "sub_diagram_reference",
+        "target_subject": "屋根",
+        "iteration": "single",
+        "description": "屋根が令109条の6の技術的基準に適合するか確認",
+        "sub_diagram_ref": "CHK-BSL-O109_6",
+        "related_articles": ["法::A22:P1", "令::A109_6"]
+      },
+      {
+        "id": "info-011",
+        "type": "information",
+        "title": "告示仕様適合",
+        "symbol": "Ms",
+        "subject": "屋根",
+        "plurality": "single",
+        "property": "国土交通大臣が定めた構造方法への適合",
+        "property_type": "proposition",
+        "description": "国土交通大臣が定めた構造方法を用いているか",
+        "related_articles": ["法::A22:P1"]
+      },
+      {
+        "id": "proc-011",
+        "type": "process",
+        "title": "告示仕様適合確認",
+        "process_type": "human_judgment",
+        "target_subject": "屋根",
+        "iteration": "single",
+        "description": "国土交通大臣が定めた構造方法（告示仕様）を用いているか確認",
+        "related_articles": ["法::A22:P1"]
+      },
+      {
+        "id": "info-012",
+        "type": "information",
+        "title": "大臣認定取得",
+        "symbol": "Mc",
+        "subject": "屋根",
+        "plurality": "single",
+        "property": "国土交通大臣の認定取得",
+        "property_type": "proposition",
+        "description": "国土交通大臣の認定を受けているか",
+        "related_articles": ["法::A22:P1"]
+      },
+      {
+        "id": "proc-012",
+        "type": "process",
+        "title": "大臣認定取得確認",
+        "process_type": "human_judgment",
+        "target_subject": "屋根",
+        "iteration": "single",
+        "description": "国土交通大臣の認定を受けているか確認",
+        "related_articles": ["法::A22:P1"]
+      },
+      {
+        "id": "info-013",
+        "type": "information",
+        "title": "法22条1項適合",
+        "symbol": "J",
+        "subject": "建築物",
+        "plurality": "single",
+        "property": "法22条1項への適合",
+        "property_type": "proposition",
+        "description": "法22条1項の規定に適合するか",
+        "related_articles": ["法::A22:P1"]
+      },
+      {
+        "id": "proc-013",
+        "type": "process",
+        "title": "法22条1項適合判定",
+        "process_type": "mechanical",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "法22条1項の規定への適合を総合判定",
+        "logic_expression": "J = NOT(Z) OR Ex OR (Pc AND (Ms OR Mc))",
+        "related_articles": ["法::A22:P1"]
+      }
+    ],
+    "edges": [
+      {
+        "id": "e-001",
+        "from": "proc-001",
+        "to": "info-001",
+        "role": "output"
+      },
+      {
+        "id": "e-002",
+        "from": "info-001",
+        "to": "proc-002",
+        "role": "input"
+      },
+      {
+        "id": "e-003",
+        "from": "proc-002",
+        "to": "info-002",
+        "role": "output"
+      },
+      {
+        "id": "e-004",
+        "from": "proc-003",
+        "to": "info-003",
+        "role": "output"
+      },
+      {
+        "id": "e-005",
+        "from": "proc-004",
+        "to": "info-004",
+        "role": "output"
+      },
+      {
+        "id": "e-006",
+        "from": "info-003",
+        "to": "proc-005",
+        "role": "input"
+      },
+      {
+        "id": "e-007",
+        "from": "info-004",
+        "to": "proc-005",
+        "role": "input"
+      },
+      {
+        "id": "e-008",
+        "from": "proc-005",
+        "to": "info-005",
+        "role": "output"
+      },
+      {
+        "id": "e-009",
+        "from": "proc-006",
+        "to": "info-006",
+        "role": "output"
+      },
+      {
+        "id": "e-010",
+        "from": "info-005",
+        "to": "proc-007",
+        "role": "input"
+      },
+      {
+        "id": "e-011",
+        "from": "info-006",
+        "to": "proc-007",
+        "role": "input"
+      },
+      {
+        "id": "e-012",
+        "from": "proc-007",
+        "to": "info-007",
+        "role": "output"
+      },
+      {
+        "id": "e-013",
+        "from": "proc-008",
+        "to": "info-008",
+        "role": "output"
+      },
+      {
+        "id": "e-014",
+        "from": "proc-009",
+        "to": "info-009",
+        "role": "output"
+      },
+      {
+        "id": "e-015",
+        "from": "info-008",
+        "to": "proc-010",
+        "role": "input"
+      },
+      {
+        "id": "e-016",
+        "from": "info-009",
+        "to": "proc-010",
+        "role": "input"
+      },
+      {
+        "id": "e-017",
+        "from": "proc-010",
+        "to": "info-010",
+        "role": "output"
+      },
+      {
+        "id": "e-018",
+        "from": "proc-011",
+        "to": "info-011",
+        "role": "output"
+      },
+      {
+        "id": "e-019",
+        "from": "proc-012",
+        "to": "info-012",
+        "role": "output"
+      },
+      {
+        "id": "e-020",
+        "from": "info-002",
+        "to": "proc-013",
+        "role": "input"
+      },
+      {
+        "id": "e-021",
+        "from": "info-007",
+        "to": "proc-013",
+        "role": "input"
+      },
+      {
+        "id": "e-022",
+        "from": "info-010",
+        "to": "proc-013",
+        "role": "input"
+      },
+      {
+        "id": "e-023",
+        "from": "info-011",
+        "to": "proc-013",
+        "role": "input"
+      },
+      {
+        "id": "e-024",
+        "from": "info-012",
+        "to": "proc-013",
+        "role": "input"
+      },
+      {
+        "id": "e-025",
+        "from": "proc-013",
+        "to": "info-013",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "delegates_to",
+      "articles": ["A109_6"],
+      "description": "屋根の防火性能に関する技術的基準を政令で規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-23T10:00:00+09:00",
+    "generator": "kijo-orchestrator-v1"
+  }
+}

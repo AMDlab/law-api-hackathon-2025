@@ -223,8 +223,9 @@ function convertToFlowElements(
 
 /**
  * グラフの整合性を検証
+ * @param isFlowDiagram フロー図の場合はtrue（フロー図ではループが許可される）
  */
-function validateGraph(diagramStructure: DiagramStructureLocal): { valid: boolean; warnings: string[] } {
+function validateGraph(diagramStructure: DiagramStructureLocal, isFlowDiagram: boolean = false): { valid: boolean; warnings: string[] } {
   const warnings: string[] = [];
   const nodes = diagramStructure.nodes;
   const edges = diagramStructure.edges;
@@ -239,8 +240,8 @@ function validateGraph(diagramStructure: DiagramStructureLocal): { valid: boolea
     );
   }
 
-  // 循環参照の検出
-  if (detectCycle(nodes, edges)) {
+  // 循環参照の検出（フロー図ではループが許可されるためスキップ）
+  if (!isFlowDiagram && detectCycle(nodes, edges)) {
     warnings.push("グラフに循環参照が含まれています");
   }
 
@@ -281,8 +282,8 @@ function KijoDiagramViewerInner({ diagram, flowDiagram, className, articleConten
     return diagram.kijo_diagram;
   }, [isFlowDiagram, flowDiagram?.flow_diagram, diagram.flow_diagram, diagram.kijo_diagram]);
 
-  // グラフの検証
-  const validation = useMemo(() => validateGraph(currentDiagramStructure), [currentDiagramStructure]);
+  // グラフの検証（フロー図ではループが許可される）
+  const validation = useMemo(() => validateGraph(currentDiagramStructure, isFlowDiagram), [currentDiagramStructure, isFlowDiagram]);
 
   // 初期ノード・エッジを計算
   const initialElements = useMemo(
