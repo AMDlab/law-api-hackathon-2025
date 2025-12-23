@@ -60,6 +60,9 @@ function getEdgePosition(
   return Position.Top;
 }
 
+// 矢印がノードに隠れないようにオフセットを適用
+const ARROW_OFFSET = 5;
+
 export function getEdgeParams(
   source: InternalNode,
   target: InternalNode
@@ -77,11 +80,30 @@ export function getEdgeParams(
   const sourcePos = getEdgePosition(source, sourceIntersectionPoint);
   const targetPos = getEdgePosition(target, targetIntersectionPoint);
 
+  // ターゲット側にオフセットを適用して矢印が見えるようにする
+  let tx = targetIntersectionPoint.x;
+  let ty = targetIntersectionPoint.y;
+
+  switch (targetPos) {
+    case Position.Top:
+      ty -= ARROW_OFFSET;
+      break;
+    case Position.Bottom:
+      ty += ARROW_OFFSET;
+      break;
+    case Position.Left:
+      tx -= ARROW_OFFSET;
+      break;
+    case Position.Right:
+      tx += ARROW_OFFSET;
+      break;
+  }
+
   return {
     sx: sourceIntersectionPoint.x,
     sy: sourceIntersectionPoint.y,
-    tx: targetIntersectionPoint.x,
-    ty: targetIntersectionPoint.y,
+    tx,
+    ty,
     sourcePos,
     targetPos,
   };

@@ -1,0 +1,221 @@
+{
+  "id": "A22_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "屋根の構造（適合判定フロー）",
+    "target_subject": "屋根",
+    "description": "法22条区域内の建築物の屋根が所定の性能基準を満たすことを判定するフロー"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "22",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": ["単体規定", "防火"],
+  "text_raw": "特定行政庁が防火地域及び準防火地域以外の市街地について指定する区域内にある建築物の屋根の構造は、通常の火災を想定した火の粉による建築物の火災の発生を防止するために屋根に必要とされる性能に関して建築物の構造及び用途の区分に応じて政令で定める技術的基準に適合するもので、国土交通大臣が定めた構造方法を用いるもの又は国土交通大臣の認定を受けたものとしなければならない。ただし、茶室、あずまやその他これらに類する建築物又は延べ面積が十平方メートル以内の物置、納屋その他これらに類する建築物の屋根の延焼のおそれのある部分以外の部分については、この限りでない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        { "type": "location", "value": "法22条区域内" }
+      ],
+      "note": "特定行政庁が防火地域及び準防火地域以外の市街地について指定する区域"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        { "ref": "info-tech-compliance", "operator": "==", "value": true },
+        {
+          "operator": "OR",
+          "conditions": [
+            { "ref": "info-minister-method", "operator": "==", "value": true },
+            { "ref": "info-minister-approval", "operator": "==", "value": true }
+          ]
+        }
+      ]
+    },
+    "exceptions": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "note": "茶室、あずまや等の屋根で延焼のおそれのある部分以外",
+          "operator": "AND",
+          "conditions": [
+            { "ref": "info-building-type", "value": "茶室・あずまや等" },
+            { "ref": "info-ensho-area", "operator": "==", "value": false }
+          ]
+        },
+        {
+          "note": "延べ面積10㎡以内の物置等の屋根で延焼のおそれのある部分以外",
+          "operator": "AND",
+          "conditions": [
+            { "ref": "info-building-type", "value": "物置・納屋等" },
+            { "ref": "info-floor-area", "operator": "<=", "value": 10 },
+            { "ref": "info-ensho-area", "operator": "==", "value": false }
+          ]
+        }
+      ],
+      "effect": "EXEMPT"
+    }
+  },
+  "flow_diagram": {
+    "title": "法22条1項 屋根の構造 適合判定フロー",
+    "description": "法22条区域内の建築物の屋根について、ただし書きによる適用除外または本則の技術的基準への適合を判定する",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "法22条区域内の建築物の屋根について判定を開始"
+      },
+      {
+        "id": "dec-building-type",
+        "type": "decision",
+        "title": "建築物の種類は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "茶室・あずまや等", "description": "茶室、あずまやその他これらに類する建築物" },
+          { "value": "物置・納屋等", "description": "物置、納屋その他これらに類する建築物" },
+          { "value": "その他", "description": "上記以外の一般建築物" }
+        ],
+        "description": "建築物の用途種別を判定"
+      },
+      {
+        "id": "dec-ensho-chashitsu",
+        "type": "decision",
+        "title": "屋根は延焼のおそれのある部分か？",
+        "decision_type": "binary",
+        "description": "茶室・あずまや等の場合、当該屋根部分が延焼のおそれのある部分に該当するか判定",
+        "related_articles": ["法::A2:I6"]
+      },
+      {
+        "id": "proc-exempt-chashitsu",
+        "type": "process",
+        "title": "適用除外（茶室・あずまや等）",
+        "process_type": "mechanical",
+        "description": "茶室・あずまや等で延焼のおそれのある部分以外のため、ただし書きにより適用除外"
+      },
+      {
+        "id": "dec-floor-area",
+        "type": "decision",
+        "title": "延べ面積 ≤ 10㎡か？",
+        "decision_type": "binary",
+        "description": "物置・納屋等の場合、延べ面積が10平方メートル以内か判定",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "A", "desc": "延べ面積" },
+          "rhs": { "value": 10, "unit": "m2" }
+        }
+      },
+      {
+        "id": "dec-ensho-monoki",
+        "type": "decision",
+        "title": "屋根は延焼のおそれのある部分か？",
+        "decision_type": "binary",
+        "description": "物置・納屋等（延べ面積10㎡以内）の場合、当該屋根部分が延焼のおそれのある部分に該当するか判定",
+        "related_articles": ["法::A2:I6"]
+      },
+      {
+        "id": "proc-exempt-monoki",
+        "type": "process",
+        "title": "適用除外（物置・納屋等）",
+        "process_type": "mechanical",
+        "description": "延べ面積10㎡以内の物置・納屋等で延焼のおそれのある部分以外のため、ただし書きにより適用除外"
+      },
+      {
+        "id": "dec-tech-standard",
+        "type": "decision",
+        "title": "技術的基準に適合するか？",
+        "decision_type": "binary",
+        "description": "令109条の9の技術的基準（火の粉による発炎防止、屋内への損傷防止）に適合するか判定",
+        "related_articles": ["令::A109_9"]
+      },
+      {
+        "id": "dec-minister-method",
+        "type": "decision",
+        "title": "大臣定め構造方法か？",
+        "decision_type": "binary",
+        "description": "国土交通大臣が定めた構造方法（告示）に該当するか判定"
+      },
+      {
+        "id": "dec-minister-approval",
+        "type": "decision",
+        "title": "大臣認定を受けているか？",
+        "decision_type": "binary",
+        "description": "国土交通大臣の認定を受けた構造方法であるか判定"
+      },
+      {
+        "id": "proc-main-comply",
+        "type": "process",
+        "title": "本則適合",
+        "process_type": "mechanical",
+        "description": "技術的基準に適合し、大臣定め構造方法または大臣認定を受けた構造方法である"
+      },
+      {
+        "id": "pass-exempt",
+        "type": "terminal",
+        "title": "適合（適用除外）",
+        "result": "pass",
+        "description": "ただし書きにより適用除外のため適合"
+      },
+      {
+        "id": "pass-main",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "本則の基準に適合"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "法22条1項の規定に不適合"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "dec-building-type", "role": "flow" },
+      { "id": "e02", "from": "dec-building-type", "to": "dec-ensho-chashitsu", "role": "option", "label": "茶室・あずまや等" },
+      { "id": "e03", "from": "dec-building-type", "to": "dec-floor-area", "role": "option", "label": "物置・納屋等" },
+      { "id": "e04", "from": "dec-building-type", "to": "dec-tech-standard", "role": "option", "label": "その他" },
+      { "id": "e05", "from": "dec-ensho-chashitsu", "to": "dec-tech-standard", "role": "yes", "label": "はい" },
+      { "id": "e06", "from": "dec-ensho-chashitsu", "to": "proc-exempt-chashitsu", "role": "no", "label": "いいえ" },
+      { "id": "e07", "from": "proc-exempt-chashitsu", "to": "pass-exempt", "role": "flow" },
+      { "id": "e08", "from": "dec-floor-area", "to": "dec-ensho-monoki", "role": "yes", "label": "はい" },
+      { "id": "e09", "from": "dec-floor-area", "to": "dec-tech-standard", "role": "no", "label": "いいえ" },
+      { "id": "e10", "from": "dec-ensho-monoki", "to": "dec-tech-standard", "role": "yes", "label": "はい" },
+      { "id": "e11", "from": "dec-ensho-monoki", "to": "proc-exempt-monoki", "role": "no", "label": "いいえ" },
+      { "id": "e12", "from": "proc-exempt-monoki", "to": "pass-exempt", "role": "flow" },
+      { "id": "e13", "from": "dec-tech-standard", "to": "dec-minister-method", "role": "yes", "label": "はい" },
+      { "id": "e14", "from": "dec-tech-standard", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e15", "from": "dec-minister-method", "to": "proc-main-comply", "role": "yes", "label": "はい" },
+      { "id": "e16", "from": "dec-minister-method", "to": "dec-minister-approval", "role": "no", "label": "いいえ" },
+      { "id": "e17", "from": "dec-minister-approval", "to": "proc-main-comply", "role": "yes", "label": "はい" },
+      { "id": "e18", "from": "dec-minister-approval", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e19", "from": "proc-main-comply", "to": "pass-main", "role": "flow" }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-A22-P1",
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "delegates_to",
+      "articles": ["A109_9"],
+      "description": "法22条1項の技術的基準を定める"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-23T18:30:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

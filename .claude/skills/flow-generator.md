@@ -225,6 +225,3 @@ schemas/flow-diagram.schema.json を読む
 - [ ] 通常の接続には`role=flow`を設定したか
 - [ ] 全パスがterminalに到達するか
 
-## 参考
-
-- 詳細手順: `prompts/適合判定フロー図生成プロンプト.md`
