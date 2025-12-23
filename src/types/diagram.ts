@@ -282,7 +282,7 @@ export function getProcessHexColor(processType: ProcessType): string {
     case "sub_diagram_reference":
       return "#D3D3D3"; // グレー
     case "undefined_input":
-      return "#FFA500"; // オレンジ
+      return "#FFFBEB"; // 琥珀色（amber-50相当）
     default:
       return "#FFFFFF";
   }
@@ -309,7 +309,7 @@ export function getProcessTailwindClass(processType: ProcessType): string {
     case "sub_diagram_reference":
       return "bg-gray-200 border-gray-400"; // グレー
     case "undefined_input":
-      return "bg-orange-300 border-orange-500"; // オレンジ
+      return "bg-amber-50 border-amber-400"; // 琥珀色
     default:
       return "bg-white border-gray-400";
   }
@@ -320,6 +320,6 @@ export function getProcessTailwindClass(processType: ProcessType): string {
  */
 export function getInformationTailwindClass(propertyType?: PropertyType): string {
   return propertyType === "visual"
-    ? "bg-orange-100 border-orange-300"
-    : "bg-white border-gray-400";
+    ? "bg-orange-50 border-orange-200"
+    : "bg-white border-gray-300";
 }

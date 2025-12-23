@@ -47,44 +47,55 @@ export const InformationNode = memo(function InformationNode({
   const { node } = data;
   const colorClass = getInformationTailwindClass(node.property_type);
 
+  const isMultiple = node.plurality === "multiple";
+
   return (
-    <div
-      className={`
-        px-4 py-2 min-h-[60px]
-        flex flex-col justify-center
-        border-2 rounded
-        shadow-sm
-        transition-all
-        whitespace-nowrap
-        ${colorClass}
-        ${selected ? "ring-2 ring-blue-500 ring-offset-2" : ""}
-      `}
-    >
-      <Handle type="target" position={Position.Left} className="!opacity-0" />
+    <div className="relative">
+      {/* 二重線表示: 複数の場合は背後に影のような四角を表示 */}
+      {isMultiple && (
+        <div
+          className={`
+            absolute top-1 left-1
+            w-full h-full
+            border-2 rounded
+            ${colorClass}
+          `}
+        />
+      )}
+      <div
+        className={`
+          relative
+          px-4 py-2 min-h-[60px]
+          flex flex-col justify-center
+          border-2 rounded
+          shadow-sm
+          transition-all
+          whitespace-nowrap
+          ${colorClass}
+          ${selected ? "ring-2 ring-blue-500 ring-offset-2" : ""}
+        `}
+      >
+        <Handle type="target" position={Position.Left} className="!opacity-0" />
 
-      {/* タイトル */}
-      <div className="font-medium text-sm text-center text-gray-800">
-        {node.symbol && (
-          <span className="text-blue-600 mr-1">[{node.symbol}]</span>
-        )}
-        {node.title}
-      </div>
-
-      {/* 関連条項（あれば表示、複数の場合は改行） */}
-      {node.related_articles && node.related_articles.length > 0 && (
-        <div className="mt-1 text-xs text-gray-500 text-center flex flex-col">
-          {node.related_articles.map((article, i) => (
-            <span key={i}>{formatRelatedArticle(article)}</span>
-          ))}
+        {/* タイトル */}
+        <div className="font-medium text-sm text-center text-gray-800">
+          {node.symbol && (
+            <span className="text-blue-600 mr-1">[{node.symbol}]</span>
+          )}
+          {node.title}
         </div>
-      )}
 
-      {/* 複数マーク */}
-      {node.plurality === "multiple" && (
-        <div className="absolute -top-1 -right-1 w-4 h-4 bg-gray-200 border border-gray-400 rounded-sm" />
-      )}
+        {/* 関連条項（あれば表示、複数の場合は改行） */}
+        {node.related_articles && node.related_articles.length > 0 && (
+          <div className="mt-1 text-xs text-gray-500 text-center flex flex-col">
+            {node.related_articles.map((article, i) => (
+              <span key={i}>{formatRelatedArticle(article)}</span>
+            ))}
+          </div>
+        )}
 
-      <Handle type="source" position={Position.Right} className="!opacity-0" />
+        <Handle type="source" position={Position.Right} className="!opacity-0" />
+      </div>
     </div>
   );
 });

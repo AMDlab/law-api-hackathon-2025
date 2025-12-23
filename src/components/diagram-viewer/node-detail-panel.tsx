@@ -284,7 +284,7 @@ function getProcessTypeBgClass(processType: string): string {
     human_judgment: "bg-orange-100",
     consistency_check: "bg-green-100",
     sub_diagram_reference: "bg-gray-200",
-    undefined_input: "bg-amber-100",
+    undefined_input: "bg-amber-50",
   };
   return classes[processType] || "bg-gray-100";
 }
