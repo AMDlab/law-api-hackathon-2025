@@ -50,6 +50,98 @@ export function getBaseArticleId(id: string): string {
 }
 
 // ========================================
+// 機序図特有の検証
+// ========================================
+
+interface NodeWithType {
+  id: string;
+  type: string;
+}
+
+interface EdgeWithRole {
+  from: string;
+  to: string;
+  role?: string;
+}
+
+/**
+ * [情報]→[情報]の直接接続を検出（機序図ルール違反）
+ *
+ * 機序図では[情報]→[処理]→[情報]の流れが必須。
+ * [情報]から[情報]への直接接続は禁止。
+ *
+ * @returns 違反しているエッジの配列
+ */
+export function detectInformationToInformationEdges(
+  nodes: NodeWithType[],
+  edges: EdgeWithRole[]
+): EdgeWithRole[] {
+  const nodeTypeMap = new Map<string, string>();
+  for (const node of nodes) {
+    nodeTypeMap.set(node.id, node.type);
+  }
+
+  const violations: EdgeWithRole[] = [];
+  for (const edge of edges) {
+    const fromType = nodeTypeMap.get(edge.from);
+    const toType = nodeTypeMap.get(edge.to);
+
+    // [情報]→[情報]の直接接続は違反
+    if (fromType === "information" && toType === "information") {
+      violations.push(edge);
+    }
+  }
+
+  return violations;
+}
+
+/**
+ * 機序図の構造ルールを検証
+ *
+ * チェック項目:
+ * 1. [情報]→[情報]の直接接続禁止
+ * 2. エッジの参照整合性
+ * 3. 循環参照
+ */
+export function validateKijoStructure(
+  nodes: NodeWithType[],
+  edges: EdgeWithRole[]
+): {
+  valid: boolean;
+  errors: string[];
+} {
+  const errors: string[] = [];
+
+  // 1. [情報]→[情報]直接接続チェック
+  const infoToInfoViolations = detectInformationToInformationEdges(nodes, edges);
+  if (infoToInfoViolations.length > 0) {
+    for (const edge of infoToInfoViolations) {
+      errors.push(
+        `[情報]→[情報]直接接続: ${edge.from} → ${edge.to} （[処理]を経由してください）`
+      );
+    }
+  }
+
+  // 2. エッジ参照整合性チェック
+  const edgeRefResult = validateEdgeReferences(nodes, edges);
+  if (!edgeRefResult.valid) {
+    for (const edge of edgeRefResult.invalidEdges) {
+      errors.push(`存在しないノード参照: ${edge.from} → ${edge.to}`);
+    }
+  }
+
+  // 3. 循環参照チェック
+  if (detectCycle(nodes, edges)) {
+    errors.push("循環参照が検出されました");
+  }
+
+  return {
+    valid: errors.length === 0,
+    errors,
+  };
+}
+
+// ========================================
 // グラフ検証
 // ========================================
 

@@ -1,8 +1,8 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://example.com/kijo-diagram.schema.json",
-  "title": "審査機序図スキーマ v3",
-  "description": "buildingSMART Japan 審査機序図作成手引書に基づく機序図データ形式 (v3.0.0)",
+  "title": "審査機序図スキーマ v3.1",
+  "description": "buildingSMART Japan 審査機序図作成手引書に基づく機序図データ形式。審査機序図は、建築確認申請における計画案件の法適合判定における情報処理のメカニズムを表現するための図式である。",
   "type": "object",
   "required": ["id", "version", "page_title", "legal_ref", "kijo_diagram"],
   "properties": {
@@ -205,7 +205,7 @@
     },
     "InformationNode": {
       "type": "object",
-      "description": "[情報]ノード - 法適合判定に関与する情報を表す矩形",
+      "description": "[情報]ノード - 法適合判定に関与する情報を表す矩形。[情報]は主体とその性質で構成される。主体は建築計画における物理的な物（壁、柱など）や幾何学的形状概念（床面積算定領域、敷地境界線など）。性質は主体がもつ属性や他の主体との関係性。",
       "required": ["id", "type", "title"],
       "properties": {
         "id": {
@@ -223,25 +223,25 @@
         "symbol": {
           "type": "string",
           "description": "論理式等で用いる記号（例: A, B, X1）",
-          "pattern": "^[A-Za-z][A-Za-z0-9]*$"
+          "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
         },
         "subject": {
           "type": "string",
-          "description": "情報を保持する主体（例: 建築物, 室, 敷地）"
+          "description": "情報を保持する主体（例: 建築物, 室, 敷地, 壁, 柱）。建築計画において数えることができるもの。"
         },
         "plurality": {
           "type": "string",
-          "description": "単数か複数か",
+          "description": "単数か複数か。複数の場合は二重線で表示。",
           "enum": ["single", "multiple"],
           "default": "single"
         },
         "property": {
           "type": "string",
-          "description": "主体がもつ性質"
+          "description": "主体がもつ性質（属性、他の主体との関係性、特定情報）"
         },
         "property_type": {
           "type": "string",
-          "description": "性質の型",
+          "description": "性質の型。手引書に基づく分類。",
           "enum": [
             "proposition",
             "classification",
@@ -253,6 +253,22 @@
             "geometric_solid",
             "set_definition",
             "visual"
+          ]
+        },
+        "property_type_description": {
+          "type": "string",
+          "description": "property_typeの説明",
+          "enum": [
+            "命題真偽 - 真か偽かが判定可能な事実（例: 技術基準を満たすか否か）",
+            "区分情報 - 既定のいくつかの区分の中のいずれかを示すもの（例: 用途地域、建物用途コード）",
+            "数値 - 大小関係に位置づけられる整数値または実数値（例: 延べ面積、高さ）",
+            "幾何学概念（点） - 例: 天空率の計測点、開口部の中心点",
+            "幾何学概念（方向） - 例: 真北",
+            "幾何学概念（線形状） - 例: 避難動線、建物と地盤面の接する線",
+            "幾何学概念（面形状） - 例: 隣地境界",
+            "幾何学概念（ソリッド） - 例: 柱/壁の形状、延焼のおそれのある部分",
+            "集合定義 - 主体と特定の関係にある他の主体がどれであるかを示す情報（例: 階に属する外壁の集合）",
+            "視認情報 - 人による総合的な認識や判断を必要とする状況や状態。機械可読性のない情報全般（例: 告示仕様適合判断のための断面詳細図）"
           ]
         },
         "unit": {
@@ -304,7 +320,7 @@
     },
     "ProcessNode": {
       "type": "object",
-      "description": "[処理]ノード - 情報を処理して別の情報を導出する角丸矩形",
+      "description": "[処理]ノード - 情報を処理して別の情報を導出する角丸矩形。[処理]に繋ぐべき[情報]は、処理対象としてどの主体に着眼するかを特定する情報と、各主体のどのような性質について知りたいのかを表す[情報]に大別される。",
       "required": ["id", "type", "title", "process_type"],
       "properties": {
         "id": {
@@ -321,13 +337,24 @@
         },
         "process_type": {
           "type": "string",
-          "description": "処理の種類",
+          "description": "処理の種類。手引書に基づく分類。",
           "enum": [
             "mechanical",
             "human_judgment",
             "consistency_check",
             "sub_diagram_reference",
             "undefined_input"
+          ]
+        },
+        "process_type_description": {
+          "type": "string",
+          "description": "process_typeの説明",
+          "enum": [
+            "機械的処理 - 自動化可能な論理演算や計算。視認情報をこれに繋ぐことはできない。水色で表示。",
+            "人の認識/判断を要する処理 - 人の認識/判断を要する処理。肌色で表示。",
+            "整合確認処理 - 異なる情報源から導かれた複数の情報を比較し整合確認を行う。☑記号を付加。",
+            "部分審査機序図への参照 - 別途作成された部分審査機序図の情報処理全体をひとつの[処理]として表現。+記号を付加。",
+            "入力情報不定処理 - 導出されるアウトプット情報を得るための情報源の所在や手続きのメカニズムも含めて人が判断する処理。インプット情報を繋がない。左側の辺を消した状態で表示。"
           ]
         },
         "target_subject": {

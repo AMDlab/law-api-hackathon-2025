@@ -3,7 +3,7 @@
 import { Suspense, useEffect, useState, useCallback } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { LawTree } from '@/components/law-tree';
-import { KijoDiagramViewer } from '@/components/kijo-diagram';
+import { KijoDiagramViewer } from '@/components/diagram-viewer';
 import { LawNode, parseLawData } from '@/lib/parser';
 import { getLawData, LAW_IDS, LAW_INFO, LawInfo } from '@/lib/api';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
