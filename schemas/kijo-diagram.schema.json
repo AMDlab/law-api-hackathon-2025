@@ -4,7 +4,7 @@
   "title": "審査機序図スキーマ v3",
   "description": "buildingSMART Japan 審査機序図作成手引書に基づく機序図データ形式 (v3.0.0)",
   "type": "object",
-  "required": ["id", "version", "page_title", "legal_ref", "diagram"],
+  "required": ["id", "version", "page_title", "legal_ref", "kijo_diagram"],
   "properties": {
     "id": {
       "type": "string",
@@ -35,8 +35,13 @@
     "compliance_logic": {
       "$ref": "#/definitions/ComplianceLogic"
     },
-    "diagram": {
-      "$ref": "#/definitions/Diagram"
+    "kijo_diagram": {
+      "$ref": "#/definitions/Diagram",
+      "description": "機序図のノードとエッジ構造"
+    },
+    "flow_diagram": {
+      "$ref": "#/definitions/FlowDiagram",
+      "description": "適合判定フロー図（オプション）"
     },
     "related_laws": {
       "type": "array",
@@ -452,6 +457,134 @@
         "description": {
           "type": "string",
           "description": "関係性の説明"
+        }
+      }
+    },
+    "FlowDiagram": {
+      "type": "object",
+      "description": "適合判定フロー図",
+      "properties": {
+        "title": {
+          "type": "string",
+          "description": "フロー図のタイトル"
+        },
+        "description": {
+          "type": "string",
+          "description": "フロー図の説明"
+        },
+        "nodes": {
+          "type": "array",
+          "description": "フロー図のノード一覧",
+          "items": {
+            "oneOf": [
+              { "$ref": "#/definitions/TerminalNode" },
+              { "$ref": "#/definitions/DecisionNode" },
+              { "$ref": "#/definitions/ProcessNode" }
+            ]
+          }
+        },
+        "edges": {
+          "type": "array",
+          "description": "ノード間の接続",
+          "items": {
+            "$ref": "#/definitions/FlowEdge"
+          }
+        }
+      },
+      "required": ["nodes", "edges"]
+    },
+    "TerminalNode": {
+      "type": "object",
+      "description": "開始・終了ノード（楕円形）",
+      "required": ["id", "type", "title", "result"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "ノードの一意識別子"
+        },
+        "type": {
+          "type": "string",
+          "const": "terminal"
+        },
+        "title": {
+          "type": "string",
+          "description": "表示タイトル"
+        },
+        "result": {
+          "type": "string",
+          "description": "結果の種類",
+          "enum": ["start", "end", "pass", "fail"]
+        },
+        "description": {
+          "type": "string",
+          "description": "結果の説明"
+        },
+        "related_articles": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "DecisionNode": {
+      "type": "object",
+      "description": "条件分岐ノード",
+      "required": ["id", "type", "title"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "ノードの一意識別子"
+        },
+        "type": {
+          "type": "string",
+          "const": "decision"
+        },
+        "title": {
+          "type": "string",
+          "description": "判定条件の質問形式"
+        },
+        "description": {
+          "type": "string",
+          "description": "判定条件の詳細説明"
+        },
+        "condition": {
+          "type": "object",
+          "properties": {
+            "operator": { "type": "string" },
+            "lhs": { "type": "object" },
+            "rhs": { "type": "object" }
+          }
+        },
+        "related_articles": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "FlowEdge": {
+      "type": "object",
+      "description": "フロー図のエッジ",
+      "required": ["id", "from", "to", "role"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "エッジの一意識別子"
+        },
+        "from": {
+          "type": "string",
+          "description": "始点ノードのID"
+        },
+        "to": {
+          "type": "string",
+          "description": "終点ノードのID"
+        },
+        "role": {
+          "type": "string",
+          "description": "エッジの役割",
+          "enum": ["yes", "no", "flow"]
+        },
+        "label": {
+          "type": "string",
+          "description": "表示ラベル"
         }
       }
     },

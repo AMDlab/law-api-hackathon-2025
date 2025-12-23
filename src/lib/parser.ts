@@ -44,7 +44,7 @@ function findChildren(node: XmlNode, tagName: string): XmlNode[] {
     return node.children.filter(c => typeof c !== 'string' && c.tag === tagName) as XmlNode[];
 }
 
-export function parseLawData(lawData: any): LawNode[] {
+export function parseLawData(lawData: unknown): LawNode[] {
   // Check if it's the new XML-JSON structure
   if (!lawData || typeof lawData !== 'object') return [];
   
@@ -52,13 +52,7 @@ export function parseLawData(lawData: any): LawNode[] {
   // The API returns { law_full_text: { tag: 'Law', ... } }
   // Our fetch returns law_full_text directly.
   
-  let rootNode = lawData as XmlNode;
-  
-  // Just in case it's wrapped
-  if (rootNode.tag !== 'Law' && (lawData as any).Law) {
-      // Old structure or wrapper? Unlikely based on test, but safety check.
-      // logic for old structure removed as we confirmed new structure
-  }
+  const rootNode = lawData as XmlNode;
   
   if (rootNode.tag !== 'Law') {
       console.warn('Root node is not Law', rootNode);

@@ -17,7 +17,7 @@ import {
 import "@xyflow/react/dist/style.css";
 import Dagre from "@dagrejs/dagre";
 
-import type { KijoDiagram, DiagramNode } from "@/types/diagram";
+import type { KijoDiagram, FlowDiagram, DiagramNode } from "@/types/diagram";
 import { detectCycle, validateEdgeReferences } from "@/lib/validation";
 import { InformationNode } from "./information-node";
 import { ProcessNode } from "./process-node";
@@ -52,6 +52,8 @@ const edgeTypes = {
 
 interface KijoDiagramViewerProps {
   diagram: KijoDiagram;
+  /** 分離形式のフロー図（別ファイルで提供される場合） */
+  flowDiagram?: FlowDiagram;
   className?: string;
   articleContent?: string;
   articleTitle?: string;
@@ -251,25 +253,33 @@ function validateGraph(diagramStructure: DiagramStructureLocal): { valid: boolea
 /**
  * 内部コンポーネント（ReactFlowコンテキスト内で使用）
  */
-function KijoDiagramViewerInner({ diagram, className, articleContent, articleTitle, onNavigate }: KijoDiagramViewerProps) {
+function KijoDiagramViewerInner({ diagram, flowDiagram, className, articleContent, articleTitle, onNavigate }: KijoDiagramViewerProps) {
   const [selectedNode, setSelectedNode] = useState<DiagramNode | null>(null);
   const [activeTab, setActiveTab] = useState<"kijo" | "flow">("kijo");
   const flowRef = useRef<HTMLDivElement>(null);
   const { fitView } = useReactFlow();
 
-  // 統合されたJSONからflow_diagramを取得
-  const hasFlowDiagram = diagram.flow_diagram !== undefined;
+  // フロー図の有無を判定（統合形式または分離形式）
+  const hasFlowDiagram = diagram.flow_diagram !== undefined || flowDiagram !== undefined;
   
   // 現在表示中の図のノード・エッジを取得
   const isFlowDiagram = activeTab === "flow" && hasFlowDiagram;
   
   // 表示用のダイアグラム構造を取得（メモ化して無限ループを防止）
+  // 優先順位: 1. 分離形式のflowDiagram, 2. 統合形式のflow_diagram, 3. kijo_diagram
   const currentDiagramStructure = useMemo(() => {
-    if (isFlowDiagram && diagram.flow_diagram) {
-      return { nodes: diagram.flow_diagram.nodes, edges: diagram.flow_diagram.edges };
+    if (isFlowDiagram) {
+      // 分離形式のフロー図を優先
+      if (flowDiagram?.flow_diagram) {
+        return { nodes: flowDiagram.flow_diagram.nodes, edges: flowDiagram.flow_diagram.edges };
+      }
+      // 統合形式のフロー図
+      if (diagram.flow_diagram) {
+        return { nodes: diagram.flow_diagram.nodes, edges: diagram.flow_diagram.edges };
+      }
     }
     return diagram.kijo_diagram;
-  }, [isFlowDiagram, diagram.flow_diagram, diagram.kijo_diagram]);
+  }, [isFlowDiagram, flowDiagram?.flow_diagram, diagram.flow_diagram, diagram.kijo_diagram]);
 
   // グラフの検証
   const validation = useMemo(() => validateGraph(currentDiagramStructure), [currentDiagramStructure]);

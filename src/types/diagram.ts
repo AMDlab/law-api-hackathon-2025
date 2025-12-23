@@ -208,7 +208,7 @@ export interface FlowDiagramInfo {
   edges: Edge[];
 }
 
-/** 審査機序図 (v3.2) - 統合形式 */
+/** 審査機序図 (v3.2) - 統合形式（後方互換性のため維持） */
 export interface KijoDiagram {
   id: string;
   version: string;
@@ -221,8 +221,28 @@ export interface KijoDiagram {
   /** 機序図（必須） */
   kijo_diagram: DiagramStructure;
 
-  /** 適合判定フロー図（オプション） */
+  /** 適合判定フロー図（オプション - 統合形式の場合） */
   flow_diagram?: FlowDiagramInfo;
+
+  related_laws?: RelatedLaw[];
+  metadata?: DiagramMetadata;
+}
+
+/** 適合判定フロー図 (v3.2) - 分離形式 */
+export interface FlowDiagram {
+  id: string;
+  version: string;
+  page_title: PageTitle;
+  legal_ref: LegalRef;
+  labels?: string[];
+  text_raw?: string;
+  compliance_logic?: ComplianceLogic;
+
+  /** フロー図（必須） */
+  flow_diagram: FlowDiagramInfo;
+
+  /** 対応する機序図ID（参照用） */
+  kijo_diagram_ref?: string;
 
   related_laws?: RelatedLaw[];
   metadata?: DiagramMetadata;

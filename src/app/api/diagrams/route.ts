@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import * as fs from "fs";
 import * as path from "path";
-import { isValidLawId, isValidArticleId } from "@/lib/validation";
+import { isValidLawId, isValidArticleId, getBaseArticleId } from "@/lib/validation";
+import { LAW_INFO } from "@/lib/api";
 
 const DIAGRAMS_DIR = path.join(process.cwd(), "data", "diagrams");
 
@@ -9,8 +10,12 @@ interface DiagramFile {
   filename: string;
   /** 表示用タイトル (例: "第43条第1項") */
   displayTitle: string;
-  /** 機序図ID (例: "A43_P1") - LawNodeのdiagramIdと対応 */
+  /** 図のID (例: "A43_P1_kijo", "A43_P1_flow") */
   diagramId: string;
+  /** ベースID (例: "A43_P1") - LawNodeのdiagramIdと対応 */
+  baseId: string;
+  /** 図の種類 */
+  type: "kijo" | "flow";
   /** APIパス */
   path: string;
 }
@@ -25,22 +30,17 @@ interface DiagramInfo {
  * 法令IDから法令名を取得
  */
 function getLawName(lawId: string): string {
-  const lawNames: Record<string, string> = {
-    "325AC0000000201": "建築基準法",
-    "325CO0000000338": "建築基準法施行令",
-  };
-  return lawNames[lawId] || lawId;
+  return LAW_INFO[lawId]?.name || lawId;
 }
 
 /**
  * ファイル名から表示用タイトルを生成
  */
 function parseDisplayTitle(filename: string): string {
-  // A43_P1.json -> 第43条第1項
-  // A43_P1_I2.json -> 第43条第1項第2号
-  // A20_3_P2.json -> 第20条の3第2項
-  // A112_P1_flow.json -> 第112条第1項（適合判定フロー）
-  const match = filename.match(/^A(\d+(?:_\d+)?)(?:_P(\d+))?(?:_I(\d+))?(?:_flow)?\.json$/);
+  // A43_P1_kijo.json -> 第43条第1項（機序図）
+  // A43_P1_flow.json -> 第43条第1項（フロー図）
+  // A20_3_P2_kijo.json -> 第20条の3第2項（機序図）
+  const match = filename.match(/^A(\d+(?:_\d+)?)(?:_P(\d+))?(?:_I(\d+))?(?:_(kijo|flow))?\.json$/);
   if (!match) return filename;
 
   const article = match[1].replace(/_/g, "の");
@@ -51,21 +51,32 @@ function parseDisplayTitle(filename: string): string {
   if (match[3]) {
     result += `第${match[3]}号`;
   }
-  // _flow サフィックスがある場合
-  if (filename.includes("_flow.json")) {
-    result += "（適合判定フロー）";
+  // 図の種類を追加
+  if (match[4] === "kijo") {
+    result += "（機序図）";
+  } else if (match[4] === "flow") {
+    result += "（フロー図）";
   }
   return result;
 }
 
 /**
  * ファイル名からarticleIdを抽出
- * 例: A43_P1.json -> A43_P1
- *     A112_P1_flow.json -> A112_P1_flow
+ * 例: A43_P1_kijo.json -> A43_P1_kijo
+ *     A43_P1_flow.json -> A43_P1_flow
  */
 function extractArticleIdFromFilename(filename: string): string | null {
-  const match = filename.match(/^(A\d+(?:_\d+)*(?:_P\d+)?(?:_I\d+)?(?:_flow)?)\.json$/);
+  const match = filename.match(/^(A\d+(?:_\d+)*(?:_P\d+)?(?:_I\d+)?(?:_kijo|_flow)?)\.json$/);
   return match ? match[1] : null;
+}
+
+/**
+ * ファイル名から図の種類を取得
+ */
+function getDiagramTypeFromFilename(filename: string): "kijo" | "flow" | null {
+  if (filename.includes("_kijo.json")) return "kijo";
+  if (filename.includes("_flow.json")) return "flow";
+  return null;
 }
 
 /**
@@ -103,8 +114,9 @@ export async function GET() {
       const validFiles = files
         .map((filename) => {
           const diagramId = extractArticleIdFromFilename(filename);
-          // diagramIdのバリデーション
-          if (!diagramId || !isValidArticleId(diagramId)) {
+          const diagramType = getDiagramTypeFromFilename(filename);
+          // diagramIdのバリデーション（_kijoまたは_flowが必須）
+          if (!diagramId || !isValidArticleId(diagramId) || !diagramType) {
             console.warn(`Skipping invalid article file: ${filename}`);
             return null;
           }
@@ -112,6 +124,8 @@ export async function GET() {
             filename,
             displayTitle: parseDisplayTitle(filename),
             diagramId,
+            baseId: getBaseArticleId(diagramId),
+            type: diagramType,
             path: `/api/diagrams/${lawId}/${diagramId}`,
           };
         })

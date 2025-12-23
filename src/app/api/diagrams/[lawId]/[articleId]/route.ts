@@ -4,8 +4,10 @@ import * as path from "path";
 import {
   isValidLawId,
   isValidArticleId,
-  validateDiagram,
-  formatValidationError,
+  getDiagramType,
+  validateKijoDiagram,
+  validateFlowDiagram,
+  formatErrors,
 } from "@/lib/validation";
 
 const DIAGRAMS_DIR = path.join(process.cwd(), "data", "diagrams");
@@ -19,7 +21,8 @@ interface RouteParams {
 
 /**
  * GET /api/diagrams/[lawId]/[articleId]
- * 特定の機序図データを取得
+ * 特定の機序図/フロー図データを取得
+ * articleId: A43_P1_kijo または A43_P1_flow
  */
 export async function GET(request: Request, { params }: RouteParams) {
   try {
@@ -36,6 +39,15 @@ export async function GET(request: Request, { params }: RouteParams) {
     if (!isValidArticleId(articleId)) {
       return NextResponse.json(
         { error: "Invalid article ID format" },
+        { status: 400 }
+      );
+    }
+
+    // 図の種類を判定
+    const diagramType = getDiagramType(articleId);
+    if (!diagramType) {
+      return NextResponse.json(
+        { error: "Article ID must end with _kijo or _flow" },
         { status: 400 }
       );
     }
@@ -74,19 +86,21 @@ export async function GET(request: Request, { params }: RouteParams) {
       );
     }
 
-    // スキーマバリデーション
-    const validationResult = validateDiagram(jsonData);
-    if (!validationResult.success) {
+    // スキーマバリデーション（図の種類に応じて）
+    const validationResult = diagramType === "kijo"
+      ? validateKijoDiagram(jsonData)
+      : validateFlowDiagram(jsonData);
+    if (!validationResult.valid) {
       return NextResponse.json(
         {
           error: "Invalid diagram schema",
-          details: formatValidationError(validationResult.error),
+          details: formatErrors(validationResult),
         },
         { status: 500 }
       );
     }
 
-    return NextResponse.json(validationResult.data);
+    return NextResponse.json(jsonData);
   } catch (error) {
     console.error("Failed to load diagram:", error);
     return NextResponse.json(
