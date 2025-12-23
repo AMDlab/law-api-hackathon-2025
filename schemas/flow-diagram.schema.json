@@ -147,12 +147,33 @@
     },
     "DecisionNode": {
       "type": "object",
-      "description": "条件分岐ノード（六角形/ひし形）",
+      "description": "条件分岐ノード（六角形/ひし形）。【重要】「〜を特定したか？」という分岐は禁止。特定した結果の値で分岐する。例: ×「構造を特定したか？」→○「構造種別は？」（木造/耐火/準耐火/その他）",
       "required": ["id", "type", "title"],
       "properties": {
         "id": { "type": "string" },
         "type": { "type": "string", "const": "decision" },
-        "title": { "type": "string" },
+        "title": {
+          "type": "string",
+          "description": "分岐条件。【禁止】「〜を特定したか？」「〜の確認」形式。【推奨】「〜は？」（値の列挙で多方向分岐）または「〜か？」（真偽判定でyes/no分岐）"
+        },
+        "decision_type": {
+          "type": "string",
+          "description": "分岐タイプ。binary: 真偽(yes/no)、multi: 値による多方向分岐",
+          "enum": ["binary", "multi"],
+          "default": "binary"
+        },
+        "options": {
+          "type": "array",
+          "description": "decision_type=multiの場合の選択肢一覧。エッジのlabelと対応する。",
+          "items": {
+            "type": "object",
+            "properties": {
+              "value": { "type": "string", "description": "選択肢の値（エッジのlabelに使用）" },
+              "description": { "type": "string", "description": "選択肢の説明" }
+            },
+            "required": ["value"]
+          }
+        },
         "description": { "type": "string" },
         "condition": { "$ref": "#/definitions/Condition" },
         "related_articles": {
@@ -231,7 +252,7 @@
     },
     "FlowEdge": {
       "type": "object",
-      "description": "フロー図のエッジ（接続）",
+      "description": "フロー図のエッジ（接続）。decision_type=multiの分岐では role=option を使い、labelに具体的な値を設定する。",
       "required": ["id", "from", "to"],
       "properties": {
         "id": { "type": "string" },
@@ -239,9 +260,13 @@
         "to": { "type": "string" },
         "role": {
           "type": "string",
-          "enum": ["yes", "no", "flow", "input", "output", "primary", "supporting"]
+          "description": "エッジの役割。yes/no: binary分岐用。option: multi分岐用（labelに値を設定）。flow: 通常の接続。",
+          "enum": ["yes", "no", "option", "flow", "input", "output", "primary", "supporting"]
         },
-        "label": { "type": "string" }
+        "label": {
+          "type": "string",
+          "description": "エッジのラベル。role=optionの場合は分岐値（例: 木造、耐火構造、準耐火構造）を設定"
+        }
       }
     },
     "RelatedLaw": {
