@@ -1,0 +1,200 @@
+{
+  "id": "A108_4_P1_I1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "耐火建築物の特定主要構造部の耐火性能検証",
+    "target_subject": "特定主要構造部",
+    "description": "特定主要構造部が耐火性能検証法により耐火性能基準に適合することの確認フロー"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "108_4",
+    "paragraph": "1",
+    "item": "1"
+  },
+  "labels": [
+    "耐火建築物",
+    "特定主要構造部",
+    "性能規定"
+  ],
+  "text_raw": "特定主要構造部が、次のイ及びロ（外壁以外の特定主要構造部にあつては、イ）に掲げる基準に適合するものであることについて耐火性能検証法により確かめられたものであること。",
+  "kijo_diagram_ref": "CHK-ORD-A108-4-P1-I1",
+  "flow_diagram": {
+    "title": "特定主要構造部の耐火性能検証法適合フロー",
+    "description": "耐火性能検証法により特定主要構造部の耐火性能基準への適合を判定するフロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "審査開始",
+        "result": "start",
+        "description": "特定主要構造部の耐火性能検証開始"
+      },
+      {
+        "id": "dec-component-type",
+        "type": "decision",
+        "title": "特定主要構造部の種類は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "外壁" },
+          { "value": "外壁以外" }
+        ],
+        "description": "判定対象の特定主要構造部が外壁か外壁以外かを判定"
+      },
+      {
+        "id": "proc-exterior-wall",
+        "type": "process",
+        "title": "外壁の場合：イ及びロ基準適用",
+        "process_type": "mechanical",
+        "description": "外壁は屋内火災基準（イ）と屋外火災基準（ロ）の両方を満たす必要がある"
+      },
+      {
+        "id": "proc-non-exterior",
+        "type": "process",
+        "title": "外壁以外の場合：イ基準のみ適用",
+        "process_type": "mechanical",
+        "description": "外壁以外の特定主要構造部は屋内火災基準（イ）のみを満たせばよい"
+      },
+      {
+        "id": "dec-indoor-fire-verification",
+        "type": "decision",
+        "title": "屋内火災時の耐火性能基準に適合するか？",
+        "decision_type": "binary",
+        "description": "耐火性能検証法により、屋内火災時に構造耐力上支障のある損傷を生じないことを確認"
+      },
+      {
+        "id": "dec-outdoor-fire-verification",
+        "type": "decision",
+        "title": "屋外火災時の耐火性能基準に適合するか？",
+        "decision_type": "binary",
+        "description": "耐火性能検証法により、外壁が屋外火災時の火熱に耐えられることを確認"
+      },
+      {
+        "id": "dec-all-components-verified",
+        "type": "decision",
+        "title": "全ての特定主要構造部を検証完了したか？",
+        "decision_type": "binary",
+        "description": "建築物の全ての特定主要構造部について検証が完了したか確認"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "第1号基準適合",
+        "result": "pass",
+        "description": "耐火性能検証法により耐火性能基準に適合することが確認された"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "第1号基準不適合",
+        "result": "fail",
+        "description": "耐火性能検証法による基準適合が確認できない"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-component-type",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-component-type",
+        "to": "proc-exterior-wall",
+        "role": "option",
+        "label": "外壁"
+      },
+      {
+        "id": "e03",
+        "from": "dec-component-type",
+        "to": "proc-non-exterior",
+        "role": "option",
+        "label": "外壁以外"
+      },
+      {
+        "id": "e04",
+        "from": "proc-exterior-wall",
+        "to": "dec-indoor-fire-verification",
+        "role": "flow"
+      },
+      {
+        "id": "e05",
+        "from": "proc-non-exterior",
+        "to": "dec-indoor-fire-verification",
+        "role": "flow"
+      },
+      {
+        "id": "e06",
+        "from": "dec-indoor-fire-verification",
+        "to": "dec-outdoor-fire-verification",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e07",
+        "from": "dec-indoor-fire-verification",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e08",
+        "from": "dec-outdoor-fire-verification",
+        "to": "dec-all-components-verified",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e09",
+        "from": "dec-outdoor-fire-verification",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e10",
+        "from": "dec-all-components-verified",
+        "to": "pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e11",
+        "from": "dec-all-components-verified",
+        "to": "dec-component-type",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A2:P9_2"],
+      "description": "特定主要構造部の定義"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "defines_detail",
+      "articles": ["A108_4:P2"],
+      "description": "耐火性能検証法の具体的方法"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00Z",
+    "updated_at": "2025-12-25T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

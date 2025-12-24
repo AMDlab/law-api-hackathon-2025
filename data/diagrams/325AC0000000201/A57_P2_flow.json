@@ -1,0 +1,165 @@
+{
+  "id": "A57_P2_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "道路内の建築物に対する高さ制限の適用除外",
+    "target_subject": "道路内の建築物",
+    "description": "道路内に設ける建築物（高架の道路の路面下に設けるものを除く）に関する高さ制限の適用判定"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "57",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "高さ制限の適用除外"
+  ],
+  "text_raw": "道路内にある建築物（高架の道路の路面下に設けるものを除く。）については、第五十六条第一項第一号及び第二項から第四項までの規定は、適用しない。",
+  "kijo_diagram_ref": "CHK-BSL-A57-P2",
+  "flow_diagram": {
+    "title": "道路内建築物の高さ制限適用除外判定フロー",
+    "description": "道路内に設ける建築物に対する第56条の高さ制限の適用除外を判定するフロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start"
+      },
+      {
+        "id": "dec-in-road",
+        "type": "decision",
+        "title": "建築物は道路内に位置するか？",
+        "decision_type": "binary",
+        "description": "敷地が道路区域内に含まれるかを都市計画情報により判定"
+      },
+      {
+        "id": "dec-elevated-road",
+        "type": "decision",
+        "title": "高架の道路の路面下に設けるものか？",
+        "decision_type": "binary",
+        "description": "建築物が高架の道路の路面下に位置するかを判定"
+      },
+      {
+        "id": "proc-exemption",
+        "type": "process",
+        "title": "高さ制限の適用除外該当",
+        "process_type": "mechanical",
+        "description": "道路内に位置し、かつ高架の道路の路面下ではないため、第56条第1項第1号及び第2項～第4項は適用除外"
+      },
+      {
+        "id": "pass-exemption",
+        "type": "terminal",
+        "title": "適合（適用除外）",
+        "result": "pass",
+        "description": "第56条の高さ制限規定が適用除外となり適合"
+      },
+      {
+        "id": "dec-article56-compliance",
+        "type": "decision",
+        "title": "高さ制限規定に適合するか？",
+        "decision_type": "binary",
+        "description": "第56条第1項第1号及び第2項～第4項の高さ制限規定に適合するか",
+        "related_articles": ["法::A56:P1:I1", "法::A56:P2", "法::A56:P3", "法::A56:P4"]
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "法57条2項に適合"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "法57条2項に不適合"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-in-road",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-in-road",
+        "to": "dec-elevated-road",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "dec-in-road",
+        "to": "dec-article56-compliance",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e04",
+        "from": "dec-elevated-road",
+        "to": "dec-article56-compliance",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e05",
+        "from": "dec-elevated-road",
+        "to": "proc-exemption",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e06",
+        "from": "proc-exemption",
+        "to": "pass-exemption",
+        "role": "flow"
+      },
+      {
+        "id": "e07",
+        "from": "dec-article56-compliance",
+        "to": "pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e08",
+        "from": "dec-article56-compliance",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": [
+        "A56:P1:I1",
+        "A56:P2",
+        "A56:P3",
+        "A56:P4"
+      ],
+      "description": "第57条第2項は第56条の高さ制限規定の適用を除外する例外規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00Z",
+    "updated_at": "2025-12-25T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

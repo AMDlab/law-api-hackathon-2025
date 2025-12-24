@@ -1,0 +1,220 @@
+{
+  "id": "A86_7_P4_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "既存不適格建築物の移転における規制適用除外",
+    "target_subject": "既存不適格建築物",
+    "description": "第三条第二項の規定により建築基準法令の規定の適用を受けない建築物について政令で定める範囲内において移転をする場合の規制文適用の判定"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "86の7",
+    "paragraph": "4"
+  },
+  "labels": [
+    "既存不適格",
+    "移転"
+  ],
+  "text_raw": "第三条第二項の規定により建築基準法令の規定の適用を受けない建築物について政令で定める範囲内において移転をする場合においては、同条第三項の規定にかかわらず、建築基準法令の規定は、適用しない。",
+  "kijo_diagram_ref": "CHK-BSL-A86-7-P4",
+  "flow_diagram": {
+    "title": "既存不適格建築物の移転における規制適用除外判定フロー",
+    "description": "第3条第2項により建築基準法令の適用を受けない建築物について、政令で定める範囲内の移転の場合の規制適用除外を判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "既存不適格建築物の移転における規制適用除外判定を開始"
+      },
+      {
+        "id": "dec-existing-noncompliant",
+        "type": "decision",
+        "title": "第3条第2項により法令の適用除外か？",
+        "decision_type": "binary",
+        "description": "当該建築物が第3条第2項の規定により建築基準法令の規定の適用を受けない既存不適格建築物であるか",
+        "related_articles": ["法::A3:P2"]
+      },
+      {
+        "id": "proc-not-existing-noncompliant",
+        "type": "process",
+        "title": "既存不適格に非該当",
+        "process_type": "mechanical",
+        "description": "第3条第2項による適用除外建築物に該当しない"
+      },
+      {
+        "id": "dec-relocation-planned",
+        "type": "decision",
+        "title": "移転を行うか？",
+        "decision_type": "binary",
+        "description": "当該建築物について移転を行う計画があるか"
+      },
+      {
+        "id": "proc-no-relocation",
+        "type": "process",
+        "title": "移転なし",
+        "process_type": "mechanical",
+        "description": "移転を行わないため本項の適用対象外"
+      },
+      {
+        "id": "dec-relocation-scope",
+        "type": "decision",
+        "title": "政令で定める範囲内の移転か？",
+        "decision_type": "binary",
+        "description": "移転が政令第150条の8で定める範囲内であるか（敷地内での移転、同一敷地内での位置変更等）",
+        "related_articles": ["令::A150_8"]
+      },
+      {
+        "id": "proc-within-scope",
+        "type": "process",
+        "title": "政令範囲内の移転と判定",
+        "process_type": "mechanical",
+        "description": "移転が政令で定める範囲内であることを確認"
+      },
+      {
+        "id": "proc-outside-scope",
+        "type": "process",
+        "title": "政令範囲外の移転",
+        "process_type": "mechanical",
+        "description": "移転が政令で定める範囲を超えているため本項の適用対象外"
+      },
+      {
+        "id": "proc-exemption-applied",
+        "type": "process",
+        "title": "建築基準法令の適用除外",
+        "process_type": "mechanical",
+        "description": "第3条第3項の規定にかかわらず、建築基準法令の規定は適用しない",
+        "related_articles": ["法::A86_7:P4"]
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "規制適用除外確定",
+        "result": "pass",
+        "description": "移転後も建築基準法令の規定が適用されない"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "本項適用対象外",
+        "result": "fail",
+        "description": "本項の適用要件を満たさず、通常の規制が適用される"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-existing-noncompliant",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-existing-noncompliant",
+        "to": "dec-relocation-planned",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "dec-existing-noncompliant",
+        "to": "proc-not-existing-noncompliant",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e04",
+        "from": "proc-not-existing-noncompliant",
+        "to": "fail",
+        "role": "flow"
+      },
+      {
+        "id": "e05",
+        "from": "dec-relocation-planned",
+        "to": "dec-relocation-scope",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e06",
+        "from": "dec-relocation-planned",
+        "to": "proc-no-relocation",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e07",
+        "from": "proc-no-relocation",
+        "to": "fail",
+        "role": "flow"
+      },
+      {
+        "id": "e08",
+        "from": "dec-relocation-scope",
+        "to": "proc-within-scope",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e09",
+        "from": "dec-relocation-scope",
+        "to": "proc-outside-scope",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e10",
+        "from": "proc-outside-scope",
+        "to": "fail",
+        "role": "flow"
+      },
+      {
+        "id": "e11",
+        "from": "proc-within-scope",
+        "to": "proc-exemption-applied",
+        "role": "flow"
+      },
+      {
+        "id": "e12",
+        "from": "proc-exemption-applied",
+        "to": "pass",
+        "role": "flow"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "defines_detail",
+      "articles": [
+        "A3:P2",
+        "A3:P3",
+        "A86_7"
+      ],
+      "description": "本規定の適用対象となる既存不適格建築物の定義及び規制緩和の根拠"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "delegates_to",
+      "articles": [
+        "A150_8"
+      ],
+      "description": "移転の範囲に関する具体的基準を規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

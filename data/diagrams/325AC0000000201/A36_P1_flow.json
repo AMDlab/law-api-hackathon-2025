@@ -1,0 +1,171 @@
+{
+  "id": "A36_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "特殊建築物等の建築材料の品質（適合判定フロー）",
+    "target_subject": "建築物",
+    "description": "居室を有する建築物の建築材料及び換気設備が化学物質発散に関する技術的基準を満たすことを判定するフロー"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "36",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": ["単体規定", "居室の採光", "建材"],
+  "text_raw": "居室を有する建築物は、その居室内において化学物質の発散による衛生上の支障がないよう、建築材料及び換気設備について政令で定める技術的基準に適合するものとしなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        { "type": "building_component", "value": "居室を有する建築物" }
+      ],
+      "note": "居室を有する建築物が対象"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        { "ref": "info-material-compliance" },
+        { "ref": "info-ventilation-compliance" }
+      ]
+    }
+  },
+  "flow_diagram": {
+    "title": "法36条1項 建築材料の品質 適合判定フロー",
+    "description": "居室内の化学物質発散に関する建築材料及び換気設備の技術的基準適合を判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "法36条1項の適合判定を開始"
+      },
+      {
+        "id": "dec-has-room",
+        "type": "decision",
+        "title": "居室を有する建築物か？",
+        "decision_type": "binary",
+        "description": "建築物が居室を有するか判定"
+      },
+      {
+        "id": "proc-not-applicable",
+        "type": "process",
+        "title": "適用対象外（居室なし）",
+        "process_type": "mechanical",
+        "description": "居室を有しない建築物のため本条適用対象外"
+      },
+      {
+        "id": "dec-material-type",
+        "type": "decision",
+        "title": "建築材料の化学物質発散等級は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "F☆☆☆☆", "description": "規制対象外（発散量ごくわずか）" },
+          { "value": "F☆☆☆", "description": "第三種（使用面積制限あり）" },
+          { "value": "F☆☆", "description": "第二種（使用面積制限あり）" },
+          { "value": "規制対象外材料", "description": "規制対象外の建築材料" }
+        ],
+        "description": "使用する建築材料のホルムアルデヒド発散等級を判定",
+        "related_articles": ["令::A20_5", "令::A20_6", "令::A20_7"]
+      },
+      {
+        "id": "proc-material-f4",
+        "type": "process",
+        "title": "F☆☆☆☆（使用制限なし）",
+        "process_type": "mechanical",
+        "description": "F☆☆☆☆建築材料は使用面積の制限なく使用可能"
+      },
+      {
+        "id": "proc-material-exempt",
+        "type": "process",
+        "title": "規制対象外材料",
+        "process_type": "mechanical",
+        "description": "規制対象外の建築材料（金属、ガラス等）は制限なく使用可能"
+      },
+      {
+        "id": "dec-material-area",
+        "type": "decision",
+        "title": "使用面積が制限値以内か？",
+        "decision_type": "binary",
+        "description": "F☆☆☆又はF☆☆の建築材料の使用面積が居室の換気量等に応じた制限値以内か判定",
+        "related_articles": ["令::A20_7"]
+      },
+      {
+        "id": "proc-material-comply",
+        "type": "process",
+        "title": "建築材料基準適合",
+        "process_type": "mechanical",
+        "description": "建築材料の使用面積が制限値以内であり基準適合"
+      },
+      {
+        "id": "dec-ventilation",
+        "type": "decision",
+        "title": "換気設備の技術基準に適合するか？",
+        "decision_type": "binary",
+        "description": "換気設備が政令で定める技術的基準（換気回数、有効換気量等）に適合するか判定",
+        "related_articles": ["令::A20_8"]
+      },
+      {
+        "id": "proc-ventilation-comply",
+        "type": "process",
+        "title": "換気設備基準適合",
+        "process_type": "mechanical",
+        "description": "換気設備が技術的基準に適合"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "法36条1項の規定に適合"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "法36条1項の規定に不適合"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "dec-has-room", "role": "flow" },
+      { "id": "e02", "from": "dec-has-room", "to": "dec-material-type", "role": "yes", "label": "はい" },
+      { "id": "e03", "from": "dec-has-room", "to": "proc-not-applicable", "role": "no", "label": "いいえ" },
+      { "id": "e04", "from": "proc-not-applicable", "to": "pass", "role": "flow" },
+      { "id": "e05", "from": "dec-material-type", "to": "proc-material-f4", "role": "option", "label": "F☆☆☆☆" },
+      { "id": "e06", "from": "dec-material-type", "to": "dec-material-area", "role": "option", "label": "F☆☆☆" },
+      { "id": "e07", "from": "dec-material-type", "to": "dec-material-area", "role": "option", "label": "F☆☆" },
+      { "id": "e08", "from": "dec-material-type", "to": "proc-material-exempt", "role": "option", "label": "規制対象外材料" },
+      { "id": "e09", "from": "proc-material-f4", "to": "dec-ventilation", "role": "flow" },
+      { "id": "e10", "from": "proc-material-exempt", "to": "dec-ventilation", "role": "flow" },
+      { "id": "e11", "from": "dec-material-area", "to": "proc-material-comply", "role": "yes", "label": "はい" },
+      { "id": "e12", "from": "dec-material-area", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e13", "from": "proc-material-comply", "to": "dec-ventilation", "role": "flow" },
+      { "id": "e14", "from": "dec-ventilation", "to": "proc-ventilation-comply", "role": "yes", "label": "はい" },
+      { "id": "e15", "from": "dec-ventilation", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e16", "from": "proc-ventilation-comply", "to": "pass", "role": "flow" }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-A36-P1",
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "delegates_to",
+      "articles": ["A20_5", "A20_6", "A20_7", "A20_8"],
+      "description": "法36条1項の技術的基準を定める。令20条の5～8（ホルムアルデヒド・クロルピリホス発散建築材料の制限、換気設備基準）"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

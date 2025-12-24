@@ -1,0 +1,158 @@
+{
+  "id": "A21_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "大規模建築物の主要構造部",
+    "target_subject": "建築物",
+    "description": "次の各号のいずれかに該当し、主要構造部に可燃材料を用いた建築物の主要構造部が所定の性能基準と構造方法を満たすことを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "21",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": ["単体規定", "防火", "主要構造部"],
+  "kijo_diagram_ref": "CHK-BSL-A21-P1",
+  "flow_diagram": {
+    "title": "法21条1項適合判定フロー",
+    "description": "大規模建築物の主要構造部の防火性能適合判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start"
+      },
+      {
+        "id": "dec-item-applicable",
+        "type": "decision",
+        "title": "法21条1項各号のいずれかに該当するか?",
+        "decision_type": "binary",
+        "description": "第1号～第3号のいずれかに該当するか"
+      },
+      {
+        "id": "proc-item-applicable",
+        "type": "process",
+        "title": "各号該当",
+        "description": "法21条1項の適用対象に該当"
+      },
+      {
+        "id": "dec-combustible",
+        "type": "decision",
+        "title": "主要構造部の政令定め部分に可燃材料を使用しているか?",
+        "decision_type": "binary",
+        "description": "床・屋根・階段を除く主要構造部の政令定め部分に木材、プラスチック等を使用"
+      },
+      {
+        "id": "proc-scope-applicable",
+        "type": "process",
+        "title": "適用範囲該当",
+        "description": "各号該当かつ可燃材料使用で法21条1項の適用範囲に該当"
+      },
+      {
+        "id": "dec-tech-standard",
+        "type": "decision",
+        "title": "政令で定める技術的基準に適合するか?",
+        "decision_type": "binary",
+        "description": "倒壊防止・延焼防止性能に関する令109条の3の2の技術的基準"
+      },
+      {
+        "id": "proc-tech-ok",
+        "type": "process",
+        "title": "技術的基準適合",
+        "description": "技術的基準に適合"
+      },
+      {
+        "id": "dec-method-type",
+        "type": "decision",
+        "title": "構造方法の種別は?",
+        "decision_type": "multi",
+        "options": [
+          {"value": "大臣定め構造方法"},
+          {"value": "大臣認定"}
+        ],
+        "description": "大臣定め構造方法又は大臣認定のいずれか"
+      },
+      {
+        "id": "dec-minister-method",
+        "type": "decision",
+        "title": "大臣定め構造方法に該当するか?",
+        "decision_type": "binary",
+        "description": "国土交通大臣が定めた構造方法（告示）に該当するか"
+      },
+      {
+        "id": "dec-minister-approval",
+        "type": "decision",
+        "title": "大臣認定を受けているか?",
+        "decision_type": "binary",
+        "description": "国土交通大臣の認定を受けた構造方法か"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "法21条1項に適合"
+      },
+      {
+        "id": "pass-not-applicable",
+        "type": "terminal",
+        "title": "適用外（適合）",
+        "result": "pass",
+        "description": "各号非該当又は可燃材料不使用のため法21条1項の適用外"
+      },
+      {
+        "id": "fail-tech",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "技術的基準に不適合"
+      },
+      {
+        "id": "fail-method",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "大臣定め構造方法・大臣認定のいずれにも該当しない"
+      }
+    ],
+    "edges": [
+      {"id": "e01", "from": "start", "to": "dec-item-applicable", "role": "flow"},
+      {"id": "e02", "from": "dec-item-applicable", "to": "proc-item-applicable", "role": "yes"},
+      {"id": "e03", "from": "dec-item-applicable", "to": "pass-not-applicable", "role": "no"},
+      {"id": "e04", "from": "proc-item-applicable", "to": "dec-combustible", "role": "flow"},
+      {"id": "e05", "from": "dec-combustible", "to": "proc-scope-applicable", "role": "yes"},
+      {"id": "e06", "from": "dec-combustible", "to": "pass-not-applicable", "role": "no"},
+      {"id": "e07", "from": "proc-scope-applicable", "to": "dec-tech-standard", "role": "flow"},
+      {"id": "e08", "from": "dec-tech-standard", "to": "proc-tech-ok", "role": "yes"},
+      {"id": "e09", "from": "dec-tech-standard", "to": "fail-tech", "role": "no"},
+      {"id": "e10", "from": "proc-tech-ok", "to": "dec-method-type", "role": "flow"},
+      {"id": "e11", "from": "dec-method-type", "to": "dec-minister-method", "role": "option", "label": "大臣定め構造方法"},
+      {"id": "e12", "from": "dec-method-type", "to": "dec-minister-approval", "role": "option", "label": "大臣認定"},
+      {"id": "e13", "from": "dec-minister-method", "to": "pass", "role": "yes"},
+      {"id": "e14", "from": "dec-minister-method", "to": "fail-method", "role": "no"},
+      {"id": "e15", "from": "dec-minister-approval", "to": "pass", "role": "yes"},
+      {"id": "e16", "from": "dec-minister-approval", "to": "fail-method", "role": "no"}
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "delegates_to",
+      "articles": ["A109_3_2"],
+      "description": "法21条1項の主要構造部の対象部分の特定及び技術的基準を定める"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00Z",
+    "generator": "claude-code-flow-generator",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

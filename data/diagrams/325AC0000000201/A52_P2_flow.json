@@ -1,0 +1,302 @@
+{
+  "id": "A52_P2_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "前面道路幅員による容積率制限",
+    "target_subject": "建築物",
+    "description": "前面道路の幅員が12メートル未満の場合の容積率制限適合判定フロー"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "52",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": [
+    "集団規定",
+    "容積率"
+  ],
+  "text_raw": "前項に定めるもののほか、前面道路（前面道路が二以上あるときは、その幅員の最大のもの。以下この項及び第十二項において同じ。）の幅員が十二メートル未満である建築物の容積率は、当該前面道路の幅員のメートルの数値に、次の各号に掲げる区分に従い、当該各号に定める数値を乗じたもの以下でなければならない。\n一 第一種低層住居専用地域、第二種低層住居専用地域又は田園住居地域内の建築物 十分の四\n二 第一種中高層住居専用地域若しくは第二種中高層住居専用地域内の建築物又は第一種住居地域、第二種住居地域若しくは準住居地域内の建築物（高層住居誘導地区内の建築物であつて、その住宅の用途に供する部分の床面積の合計がその延べ面積の三分の二以上であるもの（当該高層住居誘導地区に関する都市計画において建築物の敷地面積の最低限度が定められたときは、その敷地面積が当該最低限度以上のものに限る。第五十六条第一項第二号ハ及び別表第三の四の項において同じ。）を除く。） 十分の四（特定行政庁が都道府県都市計画審議会の議を経て指定する区域内の建築物にあつては、十分の六）\n三 その他の建築物 十分の六（特定行政庁が都道府県都市計画審議会の議を経て指定する区域内の建築物にあつては、十分の四又は十分の八のうち特定行政庁が都道府県都市計画審議会の議を経て定めるもの）",
+  "kijo_diagram_ref": "CHK-BSL-A52-P2",
+  "flow_diagram": {
+    "title": "前面道路幅員による容積率制限適合判定フロー",
+    "description": "法第52条第2項に基づく前面道路幅員による容積率制限の適合判定（前面道路幅員12m未満の場合）",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "前面道路幅員による容積率制限の適合判定を開始"
+      },
+      {
+        "id": "dec-zone",
+        "type": "decision",
+        "title": "建築物の所在地域区分は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "低層住居専用・田園住居", "description": "第一種低層住居専用地域、第二種低層住居専用地域、田園住居地域" },
+          { "value": "中高層住居専用・住居地域等", "description": "第一種中高層住居専用地域、第二種中高層住居専用地域、第一種住居地域、第二種住居地域、準住居地域（高層住居誘導地区適用除外を除く）" },
+          { "value": "その他", "description": "商業地域、工業地域、工業専用地域等" }
+        ],
+        "description": "建築物の敷地が属する用途地域等を判定",
+        "related_articles": ["法::A52:P2:I1", "法::A52:P2:I2", "法::A52:P2:I3"]
+      },
+      {
+        "id": "proc-item1",
+        "type": "process",
+        "title": "第1号該当",
+        "process_type": "mechanical",
+        "description": "低層住居専用地域等に該当し、係数4/10を適用"
+      },
+      {
+        "id": "dec-item2-designated",
+        "type": "decision",
+        "title": "特定行政庁指定区域内か？（第2号）",
+        "decision_type": "binary",
+        "description": "第2号建築物について、特定行政庁が都道府県都市計画審議会の議を経て指定する区域内か判定",
+        "related_articles": ["法::A52:P2:I2"]
+      },
+      {
+        "id": "proc-item2-default",
+        "type": "process",
+        "title": "第2号該当（係数4/10）",
+        "process_type": "mechanical",
+        "description": "中高層住居専用地域等に該当し、係数4/10を適用"
+      },
+      {
+        "id": "proc-item2-designated",
+        "type": "process",
+        "title": "第2号該当（指定区域・係数6/10）",
+        "process_type": "mechanical",
+        "description": "特定行政庁指定区域内のため、係数6/10を適用"
+      },
+      {
+        "id": "dec-item3-designated",
+        "type": "decision",
+        "title": "特定行政庁指定区域内か？（第3号）",
+        "decision_type": "binary",
+        "description": "第3号建築物について、特定行政庁が都道府県都市計画審議会の議を経て指定する区域内か判定",
+        "related_articles": ["法::A52:P2:I3"]
+      },
+      {
+        "id": "proc-item3-default",
+        "type": "process",
+        "title": "第3号該当（係数6/10）",
+        "process_type": "mechanical",
+        "description": "その他の建築物に該当し、係数6/10を適用"
+      },
+      {
+        "id": "dec-item3-coefficient",
+        "type": "decision",
+        "title": "指定区域の係数は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "4/10", "description": "十分の四" },
+          { "value": "8/10", "description": "十分の八" }
+        ],
+        "description": "特定行政庁が都道府県都市計画審議会の議を経て定めた係数を確認",
+        "related_articles": ["法::A52:P2:I3"]
+      },
+      {
+        "id": "proc-item3-coef4",
+        "type": "process",
+        "title": "第3号該当（指定区域・係数4/10）",
+        "process_type": "mechanical",
+        "description": "指定区域内で係数4/10を適用"
+      },
+      {
+        "id": "proc-item3-coef8",
+        "type": "process",
+        "title": "第3号該当（指定区域・係数8/10）",
+        "process_type": "mechanical",
+        "description": "指定区域内で係数8/10を適用"
+      },
+      {
+        "id": "proc-calc-limit",
+        "type": "process",
+        "title": "容積率上限の算出",
+        "process_type": "mechanical",
+        "description": "前面道路幅員(m) × 法定乗数 で容積率上限を算出（R_limit = W × C）"
+      },
+      {
+        "id": "proc-calc-ratio",
+        "type": "process",
+        "title": "容積率の算定",
+        "process_type": "mechanical",
+        "description": "建築物の延べ面積を敷地面積で除して容積率を算定（R = 延べ面積 / 敷地面積）"
+      },
+      {
+        "id": "dec-compliance",
+        "type": "decision",
+        "title": "容積率は上限以下か？",
+        "decision_type": "binary",
+        "description": "建築物の容積率が前面道路幅員による上限以下であるか判定",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "R", "desc": "建築物の容積率" },
+          "rhs": { "var": "R_limit", "desc": "容積率上限" }
+        },
+        "related_articles": ["法::A52:P2"]
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "容積率が前面道路幅員による上限以下であり、法第52条第2項に適合"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "容積率が前面道路幅員による上限を超過しており、法第52条第2項に不適合"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-zone",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-zone",
+        "to": "proc-item1",
+        "role": "option",
+        "label": "低層住居専用・田園住居"
+      },
+      {
+        "id": "e03",
+        "from": "dec-zone",
+        "to": "dec-item2-designated",
+        "role": "option",
+        "label": "中高層住居専用・住居地域等"
+      },
+      {
+        "id": "e04",
+        "from": "dec-zone",
+        "to": "dec-item3-designated",
+        "role": "option",
+        "label": "その他"
+      },
+      {
+        "id": "e05",
+        "from": "proc-item1",
+        "to": "proc-calc-limit",
+        "role": "flow"
+      },
+      {
+        "id": "e06",
+        "from": "dec-item2-designated",
+        "to": "proc-item2-designated",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e07",
+        "from": "dec-item2-designated",
+        "to": "proc-item2-default",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e08",
+        "from": "proc-item2-default",
+        "to": "proc-calc-limit",
+        "role": "flow"
+      },
+      {
+        "id": "e09",
+        "from": "proc-item2-designated",
+        "to": "proc-calc-limit",
+        "role": "flow"
+      },
+      {
+        "id": "e10",
+        "from": "dec-item3-designated",
+        "to": "dec-item3-coefficient",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e11",
+        "from": "dec-item3-designated",
+        "to": "proc-item3-default",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e12",
+        "from": "proc-item3-default",
+        "to": "proc-calc-limit",
+        "role": "flow"
+      },
+      {
+        "id": "e13",
+        "from": "dec-item3-coefficient",
+        "to": "proc-item3-coef4",
+        "role": "option",
+        "label": "4/10"
+      },
+      {
+        "id": "e14",
+        "from": "dec-item3-coefficient",
+        "to": "proc-item3-coef8",
+        "role": "option",
+        "label": "8/10"
+      },
+      {
+        "id": "e15",
+        "from": "proc-item3-coef4",
+        "to": "proc-calc-limit",
+        "role": "flow"
+      },
+      {
+        "id": "e16",
+        "from": "proc-item3-coef8",
+        "to": "proc-calc-limit",
+        "role": "flow"
+      },
+      {
+        "id": "e17",
+        "from": "proc-calc-limit",
+        "to": "proc-calc-ratio",
+        "role": "flow"
+      },
+      {
+        "id": "e18",
+        "from": "proc-calc-ratio",
+        "to": "dec-compliance",
+        "role": "flow"
+      },
+      {
+        "id": "e19",
+        "from": "dec-compliance",
+        "to": "pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e20",
+        "from": "dec-compliance",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00Z",
+    "updated_at": "2025-12-25T00:00:00Z",
+    "author": "Claude Opus 4.5",
+    "generator": "flow-generator-skill-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

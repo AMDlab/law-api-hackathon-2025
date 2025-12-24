@@ -1,0 +1,175 @@
+{
+  "id": "A112_P3_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "吹抜き等開放空間を有する建築物の防火区画（適合判定フロー）",
+    "target_subject": "特定主要構造部を耐火構造とした建築物",
+    "description": "耐火構造の複数部分が吹抜きなどの空間部分に接する場合、構造が火熱影響を回避すれば、当該部分と空間部分が特定防火設備で区画されているものと扱う"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "112",
+    "paragraph": "3",
+    "item": null
+  },
+  "labels": ["防火区画", "防火設備", "単体規定", "特定主要構造部"],
+  "flow_diagram": {
+    "title": "令112条3項 吹抜き等空間部分のみなし区画適合判定フロー",
+    "description": "耐火構造建築物の複数部分が空間部分に接する場合のみなし区画適用を判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "令112条3項の適合判定を開始"
+      },
+      {
+        "id": "dec-building-type",
+        "type": "decision",
+        "title": "特定主要構造部が耐火構造か？",
+        "decision_type": "binary",
+        "description": "特定主要構造部を耐火構造とした建築物であるか判定",
+        "related_articles": ["法::A2:I9の3"]
+      },
+      {
+        "id": "proc-not-applicable",
+        "type": "process",
+        "title": "適用対象外",
+        "process_type": "mechanical",
+        "description": "特定主要構造部が耐火構造でないため本項の適用対象外"
+      },
+      {
+        "id": "dec-space-exist",
+        "type": "decision",
+        "title": "吹抜き等の空間部分があるか？",
+        "decision_type": "binary",
+        "description": "吹抜きその他一定規模以上の空間が確保されている部分（空間部分）があるか判定"
+      },
+      {
+        "id": "proc-no-space",
+        "type": "process",
+        "title": "空間部分なし",
+        "process_type": "mechanical",
+        "description": "空間部分がないため本項の適用対象外"
+      },
+      {
+        "id": "dec-multiple-parts",
+        "type": "decision",
+        "title": "二以上の部分が空間部分に接しているか？",
+        "decision_type": "binary",
+        "description": "耐火構造とした二以上の部分が空間部分に接しているか判定"
+      },
+      {
+        "id": "proc-single-part",
+        "type": "process",
+        "title": "単一部分接続",
+        "process_type": "mechanical",
+        "description": "二以上の部分が接していないため本項の適用対象外"
+      },
+      {
+        "id": "dec-structure-method",
+        "type": "decision",
+        "title": "採用構造方法は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "大臣定め構造方法", "description": "国土交通大臣が定めた構造方法を用いるもの" },
+          { "value": "大臣認定", "description": "国土交通大臣の認定を受けたもの" },
+          { "value": "その他", "description": "上記以外" }
+        ],
+        "description": "通常火災時に相互間で防火上有害な火熱影響を及ぼさない構造方法を確認"
+      },
+      {
+        "id": "proc-method-comply",
+        "type": "process",
+        "title": "構造方法適合",
+        "process_type": "mechanical",
+        "description": "大臣定め構造方法又は大臣認定を満たす"
+      },
+      {
+        "id": "dec-heat-effect",
+        "type": "decision",
+        "title": "火熱影響を防止できるか？",
+        "decision_type": "binary",
+        "description": "通常の火災時において相互に火熱による防火上有害な影響を及ぼさないか判定"
+      },
+      {
+        "id": "proc-heat-comply",
+        "type": "process",
+        "title": "火熱影響防止適合",
+        "process_type": "mechanical",
+        "description": "火熱による防火上有害な影響を及ぼさない"
+      },
+      {
+        "id": "proc-deemed-compartment",
+        "type": "process",
+        "title": "みなし区画適用",
+        "process_type": "mechanical",
+        "description": "二以上の部分と空間部分が特定防火設備で区画されているものとみなして第1項を適用"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令112条3項の規定に適合（みなし区画適用可能）"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "令112条3項の規定に不適合（みなし区画適用不可）"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "dec-building-type", "role": "flow" },
+      { "id": "e02", "from": "dec-building-type", "to": "dec-space-exist", "role": "yes", "label": "はい" },
+      { "id": "e03", "from": "dec-building-type", "to": "proc-not-applicable", "role": "no", "label": "いいえ" },
+      { "id": "e04", "from": "proc-not-applicable", "to": "fail", "role": "flow" },
+      { "id": "e05", "from": "dec-space-exist", "to": "dec-multiple-parts", "role": "yes", "label": "はい" },
+      { "id": "e06", "from": "dec-space-exist", "to": "proc-no-space", "role": "no", "label": "いいえ" },
+      { "id": "e07", "from": "proc-no-space", "to": "fail", "role": "flow" },
+      { "id": "e08", "from": "dec-multiple-parts", "to": "dec-structure-method", "role": "yes", "label": "はい" },
+      { "id": "e09", "from": "dec-multiple-parts", "to": "proc-single-part", "role": "no", "label": "いいえ" },
+      { "id": "e10", "from": "proc-single-part", "to": "fail", "role": "flow" },
+      { "id": "e11", "from": "dec-structure-method", "to": "proc-method-comply", "role": "option", "label": "大臣定め構造方法" },
+      { "id": "e12", "from": "dec-structure-method", "to": "proc-method-comply", "role": "option", "label": "大臣認定" },
+      { "id": "e13", "from": "dec-structure-method", "to": "fail", "role": "option", "label": "その他" },
+      { "id": "e14", "from": "proc-method-comply", "to": "dec-heat-effect", "role": "flow" },
+      { "id": "e15", "from": "dec-heat-effect", "to": "proc-heat-comply", "role": "yes", "label": "はい" },
+      { "id": "e16", "from": "dec-heat-effect", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e17", "from": "proc-heat-comply", "to": "proc-deemed-compartment", "role": "flow" },
+      { "id": "e18", "from": "proc-deemed-compartment", "to": "pass", "role": "flow" }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-A112-P3",
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "delegates_to",
+      "articles": ["A112:P1", "A109"],
+      "description": "第1項の防火区画規定及び特定防火設備の定義"
+    },
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": ["A2:I9-3"],
+      "description": "特定主要構造部の定義"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

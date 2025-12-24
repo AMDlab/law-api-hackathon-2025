@@ -1,0 +1,183 @@
+{
+  "id": "A53_P5_I4_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "建蔽率緩和（省エネ改修）",
+    "target_subject": "建築物",
+    "description": "エネルギー消費性能向上のための外壁等の工事を行う建築物の建蔽率制限緩和の適否判定"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "53",
+    "paragraph": "5",
+    "item": "4"
+  },
+  "labels": ["集団規定", "建蔽率", "緩和規定", "省エネルギー"],
+  "kijo_diagram_ref": "CHK-BSL-A53-P5-I4",
+  "flow_diagram": {
+    "title": "建蔽率緩和（省エネ改修）判定フロー",
+    "description": "エネルギー消費性能向上のための外壁等の工事に該当し、省令基準に適合するかを判定する",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start"
+      },
+      {
+        "id": "dec-work-type",
+        "type": "decision",
+        "title": "工事の種類は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "外壁の断熱化工事" },
+          { "value": "窓の断熱改修" },
+          { "value": "屋根の断熱化工事" },
+          { "value": "その他省エネ性能向上工事" },
+          { "value": "該当なし" }
+        ],
+        "description": "実施する工事がエネルギー消費性能向上のための外壁・屋外面工事に該当するか"
+      },
+      {
+        "id": "proc-energy-work-match",
+        "type": "process",
+        "title": "省エネ改修工事該当",
+        "description": "エネルギー消費性能向上のための外壁・屋外面工事に該当"
+      },
+      {
+        "id": "dec-ministerial-standard",
+        "type": "decision",
+        "title": "構造上やむを得ないものとして省令基準に適合するか？",
+        "decision_type": "binary",
+        "description": "国土交通省令で定める基準（構造上やむを得ないものの定義）に適合しているか"
+      },
+      {
+        "id": "proc-standard-compliance",
+        "type": "process",
+        "title": "省令基準適合",
+        "description": "構造上やむを得ないものとして国土交通省令で定める基準に適合"
+      },
+      {
+        "id": "proc-item4-match",
+        "type": "process",
+        "title": "第4号該当",
+        "description": "法第53条第5項第4号の要件を満たす"
+      },
+      {
+        "id": "pass-item4-eligible",
+        "type": "terminal",
+        "title": "第5項第4号該当（緩和対象）",
+        "result": "pass",
+        "description": "第53条第5項第4号に該当し、特定行政庁の許可を得れば建蔽率緩和を受けられる"
+      },
+      {
+        "id": "fail-no-energy-work",
+        "type": "terminal",
+        "title": "第4号非該当（工事種別不適合）",
+        "result": "fail",
+        "description": "エネルギー消費性能向上のための工事に該当しない"
+      },
+      {
+        "id": "fail-no-standard",
+        "type": "terminal",
+        "title": "第4号非該当（省令基準不適合）",
+        "result": "fail",
+        "description": "省令基準に適合しないため、第5項第4号には該当しない"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e1",
+        "from": "start",
+        "to": "dec-work-type",
+        "role": "flow"
+      },
+      {
+        "id": "e2",
+        "from": "dec-work-type",
+        "to": "proc-energy-work-match",
+        "role": "option",
+        "label": "外壁の断熱化工事"
+      },
+      {
+        "id": "e3",
+        "from": "dec-work-type",
+        "to": "proc-energy-work-match",
+        "role": "option",
+        "label": "窓の断熱改修"
+      },
+      {
+        "id": "e4",
+        "from": "dec-work-type",
+        "to": "proc-energy-work-match",
+        "role": "option",
+        "label": "屋根の断熱化工事"
+      },
+      {
+        "id": "e5",
+        "from": "dec-work-type",
+        "to": "proc-energy-work-match",
+        "role": "option",
+        "label": "その他省エネ性能向上工事"
+      },
+      {
+        "id": "e6",
+        "from": "dec-work-type",
+        "to": "fail-no-energy-work",
+        "role": "option",
+        "label": "該当なし"
+      },
+      {
+        "id": "e7",
+        "from": "proc-energy-work-match",
+        "to": "dec-ministerial-standard",
+        "role": "flow"
+      },
+      {
+        "id": "e8",
+        "from": "dec-ministerial-standard",
+        "to": "proc-standard-compliance",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e9",
+        "from": "dec-ministerial-standard",
+        "to": "fail-no-standard",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e10",
+        "from": "proc-standard-compliance",
+        "to": "proc-item4-match",
+        "role": "flow"
+      },
+      {
+        "id": "e11",
+        "from": "proc-item4-match",
+        "to": "pass-item4-eligible",
+        "role": "flow"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325M50004000040",
+      "law_name": "建築基準法施行規則",
+      "law_type": "regulation",
+      "relationship": "delegates_to",
+      "description": "構造上やむを得ないものの具体的基準を定める"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

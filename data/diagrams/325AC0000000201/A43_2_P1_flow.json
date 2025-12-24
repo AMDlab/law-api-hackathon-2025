@@ -1,0 +1,164 @@
+{
+  "id": "A43_2_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "4m未満道路接道建築物への条例制限適用判定（適合判定フロー）",
+    "target_subject": "建築物",
+    "description": "法42条3項指定道路にのみ接する建築物について、地方公共団体の条例による制限の適用対象となるかを判定するフロー"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "43の2",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": ["集団規定", "接道"],
+  "text_raw": "地方公共団体は、交通上、安全上、防火上又は衛生上必要があると認めるときは、その敷地が第四十二条第三項の規定により水平距離が指定された道路にのみ二メートル（前条第三項各号のいずれかに該当する建築物で同項の条例によりその敷地が道路に接する部分の長さの制限が付加されているものにあつては、当該長さ）以上接する建築物について、条例で、その敷地、構造、建築設備又は用途に関して必要な制限を付加することができる。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        { "type": "ordinance", "value": "地方公共団体が法43条の2第1項に基づく条例を制定している" },
+        { "type": "location", "value": "交通上、安全上、防火上又は衛生上必要があると認められる区域" }
+      ],
+      "note": "地方公共団体による条例制定が前提"
+    },
+    "judgment_rule": {
+      "operator": "IF",
+      "conditions": [
+        {
+          "operator": "AND",
+          "conditions": [
+            { "ref": "info-road-type", "operator": "==", "value": "法42条3項指定道路のみ" },
+            { "ref": "info-contact-length-sufficient", "operator": "==", "value": true }
+          ]
+        }
+      ],
+      "then": { "note": "条例による制限が適用される", "ref": "info-ordinance-applicable" }
+    }
+  },
+  "flow_diagram": {
+    "title": "法43条の2第1項 条例制限適用 適合判定フロー",
+    "description": "建築物が法43条の2第1項の条例制限の適用対象となるかを判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "法43条の2第1項の適合判定を開始"
+      },
+      {
+        "id": "dec-road-type",
+        "type": "decision",
+        "title": "敷地が接する道路の種別は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "法42条3項指定道路のみ", "description": "水平距離が指定された道路のみに接する" },
+          { "value": "その他の道路を含む", "description": "法42条3項指定道路以外の道路にも接する" }
+        ],
+        "description": "敷地が接する道路が法42条3項の規定により水平距離が指定された道路のみであるかを判定",
+        "related_articles": ["法::A42:P3"]
+      },
+      {
+        "id": "dec-building-type-a43p3",
+        "type": "decision",
+        "title": "法43条3項各号の建築物か？",
+        "decision_type": "binary",
+        "description": "建築物が法43条3項各号のいずれかに該当するか判定",
+        "related_articles": ["法::A43:P3"]
+      },
+      {
+        "id": "dec-ordinance-a43p3",
+        "type": "decision",
+        "title": "法43条3項条例による接道長さ制限があるか？",
+        "decision_type": "binary",
+        "description": "法43条3項の条例により接道長さ制限が付加されているか判定"
+      },
+      {
+        "id": "proc-ordinance-length",
+        "type": "process",
+        "title": "条例規定長さを適用",
+        "process_type": "mechanical",
+        "description": "必要接道長さは法43条3項条例で規定された長さ"
+      },
+      {
+        "id": "proc-default-length",
+        "type": "process",
+        "title": "基準長さ2mを適用",
+        "process_type": "mechanical",
+        "description": "必要接道長さは2m"
+      },
+      {
+        "id": "dec-interface-length",
+        "type": "decision",
+        "title": "敷地は必要接道長さ以上接しているか？",
+        "decision_type": "binary",
+        "description": "敷地が法42条3項指定道路に必要接道長さ以上接しているか判定"
+      },
+      {
+        "id": "proc-applicable",
+        "type": "process",
+        "title": "条例制限適用対象",
+        "process_type": "mechanical",
+        "description": "法43条の2第1項に基づき地方公共団体の条例による制限が適用される"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合（条例制限適用対象）",
+        "result": "pass",
+        "description": "条例で定める敷地、構造、建築設備又は用途に関する制限が適用される"
+      },
+      {
+        "id": "fail-road",
+        "type": "terminal",
+        "title": "不適合（道路種別非該当）",
+        "result": "fail",
+        "description": "法42条3項指定道路のみに接していないため本条の適用なし"
+      },
+      {
+        "id": "fail-length",
+        "type": "terminal",
+        "title": "不適合（接道長さ不足）",
+        "result": "fail",
+        "description": "必要接道長さを満たさないため本条の適用対象外"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "dec-road-type", "role": "flow" },
+      { "id": "e02", "from": "dec-road-type", "to": "dec-building-type-a43p3", "role": "option", "label": "法42条3項指定道路のみ" },
+      { "id": "e03", "from": "dec-road-type", "to": "fail-road", "role": "option", "label": "その他の道路を含む" },
+      { "id": "e04", "from": "dec-building-type-a43p3", "to": "dec-ordinance-a43p3", "role": "yes", "label": "はい" },
+      { "id": "e05", "from": "dec-building-type-a43p3", "to": "proc-default-length", "role": "no", "label": "いいえ" },
+      { "id": "e06", "from": "dec-ordinance-a43p3", "to": "proc-ordinance-length", "role": "yes", "label": "はい" },
+      { "id": "e07", "from": "dec-ordinance-a43p3", "to": "proc-default-length", "role": "no", "label": "いいえ" },
+      { "id": "e08", "from": "proc-ordinance-length", "to": "dec-interface-length", "role": "flow" },
+      { "id": "e09", "from": "proc-default-length", "to": "dec-interface-length", "role": "flow" },
+      { "id": "e10", "from": "dec-interface-length", "to": "proc-applicable", "role": "yes", "label": "はい" },
+      { "id": "e11", "from": "dec-interface-length", "to": "fail-length", "role": "no", "label": "いいえ" },
+      { "id": "e12", "from": "proc-applicable", "to": "pass", "role": "flow" }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-A43_2-P1",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A42:P3", "A43:P3"],
+      "description": "法42条3項の指定道路および法43条3項の条例を参照"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

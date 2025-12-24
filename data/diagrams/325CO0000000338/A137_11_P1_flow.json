@@ -1,0 +1,248 @@
+{
+  "id": "A137_11_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "準防火地域における既存不適格建築物の増築・改築範囲",
+    "target_subject": "既存不適格建築物",
+    "description": "法第3条第2項により法第61条（準防火地域内）の規定の適用を受けない建築物について、法第86条の7第1項の緩和適用範囲を判定"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "137_11",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "既存不適格建築物",
+    "増改築",
+    "準防火地域",
+    "防火規制"
+  ],
+  "text_raw": "法第三条第二項の規定により法第六十一条（準防火地域内にある建築物に係る部分に限る。）の規定の適用を受けない建築物についての法第八十六条の七第一項の政令で定める範囲は、増築及び改築については、次の各号に掲げる建築物の区分に応じ、当該各号に定める要件に該当する増築又は改築に係る部分とする。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "building_type",
+          "value": "法第3条第2項の規定により法第61条（準防火地域内）の規定の適用を受けない建築物"
+        },
+        {
+          "type": "work_type",
+          "value": "増築又は改築"
+        }
+      ],
+      "note": "準防火地域内における既存不適格建築物の増築・改築"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "description": "第1号（第2号以外の建築物）: イ又はロのいずれかに該当"
+        },
+        {
+          "description": "第2号（木造で外壁・軒裏が防火構造でないもの）: 第1号イのみ"
+        }
+      ]
+    }
+  },
+  "flow_diagram": {
+    "title": "令137条の11第1項 適合判定フロー",
+    "description": "準防火地域内の既存不適格建築物の増築・改築における緩和適用範囲の判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start"
+      },
+      {
+        "id": "dec-existing-status",
+        "type": "decision",
+        "title": "法61条（準防火地域）の規定適用除外建築物か？",
+        "decision_type": "binary",
+        "description": "法第3条第2項の規定により法第61条（準防火地域内）の規定の適用を受けない既存不適格建築物であるか"
+      },
+      {
+        "id": "dec-work-type",
+        "type": "decision",
+        "title": "工事種別は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "増築" },
+          { "value": "改築" },
+          { "value": "その他" }
+        ],
+        "description": "当該工事が増築か改築か"
+      },
+      {
+        "id": "dec-structure-type",
+        "type": "decision",
+        "title": "構造種別は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "木造" },
+          { "value": "非木造" }
+        ],
+        "description": "当該建築物が木造か否か"
+      },
+      {
+        "id": "dec-exterior-fireproof",
+        "type": "decision",
+        "title": "外壁・軒裏が防火構造か？",
+        "decision_type": "binary",
+        "description": "木造建築物の外壁及び軒裏が防火構造であるか"
+      },
+      {
+        "id": "proc-category-1",
+        "type": "process",
+        "title": "第1号該当（第2号以外）",
+        "process_type": "mechanical",
+        "description": "第1号に掲げる建築物（木造以外、又は木造で外壁・軒裏が防火構造のもの）に該当"
+      },
+      {
+        "id": "proc-category-2",
+        "type": "process",
+        "title": "第2号該当（木造・防火構造なし）",
+        "process_type": "mechanical",
+        "description": "第2号に掲げる建築物（木造で外壁・軒裏が防火構造でないもの）に該当"
+      },
+      {
+        "id": "dec-fire-barrier",
+        "type": "decision",
+        "title": "火熱遮断壁等で区画されているか？",
+        "decision_type": "binary",
+        "description": "増築又は改築に係る部分が火熱遮断壁等で区画されているか（イ(1)）"
+      },
+      {
+        "id": "dec-minister-standard",
+        "type": "decision",
+        "title": "大臣定め基準に適合するか？",
+        "decision_type": "binary",
+        "description": "令136条の2各号相当基準（準防火地域内）として国土交通大臣が定めるものに適合し、大臣定め構造方法又は大臣認定を受けているか（イ(2)）"
+      },
+      {
+        "id": "proc-item-i",
+        "type": "process",
+        "title": "イ要件該当",
+        "process_type": "mechanical",
+        "description": "イ要件（火熱遮断壁等区画及び大臣定め基準）に適合"
+      },
+      {
+        "id": "dec-floor-area",
+        "type": "decision",
+        "title": "対象床面積は50m2以下か？",
+        "decision_type": "binary",
+        "description": "工事の着手が基準時以後である増築及び改築に係る部分の対象床面積の合計が50m2を超えないか（ロ(1)）"
+      },
+      {
+        "id": "dec-stories",
+        "type": "decision",
+        "title": "増改築後の階数は2以下か？",
+        "decision_type": "binary",
+        "description": "増築又は改築後における建築物の階数が2以下であるか（ロ(2)）"
+      },
+      {
+        "id": "dec-wall-fireproof",
+        "type": "decision",
+        "title": "増改築部分の外壁・軒裏が防火構造か？",
+        "decision_type": "binary",
+        "description": "増築又は改築に係る部分の外壁及び軒裏が防火構造であるか（前条第1号ロ(3)）"
+      },
+      {
+        "id": "dec-new-opening",
+        "type": "decision",
+        "title": "増改築部分の開口部に20分間防火設備があるか？",
+        "decision_type": "binary",
+        "description": "増築又は改築に係る部分の外壁の開口部（延焼のおそれのある部分）に20分間防火設備が設けられているか（前条第1号ロ(4)）"
+      },
+      {
+        "id": "dec-existing-opening",
+        "type": "decision",
+        "title": "既存部分の開口部に20分間防火設備があるか？",
+        "decision_type": "binary",
+        "description": "増築又は改築に係る部分以外の部分の外壁の開口部（延焼のおそれのある部分）に20分間防火設備が設けられているか（前条第1号ロ(5)）"
+      },
+      {
+        "id": "proc-item-ro",
+        "type": "process",
+        "title": "ロ要件該当",
+        "process_type": "mechanical",
+        "description": "ロ要件（5要件全て）に適合"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合（緩和適用範囲）",
+        "result": "pass",
+        "description": "法第86条の7第1項の政令で定める範囲に該当し、法第61条の規定が適用されない"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "不適合（緩和適用外）",
+        "result": "fail",
+        "description": "法第86条の7第1項の政令で定める範囲に該当せず、法第61条の規定が適用される"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "dec-existing-status", "role": "flow" },
+      { "id": "e02", "from": "dec-existing-status", "to": "dec-work-type", "role": "yes", "label": "はい" },
+      { "id": "e03", "from": "dec-existing-status", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e04", "from": "dec-work-type", "to": "dec-structure-type", "role": "option", "label": "増築" },
+      { "id": "e05", "from": "dec-work-type", "to": "dec-structure-type", "role": "option", "label": "改築" },
+      { "id": "e06", "from": "dec-work-type", "to": "fail", "role": "option", "label": "その他" },
+      { "id": "e07", "from": "dec-structure-type", "to": "dec-exterior-fireproof", "role": "option", "label": "木造" },
+      { "id": "e08", "from": "dec-structure-type", "to": "proc-category-1", "role": "option", "label": "非木造" },
+      { "id": "e09", "from": "dec-exterior-fireproof", "to": "proc-category-1", "role": "yes", "label": "はい" },
+      { "id": "e10", "from": "dec-exterior-fireproof", "to": "proc-category-2", "role": "no", "label": "いいえ" },
+      { "id": "e11", "from": "proc-category-1", "to": "dec-fire-barrier", "role": "flow" },
+      { "id": "e12", "from": "proc-category-2", "to": "dec-fire-barrier", "role": "flow" },
+      { "id": "e13", "from": "dec-fire-barrier", "to": "dec-minister-standard", "role": "yes", "label": "はい" },
+      { "id": "e14", "from": "dec-fire-barrier", "to": "dec-floor-area", "role": "no", "label": "いいえ" },
+      { "id": "e15", "from": "dec-minister-standard", "to": "proc-item-i", "role": "yes", "label": "はい" },
+      { "id": "e16", "from": "dec-minister-standard", "to": "dec-floor-area", "role": "no", "label": "いいえ" },
+      { "id": "e17", "from": "proc-item-i", "to": "pass", "role": "flow" },
+      { "id": "e18", "from": "dec-floor-area", "to": "dec-stories", "role": "yes", "label": "はい" },
+      { "id": "e19", "from": "dec-floor-area", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e20", "from": "dec-stories", "to": "dec-wall-fireproof", "role": "yes", "label": "はい" },
+      { "id": "e21", "from": "dec-stories", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e22", "from": "dec-wall-fireproof", "to": "dec-new-opening", "role": "yes", "label": "はい" },
+      { "id": "e23", "from": "dec-wall-fireproof", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e24", "from": "dec-new-opening", "to": "dec-existing-opening", "role": "yes", "label": "はい" },
+      { "id": "e25", "from": "dec-new-opening", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e26", "from": "dec-existing-opening", "to": "proc-item-ro", "role": "yes", "label": "はい" },
+      { "id": "e27", "from": "dec-existing-opening", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e28", "from": "proc-item-ro", "to": "pass", "role": "flow" }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-ORD-A137-11-P1",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": ["A3:P2", "A61", "A86_7:P1"],
+      "description": "法第3条第2項の既存不適格建築物の取扱、法第61条の準防火地域規制、法第86条の7第1項の緩和規定"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": ["A136_2", "A137_10:P1:I1"],
+      "description": "令136条の2各号の基準（準防火地域内建築物）、前条第1号ロ(3)-(5)を参照"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T12:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

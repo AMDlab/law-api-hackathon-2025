@@ -1,0 +1,263 @@
+{
+  "id": "A57_3_P2_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "急傾斜地崩壊危険区域内の建築物に対する措置",
+    "target_subject": "急傾斜地崩壊危険区域内の建築物",
+    "description": "急傾斜地崩壊危険区域内に建築する建築物について、その位置の変更又は設計の変更による危険性の軽減措置の実施可能性を判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "57の3",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "高さ制限",
+    "防災規定"
+  ],
+  "text_raw": "前項の規定により特定行政庁が高さについての制限を付した場合において、その制限により支障がないと認めるときは、当該建築物の位置の変更又は設計の変更に関する措置を講じて、危険性の軽減を図るものとする。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "急傾斜地崩壊危険区域内"
+        },
+        {
+          "type": "applicability",
+          "value": "特定行政庁が高さについての制限を付した場合"
+        }
+      ],
+      "note": "都道府県が指定する急傾斜地崩壊危険区域"
+    },
+    "judgment_rule": {
+      "operator": "IF",
+      "lhs": {
+        "type": "condition",
+        "description": "高さについての制限により支障がないと認めるとき"
+      },
+      "rhs": {
+        "type": "result",
+        "description": "建築物の位置の変更又は設計の変更により危険性を軽減する措置を講じなければならない"
+      }
+    }
+  },
+  "flow_diagram": {
+    "title": "法第57条の3第2項 危険性軽減措置フロー",
+    "description": "急傾斜地崩壊危険区域内における建築物の危険性軽減措置の適合判定フロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "法第57条の3第2項の適合判定を開始"
+      },
+      {
+        "id": "dec-hazard-zone",
+        "type": "decision",
+        "title": "敷地は急傾斜地崩壊危険区域内か？",
+        "decision_type": "binary",
+        "description": "敷地が都道府県知事により指定された急傾斜地崩壊危険区域内に含まれるか判定"
+      },
+      {
+        "id": "dec-height-limit-exists",
+        "type": "decision",
+        "title": "特定行政庁による高さ制限が付されているか？",
+        "decision_type": "binary",
+        "description": "第1項の規定により特定行政庁が高さについての制限を付しているか確認"
+      },
+      {
+        "id": "dec-height-compliance",
+        "type": "decision",
+        "title": "計画高さは制限値以下か？",
+        "decision_type": "binary",
+        "description": "計画する建築物の高さが特定行政庁が付した高さ制限値以下であるか判定",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "H_plan", "desc": "計画高さ" },
+          "rhs": { "var": "H_limit", "desc": "制限高さ", "unit": "m" }
+        }
+      },
+      {
+        "id": "proc-height-compliant",
+        "type": "process",
+        "title": "高さ制限に適合",
+        "process_type": "mechanical",
+        "description": "計画高さが制限値以下であることを確認"
+      },
+      {
+        "id": "dec-no-hindrance",
+        "type": "decision",
+        "title": "高さ制限により支障がないと認められるか？",
+        "decision_type": "binary",
+        "description": "高さ制限によって建築に支障がないかを特定行政庁が判断"
+      },
+      {
+        "id": "dec-mitigation-measures",
+        "type": "decision",
+        "title": "位置変更又は設計変更による危険性軽減措置が講じられるか？",
+        "decision_type": "binary",
+        "description": "建築物の位置の変更又は設計の変更による危険性軽減措置が実施されるか確認"
+      },
+      {
+        "id": "proc-mitigation-applied",
+        "type": "process",
+        "title": "危険性軽減措置を実施",
+        "process_type": "human_judgment",
+        "description": "建築物の位置の変更又は設計の変更により危険性を軽減する措置を講じる"
+      },
+      {
+        "id": "pass-exempt",
+        "type": "terminal",
+        "title": "適用対象外（適合）",
+        "result": "pass",
+        "description": "急傾斜地崩壊危険区域外のため本規定は適用されない"
+      },
+      {
+        "id": "pass-no-limit",
+        "type": "terminal",
+        "title": "適用対象外（適合）",
+        "result": "pass",
+        "description": "高さ制限が付されていないため本項は適用されない"
+      },
+      {
+        "id": "pass-compliant",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "危険性軽減措置が講じられ、法第57条の3第2項に適合"
+      },
+      {
+        "id": "fail-height",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "計画高さが制限値を超過し不適合"
+      },
+      {
+        "id": "fail-mitigation",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "危険性軽減措置が講じられていないため不適合"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-hazard-zone",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-hazard-zone",
+        "to": "dec-height-limit-exists",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "dec-hazard-zone",
+        "to": "pass-exempt",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e04",
+        "from": "dec-height-limit-exists",
+        "to": "dec-height-compliance",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e05",
+        "from": "dec-height-limit-exists",
+        "to": "pass-no-limit",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e06",
+        "from": "dec-height-compliance",
+        "to": "proc-height-compliant",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e07",
+        "from": "dec-height-compliance",
+        "to": "fail-height",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e08",
+        "from": "proc-height-compliant",
+        "to": "dec-no-hindrance",
+        "role": "flow"
+      },
+      {
+        "id": "e09",
+        "from": "dec-no-hindrance",
+        "to": "dec-mitigation-measures",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e10",
+        "from": "dec-no-hindrance",
+        "to": "pass-compliant",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e11",
+        "from": "dec-mitigation-measures",
+        "to": "proc-mitigation-applied",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e12",
+        "from": "dec-mitigation-measures",
+        "to": "fail-mitigation",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e13",
+        "from": "proc-mitigation-applied",
+        "to": "pass-compliant",
+        "role": "flow"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-A57-3-P2",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": [
+        "A57:3:P1"
+      ],
+      "description": "第57条の3第2項は第1項の規定により付された高さ制限に関する例外的な運用基準を示す"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

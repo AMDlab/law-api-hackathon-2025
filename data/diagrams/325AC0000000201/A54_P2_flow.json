@@ -1,0 +1,130 @@
+{
+  "id": "A54_P2_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "外壁の後退距離の限度の指定値制約判定フロー",
+    "target_subject": "都市計画",
+    "description": "第1項の都市計画における外壁の後退距離の限度として定めることができる数値は1.5m又は1mのいずれかであることを判定するフロー"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "54",
+    "paragraph": "2"
+  },
+  "labels": ["集団規定", "地域地区制限", "外壁後退", "都市計画指定値"],
+  "text_raw": "前項の都市計画において外壁の後退距離の限度を定める場合においては、その限度は、一・五メートル又は一メートルとする。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "第一種低層住居専用地域、第二種低層住居専用地域又は田園住居地域内"
+        },
+        {
+          "type": "precondition",
+          "value": "都市計画において外壁の後退距離の限度を定める場合"
+        }
+      ],
+      "note": "法第54条第1項の都市計画において限度を定める場合"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "type": "equality",
+          "lhs": { "symbol": "D", "description": "外壁の後退距離の限度" },
+          "rhs": { "value": 1.5, "unit": "m" }
+        },
+        {
+          "type": "equality",
+          "lhs": { "symbol": "D", "description": "外壁の後退距離の限度" },
+          "rhs": { "value": 1.0, "unit": "m" }
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "kijo_diagram_ref": "CHK-BSL-A54-P2",
+  "flow_diagram": {
+    "title": "外壁の後退距離の限度の指定値制約判定フロー",
+    "description": "法第54条第2項に基づき、都市計画で定める外壁の後退距離の限度が適法な値（1.5m又は1m）であることを判定する",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "外壁の後退距離の限度の指定値制約の判定を開始"
+      },
+      {
+        "id": "dec-define-limit",
+        "type": "decision",
+        "title": "都市計画で後退距離の限度を定めるか？",
+        "decision_type": "binary",
+        "description": "第一種低層住居専用地域等に関する都市計画において外壁の後退距離の限度を定めるか確認"
+      },
+      {
+        "id": "dec-limit-value",
+        "type": "decision",
+        "title": "指定する限度値は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "1.5m" },
+          { "value": "1m" },
+          { "value": "その他" }
+        ],
+        "description": "都市計画で定める外壁の後退距離の限度の値を確認"
+      },
+      {
+        "id": "pass-compliant",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "法第54条第2項の規定に適合（限度が1.5m又は1mである）"
+      },
+      {
+        "id": "pass-not-applicable",
+        "type": "terminal",
+        "title": "適合（規定対象外）",
+        "result": "pass",
+        "description": "都市計画で限度を定めない場合、本項は適用対象外"
+      },
+      {
+        "id": "fail-non-compliant",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "限度が1.5m又は1m以外の値であり、法第54条第2項に不適合"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "dec-define-limit", "role": "flow" },
+      { "id": "e02", "from": "dec-define-limit", "to": "dec-limit-value", "role": "yes", "label": "はい" },
+      { "id": "e03", "from": "dec-define-limit", "to": "pass-not-applicable", "role": "no", "label": "いいえ" },
+      { "id": "e04", "from": "dec-limit-value", "to": "pass-compliant", "role": "option", "label": "1.5m" },
+      { "id": "e05", "from": "dec-limit-value", "to": "pass-compliant", "role": "option", "label": "1m" },
+      { "id": "e06", "from": "dec-limit-value", "to": "fail-non-compliant", "role": "option", "label": "その他" }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A54:P1"],
+      "description": "第1項で外壁の後退距離の制限を規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

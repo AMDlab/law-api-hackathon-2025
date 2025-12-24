@@ -1,0 +1,323 @@
+{
+  "id": "A59_P2_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "高度利用地区内の建築物の壁面位置制限",
+    "target_subject": "建築物",
+    "description": "高度利用地区内の建築物の壁又は柱が、都市計画で定められた壁面の位置の制限に適合することを判定するフロー"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "59",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": [
+    "集団規定",
+    "高度利用地区"
+  ],
+  "text_raw": "高度利用地区内においては、建築物の壁又はこれに代わる柱は、建築物の地盤面下の部分及び国土交通大臣が指定する歩廊の柱その他これに類するものを除き、高度利用地区に関する都市計画において定められた壁面の位置の制限に反して建築してはならない。ただし、前項各号の一に該当する建築物については、この限りでない。",
+  "kijo_diagram_ref": "CHK-BSL-A59-P2",
+  "flow_diagram": {
+    "title": "法59条2項 高度利用地区内の壁面位置制限の適合判定フロー",
+    "description": "高度利用地区内の建築物について、第1項各号の適用除外に該当するか、または壁面の位置制限に適合するかを判定するフロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "法59条2項の適合判定を開始"
+      },
+      {
+        "id": "dec-structure",
+        "type": "decision",
+        "title": "主要構造部の構造種別は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "木造" },
+          { "value": "鉄骨造" },
+          { "value": "CB造等" },
+          { "value": "その他" }
+        ],
+        "description": "主要構造部が木造、鉄骨造、コンクリートブロック造その他これらに類する構造かを確認"
+      },
+      {
+        "id": "dec-story-for-exempt1",
+        "type": "decision",
+        "title": "階数は2以下か？",
+        "decision_type": "binary",
+        "description": "建築物の階数が2以下であるかを確認（1号除外判定用）"
+      },
+      {
+        "id": "dec-basement-for-exempt1",
+        "type": "decision",
+        "title": "地階を有するか？",
+        "decision_type": "binary",
+        "description": "建築物が地階を有するかを確認（1号除外判定用）"
+      },
+      {
+        "id": "dec-removable",
+        "type": "decision",
+        "title": "容易に移転又は除却できるか？",
+        "decision_type": "binary",
+        "description": "建築物が容易に移転し又は除却することができるかを判定"
+      },
+      {
+        "id": "proc-exempt1",
+        "type": "process",
+        "title": "1号該当",
+        "process_type": "mechanical",
+        "description": "第59条1項1号の除外要件に該当"
+      },
+      {
+        "id": "dec-public-utility",
+        "type": "decision",
+        "title": "公衆便所・巡査派出所等の公益施設か？",
+        "decision_type": "binary",
+        "description": "公衆便所、巡査派出所等の公益上必要な建築物に該当するか"
+      },
+      {
+        "id": "proc-exempt2",
+        "type": "process",
+        "title": "2号該当",
+        "process_type": "mechanical",
+        "description": "第59条1項2号の除外要件に該当"
+      },
+      {
+        "id": "dec-public-building",
+        "type": "decision",
+        "title": "学校・駅舎・卸売市場等の公益的大規模施設か？",
+        "decision_type": "binary",
+        "description": "学校、駅舎、卸売市場等の公益上必要な建築物に該当するか"
+      },
+      {
+        "id": "dec-admin-permission",
+        "type": "decision",
+        "title": "特定行政庁の許可を受けているか？",
+        "decision_type": "binary",
+        "description": "用途上又は構造上やむを得ないと認める特定行政庁の許可を受けているか"
+      },
+      {
+        "id": "proc-exempt3",
+        "type": "process",
+        "title": "3号該当",
+        "process_type": "mechanical",
+        "description": "第59条1項3号の除外要件に該当"
+      },
+      {
+        "id": "pass-exempt",
+        "type": "terminal",
+        "title": "適合（適用除外）",
+        "result": "pass",
+        "description": "第1項各号のいずれかに該当し、壁面位置制限の適用除外となる"
+      },
+      {
+        "id": "dec-wall-position",
+        "type": "decision",
+        "title": "壁・柱が壁面位置制限に適合するか？",
+        "decision_type": "binary",
+        "description": "建築物の壁又は柱（地盤面下部分・指定歩廊柱等除く）が都市計画で定められた壁面位置制限に反していないか"
+      },
+      {
+        "id": "proc-wall-compliance",
+        "type": "process",
+        "title": "壁面位置適合",
+        "process_type": "mechanical",
+        "description": "壁・柱の位置が都市計画の壁面位置制限に適合"
+      },
+      {
+        "id": "pass-compliance",
+        "type": "terminal",
+        "title": "適合（壁面位置制限適合）",
+        "result": "pass",
+        "description": "壁又は柱が都市計画で定められた壁面位置制限に適合"
+      },
+      {
+        "id": "fail-wall",
+        "type": "terminal",
+        "title": "不適合（壁面位置違反）",
+        "result": "fail",
+        "description": "壁又は柱が都市計画で定められた壁面位置制限に反しているため不適合"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-structure",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-structure",
+        "to": "dec-story-for-exempt1",
+        "role": "option",
+        "label": "木造"
+      },
+      {
+        "id": "e03",
+        "from": "dec-structure",
+        "to": "dec-story-for-exempt1",
+        "role": "option",
+        "label": "鉄骨造"
+      },
+      {
+        "id": "e04",
+        "from": "dec-structure",
+        "to": "dec-story-for-exempt1",
+        "role": "option",
+        "label": "CB造等"
+      },
+      {
+        "id": "e05",
+        "from": "dec-structure",
+        "to": "dec-public-utility",
+        "role": "option",
+        "label": "その他"
+      },
+      {
+        "id": "e06",
+        "from": "dec-story-for-exempt1",
+        "to": "dec-basement-for-exempt1",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e07",
+        "from": "dec-story-for-exempt1",
+        "to": "dec-public-utility",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e08",
+        "from": "dec-basement-for-exempt1",
+        "to": "dec-removable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e09",
+        "from": "dec-basement-for-exempt1",
+        "to": "dec-public-utility",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e10",
+        "from": "dec-removable",
+        "to": "proc-exempt1",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e11",
+        "from": "dec-removable",
+        "to": "dec-public-utility",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e12",
+        "from": "proc-exempt1",
+        "to": "pass-exempt",
+        "role": "flow"
+      },
+      {
+        "id": "e13",
+        "from": "dec-public-utility",
+        "to": "proc-exempt2",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e14",
+        "from": "dec-public-utility",
+        "to": "dec-public-building",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e15",
+        "from": "proc-exempt2",
+        "to": "pass-exempt",
+        "role": "flow"
+      },
+      {
+        "id": "e16",
+        "from": "dec-public-building",
+        "to": "dec-admin-permission",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e17",
+        "from": "dec-public-building",
+        "to": "dec-wall-position",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e18",
+        "from": "dec-admin-permission",
+        "to": "proc-exempt3",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e19",
+        "from": "dec-admin-permission",
+        "to": "dec-wall-position",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e20",
+        "from": "proc-exempt3",
+        "to": "pass-exempt",
+        "role": "flow"
+      },
+      {
+        "id": "e21",
+        "from": "dec-wall-position",
+        "to": "proc-wall-compliance",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e22",
+        "from": "dec-wall-position",
+        "to": "fail-wall",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e23",
+        "from": "proc-wall-compliance",
+        "to": "pass-compliance",
+        "role": "flow"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A59:P1"],
+      "description": "第59条1項による適用除外要件を参照"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

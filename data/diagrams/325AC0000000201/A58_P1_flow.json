@@ -1,0 +1,212 @@
+{
+  "id": "A58_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "建築物の高さ（高度地区）",
+    "target_subject": "建築物",
+    "description": "高度地区内の建築物の高さが都市計画に定められた内容に適合することを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "58",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "集団規定",
+    "高度地区"
+  ],
+  "text_raw": "高度地区内においては、建築物の高さは、高度地区に関する都市計画において定められた内容に適合するものでなければならない。",
+  "kijo_diagram_ref": "CHK-BSL-A58-P1",
+  "flow_diagram": {
+    "title": "高度地区内建築物の高さ制限判定フロー",
+    "description": "高度地区内の建築物の高さが都市計画で定められた制限に適合するかを判定するフロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start"
+      },
+      {
+        "id": "dec-in-height-district",
+        "type": "decision",
+        "title": "敷地は高度地区内か？",
+        "decision_type": "binary",
+        "description": "建築物の敷地が都市計画法に基づき指定された高度地区内に位置するかを判定"
+      },
+      {
+        "id": "dec-limit-type",
+        "type": "decision",
+        "title": "高度地区の制限タイプは？",
+        "decision_type": "multi",
+        "description": "都市計画で定められた高さ制限が最高限度か最低限度かを確認",
+        "options": [
+          { "value": "最高限度", "description": "建築物の高さの最高限度が定められている" },
+          { "value": "最低限度", "description": "建築物の高さの最低限度が定められている" },
+          { "value": "両方", "description": "最高限度と最低限度の両方が定められている" }
+        ]
+      },
+      {
+        "id": "dec-max-height",
+        "type": "decision",
+        "title": "建築物の高さは最高限度以下か？",
+        "decision_type": "binary",
+        "description": "建築物の高さが都市計画で定められた最高限度を超えていないかを判定"
+      },
+      {
+        "id": "dec-min-height",
+        "type": "decision",
+        "title": "建築物の高さは最低限度以上か？",
+        "decision_type": "binary",
+        "description": "建築物の高さが都市計画で定められた最低限度を満たしているかを判定"
+      },
+      {
+        "id": "dec-both-max",
+        "type": "decision",
+        "title": "建築物の高さは最高限度以下か？",
+        "decision_type": "binary",
+        "description": "建築物の高さが都市計画で定められた最高限度を超えていないかを判定"
+      },
+      {
+        "id": "dec-both-min",
+        "type": "decision",
+        "title": "建築物の高さは最低限度以上か？",
+        "decision_type": "binary",
+        "description": "建築物の高さが都市計画で定められた最低限度を満たしているかを判定"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "法58条1項に適合"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "法58条1項に不適合"
+      },
+      {
+        "id": "pass-not-applicable",
+        "type": "terminal",
+        "title": "適用対象外",
+        "result": "pass",
+        "description": "高度地区外のため本項の適用対象外"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-in-height-district",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-in-height-district",
+        "to": "dec-limit-type",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "dec-in-height-district",
+        "to": "pass-not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e04",
+        "from": "dec-limit-type",
+        "to": "dec-max-height",
+        "role": "option",
+        "label": "最高限度"
+      },
+      {
+        "id": "e05",
+        "from": "dec-limit-type",
+        "to": "dec-min-height",
+        "role": "option",
+        "label": "最低限度"
+      },
+      {
+        "id": "e06",
+        "from": "dec-limit-type",
+        "to": "dec-both-max",
+        "role": "option",
+        "label": "両方"
+      },
+      {
+        "id": "e07",
+        "from": "dec-max-height",
+        "to": "pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e08",
+        "from": "dec-max-height",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e09",
+        "from": "dec-min-height",
+        "to": "pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e10",
+        "from": "dec-min-height",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e11",
+        "from": "dec-both-max",
+        "to": "dec-both-min",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e12",
+        "from": "dec-both-max",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e13",
+        "from": "dec-both-min",
+        "to": "pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e14",
+        "from": "dec-both-min",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "related_laws": [],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00Z",
+    "updated_at": "2025-12-25T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

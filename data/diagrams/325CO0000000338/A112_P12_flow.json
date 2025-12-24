@@ -1,0 +1,355 @@
+{
+  "id": "A112_P12_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "小規模病院等の竪穴区画",
+    "target_subject": "建築物",
+    "description": "3階を病院等に供する階数3・延べ面積200平方メートル未満の建築物の竪穴区画"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "112",
+    "paragraph": "12",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "防火区画",
+    "竪穴区画"
+  ],
+  "text_raw": "三階を病院、診療所（患者の収容施設があるものに限る。次項において同じ。）又は児童福祉施設等（入所する者の寝室があるものに限る。同項において同じ。）の用途に供する建築物のうち階数が三で延べ面積が二百平方メートル未満のもの（前項に規定する建築物を除く。）の竪穴部分については、当該竪穴部分以外の部分と間仕切壁又は法第二条第九号の二ロに規定する防火設備で区画しなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "building_use",
+          "value": "3階を病院・診療所（収容施設あり）・児童福祉施設等（入所寝室あり）"
+        },
+        {
+          "type": "numeric",
+          "value": "階数 = 3"
+        },
+        {
+          "type": "numeric",
+          "value": "延べ面積 < 200平方メートル"
+        },
+        {
+          "type": "exclusion",
+          "value": "第11項に規定する建築物を除く"
+        }
+      ]
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "requirement",
+          "value": "竪穴部分を間仕切壁または防火設備で区画"
+        }
+      ]
+    },
+    "exceptions": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "building_part",
+          "value": "スプリンクラー設備等を設けた居室等"
+        }
+      ],
+      "effect": "RELAX",
+      "description": "十分間防火設備で区画可"
+    }
+  },
+  "flow_diagram": {
+    "title": "小規模病院等の竪穴区画適合判定フロー",
+    "description": "3階を病院等に供する小規模建築物の竪穴区画の適合を判定するフロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "小規模病院等の竪穴区画適合判定の開始"
+      },
+      {
+        "id": "dec-3f-use",
+        "type": "decision",
+        "title": "3階の用途は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "病院", "description": "病院" },
+          { "value": "診療所（収容施設あり）", "description": "診療所（患者の収容施設があるもの）" },
+          { "value": "児童福祉施設等（入所寝室あり）", "description": "児童福祉施設等（入所する者の寝室があるもの）" },
+          { "value": "その他", "description": "上記以外の用途" }
+        ],
+        "description": "建築物の3階の用途を確認"
+      },
+      {
+        "id": "proc-use-applicable",
+        "type": "process",
+        "title": "対象用途に該当",
+        "process_type": "mechanical",
+        "description": "3階が病院、診療所（収容施設あり）、または児童福祉施設等（入所寝室あり）に該当"
+      },
+      {
+        "id": "dec-floor-count",
+        "type": "decision",
+        "title": "建築物の階数は3か？",
+        "decision_type": "binary",
+        "description": "建築物の階数が3であるかを確認"
+      },
+      {
+        "id": "proc-floor-count-ok",
+        "type": "process",
+        "title": "階数要件に該当",
+        "process_type": "mechanical",
+        "description": "階数が3である条件を満たす"
+      },
+      {
+        "id": "dec-area",
+        "type": "decision",
+        "title": "延べ面積は200平方メートル未満か？",
+        "decision_type": "binary",
+        "description": "建築物の延べ面積が200平方メートル未満であるかを確認"
+      },
+      {
+        "id": "proc-area-ok",
+        "type": "process",
+        "title": "延べ面積要件に該当",
+        "process_type": "mechanical",
+        "description": "延べ面積が200平方メートル未満の条件を満たす"
+      },
+      {
+        "id": "dec-p11-applicable",
+        "type": "decision",
+        "title": "第11項の対象建築物か？",
+        "decision_type": "binary",
+        "description": "前項（第11項）に規定する建築物に該当するか（準耐火構造等で地階または3階以上に居室を有する）",
+        "related_articles": ["令::A112:P11"]
+      },
+      {
+        "id": "proc-p11-excludes",
+        "type": "process",
+        "title": "第11項対象外を確認",
+        "process_type": "mechanical",
+        "description": "第11項に規定する建築物でないことを確認"
+      },
+      {
+        "id": "proc-shaft-identify",
+        "type": "process",
+        "title": "竪穴部分の特定",
+        "process_type": "undefined_input",
+        "description": "建築物内の竪穴部分（階段、吹抜き等）を特定"
+      },
+      {
+        "id": "dec-compartment-type",
+        "type": "decision",
+        "title": "区画の設置状況は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "間仕切壁", "description": "間仕切壁で区画" },
+          { "value": "法2条9号の2ロの防火設備", "description": "法第2条第9号の二ロに規定する防火設備で区画" },
+          { "value": "区画なし", "description": "適切な区画がない" }
+        ],
+        "description": "竪穴部分と竪穴部分以外の部分との区画状況を確認"
+      },
+      {
+        "id": "proc-compartment-ok",
+        "type": "process",
+        "title": "適切な区画が設置されている",
+        "process_type": "mechanical",
+        "description": "間仕切壁または防火設備で適切に区画されている"
+      },
+      {
+        "id": "dec-all-shafts-checked",
+        "type": "decision",
+        "title": "全ての竪穴部分を確認したか？",
+        "decision_type": "binary",
+        "description": "建築物内の全ての竪穴部分について確認が完了したか"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "第12項の竪穴区画規定に適合"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "第12項の竪穴区画規定に不適合"
+      },
+      {
+        "id": "not-applicable",
+        "type": "terminal",
+        "title": "適用対象外",
+        "result": "end",
+        "description": "本項の適用対象外（第11項が適用される場合を含む）"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-3f-use",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-3f-use",
+        "to": "proc-use-applicable",
+        "role": "option",
+        "label": "病院"
+      },
+      {
+        "id": "e03",
+        "from": "dec-3f-use",
+        "to": "proc-use-applicable",
+        "role": "option",
+        "label": "診療所（収容施設あり）"
+      },
+      {
+        "id": "e04",
+        "from": "dec-3f-use",
+        "to": "proc-use-applicable",
+        "role": "option",
+        "label": "児童福祉施設等（入所寝室あり）"
+      },
+      {
+        "id": "e05",
+        "from": "dec-3f-use",
+        "to": "not-applicable",
+        "role": "option",
+        "label": "その他"
+      },
+      {
+        "id": "e06",
+        "from": "proc-use-applicable",
+        "to": "dec-floor-count",
+        "role": "flow"
+      },
+      {
+        "id": "e07",
+        "from": "dec-floor-count",
+        "to": "proc-floor-count-ok",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e08",
+        "from": "dec-floor-count",
+        "to": "not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e09",
+        "from": "proc-floor-count-ok",
+        "to": "dec-area",
+        "role": "flow"
+      },
+      {
+        "id": "e10",
+        "from": "dec-area",
+        "to": "proc-area-ok",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e11",
+        "from": "dec-area",
+        "to": "not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e12",
+        "from": "proc-area-ok",
+        "to": "dec-p11-applicable",
+        "role": "flow"
+      },
+      {
+        "id": "e13",
+        "from": "dec-p11-applicable",
+        "to": "not-applicable",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e14",
+        "from": "dec-p11-applicable",
+        "to": "proc-p11-excludes",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e15",
+        "from": "proc-p11-excludes",
+        "to": "proc-shaft-identify",
+        "role": "flow"
+      },
+      {
+        "id": "e16",
+        "from": "proc-shaft-identify",
+        "to": "dec-compartment-type",
+        "role": "flow"
+      },
+      {
+        "id": "e17",
+        "from": "dec-compartment-type",
+        "to": "proc-compartment-ok",
+        "role": "option",
+        "label": "間仕切壁"
+      },
+      {
+        "id": "e18",
+        "from": "dec-compartment-type",
+        "to": "proc-compartment-ok",
+        "role": "option",
+        "label": "法2条9号の2ロの防火設備"
+      },
+      {
+        "id": "e19",
+        "from": "dec-compartment-type",
+        "to": "fail",
+        "role": "option",
+        "label": "区画なし"
+      },
+      {
+        "id": "e20",
+        "from": "proc-compartment-ok",
+        "to": "dec-all-shafts-checked",
+        "role": "flow"
+      },
+      {
+        "id": "e21",
+        "from": "dec-all-shafts-checked",
+        "to": "pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e22",
+        "from": "dec-all-shafts-checked",
+        "to": "proc-shaft-identify",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-KIJO-A112-P12",
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00.000Z",
+    "updated_at": "2025-12-25T00:00:00.000Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

@@ -1,0 +1,623 @@
+{
+  "id": "A52_P6_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "容積率算定の基礎となる延べ面積の不算入部分",
+    "target_subject": "建築物",
+    "description": "容積率計算において延べ面積に算入しない建築物の部分（昇降機昇降路、共用廊下・階段、機械室等）を特定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "52",
+    "paragraph": "6",
+    "item": null
+  },
+  "labels": [
+    "集団規定",
+    "容積率",
+    "床面積不算入"
+  ],
+  "text_raw": "第一項、第二項、次項、第十二項及び第十四項、第五十七条の二第三項第二号、第五十七条の三第二項、第五十九条第一項及び第三項、第五十九条の二第一項、第六十条第一項、第六十条の二第一項及び第四項、第六十八条の三第一項、第六十八条の四、第六十八条の五、第六十八条の五の二、第六十八条の五の三第一項、第六十八条の五の四（第一号ロを除く。）、第六十八条の五の五第一項第一号ロ、第六十八条の八、第六十八条の九第一項、第八十六条第三項及び第四項、第八十六条の二第二項及び第三項、第八十六条の五第三項並びに第八十六条の六第一項に規定する建築物の容積率の算定の基礎となる延べ面積には、次に掲げる建築物の部分の床面積は、算入しないものとする。\n一　政令で定める昇降機の昇降路の部分\n二　共同住宅又は老人ホーム等の共用の廊下又は階段の用に供する部分\n三　住宅又は老人ホーム等に設ける機械室その他これに類する建築物の部分（給湯設備その他の国土交通省令で定める建築設備を設置するためのものであつて、市街地の環境を害するおそれがないものとして国土交通省令で定める基準に適合するものに限る。）で、特定行政庁が交通上、安全上、防火上及び衛生上支障がないと認めるもの",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "value": true,
+      "conditions": [
+        {
+          "type": "applicability",
+          "value": "容積率規定が適用される建築物"
+        }
+      ],
+      "note": "法第52条第1項等の容積率規定の適用を受ける建築物が対象"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "type": "match",
+          "value": "昇降機昇降路該当（政令で定めるもの）"
+        },
+        {
+          "type": "match",
+          "value": "共同住宅等の共用廊下・階段該当"
+        },
+        {
+          "type": "AND",
+          "conditions": [
+            {
+              "type": "match",
+              "value": "住宅等の機械室該当"
+            },
+            {
+              "type": "match",
+              "value": "建築設備要件適合"
+            },
+            {
+              "type": "match",
+              "value": "環境基準適合"
+            },
+            {
+              "type": "approval",
+              "value": "特定行政庁認定"
+            }
+          ]
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "flow_diagram": {
+    "title": "容積率算定延べ面積不算入部分判定フロー",
+    "description": "建築物の各部分が容積率算定の延べ面積に算入されない3つの要件（第1号〜第3号）のいずれかに該当するかを判定するフロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "審査開始",
+        "result": "start",
+        "description": "容積率算定延べ面積不算入部分の判定を開始"
+      },
+      {
+        "id": "dec-part-type",
+        "type": "decision",
+        "title": "建築物の部分の種別は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "昇降機昇降路" },
+          { "value": "廊下・階段" },
+          { "value": "機械室等" },
+          { "value": "その他" }
+        ],
+        "description": "当該建築物の部分の種別を判定"
+      },
+      {
+        "id": "proc-elevator-type",
+        "type": "process",
+        "title": "昇降機昇降路該当",
+        "description": "昇降機昇降路として第1号の判定へ進む"
+      },
+      {
+        "id": "dec-elevator-type-detail",
+        "type": "decision",
+        "title": "昇降機の種別は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "エレベーター昇降路" },
+          { "value": "エスカレーター昇降路" },
+          { "value": "その他" }
+        ],
+        "description": "政令で定める昇降機（エレベーター・エスカレーター）の昇降路に該当するか",
+        "related_articles": ["令::A135_17"]
+      },
+      {
+        "id": "proc-item1-match",
+        "type": "process",
+        "title": "第1号該当",
+        "description": "政令で定める昇降機の昇降路の部分に該当"
+      },
+      {
+        "id": "dec-escalator-projection",
+        "type": "decision",
+        "title": "水平投影面積が床面積に算入されるか？",
+        "decision_type": "binary",
+        "description": "エスカレーターの水平投影面積が床面積に算入される場合は当該面積を除く"
+      },
+      {
+        "id": "proc-escalator-match",
+        "type": "process",
+        "title": "エスカレーター昇降路該当",
+        "description": "エスカレーターの昇降路（水平投影面積が床面積に算入されない場合）"
+      },
+      {
+        "id": "proc-escalator-not-match",
+        "type": "process",
+        "title": "エスカレーター水平投影面積除外",
+        "description": "水平投影面積が床面積に算入される場合は当該面積を除く"
+      },
+      {
+        "id": "proc-corridor-type",
+        "type": "process",
+        "title": "廊下・階段該当",
+        "description": "廊下又は階段として第2号の判定へ進む"
+      },
+      {
+        "id": "dec-building-use-corridor",
+        "type": "decision",
+        "title": "建築物の用途は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "共同住宅" },
+          { "value": "老人ホーム等" },
+          { "value": "その他" }
+        ],
+        "description": "建築物の用途が共同住宅又は老人ホーム等であるか"
+      },
+      {
+        "id": "proc-corridor-use-eligible",
+        "type": "process",
+        "title": "用途要件適合",
+        "description": "共同住宅又は老人ホーム等の用途であることを確認"
+      },
+      {
+        "id": "proc-corridor-use-not-eligible",
+        "type": "process",
+        "title": "用途要件不適合",
+        "description": "共同住宅・老人ホーム等以外の用途のため第2号不算入対象外"
+      },
+      {
+        "id": "dec-is-common",
+        "type": "decision",
+        "title": "共用の廊下又は階段か？",
+        "decision_type": "binary",
+        "description": "当該部分が共用の用に供されるか"
+      },
+      {
+        "id": "proc-item2-match",
+        "type": "process",
+        "title": "第2号該当",
+        "description": "共同住宅又は老人ホーム等の共用の廊下又は階段の用に供する部分に該当"
+      },
+      {
+        "id": "proc-common-not-eligible",
+        "type": "process",
+        "title": "共用でない",
+        "description": "共用でないため第2号不算入対象外"
+      },
+      {
+        "id": "proc-mechanical-type",
+        "type": "process",
+        "title": "機械室等該当",
+        "description": "機械室その他これに類する部分として第3号の判定へ進む"
+      },
+      {
+        "id": "dec-building-use-mechanical",
+        "type": "decision",
+        "title": "建築物の用途は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "住宅" },
+          { "value": "老人ホーム等" },
+          { "value": "その他" }
+        ],
+        "description": "建築物の用途が住宅又は老人ホーム等であるか"
+      },
+      {
+        "id": "proc-mechanical-use-eligible",
+        "type": "process",
+        "title": "用途要件適合",
+        "description": "住宅又は老人ホーム等の用途であることを確認"
+      },
+      {
+        "id": "proc-mechanical-use-not-eligible",
+        "type": "process",
+        "title": "用途要件不適合",
+        "description": "住宅・老人ホーム等以外の用途のため第3号不算入対象外"
+      },
+      {
+        "id": "dec-equipment-compliance",
+        "type": "decision",
+        "title": "省令定め建築設備設置用か？",
+        "decision_type": "binary",
+        "description": "給湯設備その他の国土交通省令で定める建築設備を設置するためのものか",
+        "related_articles": ["規則::A1_4_2"]
+      },
+      {
+        "id": "proc-equipment-eligible",
+        "type": "process",
+        "title": "設備要件適合",
+        "description": "国土交通省令で定める建築設備を設置するための部分であることを確認"
+      },
+      {
+        "id": "proc-equipment-not-eligible",
+        "type": "process",
+        "title": "設備要件不適合",
+        "description": "省令定め建築設備を設置するための部分でないため第3号不算入対象外"
+      },
+      {
+        "id": "dec-env-compliance",
+        "type": "decision",
+        "title": "市街地環境基準に適合するか？",
+        "decision_type": "binary",
+        "description": "市街地の環境を害するおそれがないものとして国土交通省令で定める基準に適合するか",
+        "related_articles": ["規則::A1_4_2"]
+      },
+      {
+        "id": "proc-env-eligible",
+        "type": "process",
+        "title": "環境基準適合",
+        "description": "国土交通省令で定める環境基準に適合することを確認"
+      },
+      {
+        "id": "proc-env-not-eligible",
+        "type": "process",
+        "title": "環境基準不適合",
+        "description": "省令定め環境基準に適合しないため第3号不算入対象外"
+      },
+      {
+        "id": "dec-admin-approval",
+        "type": "decision",
+        "title": "特定行政庁の認定を受けたか？",
+        "decision_type": "binary",
+        "description": "特定行政庁が交通上、安全上、防火上及び衛生上支障がないと認めたか"
+      },
+      {
+        "id": "proc-item3-match",
+        "type": "process",
+        "title": "第3号該当",
+        "description": "住宅又は老人ホーム等に設ける機械室等で全要件適合に該当"
+      },
+      {
+        "id": "proc-approval-not-granted",
+        "type": "process",
+        "title": "認定なし",
+        "description": "特定行政庁の認定がないため第3号不算入対象外"
+      },
+      {
+        "id": "proc-other-type",
+        "type": "process",
+        "title": "その他の部分",
+        "description": "第1号〜第3号のいずれにも該当しない部分"
+      },
+      {
+        "id": "proc-floor-exclusion",
+        "type": "process",
+        "title": "床面積不算入適用",
+        "process_type": "mechanical",
+        "description": "当該部分の床面積を容積率算定の延べ面積に算入しない"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合（床面積不算入）",
+        "result": "pass",
+        "description": "当該部分の床面積は容積率算定の延べ面積に算入しない"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "不適合（不算入対象外）",
+        "result": "fail",
+        "description": "第6項各号のいずれにも該当しないため通常の容積率算定を適用"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-part-type",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-part-type",
+        "to": "proc-elevator-type",
+        "role": "option",
+        "label": "昇降機昇降路"
+      },
+      {
+        "id": "e03",
+        "from": "dec-part-type",
+        "to": "proc-corridor-type",
+        "role": "option",
+        "label": "廊下・階段"
+      },
+      {
+        "id": "e04",
+        "from": "dec-part-type",
+        "to": "proc-mechanical-type",
+        "role": "option",
+        "label": "機械室等"
+      },
+      {
+        "id": "e05",
+        "from": "dec-part-type",
+        "to": "proc-other-type",
+        "role": "option",
+        "label": "その他"
+      },
+      {
+        "id": "e06",
+        "from": "proc-elevator-type",
+        "to": "dec-elevator-type-detail",
+        "role": "flow"
+      },
+      {
+        "id": "e07",
+        "from": "dec-elevator-type-detail",
+        "to": "proc-item1-match",
+        "role": "option",
+        "label": "エレベーター昇降路"
+      },
+      {
+        "id": "e08",
+        "from": "dec-elevator-type-detail",
+        "to": "dec-escalator-projection",
+        "role": "option",
+        "label": "エスカレーター昇降路"
+      },
+      {
+        "id": "e09",
+        "from": "dec-elevator-type-detail",
+        "to": "proc-other-type",
+        "role": "option",
+        "label": "その他"
+      },
+      {
+        "id": "e10",
+        "from": "dec-escalator-projection",
+        "to": "proc-escalator-not-match",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e11",
+        "from": "dec-escalator-projection",
+        "to": "proc-escalator-match",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e12",
+        "from": "proc-escalator-match",
+        "to": "proc-item1-match",
+        "role": "flow"
+      },
+      {
+        "id": "e13",
+        "from": "proc-escalator-not-match",
+        "to": "fail",
+        "role": "flow"
+      },
+      {
+        "id": "e14",
+        "from": "proc-item1-match",
+        "to": "proc-floor-exclusion",
+        "role": "flow"
+      },
+      {
+        "id": "e15",
+        "from": "proc-corridor-type",
+        "to": "dec-building-use-corridor",
+        "role": "flow"
+      },
+      {
+        "id": "e16",
+        "from": "dec-building-use-corridor",
+        "to": "proc-corridor-use-eligible",
+        "role": "option",
+        "label": "共同住宅"
+      },
+      {
+        "id": "e17",
+        "from": "dec-building-use-corridor",
+        "to": "proc-corridor-use-eligible",
+        "role": "option",
+        "label": "老人ホーム等"
+      },
+      {
+        "id": "e18",
+        "from": "dec-building-use-corridor",
+        "to": "proc-corridor-use-not-eligible",
+        "role": "option",
+        "label": "その他"
+      },
+      {
+        "id": "e19",
+        "from": "proc-corridor-use-not-eligible",
+        "to": "fail",
+        "role": "flow"
+      },
+      {
+        "id": "e20",
+        "from": "proc-corridor-use-eligible",
+        "to": "dec-is-common",
+        "role": "flow"
+      },
+      {
+        "id": "e21",
+        "from": "dec-is-common",
+        "to": "proc-item2-match",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e22",
+        "from": "dec-is-common",
+        "to": "proc-common-not-eligible",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e23",
+        "from": "proc-common-not-eligible",
+        "to": "fail",
+        "role": "flow"
+      },
+      {
+        "id": "e24",
+        "from": "proc-item2-match",
+        "to": "proc-floor-exclusion",
+        "role": "flow"
+      },
+      {
+        "id": "e25",
+        "from": "proc-mechanical-type",
+        "to": "dec-building-use-mechanical",
+        "role": "flow"
+      },
+      {
+        "id": "e26",
+        "from": "dec-building-use-mechanical",
+        "to": "proc-mechanical-use-eligible",
+        "role": "option",
+        "label": "住宅"
+      },
+      {
+        "id": "e27",
+        "from": "dec-building-use-mechanical",
+        "to": "proc-mechanical-use-eligible",
+        "role": "option",
+        "label": "老人ホーム等"
+      },
+      {
+        "id": "e28",
+        "from": "dec-building-use-mechanical",
+        "to": "proc-mechanical-use-not-eligible",
+        "role": "option",
+        "label": "その他"
+      },
+      {
+        "id": "e29",
+        "from": "proc-mechanical-use-not-eligible",
+        "to": "fail",
+        "role": "flow"
+      },
+      {
+        "id": "e30",
+        "from": "proc-mechanical-use-eligible",
+        "to": "dec-equipment-compliance",
+        "role": "flow"
+      },
+      {
+        "id": "e31",
+        "from": "dec-equipment-compliance",
+        "to": "proc-equipment-eligible",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e32",
+        "from": "dec-equipment-compliance",
+        "to": "proc-equipment-not-eligible",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e33",
+        "from": "proc-equipment-not-eligible",
+        "to": "fail",
+        "role": "flow"
+      },
+      {
+        "id": "e34",
+        "from": "proc-equipment-eligible",
+        "to": "dec-env-compliance",
+        "role": "flow"
+      },
+      {
+        "id": "e35",
+        "from": "dec-env-compliance",
+        "to": "proc-env-eligible",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e36",
+        "from": "dec-env-compliance",
+        "to": "proc-env-not-eligible",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e37",
+        "from": "proc-env-not-eligible",
+        "to": "fail",
+        "role": "flow"
+      },
+      {
+        "id": "e38",
+        "from": "proc-env-eligible",
+        "to": "dec-admin-approval",
+        "role": "flow"
+      },
+      {
+        "id": "e39",
+        "from": "dec-admin-approval",
+        "to": "proc-item3-match",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e40",
+        "from": "dec-admin-approval",
+        "to": "proc-approval-not-granted",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e41",
+        "from": "proc-approval-not-granted",
+        "to": "fail",
+        "role": "flow"
+      },
+      {
+        "id": "e42",
+        "from": "proc-item3-match",
+        "to": "proc-floor-exclusion",
+        "role": "flow"
+      },
+      {
+        "id": "e43",
+        "from": "proc-other-type",
+        "to": "fail",
+        "role": "flow"
+      },
+      {
+        "id": "e44",
+        "from": "proc-floor-exclusion",
+        "to": "pass",
+        "role": "flow"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-A52-P6",
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "delegates_to",
+      "articles": ["A135_17"],
+      "description": "昇降機の昇降路の範囲を政令で規定"
+    },
+    {
+      "law_id": "325M50004000040",
+      "law_name": "建築基準法施行規則",
+      "law_type": "regulation",
+      "relationship": "delegates_to",
+      "articles": ["A1_4_2"],
+      "description": "建築設備の種類及び環境基準を国土交通省令で規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00.000Z",
+    "author": "Claude Opus 4.5",
+    "generator": "flow-generator-skill",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法",
+    "checklist_ref": "確認審査報告書チェックリスト.csv 行102"
+  }
+}

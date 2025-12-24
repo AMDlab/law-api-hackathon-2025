@@ -1,0 +1,205 @@
+{
+  "id": "A52_P2_I3_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "容積率（前面道路幅員制限・その他の建築物）",
+    "target_subject": "建築物",
+    "description": "前面道路幅員が12メートル未満の場合における、商業地域・工業地域等の建築物の容積率制限適合判定フロー"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "52",
+    "paragraph": "2",
+    "item": "3"
+  },
+  "labels": [
+    "集団規定",
+    "容積率",
+    "前面道路制限"
+  ],
+  "text_raw": "三　その他の建築物　十分の六（特定行政庁が都道府県都市計画審議会の議を経て指定する区域内の建築物にあつては、十分の四又は十分の八のうち特定行政庁が都道府県都市計画審議会の議を経て定めるもの）",
+  "kijo_diagram_ref": "CHK-BSL-A52-P2-I3",
+  "flow_diagram": {
+    "title": "その他建築物の前面道路容積率制限適合判定フロー",
+    "description": "法第52条第2項第3号に基づく前面道路幅員による容積率制限の適合判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "その他建築物（商業地域、工業地域等）の前面道路容積率制限適合判定を開始"
+      },
+      {
+        "id": "dec-designated-area",
+        "type": "decision",
+        "title": "特定行政庁指定区域内か？",
+        "decision_type": "binary",
+        "description": "特定行政庁が都道府県都市計画審議会の議を経て指定する区域内に所在するか判定",
+        "related_articles": ["法::A52:P2:I3"]
+      },
+      {
+        "id": "dec-designated-coefficient",
+        "type": "decision",
+        "title": "指定区域の係数は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "4/10", "description": "十分の四" },
+          { "value": "8/10", "description": "十分の八" }
+        ],
+        "description": "特定行政庁が都道府県都市計画審議会の議を経て定めた係数（4/10または8/10）を確認",
+        "related_articles": ["法::A52:P2:I3"]
+      },
+      {
+        "id": "proc-calc-limit-default",
+        "type": "process",
+        "title": "容積率上限算定（係数6/10）",
+        "process_type": "mechanical",
+        "description": "前面道路幅員(m) × 6/10 で容積率上限を算定"
+      },
+      {
+        "id": "proc-calc-limit-4",
+        "type": "process",
+        "title": "容積率上限算定（係数4/10）",
+        "process_type": "mechanical",
+        "description": "前面道路幅員(m) × 4/10 で容積率上限を算定"
+      },
+      {
+        "id": "proc-calc-limit-8",
+        "type": "process",
+        "title": "容積率上限算定（係数8/10）",
+        "process_type": "mechanical",
+        "description": "前面道路幅員(m) × 8/10 で容積率上限を算定"
+      },
+      {
+        "id": "proc-calc-volume",
+        "type": "process",
+        "title": "計画容積率の算定",
+        "process_type": "mechanical",
+        "description": "建築物の延べ面積を敷地面積で除して計画容積率を算定（V = A_total / A_site）"
+      },
+      {
+        "id": "dec-compliance",
+        "type": "decision",
+        "title": "計画容積率は上限以下か？",
+        "decision_type": "binary",
+        "description": "建築物の計画容積率が前面道路幅員による容積率上限以下であるか判定",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "V", "desc": "計画容積率" },
+          "rhs": { "var": "V_limit", "desc": "容積率上限" }
+        },
+        "related_articles": ["法::A52:P2:I3"]
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "計画容積率が前面道路幅員による上限以下であり、法第52条第2項第3号に適合"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "計画容積率が前面道路幅員による上限を超過しており、法第52条第2項第3号に不適合"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-designated-area",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-designated-area",
+        "to": "dec-designated-coefficient",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "dec-designated-area",
+        "to": "proc-calc-limit-default",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e04",
+        "from": "dec-designated-coefficient",
+        "to": "proc-calc-limit-4",
+        "role": "option",
+        "label": "4/10"
+      },
+      {
+        "id": "e05",
+        "from": "dec-designated-coefficient",
+        "to": "proc-calc-limit-8",
+        "role": "option",
+        "label": "8/10"
+      },
+      {
+        "id": "e06",
+        "from": "proc-calc-limit-default",
+        "to": "proc-calc-volume",
+        "role": "flow"
+      },
+      {
+        "id": "e07",
+        "from": "proc-calc-limit-4",
+        "to": "proc-calc-volume",
+        "role": "flow"
+      },
+      {
+        "id": "e08",
+        "from": "proc-calc-limit-8",
+        "to": "proc-calc-volume",
+        "role": "flow"
+      },
+      {
+        "id": "e09",
+        "from": "proc-calc-volume",
+        "to": "dec-compliance",
+        "role": "flow"
+      },
+      {
+        "id": "e10",
+        "from": "dec-compliance",
+        "to": "pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e11",
+        "from": "dec-compliance",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A52:P1", "A52:P2"],
+      "description": "第1項で容積率の定義、第2項本文で前面道路幅員制限を規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00Z",
+    "updated_at": "2025-12-25T00:00:00Z",
+    "author": "Claude Opus 4.5",
+    "generator": "flow-generator-skill-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

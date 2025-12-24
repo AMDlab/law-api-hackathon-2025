@@ -1,0 +1,231 @@
+{
+  "id": "A68_9_P2_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "準景観地区内の建築物規制",
+    "target_subject": "建築物",
+    "description": "準景観地区内において市町村が定めた建築物の高さ・壁面位置等の制限に適合することを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "68_9",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": ["集団規定", "景観"],
+  "text_raw": "景観法第七十四条第一項の準景観地区内においては、市町村は、良好な景観の保全を図るため必要があると認めるときは、政令で定める基準に従い、条例で、建築物の高さ、壁面の位置その他の建築物の構造又は敷地に関して必要な制限を定めることができる。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "準景観地区内"
+        }
+      ],
+      "note": "景観法第74条第1項に基づく準景観地区内に限定"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-landscape-necessity",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "operator": "AND",
+          "conditions": [
+            {
+              "ref": "info-height-compliance",
+              "operator": "==",
+              "value": true
+            },
+            {
+              "ref": "info-wallface-compliance",
+              "operator": "==",
+              "value": true
+            },
+            {
+              "ref": "info-structure-compliance",
+              "operator": "==",
+              "value": true
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "flow_diagram": {
+    "title": "準景観地区内建築物規制の判定フロー",
+    "description": "準景観地区内の建築物が条例で定められた制限に適合するか判定するフロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start"
+      },
+      {
+        "id": "dec-location-in-area",
+        "type": "decision",
+        "title": "準景観地区内か？",
+        "decision_type": "binary",
+        "description": "敷地が景観法第74条第1項に基づく準景観地区内に位置するか確認"
+      },
+      {
+        "id": "dec-ordinance-exists",
+        "type": "decision",
+        "title": "条例で制限が定められているか？",
+        "decision_type": "binary",
+        "description": "市町村が条例で建築物の高さ、壁面の位置等の制限を定めているか確認"
+      },
+      {
+        "id": "dec-restriction-type",
+        "type": "decision",
+        "title": "条例で定められた制限の種類は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "高さ制限" },
+          { "value": "壁面位置制限" },
+          { "value": "構造・敷地制限" },
+          { "value": "複合制限" }
+        ],
+        "description": "条例で定められた制限の種類を確認"
+      },
+      {
+        "id": "proc-height-check",
+        "type": "process",
+        "title": "高さ制限の確認対象",
+        "process_type": "mechanical",
+        "description": "高さ制限が適用される"
+      },
+      {
+        "id": "dec-height-compliance",
+        "type": "decision",
+        "title": "高さ制限を満たすか？",
+        "decision_type": "binary",
+        "description": "建築物の高さが条例で定められた制限値以下か確認"
+      },
+      {
+        "id": "proc-wallface-check",
+        "type": "process",
+        "title": "壁面位置制限の確認対象",
+        "process_type": "mechanical",
+        "description": "壁面位置制限が適用される"
+      },
+      {
+        "id": "dec-wallface-compliance",
+        "type": "decision",
+        "title": "壁面位置制限を満たすか？",
+        "decision_type": "binary",
+        "description": "建築物の壁面位置が条例で定められた制限を満たすか確認"
+      },
+      {
+        "id": "proc-structure-check",
+        "type": "process",
+        "title": "構造・敷地制限の確認対象",
+        "process_type": "mechanical",
+        "description": "構造又は敷地に関する制限が適用される"
+      },
+      {
+        "id": "dec-structure-compliance",
+        "type": "decision",
+        "title": "構造・敷地制限を満たすか？",
+        "decision_type": "binary",
+        "description": "建築物の構造及び敷地が条例で定められた制限を満たすか確認"
+      },
+      {
+        "id": "proc-all-restrictions",
+        "type": "process",
+        "title": "複合制限の確認",
+        "process_type": "mechanical",
+        "description": "複数の制限が定められている場合、すべてを確認"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "準景観地区内の建築物制限に適合"
+      },
+      {
+        "id": "pass-no-ordinance",
+        "type": "terminal",
+        "title": "規定対象外（条例なし）",
+        "result": "pass",
+        "description": "条例で制限が定められていないため規制対象外"
+      },
+      {
+        "id": "fail-outside-area",
+        "type": "terminal",
+        "title": "規定対象外（区域外）",
+        "result": "pass",
+        "description": "準景観地区外のため本規定の対象外"
+      },
+      {
+        "id": "fail-height",
+        "type": "terminal",
+        "title": "不適合（高さ制限違反）",
+        "result": "fail",
+        "description": "建築物の高さが条例の制限を超過"
+      },
+      {
+        "id": "fail-wallface",
+        "type": "terminal",
+        "title": "不適合（壁面位置違反）",
+        "result": "fail",
+        "description": "建築物の壁面位置が条例の制限を満たさない"
+      },
+      {
+        "id": "fail-structure",
+        "type": "terminal",
+        "title": "不適合（構造・敷地違反）",
+        "result": "fail",
+        "description": "建築物の構造又は敷地が条例の制限を満たさない"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "dec-location-in-area", "role": "flow" },
+      { "id": "e02", "from": "dec-location-in-area", "to": "dec-ordinance-exists", "role": "yes", "label": "はい" },
+      { "id": "e03", "from": "dec-location-in-area", "to": "fail-outside-area", "role": "no", "label": "いいえ" },
+      { "id": "e04", "from": "dec-ordinance-exists", "to": "dec-restriction-type", "role": "yes", "label": "はい" },
+      { "id": "e05", "from": "dec-ordinance-exists", "to": "pass-no-ordinance", "role": "no", "label": "いいえ" },
+      { "id": "e06", "from": "dec-restriction-type", "to": "proc-height-check", "role": "option", "label": "高さ制限" },
+      { "id": "e07", "from": "dec-restriction-type", "to": "proc-wallface-check", "role": "option", "label": "壁面位置制限" },
+      { "id": "e08", "from": "dec-restriction-type", "to": "proc-structure-check", "role": "option", "label": "構造・敷地制限" },
+      { "id": "e09", "from": "dec-restriction-type", "to": "proc-all-restrictions", "role": "option", "label": "複合制限" },
+      { "id": "e10", "from": "proc-height-check", "to": "dec-height-compliance", "role": "flow" },
+      { "id": "e11", "from": "dec-height-compliance", "to": "pass", "role": "yes", "label": "はい" },
+      { "id": "e12", "from": "dec-height-compliance", "to": "fail-height", "role": "no", "label": "いいえ" },
+      { "id": "e13", "from": "proc-wallface-check", "to": "dec-wallface-compliance", "role": "flow" },
+      { "id": "e14", "from": "dec-wallface-compliance", "to": "pass", "role": "yes", "label": "はい" },
+      { "id": "e15", "from": "dec-wallface-compliance", "to": "fail-wallface", "role": "no", "label": "いいえ" },
+      { "id": "e16", "from": "proc-structure-check", "to": "dec-structure-compliance", "role": "flow" },
+      { "id": "e17", "from": "dec-structure-compliance", "to": "pass", "role": "yes", "label": "はい" },
+      { "id": "e18", "from": "dec-structure-compliance", "to": "fail-structure", "role": "no", "label": "いいえ" },
+      { "id": "e19", "from": "proc-all-restrictions", "to": "dec-height-compliance", "role": "flow" }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-A68-9-P2",
+  "related_laws": [
+    {
+      "law_id": "法",
+      "law_name": "景観法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A74"],
+      "description": "準景観地区の定義(景観法第74条第1項)を参照"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

@@ -1,0 +1,244 @@
+{
+  "id": "A56_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "建築物の各部分の高さ制限",
+    "target_subject": "建築物",
+    "description": "建築物の各部分が別表第三に基づく道路斜線制限、隣地斜線制限、北側斜線制限のいずれかを満たすことを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "56",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "集団規定",
+    "高さ制限",
+    "道路斜線制限",
+    "隣地斜線制限",
+    "北側斜線制限"
+  ],
+  "text_raw": "建築物の各部分の高さは、次に掲げるもの以下としなければならない。一別表第三（い）欄及び（ろ）欄に掲げる地域、地区又は区域及び容積率の限度の区分に応じ、前面道路の反対側の境界線からの水平距離が同表（は）欄に掲げる距離以下の範囲内においては、当該部分から前面道路の反対側の境界線までの水平距離に、同表（に）欄に掲げる数値を乗じて得たもの二当該部分から隣地境界線までの水平距離に、次に掲げる区分に従い、イ若しくはニに定める数値が一・二五とされている建築物で高さが二十メートルを超える部分を有するもの又はイからニまでに定める数値が二・五とされている建築物（ロ及びハに掲げる建築物で、特定行政庁が都道府県都市計画審議会の議を経て指定する区域内にあるものを除く。以下この号及び第七項第二号において同じ。）で高さが三十一メートルを超える部分を有するものにあつては、それぞれその部分から隣地境界線までの水平距離のうち最小のものに相当する距離を加えたものに、イからニまでに定める数値を乗じて得たものに、イ又はニに定める数値が一・二五とされている建築物にあつては二十メートルを、イからニまでに定める数値が二・五とされている建築物にあつては三十一メートルを加えたもの三第一種低層住居専用地域、第二種低層住居専用地域若しくは田園住居地域内又は第一種中高層住居専用地域若しくは第二種中高層住居専用地域（次条第一項の規定に基づく条例で別表第四の二の項に規定する（一）、（二）又は（三）の号が指定されているものを除く。以下この号及び第七項第三号において同じ。）内においては、当該部分から前面道路の反対側の境界線又は隣地境界線までの真北方向の水平距離に一・二五を乗じて得たものに、第一種低層住居専用地域、第二種低層住居専用地域又は田園住居地域内の建築物にあつては五メートルを、第一種中高層住居専用地域又は第二種中高層住居専用地域内の建築物にあつては十メートルを加えたもの",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "別表第三に定める地域・地区・区域"
+        }
+      ],
+      "note": "用途地域、容積率により高さ制限が異なる"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "note": "各部分が適用される制限値以下",
+          "ref": "info-part-compliance",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    }
+  },
+  "flow_diagram": {
+    "title": "法56条1項 高さ制限適合判定フロー",
+    "description": "建築物の各部分について、道路斜線・隣地斜線・北側斜線の各制限への適合を判定する",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "法56条1項の高さ制限適合判定を開始"
+      },
+      {
+        "id": "dec-zone-type",
+        "type": "decision",
+        "title": "用途地域は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "住居系地域" },
+          { "value": "商業系地域" },
+          { "value": "工業系地域" },
+          { "value": "低層住居専用地域等" }
+        ],
+        "description": "敷地の用途地域を確認し、適用される斜線制限を特定"
+      },
+      {
+        "id": "proc-building-parts",
+        "type": "process",
+        "title": "建築物各部分の特定",
+        "process_type": "undefined_input",
+        "description": "判定対象となる建築物の各部分（最高高さ位置等）を特定"
+      },
+      {
+        "id": "dec-road-slope-applicable",
+        "type": "decision",
+        "title": "道路斜線制限の対象か？",
+        "decision_type": "binary",
+        "description": "別表第三に定める地域・地区・区域内で道路斜線制限が適用されるか"
+      },
+      {
+        "id": "proc-road-slope-calc",
+        "type": "process",
+        "title": "道路斜線制限高さ算出",
+        "process_type": "mechanical",
+        "description": "各部分の道路斜線制限高さを計算（D_road × K_road）"
+      },
+      {
+        "id": "dec-road-slope-check",
+        "type": "decision",
+        "title": "各部分の高さが道路斜線制限以下か？",
+        "decision_type": "binary",
+        "description": "H ≤ H_road_limit を判定"
+      },
+      {
+        "id": "proc-road-pass",
+        "type": "process",
+        "title": "道路斜線適合",
+        "description": "道路斜線制限に適合"
+      },
+      {
+        "id": "dec-adjacent-slope-applicable",
+        "type": "decision",
+        "title": "隣地斜線制限の対象か？",
+        "decision_type": "binary",
+        "description": "隣地斜線制限が適用される地域か"
+      },
+      {
+        "id": "proc-adjacent-slope-calc",
+        "type": "process",
+        "title": "隣地斜線制限高さ算出",
+        "process_type": "mechanical",
+        "description": "各部分の隣地斜線制限高さを計算（D_adj × 係数 + 立上高さ）"
+      },
+      {
+        "id": "dec-adjacent-slope-check",
+        "type": "decision",
+        "title": "各部分の高さが隣地斜線制限以下か？",
+        "decision_type": "binary",
+        "description": "H ≤ H_adj_limit を判定"
+      },
+      {
+        "id": "proc-adjacent-pass",
+        "type": "process",
+        "title": "隣地斜線適合",
+        "description": "隣地斜線制限に適合"
+      },
+      {
+        "id": "dec-north-slope-applicable",
+        "type": "decision",
+        "title": "北側斜線制限の対象か？",
+        "decision_type": "binary",
+        "description": "低層住居専用地域・田園住居地域・中高層住居専用地域か"
+      },
+      {
+        "id": "dec-north-zone-type",
+        "type": "decision",
+        "title": "北側斜線の立上高さは？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "5m", "description": "低層住居専用地域・田園住居地域" },
+          { "value": "10m", "description": "中高層住居専用地域" }
+        ],
+        "description": "用途地域に応じた北側斜線の立上高さを特定"
+      },
+      {
+        "id": "proc-north-slope-calc",
+        "type": "process",
+        "title": "北側斜線制限高さ算出",
+        "process_type": "mechanical",
+        "description": "各部分の北側斜線制限高さを計算（D_north × 1.25 + 立上高さ）"
+      },
+      {
+        "id": "dec-north-slope-check",
+        "type": "decision",
+        "title": "各部分の高さが北側斜線制限以下か？",
+        "decision_type": "binary",
+        "description": "H ≤ H_north_limit を判定"
+      },
+      {
+        "id": "proc-north-pass",
+        "type": "process",
+        "title": "北側斜線適合",
+        "description": "北側斜線制限に適合"
+      },
+      {
+        "id": "dec-all-parts-check",
+        "type": "decision",
+        "title": "全ての部分で斜線制限に適合か？",
+        "decision_type": "binary",
+        "description": "建築物の全ての部分が適用される斜線制限に適合しているか"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "法56条1項の高さ制限に適合"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "法56条1項の高さ制限に不適合"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "dec-zone-type", "role": "flow" },
+      { "id": "e02", "from": "dec-zone-type", "to": "proc-building-parts", "role": "option", "label": "住居系地域" },
+      { "id": "e03", "from": "dec-zone-type", "to": "proc-building-parts", "role": "option", "label": "商業系地域" },
+      { "id": "e04", "from": "dec-zone-type", "to": "proc-building-parts", "role": "option", "label": "工業系地域" },
+      { "id": "e05", "from": "dec-zone-type", "to": "proc-building-parts", "role": "option", "label": "低層住居専用地域等" },
+      { "id": "e06", "from": "proc-building-parts", "to": "dec-road-slope-applicable", "role": "flow" },
+      { "id": "e07", "from": "dec-road-slope-applicable", "to": "proc-road-slope-calc", "role": "yes", "label": "はい" },
+      { "id": "e08", "from": "dec-road-slope-applicable", "to": "dec-adjacent-slope-applicable", "role": "no", "label": "いいえ" },
+      { "id": "e09", "from": "proc-road-slope-calc", "to": "dec-road-slope-check", "role": "flow" },
+      { "id": "e10", "from": "dec-road-slope-check", "to": "proc-road-pass", "role": "yes", "label": "はい" },
+      { "id": "e11", "from": "dec-road-slope-check", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e12", "from": "proc-road-pass", "to": "dec-adjacent-slope-applicable", "role": "flow" },
+      { "id": "e13", "from": "dec-adjacent-slope-applicable", "to": "proc-adjacent-slope-calc", "role": "yes", "label": "はい" },
+      { "id": "e14", "from": "dec-adjacent-slope-applicable", "to": "dec-north-slope-applicable", "role": "no", "label": "いいえ" },
+      { "id": "e15", "from": "proc-adjacent-slope-calc", "to": "dec-adjacent-slope-check", "role": "flow" },
+      { "id": "e16", "from": "dec-adjacent-slope-check", "to": "proc-adjacent-pass", "role": "yes", "label": "はい" },
+      { "id": "e17", "from": "dec-adjacent-slope-check", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e18", "from": "proc-adjacent-pass", "to": "dec-north-slope-applicable", "role": "flow" },
+      { "id": "e19", "from": "dec-north-slope-applicable", "to": "dec-north-zone-type", "role": "yes", "label": "はい" },
+      { "id": "e20", "from": "dec-north-slope-applicable", "to": "dec-all-parts-check", "role": "no", "label": "いいえ" },
+      { "id": "e21", "from": "dec-north-zone-type", "to": "proc-north-slope-calc", "role": "option", "label": "5m" },
+      { "id": "e22", "from": "dec-north-zone-type", "to": "proc-north-slope-calc", "role": "option", "label": "10m" },
+      { "id": "e23", "from": "proc-north-slope-calc", "to": "dec-north-slope-check", "role": "flow" },
+      { "id": "e24", "from": "dec-north-slope-check", "to": "proc-north-pass", "role": "yes", "label": "はい" },
+      { "id": "e25", "from": "dec-north-slope-check", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e26", "from": "proc-north-pass", "to": "dec-all-parts-check", "role": "flow" },
+      { "id": "e27", "from": "dec-all-parts-check", "to": "pass", "role": "yes", "label": "はい" },
+      { "id": "e28", "from": "dec-all-parts-check", "to": "fail", "role": "no", "label": "いいえ" }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-A56-P1",
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "defines_detail",
+      "articles": ["A130", "A131", "A132"],
+      "description": "道路斜線・隣地斜線・北側斜線の詳細規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00+09:00",
+    "updated_at": "2025-12-25T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

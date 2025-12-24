@@ -1,0 +1,229 @@
+{
+  "id": "A53_P2_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "複数地域にわたる敷地の建蔽率計算",
+    "target_subject": "建築物",
+    "description": "敷地が複数の地域・区域にまたがる場合の建蔽率限度の加重平均計算"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "53",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": [
+    "集団規定",
+    "建蔽率"
+  ],
+  "text_raw": "建築物の敷地が前項の規定による建築物の建蔽率に関する制限を受ける地域又は区域の二以上にわたる場合においては、当該建築物の建蔽率は、同項の規定による当該各地域又は区域内の建築物の建蔽率の限度にその敷地の当該地域又は区域内にある各部分の面積の敷地面積に対する割合を乗じて得たものの合計以下でなければならない。",
+  "kijo_diagram_ref": "CHK-BSL-A53-P2",
+  "flow_diagram": {
+    "title": "複数地域にわたる敷地の建蔽率適合判定フロー",
+    "description": "敷地が複数地域にまたがる場合の建蔽率限度（加重平均）への適合を判定する",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "複数地域にわたる敷地の建蔽率適合判定を開始"
+      },
+      {
+        "id": "dec-multiple-districts",
+        "type": "decision",
+        "title": "敷地は複数の地域・区域にまたがるか？",
+        "decision_type": "binary",
+        "description": "敷地が第1項の建蔽率制限を受ける地域・区域の二以上にわたるか確認"
+      },
+      {
+        "id": "proc-identify-districts",
+        "type": "process",
+        "title": "地域区分の特定",
+        "process_type": "undefined_input",
+        "description": "都市計画情報から敷地がまたがる全ての地域・区域を特定"
+      },
+      {
+        "id": "proc-calc-area-each",
+        "type": "process",
+        "title": "各地域内面積の測定",
+        "process_type": "mechanical",
+        "description": "敷地の各地域・区域内の面積を幾何学的に算出"
+      },
+      {
+        "id": "proc-calc-total-area",
+        "type": "process",
+        "title": "敷地面積の算出",
+        "process_type": "mechanical",
+        "description": "各部分面積の合計から敷地面積を算出（A_total = Sum(A_i)）"
+      },
+      {
+        "id": "proc-get-bcr-limits",
+        "type": "process",
+        "title": "各地域の建蔽率限度取得",
+        "process_type": "mechanical",
+        "description": "第1項に基づく各地域・区域の建蔽率限度を取得"
+      },
+      {
+        "id": "proc-calc-area-ratio",
+        "type": "process",
+        "title": "面積割合の計算",
+        "process_type": "mechanical",
+        "description": "各地域内の面積を敷地面積で除して割合を算出（r_i = A_i / A_total）"
+      },
+      {
+        "id": "proc-calc-weighted-bcr",
+        "type": "process",
+        "title": "加重平均建蔽率限度の計算",
+        "process_type": "mechanical",
+        "description": "各地域の建蔽率限度に面積割合を乗じて合計（BCR_limit = Sum(BCR_base_i x r_i)）"
+      },
+      {
+        "id": "proc-get-building-area",
+        "type": "process",
+        "title": "建築面積の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築面積を読み取る"
+      },
+      {
+        "id": "proc-calc-bcr-actual",
+        "type": "process",
+        "title": "実際の建蔽率の計算",
+        "process_type": "mechanical",
+        "description": "建築面積を敷地面積で除して建蔽率を算出（BCR_actual = BA / A_total）"
+      },
+      {
+        "id": "dec-bcr-compliance",
+        "type": "decision",
+        "title": "建蔽率は加重平均限度以下か？",
+        "decision_type": "binary",
+        "description": "実際の建蔽率が加重平均した建蔽率限度以下であるか判定"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "建蔽率が加重平均限度以下であり、法53条2項に適合"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "建蔽率が加重平均限度を超えており、法53条2項に不適合"
+      },
+      {
+        "id": "end-not-applicable",
+        "type": "terminal",
+        "title": "適用対象外",
+        "result": "end",
+        "description": "敷地が単一地域内にあるため本項の適用対象外（第1項が適用）"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-multiple-districts",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-multiple-districts",
+        "to": "proc-identify-districts",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "dec-multiple-districts",
+        "to": "end-not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e04",
+        "from": "proc-identify-districts",
+        "to": "proc-calc-area-each",
+        "role": "flow"
+      },
+      {
+        "id": "e05",
+        "from": "proc-calc-area-each",
+        "to": "proc-calc-total-area",
+        "role": "flow"
+      },
+      {
+        "id": "e06",
+        "from": "proc-calc-total-area",
+        "to": "proc-get-bcr-limits",
+        "role": "flow"
+      },
+      {
+        "id": "e07",
+        "from": "proc-get-bcr-limits",
+        "to": "proc-calc-area-ratio",
+        "role": "flow"
+      },
+      {
+        "id": "e08",
+        "from": "proc-calc-area-ratio",
+        "to": "proc-calc-weighted-bcr",
+        "role": "flow"
+      },
+      {
+        "id": "e09",
+        "from": "proc-calc-weighted-bcr",
+        "to": "proc-get-building-area",
+        "role": "flow"
+      },
+      {
+        "id": "e10",
+        "from": "proc-get-building-area",
+        "to": "proc-calc-bcr-actual",
+        "role": "flow"
+      },
+      {
+        "id": "e11",
+        "from": "proc-calc-bcr-actual",
+        "to": "dec-bcr-compliance",
+        "role": "flow"
+      },
+      {
+        "id": "e12",
+        "from": "dec-bcr-compliance",
+        "to": "pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e13",
+        "from": "dec-bcr-compliance",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A53:P1"],
+      "description": "第1項の建蔽率限度を参照"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

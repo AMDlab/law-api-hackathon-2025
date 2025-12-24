@@ -1,0 +1,175 @@
+{
+  "id": "A52_P1_I8_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "容積率（用途地域の指定のない区域）",
+    "target_subject": "建築物",
+    "description": "用途地域の指定のない区域内の建築物の容積率制限適合判定フロー"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "52",
+    "paragraph": "1",
+    "item": "8"
+  },
+  "labels": [
+    "集団規定",
+    "容積率"
+  ],
+  "text_raw": "用途地域の指定のない区域内の建築物 十分の五、十分の八、十分の十、十分の二十、十分の三十又は十分の四十のうち、特定行政庁が土地利用の状況等を考慮し当該区域を区分して都道府県都市計画審議会の議を経て定めるもの",
+  "kijo_diagram_ref": "CHK-BSL-A52-P1-I8",
+  "flow_diagram": {
+    "title": "用途地域指定なし区域の容積率適合判定フロー",
+    "description": "法第52条第1項第8号に基づく容積率制限の適合判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "用途地域指定なし区域における容積率制限の適合判定を開始"
+      },
+      {
+        "id": "dec-volume-limit",
+        "type": "decision",
+        "title": "特定行政庁が定める容積率限度は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "50%", "description": "十分の五" },
+          { "value": "80%", "description": "十分の八" },
+          { "value": "100%", "description": "十分の十" },
+          { "value": "200%", "description": "十分の二十" },
+          { "value": "300%", "description": "十分の三十" },
+          { "value": "400%", "description": "十分の四十" }
+        ],
+        "description": "特定行政庁が土地利用の状況等を考慮し都道府県都市計画審議会の議を経て定めた容積率限度を確認",
+        "related_articles": ["法::A52:P1:I8"]
+      },
+      {
+        "id": "proc-calc-volume",
+        "type": "process",
+        "title": "容積率の算定",
+        "process_type": "mechanical",
+        "description": "建築物の延べ面積を敷地面積で除して容積率を算定（V = A / As）"
+      },
+      {
+        "id": "dec-compliance",
+        "type": "decision",
+        "title": "容積率は限度以下か？",
+        "decision_type": "binary",
+        "description": "建築物の容積率が特定行政庁が定める限度以下であるか判定",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "V", "desc": "建築物の容積率" },
+          "rhs": { "var": "V_max", "desc": "容積率限度" }
+        },
+        "related_articles": ["法::A52:P1:I8"]
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "建築物の容積率が限度以下であり、法第52条第1項第8号に適合"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "建築物の容積率が限度を超過しており、法第52条第1項第8号に不適合"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-volume-limit",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-volume-limit",
+        "to": "proc-calc-volume",
+        "role": "option",
+        "label": "50%"
+      },
+      {
+        "id": "e03",
+        "from": "dec-volume-limit",
+        "to": "proc-calc-volume",
+        "role": "option",
+        "label": "80%"
+      },
+      {
+        "id": "e04",
+        "from": "dec-volume-limit",
+        "to": "proc-calc-volume",
+        "role": "option",
+        "label": "100%"
+      },
+      {
+        "id": "e05",
+        "from": "dec-volume-limit",
+        "to": "proc-calc-volume",
+        "role": "option",
+        "label": "200%"
+      },
+      {
+        "id": "e06",
+        "from": "dec-volume-limit",
+        "to": "proc-calc-volume",
+        "role": "option",
+        "label": "300%"
+      },
+      {
+        "id": "e07",
+        "from": "dec-volume-limit",
+        "to": "proc-calc-volume",
+        "role": "option",
+        "label": "400%"
+      },
+      {
+        "id": "e08",
+        "from": "proc-calc-volume",
+        "to": "dec-compliance",
+        "role": "flow"
+      },
+      {
+        "id": "e09",
+        "from": "dec-compliance",
+        "to": "pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e10",
+        "from": "dec-compliance",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A52:P3", "A52:P6"],
+      "description": "容積率算定における不算入規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00Z",
+    "updated_at": "2025-12-25T00:00:00Z",
+    "author": "Claude Opus 4.5",
+    "generator": "flow-generator-skill-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

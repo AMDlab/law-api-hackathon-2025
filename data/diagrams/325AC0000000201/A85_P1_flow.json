@@ -1,0 +1,295 @@
+{
+  "id": "A85_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "仮設建築物の適用除外",
+    "target_subject": "建築物",
+    "description": "非常災害時の応急仮設建築物等について、特定行政庁が許可した場合に法の適用を除外する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "85",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": ["手続規定", "適用除外"],
+  "text_raw": "非常災害があつた場合において、その発生した区域又はこれに隣接する区域で特定行政庁が指定するものの内においては、災害により破損した建築物の応急の修繕又は次の各号のいずれかに該当する応急仮設建築物の建築で、その災害が発生した日から一月以内にその工事に着手するものについては、建築基準法令の規定は、適用しない。ただし、防火地域内に建築する場合については、この限りでない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        { "type": "disaster", "value": "非常災害が発生した場合" },
+        { "type": "location", "value": "災害発生区域又は隣接区域で特定行政庁が指定した区域内" },
+        { "type": "time", "value": "災害発生日から1月以内に工事着手" }
+      ],
+      "note": "非常災害時の応急措置に限定"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        { "type": "work_type", "value": "災害により破損した建築物の応急の修繕" },
+        { "type": "building_type", "value": "応急仮設建築物" }
+      ]
+    },
+    "exceptions": {
+      "operator": "AND",
+      "conditions": [
+        { "type": "location", "value": "防火地域内", "effect": "NOT_EXEMPT" }
+      ],
+      "effect": "EXCLUDE_FROM_EXEMPTION",
+      "note": "防火地域内では適用除外されない"
+    }
+  },
+  "flow_diagram": {
+    "title": "法85条1項 非常災害時の仮設建築物適用除外判定フロー",
+    "description": "非常災害時の応急仮設建築物等について建築基準法令の適用除外を判定するフロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start"
+      },
+      {
+        "id": "dec-disaster",
+        "type": "decision",
+        "title": "非常災害が発生したか？",
+        "decision_type": "binary",
+        "description": "地震、台風、火災等の非常災害が発生したか確認"
+      },
+      {
+        "id": "dec-designated-area",
+        "type": "decision",
+        "title": "特定行政庁が指定した区域内か？",
+        "decision_type": "binary",
+        "description": "災害発生区域または隣接区域で特定行政庁が指定した区域内に位置するか"
+      },
+      {
+        "id": "proc-area-confirmed",
+        "type": "process",
+        "title": "指定区域該当確認",
+        "process_type": "mechanical",
+        "description": "特定行政庁が指定した区域内であることを確認"
+      },
+      {
+        "id": "dec-building-type",
+        "type": "decision",
+        "title": "建築物の種別は？",
+        "decision_type": "multi",
+        "description": "災害破損建築物の応急修繕か、応急仮設建築物かを判定",
+        "options": [
+          { "value": "災害破損建築物の応急修繕" },
+          { "value": "応急仮設建築物" },
+          { "value": "その他" }
+        ]
+      },
+      {
+        "id": "proc-repair-type",
+        "type": "process",
+        "title": "応急修繕該当",
+        "process_type": "mechanical",
+        "description": "災害により破損した建築物の応急の修繕に該当"
+      },
+      {
+        "id": "proc-temporary-type",
+        "type": "process",
+        "title": "応急仮設建築物該当",
+        "process_type": "mechanical",
+        "description": "応急仮設建築物の建築に該当"
+      },
+      {
+        "id": "dec-one-month",
+        "type": "decision",
+        "title": "災害発生日から1ヶ月以内に工事着手か？",
+        "decision_type": "binary",
+        "description": "災害発生日から1ヶ月以内に工事に着手するか確認"
+      },
+      {
+        "id": "proc-timing-confirmed",
+        "type": "process",
+        "title": "着手時期適合確認",
+        "process_type": "mechanical",
+        "description": "1ヶ月以内の工事着手を確認"
+      },
+      {
+        "id": "dec-fire-area",
+        "type": "decision",
+        "title": "防火地域内か？",
+        "decision_type": "binary",
+        "description": "建築物の敷地が防火地域内に所在するか判定"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合（適用除外）",
+        "result": "pass",
+        "description": "法85条1項により建築基準法令の規定が適用除外される"
+      },
+      {
+        "id": "fail-no-disaster",
+        "type": "terminal",
+        "title": "不適合（非常災害なし）",
+        "result": "fail",
+        "description": "非常災害が発生していないため、本条項の適用除外は受けられない"
+      },
+      {
+        "id": "fail-not-designated",
+        "type": "terminal",
+        "title": "不適合（指定区域外）",
+        "result": "fail",
+        "description": "特定行政庁が指定した区域外のため、適用除外は受けられない"
+      },
+      {
+        "id": "fail-building-type",
+        "type": "terminal",
+        "title": "不適合（種別不適合）",
+        "result": "fail",
+        "description": "応急修繕でも応急仮設建築物でもないため、適用除外は受けられない"
+      },
+      {
+        "id": "fail-timing",
+        "type": "terminal",
+        "title": "不適合（着手時期超過）",
+        "result": "fail",
+        "description": "災害発生日から1ヶ月を超えているため、適用除外は受けられない"
+      },
+      {
+        "id": "fail-fire-area",
+        "type": "terminal",
+        "title": "不適合（防火地域内）",
+        "result": "fail",
+        "description": "防火地域内のため、ただし書きにより適用除外は受けられない"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-disaster",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-disaster",
+        "to": "dec-designated-area",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "dec-disaster",
+        "to": "fail-no-disaster",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e04",
+        "from": "dec-designated-area",
+        "to": "proc-area-confirmed",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e05",
+        "from": "dec-designated-area",
+        "to": "fail-not-designated",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e06",
+        "from": "proc-area-confirmed",
+        "to": "dec-building-type",
+        "role": "flow"
+      },
+      {
+        "id": "e07",
+        "from": "dec-building-type",
+        "to": "proc-repair-type",
+        "role": "option",
+        "label": "災害破損建築物の応急修繕"
+      },
+      {
+        "id": "e08",
+        "from": "dec-building-type",
+        "to": "proc-temporary-type",
+        "role": "option",
+        "label": "応急仮設建築物"
+      },
+      {
+        "id": "e09",
+        "from": "dec-building-type",
+        "to": "fail-building-type",
+        "role": "option",
+        "label": "その他"
+      },
+      {
+        "id": "e10",
+        "from": "proc-repair-type",
+        "to": "dec-one-month",
+        "role": "flow"
+      },
+      {
+        "id": "e11",
+        "from": "proc-temporary-type",
+        "to": "dec-one-month",
+        "role": "flow"
+      },
+      {
+        "id": "e12",
+        "from": "dec-one-month",
+        "to": "proc-timing-confirmed",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e13",
+        "from": "dec-one-month",
+        "to": "fail-timing",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e14",
+        "from": "proc-timing-confirmed",
+        "to": "dec-fire-area",
+        "role": "flow"
+      },
+      {
+        "id": "e15",
+        "from": "dec-fire-area",
+        "to": "fail-fire-area",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e16",
+        "from": "dec-fire-area",
+        "to": "pass",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-A85-P1",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A61"],
+      "description": "防火地域の定義"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

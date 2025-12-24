@@ -1,0 +1,110 @@
+{
+  "id": "A84_2_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "簡易な構造の建築物に対する制限の緩和",
+    "target_subject": "建築物",
+    "description": "簡易な構造の建築物について、特定の建築規制を適用しないことを定める規定"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "84_2",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": ["単体規定", "総則"],
+  "text_raw": "（簡易な構造の建築物に対する制限の緩和）\n第八十四条の二\n壁を有しない自動車車庫、屋根を帆布としたスポーツの練習場その他の政令で指定する簡易な構造の建築物又は建築物の部分で、政令で定める基準に適合するものについては、第二十二条から第二十六条まで、第二十七条第一項及び第三項、第三十五条の二、第六十一条、第六十二条並びに第六十七条第一項の規定は、適用しない。",
+  "kijo_diagram_ref": "CHK-BSL-A84-2-P1",
+  "flow_diagram": {
+    "title": "簡易な構造の建築物に対する制限緩和判定フロー",
+    "description": "法84条の2に基づき、簡易な構造の建築物に対して特定規制が適用除外となるかを判定するフロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start"
+      },
+      {
+        "id": "dec-structure-type",
+        "type": "decision",
+        "title": "構造形式は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "壁を有しない自動車車庫", "description": "壁のない自動車車庫" },
+          { "value": "屋根を帆布としたスポーツ練習場", "description": "帆布屋根のスポーツ練習場" },
+          { "value": "その他政令指定の簡易構造", "description": "政令で指定されるその他の簡易な構造" },
+          { "value": "該当しない", "description": "簡易な構造に該当しない" }
+        ],
+        "description": "建築物の構造形式がどの区分に該当するかを判定"
+      },
+      {
+        "id": "proc-simple-structure-confirmed",
+        "type": "process",
+        "title": "簡易な構造該当",
+        "process_type": "mechanical",
+        "description": "政令で指定される簡易な構造の建築物又は建築物の部分に該当することを確認"
+      },
+      {
+        "id": "dec-ordinance-compliance",
+        "type": "decision",
+        "title": "政令で定める基準に適合するか？",
+        "decision_type": "binary",
+        "description": "建築基準法施行令（第138条の4、第138条の5）で定める技術基準に適合するか",
+        "related_articles": ["令::A138_4", "令::A138_5"]
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "規制適用除外",
+        "result": "pass",
+        "description": "第22条〜第26条、第27条1項及び3項、第35条の2、第61条、第62条、第67条1項の適用除外"
+      },
+      {
+        "id": "fail-not-simple-structure",
+        "type": "terminal",
+        "title": "適用対象外",
+        "result": "fail",
+        "description": "簡易な構造に該当しないため本条の適用対象外"
+      },
+      {
+        "id": "fail-not-compliant",
+        "type": "terminal",
+        "title": "緩和不可",
+        "result": "fail",
+        "description": "政令基準を満たさないため通常の規制が適用される"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "dec-structure-type", "role": "flow" },
+      { "id": "e02", "from": "dec-structure-type", "to": "proc-simple-structure-confirmed", "role": "option", "label": "壁を有しない自動車車庫" },
+      { "id": "e03", "from": "dec-structure-type", "to": "proc-simple-structure-confirmed", "role": "option", "label": "屋根を帆布としたスポーツ練習場" },
+      { "id": "e04", "from": "dec-structure-type", "to": "proc-simple-structure-confirmed", "role": "option", "label": "その他政令指定の簡易構造" },
+      { "id": "e05", "from": "dec-structure-type", "to": "fail-not-simple-structure", "role": "option", "label": "該当しない" },
+      { "id": "e06", "from": "proc-simple-structure-confirmed", "to": "dec-ordinance-compliance", "role": "flow" },
+      { "id": "e07", "from": "dec-ordinance-compliance", "to": "pass", "role": "yes", "label": "はい" },
+      { "id": "e08", "from": "dec-ordinance-compliance", "to": "fail-not-compliant", "role": "no", "label": "いいえ" }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "defines_detail",
+      "articles": ["A138_4", "A138_5"],
+      "description": "簡易な構造の建築物の具体的定義と基準"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00+09:00",
+    "updated_at": "2025-12-25T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

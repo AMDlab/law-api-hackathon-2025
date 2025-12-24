@@ -1,0 +1,168 @@
+{
+  "id": "A52_P13_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "壁面線等による敷地面積の補正",
+    "target_subject": "敷地",
+    "description": "第12項の壁面線等による容積率緩和を適用する場合、前面道路と壁面線等との間の部分を敷地面積から除外する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "52",
+    "paragraph": "13",
+    "item": null
+  },
+  "labels": ["集団規定", "容積率", "敷地面積算定"],
+  "text_raw": "前項の場合においては、当該建築物の敷地のうち前面道路と壁面線等との間の部分の面積は、敷地面積又は敷地の部分の面積に算入しないものとする。",
+  "kijo_diagram_ref": "CHK-BSL-A52-P13",
+  "flow_diagram": {
+    "title": "壁面線等による敷地面積補正の適合判定フロー",
+    "description": "法52条12項の適用時に敷地面積から除外すべき部分を算定する",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "敷地面積補正の判定を開始"
+      },
+      {
+        "id": "dec-p12-applicable",
+        "type": "decision",
+        "title": "法52条12項の適用を受けるか？",
+        "decision_type": "binary",
+        "description": "前面道路幅員係数4/10の建築物で、壁面線等を越えないもので、法52条12項のみなし規定の適用を受けるか",
+        "related_articles": ["法::A52:P12"]
+      },
+      {
+        "id": "proc-identify-road-boundary",
+        "type": "process",
+        "title": "前面道路境界線の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から前面道路の境界線の位置を読み取る"
+      },
+      {
+        "id": "proc-identify-setback-line",
+        "type": "process",
+        "title": "壁面線等の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から壁面線又は壁面位置制限の限度の線を読み取る"
+      },
+      {
+        "id": "proc-calc-setback-area",
+        "type": "process",
+        "title": "セットバック部分の面積算出",
+        "process_type": "mechanical",
+        "description": "前面道路境界線と壁面線等との間の敷地部分の面積を幾何学的に計算"
+      },
+      {
+        "id": "proc-identify-total-area",
+        "type": "process",
+        "title": "敷地面積の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から敷地全体の面積を読み取る"
+      },
+      {
+        "id": "proc-calc-effective-area",
+        "type": "process",
+        "title": "容積率算定用敷地面積の計算",
+        "process_type": "mechanical",
+        "description": "敷地面積からセットバック部分の面積を除いて有効敷地面積を算出（As_eff = As - Asetback）"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "算定完了",
+        "result": "pass",
+        "description": "容積率算定用の敷地面積が確定"
+      },
+      {
+        "id": "fail-not-applicable",
+        "type": "terminal",
+        "title": "本項適用対象外",
+        "result": "fail",
+        "description": "法52条12項の適用を受けないため本項適用対象外"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-p12-applicable",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-p12-applicable",
+        "to": "proc-identify-road-boundary",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "dec-p12-applicable",
+        "to": "fail-not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e04",
+        "from": "proc-identify-road-boundary",
+        "to": "proc-identify-setback-line",
+        "role": "flow"
+      },
+      {
+        "id": "e05",
+        "from": "proc-identify-setback-line",
+        "to": "proc-calc-setback-area",
+        "role": "flow"
+      },
+      {
+        "id": "e06",
+        "from": "proc-calc-setback-area",
+        "to": "proc-identify-total-area",
+        "role": "flow"
+      },
+      {
+        "id": "e07",
+        "from": "proc-identify-total-area",
+        "to": "proc-calc-effective-area",
+        "role": "flow"
+      },
+      {
+        "id": "e08",
+        "from": "proc-calc-effective-area",
+        "to": "pass",
+        "role": "flow"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A52:P12"],
+      "description": "第12項の壁面線等による容積率緩和規定を前提とする敷地面積算定ルール"
+    },
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A68_2:P1"],
+      "description": "壁面の位置の制限に関する条例規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

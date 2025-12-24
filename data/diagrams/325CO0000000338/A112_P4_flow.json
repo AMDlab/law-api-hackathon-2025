@@ -1,0 +1,167 @@
+{
+  "id": "A112_P4_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "準耐火建築物等の防火区画（500平方メートル区画）適合判定フロー",
+    "target_subject": "建築物",
+    "description": "延べ面積500平方メートル超の準耐火建築物等における防火区画要件の判定"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "112",
+    "paragraph": "4",
+    "item": null
+  },
+  "labels": ["単体規定", "防火区画"],
+  "text_raw": "延べ面積が五百平方メートルを超えるものについては、床面積の合計五百平方メートル以内ごとに一時間準耐火基準に適合する準耐火構造の床若しくは壁又は特定防火設備で区画し、かつ、防火上主要な間仕切壁を準耐火構造とし、小屋裏又は天井裏に達せしめなければならない。",
+  "flow_diagram": {
+    "title": "令112条4項 500平方メートル区画適合判定フロー",
+    "description": "準耐火建築物等で延べ面積500平方メートル超の場合の防火区画要件を判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "令112条4項の適合判定を開始"
+      },
+      {
+        "id": "dec-structure-type",
+        "type": "decision",
+        "title": "構造種別は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "準耐火建築物等", "description": "準耐火建築物又はこれに準ずる建築物" },
+          { "value": "その他", "description": "準耐火建築物等に該当しない" }
+        ],
+        "description": "建築物の構造種別を判定"
+      },
+      {
+        "id": "proc-not-applicable-structure",
+        "type": "process",
+        "title": "適用対象外（構造種別）",
+        "process_type": "mechanical",
+        "description": "準耐火建築物等に該当しないため本項の適用対象外"
+      },
+      {
+        "id": "dec-area",
+        "type": "decision",
+        "title": "延べ面積 > 500平方メートルか？",
+        "decision_type": "binary",
+        "description": "延べ面積が500平方メートルを超えるか判定",
+        "condition": {
+          "operator": "GT",
+          "lhs": { "var": "A", "desc": "延べ面積" },
+          "rhs": { "value": 500, "unit": "平方メートル" }
+        }
+      },
+      {
+        "id": "proc-not-applicable-area",
+        "type": "process",
+        "title": "適用対象外（面積）",
+        "process_type": "mechanical",
+        "description": "延べ面積500平方メートル以下のため本項の適用対象外"
+      },
+      {
+        "id": "proc-applicable",
+        "type": "process",
+        "title": "本項適用",
+        "process_type": "mechanical",
+        "description": "準耐火建築物等で延べ面積500平方メートル超のため本項を適用"
+      },
+      {
+        "id": "dec-compartment",
+        "type": "decision",
+        "title": "500平方メートル以内ごとに区画されているか？",
+        "decision_type": "binary",
+        "description": "床面積の合計500平方メートル以内ごとに一時間準耐火基準適合の準耐火構造の床・壁又は特定防火設備で区画されているか判定"
+      },
+      {
+        "id": "proc-compartment-ok",
+        "type": "process",
+        "title": "区画要件適合",
+        "process_type": "mechanical",
+        "description": "防火区画要件を満たしている"
+      },
+      {
+        "id": "dec-partition-structure",
+        "type": "decision",
+        "title": "防火上主要な間仕切壁は準耐火構造か？",
+        "decision_type": "binary",
+        "description": "防火上主要な間仕切壁が準耐火構造であるか判定"
+      },
+      {
+        "id": "proc-partition-ok",
+        "type": "process",
+        "title": "間仕切壁構造適合",
+        "process_type": "mechanical",
+        "description": "間仕切壁が準耐火構造である"
+      },
+      {
+        "id": "dec-partition-reach",
+        "type": "decision",
+        "title": "間仕切壁が小屋裏・天井裏に達しているか？",
+        "decision_type": "binary",
+        "description": "防火上主要な間仕切壁が小屋裏又は天井裏に達しているか判定"
+      },
+      {
+        "id": "proc-reach-ok",
+        "type": "process",
+        "title": "小屋裏等到達適合",
+        "process_type": "mechanical",
+        "description": "間仕切壁が小屋裏・天井裏に達している"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令112条4項の規定に適合"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "令112条4項の規定に不適合"
+      },
+      {
+        "id": "end-not-applicable",
+        "type": "terminal",
+        "title": "適用対象外",
+        "result": "end",
+        "description": "本項の適用対象外"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "dec-structure-type", "role": "flow" },
+      { "id": "e02", "from": "dec-structure-type", "to": "dec-area", "role": "option", "label": "準耐火建築物等" },
+      { "id": "e03", "from": "dec-structure-type", "to": "proc-not-applicable-structure", "role": "option", "label": "その他" },
+      { "id": "e04", "from": "proc-not-applicable-structure", "to": "end-not-applicable", "role": "flow" },
+      { "id": "e05", "from": "dec-area", "to": "proc-applicable", "role": "yes", "label": "はい" },
+      { "id": "e06", "from": "dec-area", "to": "proc-not-applicable-area", "role": "no", "label": "いいえ" },
+      { "id": "e07", "from": "proc-not-applicable-area", "to": "end-not-applicable", "role": "flow" },
+      { "id": "e08", "from": "proc-applicable", "to": "dec-compartment", "role": "flow" },
+      { "id": "e09", "from": "dec-compartment", "to": "proc-compartment-ok", "role": "yes", "label": "はい" },
+      { "id": "e10", "from": "dec-compartment", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e11", "from": "proc-compartment-ok", "to": "dec-partition-structure", "role": "flow" },
+      { "id": "e12", "from": "dec-partition-structure", "to": "proc-partition-ok", "role": "yes", "label": "はい" },
+      { "id": "e13", "from": "dec-partition-structure", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e14", "from": "proc-partition-ok", "to": "dec-partition-reach", "role": "flow" },
+      { "id": "e15", "from": "dec-partition-reach", "to": "proc-reach-ok", "role": "yes", "label": "はい" },
+      { "id": "e16", "from": "dec-partition-reach", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e17", "from": "proc-reach-ok", "to": "pass", "role": "flow" }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-KIJO-A112-P4",
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

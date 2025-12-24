@@ -1,0 +1,257 @@
+{
+  "id": "A49_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "特別用途地区内の建築制限適合判定フロー",
+    "target_subject": "建築物",
+    "description": "特別用途地区内における建築物の建築制限又は禁止が地方公共団体の条例に適合するかを判定するフロー"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "49",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "集団規定",
+    "用途制限"
+  ],
+  "text_raw": "特別用途地区内においては、前条第一項から第十三項までに定めるものを除くほか、その地区の指定の目的のためにする建築物の建築の制限又は禁止に関して必要な規定は、地方公共団体の条例で定める。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "特別用途地区内"
+        }
+      ],
+      "note": "都市計画法に基づき都市計画で定められた特別用途地区"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-ordinance-exists",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "ref": "info-compliance",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    }
+  },
+  "flow_diagram": {
+    "title": "法49条1項 特別用途地区建築制限適合判定フロー",
+    "description": "特別用途地区内での建築物の建築制限又は禁止への適合を判定する",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "特別用途地区内の建築制限適合判定を開始"
+      },
+      {
+        "id": "dec-location",
+        "type": "decision",
+        "title": "特別用途地区内か？",
+        "decision_type": "binary",
+        "description": "敷地が特別用途地区内に所在するかを確認"
+      },
+      {
+        "id": "proc-district-type",
+        "type": "process",
+        "title": "地区区分の特定",
+        "process_type": "mechanical",
+        "description": "都市計画情報から特別用途地区の種類（文教地区、小売店舗地区等）を特定"
+      },
+      {
+        "id": "dec-article48",
+        "type": "decision",
+        "title": "法48条1項〜13項で規制されるか？",
+        "decision_type": "binary",
+        "description": "法48条1項〜13項の用途地域による制限が適用されるかを確認",
+        "related_articles": [
+          "法::A48:P1",
+          "法::A48:P2",
+          "法::A48:P3",
+          "法::A48:P4",
+          "法::A48:P5",
+          "法::A48:P6",
+          "法::A48:P7",
+          "法::A48:P8",
+          "法::A48:P9",
+          "法::A48:P10",
+          "法::A48:P11",
+          "法::A48:P12",
+          "法::A48:P13"
+        ]
+      },
+      {
+        "id": "proc-article48-check",
+        "type": "process",
+        "title": "法48条制限の適合判定",
+        "process_type": "sub_diagram_reference",
+        "description": "法48条1項〜13項の用途地域による制限への適合を判定"
+      },
+      {
+        "id": "dec-ordinance-exists",
+        "type": "decision",
+        "title": "条例による制限規定があるか？",
+        "decision_type": "binary",
+        "description": "当該特別用途地区について地方公共団体の条例に建築制限又は禁止の規定が存在するかを確認"
+      },
+      {
+        "id": "proc-building-use",
+        "type": "process",
+        "title": "建築物用途の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の用途を特定"
+      },
+      {
+        "id": "dec-ordinance-compliance",
+        "type": "decision",
+        "title": "条例の制限に適合するか？",
+        "decision_type": "binary",
+        "description": "建築物の用途が条例で定める建築制限又は禁止の規定に適合するかを判定"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "法49条1項の規定に適合"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "法49条1項の規定に不適合"
+      },
+      {
+        "id": "pass-outside",
+        "type": "terminal",
+        "title": "適用対象外（適合）",
+        "result": "pass",
+        "description": "特別用途地区外のため、本規定の適用対象外"
+      },
+      {
+        "id": "pass-no-ordinance",
+        "type": "terminal",
+        "title": "適合（条例規定なし）",
+        "result": "pass",
+        "description": "条例による制限規定がないため、法49条1項の制限はない"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-location",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-location",
+        "to": "proc-district-type",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "dec-location",
+        "to": "pass-outside",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e04",
+        "from": "proc-district-type",
+        "to": "dec-article48",
+        "role": "flow"
+      },
+      {
+        "id": "e05",
+        "from": "dec-article48",
+        "to": "proc-article48-check",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e06",
+        "from": "dec-article48",
+        "to": "dec-ordinance-exists",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e07",
+        "from": "proc-article48-check",
+        "to": "dec-ordinance-exists",
+        "role": "flow"
+      },
+      {
+        "id": "e08",
+        "from": "dec-ordinance-exists",
+        "to": "proc-building-use",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e09",
+        "from": "dec-ordinance-exists",
+        "to": "pass-no-ordinance",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e10",
+        "from": "proc-building-use",
+        "to": "dec-ordinance-compliance",
+        "role": "flow"
+      },
+      {
+        "id": "e11",
+        "from": "dec-ordinance-compliance",
+        "to": "pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e12",
+        "from": "dec-ordinance-compliance",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-A49-P1",
+  "related_laws": [
+    {
+      "law_id": "343AC0000000100",
+      "law_name": "都市計画法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": [
+        "A8:P1:I1"
+      ],
+      "description": "特別用途地区の定義と指定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00.000Z",
+    "generator": "flow-generator-skill-v3",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法",
+    "author": "Claude Code"
+  }
+}

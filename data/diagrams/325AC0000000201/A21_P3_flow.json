@@ -1,0 +1,126 @@
+{
+  "id": "A21_P3_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "大規模建築物基準の建築物部分別適用",
+    "target_subject": "建築物",
+    "description": "政令で定める部分が二以上ある建築物について、各部分を別の建築物とみなして前二項の基準を適用する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "21",
+    "paragraph": "3",
+    "item": null
+  },
+  "labels": ["単体規定", "防火", "みなし規定"],
+  "kijo_diagram_ref": "CHK-BSL-A21-P3",
+  "flow_diagram": {
+    "title": "法21条3項適合判定フロー",
+    "description": "エキスパンションジョイント等で区画された建築物の法21条1項・2項みなし適用判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start"
+      },
+      {
+        "id": "dec-structure-type",
+        "type": "decision",
+        "title": "建築物の構造形式は?",
+        "decision_type": "multi",
+        "options": [
+          {"value": "一体構造"},
+          {"value": "エキスパンションジョイント等で区画"}
+        ],
+        "description": "建築物の構造形式を確認"
+      },
+      {
+        "id": "dec-deemed-parts",
+        "type": "decision",
+        "title": "政令で定める部分（令109条の3第3号）に該当するか?",
+        "decision_type": "binary",
+        "description": "エキスパンションジョイント等で区画された部分に該当するか"
+      },
+      {
+        "id": "proc-deemed-applicable",
+        "type": "process",
+        "title": "政令で定める部分該当",
+        "description": "令109条の3第3号に規定する部分に該当"
+      },
+      {
+        "id": "dec-parts-count",
+        "type": "decision",
+        "title": "区画部分は二以上あるか?",
+        "decision_type": "binary",
+        "description": "N >= 2"
+      },
+      {
+        "id": "proc-apply-minashi",
+        "type": "process",
+        "title": "みなし規定適用",
+        "description": "各区画部分を別の建築物とみなして法21条1項・2項を適用"
+      },
+      {
+        "id": "dec-each-part-compliance",
+        "type": "decision",
+        "title": "全ての区画部分が法21条1項・2項に適合するか?",
+        "decision_type": "binary",
+        "description": "各部分を別の建築物として法21条前二項基準を適用し、全部分が適合するか"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "法21条3項に適合（全区画部分が法21条1項・2項適合）"
+      },
+      {
+        "id": "pass-not-applicable",
+        "type": "terminal",
+        "title": "適用外（適合）",
+        "result": "pass",
+        "description": "法21条3項の適用対象外（一体構造又は単一区画のため法21条1項・2項で直接判定）"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "一部の区画部分が法21条1項・2項に不適合"
+      }
+    ],
+    "edges": [
+      {"id": "e01", "from": "start", "to": "dec-structure-type", "role": "flow"},
+      {"id": "e02", "from": "dec-structure-type", "to": "pass-not-applicable", "role": "option", "label": "一体構造"},
+      {"id": "e03", "from": "dec-structure-type", "to": "dec-deemed-parts", "role": "option", "label": "エキスパンションジョイント等で区画"},
+      {"id": "e04", "from": "dec-deemed-parts", "to": "proc-deemed-applicable", "role": "yes"},
+      {"id": "e05", "from": "dec-deemed-parts", "to": "pass-not-applicable", "role": "no"},
+      {"id": "e06", "from": "proc-deemed-applicable", "to": "dec-parts-count", "role": "flow"},
+      {"id": "e07", "from": "dec-parts-count", "to": "proc-apply-minashi", "role": "yes"},
+      {"id": "e08", "from": "dec-parts-count", "to": "pass-not-applicable", "role": "no"},
+      {"id": "e09", "from": "proc-apply-minashi", "to": "dec-each-part-compliance", "role": "flow"},
+      {"id": "e10", "from": "dec-each-part-compliance", "to": "pass", "role": "yes"},
+      {"id": "e11", "from": "dec-each-part-compliance", "to": "fail", "role": "no"}
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "delegates_to",
+      "articles": ["A109_3_3"],
+      "description": "第109条の3第3号（別の建築物とみなす部分）"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00Z",
+    "generator": "claude-code-flow-generator",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

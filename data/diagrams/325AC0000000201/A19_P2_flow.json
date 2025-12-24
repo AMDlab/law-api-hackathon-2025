@@ -1,0 +1,119 @@
+{
+  "id": "A19_P2_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "湿潤な土地等における措置",
+    "target_subject": "建築物",
+    "description": "湿潤な土地等に建築物を建築する場合の衛生上・安全上必要な措置を判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "19",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": ["単体規定", "敷地・地盤"],
+  "text_raw": "湿潤な土地、出水のおそれの多い土地又はごみその他これに類する物で埋め立てられた土地に建築物を建築する場合においては、盛土、地盤の改良その他衛生上又は安全上必要な措置を講じなければならない。",
+  "kijo_diagram_ref": "CHK-BSL-A19-P2",
+  "flow_diagram": {
+    "title": "法19条2項適合判定フロー",
+    "description": "湿潤な土地等における衛生上・安全上必要な措置の適合判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start"
+      },
+      {
+        "id": "dec-land-type",
+        "type": "decision",
+        "title": "敷地の土地種別は?",
+        "decision_type": "multi",
+        "options": [
+          {"value": "湿潤な土地"},
+          {"value": "出水のおそれの多い土地"},
+          {"value": "ごみ等埋立地"},
+          {"value": "通常の土地"}
+        ],
+        "description": "敷地の土地種別を判定（湿潤/出水/埋立/通常）"
+      },
+      {
+        "id": "proc-target-land",
+        "type": "process",
+        "title": "対象土地に該当",
+        "description": "法19条2項の対象となる土地に該当"
+      },
+      {
+        "id": "dec-measures-exist",
+        "type": "decision",
+        "title": "衛生上又は安全上必要な措置を講じているか?",
+        "decision_type": "binary",
+        "description": "盛土、地盤改良その他の措置を講じているか"
+      },
+      {
+        "id": "proc-measures-exist",
+        "type": "process",
+        "title": "措置あり",
+        "description": "何らかの措置が講じられている"
+      },
+      {
+        "id": "dec-measures-adequate",
+        "type": "decision",
+        "title": "措置は土地の状況に応じて適切か?",
+        "decision_type": "binary",
+        "description": "措置が衛生上又は安全上適切かを判定"
+      },
+      {
+        "id": "pass-adequate",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "適切な措置を講じており法19条2項に適合"
+      },
+      {
+        "id": "fail-no-measures",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "必要な措置を講じていない"
+      },
+      {
+        "id": "fail-inadequate",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "措置が適切でない"
+      },
+      {
+        "id": "pass-not-applicable",
+        "type": "terminal",
+        "title": "適用外（適合）",
+        "result": "pass",
+        "description": "対象土地に該当しないため法19条2項の適用外"
+      }
+    ],
+    "edges": [
+      {"id": "e01", "from": "start", "to": "dec-land-type", "role": "flow"},
+      {"id": "e02", "from": "dec-land-type", "to": "proc-target-land", "role": "option", "label": "湿潤な土地"},
+      {"id": "e03", "from": "dec-land-type", "to": "proc-target-land", "role": "option", "label": "出水のおそれの多い土地"},
+      {"id": "e04", "from": "dec-land-type", "to": "proc-target-land", "role": "option", "label": "ごみ等埋立地"},
+      {"id": "e05", "from": "dec-land-type", "to": "pass-not-applicable", "role": "option", "label": "通常の土地"},
+      {"id": "e06", "from": "proc-target-land", "to": "dec-measures-exist", "role": "flow"},
+      {"id": "e07", "from": "dec-measures-exist", "to": "proc-measures-exist", "role": "yes"},
+      {"id": "e08", "from": "dec-measures-exist", "to": "fail-no-measures", "role": "no"},
+      {"id": "e09", "from": "proc-measures-exist", "to": "dec-measures-adequate", "role": "flow"},
+      {"id": "e10", "from": "dec-measures-adequate", "to": "pass-adequate", "role": "yes"},
+      {"id": "e11", "from": "dec-measures-adequate", "to": "fail-inadequate", "role": "no"}
+    ]
+  },
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00Z",
+    "generator": "claude-code-flow-generator",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

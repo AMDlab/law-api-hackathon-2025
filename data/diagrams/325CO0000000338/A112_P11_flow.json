@@ -1,0 +1,372 @@
+{
+  "id": "A112_P11_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "竪穴区画",
+    "target_subject": "建築物",
+    "description": "地階または3階以上に居室を有する建築物の竪穴部分の区画"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "112",
+    "paragraph": "11",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "防火区画",
+    "竪穴区画"
+  ],
+  "text_raw": "主要構造部を準耐火構造とした建築物（特定主要構造部を耐火構造とした建築物を含む。）又は第百三十六条の二第一号ロ若しくは第二号ロに掲げる基準に適合する建築物であつて、地階又は三階以上の階に居室を有するものの竪穴部分については、当該竪穴部分以外の部分と準耐火構造の床若しくは壁又は法第二条第九号の二ロに規定する防火設備で区画しなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "building_standard",
+          "value": "主要構造部が準耐火構造または令第136条の2適合"
+        },
+        {
+          "type": "floor",
+          "value": "地階または3階以上に居室を有する"
+        }
+      ]
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "requirement",
+          "value": "竪穴部分を竪穴部分以外と準耐火構造の床・壁または防火設備で区画"
+        }
+      ]
+    },
+    "exceptions": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "type": "building_part",
+          "value": "避難階から直上・直下階のみに通ずる吹抜き等で内装不燃のもの"
+        },
+        {
+          "type": "building_part",
+          "value": "小規模住宅（階数3以下・200平方メートル以内）の竪穴部分"
+        }
+      ],
+      "effect": "EXEMPT"
+    }
+  },
+  "flow_diagram": {
+    "title": "竪穴区画適合判定フロー",
+    "description": "地階または3階以上に居室を有する建築物の竪穴区画の適合を判定するフロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "竪穴区画適合判定の開始"
+      },
+      {
+        "id": "dec-structure-type",
+        "type": "decision",
+        "title": "主要構造部の構造種別は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "準耐火構造", "description": "主要構造部が準耐火構造" },
+          { "value": "特定主要構造部が耐火構造", "description": "特定主要構造部を耐火構造とした建築物" },
+          { "value": "令136条の2適合", "description": "令第136条の2第1号ロまたは第2号ロに適合" },
+          { "value": "その他", "description": "上記以外" }
+        ],
+        "description": "建築物の主要構造部が準耐火構造等に該当するかを判定"
+      },
+      {
+        "id": "proc-structure-applicable",
+        "type": "process",
+        "title": "構造要件に該当",
+        "process_type": "mechanical",
+        "description": "準耐火構造等の構造要件に該当する"
+      },
+      {
+        "id": "dec-basement-room",
+        "type": "decision",
+        "title": "地階に居室があるか？",
+        "decision_type": "binary",
+        "description": "建築物の地階に居室を有するかを確認"
+      },
+      {
+        "id": "dec-upper-room",
+        "type": "decision",
+        "title": "3階以上の階に居室があるか？",
+        "decision_type": "binary",
+        "description": "建築物の3階以上の階に居室を有するかを確認"
+      },
+      {
+        "id": "proc-floor-applicable",
+        "type": "process",
+        "title": "居室階要件に該当",
+        "process_type": "mechanical",
+        "description": "地階または3階以上に居室を有する要件に該当する"
+      },
+      {
+        "id": "proc-shaft-identify",
+        "type": "process",
+        "title": "竪穴部分の特定",
+        "process_type": "undefined_input",
+        "description": "建築物内の竪穴部分（吹抜き、階段、昇降路、ダクトスペース等）を特定"
+      },
+      {
+        "id": "dec-exemption-i1",
+        "type": "decision",
+        "title": "第1号の除外（内装不燃の吹抜き等）に該当するか？",
+        "decision_type": "binary",
+        "description": "避難階から直上・直下階のみに通じ、壁・天井が不燃材料の吹抜き等に該当するか",
+        "related_articles": ["令::A112:P11:I1"]
+      },
+      {
+        "id": "proc-exemption-i1-pass",
+        "type": "process",
+        "title": "第1号除外に該当",
+        "process_type": "sub_diagram_reference",
+        "description": "第1号の除外条件に該当する竪穴部分"
+      },
+      {
+        "id": "dec-exemption-i2",
+        "type": "decision",
+        "title": "第2号の除外（小規模住宅）に該当するか？",
+        "decision_type": "binary",
+        "description": "階数3以下・延べ面積200平方メートル以内の住宅の竪穴部分に該当するか",
+        "related_articles": ["令::A112:P11:I2"]
+      },
+      {
+        "id": "proc-exemption-i2-pass",
+        "type": "process",
+        "title": "第2号除外に該当",
+        "process_type": "mechanical",
+        "description": "第2号の除外条件に該当する竪穴部分"
+      },
+      {
+        "id": "dec-compartment-type",
+        "type": "decision",
+        "title": "区画の設置状況は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "準耐火構造の床・壁", "description": "準耐火構造の床若しくは壁で区画" },
+          { "value": "法2条9号の2ロの防火設備", "description": "法第2条第9号の二ロに規定する防火設備で区画" },
+          { "value": "区画なし", "description": "適切な区画がない" }
+        ],
+        "description": "竪穴部分と竪穴部分以外の部分との区画状況を確認"
+      },
+      {
+        "id": "proc-compartment-ok",
+        "type": "process",
+        "title": "適切な区画が設置されている",
+        "process_type": "mechanical",
+        "description": "準耐火構造の床・壁または防火設備で適切に区画されている"
+      },
+      {
+        "id": "dec-all-shafts-checked",
+        "type": "decision",
+        "title": "全ての竪穴部分を確認したか？",
+        "decision_type": "binary",
+        "description": "建築物内の全ての竪穴部分について確認が完了したか"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "第11項の竪穴区画規定に適合"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "第11項の竪穴区画規定に不適合"
+      },
+      {
+        "id": "not-applicable",
+        "type": "terminal",
+        "title": "適用対象外",
+        "result": "end",
+        "description": "本項の適用対象外"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-structure-type",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-structure-type",
+        "to": "proc-structure-applicable",
+        "role": "option",
+        "label": "準耐火構造"
+      },
+      {
+        "id": "e03",
+        "from": "dec-structure-type",
+        "to": "proc-structure-applicable",
+        "role": "option",
+        "label": "特定主要構造部が耐火構造"
+      },
+      {
+        "id": "e04",
+        "from": "dec-structure-type",
+        "to": "proc-structure-applicable",
+        "role": "option",
+        "label": "令136条の2適合"
+      },
+      {
+        "id": "e05",
+        "from": "dec-structure-type",
+        "to": "not-applicable",
+        "role": "option",
+        "label": "その他"
+      },
+      {
+        "id": "e06",
+        "from": "proc-structure-applicable",
+        "to": "dec-basement-room",
+        "role": "flow"
+      },
+      {
+        "id": "e07",
+        "from": "dec-basement-room",
+        "to": "proc-floor-applicable",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e08",
+        "from": "dec-basement-room",
+        "to": "dec-upper-room",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e09",
+        "from": "dec-upper-room",
+        "to": "proc-floor-applicable",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e10",
+        "from": "dec-upper-room",
+        "to": "not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e11",
+        "from": "proc-floor-applicable",
+        "to": "proc-shaft-identify",
+        "role": "flow"
+      },
+      {
+        "id": "e12",
+        "from": "proc-shaft-identify",
+        "to": "dec-exemption-i1",
+        "role": "flow"
+      },
+      {
+        "id": "e13",
+        "from": "dec-exemption-i1",
+        "to": "proc-exemption-i1-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e14",
+        "from": "dec-exemption-i1",
+        "to": "dec-exemption-i2",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e15",
+        "from": "proc-exemption-i1-pass",
+        "to": "dec-all-shafts-checked",
+        "role": "flow"
+      },
+      {
+        "id": "e16",
+        "from": "dec-exemption-i2",
+        "to": "proc-exemption-i2-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e17",
+        "from": "dec-exemption-i2",
+        "to": "dec-compartment-type",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e18",
+        "from": "proc-exemption-i2-pass",
+        "to": "dec-all-shafts-checked",
+        "role": "flow"
+      },
+      {
+        "id": "e19",
+        "from": "dec-compartment-type",
+        "to": "proc-compartment-ok",
+        "role": "option",
+        "label": "準耐火構造の床・壁"
+      },
+      {
+        "id": "e20",
+        "from": "dec-compartment-type",
+        "to": "proc-compartment-ok",
+        "role": "option",
+        "label": "法2条9号の2ロの防火設備"
+      },
+      {
+        "id": "e21",
+        "from": "dec-compartment-type",
+        "to": "fail",
+        "role": "option",
+        "label": "区画なし"
+      },
+      {
+        "id": "e22",
+        "from": "proc-compartment-ok",
+        "to": "dec-all-shafts-checked",
+        "role": "flow"
+      },
+      {
+        "id": "e23",
+        "from": "dec-all-shafts-checked",
+        "to": "pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e24",
+        "from": "dec-all-shafts-checked",
+        "to": "proc-shaft-identify",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-KIJO-A112-P11",
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00.000Z",
+    "updated_at": "2025-12-25T00:00:00.000Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

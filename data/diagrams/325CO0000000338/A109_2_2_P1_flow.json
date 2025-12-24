@@ -1,0 +1,318 @@
+{
+  "id": "A109_2_2_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "準耐火構造建築物の主要構造部の構成",
+    "target_subject": "建築物",
+    "description": "主要構造部を準耐火構造とした建築物（特定主要構造部を耐火構造とした建築物を含む）の適合判定"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "109の2の2",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "耐火構造・準耐火構造"
+  ],
+  "text_raw": "主要構造部を準耐火構造とした建築物（特定主要構造部を耐火構造とした建築物を含む。）は、次の各号に掲げる場合の区分に応じて、当該各号に定める基準に適合するものとしなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "building_characteristic",
+          "value": "主要構造部を準耐火構造とした建築物"
+        }
+      ],
+      "note": "特定主要構造部を耐火構造とした建築物を含む"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "note": "第1号の場合",
+          "ref": "info-case1"
+        },
+        {
+          "note": "第2号の場合",
+          "ref": "info-case2"
+        }
+      ]
+    }
+  },
+  "flow_diagram": {
+    "title": "準耐火構造建築物の適合判定フロー",
+    "description": "主要構造部を準耐火構造とした建築物が各号の基準に適合するかを判定するフロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "準耐火構造建築物の適合判定開始"
+      },
+      {
+        "id": "dec-structure-type",
+        "type": "decision",
+        "title": "主要構造部の構造種別は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "準耐火構造", "description": "主要構造部が準耐火構造" },
+          { "value": "特定主要構造部が耐火構造", "description": "特定主要構造部を耐火構造とした建築物" },
+          { "value": "その他", "description": "準耐火構造でも耐火構造でもない" }
+        ],
+        "description": "主要構造部が準耐火構造か、特定主要構造部が耐火構造かを判定"
+      },
+      {
+        "id": "not-applicable",
+        "type": "terminal",
+        "title": "適用対象外",
+        "result": "end",
+        "description": "本条の適用対象外"
+      },
+      {
+        "id": "proc-scope-applicable",
+        "type": "process",
+        "title": "本条の適用対象",
+        "process_type": "mechanical",
+        "description": "主要構造部を準耐火構造とした建築物として本条が適用される"
+      },
+      {
+        "id": "dec-quasi-fireproof-type",
+        "type": "decision",
+        "title": "準耐火構造の種別は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "準耐火構造I型", "description": "準耐火イ" },
+          { "value": "準耐火構造II型", "description": "準耐火ロ-1" },
+          { "value": "準耐火構造III型", "description": "準耐火ロ-2" }
+        ],
+        "description": "準耐火構造の詳細種別を判定"
+      },
+      {
+        "id": "proc-case-determination",
+        "type": "process",
+        "title": "適用される場合の判定",
+        "process_type": "mechanical",
+        "description": "建築物の用途、階数、延べ面積等から第109条の2の2各号のいずれに該当するか判定"
+      },
+      {
+        "id": "dec-case",
+        "type": "decision",
+        "title": "該当する場合分けは？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "第1号", "description": "第1号に該当する場合" },
+          { "value": "第2号", "description": "第2号に該当する場合" }
+        ],
+        "description": "各号のいずれに該当するかを判定"
+      },
+      {
+        "id": "proc-case1-check",
+        "type": "process",
+        "title": "第1号基準の確認",
+        "process_type": "sub_diagram_reference",
+        "description": "第1号に定める基準への適合を確認",
+        "related_articles": ["令::A109_2_2:P1:I1"]
+      },
+      {
+        "id": "proc-case2-check",
+        "type": "process",
+        "title": "第2号基準の確認",
+        "process_type": "sub_diagram_reference",
+        "description": "第2号に定める基準への適合を確認",
+        "related_articles": ["令::A109_2_2:P1:I2"]
+      },
+      {
+        "id": "dec-case-compliance",
+        "type": "decision",
+        "title": "該当号の基準に適合か？",
+        "decision_type": "binary",
+        "description": "該当する号に定める基準に適合しているか"
+      },
+      {
+        "id": "proc-fireproof-standard-check",
+        "type": "process",
+        "title": "準耐火構造基準の確認",
+        "process_type": "sub_diagram_reference",
+        "description": "令第106条～第115条の準耐火構造基準に適合するか確認",
+        "related_articles": ["令::A106", "令::A107", "令::A108", "令::A109", "令::A110", "令::A111", "令::A112", "令::A113", "令::A114", "令::A115"]
+      },
+      {
+        "id": "dec-fireproof-compliance",
+        "type": "decision",
+        "title": "準耐火構造基準に適合か？",
+        "decision_type": "binary",
+        "description": "準耐火構造の詳細基準に適合しているか"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令第109条の2の2の基準に適合"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "令第109条の2の2の基準に不適合"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-structure-type",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-structure-type",
+        "to": "proc-scope-applicable",
+        "role": "option",
+        "label": "準耐火構造"
+      },
+      {
+        "id": "e03",
+        "from": "dec-structure-type",
+        "to": "proc-scope-applicable",
+        "role": "option",
+        "label": "特定主要構造部が耐火構造"
+      },
+      {
+        "id": "e04",
+        "from": "dec-structure-type",
+        "to": "not-applicable",
+        "role": "option",
+        "label": "その他"
+      },
+      {
+        "id": "e05",
+        "from": "proc-scope-applicable",
+        "to": "dec-quasi-fireproof-type",
+        "role": "flow"
+      },
+      {
+        "id": "e06",
+        "from": "dec-quasi-fireproof-type",
+        "to": "proc-case-determination",
+        "role": "option",
+        "label": "準耐火構造I型"
+      },
+      {
+        "id": "e07",
+        "from": "dec-quasi-fireproof-type",
+        "to": "proc-case-determination",
+        "role": "option",
+        "label": "準耐火構造II型"
+      },
+      {
+        "id": "e08",
+        "from": "dec-quasi-fireproof-type",
+        "to": "proc-case-determination",
+        "role": "option",
+        "label": "準耐火構造III型"
+      },
+      {
+        "id": "e09",
+        "from": "proc-case-determination",
+        "to": "dec-case",
+        "role": "flow"
+      },
+      {
+        "id": "e10",
+        "from": "dec-case",
+        "to": "proc-case1-check",
+        "role": "option",
+        "label": "第1号"
+      },
+      {
+        "id": "e11",
+        "from": "dec-case",
+        "to": "proc-case2-check",
+        "role": "option",
+        "label": "第2号"
+      },
+      {
+        "id": "e12",
+        "from": "proc-case1-check",
+        "to": "dec-case-compliance",
+        "role": "flow"
+      },
+      {
+        "id": "e13",
+        "from": "proc-case2-check",
+        "to": "dec-case-compliance",
+        "role": "flow"
+      },
+      {
+        "id": "e14",
+        "from": "dec-case-compliance",
+        "to": "proc-fireproof-standard-check",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e15",
+        "from": "dec-case-compliance",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e16",
+        "from": "proc-fireproof-standard-check",
+        "to": "dec-fireproof-compliance",
+        "role": "flow"
+      },
+      {
+        "id": "e17",
+        "from": "dec-fireproof-compliance",
+        "to": "pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e18",
+        "from": "dec-fireproof-compliance",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-ORD-A109-2-2-P1",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": ["27", "28"],
+      "description": "準耐火構造の定義と要件の基本"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": ["106", "107", "108", "109", "110", "111", "112", "113", "114", "115"],
+      "description": "準耐火構造の詳細基準"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00.000Z",
+    "updated_at": "2025-12-25T00:00:00.000Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

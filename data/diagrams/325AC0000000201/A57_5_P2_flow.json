@@ -1,0 +1,245 @@
+{
+  "id": "A57_5_P2_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "敷地が高層住居誘導地区内外にわたる場合の建蔽率限度の適用",
+    "target_subject": "建築物",
+    "description": "建築物の敷地が高層住居誘導地区の内外にわたる場合、建築物の高層住居誘導地区内部分に係る建蔽率限度を判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "57_5",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "敷地分割"
+  ],
+  "text_raw": "前項の場合において、建築物の敷地が高層住居誘導地区の内外にわたるときは、当該高層住居誘導地区に関する都市計画において定められた建築物の建蔽率の最高限度を、当該建築物の当該高層住居誘導地区内にある部分に係る第五十三条第一項の規定による建築物の建蔽率の限度とみなして、同条第二項の規定を適用する。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "敷地が高層住居誘導地区の内外にわたる場合"
+        },
+        {
+          "type": "prerequisite",
+          "value": "第57条の5第1項が適用される"
+        }
+      ],
+      "note": "建築物の敷地が高層住居誘導地区内外にわたる場合のみ適用"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-site-span",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "ref": "info-bcr-limit-set",
+          "operator": "!=",
+          "value": null
+        }
+      ]
+    }
+  },
+  "flow_diagram": {
+    "title": "法第57条の5第2項 区内外敷地の建蔽率判定フロー",
+    "description": "敷地が高層住居誘導地区の内外にわたる場合の建蔽率限度適合判定フロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "法第57条の5第2項の適合判定を開始"
+      },
+      {
+        "id": "dec-p1-applicable",
+        "type": "decision",
+        "title": "第1項が適用されるか？",
+        "decision_type": "binary",
+        "description": "法第57条の5第1項（高層住居誘導地区内の建蔽率制限）が適用されるか確認"
+      },
+      {
+        "id": "dec-site-span",
+        "type": "decision",
+        "title": "敷地は高層住居誘導地区の内外にわたるか？",
+        "decision_type": "binary",
+        "description": "敷地が高層住居誘導地区の境界をまたいでいるか確認"
+      },
+      {
+        "id": "proc-site-division",
+        "type": "process",
+        "title": "敷地を区内外に分割",
+        "process_type": "mechanical",
+        "description": "敷地を高層住居誘導地区内の部分と区外の部分に分割"
+      },
+      {
+        "id": "proc-building-extraction",
+        "type": "process",
+        "title": "建築物の区内部分を特定",
+        "process_type": "mechanical",
+        "description": "建築物全体から高層住居誘導地区内にある部分を抽出"
+      },
+      {
+        "id": "proc-bcr-calculation",
+        "type": "process",
+        "title": "区内部分の建蔽率を計算",
+        "process_type": "mechanical",
+        "description": "建築物の区内部分の建築面積を敷地の区内部分の面積で除して建蔽率を計算（BCR = Ba / Sa × 100）"
+      },
+      {
+        "id": "dec-bcr-compliance",
+        "type": "decision",
+        "title": "区内部分の建蔽率は最高限度以下か？",
+        "decision_type": "binary",
+        "description": "計算された建蔽率が都市計画で定められた最高限度以下であるか判定",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "BCR", "desc": "区内部分の建蔽率" },
+          "rhs": { "var": "R1", "desc": "建蔽率最高限度", "unit": "%" }
+        }
+      },
+      {
+        "id": "proc-bcr-compliant",
+        "type": "process",
+        "title": "建蔽率に適合",
+        "process_type": "mechanical",
+        "description": "区内部分の建蔽率が最高限度以下であることを確認"
+      },
+      {
+        "id": "pass-not-applicable",
+        "type": "terminal",
+        "title": "適用対象外（適合）",
+        "result": "pass",
+        "description": "第1項が適用されないため本規定も適用されない"
+      },
+      {
+        "id": "pass-no-span",
+        "type": "terminal",
+        "title": "適用対象外（適合）",
+        "result": "pass",
+        "description": "敷地が区内外にわたらないため本規定は適用されない（第1項のみ適用）"
+      },
+      {
+        "id": "pass-compliant",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "区内部分の建蔽率が最高限度以下で法第57条の5第2項に適合"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "区内部分の建蔽率が最高限度を超過し不適合"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-p1-applicable",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-p1-applicable",
+        "to": "dec-site-span",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "dec-p1-applicable",
+        "to": "pass-not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e04",
+        "from": "dec-site-span",
+        "to": "proc-site-division",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e05",
+        "from": "dec-site-span",
+        "to": "pass-no-span",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e06",
+        "from": "proc-site-division",
+        "to": "proc-building-extraction",
+        "role": "flow"
+      },
+      {
+        "id": "e07",
+        "from": "proc-building-extraction",
+        "to": "proc-bcr-calculation",
+        "role": "flow"
+      },
+      {
+        "id": "e08",
+        "from": "proc-bcr-calculation",
+        "to": "dec-bcr-compliance",
+        "role": "flow"
+      },
+      {
+        "id": "e09",
+        "from": "dec-bcr-compliance",
+        "to": "proc-bcr-compliant",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e10",
+        "from": "dec-bcr-compliance",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e11",
+        "from": "proc-bcr-compliant",
+        "to": "pass-compliant",
+        "role": "flow"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-A57_5-P2",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": [
+        "A57_5:P1",
+        "A53:P1",
+        "A53:P2"
+      ],
+      "description": "第57条の5第1項の適用、第53条第1項及び第2項の規定を適用"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

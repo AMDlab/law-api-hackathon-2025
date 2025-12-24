@@ -1,0 +1,372 @@
+{
+  "id": "A67_P4_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "特定防災街区整備地区内の既存不適格敷地の適用除外",
+    "target_subject": "敷地",
+    "description": "敷地面積最低限度の制定・変更時に既存の敷地が第3項の規定の適用除外となる条件を判定する（第53条の2第3項の準用）"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "67",
+    "paragraph": "4",
+    "item": null
+  },
+  "labels": [
+    "集団規定",
+    "敷地",
+    "既存不適格",
+    "特定防災街区整備地区",
+    "準用規定"
+  ],
+  "text_raw": "第五十三条の二第三項の規定は、前項の都市計画において建築物の敷地面積の最低限度が定められ、又は変更された場合に準用する。この場合において、同条第三項中「第一項」とあるのは、「第六十七条第三項」と読み替えるものとする。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "特定防災街区整備地区に関する都市計画内"
+        },
+        {
+          "type": "temporal",
+          "value": "第3項の敷地面積最低限度が定められ又は変更された際"
+        }
+      ],
+      "note": "特定防災街区整備地区に関する都市計画において敷地面積最低限度が定められ又は変更された区域"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "operator": "OR",
+          "conditions": [
+            {
+              "ref": "info-existing-nonconforming-site",
+              "operator": "==",
+              "value": true,
+              "note": "制定・変更時に既に不適格だった敷地"
+            },
+            {
+              "ref": "info-rights-based-nonconforming",
+              "operator": "==",
+              "value": true,
+              "note": "制定・変更時に所有権等に基づき使用すれば不適格となる土地"
+            }
+          ]
+        },
+        {
+          "ref": "info-single-site-use",
+          "operator": "==",
+          "value": true,
+          "note": "全部を一の敷地として使用"
+        }
+      ]
+    },
+    "exceptions": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "ref": "info-previous-violation",
+          "operator": "==",
+          "value": true,
+          "note": "変更前の制限に既に違反していた"
+        },
+        {
+          "ref": "info-became-conforming",
+          "operator": "==",
+          "value": true,
+          "note": "後に適合するに至った"
+        }
+      ],
+      "effect": "NO_EXEMPTION"
+    }
+  },
+  "kijo_diagram_ref": "CHK-BSL-A67-P4",
+  "flow_diagram": {
+    "title": "特定防災街区整備地区内の既存不適格敷地の適用除外判定フロー",
+    "description": "敷地面積最低限度規制の既存不適格敷地について、第3項の適用除外となるかを判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start"
+      },
+      {
+        "id": "dec-regulation-change",
+        "type": "decision",
+        "title": "敷地面積最低限度は制定又は変更されたか？",
+        "decision_type": "binary",
+        "description": "特定防災街区整備地区に関する都市計画において敷地面積最低限度が定められ又は変更されたか"
+      },
+      {
+        "id": "dec-site-status",
+        "type": "decision",
+        "title": "規制時の敷地の状況は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "既に建築物の敷地として使用" },
+          { "value": "所有権等に基づき使用予定の土地" },
+          { "value": "その他" }
+        ],
+        "description": "規制制定・変更時における敷地の使用状況を判定"
+      },
+      {
+        "id": "dec-site-area-nonconforming",
+        "type": "decision",
+        "title": "規制時の敷地面積は最低限度未満か？",
+        "decision_type": "binary",
+        "description": "規制制定・変更時の敷地面積(A1)が最低限度(Amin)未満であるか判定",
+        "condition": {
+          "operator": "LT",
+          "lhs": { "var": "A1", "desc": "規制時の敷地面積" },
+          "rhs": { "var": "Amin", "desc": "敷地面積の最低限度", "unit": "m2" }
+        }
+      },
+      {
+        "id": "proc-existing-nonconforming",
+        "type": "process",
+        "title": "既存不適格敷地に該当",
+        "process_type": "mechanical",
+        "description": "制定・変更時に現に建築物の敷地として使用されており第3項に不適合"
+      },
+      {
+        "id": "dec-rights-based-nonconforming",
+        "type": "decision",
+        "title": "所有権等に基づき敷地使用で最低限度未満となるか？",
+        "decision_type": "binary",
+        "description": "規制時に所有権等に基づき敷地として使用すれば第3項に適合しないか判定"
+      },
+      {
+        "id": "proc-rights-based-nonconforming",
+        "type": "process",
+        "title": "権利に基づく不適格敷地に該当",
+        "process_type": "mechanical",
+        "description": "制定・変更時に所有権等に基づき使用すれば第3項に不適合となる土地"
+      },
+      {
+        "id": "dec-single-site-use",
+        "type": "decision",
+        "title": "全部を一の敷地として使用するか？",
+        "decision_type": "binary",
+        "description": "当該土地の全部を一の敷地として使用するか確認"
+      },
+      {
+        "id": "dec-previous-violation",
+        "type": "decision",
+        "title": "変更前の制限に既に違反していたか？",
+        "decision_type": "binary",
+        "description": "規制変更時に従前の敷地面積最低限度制限に既に違反していたか判定（第1号に準ずる）"
+      },
+      {
+        "id": "proc-previous-violation-match",
+        "type": "process",
+        "title": "従前制限違反に該当",
+        "process_type": "mechanical",
+        "description": "従前の制限に既に違反していたため適用除外の対象外"
+      },
+      {
+        "id": "dec-became-conforming",
+        "type": "decision",
+        "title": "その後に第3項に適合するに至ったか？",
+        "decision_type": "binary",
+        "description": "規制制定・変更後に敷地面積が最低限度以上となったか判定（第2号に準ずる）"
+      },
+      {
+        "id": "proc-became-conforming-match",
+        "type": "process",
+        "title": "適合化に該当",
+        "process_type": "mechanical",
+        "description": "第3項の規定に適合するに至ったため適用除外の対象外"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "第3項適用除外（適合）",
+        "result": "pass",
+        "description": "第67条第3項の規定が適用されない（適用除外）"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "第3項適用（不適合）",
+        "result": "fail",
+        "description": "第67条第3項の規定が適用される（適用除外なし）"
+      },
+      {
+        "id": "not-applicable",
+        "type": "terminal",
+        "title": "規定対象外",
+        "result": "end",
+        "description": "本規定の適用範囲外"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-regulation-change",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-regulation-change",
+        "to": "dec-site-status",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "dec-regulation-change",
+        "to": "not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e04",
+        "from": "dec-site-status",
+        "to": "dec-site-area-nonconforming",
+        "role": "option",
+        "label": "既に建築物の敷地として使用"
+      },
+      {
+        "id": "e05",
+        "from": "dec-site-status",
+        "to": "dec-rights-based-nonconforming",
+        "role": "option",
+        "label": "所有権等に基づき使用予定の土地"
+      },
+      {
+        "id": "e06",
+        "from": "dec-site-status",
+        "to": "fail",
+        "role": "option",
+        "label": "その他"
+      },
+      {
+        "id": "e07",
+        "from": "dec-site-area-nonconforming",
+        "to": "proc-existing-nonconforming",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e08",
+        "from": "dec-site-area-nonconforming",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e09",
+        "from": "proc-existing-nonconforming",
+        "to": "dec-single-site-use",
+        "role": "flow"
+      },
+      {
+        "id": "e10",
+        "from": "dec-rights-based-nonconforming",
+        "to": "proc-rights-based-nonconforming",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e11",
+        "from": "dec-rights-based-nonconforming",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e12",
+        "from": "proc-rights-based-nonconforming",
+        "to": "dec-single-site-use",
+        "role": "flow"
+      },
+      {
+        "id": "e13",
+        "from": "dec-single-site-use",
+        "to": "dec-previous-violation",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e14",
+        "from": "dec-single-site-use",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e15",
+        "from": "dec-previous-violation",
+        "to": "proc-previous-violation-match",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e16",
+        "from": "dec-previous-violation",
+        "to": "dec-became-conforming",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e17",
+        "from": "proc-previous-violation-match",
+        "to": "fail",
+        "role": "flow"
+      },
+      {
+        "id": "e18",
+        "from": "dec-became-conforming",
+        "to": "proc-became-conforming-match",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e19",
+        "from": "dec-became-conforming",
+        "to": "pass",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e20",
+        "from": "proc-became-conforming-match",
+        "to": "fail",
+        "role": "flow"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A53_2:P3"],
+      "description": "第53条の2第3項の規定を準用し、第1項は第67条第3項として読み替える"
+    },
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A67:P3"],
+      "description": "特定防災街区整備地区内の敷地面積最低限度規制"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00.000Z",
+    "updated_at": "2025-12-25T00:00:00.000Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-skill",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

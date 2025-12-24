@@ -1,0 +1,136 @@
+{
+  "id": "A44_P1_I4_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "道路内建築制限の適用除外（第4号）（適合判定フロー）",
+    "target_subject": "建築物",
+    "description": "公共用歩廊等で特定行政庁の許可を受けたものが適用除外に該当することを判定するフロー"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "44",
+    "paragraph": "1",
+    "item": "4"
+  },
+  "labels": ["集団規定", "道路", "適用除外"],
+  "text_raw": "公共用歩廊その他政令で定める建築物で特定行政庁が安全上、防火上及び衛生上他の建築物の利便を妨げ、その他周囲の環境を害するおそれがないと認めて許可したもの",
+  "compliance_logic": {
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        { "note": "公共用歩廊等の該当", "ref": "info-building-type-match" },
+        { "note": "特定行政庁の許可", "ref": "info-permission" }
+      ]
+    }
+  },
+  "flow_diagram": {
+    "title": "法44条1項4号 公共用歩廊等の道路内建築 適合判定フロー",
+    "description": "公共用歩廊その他政令で定める建築物で特定行政庁の許可を受けたものの適用除外要件を判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "法44条1項4号の適合判定を開始"
+      },
+      {
+        "id": "dec-building-type",
+        "type": "decision",
+        "title": "建築物の種類は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "公共用歩廊", "description": "アーケード等の公共用歩廊" },
+          { "value": "政令で定める建築物", "description": "令第145条で定める建築物（渡り廊下、公共用トイレ等）" },
+          { "value": "その他", "description": "上記以外の建築物" }
+        ],
+        "description": "建築物が公共用歩廊その他政令で定める建築物に該当するか判定",
+        "related_articles": ["令::A145"]
+      },
+      {
+        "id": "proc-building-type-match",
+        "type": "process",
+        "title": "公共用歩廊等該当",
+        "process_type": "mechanical",
+        "description": "公共用歩廊その他政令で定める建築物に該当することを確認"
+      },
+      {
+        "id": "dec-safety-judgment",
+        "type": "decision",
+        "title": "安全性等の判断を受けているか？",
+        "decision_type": "binary",
+        "description": "特定行政庁が安全上、防火上及び衛生上他の建築物の利便を妨げ、その他周囲の環境を害するおそれがないと認めているか判定"
+      },
+      {
+        "id": "dec-permission",
+        "type": "decision",
+        "title": "許可書があるか？",
+        "decision_type": "binary",
+        "description": "特定行政庁の許可（建築審査会の同意を得たもの）を受けているか判定",
+        "related_articles": ["法::A44:P2"]
+      },
+      {
+        "id": "proc-item4-match",
+        "type": "process",
+        "title": "第4号該当",
+        "process_type": "mechanical",
+        "description": "法44条1項4号の全要件を満たす"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合（適用除外）",
+        "result": "pass",
+        "description": "法44条1項4号に該当し、道路内建築制限の適用除外となる"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "法44条1項4号に該当せず、道路内建築制限が適用される"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "dec-building-type", "role": "flow" },
+      { "id": "e02", "from": "dec-building-type", "to": "proc-building-type-match", "role": "option", "label": "公共用歩廊" },
+      { "id": "e03", "from": "dec-building-type", "to": "proc-building-type-match", "role": "option", "label": "政令で定める建築物" },
+      { "id": "e04", "from": "dec-building-type", "to": "fail", "role": "option", "label": "その他" },
+      { "id": "e05", "from": "proc-building-type-match", "to": "dec-safety-judgment", "role": "flow" },
+      { "id": "e06", "from": "dec-safety-judgment", "to": "dec-permission", "role": "yes", "label": "はい" },
+      { "id": "e07", "from": "dec-safety-judgment", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e08", "from": "dec-permission", "to": "proc-item4-match", "role": "yes", "label": "はい" },
+      { "id": "e09", "from": "dec-permission", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e10", "from": "proc-item4-match", "to": "pass", "role": "flow" }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-A44-P1-I4",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A44:P2"],
+      "description": "第4号の許可には建築審査会の同意が必要（第2項）"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "delegates_to",
+      "articles": ["A145"],
+      "description": "道路内に建築できる建築物を規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

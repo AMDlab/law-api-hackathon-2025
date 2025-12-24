@@ -1,0 +1,150 @@
+{
+  "id": "A39_P2_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "災害危険区域内の建築制限適合確認（適合判定フロー）",
+    "target_subject": "建築物",
+    "description": "災害危険区域内における建築物の建築制限（条例）への適合を判定するフロー"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "39",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": ["集団規定", "災害防止", "条例委任"],
+  "text_raw": "災害危険区域内における住居の用に供する建築物の建築の禁止その他建築物の建築に関する制限で災害防止上必要なものは、前項の条例で定める。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        { "type": "location", "value": "災害危険区域内" },
+        { "type": "ordinance", "value": "地方公共団体が法39条1項に基づき制定した条例が存在" }
+      ],
+      "note": "敷地が災害危険区域内に位置する場合に適用。具体的な制限内容は地方公共団体の条例で定められる。"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        { "type": "ordinance_compliance", "ref": "info-restriction-compliance", "operator": "==", "value": true }
+      ],
+      "note": "地方公共団体の条例で定められた建築制限（住居用建築物の建築禁止その他災害防止上必要な制限）に適合すること"
+    }
+  },
+  "flow_diagram": {
+    "title": "法39条2項 災害危険区域内建築制限 適合判定フロー",
+    "description": "災害危険区域内の建築物が条例で定められた建築制限に適合するかを判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "法39条2項の適合判定を開始"
+      },
+      {
+        "id": "dec-in-zone",
+        "type": "decision",
+        "title": "敷地は災害危険区域内か？",
+        "decision_type": "binary",
+        "description": "敷地が条例で指定された災害危険区域内に位置するか判定（法39条1項による判定結果を参照）",
+        "related_articles": ["法::A39:P1"]
+      },
+      {
+        "id": "proc-out-zone",
+        "type": "process",
+        "title": "災害危険区域外",
+        "process_type": "mechanical",
+        "description": "敷地は災害危険区域外のため法39条2項は適用されない"
+      },
+      {
+        "id": "dec-building-use",
+        "type": "decision",
+        "title": "建築物の用途は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "住居用", "description": "住宅、共同住宅等" },
+          { "value": "非住居用", "description": "事務所、工場等" }
+        ],
+        "description": "建築物の用途区分を判定"
+      },
+      {
+        "id": "dec-residential-prohibited",
+        "type": "decision",
+        "title": "条例で住居用建築物の建築が禁止されているか？",
+        "decision_type": "binary",
+        "description": "当該災害危険区域において住居用建築物の建築が条例で禁止されているか判定"
+      },
+      {
+        "id": "proc-residential-prohibited",
+        "type": "process",
+        "title": "住居用建築物建築禁止",
+        "process_type": "mechanical",
+        "description": "条例により住居用建築物の建築が禁止されている区域"
+      },
+      {
+        "id": "dec-ordinance-restrictions",
+        "type": "decision",
+        "title": "条例の建築制限に適合するか？",
+        "decision_type": "binary",
+        "description": "条例で定められた災害防止上必要な建築制限（構造制限、用途制限、規模制限等）に適合するか判定"
+      },
+      {
+        "id": "proc-ordinance-comply",
+        "type": "process",
+        "title": "条例制限適合",
+        "process_type": "mechanical",
+        "description": "条例で定められた建築制限に適合"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "法39条2項の規定に適合（災害危険区域外、又は条例制限に適合）"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "法39条2項の規定に不適合（条例の建築制限に違反）"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "dec-in-zone", "role": "flow" },
+      { "id": "e02", "from": "dec-in-zone", "to": "dec-building-use", "role": "yes", "label": "はい" },
+      { "id": "e03", "from": "dec-in-zone", "to": "proc-out-zone", "role": "no", "label": "いいえ" },
+      { "id": "e04", "from": "proc-out-zone", "to": "pass", "role": "flow" },
+      { "id": "e05", "from": "dec-building-use", "to": "dec-residential-prohibited", "role": "option", "label": "住居用" },
+      { "id": "e06", "from": "dec-building-use", "to": "dec-ordinance-restrictions", "role": "option", "label": "非住居用" },
+      { "id": "e07", "from": "dec-residential-prohibited", "to": "proc-residential-prohibited", "role": "yes", "label": "はい" },
+      { "id": "e08", "from": "dec-residential-prohibited", "to": "dec-ordinance-restrictions", "role": "no", "label": "いいえ" },
+      { "id": "e09", "from": "proc-residential-prohibited", "to": "fail", "role": "flow" },
+      { "id": "e10", "from": "dec-ordinance-restrictions", "to": "proc-ordinance-comply", "role": "yes", "label": "はい" },
+      { "id": "e11", "from": "dec-ordinance-restrictions", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e12", "from": "proc-ordinance-comply", "to": "pass", "role": "flow" }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-A39-P2",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A39:P1"],
+      "description": "災害危険区域の指定（第39条第1項）"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

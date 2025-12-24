@@ -1,0 +1,203 @@
+{
+  "id": "A57_2_P6_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "特例容積率限度が公告された場合の適用フロー",
+    "target_subject": "建築物",
+    "description": "特例容積率の限度が公告されたときに、当該特例敷地内の建築物に対して特例容積率限度を適用するか判定するフロー"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "57の2",
+    "paragraph": "6",
+    "item": null
+  },
+  "labels": [
+    "集団規定",
+    "手続規定",
+    "特例容積率適用"
+  ],
+  "text_raw": "第四項の規定により特例容積率の限度が公告されたときは、当該特例敷地内の建築物については、当該特例容積率の限度を第五十二条第一項各号に掲げる数値とみなして、同条の規定を適用する。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "procedural",
+          "value": "特例容積率の限度が公告されている"
+        },
+        {
+          "type": "location",
+          "value": "特例敷地内"
+        }
+      ],
+      "note": "特例敷地内で特例容積率の限度の公告がされた場合に適用"
+    },
+    "judgment_rule": {
+      "operator": "ALWAYS",
+      "conditions": [
+        {
+          "note": "容積率限度の適用方法の規定",
+          "ref": "info-special-ratio-applied",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "kijo_diagram_ref": "CHK-BSL-A57-2-P6",
+  "flow_diagram": {
+    "title": "特例容積率限度の適用判定フロー",
+    "description": "第57条の2第6項に基づき、建築物に特例容積率限度を適用するかを判定するフロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "特例容積率限度の適用判定を開始"
+      },
+      {
+        "id": "dec-special-site",
+        "type": "decision",
+        "title": "建築物は特例敷地内に位置するか？",
+        "decision_type": "binary",
+        "description": "判定対象の建築物が特例敷地内に位置しているか"
+      },
+      {
+        "id": "proc-special-site-confirmed",
+        "type": "process",
+        "title": "特例敷地内",
+        "process_type": "mechanical",
+        "description": "建築物が特例敷地内に位置することを確認"
+      },
+      {
+        "id": "dec-proclamation-exists",
+        "type": "decision",
+        "title": "第4項による公告があるか？",
+        "decision_type": "binary",
+        "description": "当該特例敷地について第57条の2第4項の規定により特例容積率の限度が公告されているか"
+      },
+      {
+        "id": "proc-proclamation-confirmed",
+        "type": "process",
+        "title": "公告あり",
+        "process_type": "mechanical",
+        "description": "第4項の規定による公告が行われていることを確認"
+      },
+      {
+        "id": "proc-obtain-special-ratio",
+        "type": "process",
+        "title": "特例容積率限度の取得",
+        "process_type": "mechanical",
+        "description": "当該特例敷地に指定された特例容積率の限度の数値を取得"
+      },
+      {
+        "id": "proc-apply-substitution",
+        "type": "process",
+        "title": "第52条の容積率として適用",
+        "process_type": "mechanical",
+        "description": "特例容積率の限度を第52条第1項各号に掲げる数値とみなして適用"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "特例容積率適用",
+        "result": "pass",
+        "description": "特例容積率の限度を第52条の容積率限度として適用する"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "通常の容積率適用",
+        "result": "fail",
+        "description": "特例容積率の限度を適用せず、通常の第52条の規定を適用する"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e-start-to-site",
+        "from": "start",
+        "to": "dec-special-site",
+        "role": "flow"
+      },
+      {
+        "id": "e-site-yes",
+        "from": "dec-special-site",
+        "to": "proc-special-site-confirmed",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e-site-no",
+        "from": "dec-special-site",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e-site-to-proclamation",
+        "from": "proc-special-site-confirmed",
+        "to": "dec-proclamation-exists",
+        "role": "flow"
+      },
+      {
+        "id": "e-proclamation-yes",
+        "from": "dec-proclamation-exists",
+        "to": "proc-proclamation-confirmed",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e-proclamation-no",
+        "from": "dec-proclamation-exists",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e-proclamation-to-obtain",
+        "from": "proc-proclamation-confirmed",
+        "to": "proc-obtain-special-ratio",
+        "role": "flow"
+      },
+      {
+        "id": "e-obtain-to-apply",
+        "from": "proc-obtain-special-ratio",
+        "to": "proc-apply-substitution",
+        "role": "flow"
+      },
+      {
+        "id": "e-apply-to-pass",
+        "from": "proc-apply-substitution",
+        "to": "pass",
+        "role": "flow"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": [
+        "A52:P1",
+        "A57_2:P4"
+      ],
+      "description": "第52条の容積率制限に特例容積率を適用する根拠となる規定。第57条の2第4項の公告により効力を生ずる。"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00Z",
+    "updated_at": "2025-12-25T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

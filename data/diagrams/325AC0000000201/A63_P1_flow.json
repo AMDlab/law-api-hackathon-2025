@@ -1,0 +1,216 @@
+{
+  "id": "A63_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "耐火構造外壁の隣地境界線設置可否判定フロー",
+    "target_subject": "外壁",
+    "description": "防火地域又は準防火地域内の建築物において、耐火構造の外壁を隣地境界線に接して設けることができるかを判定するフロー"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "63",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "集団規定",
+    "防火"
+  ],
+  "text_raw": "防火地域又は準防火地域内にある建築物で、外壁が耐火構造のものについては、その外壁を隣地境界線に接して設けることができる。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "防火地域内"
+        },
+        {
+          "type": "location",
+          "value": "準防火地域内"
+        }
+      ],
+      "note": "防火地域又は準防火地域内の建築物に適用"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-fireproof-structure",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "ref": "info-boundary-adjacent",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "note": "外壁が耐火構造であり、かつ隣地境界線に接して設ける場合に許容される"
+    }
+  },
+  "kijo_diagram_ref": "CHK-BSL-A63-P1",
+  "flow_diagram": {
+    "title": "耐火構造外壁の隣地境界線設置可否判定",
+    "description": "防火・準防火地域内で外壁が耐火構造であれば隣地境界線に接して設けることができるかを判定するフロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "法63条1項の判定を開始"
+      },
+      {
+        "id": "dec-fire-area",
+        "type": "decision",
+        "title": "防火地域又は準防火地域内か？",
+        "decision_type": "binary",
+        "description": "敷地が防火地域又は準防火地域内に位置するかを判定"
+      },
+      {
+        "id": "end-not-applicable",
+        "type": "terminal",
+        "title": "法63条1項対象外",
+        "result": "end",
+        "description": "防火地域・準防火地域外のため本条項は適用されない"
+      },
+      {
+        "id": "dec-boundary-adjacent",
+        "type": "decision",
+        "title": "外壁を隣地境界線に接して設けるか？",
+        "decision_type": "binary",
+        "description": "外壁が隣地境界線に接して設けられているかを判定"
+      },
+      {
+        "id": "end-no-boundary",
+        "type": "terminal",
+        "title": "本条項判定不要",
+        "result": "end",
+        "description": "隣地境界線に接していないため本条項の判定は不要"
+      },
+      {
+        "id": "dec-wall-structure",
+        "type": "decision",
+        "title": "外壁の構造は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "耐火構造", "description": "耐火構造に該当" },
+          { "value": "準耐火構造", "description": "準耐火構造" },
+          { "value": "その他", "description": "その他の構造" }
+        ],
+        "description": "隣地境界線に接する外壁の構造種別を判定",
+        "related_articles": [
+          "法::A2:I7"
+        ]
+      },
+      {
+        "id": "proc-fireproof-ok",
+        "type": "process",
+        "title": "耐火構造該当",
+        "process_type": "mechanical",
+        "description": "外壁が耐火構造に該当することを確認"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合（設置許容）",
+        "result": "pass",
+        "description": "法63条1項により外壁を隣地境界線に接して設けることができる"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "不適合（設置不可）",
+        "result": "fail",
+        "description": "耐火構造でないため隣地境界線に接して設けることはできない"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-fire-area",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-fire-area",
+        "to": "dec-boundary-adjacent",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "dec-fire-area",
+        "to": "end-not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e04",
+        "from": "dec-boundary-adjacent",
+        "to": "dec-wall-structure",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e05",
+        "from": "dec-boundary-adjacent",
+        "to": "end-no-boundary",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e06",
+        "from": "dec-wall-structure",
+        "to": "proc-fireproof-ok",
+        "role": "option",
+        "label": "耐火構造"
+      },
+      {
+        "id": "e07",
+        "from": "dec-wall-structure",
+        "to": "fail",
+        "role": "option",
+        "label": "準耐火構造"
+      },
+      {
+        "id": "e08",
+        "from": "dec-wall-structure",
+        "to": "fail",
+        "role": "option",
+        "label": "その他"
+      },
+      {
+        "id": "e09",
+        "from": "proc-fireproof-ok",
+        "to": "pass",
+        "role": "flow"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": [
+        "A2:I7"
+      ],
+      "description": "耐火構造の定義"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00+09:00",
+    "updated_at": "2025-12-25T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

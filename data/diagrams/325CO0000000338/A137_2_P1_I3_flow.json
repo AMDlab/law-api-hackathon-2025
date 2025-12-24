@@ -1,0 +1,182 @@
+{
+  "id": "A137_2_P1_I3_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "構造耐力に係る既存不適格建築物の増改築 第3号基準（フロー図）",
+    "target_subject": "増築及び改築",
+    "description": "床面積が1/20以下の増築・改築について、構造方法がイ又はロのいずれかに適合するかの判定フロー"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "137_2",
+    "paragraph": "1",
+    "item": "3"
+  },
+  "labels": [
+    "既存不適格建築物",
+    "増改築",
+    "構造耐力",
+    "第3号"
+  ],
+  "kijo_diagram_ref": "CHK-EXT-A137-2-P1-I3",
+  "flow_diagram": {
+    "title": "令第137条の2第1項第3号適合判定フロー",
+    "description": "床面積が基準時延べ面積の1/20以下の増改築における構造方法の適合判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "令第137条の2第1項第3号の適合判定を開始"
+      },
+      {
+        "id": "dec-range-check",
+        "type": "decision",
+        "title": "増改築部分床面積 <= 1/20閾値か？",
+        "decision_type": "binary",
+        "description": "増改築部分の床面積が基準時延べ面積の1/20（上限50m2）以下であるか判定"
+      },
+      {
+        "id": "proc-range-applicable",
+        "type": "process",
+        "title": "第3号範囲該当",
+        "description": "増改築部分が第3号の適用範囲に該当"
+      },
+      {
+        "id": "dec-route-select",
+        "type": "decision",
+        "title": "適合ルートは？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "イ", "description": "構造規定適合かつ危険性非増大" },
+          { "value": "ロ", "description": "第1号又は第2号基準に適合" }
+        ],
+        "description": "イ又はロのどちらのルートで適合を判定するか"
+      },
+      {
+        "id": "proc-route-a",
+        "type": "process",
+        "title": "イルート判定",
+        "description": "イの要件による適合判定を行う"
+      },
+      {
+        "id": "dec-target-struct-compliance",
+        "type": "decision",
+        "title": "増改築部分は構造規定に適合するか？",
+        "decision_type": "binary",
+        "description": "増改築部分が第3章及び令129条の2の3、条例の構造耐力規定に適合するか（イ（１））",
+        "related_articles": ["令::A36〜A99", "令::A129_2_3"]
+      },
+      {
+        "id": "dec-danger-check",
+        "type": "decision",
+        "title": "既存部分の危険性は増大しないか？",
+        "decision_type": "binary",
+        "description": "既存部分の構造耐力上の危険性が増大しないか（イ（２））"
+      },
+      {
+        "id": "proc-route-a-pass",
+        "type": "process",
+        "title": "イ適合",
+        "description": "イの要件（（１）構造規定適合かつ（２）危険性非増大）に適合"
+      },
+      {
+        "id": "proc-route-b",
+        "type": "process",
+        "title": "ロルート判定",
+        "description": "ロの要件による適合判定を行う"
+      },
+      {
+        "id": "dec-item1-compliance",
+        "type": "decision",
+        "title": "第1号基準に適合するか？",
+        "decision_type": "binary",
+        "description": "令第137条の2第1項第1号に定める基準に適合するか",
+        "related_articles": ["令::A137_2:P1:I1"]
+      },
+      {
+        "id": "proc-item1-pass",
+        "type": "process",
+        "title": "第1号基準適合",
+        "description": "第1号基準への適合によりロの要件を満たす"
+      },
+      {
+        "id": "dec-item2-compliance",
+        "type": "decision",
+        "title": "第2号基準に適合するか？",
+        "decision_type": "binary",
+        "description": "令第137条の2第1項第2号に定める基準に適合するか",
+        "related_articles": ["令::A137_2:P1:I2"]
+      },
+      {
+        "id": "proc-item2-pass",
+        "type": "process",
+        "title": "第2号基準適合",
+        "description": "第2号基準への適合によりロの要件を満たす"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令第137条の2第1項第3号に適合"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "令第137条の2第1項第3号に不適合"
+      },
+      {
+        "id": "fail-range",
+        "type": "terminal",
+        "title": "範囲外",
+        "result": "fail",
+        "description": "第3号の適用範囲外（第2号又は第1号を検討）"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "dec-range-check", "role": "flow" },
+      { "id": "e02", "from": "dec-range-check", "to": "proc-range-applicable", "role": "yes", "label": "はい" },
+      { "id": "e03", "from": "dec-range-check", "to": "fail-range", "role": "no", "label": "いいえ" },
+      { "id": "e04", "from": "proc-range-applicable", "to": "dec-route-select", "role": "flow" },
+      { "id": "e05", "from": "dec-route-select", "to": "proc-route-a", "role": "option", "label": "イ" },
+      { "id": "e06", "from": "dec-route-select", "to": "proc-route-b", "role": "option", "label": "ロ" },
+      { "id": "e07", "from": "proc-route-a", "to": "dec-target-struct-compliance", "role": "flow" },
+      { "id": "e08", "from": "dec-target-struct-compliance", "to": "dec-danger-check", "role": "yes", "label": "はい" },
+      { "id": "e09", "from": "dec-target-struct-compliance", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e10", "from": "dec-danger-check", "to": "proc-route-a-pass", "role": "yes", "label": "はい" },
+      { "id": "e11", "from": "dec-danger-check", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e12", "from": "proc-route-a-pass", "to": "pass", "role": "flow" },
+      { "id": "e13", "from": "proc-route-b", "to": "dec-item1-compliance", "role": "flow" },
+      { "id": "e14", "from": "dec-item1-compliance", "to": "proc-item1-pass", "role": "yes", "label": "はい" },
+      { "id": "e15", "from": "dec-item1-compliance", "to": "dec-item2-compliance", "role": "no", "label": "いいえ" },
+      { "id": "e16", "from": "proc-item1-pass", "to": "pass", "role": "flow" },
+      { "id": "e17", "from": "dec-item2-compliance", "to": "proc-item2-pass", "role": "yes", "label": "はい" },
+      { "id": "e18", "from": "dec-item2-compliance", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e19", "from": "proc-item2-pass", "to": "pass", "role": "flow" }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A40"],
+      "description": "法第40条に基づく条例の構造耐力規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T16:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

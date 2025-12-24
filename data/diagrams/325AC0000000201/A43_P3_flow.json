@@ -1,0 +1,219 @@
+{
+  "id": "A43_P3_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "条例による接道規制の付加対象建築物（適合判定フロー）",
+    "target_subject": "建築物",
+    "description": "地方公共団体が条例で接道に関する制限を付加できる建築物の範囲を判定するフロー"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "43",
+    "paragraph": "3",
+    "item": null
+  },
+  "labels": ["集団規定", "道路", "接道", "条例委任"],
+  "text_raw": "地方公共団体は、次の各号のいずれかに該当する建築物について、その用途、規模又は位置の特殊性により、第一項の規定によつては避難又は通行の安全の目的を十分に達成することが困難であると認めるときは、条例で、その敷地が接しなければならない道路の幅員、その敷地が道路に接する部分の長さその他その敷地又は建築物と道路との関係に関して必要な制限を付加することができる。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "OR",
+      "conditions": [
+        { "type": "building_type", "value": "特殊建築物" },
+        { "type": "building_floors", "value": "階数が3以上" },
+        { "type": "building_room", "value": "政令で定める窓その他の開口部を有しない居室を有する" },
+        { "type": "building_area", "value": "延べ面積が1000㎡超" },
+        { "type": "site_location", "value": "袋路状道路のみに接し延べ面積150㎡超(一戸建て住宅除く)" }
+      ],
+      "note": "各号のいずれかに該当する建築物が条例による付加制限の対象となり得る"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        { "ref": "info-special-building" },
+        { "ref": "info-floors-three-or-more" },
+        { "ref": "info-no-window-room" },
+        { "ref": "info-large-area" },
+        { "ref": "info-cul-de-sac" }
+      ]
+    }
+  },
+  "flow_diagram": {
+    "title": "法43条3項 条例による接道規制付加対象 該当判定フロー",
+    "description": "第1号から第5号のいずれかに該当するかを判定し、条例による接道制限の付加対象となるかを確認",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "法43条3項の該当判定を開始"
+      },
+      {
+        "id": "dec-special-building",
+        "type": "decision",
+        "title": "特殊建築物か？",
+        "decision_type": "binary",
+        "description": "法別表第一に定める特殊建築物（劇場、病院、共同住宅、学校、百貨店等）に該当するか判定",
+        "related_articles": ["法::A2:P1:I2"]
+      },
+      {
+        "id": "proc-item1-match",
+        "type": "process",
+        "title": "1号該当",
+        "process_type": "mechanical",
+        "description": "特殊建築物に該当するため第1号に該当"
+      },
+      {
+        "id": "dec-floors-3-or-more",
+        "type": "decision",
+        "title": "階数が3以上か？",
+        "decision_type": "binary",
+        "description": "建築物の階数が3以上であるか判定",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "F", "desc": "階数" },
+          "rhs": { "value": 3, "unit": "階" }
+        }
+      },
+      {
+        "id": "proc-item2-match",
+        "type": "process",
+        "title": "2号該当",
+        "process_type": "mechanical",
+        "description": "階数が3以上であるため第2号に該当"
+      },
+      {
+        "id": "dec-windowless-room",
+        "type": "decision",
+        "title": "無窓居室を有するか？",
+        "decision_type": "binary",
+        "description": "政令で定める窓その他の開口部を有しない居室を有するか判定",
+        "related_articles": ["令::A116_2:P1"]
+      },
+      {
+        "id": "proc-item3-match",
+        "type": "process",
+        "title": "3号該当",
+        "process_type": "mechanical",
+        "description": "無窓居室を有するため第3号に該当"
+      },
+      {
+        "id": "dec-area-over-1000",
+        "type": "decision",
+        "title": "延べ面積 > 1000㎡か？",
+        "decision_type": "binary",
+        "description": "建築物の延べ面積が1000㎡を超えるか判定",
+        "condition": {
+          "operator": "GT",
+          "lhs": { "var": "A", "desc": "延べ面積" },
+          "rhs": { "value": 1000, "unit": "㎡" }
+        }
+      },
+      {
+        "id": "proc-item4-match",
+        "type": "process",
+        "title": "4号該当",
+        "process_type": "mechanical",
+        "description": "延べ面積が1000㎡を超えるため第4号に該当"
+      },
+      {
+        "id": "dec-cul-de-sac",
+        "type": "decision",
+        "title": "袋路状道路のみに接するか？",
+        "decision_type": "binary",
+        "description": "敷地が袋路状道路（その一端のみが他の道路に接続したもの）にのみ接するか判定"
+      },
+      {
+        "id": "dec-area-over-150",
+        "type": "decision",
+        "title": "延べ面積 > 150㎡か？",
+        "decision_type": "binary",
+        "description": "建築物の延べ面積が150㎡を超えるか判定",
+        "condition": {
+          "operator": "GT",
+          "lhs": { "var": "A", "desc": "延べ面積" },
+          "rhs": { "value": 150, "unit": "㎡" }
+        }
+      },
+      {
+        "id": "dec-not-single-house",
+        "type": "decision",
+        "title": "一戸建ての住宅以外か？",
+        "decision_type": "binary",
+        "description": "建築物が一戸建ての住宅に該当しないか判定"
+      },
+      {
+        "id": "proc-item5-match",
+        "type": "process",
+        "title": "5号該当",
+        "process_type": "mechanical",
+        "description": "袋路状道路のみに接し、延べ面積150㎡超、一戸建て住宅以外のため第5号に該当"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "条例付加対象",
+        "result": "pass",
+        "description": "法43条3項各号のいずれかに該当し、条例による接道制限の付加対象となり得る"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "条例付加対象外",
+        "result": "fail",
+        "description": "法43条3項各号に該当せず、条例による付加制限の対象外"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "dec-special-building", "role": "flow" },
+      { "id": "e02", "from": "dec-special-building", "to": "proc-item1-match", "role": "yes", "label": "はい" },
+      { "id": "e03", "from": "dec-special-building", "to": "dec-floors-3-or-more", "role": "no", "label": "いいえ" },
+      { "id": "e04", "from": "proc-item1-match", "to": "pass", "role": "flow" },
+      { "id": "e05", "from": "dec-floors-3-or-more", "to": "proc-item2-match", "role": "yes", "label": "はい" },
+      { "id": "e06", "from": "dec-floors-3-or-more", "to": "dec-windowless-room", "role": "no", "label": "いいえ" },
+      { "id": "e07", "from": "proc-item2-match", "to": "pass", "role": "flow" },
+      { "id": "e08", "from": "dec-windowless-room", "to": "proc-item3-match", "role": "yes", "label": "はい" },
+      { "id": "e09", "from": "dec-windowless-room", "to": "dec-area-over-1000", "role": "no", "label": "いいえ" },
+      { "id": "e10", "from": "proc-item3-match", "to": "pass", "role": "flow" },
+      { "id": "e11", "from": "dec-area-over-1000", "to": "proc-item4-match", "role": "yes", "label": "はい" },
+      { "id": "e12", "from": "dec-area-over-1000", "to": "dec-cul-de-sac", "role": "no", "label": "いいえ" },
+      { "id": "e13", "from": "proc-item4-match", "to": "pass", "role": "flow" },
+      { "id": "e14", "from": "dec-cul-de-sac", "to": "dec-area-over-150", "role": "yes", "label": "はい" },
+      { "id": "e15", "from": "dec-cul-de-sac", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e16", "from": "dec-area-over-150", "to": "dec-not-single-house", "role": "yes", "label": "はい" },
+      { "id": "e17", "from": "dec-area-over-150", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e18", "from": "dec-not-single-house", "to": "proc-item5-match", "role": "yes", "label": "はい" },
+      { "id": "e19", "from": "dec-not-single-house", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e20", "from": "proc-item5-match", "to": "pass", "role": "flow" }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-A43-P3",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A2:P1", "A43:P1"],
+      "description": "特殊建築物の定義(法2条2号)および接道義務の原則(法43条1項)を参照"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "delegates_to",
+      "articles": ["A116_2:P1"],
+      "description": "政令で定める窓その他の開口部の基準を参照"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

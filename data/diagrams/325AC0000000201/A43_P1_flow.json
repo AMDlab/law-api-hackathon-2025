@@ -1,0 +1,182 @@
+{
+  "id": "A43_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "敷地の接道義務（適合判定フロー）",
+    "target_subject": "敷地",
+    "description": "建築物の敷地が道路に2メートル以上接することを判定するフロー"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "43",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": ["集団規定", "道路", "接道"],
+  "text_raw": "建築物の敷地は、道路(次に掲げるものを除く。第四十四条第一項を除き、以下同じ。)に二メートル以上接しなければならない。ただし、その敷地の周囲に広い空地を有する建築物その他の国土交通省令で定める基準に適合する建築物で、特定行政庁が交通上、安全上、防火上及び衛生上支障がないと認めて建築審査会の同意を得て許可したものについては、この限りでない。",
+  "compliance_logic": {
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        { "ref": "info-width-compliance", "operator": "==", "value": true },
+        { "ref": "info-exempt", "operator": "==", "value": true }
+      ]
+    },
+    "exceptions": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "note": "周囲に広い空地を有し、特定行政庁の許可を受けたもの",
+          "operator": "AND",
+          "conditions": [
+            { "ref": "info-wide-open-space", "operator": "==", "value": true },
+            { "ref": "info-authority-permit", "operator": "==", "value": true }
+          ]
+        },
+        {
+          "note": "国土交通省令基準適合で、特定行政庁の許可を受けたもの",
+          "operator": "AND",
+          "conditions": [
+            { "ref": "info-ministerial-standard", "operator": "==", "value": true },
+            { "ref": "info-authority-permit", "operator": "==", "value": true }
+          ]
+        }
+      ],
+      "effect": "EXEMPT"
+    }
+  },
+  "flow_diagram": {
+    "title": "法43条1項 敷地の接道義務 適合判定フロー",
+    "description": "敷地が道路に2m以上接するか、またはただし書きの適用除外に該当するかを判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "法43条1項の適合判定を開始"
+      },
+      {
+        "id": "dec-road-contact",
+        "type": "decision",
+        "title": "道路に2m以上接しているか？",
+        "decision_type": "binary",
+        "description": "敷地が法42条の道路に2メートル以上接しているか判定",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "L", "desc": "接道幅員" },
+          "rhs": { "value": 2, "unit": "m" }
+        },
+        "related_articles": ["法::A42"]
+      },
+      {
+        "id": "proc-main-comply",
+        "type": "process",
+        "title": "本則適合",
+        "process_type": "mechanical",
+        "description": "道路に2メートル以上接しており本則に適合"
+      },
+      {
+        "id": "dec-wide-space",
+        "type": "decision",
+        "title": "周囲に広い空地を有するか？",
+        "decision_type": "binary",
+        "description": "敷地の周囲に広い空地を有するか判定"
+      },
+      {
+        "id": "proc-wide-space-yes",
+        "type": "process",
+        "title": "広い空地あり",
+        "process_type": "mechanical",
+        "description": "敷地の周囲に広い空地を有する"
+      },
+      {
+        "id": "dec-ministerial",
+        "type": "decision",
+        "title": "国土交通省令基準に適合するか？",
+        "decision_type": "binary",
+        "description": "規則第10条の3に定める基準に適合するか判定",
+        "related_articles": ["規則::A10_3"]
+      },
+      {
+        "id": "proc-ministerial-yes",
+        "type": "process",
+        "title": "省令基準適合",
+        "process_type": "mechanical",
+        "description": "国土交通省令で定める基準に適合する"
+      },
+      {
+        "id": "dec-permit",
+        "type": "decision",
+        "title": "特定行政庁の許可を受けているか？",
+        "decision_type": "binary",
+        "description": "特定行政庁が建築審査会の同意を得て許可したか判定"
+      },
+      {
+        "id": "proc-exempt",
+        "type": "process",
+        "title": "適用除外",
+        "process_type": "mechanical",
+        "description": "ただし書きにより適用除外"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "法43条1項の規定に適合"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "法43条1項の規定に不適合"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "dec-road-contact", "role": "flow" },
+      { "id": "e02", "from": "dec-road-contact", "to": "proc-main-comply", "role": "yes", "label": "はい" },
+      { "id": "e03", "from": "dec-road-contact", "to": "dec-wide-space", "role": "no", "label": "いいえ" },
+      { "id": "e04", "from": "proc-main-comply", "to": "pass", "role": "flow" },
+      { "id": "e05", "from": "dec-wide-space", "to": "proc-wide-space-yes", "role": "yes", "label": "はい" },
+      { "id": "e06", "from": "dec-wide-space", "to": "dec-ministerial", "role": "no", "label": "いいえ" },
+      { "id": "e07", "from": "proc-wide-space-yes", "to": "dec-permit", "role": "flow" },
+      { "id": "e08", "from": "dec-ministerial", "to": "proc-ministerial-yes", "role": "yes", "label": "はい" },
+      { "id": "e09", "from": "dec-ministerial", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e10", "from": "proc-ministerial-yes", "to": "dec-permit", "role": "flow" },
+      { "id": "e11", "from": "dec-permit", "to": "proc-exempt", "role": "yes", "label": "はい" },
+      { "id": "e12", "from": "dec-permit", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e13", "from": "proc-exempt", "to": "pass", "role": "flow" }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-A43-P1",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A42"],
+      "description": "道路の定義"
+    },
+    {
+      "law_id": "325M50004000040",
+      "law_name": "建築基準法施行規則",
+      "law_type": "regulation",
+      "relationship": "delegates_to",
+      "articles": ["A10_3"],
+      "description": "法43条1項ただし書きの基準"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

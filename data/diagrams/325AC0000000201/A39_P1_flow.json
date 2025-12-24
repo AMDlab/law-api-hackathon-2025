@@ -1,0 +1,127 @@
+{
+  "id": "A39_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "災害危険区域の指定確認（適合判定フロー）",
+    "target_subject": "敷地",
+    "description": "敷地が地方公共団体の条例により指定された災害危険区域内に位置するかを判定するフロー"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "39",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": ["集団規定", "敷地"],
+  "text_raw": "地方公共団体は、条例で、津波、高潮、出水等による危険の著しい区域を災害危険区域として指定することができる。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        { "type": "location", "value": "地方公共団体の管轄区域内" }
+      ],
+      "note": "地方公共団体が条例で災害危険区域を指定している場合に適用"
+    },
+    "judgment_rule": {
+      "operator": "CHECK",
+      "conditions": [
+        { "ref": "info-designated-zone", "operator": "==", "value": true }
+      ],
+      "note": "敷地が災害危険区域として指定されている場合、第39条第2項の建築制限が適用される"
+    }
+  },
+  "flow_diagram": {
+    "title": "法39条1項 災害危険区域の指定確認フロー",
+    "description": "敷地が条例で指定された災害危険区域内に位置するかを判定（位置する場合は法39条2項の建築制限が適用）",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "法39条1項の確認を開始"
+      },
+      {
+        "id": "dec-ordinance-exists",
+        "type": "decision",
+        "title": "管轄自治体に災害危険区域条例があるか？",
+        "decision_type": "binary",
+        "description": "敷地を管轄する地方公共団体が法39条に基づく災害危険区域を指定する条例を制定しているか判定"
+      },
+      {
+        "id": "proc-no-ordinance",
+        "type": "process",
+        "title": "災害危険区域指定なし",
+        "process_type": "mechanical",
+        "description": "当該地方公共団体には災害危険区域を指定する条例がない"
+      },
+      {
+        "id": "dec-in-zone",
+        "type": "decision",
+        "title": "敷地は災害危険区域内か？",
+        "decision_type": "binary",
+        "description": "敷地位置が条例で指定された災害危険区域（津波、高潮、出水等による危険の著しい区域）の境界内に含まれるか判定"
+      },
+      {
+        "id": "proc-in-zone-yes",
+        "type": "process",
+        "title": "災害危険区域内該当",
+        "process_type": "mechanical",
+        "description": "敷地が災害危険区域内に位置する。法39条2項の建築制限が適用される",
+        "related_articles": ["法::A39:P2"]
+      },
+      {
+        "id": "proc-in-zone-no",
+        "type": "process",
+        "title": "災害危険区域外",
+        "process_type": "mechanical",
+        "description": "敷地は災害危険区域外に位置する"
+      },
+      {
+        "id": "pass-in-zone",
+        "type": "terminal",
+        "title": "区域内（法39条2項適用）",
+        "result": "end",
+        "description": "敷地は災害危険区域内。法39条2項の建築制限への適合確認が必要"
+      },
+      {
+        "id": "pass-out-zone",
+        "type": "terminal",
+        "title": "区域外（法39条2項適用外）",
+        "result": "pass",
+        "description": "敷地は災害危険区域外。法39条2項の建築制限は適用されない"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "dec-ordinance-exists", "role": "flow" },
+      { "id": "e02", "from": "dec-ordinance-exists", "to": "dec-in-zone", "role": "yes", "label": "はい" },
+      { "id": "e03", "from": "dec-ordinance-exists", "to": "proc-no-ordinance", "role": "no", "label": "いいえ" },
+      { "id": "e04", "from": "proc-no-ordinance", "to": "pass-out-zone", "role": "flow" },
+      { "id": "e05", "from": "dec-in-zone", "to": "proc-in-zone-yes", "role": "yes", "label": "はい" },
+      { "id": "e06", "from": "dec-in-zone", "to": "proc-in-zone-no", "role": "no", "label": "いいえ" },
+      { "id": "e07", "from": "proc-in-zone-yes", "to": "pass-in-zone", "role": "flow" },
+      { "id": "e08", "from": "proc-in-zone-no", "to": "pass-out-zone", "role": "flow" }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-A39-P1",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A39:P2"],
+      "description": "災害危険区域内における建築制限（第39条第2項で規定）"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

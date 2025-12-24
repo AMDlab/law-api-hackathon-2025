@@ -1,0 +1,212 @@
+{
+  "id": "A61_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "防火地域等内建築物の防火設備・構造（適合判定フロー）",
+    "target_subject": "建築物",
+    "description": "防火地域又は準防火地域内の建築物が外壁開口部の防火設備設置と建築物部分の技術的基準適合を判定するフロー"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "61",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": ["集団規定", "防火"],
+  "text_raw": "防火地域又は準防火地域内にある建築物は、その外壁の開口部で延焼のおそれのある部分に防火戸その他の政令で定める防火設備を設け、かつ、壁、柱、床その他の建築物の部分及び当該防火設備を通常の火災による周囲への延焼を防止するためにこれらに必要とされる性能に関して防火地域及び準防火地域の別並びに建築物の規模に応じて政令で定める技術的基準に適合するもので、国土交通大臣が定めた構造方法を用いるもの又は国土交通大臣の認定を受けたものとしなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "OR",
+      "conditions": [
+        { "type": "location", "value": "防火地域内" },
+        { "type": "location", "value": "準防火地域内" }
+      ]
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        { "ref": "info-exempt" },
+        {
+          "operator": "AND",
+          "conditions": [
+            { "ref": "info-fire-equipment-installed" },
+            { "ref": "info-tech-compliance" },
+            {
+              "operator": "OR",
+              "conditions": [
+                { "ref": "info-minister-method" },
+                { "ref": "info-minister-approval" }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "exceptions": {
+      "operator": "OR",
+      "conditions": [
+        { "note": "高さ2m以下の門又は塀" },
+        { "note": "準防火地域内の非木造建築物に附属する門又は塀" }
+      ],
+      "effect": "EXEMPT"
+    }
+  },
+  "flow_diagram": {
+    "title": "法61条1項 防火地域等内建築物 適合判定フロー",
+    "description": "外壁開口部の防火設備設置と建築物部分の技術的基準適合、または適用除外を判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "法61条1項の適合判定を開始"
+      },
+      {
+        "id": "dec-structure-type",
+        "type": "decision",
+        "title": "建築物の種類は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "建築物本体", "description": "主たる建築物" },
+          { "value": "門又は塀", "description": "門、塀等の工作物" }
+        ],
+        "description": "建築物本体か門・塀かを判定"
+      },
+      {
+        "id": "dec-height-2m",
+        "type": "decision",
+        "title": "高さ ≤ 2mか？",
+        "decision_type": "binary",
+        "description": "門又は塀の高さが2メートル以下か判定",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "H", "desc": "高さ" },
+          "rhs": { "value": 2, "unit": "m" }
+        }
+      },
+      {
+        "id": "proc-exempt-height",
+        "type": "process",
+        "title": "適用除外（高さ2m以下）",
+        "process_type": "mechanical",
+        "description": "高さ2m以下の門又は塀のためただし書き適用除外"
+      },
+      {
+        "id": "dec-junbouka-area",
+        "type": "decision",
+        "title": "準防火地域内か？",
+        "decision_type": "binary",
+        "description": "敷地が準防火地域内にあるか判定"
+      },
+      {
+        "id": "dec-main-building-type",
+        "type": "decision",
+        "title": "主たる建築物は木造建築物等以外か？",
+        "decision_type": "binary",
+        "description": "門・塀が附属する主たる建築物が木造建築物等以外か判定"
+      },
+      {
+        "id": "proc-exempt-junbouka",
+        "type": "process",
+        "title": "適用除外（準防火地域・非木造）",
+        "process_type": "mechanical",
+        "description": "準防火地域内の非木造建築物に附属する門又は塀のためただし書き適用除外"
+      },
+      {
+        "id": "dec-fire-equipment",
+        "type": "decision",
+        "title": "延焼のおそれのある開口部に防火設備があるか？",
+        "decision_type": "binary",
+        "description": "外壁の開口部で延焼のおそれのある部分に防火戸等の防火設備が設けられているか判定",
+        "related_articles": ["法::A2:I6"]
+      },
+      {
+        "id": "dec-tech-standard",
+        "type": "decision",
+        "title": "技術的基準に適合するか？",
+        "decision_type": "binary",
+        "description": "壁・柱・床等及び防火設備が政令で定める技術的基準に適合するか判定",
+        "related_articles": ["令::A107", "令::A108"]
+      },
+      {
+        "id": "dec-minister-method",
+        "type": "decision",
+        "title": "大臣定め構造方法か？",
+        "decision_type": "binary",
+        "description": "国土交通大臣が定めた構造方法（告示）に該当するか判定"
+      },
+      {
+        "id": "dec-minister-approval",
+        "type": "decision",
+        "title": "大臣認定を受けているか？",
+        "decision_type": "binary",
+        "description": "国土交通大臣の認定を受けた構造方法であるか判定"
+      },
+      {
+        "id": "proc-main-comply",
+        "type": "process",
+        "title": "本則適合",
+        "process_type": "mechanical",
+        "description": "防火設備設置、技術的基準適合、大臣定め方法又は認定を満たす"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "法61条1項の規定に適合"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "法61条1項の規定に不適合"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "dec-structure-type", "role": "flow" },
+      { "id": "e02", "from": "dec-structure-type", "to": "dec-fire-equipment", "role": "option", "label": "建築物本体" },
+      { "id": "e03", "from": "dec-structure-type", "to": "dec-height-2m", "role": "option", "label": "門又は塀" },
+      { "id": "e04", "from": "dec-height-2m", "to": "proc-exempt-height", "role": "yes", "label": "はい" },
+      { "id": "e05", "from": "dec-height-2m", "to": "dec-junbouka-area", "role": "no", "label": "いいえ" },
+      { "id": "e06", "from": "proc-exempt-height", "to": "pass", "role": "flow" },
+      { "id": "e07", "from": "dec-junbouka-area", "to": "dec-main-building-type", "role": "yes", "label": "はい" },
+      { "id": "e08", "from": "dec-junbouka-area", "to": "dec-fire-equipment", "role": "no", "label": "いいえ" },
+      { "id": "e09", "from": "dec-main-building-type", "to": "proc-exempt-junbouka", "role": "yes", "label": "はい" },
+      { "id": "e10", "from": "dec-main-building-type", "to": "dec-fire-equipment", "role": "no", "label": "いいえ" },
+      { "id": "e11", "from": "proc-exempt-junbouka", "to": "pass", "role": "flow" },
+      { "id": "e12", "from": "dec-fire-equipment", "to": "dec-tech-standard", "role": "yes", "label": "はい" },
+      { "id": "e13", "from": "dec-fire-equipment", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e14", "from": "dec-tech-standard", "to": "dec-minister-method", "role": "yes", "label": "はい" },
+      { "id": "e15", "from": "dec-tech-standard", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e16", "from": "dec-minister-method", "to": "proc-main-comply", "role": "yes", "label": "はい" },
+      { "id": "e17", "from": "dec-minister-method", "to": "dec-minister-approval", "role": "no", "label": "いいえ" },
+      { "id": "e18", "from": "dec-minister-approval", "to": "proc-main-comply", "role": "yes", "label": "はい" },
+      { "id": "e19", "from": "dec-minister-approval", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e20", "from": "proc-main-comply", "to": "pass", "role": "flow" }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-A61-P1",
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "delegates_to",
+      "articles": ["A107", "A108", "A109"],
+      "description": "法61条1項の技術的基準、防火設備の詳細を定める"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

@@ -1,0 +1,220 @@
+{
+  "id": "A137_10_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "防火地域における既存不適格建築物の増築・改築範囲",
+    "target_subject": "既存不適格建築物",
+    "description": "法第3条第2項により法第61条（防火地域内）の規定の適用を受けない建築物について、法第86条の7第1項の緩和適用範囲を判定"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "137_10",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "既存不適格建築物",
+    "増改築",
+    "防火地域",
+    "防火規制"
+  ],
+  "text_raw": "法第三条第二項の規定により法第六十一条（防火地域内にある建築物に係る部分に限る。）の規定の適用を受けない建築物についての法第八十六条の七第一項の政令で定める範囲は、増築及び改築については、次の各号に掲げる建築物の区分に応じ、当該各号に定める要件に該当する増築又は改築に係る部分とする。",
+  "kijo_diagram_ref": "CHK-ORD-A137-10-P1",
+  "flow_diagram": {
+    "title": "防火地域における既存不適格建築物の増築・改築範囲フロー",
+    "description": "既存不適格建築物を建築物区分（第1号/第2号）に応じて判定し、緩和適用範囲を決定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "緩和適用範囲判定の開始"
+      },
+      {
+        "id": "dec-existing-status",
+        "type": "decision",
+        "title": "法第61条（防火地域内）の適用を受けない既存不適格建築物か？",
+        "decision_type": "binary",
+        "description": "当該既存建築物が法第3条第2項の規定により法第61条（防火地域内）の規定の適用を受けない建築物か"
+      },
+      {
+        "id": "dec-work-type",
+        "type": "decision",
+        "title": "工事種別は増築又は改築か？",
+        "decision_type": "binary",
+        "description": "当該工事が増築又は改築であるか確認"
+      },
+      {
+        "id": "dec-structure-type",
+        "type": "decision",
+        "title": "構造種別は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "木造以外" },
+          { "value": "木造（外壁・軒裏が防火構造）" },
+          { "value": "木造（外壁・軒裏が防火構造以外）" }
+        ],
+        "description": "当該建築物が木造か否か、木造の場合は外壁・軒裏が防火構造か確認"
+      },
+      {
+        "id": "proc-category-1",
+        "type": "process",
+        "title": "第1号該当（第2号以外の建築物）",
+        "process_type": "mechanical",
+        "description": "木造以外、又は木造で外壁・軒裏が防火構造の建築物"
+      },
+      {
+        "id": "proc-category-2",
+        "type": "process",
+        "title": "第2号該当（木造で防火構造でない建築物）",
+        "process_type": "mechanical",
+        "description": "木造の建築物のうち、外壁及び軒裏が防火構造のもの以外のもの"
+      },
+      {
+        "id": "proc-target-identify",
+        "type": "process",
+        "title": "増築・改築部分を特定",
+        "process_type": "undefined_input",
+        "description": "設計図書から増築又は改築に係る部分の範囲を特定"
+      },
+      {
+        "id": "dec-item1-i",
+        "type": "decision",
+        "title": "第1号イに適合するか？",
+        "decision_type": "binary",
+        "description": "火熱遮断壁等区画及び大臣定め基準に適合するか",
+        "related_articles": ["令::A137_10:P1:I1"]
+      },
+      {
+        "id": "proc-item1-i-ok",
+        "type": "process",
+        "title": "第1号イ適合",
+        "process_type": "mechanical",
+        "description": "第1号イ要件に適合"
+      },
+      {
+        "id": "dec-item1-ro",
+        "type": "decision",
+        "title": "第1号ロに適合するか？",
+        "decision_type": "binary",
+        "description": "対象床面積50m2以下等5要件に全て適合するか"
+      },
+      {
+        "id": "proc-item1-ro-ok",
+        "type": "process",
+        "title": "第1号ロ適合",
+        "process_type": "mechanical",
+        "description": "第1号ロ要件に適合"
+      },
+      {
+        "id": "dec-item2",
+        "type": "decision",
+        "title": "第1号イに適合するか？",
+        "decision_type": "binary",
+        "description": "第2号は第1号イのみが適合要件"
+      },
+      {
+        "id": "proc-item2-ok",
+        "type": "process",
+        "title": "第2号適合",
+        "process_type": "mechanical",
+        "description": "第2号要件（第1号イ）に適合"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "緩和適用範囲該当",
+        "result": "pass",
+        "description": "増築・改築部分が令第137条の10第1項の緩和適用範囲に該当"
+      },
+      {
+        "id": "fail-not-existing",
+        "type": "terminal",
+        "title": "対象外（既存不適格でない）",
+        "result": "fail",
+        "description": "法第61条（防火地域内）の適用を受けない既存不適格建築物でない"
+      },
+      {
+        "id": "fail-not-extension",
+        "type": "terminal",
+        "title": "対象外（増築・改築でない）",
+        "result": "fail",
+        "description": "当該工事が増築又は改築でない"
+      },
+      {
+        "id": "fail-item1",
+        "type": "terminal",
+        "title": "第1号不適合",
+        "result": "fail",
+        "description": "第1号のイ・ロいずれの要件にも適合しない"
+      },
+      {
+        "id": "fail-item2",
+        "type": "terminal",
+        "title": "第2号不適合",
+        "result": "fail",
+        "description": "第2号要件（第1号イ）に適合しない"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "dec-existing-status", "role": "flow" },
+      { "id": "e02", "from": "dec-existing-status", "to": "dec-work-type", "role": "yes", "label": "はい" },
+      { "id": "e03", "from": "dec-existing-status", "to": "fail-not-existing", "role": "no", "label": "いいえ" },
+      { "id": "e04", "from": "dec-work-type", "to": "dec-structure-type", "role": "yes", "label": "はい" },
+      { "id": "e05", "from": "dec-work-type", "to": "fail-not-extension", "role": "no", "label": "いいえ" },
+      { "id": "e06", "from": "dec-structure-type", "to": "proc-category-1", "role": "option", "label": "木造以外" },
+      { "id": "e07", "from": "dec-structure-type", "to": "proc-category-1", "role": "option", "label": "木造（外壁・軒裏が防火構造）" },
+      { "id": "e08", "from": "dec-structure-type", "to": "proc-category-2", "role": "option", "label": "木造（外壁・軒裏が防火構造以外）" },
+      { "id": "e09", "from": "proc-category-1", "to": "proc-target-identify", "role": "flow" },
+      { "id": "e10", "from": "proc-category-2", "to": "proc-target-identify", "role": "flow" },
+      { "id": "e11", "from": "proc-target-identify", "to": "dec-item1-i", "role": "flow" },
+      { "id": "e12", "from": "dec-item1-i", "to": "proc-item1-i-ok", "role": "yes", "label": "はい" },
+      { "id": "e13", "from": "dec-item1-i", "to": "dec-item1-ro", "role": "no", "label": "いいえ" },
+      { "id": "e14", "from": "proc-item1-i-ok", "to": "pass", "role": "flow" },
+      { "id": "e15", "from": "dec-item1-ro", "to": "proc-item1-ro-ok", "role": "yes", "label": "はい" },
+      { "id": "e16", "from": "dec-item1-ro", "to": "fail-item1", "role": "no", "label": "いいえ" },
+      { "id": "e17", "from": "proc-item1-ro-ok", "to": "pass", "role": "flow" },
+      { "id": "e18", "from": "proc-target-identify", "to": "dec-item2", "role": "flow" },
+      { "id": "e19", "from": "dec-item2", "to": "proc-item2-ok", "role": "yes", "label": "はい" },
+      { "id": "e20", "from": "dec-item2", "to": "fail-item2", "role": "no", "label": "いいえ" },
+      { "id": "e21", "from": "proc-item2-ok", "to": "pass", "role": "flow" }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": [
+        "A3:P2",
+        "A61",
+        "A86_7:P1"
+      ],
+      "description": "法第3条第2項の既存不適格建築物の取扱、法第61条の防火地域規制、法第86条の7第1項の緩和規定"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": [
+        "A136_2",
+        "A109"
+      ],
+      "description": "令136条の2各号の基準（防火地域内建築物）、令109条の防火設備"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00Z",
+    "updated_at": "2025-12-25T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

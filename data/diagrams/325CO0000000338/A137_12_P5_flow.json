@@ -1,0 +1,249 @@
+{
+  "id": "A137_12_P5_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "法25条（軒裏）適用除外木造建築物等の大規模修繕・模様替の適用除外判定フロー",
+    "target_subject": "木造建築物等",
+    "description": "法25条（軒裏の延焼のおそれのある部分）の適用を受けない木造建築物等について、大規模修繕または大規模模様替が法86条の7の適用除外対象となる条件を判定するフロー"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "137_12",
+    "paragraph": "5",
+    "item": null
+  },
+  "labels": [
+    "既存不適格",
+    "大規模修繕",
+    "大規模模様替",
+    "木造建築物等",
+    "軒裏"
+  ],
+  "text_raw": "法第三条第二項の規定により法第二十五条（軒裏（延焼のおそれのある部分に限る。）に係る部分に限る。）の規定の適用を受けない木造建築物等についての法第八十六条の七第一項の政令で定める範囲は、大規模の修繕又は大規模の模様替については、当該木造建築物等における屋根及び外壁以外の部分に係る全ての大規模の修繕又は大規模の模様替とする。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "applicability_condition",
+          "value": "法3条2項により法25条（軒裏の延焼のおそれのある部分に係る部分に限る）の適用を受けない木造建築物等"
+        }
+      ],
+      "note": "既存の木造建築物等で法25条（軒裏の延焼のおそれのある部分）の適用除外対象"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-work-type",
+          "operator": "IN",
+          "value": ["大規模修繕", "大規模模様替"]
+        },
+        {
+          "ref": "info-work-location",
+          "operator": "NOT_IN",
+          "value": ["屋根", "外壁"]
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "flow_diagram": {
+    "title": "法25条（軒裏）適用除外木造建築物等の大規模修繕・模様替の適用除外判定フロー",
+    "description": "既存不適格の木造建築物等（法25条・軒裏）の大規模修繕・模様替が法86条の7の適用除外となるかを判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start"
+      },
+      {
+        "id": "dec-building-type",
+        "type": "decision",
+        "title": "木造建築物等か？",
+        "decision_type": "binary",
+        "description": "当該建築物が木造建築物等に該当するか"
+      },
+      {
+        "id": "dec-exemption",
+        "type": "decision",
+        "title": "法25条（軒裏）の適用を受けない建築物か？",
+        "decision_type": "binary",
+        "description": "法3条2項により法25条（軒裏の延焼のおそれのある部分）の適用を受けない既存建築物であるか"
+      },
+      {
+        "id": "dec-work-type",
+        "type": "decision",
+        "title": "工事種別は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "大規模修繕" },
+          { "value": "大規模模様替" },
+          { "value": "その他" }
+        ],
+        "description": "当該工事が大規模修繕、大規模模様替、またはその他のいずれか"
+      },
+      {
+        "id": "dec-work-location",
+        "type": "decision",
+        "title": "工事対象部位は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "屋根" },
+          { "value": "外壁" },
+          { "value": "屋根・外壁以外" }
+        ],
+        "description": "工事が建築物のどの部位に係るか確認（屋根・外壁・その他）"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適用除外",
+        "result": "pass",
+        "description": "法86条の7の政令で定める範囲に該当し、法25条（軒裏）の適用が除外される"
+      },
+      {
+        "id": "fail-not-wooden",
+        "type": "terminal",
+        "title": "本規定の対象外",
+        "result": "fail",
+        "description": "木造建築物等でないため、本規定は適用されない"
+      },
+      {
+        "id": "fail-not-exempt",
+        "type": "terminal",
+        "title": "本規定の対象外",
+        "result": "fail",
+        "description": "法25条（軒裏）の適用除外対象建築物でないため、本規定は適用されない"
+      },
+      {
+        "id": "fail-other-work",
+        "type": "terminal",
+        "title": "本規定の対象外",
+        "result": "fail",
+        "description": "大規模修繕・模様替以外の工事のため、本規定は適用されない"
+      },
+      {
+        "id": "fail-roof-wall",
+        "type": "terminal",
+        "title": "適用除外に該当しない",
+        "result": "fail",
+        "description": "屋根又は外壁に係る工事のため、適用除外に該当しない"
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge-001",
+        "from": "start",
+        "to": "dec-building-type",
+        "role": "flow"
+      },
+      {
+        "id": "edge-002",
+        "from": "dec-building-type",
+        "to": "dec-exemption",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "edge-003",
+        "from": "dec-building-type",
+        "to": "fail-not-wooden",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "edge-004",
+        "from": "dec-exemption",
+        "to": "dec-work-type",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "edge-005",
+        "from": "dec-exemption",
+        "to": "fail-not-exempt",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "edge-006",
+        "from": "dec-work-type",
+        "to": "dec-work-location",
+        "role": "option",
+        "label": "大規模修繕"
+      },
+      {
+        "id": "edge-007",
+        "from": "dec-work-type",
+        "to": "dec-work-location",
+        "role": "option",
+        "label": "大規模模様替"
+      },
+      {
+        "id": "edge-008",
+        "from": "dec-work-type",
+        "to": "fail-other-work",
+        "role": "option",
+        "label": "その他"
+      },
+      {
+        "id": "edge-009",
+        "from": "dec-work-location",
+        "to": "fail-roof-wall",
+        "role": "option",
+        "label": "屋根"
+      },
+      {
+        "id": "edge-010",
+        "from": "dec-work-location",
+        "to": "fail-roof-wall",
+        "role": "option",
+        "label": "外壁"
+      },
+      {
+        "id": "edge-011",
+        "from": "dec-work-location",
+        "to": "pass",
+        "role": "option",
+        "label": "屋根・外壁以外"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-ORD-A137_12-P5",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": [
+        "A3:P2",
+        "A25",
+        "A86_7"
+      ],
+      "description": "法3条2項で既存建築物等の適用除外を規定。法25条は大規模木造建築物等の軒裏等を規定。法86条の7は大規模修繕・模様替の適用除外を規定"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "defines_detail",
+      "articles": [
+        "A137_12:P5"
+      ],
+      "description": "大規模修繕・模様替の定義及び適用除外の詳細基準"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T12:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

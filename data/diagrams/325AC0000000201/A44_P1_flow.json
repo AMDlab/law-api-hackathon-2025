@@ -1,0 +1,163 @@
+{
+  "id": "A44_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "道路内の建築制限",
+    "target_subject": "建築物",
+    "description": "建築物又は擁壁が道路内・道路突出位置に建築されていないことを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "44",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": ["集団規定", "道路"],
+  "text_raw": "建築物又は敷地を造成するための擁壁は、道路内に、又は道路に突き出して建築し、又は築造してはならない。ただし、次の各号のいずれかに該当する建築物については、この限りでない。一 地盤面下に設ける建築物 二 公衆便所、巡査派出所その他これらに類する公益上必要な建築物で特定行政庁が通行上支障がないと認めて建築審査会の同意を得て許可したもの",
+  "compliance_logic": {
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "note": "原則：道路内・道路突出位置に建築物等が存在しない",
+          "operator": "NOT",
+          "ref": "info-in-road-area"
+        },
+        {
+          "note": "例外：ただし書き各号のいずれかに該当",
+          "ref": "info-exempt"
+        }
+      ]
+    },
+    "exceptions": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "note": "第1号：地盤面下に設ける建築物",
+          "ref": "info-underground",
+          "related_article": "法::A44:P1:I1"
+        },
+        {
+          "note": "第2号：公益上必要な建築物で特定行政庁の許可を受けたもの",
+          "operator": "AND",
+          "conditions": [
+            { "ref": "info-public-interest", "value": true },
+            { "ref": "info-permission", "value": true }
+          ],
+          "related_article": "法::A44:P1:I2"
+        }
+      ],
+      "effect": "EXEMPT"
+    }
+  },
+  "flow_diagram": {
+    "title": "法44条1項適合判定フロー",
+    "description": "建築物等が道路内・道路突出禁止規定に適合するかを判定するフロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start"
+      },
+      {
+        "id": "dec-in-road",
+        "type": "decision",
+        "title": "道路内又は道路に突き出しているか？",
+        "decision_type": "binary",
+        "description": "建築物が道路内に存在するか、道路に突き出しているかを判定"
+      },
+      {
+        "id": "dec-underground",
+        "type": "decision",
+        "title": "地盤面下に設ける建築物か？",
+        "decision_type": "binary",
+        "description": "建築物が地盤面下に設けられているか（第1号）"
+      },
+      {
+        "id": "proc-item1-match",
+        "type": "process",
+        "title": "第1号該当",
+        "process_type": "mechanical",
+        "description": "地盤面下に設ける建築物として第1号に該当"
+      },
+      {
+        "id": "dec-public-interest",
+        "type": "decision",
+        "title": "公益上必要な建築物か？",
+        "decision_type": "binary",
+        "description": "公衆便所、巡査派出所その他これらに類する公益上必要な建築物に該当するか"
+      },
+      {
+        "id": "dec-permission",
+        "type": "decision",
+        "title": "特定行政庁の許可を受けたか？",
+        "decision_type": "binary",
+        "description": "特定行政庁が通行上支障がないと認めて建築審査会の同意を得て許可したものか"
+      },
+      {
+        "id": "proc-item2-match",
+        "type": "process",
+        "title": "第2号該当",
+        "process_type": "mechanical",
+        "description": "公益上必要な建築物で許可を受けたものとして第2号に該当"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "法44条1項の規定に適合"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "法44条1項の規定に不適合"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "dec-in-road", "role": "flow" },
+      { "id": "e02", "from": "dec-in-road", "to": "pass", "role": "no", "label": "いいえ" },
+      { "id": "e03", "from": "dec-in-road", "to": "dec-underground", "role": "yes", "label": "はい" },
+      { "id": "e04", "from": "dec-underground", "to": "proc-item1-match", "role": "yes", "label": "はい" },
+      { "id": "e05", "from": "proc-item1-match", "to": "pass", "role": "flow" },
+      { "id": "e06", "from": "dec-underground", "to": "dec-public-interest", "role": "no", "label": "いいえ" },
+      { "id": "e07", "from": "dec-public-interest", "to": "dec-permission", "role": "yes", "label": "はい" },
+      { "id": "e08", "from": "dec-public-interest", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e09", "from": "dec-permission", "to": "proc-item2-match", "role": "yes", "label": "はい" },
+      { "id": "e10", "from": "proc-item2-match", "to": "pass", "role": "flow" },
+      { "id": "e11", "from": "dec-permission", "to": "fail", "role": "no", "label": "いいえ" }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-A44-P1",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A42"],
+      "description": "道路の定義を参照"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": ["A2:I2"],
+      "description": "地盤面の定義を参照"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

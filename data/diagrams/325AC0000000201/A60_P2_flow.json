@@ -1,0 +1,301 @@
+{
+  "id": "A60_P2_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "壁面の位置の制限への適合",
+    "target_subject": "建築物の壁又は柱",
+    "description": "特定街区内の建築物の壁又は柱が、都市計画で定められた壁面の位置の制限に適合することを判定するフロー"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "60",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": ["集団規定", "特定街区"],
+  "text_raw": "特定街区内においては、建築物の壁又はこれに代わる柱は、建築物の地盤面下の部分及び国土交通大臣が指定する歩廊の柱その他これに類するものを除き、特定街区に関する都市計画において定められた壁面の位置の制限に反して建築してはならない。",
+  "kijo_diagram_ref": "CHK-BSL-A60-P2",
+  "flow_diagram": {
+    "title": "特定街区内の壁面位置制限適合判定フロー",
+    "description": "特定街区内の建築物の壁又は柱について、壁面の位置の制限への適合又は適用除外を判定するフロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "法60条2項の適合判定を開始"
+      },
+      {
+        "id": "dec-location",
+        "type": "decision",
+        "title": "敷地は特定街区内か？",
+        "decision_type": "binary",
+        "description": "建築物の敷地が特定街区内に位置するか判定"
+      },
+      {
+        "id": "proc-identify-walls",
+        "type": "process",
+        "title": "壁又は柱を特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から判定対象となる壁又は柱を全て特定する"
+      },
+      {
+        "id": "proc-loop-start",
+        "type": "process",
+        "title": "各壁又は柱について判定",
+        "process_type": "mechanical",
+        "description": "特定された各壁又は柱について順次判定を行う"
+      },
+      {
+        "id": "dec-underground",
+        "type": "decision",
+        "title": "地盤面下の部分か？",
+        "decision_type": "binary",
+        "description": "当該壁又は柱が建築物の地盤面下の部分であるか判定"
+      },
+      {
+        "id": "proc-exempt-underground",
+        "type": "process",
+        "title": "地盤面下部分該当",
+        "process_type": "mechanical",
+        "description": "地盤面下の部分として適用除外に該当"
+      },
+      {
+        "id": "dec-corridor",
+        "type": "decision",
+        "title": "指定歩廊の柱か？",
+        "decision_type": "binary",
+        "description": "当該壁又は柱が国土交通大臣が指定する歩廊の柱に該当するか判定"
+      },
+      {
+        "id": "proc-exempt-corridor",
+        "type": "process",
+        "title": "指定歩廊柱該当",
+        "process_type": "mechanical",
+        "description": "指定歩廊の柱として適用除外に該当"
+      },
+      {
+        "id": "dec-similar",
+        "type": "decision",
+        "title": "これに類するものか？",
+        "decision_type": "binary",
+        "description": "地盤面下部分や指定歩廊の柱に類するものに該当するか判定（人的判断）"
+      },
+      {
+        "id": "proc-exempt-similar",
+        "type": "process",
+        "title": "類似適用除外該当",
+        "process_type": "human_judgment",
+        "description": "類似するものとして適用除外に該当"
+      },
+      {
+        "id": "proc-check-position",
+        "type": "process",
+        "title": "壁面の位置を特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から壁又は柱の位置（敷地境界からの距離等）を特定する"
+      },
+      {
+        "id": "dec-position-limit",
+        "type": "decision",
+        "title": "壁面位置は制限内か？",
+        "decision_type": "binary",
+        "description": "壁面の位置が都市計画で定められた制限に適合するか判定"
+      },
+      {
+        "id": "proc-position-ok",
+        "type": "process",
+        "title": "壁面位置制限適合",
+        "process_type": "mechanical",
+        "description": "壁面の位置の制限に適合"
+      },
+      {
+        "id": "proc-element-ok",
+        "type": "process",
+        "title": "当該壁又は柱は適合",
+        "process_type": "mechanical",
+        "description": "当該壁又は柱について法60条2項に適合"
+      },
+      {
+        "id": "dec-all-checked",
+        "type": "decision",
+        "title": "全ての壁及び柱を確認したか？",
+        "decision_type": "binary",
+        "description": "全ての壁又は柱について判定が完了したか確認"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "法60条2項に適合（全ての壁及び柱が制限内又は適用除外）"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "壁面の位置の制限に反しているため不適合"
+      },
+      {
+        "id": "end-not-applicable",
+        "type": "terminal",
+        "title": "本項適用外",
+        "result": "end",
+        "description": "特定街区外のため本項は適用されない"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-location",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-location",
+        "to": "proc-identify-walls",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "dec-location",
+        "to": "end-not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e04",
+        "from": "proc-identify-walls",
+        "to": "proc-loop-start",
+        "role": "flow"
+      },
+      {
+        "id": "e05",
+        "from": "proc-loop-start",
+        "to": "dec-underground",
+        "role": "flow"
+      },
+      {
+        "id": "e06",
+        "from": "dec-underground",
+        "to": "proc-exempt-underground",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e07",
+        "from": "dec-underground",
+        "to": "dec-corridor",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e08",
+        "from": "proc-exempt-underground",
+        "to": "proc-element-ok",
+        "role": "flow"
+      },
+      {
+        "id": "e09",
+        "from": "dec-corridor",
+        "to": "proc-exempt-corridor",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e10",
+        "from": "dec-corridor",
+        "to": "dec-similar",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e11",
+        "from": "proc-exempt-corridor",
+        "to": "proc-element-ok",
+        "role": "flow"
+      },
+      {
+        "id": "e12",
+        "from": "dec-similar",
+        "to": "proc-exempt-similar",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e13",
+        "from": "dec-similar",
+        "to": "proc-check-position",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e14",
+        "from": "proc-exempt-similar",
+        "to": "proc-element-ok",
+        "role": "flow"
+      },
+      {
+        "id": "e15",
+        "from": "proc-check-position",
+        "to": "dec-position-limit",
+        "role": "flow"
+      },
+      {
+        "id": "e16",
+        "from": "dec-position-limit",
+        "to": "proc-position-ok",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e17",
+        "from": "dec-position-limit",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e18",
+        "from": "proc-position-ok",
+        "to": "proc-element-ok",
+        "role": "flow"
+      },
+      {
+        "id": "e19",
+        "from": "proc-element-ok",
+        "to": "dec-all-checked",
+        "role": "flow"
+      },
+      {
+        "id": "e20",
+        "from": "dec-all-checked",
+        "to": "pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e21",
+        "from": "dec-all-checked",
+        "to": "proc-loop-start",
+        "role": "no",
+        "label": "いいえ（次の要素へ）"
+      }
+    ]
+  },
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00Z",
+    "updated_at": "2025-12-25T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

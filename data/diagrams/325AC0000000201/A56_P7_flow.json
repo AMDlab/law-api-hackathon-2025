@@ -1,0 +1,367 @@
+{
+  "id": "A56_P7_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "高さ制限の適用除外判定フロー",
+    "target_subject": "建築物",
+    "description": "採光・通風等の確保により高さ制限（道路斜線・隣地斜線・北側斜線）の適用を除外する判定"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "56",
+    "paragraph": "7",
+    "item": null
+  },
+  "labels": [
+    "集団規定",
+    "高さ制限",
+    "適用除外"
+  ],
+  "text_raw": "次の各号のいずれかに掲げる規定によりその高さが制限された場合にそれぞれ当該各号に定める位置において確保される採光、通風等と同程度以上の採光、通風等が当該位置において確保されるものとして政令で定める基準に適合する建築物については、それぞれ当該各号に掲げる規定は、適用しない。",
+  "compliance_logic": {
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "note": "道路斜線制限の適用除外判定",
+          "ref": "info-road-exemption",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "note": "隣地斜線制限の適用除外判定",
+          "ref": "info-adjacent-exemption",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "note": "北側斜線制限の適用除外判定",
+          "ref": "info-north-exemption",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    },
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "legal_condition",
+          "value": "当該建築物が高さ制限の対象となること（第56条1項〜第6項のいずれかが適用）"
+        }
+      ],
+      "note": "第56条7項は、1項〜6項のいずれかが適用される場合に限り、その規定の適用を除外するための規定"
+    }
+  },
+  "flow_diagram": {
+    "title": "第56条7項 高さ制限の適用除外判定フロー",
+    "description": "道路斜線・隣地斜線・北側斜線の各制限について、採光・通風確保による適用除外の可否を判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "高さ制限の適用除外判定を開始"
+      },
+      {
+        "id": "dec-height-limit-type",
+        "type": "decision",
+        "title": "適用される高さ制限規定は？",
+        "decision_type": "multi",
+        "description": "当該建築物に適用される高さ制限規定（道路斜線・隣地斜線・北側斜線）を確認",
+        "options": [
+          { "value": "道路斜線", "description": "第56条1項1号、2項〜4項の道路斜線制限" },
+          { "value": "隣地斜線", "description": "第56条1項2号、5項の隣地斜線制限" },
+          { "value": "北側斜線", "description": "第56条1項3号、5項の北側斜線制限" },
+          { "value": "適用なし", "description": "高さ制限が適用されない" }
+        ]
+      },
+      {
+        "id": "proc-road-reference",
+        "type": "process",
+        "title": "1号該当（道路斜線制限対象）",
+        "process_type": "mechanical",
+        "description": "前面道路反対側境界線上の政令で定める位置を基準として判定"
+      },
+      {
+        "id": "proc-adjacent-reference",
+        "type": "process",
+        "title": "2号該当（隣地斜線制限対象）",
+        "process_type": "mechanical",
+        "description": "隣地境界線から所定距離外側（係数1.25:16m、2.5:12.4m）の線上の位置を基準として判定"
+      },
+      {
+        "id": "proc-north-reference",
+        "type": "process",
+        "title": "3号該当（北側斜線制限対象）",
+        "process_type": "mechanical",
+        "description": "北側境界線から真北方向に所定距離外側（低層:4m、中高層:8m）の線上の位置を基準として判定"
+      },
+      {
+        "id": "dec-road-daylight",
+        "type": "decision",
+        "title": "道路斜線：基準位置と同程度以上の採光・通風を確保しているか？",
+        "decision_type": "binary",
+        "description": "前面道路反対側境界線上の政令位置での採光・通風等を基準とした比較"
+      },
+      {
+        "id": "dec-adjacent-daylight",
+        "type": "decision",
+        "title": "隣地斜線：基準位置と同程度以上の採光・通風を確保しているか？",
+        "decision_type": "binary",
+        "description": "隣地境界線から基準距離外側の位置での採光・通風等を基準とした比較"
+      },
+      {
+        "id": "dec-north-daylight",
+        "type": "decision",
+        "title": "北側斜線：基準位置と同程度以上の採光・通風を確保しているか？",
+        "decision_type": "binary",
+        "description": "北側境界線から基準距離外側の位置での採光・通風等を基準とした比較"
+      },
+      {
+        "id": "dec-road-ordinance",
+        "type": "decision",
+        "title": "道路斜線：政令で定める基準に適合するか？",
+        "decision_type": "binary",
+        "description": "政令で定める採光・通風等の基準（天空率等）への適合確認"
+      },
+      {
+        "id": "dec-adjacent-ordinance",
+        "type": "decision",
+        "title": "隣地斜線：政令で定める基準に適合するか？",
+        "decision_type": "binary",
+        "description": "政令で定める採光・通風等の基準（天空率等）への適合確認"
+      },
+      {
+        "id": "dec-north-ordinance",
+        "type": "decision",
+        "title": "北側斜線：政令で定める基準に適合するか？",
+        "decision_type": "binary",
+        "description": "政令で定める採光・通風等の基準への適合確認"
+      },
+      {
+        "id": "pass-road",
+        "type": "terminal",
+        "title": "適合（道路斜線制限の適用除外）",
+        "result": "pass",
+        "description": "第56条1項1号等の道路斜線制限は適用しない"
+      },
+      {
+        "id": "pass-adjacent",
+        "type": "terminal",
+        "title": "適合（隣地斜線制限の適用除外）",
+        "result": "pass",
+        "description": "第56条1項2号等の隣地斜線制限は適用しない"
+      },
+      {
+        "id": "pass-north",
+        "type": "terminal",
+        "title": "適合（北側斜線制限の適用除外）",
+        "result": "pass",
+        "description": "第56条1項3号等の北側斜線制限は適用しない"
+      },
+      {
+        "id": "fail-road",
+        "type": "terminal",
+        "title": "不適合（道路斜線制限が適用）",
+        "result": "fail",
+        "description": "道路斜線制限の適用除外要件を満たさない"
+      },
+      {
+        "id": "fail-adjacent",
+        "type": "terminal",
+        "title": "不適合（隣地斜線制限が適用）",
+        "result": "fail",
+        "description": "隣地斜線制限の適用除外要件を満たさない"
+      },
+      {
+        "id": "fail-north",
+        "type": "terminal",
+        "title": "不適合（北側斜線制限が適用）",
+        "result": "fail",
+        "description": "北側斜線制限の適用除外要件を満たさない"
+      },
+      {
+        "id": "end-not-applicable",
+        "type": "terminal",
+        "title": "対象外",
+        "result": "end",
+        "description": "高さ制限が適用されないため、適用除外の判定対象外"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-height-limit-type",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-height-limit-type",
+        "to": "proc-road-reference",
+        "role": "option",
+        "label": "道路斜線"
+      },
+      {
+        "id": "e03",
+        "from": "dec-height-limit-type",
+        "to": "proc-adjacent-reference",
+        "role": "option",
+        "label": "隣地斜線"
+      },
+      {
+        "id": "e04",
+        "from": "dec-height-limit-type",
+        "to": "proc-north-reference",
+        "role": "option",
+        "label": "北側斜線"
+      },
+      {
+        "id": "e05",
+        "from": "dec-height-limit-type",
+        "to": "end-not-applicable",
+        "role": "option",
+        "label": "適用なし"
+      },
+      {
+        "id": "e06",
+        "from": "proc-road-reference",
+        "to": "dec-road-daylight",
+        "role": "flow"
+      },
+      {
+        "id": "e07",
+        "from": "proc-adjacent-reference",
+        "to": "dec-adjacent-daylight",
+        "role": "flow"
+      },
+      {
+        "id": "e08",
+        "from": "proc-north-reference",
+        "to": "dec-north-daylight",
+        "role": "flow"
+      },
+      {
+        "id": "e09",
+        "from": "dec-road-daylight",
+        "to": "dec-road-ordinance",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e10",
+        "from": "dec-road-daylight",
+        "to": "fail-road",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e11",
+        "from": "dec-adjacent-daylight",
+        "to": "dec-adjacent-ordinance",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e12",
+        "from": "dec-adjacent-daylight",
+        "to": "fail-adjacent",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e13",
+        "from": "dec-north-daylight",
+        "to": "dec-north-ordinance",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e14",
+        "from": "dec-north-daylight",
+        "to": "fail-north",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e15",
+        "from": "dec-road-ordinance",
+        "to": "pass-road",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e16",
+        "from": "dec-road-ordinance",
+        "to": "fail-road",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e17",
+        "from": "dec-adjacent-ordinance",
+        "to": "pass-adjacent",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e18",
+        "from": "dec-adjacent-ordinance",
+        "to": "fail-adjacent",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e19",
+        "from": "dec-north-ordinance",
+        "to": "pass-north",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e20",
+        "from": "dec-north-ordinance",
+        "to": "fail-north",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-A56-P7",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": [
+        "A56_P1",
+        "A56_P2",
+        "A56_P3",
+        "A56_P4",
+        "A56_P5",
+        "A56_P6"
+      ],
+      "description": "第56条の各項で定める高さ制限規定の適用除外要件"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "defines_detail",
+      "description": "採光・通風等の基準を定める政令（天空率等）"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00+09:00",
+    "author": "Claude Code (flow-generator)",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

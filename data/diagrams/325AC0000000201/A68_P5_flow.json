@@ -1,0 +1,143 @@
+{
+  "id": "A68_P5_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "景観地区内の法56条の特例適用",
+    "target_subject": "建築物",
+    "description": "特定の景観地区内において、建築物が法56条の容積率規定の適用を受けないための条件判定"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "68",
+    "paragraph": "5",
+    "item": null
+  },
+  "labels": ["集団規定", "景観"],
+  "text_raw": "景観地区に関する都市計画において建築物の高さの最高限度、壁面の位置の制限（道路に面する壁面の位置を制限するものを含むものに限る。）及び建築物の敷地面積の最低限度が定められている景観地区（景観法第七十二条第二項の景観地区工作物制限条例で、壁面後退区域（当該壁面の位置の制限として定められた限度の線と敷地境界線との間の土地の区域をいう。）における工作物（土地に定着する工作物以外のものを含む。）の設置の制限（当該壁面後退区域において連続的に有効な空地を確保するため必要なものを含むものに限る。）が定められている区域に限る。）内の建築物で、当該景観地区に関する都市計画の内容に適合し、かつ、敷地内に有効な空地が確保されていること等により、特定行政庁が交通上、安全上、防火上及び衛生上支障がないと認めるものについては、第五十六条の規定は、適用しない。",
+  "kijo_diagram_ref": "CHK-BSL-A68-P5",
+  "flow_diagram": {
+    "title": "景観地区内の法56条適用除外判定フロー",
+    "description": "法68条5項に基づき、第56条の斜線制限が適用除外となるかを判定するフロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start"
+      },
+      {
+        "id": "dec-scenic-district-regulations",
+        "type": "decision",
+        "title": "高さ最高限度・壁面位置制限・敷地面積最低限度が定められた景観地区か？",
+        "decision_type": "binary",
+        "description": "景観地区に関する都市計画において、高さの最高限度、壁面の位置の制限、敷地面積の最低限度の3つが全て定められているか"
+      },
+      {
+        "id": "dec-ordinance-exists",
+        "type": "decision",
+        "title": "工作物制限条例が定められているか？",
+        "decision_type": "binary",
+        "description": "景観法第72条第2項の景観地区工作物制限条例で、壁面後退区域における工作物の設置制限が定められているか"
+      },
+      {
+        "id": "proc-scope-confirmed",
+        "type": "process",
+        "title": "特定景観地区該当",
+        "process_type": "mechanical",
+        "description": "法68条5項の適用対象となる特定の景観地区内であることを確認"
+      },
+      {
+        "id": "dec-plan-conformance",
+        "type": "decision",
+        "title": "都市計画に適合するか？",
+        "decision_type": "binary",
+        "description": "建築物が当該景観地区に関する都市計画の内容に適合するか"
+      },
+      {
+        "id": "dec-open-space",
+        "type": "decision",
+        "title": "有効な空地が確保されているか？",
+        "decision_type": "binary",
+        "description": "敷地内に有効な空地が確保されているか（壁面後退区域における連続的な空地を含む）"
+      },
+      {
+        "id": "dec-authority-approval",
+        "type": "decision",
+        "title": "特定行政庁が支障なしと認めるか？",
+        "decision_type": "binary",
+        "description": "特定行政庁が交通上、安全上、防火上及び衛生上支障がないと認めるか"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "第56条適用除外",
+        "result": "pass",
+        "description": "第56条の斜線制限は適用しない"
+      },
+      {
+        "id": "fail-not-scenic-district",
+        "type": "terminal",
+        "title": "適用対象外",
+        "result": "fail",
+        "description": "特定条件を満たす景観地区でないため本条の適用対象外"
+      },
+      {
+        "id": "fail-no-ordinance",
+        "type": "terminal",
+        "title": "適用対象外",
+        "result": "fail",
+        "description": "工作物制限条例が定められていないため本条の適用対象外"
+      },
+      {
+        "id": "fail-not-compliant",
+        "type": "terminal",
+        "title": "緩和不可",
+        "result": "fail",
+        "description": "都市計画適合、空地確保、または特定行政庁の認定を満たさないため第56条が適用される"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "dec-scenic-district-regulations", "role": "flow" },
+      { "id": "e02", "from": "dec-scenic-district-regulations", "to": "dec-ordinance-exists", "role": "yes", "label": "はい" },
+      { "id": "e03", "from": "dec-scenic-district-regulations", "to": "fail-not-scenic-district", "role": "no", "label": "いいえ" },
+      { "id": "e04", "from": "dec-ordinance-exists", "to": "proc-scope-confirmed", "role": "yes", "label": "はい" },
+      { "id": "e05", "from": "dec-ordinance-exists", "to": "fail-no-ordinance", "role": "no", "label": "いいえ" },
+      { "id": "e06", "from": "proc-scope-confirmed", "to": "dec-plan-conformance", "role": "flow" },
+      { "id": "e07", "from": "dec-plan-conformance", "to": "dec-open-space", "role": "yes", "label": "はい" },
+      { "id": "e08", "from": "dec-plan-conformance", "to": "fail-not-compliant", "role": "no", "label": "いいえ" },
+      { "id": "e09", "from": "dec-open-space", "to": "dec-authority-approval", "role": "yes", "label": "はい" },
+      { "id": "e10", "from": "dec-open-space", "to": "fail-not-compliant", "role": "no", "label": "いいえ" },
+      { "id": "e11", "from": "dec-authority-approval", "to": "pass", "role": "yes", "label": "はい" },
+      { "id": "e12", "from": "dec-authority-approval", "to": "fail-not-compliant", "role": "no", "label": "いいえ" }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "supersedes",
+      "articles": ["A56"],
+      "description": "法56条の容積率規定の適用を除外する特例"
+    },
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A68:P1", "A68:P2", "A68:P3"],
+      "description": "景観地区の高さ、壁面位置、敷地面積に関する他の規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00+09:00",
+    "updated_at": "2025-12-25T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

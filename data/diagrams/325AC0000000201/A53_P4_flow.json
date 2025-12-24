@@ -1,0 +1,187 @@
+{
+  "id": "A53_P4_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "壁面線等による建蔽率制限の緩和（許可）",
+    "target_subject": "建築物",
+    "description": "隣地境界線から後退した壁面線等の指定がある場合において、壁面線等を越えない建築物で特定行政庁が許可したものは、建蔽率の限度を超えることができる"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "53",
+    "paragraph": "4",
+    "item": null
+  },
+  "labels": ["集団規定", "建蔽率", "壁面線", "許可"],
+  "kijo_diagram_ref": "CHK-BSL-A53-P4",
+  "flow_diagram": {
+    "title": "壁面線等による建蔽率制限緩和（許可）判定フロー",
+    "description": "壁面線等の指定の有無、壁面線等の遵守、特定行政庁の許可を確認し、建蔽率緩和の適用可否を判定する",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start"
+      },
+      {
+        "id": "dec-setback-designated",
+        "type": "decision",
+        "title": "隣地境界線からの壁面線等の指定があるか？",
+        "decision_type": "binary",
+        "description": "隣地境界線から後退した壁面線の指定、又は法68条の2第1項に基づく条例による壁面の位置の制限があるか"
+      },
+      {
+        "id": "dec-building-within-line",
+        "type": "decision",
+        "title": "建築物が壁面線等を越えないか？",
+        "decision_type": "binary",
+        "description": "建築物の壁・柱が壁面線等を越えていないか（ひさし等の政令で定める部分を除く）"
+      },
+      {
+        "id": "dec-permission-granted",
+        "type": "decision",
+        "title": "特定行政庁の許可があるか？",
+        "decision_type": "binary",
+        "description": "特定行政庁が安全上、防火上及び衛生上支障がないと認めて許可したか"
+      },
+      {
+        "id": "proc-setback-compliance",
+        "type": "process",
+        "title": "壁面線等遵守確認",
+        "description": "建築物が壁面線等を越えていないことを確認"
+      },
+      {
+        "id": "proc-permission-confirmed",
+        "type": "process",
+        "title": "許可確認",
+        "description": "特定行政庁の許可があることを確認"
+      },
+      {
+        "id": "pass-relaxation",
+        "type": "terminal",
+        "title": "建蔽率緩和適用可",
+        "result": "pass",
+        "description": "許可の範囲内において、前三項の規定による建蔽率の限度を超えることができる"
+      },
+      {
+        "id": "fail-no-designation",
+        "type": "terminal",
+        "title": "対象外（指定なし）",
+        "result": "fail",
+        "description": "壁面線等の指定がないため、本項の適用対象外"
+      },
+      {
+        "id": "fail-exceeds-line",
+        "type": "terminal",
+        "title": "緩和不可（壁面線等超過）",
+        "result": "fail",
+        "description": "建築物が壁面線等を越えているため、緩和は適用されない"
+      },
+      {
+        "id": "fail-no-permission",
+        "type": "terminal",
+        "title": "緩和不可（許可なし）",
+        "result": "fail",
+        "description": "特定行政庁の許可がないため、緩和は適用されない"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e1",
+        "from": "start",
+        "to": "dec-setback-designated",
+        "role": "flow"
+      },
+      {
+        "id": "e2",
+        "from": "dec-setback-designated",
+        "to": "dec-building-within-line",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e3",
+        "from": "dec-setback-designated",
+        "to": "fail-no-designation",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e4",
+        "from": "dec-building-within-line",
+        "to": "proc-setback-compliance",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e5",
+        "from": "dec-building-within-line",
+        "to": "fail-exceeds-line",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e6",
+        "from": "proc-setback-compliance",
+        "to": "dec-permission-granted",
+        "role": "flow"
+      },
+      {
+        "id": "e7",
+        "from": "dec-permission-granted",
+        "to": "proc-permission-confirmed",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e8",
+        "from": "dec-permission-granted",
+        "to": "fail-no-permission",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e9",
+        "from": "proc-permission-confirmed",
+        "to": "pass-relaxation",
+        "role": "flow"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A53:P1", "A53:P2", "A53:P3"],
+      "description": "第1項〜第3項の建蔽率制限に対する緩和規定"
+    },
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A68_2:P1"],
+      "description": "壁面の位置の制限に関する条例規定"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "defines_detail",
+      "description": "ひさしその他の建築物の部分で除外されるもの（政令で定める）"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

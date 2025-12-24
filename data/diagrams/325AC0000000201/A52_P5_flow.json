@@ -1,0 +1,203 @@
+{
+  "id": "A52_P5_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "地盤面の条例による別定の確認",
+    "target_subject": "建築物",
+    "description": "容積率算定に用いる地盤面について、地方公共団体の条例による別定が適用されるか確認する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "52",
+    "paragraph": "5"
+  },
+  "labels": [
+    "集団規定",
+    "容積率"
+  ],
+  "text_raw": "地方公共団体は、土地の状況等により必要と認める場合においては、前項の規定にかかわらず、政令で定める基準に従い、条例で、区域を限り、第三項の地盤面を別に定めることができる。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "地方公共団体が条例で地盤面を別に定めた区域内"
+        }
+      ],
+      "note": "第52条第5項に基づき地方公共団体が条例で定める区域に限定"
+    },
+    "judgment_rule": {
+      "operator": "EXISTS",
+      "conditions": [
+        {
+          "type": "ordinance_existence",
+          "description": "当該地方公共団体において第52条第5項に基づく条例が制定されているか"
+        },
+        {
+          "type": "area_applicability",
+          "description": "当該敷地が条例で定める区域内にあるか"
+        }
+      ]
+    }
+  },
+  "flow_diagram": {
+    "title": "地盤面別定条例適用判定フロー",
+    "description": "容積率算定に用いる地盤面について条例による別定が適用されるかを判定するフロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "審査開始",
+        "result": "start",
+        "description": "地盤面別定条例の適用有無の審査を開始"
+      },
+      {
+        "id": "dec-ordinance-exists",
+        "type": "decision",
+        "title": "地盤面別定条例が制定されているか？",
+        "decision_type": "binary",
+        "description": "当該地方公共団体において法第52条第5項に基づく条例が制定されているか確認"
+      },
+      {
+        "id": "proc-no-ordinance",
+        "type": "process",
+        "title": "条例未制定",
+        "description": "当該地方公共団体に地盤面別定条例がないため原則規定を適用"
+      },
+      {
+        "id": "proc-ordinance-exists",
+        "type": "process",
+        "title": "条例制定あり",
+        "description": "地盤面別定条例が制定されていることを確認"
+      },
+      {
+        "id": "dec-site-in-area",
+        "type": "decision",
+        "title": "敷地が条例指定区域内か？",
+        "decision_type": "binary",
+        "description": "当該敷地が条例で定める区域内に位置するかを幾何学的に判定"
+      },
+      {
+        "id": "proc-outside-area",
+        "type": "process",
+        "title": "指定区域外",
+        "description": "敷地が条例指定区域外のため原則規定を適用"
+      },
+      {
+        "id": "proc-inside-area",
+        "type": "process",
+        "title": "指定区域内該当",
+        "description": "敷地が条例指定区域内にあることを確認"
+      },
+      {
+        "id": "proc-get-alternative-def",
+        "type": "process",
+        "title": "条例定め地盤面定義の取得",
+        "process_type": "mechanical",
+        "description": "条例で定められた地盤面の定義内容を取得"
+      },
+      {
+        "id": "pass-ordinance-applies",
+        "type": "terminal",
+        "title": "適合（条例地盤面適用）",
+        "result": "pass",
+        "description": "条例で定める地盤面を容積率算定に適用する"
+      },
+      {
+        "id": "end-default-applies",
+        "type": "terminal",
+        "title": "審査終了（原則地盤面適用）",
+        "result": "end",
+        "description": "条例適用なしのため法第52条第4項の原則地盤面を適用"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-ordinance-exists",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-ordinance-exists",
+        "to": "proc-no-ordinance",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e03",
+        "from": "dec-ordinance-exists",
+        "to": "proc-ordinance-exists",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e04",
+        "from": "proc-no-ordinance",
+        "to": "end-default-applies",
+        "role": "flow"
+      },
+      {
+        "id": "e05",
+        "from": "proc-ordinance-exists",
+        "to": "dec-site-in-area",
+        "role": "flow"
+      },
+      {
+        "id": "e06",
+        "from": "dec-site-in-area",
+        "to": "proc-outside-area",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e07",
+        "from": "dec-site-in-area",
+        "to": "proc-inside-area",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e08",
+        "from": "proc-outside-area",
+        "to": "end-default-applies",
+        "role": "flow"
+      },
+      {
+        "id": "e09",
+        "from": "proc-inside-area",
+        "to": "proc-get-alternative-def",
+        "role": "flow"
+      },
+      {
+        "id": "e10",
+        "from": "proc-get-alternative-def",
+        "to": "pass-ordinance-applies",
+        "role": "flow"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-A52-P5",
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "delegates_to",
+      "description": "政令で定める基準に従い条例を制定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00.000Z",
+    "author": "Claude Opus 4.5",
+    "generator": "flow-generator-skill",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法",
+    "checklist_ref": "確認審査報告書チェックリスト行101"
+  }
+}

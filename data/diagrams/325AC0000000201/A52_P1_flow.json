@@ -1,0 +1,123 @@
+{
+  "id": "A52_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "容積率（適合判定フロー）",
+    "target_subject": "建築物",
+    "description": "建築物の容積率が用途地域ごとに都市計画で定められた数値以下であることを判定するフロー"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "52",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": ["集団規定", "容積率"],
+  "text_raw": "建築物の延べ面積の敷地面積に対する割合（以下「容積率」という。）は、次の各号に掲げる区域の区分に従い、当該各号に定める数値以下でなければならない。",
+  "compliance_logic": {
+    "judgment_rule": {
+      "operator": "<=",
+      "lhs": { "ref": "info-volume-ratio", "symbol": "V" },
+      "rhs": { "ref": "info-limit-volume-ratio", "symbol": "Vmax" }
+    }
+  },
+  "flow_diagram": {
+    "title": "法52条1項 容積率 適合判定フロー",
+    "description": "建築物の容積率が都市計画で定められた上限以下かを判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "法52条1項の適合判定を開始"
+      },
+      {
+        "id": "info-calc-volume",
+        "type": "information",
+        "title": "容積率を計算",
+        "symbol": "V",
+        "subject": "建築物",
+        "property": "容積率",
+        "property_type": "numeric",
+        "description": "延べ面積÷敷地面積で容積率を算出"
+      },
+      {
+        "id": "dec-use-district",
+        "type": "decision",
+        "title": "用途地域は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "第一種低層住居専用地域", "description": "50〜200%のいずれか" },
+          { "value": "第二種低層住居専用地域", "description": "50〜200%のいずれか" },
+          { "value": "中高層住居専用地域", "description": "100〜400%のいずれか" },
+          { "value": "住居系・商業系・工業系", "description": "各地域の上限に従う" }
+        ],
+        "description": "敷地が所在する用途地域を判定"
+      },
+      {
+        "id": "proc-get-limit",
+        "type": "process",
+        "title": "都市計画の容積率上限を取得",
+        "process_type": "mechanical",
+        "description": "用途地域に応じて都市計画で定められた容積率の上限値を取得"
+      },
+      {
+        "id": "dec-volume-check",
+        "type": "decision",
+        "title": "容積率 ≤ 上限か？",
+        "decision_type": "binary",
+        "description": "建築物の容積率が都市計画で定められた上限以下か判定",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "V", "desc": "容積率" },
+          "rhs": { "var": "Vmax", "desc": "都市計画の容積率上限" }
+        }
+      },
+      {
+        "id": "proc-comply",
+        "type": "process",
+        "title": "容積率適合",
+        "process_type": "mechanical",
+        "description": "容積率が上限以下のため基準適合"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "法52条1項の規定に適合"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "法52条1項の規定に不適合"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "info-calc-volume", "role": "flow" },
+      { "id": "e02", "from": "info-calc-volume", "to": "dec-use-district", "role": "flow" },
+      { "id": "e03", "from": "dec-use-district", "to": "proc-get-limit", "role": "option", "label": "第一種低層住居専用地域" },
+      { "id": "e04", "from": "dec-use-district", "to": "proc-get-limit", "role": "option", "label": "第二種低層住居専用地域" },
+      { "id": "e05", "from": "dec-use-district", "to": "proc-get-limit", "role": "option", "label": "中高層住居専用地域" },
+      { "id": "e06", "from": "dec-use-district", "to": "proc-get-limit", "role": "option", "label": "住居系・商業系・工業系" },
+      { "id": "e07", "from": "proc-get-limit", "to": "dec-volume-check", "role": "flow" },
+      { "id": "e08", "from": "dec-volume-check", "to": "proc-comply", "role": "yes", "label": "はい" },
+      { "id": "e09", "from": "dec-volume-check", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e10", "from": "proc-comply", "to": "pass", "role": "flow" }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-A52-P1",
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

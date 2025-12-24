@@ -1,0 +1,246 @@
+{
+  "id": "A57_3_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "特例敷地の指定取消し申請要件フロー",
+    "target_subject": "特例敷地",
+    "description": "特例敷地の指定取消しを申請する場合の要件を判定するフロー"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "57の3",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "集団規定",
+    "容積率"
+  ],
+  "text_raw": "前条第四項の規定により公告された特例敷地である土地について所有権又は借地権を有する者は、その全員の合意により、同条第三項の指定の取消しを特定行政庁に申請することができる。この場合においては、あらかじめ、当該特例敷地について政令で定める利害関係を有する者の同意を得なければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "property",
+          "value": "前条第四項により指定された特例敷地"
+        }
+      ],
+      "note": "第57条の2に基づいて指定された特例敷地"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-unanimous-consent",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "ref": "info-stakeholder-consent",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "kijo_diagram_ref": "CHK-BSL-A57-3-P1",
+  "flow_diagram": {
+    "title": "特例敷地の指定取消し申請要件判定フロー",
+    "description": "第57条の3第1項に基づく特例敷地の指定取消し申請の要件を判定するフロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "指定取消し申請要件の判定を開始"
+      },
+      {
+        "id": "dec-special-site-proclaimed",
+        "type": "decision",
+        "title": "第57条の2第4項で公告された特例敷地か？",
+        "decision_type": "binary",
+        "description": "対象の土地が前条第4項の規定により公告された特例敷地であるか"
+      },
+      {
+        "id": "proc-special-site-confirmed",
+        "type": "process",
+        "title": "特例敷地該当",
+        "process_type": "mechanical",
+        "description": "公告された特例敷地であることを確認"
+      },
+      {
+        "id": "proc-identify-landowners",
+        "type": "process",
+        "title": "所有権等保有者の特定",
+        "process_type": "undefined_input",
+        "description": "特例敷地に対する所有権または借地権を有する者を全て特定"
+      },
+      {
+        "id": "dec-unanimous-consent",
+        "type": "decision",
+        "title": "所有権等保有者全員の合意があるか？",
+        "decision_type": "binary",
+        "description": "特例敷地の土地について所有権又は借地権を有する者の全員が指定の取消しに合意しているか"
+      },
+      {
+        "id": "proc-unanimous-confirmed",
+        "type": "process",
+        "title": "全員合意あり",
+        "process_type": "human_judgment",
+        "description": "所有権等保有者全員の合意を確認"
+      },
+      {
+        "id": "proc-identify-stakeholders",
+        "type": "process",
+        "title": "利害関係人の特定",
+        "process_type": "mechanical",
+        "description": "政令で定める利害関係を有する者を特定"
+      },
+      {
+        "id": "dec-stakeholder-consent",
+        "type": "decision",
+        "title": "利害関係人の同意を得ているか？",
+        "decision_type": "binary",
+        "description": "政令で定める利害関係を有する者から、あらかじめ同意を得ているか"
+      },
+      {
+        "id": "proc-stakeholder-confirmed",
+        "type": "process",
+        "title": "利害関係人同意あり",
+        "process_type": "human_judgment",
+        "description": "利害関係人の同意を確認"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "申請可能",
+        "result": "pass",
+        "description": "全ての要件を満たし、特例敷地の指定取消しを申請することができる"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "申請不可",
+        "result": "fail",
+        "description": "要件を満たさないため、特例敷地の指定取消しを申請することができない"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e-start-to-site",
+        "from": "start",
+        "to": "dec-special-site-proclaimed",
+        "role": "flow"
+      },
+      {
+        "id": "e-site-yes",
+        "from": "dec-special-site-proclaimed",
+        "to": "proc-special-site-confirmed",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e-site-no",
+        "from": "dec-special-site-proclaimed",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e-site-to-identify",
+        "from": "proc-special-site-confirmed",
+        "to": "proc-identify-landowners",
+        "role": "flow"
+      },
+      {
+        "id": "e-identify-to-unanimous",
+        "from": "proc-identify-landowners",
+        "to": "dec-unanimous-consent",
+        "role": "flow"
+      },
+      {
+        "id": "e-unanimous-yes",
+        "from": "dec-unanimous-consent",
+        "to": "proc-unanimous-confirmed",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e-unanimous-no",
+        "from": "dec-unanimous-consent",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e-unanimous-to-stakeholder",
+        "from": "proc-unanimous-confirmed",
+        "to": "proc-identify-stakeholders",
+        "role": "flow"
+      },
+      {
+        "id": "e-stakeholder-identify-to-consent",
+        "from": "proc-identify-stakeholders",
+        "to": "dec-stakeholder-consent",
+        "role": "flow"
+      },
+      {
+        "id": "e-stakeholder-yes",
+        "from": "dec-stakeholder-consent",
+        "to": "proc-stakeholder-confirmed",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e-stakeholder-no",
+        "from": "dec-stakeholder-consent",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e-stakeholder-to-pass",
+        "from": "proc-stakeholder-confirmed",
+        "to": "pass",
+        "role": "flow"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": [
+        "A57_2:P3",
+        "A57_2:P4"
+      ],
+      "description": "特例敷地の指定要件及び公告規定"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "defines_detail",
+      "articles": [
+        "A108_3:P1:I3"
+      ],
+      "description": "利害関係人の定義"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00Z",
+    "updated_at": "2025-12-25T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

@@ -1,0 +1,155 @@
+{
+  "id": "A137_6_3_P2_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "敷地内通路に係る既存不適格建築物の増築・改築の範囲",
+    "target_subject": "増築及び改築に係る部分",
+    "description": "法第3条第2項の規定により法第35条（前項に規定する技術的基準に係る部分）の規定の適用を受けない建築物の増築・改築が、法第86条の7第1項の緩和適用を受ける範囲であるかの判定"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "137_6_3",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": [
+    "既存不適格建築物",
+    "増改築",
+    "敷地内通路",
+    "避難",
+    "消火"
+  ],
+  "text_raw": "法第三条第二項の規定により法第三十五条（前項に規定する技術的基準に係る部分に限る。）の規定の適用を受けない建築物についての法第八十六条の七第一項の政令で定める範囲は、増築及び改築については、工事の着手がこの政令の施行の日以後である増築又は改築に係る部分の床面積の合計が五十平方メートルを超えず、かつ、増築又は改築後における延べ面積が基準時における延べ面積の一・二倍を超えないこととする。",
+  "kijo_diagram_ref": "CHK-EXT-A137-6-3-P2",
+  "flow_diagram": {
+    "title": "敷地内通路に係る既存不適格建築物の増改築範囲判定フロー",
+    "description": "増築・改築部分の床面積及び延べ面積倍率による緩和適用範囲の判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "敷地内通路に係る既存不適格建築物の増改築範囲判定を開始"
+      },
+      {
+        "id": "dec-existing-status",
+        "type": "decision",
+        "title": "法第35条の規定適用を受けない既存建築物か？",
+        "decision_type": "binary",
+        "description": "法第3条第2項の規定により法第35条（敷地内通路技術的基準）の適用を受けない建築物であるか"
+      },
+      {
+        "id": "dec-work-type",
+        "type": "decision",
+        "title": "工事種別は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "増築" },
+          { "value": "改築" },
+          { "value": "その他" }
+        ],
+        "description": "当該工事が増築・改築であるかを判定"
+      },
+      {
+        "id": "proc-target-floor-area",
+        "type": "process",
+        "title": "増改築部分床面積の算定",
+        "process_type": "mechanical",
+        "description": "政令施行日以後に着手した増築・改築部分の床面積の合計を算定"
+      },
+      {
+        "id": "dec-floor-area-check",
+        "type": "decision",
+        "title": "増改築部分の床面積合計 <= 50m2 か？",
+        "decision_type": "binary",
+        "description": "増築・改築部分の床面積の合計が50m2以下であるか判定"
+      },
+      {
+        "id": "proc-base-total-area",
+        "type": "process",
+        "title": "基準時延べ面積の特定",
+        "process_type": "undefined_input",
+        "description": "基準時における当該建築物の延べ面積を確認"
+      },
+      {
+        "id": "proc-after-total-area",
+        "type": "process",
+        "title": "増改築後延べ面積の算定",
+        "process_type": "mechanical",
+        "description": "増築又は改築後における建築物の延べ面積を算定"
+      },
+      {
+        "id": "dec-total-area-check",
+        "type": "decision",
+        "title": "増改築後延べ面積 <= 基準時の1.2倍 か？",
+        "decision_type": "binary",
+        "description": "増改築後の延べ面積が基準時延べ面積の1.2倍以下であるか判定"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "緩和適用範囲に該当",
+        "result": "pass",
+        "description": "増築・改築部分が令第137条の6の3第2項の緩和適用範囲に該当する"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "緩和適用範囲外",
+        "result": "fail",
+        "description": "増築・改築部分が令第137条の6の3第2項の緩和適用範囲外"
+      },
+      {
+        "id": "fail-not-applicable",
+        "type": "terminal",
+        "title": "本条の対象外",
+        "result": "fail",
+        "description": "本条の適用対象となる建築物・工事ではない"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "dec-existing-status", "role": "flow" },
+      { "id": "e02", "from": "dec-existing-status", "to": "dec-work-type", "role": "yes", "label": "はい" },
+      { "id": "e03", "from": "dec-existing-status", "to": "fail-not-applicable", "role": "no", "label": "いいえ" },
+      { "id": "e04", "from": "dec-work-type", "to": "proc-target-floor-area", "role": "option", "label": "増築" },
+      { "id": "e05", "from": "dec-work-type", "to": "proc-target-floor-area", "role": "option", "label": "改築" },
+      { "id": "e06", "from": "dec-work-type", "to": "fail-not-applicable", "role": "option", "label": "その他" },
+      { "id": "e07", "from": "proc-target-floor-area", "to": "dec-floor-area-check", "role": "flow" },
+      { "id": "e08", "from": "dec-floor-area-check", "to": "proc-base-total-area", "role": "yes", "label": "はい" },
+      { "id": "e09", "from": "dec-floor-area-check", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e10", "from": "proc-base-total-area", "to": "proc-after-total-area", "role": "flow" },
+      { "id": "e11", "from": "proc-after-total-area", "to": "dec-total-area-check", "role": "flow" },
+      { "id": "e12", "from": "dec-total-area-check", "to": "pass", "role": "yes", "label": "はい" },
+      { "id": "e13", "from": "dec-total-area-check", "to": "fail", "role": "no", "label": "いいえ" }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": ["A3:P2", "A35", "A86_7:P1"],
+      "description": "法第3条第2項の既存不適格建築物の取扱、法第35条の避難施設に関する規定、法第86条の7第1項の緩和規定"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": ["A137_6_3:P1"],
+      "description": "前項に規定する技術的基準"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T17:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

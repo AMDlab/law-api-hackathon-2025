@@ -1,0 +1,221 @@
+{
+  "id": "A56_P4_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "後退した建築物における高さ制限の特例",
+    "target_subject": "建築物",
+    "description": "前面道路から後退した建築物で、前面道路の幅員が12m以上の場合、高さ制限の計算方法を変更適用する判定"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "56",
+    "paragraph": "4",
+    "item": null
+  },
+  "labels": [
+    "集団規定",
+    "高さ制限",
+    "後退建築物"
+  ],
+  "text_raw": "前項に規定する建築物で前面道路の境界線から後退したものに対する同項の規定の適用については、同項中「前面道路の反対側の境界線」とあるのは「前面道路の反対側の境界線から当該建築物の後退距離（当該建築物（地盤面下の部分その他政令で定める部分を除く。）から前面道路の境界線までの水平距離のうち最小のものをいう。以下この表において同じ。）に相当する距離だけ外側の線」と、「前面道路の幅員に」とあるのは「、前面道路の幅員に、当該建築物の後退距離に二を乗じて得たものを加えたものに」とすることができる。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "第一種中高層住居専用地域、第二種中高層住居専用地域、第一種住居地域、第二種住居地域又は準住居地域内"
+        },
+        {
+          "type": "building_characteristic",
+          "value": "前面道路の幅員が12m以上"
+        },
+        {
+          "type": "building_characteristic",
+          "value": "前面道路の境界線から後退した建築物"
+        }
+      ],
+      "note": "法56条第3項に規定する建築物であって前面道路から後退しているもの"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-retreat-distance",
+          "operator": ">",
+          "value": 0
+        },
+        {
+          "ref": "info-road-width",
+          "operator": ">=",
+          "value": 12
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "flow_diagram": {
+    "title": "法56条4項 後退建築物の高さ制限特例フロー",
+    "description": "前面道路から後退した建築物について、境界線と幅員を調整した高さ制限の適合を判定する",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "法56条4項の後退建築物の高さ制限特例適用判定を開始"
+      },
+      {
+        "id": "dec-zone-type",
+        "type": "decision",
+        "title": "用途地域は対象地域か？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "中高層住居専用地域" },
+          { "value": "住居地域" },
+          { "value": "準住居地域" },
+          { "value": "対象外地域" }
+        ],
+        "description": "第一種・第二種中高層住居専用地域、第一種・第二種住居地域、準住居地域に該当するか"
+      },
+      {
+        "id": "proc-not-applicable-zone",
+        "type": "process",
+        "title": "本項適用対象外（地域）",
+        "description": "対象地域でないため56条4項の適用対象外"
+      },
+      {
+        "id": "dec-road-width",
+        "type": "decision",
+        "title": "前面道路の幅員は12m以上か？",
+        "decision_type": "binary",
+        "description": "前面道路の幅員が12m以上であることを確認"
+      },
+      {
+        "id": "proc-not-applicable-width",
+        "type": "process",
+        "title": "本項適用対象外（道路幅員）",
+        "description": "道路幅員が12m未満のため56条4項の適用対象外"
+      },
+      {
+        "id": "dec-setback-status",
+        "type": "decision",
+        "title": "建築物は前面道路から後退しているか？",
+        "decision_type": "binary",
+        "description": "建築物が前面道路の境界線から後退しているかを確認"
+      },
+      {
+        "id": "proc-not-applicable-setback",
+        "type": "process",
+        "title": "本項適用対象外（後退なし）",
+        "description": "後退していないため56条4項の適用対象外"
+      },
+      {
+        "id": "proc-applicable",
+        "type": "process",
+        "title": "特例適用対象該当",
+        "description": "法56条4項の特例適用条件を全て満たす"
+      },
+      {
+        "id": "proc-retreat-distance",
+        "type": "process",
+        "title": "後退距離の特定",
+        "process_type": "undefined_input",
+        "description": "建築物（地盤面下の部分を除く）から前面道路境界線までの最小水平距離を特定"
+      },
+      {
+        "id": "proc-boundary-adjustment",
+        "type": "process",
+        "title": "基準となる境界線の調整",
+        "process_type": "mechanical",
+        "description": "前面道路の反対側境界線を後退距離分外側に移動"
+      },
+      {
+        "id": "proc-width-adjustment",
+        "type": "process",
+        "title": "前面道路幅員の調整",
+        "process_type": "mechanical",
+        "description": "前面道路の幅員に後退距離×2を加算"
+      },
+      {
+        "id": "proc-height-calculation",
+        "type": "process",
+        "title": "調整後の高さ制限値の計算",
+        "process_type": "mechanical",
+        "description": "調整後の境界線と幅員係数用値を用いて高さ制限値を計算"
+      },
+      {
+        "id": "proc-building-height",
+        "type": "process",
+        "title": "建築物の計画高さの特定",
+        "process_type": "undefined_input",
+        "description": "建築物の最高高さを特定"
+      },
+      {
+        "id": "dec-height-compliance",
+        "type": "decision",
+        "title": "計画高さが調整後の制限値以下か？",
+        "decision_type": "binary",
+        "description": "H ≤ 調整後の高さ制限値 を判定"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "法56条4項の調整後の高さ制限に適合"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "法56条4項の調整後の高さ制限に不適合"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "dec-zone-type", "role": "flow" },
+      { "id": "e02", "from": "dec-zone-type", "to": "dec-road-width", "role": "option", "label": "中高層住居専用地域" },
+      { "id": "e03", "from": "dec-zone-type", "to": "dec-road-width", "role": "option", "label": "住居地域" },
+      { "id": "e04", "from": "dec-zone-type", "to": "dec-road-width", "role": "option", "label": "準住居地域" },
+      { "id": "e05", "from": "dec-zone-type", "to": "proc-not-applicable-zone", "role": "option", "label": "対象外地域" },
+      { "id": "e06", "from": "proc-not-applicable-zone", "to": "pass", "role": "flow" },
+      { "id": "e07", "from": "dec-road-width", "to": "dec-setback-status", "role": "yes", "label": "はい" },
+      { "id": "e08", "from": "dec-road-width", "to": "proc-not-applicable-width", "role": "no", "label": "いいえ" },
+      { "id": "e09", "from": "proc-not-applicable-width", "to": "pass", "role": "flow" },
+      { "id": "e10", "from": "dec-setback-status", "to": "proc-applicable", "role": "yes", "label": "はい" },
+      { "id": "e11", "from": "dec-setback-status", "to": "proc-not-applicable-setback", "role": "no", "label": "いいえ" },
+      { "id": "e12", "from": "proc-not-applicable-setback", "to": "pass", "role": "flow" },
+      { "id": "e13", "from": "proc-applicable", "to": "proc-retreat-distance", "role": "flow" },
+      { "id": "e14", "from": "proc-retreat-distance", "to": "proc-boundary-adjustment", "role": "flow" },
+      { "id": "e15", "from": "proc-boundary-adjustment", "to": "proc-width-adjustment", "role": "flow" },
+      { "id": "e16", "from": "proc-width-adjustment", "to": "proc-height-calculation", "role": "flow" },
+      { "id": "e17", "from": "proc-height-calculation", "to": "proc-building-height", "role": "flow" },
+      { "id": "e18", "from": "proc-building-height", "to": "dec-height-compliance", "role": "flow" },
+      { "id": "e19", "from": "dec-height-compliance", "to": "pass", "role": "yes", "label": "はい" },
+      { "id": "e20", "from": "dec-height-compliance", "to": "fail", "role": "no", "label": "いいえ" }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-A56-P4",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A56:P1", "A56:P2", "A56:P3"],
+      "description": "第1項から第3項の高さ制限に対する特例を定める"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00+09:00",
+    "updated_at": "2025-12-25T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

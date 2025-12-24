@@ -1,0 +1,284 @@
+{
+  "id": "A67_P5_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "特定防災街区整備地区内の壁・柱の配置制限",
+    "target_subject": "建築物",
+    "description": "特定防災街区整備地区内における建築物の壁又は柱の壁面位置制限への適合判定"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "67",
+    "paragraph": "5",
+    "item": null
+  },
+  "labels": [
+    "集団規定",
+    "防火",
+    "都市計画関連"
+  ],
+  "text_raw": "特定防災街区整備地区内においては、建築物の壁又はこれに代わる柱は、特定防災街区整備地区に関する都市計画において壁面の位置の制限が定められたときは、建築物の地盤面下の部分を除き、当該壁面の位置の制限に反して建築してはならない。ただし、次の各号のいずれかに該当する建築物については、この限りでない。一第三項第一号に掲げる建築物二学校、駅舎、卸売市場その他これらに類する公益上必要な建築物で、特定行政庁が用途上又は構造上やむを得ないと認めて許可したもの",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "特定防災街区整備地区内"
+        },
+        {
+          "type": "urban_plan_condition",
+          "value": "壁面の位置の制限が定められている"
+        }
+      ],
+      "note": "特定防災街区整備地区に関する都市計画において壁面の位置の制限が定められた場合に適用"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-wall-or-pillar-position",
+          "operator": "satisfies",
+          "value": "壁面位置の制限"
+        },
+        {
+          "operator": "OR",
+          "conditions": [
+            {
+              "ref": "info-ground-level-exclusion",
+              "operator": "==",
+              "value": true
+            },
+            {
+              "ref": "info-exception-match",
+              "operator": "==",
+              "value": false
+            }
+          ]
+        }
+      ]
+    },
+    "exceptions": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "type": "building_category",
+          "ref_article": "法::A67:P3:I1",
+          "description": "第3項第1号に掲げる建築物（公衆便所、巡査派出所等公益上必要な建築物）"
+        },
+        {
+          "type": "special_permission",
+          "description": "学校、駅舎、卸売市場その他これらに類する公益上必要な建築物で、特定行政庁が用途上又は構造上やむを得ないと認めて許可したもの"
+        }
+      ],
+      "effect": "EXEMPT"
+    }
+  },
+  "kijo_diagram_ref": "CHK-BSL-A67-P5",
+  "flow_diagram": {
+    "title": "特定防災街区整備地区内の壁・柱の配置制限適合判定フロー",
+    "description": "建築物の壁又は柱が壁面位置制限に適合するかを判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start"
+      },
+      {
+        "id": "dec-location",
+        "type": "decision",
+        "title": "特定防災街区整備地区内か？",
+        "decision_type": "binary",
+        "description": "敷地が特定防災街区整備地区内に位置するか確認"
+      },
+      {
+        "id": "dec-restriction-defined",
+        "type": "decision",
+        "title": "都市計画で壁面位置制限が定められているか？",
+        "decision_type": "binary",
+        "description": "当該区域の都市計画において壁面の位置の制限が定められているか確認"
+      },
+      {
+        "id": "dec-exception-type",
+        "type": "decision",
+        "title": "建築物の種別は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "公衆便所・巡査派出所等公益上必要な建築物" },
+          { "value": "学校・駅舎・卸売市場等公益施設" },
+          { "value": "その他の建築物" }
+        ],
+        "description": "建築物が第5項各号の例外に該当するか判定"
+      },
+      {
+        "id": "proc-exception-1-match",
+        "type": "process",
+        "title": "第1号該当（公益上必要な建築物）",
+        "process_type": "mechanical",
+        "description": "法67条3項1号に掲げる建築物に該当",
+        "related_articles": ["法::A67:P3:I1"]
+      },
+      {
+        "id": "dec-special-permission",
+        "type": "decision",
+        "title": "特定行政庁の許可を取得しているか？",
+        "decision_type": "binary",
+        "description": "特定行政庁が用途上又は構造上やむを得ないと認めて許可したか確認"
+      },
+      {
+        "id": "proc-exception-2-match",
+        "type": "process",
+        "title": "第2号該当（特定行政庁許可済み公益施設）",
+        "process_type": "mechanical",
+        "description": "学校等公益施設で特定行政庁の許可を取得"
+      },
+      {
+        "id": "dec-wall-pillar-position",
+        "type": "decision",
+        "title": "全ての壁・柱が壁面位置制限に適合するか？",
+        "decision_type": "binary",
+        "description": "地盤面下の部分を除き、全ての壁又は柱が壁面位置制限に適合するか判定"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "法67条5項適合",
+        "result": "pass",
+        "description": "建築物が法67条5項の規定に適合"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "法67条5項不適合",
+        "result": "fail",
+        "description": "建築物が法67条5項の規定に不適合"
+      },
+      {
+        "id": "not-applicable",
+        "type": "terminal",
+        "title": "規定対象外",
+        "result": "end",
+        "description": "本規定の適用範囲外"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-location",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-location",
+        "to": "dec-restriction-defined",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "dec-location",
+        "to": "not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e04",
+        "from": "dec-restriction-defined",
+        "to": "dec-exception-type",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e05",
+        "from": "dec-restriction-defined",
+        "to": "pass",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e06",
+        "from": "dec-exception-type",
+        "to": "proc-exception-1-match",
+        "role": "option",
+        "label": "公衆便所・巡査派出所等公益上必要な建築物"
+      },
+      {
+        "id": "e07",
+        "from": "dec-exception-type",
+        "to": "dec-special-permission",
+        "role": "option",
+        "label": "学校・駅舎・卸売市場等公益施設"
+      },
+      {
+        "id": "e08",
+        "from": "dec-exception-type",
+        "to": "dec-wall-pillar-position",
+        "role": "option",
+        "label": "その他の建築物"
+      },
+      {
+        "id": "e09",
+        "from": "proc-exception-1-match",
+        "to": "pass",
+        "role": "flow"
+      },
+      {
+        "id": "e10",
+        "from": "dec-special-permission",
+        "to": "proc-exception-2-match",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e11",
+        "from": "dec-special-permission",
+        "to": "dec-wall-pillar-position",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e12",
+        "from": "proc-exception-2-match",
+        "to": "pass",
+        "role": "flow"
+      },
+      {
+        "id": "e13",
+        "from": "dec-wall-pillar-position",
+        "to": "pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e14",
+        "from": "dec-wall-pillar-position",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A67:P3:I1"],
+      "description": "法67条5項の例外要件として法67条3項1号を参照"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00.000Z",
+    "updated_at": "2025-12-25T00:00:00.000Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-skill",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

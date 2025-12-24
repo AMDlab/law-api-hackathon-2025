@@ -1,0 +1,272 @@
+{
+  "id": "A85_P3_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "応急仮設建築物の存続期間制限と許可要件",
+    "target_subject": "応急仮設建築物",
+    "description": "応急仮設建築物の建築工事完了後の存続期間管理と許可要件の判定フロー"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "85",
+    "paragraph": "3"
+  },
+  "labels": [
+    "応急仮設建築物",
+    "存続期間制限",
+    "許可制度"
+  ],
+  "text_raw": "前二項の応急仮設建築物を建築した者は、その建築工事を完了した後三月を超えて当該建築物を存続させようとする場合においては、その超えることとなる日前に、特定行政庁の許可を受けなければならない。ただし、当該許可の申請をした場合において、その超えることとなる日前に当該申請に対する処分がされないときは、当該処分がされるまでの間は、なお当該建築物を存続させることができる。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "building_type",
+          "value": "応急仮設建築物"
+        },
+        {
+          "type": "temporal",
+          "value": "建築工事完了後"
+        }
+      ],
+      "note": "前2項（第1項・第2項）に該当する応急仮設建築物が対象"
+    },
+    "judgment_rule": {
+      "primary": "3月超過日前に許可を受けた OR (許可申請日から処分日まで建築物を存続させる)",
+      "conditions": [
+        {
+          "condition": "3月超過前に許可を受けた",
+          "complies": true
+        },
+        {
+          "condition": "許可申請後、処分待機期間中",
+          "complies": true
+        },
+        {
+          "condition": "3月超過後も許可なく存続させた",
+          "complies": false
+        }
+      ]
+    }
+  },
+  "flow_diagram": {
+    "title": "応急仮設建築物存続期間許可判定フロー",
+    "description": "応急仮設建築物を3ヶ月を超えて存続させる場合の許可取得要否判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start"
+      },
+      {
+        "id": "dec-building-type",
+        "type": "decision",
+        "title": "応急仮設建築物か？",
+        "decision_type": "binary",
+        "description": "法第85条第1項又は第2項に基づく応急仮設建築物に該当するか"
+      },
+      {
+        "id": "dec-exceed-3months",
+        "type": "decision",
+        "title": "3ヶ月を超えて存続させるか？",
+        "decision_type": "binary",
+        "description": "建築工事完了後3ヶ月を超えて建築物を存続させる意図があるか"
+      },
+      {
+        "id": "proc-no-permit-required",
+        "type": "process",
+        "title": "許可不要",
+        "process_type": "mechanical",
+        "description": "3ヶ月以内の存続であれば許可不要"
+      },
+      {
+        "id": "dec-application-submitted",
+        "type": "decision",
+        "title": "3ヶ月超過日前に許可申請を提出したか？",
+        "decision_type": "binary",
+        "description": "3ヶ月を超える日の前に特定行政庁へ許可申請を提出したか"
+      },
+      {
+        "id": "dec-permit-status",
+        "type": "decision",
+        "title": "許可処分の状況は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "許可" },
+          { "value": "不許可" },
+          { "value": "審査中" }
+        ],
+        "description": "特定行政庁からの許可処分の状況"
+      },
+      {
+        "id": "proc-permit-obtained",
+        "type": "process",
+        "title": "許可取得済み",
+        "process_type": "mechanical",
+        "description": "3ヶ月超過日前に許可を取得"
+      },
+      {
+        "id": "proc-pending-decision",
+        "type": "process",
+        "title": "処分待機期間中",
+        "process_type": "mechanical",
+        "description": "許可申請後、処分がされるまでの期間（ただし書き適用）"
+      },
+      {
+        "id": "pass-permitted",
+        "type": "terminal",
+        "title": "適合（許可取得）",
+        "result": "pass",
+        "description": "許可を取得して存続可能"
+      },
+      {
+        "id": "pass-pending",
+        "type": "terminal",
+        "title": "適合（処分待機中）",
+        "result": "pass",
+        "description": "処分がされるまでの間、存続可能（ただし書き）"
+      },
+      {
+        "id": "pass-within-period",
+        "type": "terminal",
+        "title": "適合（期間内）",
+        "result": "pass",
+        "description": "3ヶ月以内の存続のため許可不要"
+      },
+      {
+        "id": "fail-not-target",
+        "type": "terminal",
+        "title": "対象外",
+        "result": "end",
+        "description": "応急仮設建築物に該当しないため本項の適用なし"
+      },
+      {
+        "id": "fail-no-application",
+        "type": "terminal",
+        "title": "不適合（申請なし）",
+        "result": "fail",
+        "description": "3ヶ月超過日前に許可申請をしていない"
+      },
+      {
+        "id": "fail-denied",
+        "type": "terminal",
+        "title": "不適合（不許可）",
+        "result": "fail",
+        "description": "許可申請が不許可となった"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-building-type",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-building-type",
+        "to": "dec-exceed-3months",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "dec-building-type",
+        "to": "fail-not-target",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e04",
+        "from": "dec-exceed-3months",
+        "to": "dec-application-submitted",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e05",
+        "from": "dec-exceed-3months",
+        "to": "proc-no-permit-required",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e06",
+        "from": "proc-no-permit-required",
+        "to": "pass-within-period",
+        "role": "flow"
+      },
+      {
+        "id": "e07",
+        "from": "dec-application-submitted",
+        "to": "dec-permit-status",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e08",
+        "from": "dec-application-submitted",
+        "to": "fail-no-application",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e09",
+        "from": "dec-permit-status",
+        "to": "proc-permit-obtained",
+        "role": "option",
+        "label": "許可"
+      },
+      {
+        "id": "e10",
+        "from": "dec-permit-status",
+        "to": "fail-denied",
+        "role": "option",
+        "label": "不許可"
+      },
+      {
+        "id": "e11",
+        "from": "dec-permit-status",
+        "to": "proc-pending-decision",
+        "role": "option",
+        "label": "審査中"
+      },
+      {
+        "id": "e12",
+        "from": "proc-permit-obtained",
+        "to": "pass-permitted",
+        "role": "flow"
+      },
+      {
+        "id": "e13",
+        "from": "proc-pending-decision",
+        "to": "pass-pending",
+        "role": "flow"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-A85-P3",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A85:P1", "A85:P2", "A85:P4", "A85:P5"],
+      "description": "第1項・第2項の応急仮設建築物の定義、第4項の許可期間（2年以内）、第5項の期間延長"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00Z",
+    "updated_at": "2025-12-25T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-skill",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

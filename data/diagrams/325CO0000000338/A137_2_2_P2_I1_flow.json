@@ -1,0 +1,156 @@
+{
+  "id": "A137_2_2_P2_I1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "大規模建築物の延べ面積に係る既存不適格建築物の増改築 第1号基準",
+    "target_subject": "増築及び改築",
+    "description": "火熱遮断壁等による区画及び主要構造部の準耐火構造等への適合判定フロー"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "137_2_2",
+    "paragraph": "2",
+    "item": "1"
+  },
+  "labels": [
+    "既存不適格建築物",
+    "増改築",
+    "大規模建築物",
+    "延べ面積3000m2超",
+    "第1号"
+  ],
+  "kijo_diagram_ref": "CHK-EXT-A137-2-2-P2-I1",
+  "flow_diagram": {
+    "title": "増改築適用範囲判定フロー（令第137条の2の2第2項第1号）",
+    "description": "増築・改築部分が火熱遮断壁等で区画され、主要構造部が準耐火構造等に適合するかを判定するフロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "第2項第1号適合判定の開始"
+      },
+      {
+        "id": "dec-fire-barrier",
+        "type": "decision",
+        "title": "増改築部分は火熱遮断壁等で区画されているか？",
+        "decision_type": "binary",
+        "description": "増築又は改築に係る部分が火熱遮断壁等で区画されているか確認（イの要件）"
+      },
+      {
+        "id": "proc-fire-barrier-compliance",
+        "type": "process",
+        "title": "イ要件適合確認",
+        "process_type": "mechanical",
+        "description": "火熱遮断壁等による区画要件（イ）に適合"
+      },
+      {
+        "id": "dec-structure-part-exist",
+        "type": "decision",
+        "title": "大臣が定める主要構造部が存在するか？",
+        "decision_type": "binary",
+        "description": "増築・改築部分に法第21条第2項第2号に規定する性能と同等の性能を有すべきものとして大臣が定める部分が存在するか確認"
+      },
+      {
+        "id": "dec-structure-type",
+        "type": "decision",
+        "title": "主要構造部の構造種別は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "準耐火構造" },
+          { "value": "大臣定め構造方法" },
+          { "value": "大臣認定" },
+          { "value": "いずれでもない" }
+        ],
+        "description": "主要構造部が準耐火構造、同等の準耐火性能を有する大臣定め構造方法、又は大臣認定のいずれであるか判定"
+      },
+      {
+        "id": "proc-quasi-fireproof",
+        "type": "process",
+        "title": "準耐火構造適合",
+        "process_type": "mechanical",
+        "description": "主要構造部が準耐火構造である"
+      },
+      {
+        "id": "proc-minister-method",
+        "type": "process",
+        "title": "大臣定め構造方法適合",
+        "process_type": "mechanical",
+        "description": "主要構造部が同等の準耐火性能を有する大臣定め構造方法を用いている"
+      },
+      {
+        "id": "proc-minister-approval",
+        "type": "process",
+        "title": "大臣認定適合",
+        "process_type": "mechanical",
+        "description": "主要構造部が大臣の認定を受けたものである"
+      },
+      {
+        "id": "proc-structure-compliance",
+        "type": "process",
+        "title": "ロ要件適合確認",
+        "process_type": "mechanical",
+        "description": "主要構造部がロの要件に適合"
+      },
+      {
+        "id": "proc-no-structure-part",
+        "type": "process",
+        "title": "対象主要構造部なし",
+        "process_type": "mechanical",
+        "description": "大臣が定める主要構造部が存在しないため、ロの要件は自動適合"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "第2項第1号適合",
+        "result": "pass",
+        "description": "令第137条の2の2第2項第1号（イ及びロ）に適合する"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "第2項第1号不適合",
+        "result": "fail",
+        "description": "令第137条の2の2第2項第1号に適合しない"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "dec-fire-barrier", "role": "flow" },
+      { "id": "e02", "from": "dec-fire-barrier", "to": "proc-fire-barrier-compliance", "role": "yes", "label": "はい" },
+      { "id": "e03", "from": "dec-fire-barrier", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e04", "from": "proc-fire-barrier-compliance", "to": "dec-structure-part-exist", "role": "flow" },
+      { "id": "e05", "from": "dec-structure-part-exist", "to": "dec-structure-type", "role": "yes", "label": "はい" },
+      { "id": "e06", "from": "dec-structure-part-exist", "to": "proc-no-structure-part", "role": "no", "label": "いいえ" },
+      { "id": "e07", "from": "proc-no-structure-part", "to": "pass", "role": "flow" },
+      { "id": "e08", "from": "dec-structure-type", "to": "proc-quasi-fireproof", "role": "option", "label": "準耐火構造" },
+      { "id": "e09", "from": "dec-structure-type", "to": "proc-minister-method", "role": "option", "label": "大臣定め構造方法" },
+      { "id": "e10", "from": "dec-structure-type", "to": "proc-minister-approval", "role": "option", "label": "大臣認定" },
+      { "id": "e11", "from": "dec-structure-type", "to": "fail", "role": "option", "label": "いずれでもない" },
+      { "id": "e12", "from": "proc-quasi-fireproof", "to": "proc-structure-compliance", "role": "flow" },
+      { "id": "e13", "from": "proc-minister-method", "to": "proc-structure-compliance", "role": "flow" },
+      { "id": "e14", "from": "proc-minister-approval", "to": "proc-structure-compliance", "role": "flow" },
+      { "id": "e15", "from": "proc-structure-compliance", "to": "pass", "role": "flow" }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A21:P2:I2"],
+      "description": "法第21条第2項第2号に規定する性能と同等の性能を有すべき部分の定義"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T12:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

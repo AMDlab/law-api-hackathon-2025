@@ -1,0 +1,209 @@
+{
+  "id": "A87_3_P3_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "用途変更の適用除外判定（適合判定フロー）",
+    "target_subject": "建築物の用途変更",
+    "description": "第3条第2項により建築基準規定が非適用となっている建築物について用途変更時の除外条件を判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "87",
+    "paragraph": "3",
+    "item": null
+  },
+  "labels": ["用途変更", "適用判定", "単体規定"],
+  "text_raw": "第三条第二項の規定により第二十七条、第二十八条第一項若しくは第三項、第二十九条、第三十条、第三十五条から第三十五条の三まで、第三十六条中第二十八条第一項若しくは第三十五条に関する部分、第四十八条第一項から第十四項まで若しくは第五十一条の規定又は第三十九条第二項、第四十条、第四十三条第三項、第四十三条の二、第四十九条から第五十条まで、第六十八条の二第一項若しくは第六十八条の九第一項の規定に基づく条例の規定（次条第一項において「第二十七条等の規定」という。）の適用を受けない建築物の用途を変更する場合においては、次の各号のいずれかに該当する場合を除き、これらの規定を準用する。一増築、改築、大規模の修繕又は大規模の模様替をする場合二当該用途の変更が政令で指定する類似の用途相互間におけるものであつて、かつ、建築物の修繕若しくは模様替をしない場合又はその修繕若しくは模様替が大規模でない場合三第四十八条第一項から第十四項までの規定に関しては、用途の変更が政令で定める範囲内である場合",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        { "type": "location", "value": "第三条第二項の規定により建築基準規定が非適用" },
+        { "type": "action", "value": "建築物の用途を変更" }
+      ],
+      "note": "この項は、第三条第二項により既に建築基準規定が適用されていない建築物について、用途変更時にどのような規定を準用するかを定める"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        { "type": "fact", "value": "適用除外事項に該当しない" }
+      ],
+      "effect": "建築基準規定を準用する"
+    },
+    "exceptions": {
+      "operator": "OR",
+      "conditions": [
+        { "id": "except-1", "description": "増築、改築、大規模の修繕又は大規模の模様替をする場合" },
+        { "id": "except-2", "description": "類似用途相互間の変更で、修繕等がないか大規模でない場合" },
+        { "id": "except-3", "description": "第48条に関し、用途変更が政令範囲内の場合" }
+      ]
+    }
+  },
+  "flow_diagram": {
+    "title": "法87条3項 用途変更の適用除外判定フロー",
+    "description": "第3条第2項により非適用となっている建築物の用途変更時における、建築基準規定の準用除外要件を判定する",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "用途変更の適用除外判定を開始"
+      },
+      {
+        "id": "dec-non-applicability",
+        "type": "decision",
+        "title": "第3条第2項により規定が非適用か？",
+        "decision_type": "binary",
+        "description": "当該建築物が第3条第2項の規定により建築基準規定が適用されていない状態にあるか判定"
+      },
+      {
+        "id": "dec-use-change",
+        "type": "decision",
+        "title": "用途変更を行うか？",
+        "decision_type": "binary",
+        "description": "当該建築物の用途を変更するか判定"
+      },
+      {
+        "id": "dec-construction-type",
+        "type": "decision",
+        "title": "工事内容は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "増築", "description": "増築工事を行う" },
+          { "value": "改築", "description": "改築工事を行う" },
+          { "value": "大規模修繕", "description": "大規模の修繕を行う" },
+          { "value": "大規模模様替", "description": "大規模の模様替を行う" },
+          { "value": "小規模工事又は工事なし", "description": "大規模でない修繕・模様替、又は工事なし" }
+        ],
+        "description": "用途変更に伴う工事の種別を判定"
+      },
+      {
+        "id": "proc-exempt-1-match",
+        "type": "process",
+        "title": "第1号該当",
+        "process_type": "mechanical",
+        "description": "増築、改築、大規模の修繕又は大規模の模様替をする場合に該当"
+      },
+      {
+        "id": "dec-similar-use",
+        "type": "decision",
+        "title": "類似用途相互間の変更か？",
+        "decision_type": "binary",
+        "description": "用途変更が政令で指定する類似の用途相互間であるか判定"
+      },
+      {
+        "id": "dec-repair-scale",
+        "type": "decision",
+        "title": "修繕・模様替の状況は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "修繕・模様替なし", "description": "修繕又は模様替を行わない" },
+          { "value": "大規模でない", "description": "修繕又は模様替が大規模でない" },
+          { "value": "大規模", "description": "修繕又は模様替が大規模" }
+        ],
+        "description": "修繕又は模様替の有無と規模を判定"
+      },
+      {
+        "id": "proc-exempt-2-match",
+        "type": "process",
+        "title": "第2号該当",
+        "process_type": "mechanical",
+        "description": "類似用途相互間の変更であり、修繕等がない又は大規模でない場合に該当"
+      },
+      {
+        "id": "dec-art48-scope",
+        "type": "decision",
+        "title": "第48条に関し政令範囲内か？",
+        "decision_type": "binary",
+        "description": "第48条第1項から第14項の規定に関して、用途変更が政令で定める範囲内であるか判定"
+      },
+      {
+        "id": "proc-exempt-3-match",
+        "type": "process",
+        "title": "第3号該当（第48条のみ）",
+        "process_type": "mechanical",
+        "description": "第48条の規定に関しては適用除外。他の規定は準用される"
+      },
+      {
+        "id": "pass-exempt-all",
+        "type": "terminal",
+        "title": "準用規定不適用",
+        "result": "pass",
+        "description": "第1号又は第2号により準用規定が適用されない"
+      },
+      {
+        "id": "pass-exempt-48-only",
+        "type": "terminal",
+        "title": "第48条のみ不適用",
+        "result": "pass",
+        "description": "第3号により第48条のみ適用除外。他の規定は準用される"
+      },
+      {
+        "id": "fail-apply-regulations",
+        "type": "terminal",
+        "title": "準用規定適用",
+        "result": "fail",
+        "description": "適用除外に該当しないため、第27条等の準用規定が適用される"
+      },
+      {
+        "id": "pass-not-subject",
+        "type": "terminal",
+        "title": "本条項適用対象外",
+        "result": "pass",
+        "description": "第3条第2項の非適用建築物でない、又は用途変更しないため対象外"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "dec-non-applicability", "role": "flow" },
+      { "id": "e02", "from": "dec-non-applicability", "to": "dec-use-change", "role": "yes", "label": "はい" },
+      { "id": "e03", "from": "dec-non-applicability", "to": "pass-not-subject", "role": "no", "label": "いいえ" },
+      { "id": "e04", "from": "dec-use-change", "to": "dec-construction-type", "role": "yes", "label": "はい" },
+      { "id": "e05", "from": "dec-use-change", "to": "pass-not-subject", "role": "no", "label": "いいえ" },
+      { "id": "e06", "from": "dec-construction-type", "to": "proc-exempt-1-match", "role": "option", "label": "増築" },
+      { "id": "e07", "from": "dec-construction-type", "to": "proc-exempt-1-match", "role": "option", "label": "改築" },
+      { "id": "e08", "from": "dec-construction-type", "to": "proc-exempt-1-match", "role": "option", "label": "大規模修繕" },
+      { "id": "e09", "from": "dec-construction-type", "to": "proc-exempt-1-match", "role": "option", "label": "大規模模様替" },
+      { "id": "e10", "from": "dec-construction-type", "to": "dec-similar-use", "role": "option", "label": "小規模工事又は工事なし" },
+      { "id": "e11", "from": "proc-exempt-1-match", "to": "pass-exempt-all", "role": "flow" },
+      { "id": "e12", "from": "dec-similar-use", "to": "dec-repair-scale", "role": "yes", "label": "はい" },
+      { "id": "e13", "from": "dec-similar-use", "to": "dec-art48-scope", "role": "no", "label": "いいえ" },
+      { "id": "e14", "from": "dec-repair-scale", "to": "proc-exempt-2-match", "role": "option", "label": "修繕・模様替なし" },
+      { "id": "e15", "from": "dec-repair-scale", "to": "proc-exempt-2-match", "role": "option", "label": "大規模でない" },
+      { "id": "e16", "from": "dec-repair-scale", "to": "dec-art48-scope", "role": "option", "label": "大規模" },
+      { "id": "e17", "from": "proc-exempt-2-match", "to": "pass-exempt-all", "role": "flow" },
+      { "id": "e18", "from": "dec-art48-scope", "to": "proc-exempt-3-match", "role": "yes", "label": "はい" },
+      { "id": "e19", "from": "dec-art48-scope", "to": "fail-apply-regulations", "role": "no", "label": "いいえ" },
+      { "id": "e20", "from": "proc-exempt-3-match", "to": "pass-exempt-48-only", "role": "flow" }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-A87-3-P3",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A3:P2", "A27", "A28", "A29", "A30", "A35", "A35-2", "A35-3", "A36", "A48", "A51"],
+      "description": "第87条第3項が準用対象としている各建築基準規定"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "defines_detail",
+      "articles": ["A137:P18", "A137:P19"],
+      "description": "政令で指定する類似用途相互間と用途変更の範囲を定める"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

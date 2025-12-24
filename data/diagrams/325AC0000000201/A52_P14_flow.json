@@ -1,0 +1,211 @@
+{
+  "id": "A52_P14_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "容積率の特例許可",
+    "target_subject": "建築物",
+    "description": "特定の建築物について特定行政庁の許可により容積率の限度を超過することを認める適合判定フロー"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "52",
+    "paragraph": "14"
+  },
+  "labels": [
+    "集団規定",
+    "容積率",
+    "特例許可"
+  ],
+  "text_raw": "次の各号のいずれかに該当する建築物で、特定行政庁が交通上、安全上、防火上及び衛生上支障がないと認めて許可したものの容積率は、第一項から第九項までの規定にかかわらず、その許可の範囲内において、これらの規定による限度を超えるものとすることができる。\n一　同一敷地内の建築物の機械室その他これに類する部分の床面積の合計の建築物の延べ面積に対する割合が著しく大きい場合におけるその敷地内の建築物\n二　その敷地の周囲に広い公園、広場、道路その他の空地を有する建築物\n三　建築物のエネルギー消費性能（建築物のエネルギー消費性能の向上等に関する法律（平成二十七年法律第五十三号）第二条第一項第二号に規定するエネルギー消費性能をいう。次条第五項第四号において同じ。）の向上のため必要な外壁に関する工事その他の屋外に面する建築物の部分に関する工事を行う建築物で構造上やむを得ないものとして国土交通省令で定めるもの",
+  "kijo_diagram_ref": "CHK-BSL-A52-P14",
+  "flow_diagram": {
+    "title": "容積率特例許可の適合判定フロー",
+    "description": "法第52条第14項に基づく容積率特例許可の該当性判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "容積率特例許可の該当性判定を開始"
+      },
+      {
+        "id": "dec-machinery-ratio",
+        "type": "decision",
+        "title": "機械室等の面積割合が著しく大きいか？",
+        "decision_type": "binary",
+        "description": "同一敷地内の建築物の機械室その他これに類する部分の床面積合計が、延べ面積に対して著しく大きい割合か判定（第1号）",
+        "related_articles": ["法::A52:P14:I1"]
+      },
+      {
+        "id": "proc-item1",
+        "type": "process",
+        "title": "第1号該当",
+        "process_type": "mechanical",
+        "description": "機械室割合が著しく大きい建築物として第1号に該当"
+      },
+      {
+        "id": "dec-open-space",
+        "type": "decision",
+        "title": "敷地周囲に広い空地があるか？",
+        "decision_type": "binary",
+        "description": "敷地の周囲に広い公園、広場、道路その他の空地を有するか判定（第2号）",
+        "related_articles": ["法::A52:P14:I2"]
+      },
+      {
+        "id": "proc-item2",
+        "type": "process",
+        "title": "第2号該当",
+        "process_type": "mechanical",
+        "description": "敷地周囲に広い空地を有する建築物として第2号に該当"
+      },
+      {
+        "id": "dec-energy-retrofit",
+        "type": "decision",
+        "title": "省エネ改修で構造上やむを得ないものか？",
+        "decision_type": "binary",
+        "description": "エネルギー消費性能向上のための外壁等の工事を行う建築物で、構造上やむを得ないものとして国土交通省令で定めるものに該当するか判定（第3号）",
+        "related_articles": ["法::A52:P14:I3"]
+      },
+      {
+        "id": "proc-item3",
+        "type": "process",
+        "title": "第3号該当",
+        "process_type": "mechanical",
+        "description": "省エネ改修建築物として第3号に該当"
+      },
+      {
+        "id": "dec-approval",
+        "type": "decision",
+        "title": "特定行政庁の許可を受けているか？",
+        "decision_type": "binary",
+        "description": "交通上、安全上、防火上及び衛生上支障がないと特定行政庁が認めて許可したか確認",
+        "related_articles": ["法::A52:P14"]
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "容積率超過可能",
+        "result": "pass",
+        "description": "許可の範囲内において第1項から第9項の規定による限度を超えることができる"
+      },
+      {
+        "id": "fail-no-item",
+        "type": "terminal",
+        "title": "各号非該当",
+        "result": "fail",
+        "description": "第14項各号のいずれにも該当しないため、特例許可の対象外"
+      },
+      {
+        "id": "fail-no-approval",
+        "type": "terminal",
+        "title": "許可未取得",
+        "result": "fail",
+        "description": "特定行政庁の許可を受けていないため、容積率超過不可"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-machinery-ratio",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-machinery-ratio",
+        "to": "proc-item1",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "dec-machinery-ratio",
+        "to": "dec-open-space",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e04",
+        "from": "proc-item1",
+        "to": "dec-approval",
+        "role": "flow"
+      },
+      {
+        "id": "e05",
+        "from": "dec-open-space",
+        "to": "proc-item2",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e06",
+        "from": "dec-open-space",
+        "to": "dec-energy-retrofit",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e07",
+        "from": "proc-item2",
+        "to": "dec-approval",
+        "role": "flow"
+      },
+      {
+        "id": "e08",
+        "from": "dec-energy-retrofit",
+        "to": "proc-item3",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e09",
+        "from": "dec-energy-retrofit",
+        "to": "fail-no-item",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e10",
+        "from": "proc-item3",
+        "to": "dec-approval",
+        "role": "flow"
+      },
+      {
+        "id": "e11",
+        "from": "dec-approval",
+        "to": "pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e12",
+        "from": "dec-approval",
+        "to": "fail-no-approval",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A52:P1", "A52:P2", "A52:P3", "A52:P4", "A52:P5", "A52:P6", "A52:P7", "A52:P8", "A52:P9"],
+      "description": "第52条14項は第1項から第9項までの容積率制限の特例を定める"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00Z",
+    "updated_at": "2025-12-25T00:00:00Z",
+    "author": "Claude Opus 4.5",
+    "generator": "flow-generator-skill-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

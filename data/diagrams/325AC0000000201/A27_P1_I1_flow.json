@@ -1,0 +1,141 @@
+{
+  "id": "A27_P1_I1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "特殊建築物の特定主要構造部（別表第一対象）",
+    "target_subject": "特殊建築物",
+    "description": "別表第一の用途で特定の階に供する特殊建築物の特定主要構造部基準の適合判定フロー"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "27",
+    "paragraph": "1",
+    "item": "1"
+  },
+  "labels": ["単体規定", "防火", "特殊建築物"],
+  "text_raw": "一別表第一（ろ）欄に掲げる階を同表（い）欄（一）項から（四）項までに掲げる用途に供するもの（階数が三以下の建築物にあつては、階数が二以上のものに限る。）",
+  "kijo_diagram_ref": "CHK-BSL-A27-P1-I1",
+  "flow_diagram": {
+    "title": "法27条1項1号該当判定フロー",
+    "description": "別表第一(い)欄(一)〜(四)項の用途に供する特殊建築物が法27条1項1号に該当するかを判定するフロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start"
+      },
+      {
+        "id": "dec-use",
+        "type": "decision",
+        "title": "建築物の用途は？",
+        "decision_type": "multi",
+        "description": "別表第一(い)欄(一)〜(四)項に該当するか判定",
+        "options": [
+          { "value": "(一)劇場等" },
+          { "value": "(二)病院等" },
+          { "value": "(三)ホテル等" },
+          { "value": "(四)学校等" },
+          { "value": "その他" }
+        ]
+      },
+      {
+        "id": "proc-use-1",
+        "type": "process",
+        "title": "(一)劇場等該当",
+        "process_type": "mechanical"
+      },
+      {
+        "id": "proc-use-2",
+        "type": "process",
+        "title": "(二)病院等該当",
+        "process_type": "mechanical"
+      },
+      {
+        "id": "proc-use-3",
+        "type": "process",
+        "title": "(三)ホテル等該当",
+        "process_type": "mechanical"
+      },
+      {
+        "id": "proc-use-4",
+        "type": "process",
+        "title": "(四)学校等該当",
+        "process_type": "mechanical"
+      },
+      {
+        "id": "dec-floor",
+        "type": "decision",
+        "title": "用途に供する階は別表第一(ろ)欄の階か？",
+        "decision_type": "binary",
+        "description": "該当用途区分に対応する別表第一(ろ)欄に掲げる階に該当するか判定"
+      },
+      {
+        "id": "dec-stories",
+        "type": "decision",
+        "title": "階数は？",
+        "decision_type": "multi",
+        "description": "建築物の階数を判定",
+        "options": [
+          { "value": "4以上" },
+          { "value": "2〜3" },
+          { "value": "1" }
+        ]
+      },
+      {
+        "id": "proc-stories-high",
+        "type": "process",
+        "title": "階数4以上：階数条件適合",
+        "process_type": "mechanical"
+      },
+      {
+        "id": "proc-stories-mid",
+        "type": "process",
+        "title": "階数2〜3：階数条件適合",
+        "process_type": "mechanical"
+      },
+      {
+        "id": "end-applicable",
+        "type": "terminal",
+        "title": "法27条1項1号該当",
+        "result": "pass",
+        "description": "特定主要構造部の基準適用対象"
+      },
+      {
+        "id": "end-not-applicable",
+        "type": "terminal",
+        "title": "法27条1項1号非該当",
+        "result": "fail",
+        "description": "本号の適用対象外"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "dec-use", "role": "flow" },
+      { "id": "e02", "from": "dec-use", "to": "proc-use-1", "role": "option", "label": "(一)劇場等" },
+      { "id": "e03", "from": "dec-use", "to": "proc-use-2", "role": "option", "label": "(二)病院等" },
+      { "id": "e04", "from": "dec-use", "to": "proc-use-3", "role": "option", "label": "(三)ホテル等" },
+      { "id": "e05", "from": "dec-use", "to": "proc-use-4", "role": "option", "label": "(四)学校等" },
+      { "id": "e06", "from": "dec-use", "to": "end-not-applicable", "role": "option", "label": "その他" },
+      { "id": "e07", "from": "proc-use-1", "to": "dec-floor", "role": "flow" },
+      { "id": "e08", "from": "proc-use-2", "to": "dec-floor", "role": "flow" },
+      { "id": "e09", "from": "proc-use-3", "to": "dec-floor", "role": "flow" },
+      { "id": "e10", "from": "proc-use-4", "to": "dec-floor", "role": "flow" },
+      { "id": "e11", "from": "dec-floor", "to": "dec-stories", "role": "yes" },
+      { "id": "e12", "from": "dec-floor", "to": "end-not-applicable", "role": "no" },
+      { "id": "e13", "from": "dec-stories", "to": "proc-stories-high", "role": "option", "label": "4以上" },
+      { "id": "e14", "from": "dec-stories", "to": "proc-stories-mid", "role": "option", "label": "2〜3" },
+      { "id": "e15", "from": "dec-stories", "to": "end-not-applicable", "role": "option", "label": "1" },
+      { "id": "e16", "from": "proc-stories-high", "to": "end-applicable", "role": "flow" },
+      { "id": "e17", "from": "proc-stories-mid", "to": "end-applicable", "role": "flow" }
+    ]
+  },
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00Z",
+    "generator": "claude-code-flow-generator",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

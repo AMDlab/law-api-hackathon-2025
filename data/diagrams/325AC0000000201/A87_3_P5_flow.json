@@ -1,0 +1,185 @@
+{
+  "id": "A87_3_P5_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "災害救助用建築物等の使用期間延長許可（適合判定フロー）",
+    "target_subject": "特定行政庁",
+    "description": "災害救助用建築物または公益的建築物の使用期間を延長する許可の判定を行う"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "87の3",
+    "paragraph": "5",
+    "item": null
+  },
+  "labels": ["災害復興", "特例規定"],
+  "text_raw": "特定行政庁は、被災者の需要に応ずるに足りる適当な建築物が不足することその他の理由により前項に規定する期間を超えて使用する特別の必要がある災害救助用建築物又は公益的建築物について、安全上、防火上及び衛生上支障がなく、かつ、公益上やむを得ないと認める場合においては、同項の規定にかかわらず、更に一年を超えない範囲内において同項の規定による許可の期間を延長することができる。被災者の需要に応ずるに足りる適当な建築物が不足することその他の理由により当該延長に係る期間を超えて使用する特別の必要がある災害救助用建築物又は公益的建築物についても、同様とする。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        { "type": "location", "value": "被災地域" },
+        { "type": "general", "value": "災害救助用建築物又は公益的建築物で前項の2年の許可期間を超えて使用する必要がある場合" }
+      ],
+      "note": "災害発生後、建築物を災害救助用建築物または公益的建築物として用途変更した場合の使用期間延長"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        { "ref": "info-necessity", "operator": "==", "value": true, "description": "特別な必要性がある" },
+        { "ref": "info-safety-compliance", "operator": "==", "value": true, "description": "安全上・防火上・衛生上支障がない" },
+        { "ref": "info-public-interest", "operator": "==", "value": true, "description": "公益上やむを得ない" }
+      ]
+    }
+  },
+  "flow_diagram": {
+    "title": "法87条の3第5項 災害救助用建築物等の使用期間延長許可フロー",
+    "description": "2年の許可期間を超えて災害救助用建築物又は公益的建築物を継続使用する場合の延長許可要件を判定する",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "使用期間延長許可の判定を開始"
+      },
+      {
+        "id": "dec-building-use",
+        "type": "decision",
+        "title": "建築物の用途は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "災害救助用建築物", "description": "住宅、病院等で国・地方公共団体・日本赤十字社が災害救助に使用" },
+          { "value": "公益的建築物", "description": "学校、集会場等の公益的な用途の建築物" },
+          { "value": "その他", "description": "災害救助用建築物又は公益的建築物に該当しない" }
+        ],
+        "description": "延長対象となる建築物の用途種別を判定"
+      },
+      {
+        "id": "proc-use-confirmed",
+        "type": "process",
+        "title": "対象建築物確認",
+        "process_type": "mechanical",
+        "description": "災害救助用建築物又は公益的建築物であることを確認"
+      },
+      {
+        "id": "dec-necessity",
+        "type": "decision",
+        "title": "使用継続の特別な必要性があるか？",
+        "decision_type": "binary",
+        "description": "被災者の需要に応ずるに足りる適当な建築物が不足すること等の理由により、前項の期間を超えて使用する特別の必要があるか判定"
+      },
+      {
+        "id": "proc-necessity-confirmed",
+        "type": "process",
+        "title": "特別な必要性認定",
+        "process_type": "human_judgment",
+        "description": "被災者の需要不足等により特別の必要性があると認定"
+      },
+      {
+        "id": "dec-safety",
+        "type": "decision",
+        "title": "安全上支障がないか？",
+        "decision_type": "binary",
+        "description": "延長使用において安全上支障がないか判定"
+      },
+      {
+        "id": "dec-fire-prevention",
+        "type": "decision",
+        "title": "防火上支障がないか？",
+        "decision_type": "binary",
+        "description": "延長使用において防火上支障がないか判定"
+      },
+      {
+        "id": "dec-health",
+        "type": "decision",
+        "title": "衛生上支障がないか？",
+        "decision_type": "binary",
+        "description": "延長使用において衛生上支障がないか判定"
+      },
+      {
+        "id": "proc-safety-confirmed",
+        "type": "process",
+        "title": "安全・防火・衛生要件充足",
+        "process_type": "human_judgment",
+        "description": "安全上、防火上及び衛生上支障がないと認定"
+      },
+      {
+        "id": "dec-public-interest",
+        "type": "decision",
+        "title": "公益上やむを得ないか？",
+        "decision_type": "binary",
+        "description": "使用期間延長が公益上やむを得ないと認められるか判定"
+      },
+      {
+        "id": "proc-all-requirements-met",
+        "type": "process",
+        "title": "全要件充足",
+        "process_type": "human_judgment",
+        "description": "特別な必要性、安全性・防火性・衛生性、公益上の必要性の全要件を満たす"
+      },
+      {
+        "id": "pass-extension-permit",
+        "type": "terminal",
+        "title": "延長許可可能（1年以内）",
+        "result": "pass",
+        "description": "全要件を満たすため、更に1年を超えない範囲内で使用期間を延長することができる"
+      },
+      {
+        "id": "fail-not-permit",
+        "type": "terminal",
+        "title": "延長許可不可",
+        "result": "fail",
+        "description": "要件を満たさないため、使用期間の延長を許可することができない"
+      },
+      {
+        "id": "pass-not-applicable",
+        "type": "terminal",
+        "title": "本条項適用対象外",
+        "result": "pass",
+        "description": "災害救助用建築物又は公益的建築物に該当しないため、本条項の適用対象外"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "dec-building-use", "role": "flow" },
+      { "id": "e02", "from": "dec-building-use", "to": "proc-use-confirmed", "role": "option", "label": "災害救助用建築物" },
+      { "id": "e03", "from": "dec-building-use", "to": "proc-use-confirmed", "role": "option", "label": "公益的建築物" },
+      { "id": "e04", "from": "dec-building-use", "to": "pass-not-applicable", "role": "option", "label": "その他" },
+      { "id": "e05", "from": "proc-use-confirmed", "to": "dec-necessity", "role": "flow" },
+      { "id": "e06", "from": "dec-necessity", "to": "proc-necessity-confirmed", "role": "yes", "label": "はい" },
+      { "id": "e07", "from": "dec-necessity", "to": "fail-not-permit", "role": "no", "label": "いいえ" },
+      { "id": "e08", "from": "proc-necessity-confirmed", "to": "dec-safety", "role": "flow" },
+      { "id": "e09", "from": "dec-safety", "to": "dec-fire-prevention", "role": "yes", "label": "はい" },
+      { "id": "e10", "from": "dec-safety", "to": "fail-not-permit", "role": "no", "label": "いいえ" },
+      { "id": "e11", "from": "dec-fire-prevention", "to": "dec-health", "role": "yes", "label": "はい" },
+      { "id": "e12", "from": "dec-fire-prevention", "to": "fail-not-permit", "role": "no", "label": "いいえ" },
+      { "id": "e13", "from": "dec-health", "to": "proc-safety-confirmed", "role": "yes", "label": "はい" },
+      { "id": "e14", "from": "dec-health", "to": "fail-not-permit", "role": "no", "label": "いいえ" },
+      { "id": "e15", "from": "proc-safety-confirmed", "to": "dec-public-interest", "role": "flow" },
+      { "id": "e16", "from": "dec-public-interest", "to": "proc-all-requirements-met", "role": "yes", "label": "はい" },
+      { "id": "e17", "from": "dec-public-interest", "to": "fail-not-permit", "role": "no", "label": "いいえ" },
+      { "id": "e18", "from": "proc-all-requirements-met", "to": "pass-extension-permit", "role": "flow" }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-A87-3-P5",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A87-3:P1", "A87-3:P2", "A87-3:P4"],
+      "description": "災害救助用建築物・公益的建築物の定義と初期許可期間"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

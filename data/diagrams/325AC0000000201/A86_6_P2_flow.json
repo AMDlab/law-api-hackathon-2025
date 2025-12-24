@@ -1,0 +1,279 @@
+{
+  "id": "A86_6_P2_flow",
+  "version": "3.2.0",
+  "page_title": {
+    "title": "総合的設計による容積率等の適用除外判定フロー",
+    "target_subject": "建築物",
+    "description": "一団地の住宅施設の都市計画に基づく総合的設計による建築物が、容積率・建蔽率・外壁後退距離・高さ規定の適用除外を受けるための判定フロー"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "86の6",
+    "paragraph": "2"
+  },
+  "labels": ["単体規定", "集団規定", "適用除外"],
+  "text_raw": "前項の都市計画に基づき建築物を総合的設計によつて建築する場合において、当該建築物が同項の規定により当該都市計画に定められた基準に適合しており、かつ、特定行政庁がその各建築物の位置及び構造が当該第一種低層住居専用地域、第二種低層住居専用地域又は田園住居地域内の住居の環境の保護に支障がないと認めるときは、当該建築物については、第五十二条第一項第一号、第五十三条第一項第一号、第五十四条第一項及び第五十五条第一項の規定は、適用しない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "第一種低層住居専用地域、第二種低層住居専用地域又は田園住居地域内"
+        },
+        {
+          "type": "regulation",
+          "value": "一団地の住宅施設に関する都市計画が定められている地域"
+        }
+      ]
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "compliance",
+          "value": "当該建築物が都市計画で定められた基準に適合する"
+        },
+        {
+          "type": "human_judgment",
+          "value": "特定行政庁が住居の環境の保護に支障がないと認める"
+        }
+      ],
+      "effect": "第52条第1項第1号、第53条第1項第1号、第54条第1項及び第55条第1項の規定は適用しない"
+    }
+  },
+  "flow_diagram": {
+    "title": "総合的設計による規定適用除外判定フロー",
+    "description": "第86条の6第2項に基づく容積率・建蔽率・外壁後退距離・高さ規定の適用除外判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "審査開始"
+      },
+      {
+        "id": "dec-zone-type",
+        "type": "decision",
+        "title": "敷地の用途地域は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "第一種低層住居専用地域", "description": "低層住居専用地域" },
+          { "value": "第二種低層住居専用地域", "description": "低層住居専用地域" },
+          { "value": "田園住居地域", "description": "田園住居地域" },
+          { "value": "その他の地域", "description": "上記以外の用途地域" }
+        ],
+        "description": "敷地が属する用途地域を判定"
+      },
+      {
+        "id": "proc-zone-applicable",
+        "type": "process",
+        "title": "対象地域該当",
+        "description": "低層住居専用地域または田園住居地域に該当"
+      },
+      {
+        "id": "proc-zone-not-applicable",
+        "type": "process",
+        "title": "対象地域外",
+        "description": "本規定の適用対象となる用途地域ではない"
+      },
+      {
+        "id": "dec-comprehensive-design",
+        "type": "decision",
+        "title": "前項の都市計画に基づく総合的設計か？",
+        "decision_type": "binary",
+        "description": "第86条の6第1項の都市計画に基づき総合的設計によって建築するか判定"
+      },
+      {
+        "id": "proc-comprehensive-applicable",
+        "type": "process",
+        "title": "総合的設計該当",
+        "description": "一団地の住宅施設都市計画に基づく総合的設計による建築"
+      },
+      {
+        "id": "dec-plan-compliance",
+        "type": "decision",
+        "title": "都市計画で定められた基準に適合しているか？",
+        "decision_type": "binary",
+        "description": "建築物の容積率・建蔽率・外壁後退距離・高さが都市計画基準に適合しているか判定"
+      },
+      {
+        "id": "proc-plan-compliance-ok",
+        "type": "process",
+        "title": "都市計画基準適合",
+        "description": "建築物が都市計画で定められた基準に適合"
+      },
+      {
+        "id": "dec-environment-protection",
+        "type": "decision",
+        "title": "住居環境の保護に支障がないと認められるか？",
+        "decision_type": "binary",
+        "description": "特定行政庁が建築物の位置及び構造が住居の環境の保護に支障がないと認めるか判定（人的判断）"
+      },
+      {
+        "id": "proc-environment-ok",
+        "type": "process",
+        "title": "住居環境保護認定",
+        "description": "特定行政庁により住居の環境の保護に支障がないと認定"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適用除外（適合）",
+        "result": "pass",
+        "description": "第52条第1項第1号、第53条第1項第1号、第54条第1項及び第55条第1項の規定を適用しない"
+      },
+      {
+        "id": "fail-plan",
+        "type": "terminal",
+        "title": "不適合（基準不適合）",
+        "result": "fail",
+        "description": "都市計画で定められた基準に適合しないため適用除外不可"
+      },
+      {
+        "id": "fail-environment",
+        "type": "terminal",
+        "title": "不適合（住居環境）",
+        "result": "fail",
+        "description": "住居環境の保護に支障があるため適用除外不可"
+      },
+      {
+        "id": "end-not-applicable",
+        "type": "terminal",
+        "title": "適用対象外",
+        "result": "end",
+        "description": "本規定の適用対象外"
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge-start-to-zone",
+        "from": "start",
+        "to": "dec-zone-type",
+        "role": "flow"
+      },
+      {
+        "id": "edge-zone-1st-low",
+        "from": "dec-zone-type",
+        "to": "proc-zone-applicable",
+        "role": "option",
+        "label": "第一種低層住居専用地域"
+      },
+      {
+        "id": "edge-zone-2nd-low",
+        "from": "dec-zone-type",
+        "to": "proc-zone-applicable",
+        "role": "option",
+        "label": "第二種低層住居専用地域"
+      },
+      {
+        "id": "edge-zone-rural",
+        "from": "dec-zone-type",
+        "to": "proc-zone-applicable",
+        "role": "option",
+        "label": "田園住居地域"
+      },
+      {
+        "id": "edge-zone-other",
+        "from": "dec-zone-type",
+        "to": "proc-zone-not-applicable",
+        "role": "option",
+        "label": "その他の地域"
+      },
+      {
+        "id": "edge-zone-not-applicable-to-end",
+        "from": "proc-zone-not-applicable",
+        "to": "end-not-applicable",
+        "role": "flow"
+      },
+      {
+        "id": "edge-zone-applicable-to-comprehensive",
+        "from": "proc-zone-applicable",
+        "to": "dec-comprehensive-design",
+        "role": "flow"
+      },
+      {
+        "id": "edge-comprehensive-yes",
+        "from": "dec-comprehensive-design",
+        "to": "proc-comprehensive-applicable",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "edge-comprehensive-no",
+        "from": "dec-comprehensive-design",
+        "to": "end-not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "edge-comprehensive-to-plan",
+        "from": "proc-comprehensive-applicable",
+        "to": "dec-plan-compliance",
+        "role": "flow"
+      },
+      {
+        "id": "edge-plan-yes",
+        "from": "dec-plan-compliance",
+        "to": "proc-plan-compliance-ok",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "edge-plan-no",
+        "from": "dec-plan-compliance",
+        "to": "fail-plan",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "edge-plan-ok-to-environment",
+        "from": "proc-plan-compliance-ok",
+        "to": "dec-environment-protection",
+        "role": "flow"
+      },
+      {
+        "id": "edge-environment-yes",
+        "from": "dec-environment-protection",
+        "to": "proc-environment-ok",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "edge-environment-no",
+        "from": "dec-environment-protection",
+        "to": "fail-environment",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "edge-environment-ok-to-pass",
+        "from": "proc-environment-ok",
+        "to": "pass",
+        "role": "flow"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-A86-6-P2",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["86_6:P1", "52:P1:I1", "53:P1:I1", "54:P1", "55:P1"],
+      "description": "第86条の6第1項の都市計画基準及び第52〜55条の適用除外規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

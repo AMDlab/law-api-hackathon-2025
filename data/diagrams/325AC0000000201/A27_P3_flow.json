@@ -1,0 +1,148 @@
+{
+  "id": "A27_P3_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "特殊建築物の耐火・準耐火建築物要件",
+    "target_subject": "特殊建築物",
+    "description": "次の各号に該当する特殊建築物は耐火建築物又は準耐火建築物としなければならない"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "27",
+    "paragraph": "3",
+    "item": null
+  },
+  "labels": ["単体規定", "防火", "準耐火建築物"],
+  "text_raw": "次の各号のいずれかに該当する特殊建築物は、耐火建築物又は準耐火建築物（別表第一（い）欄（六）項に掲げる用途に供するものにあつては、特定避難時間倒壊等防止建築物に限る。）としなければならない。",
+  "kijo_diagram_ref": "CHK-BSL-A27-P3",
+  "flow_diagram": {
+    "title": "法27条3項適合判定フロー",
+    "description": "特殊建築物が法27条3項各号に該当する場合の耐火建築物又は準耐火建築物要件適合判定フロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start"
+      },
+      {
+        "id": "dec-category",
+        "type": "decision",
+        "title": "法27条3項各号のいずれかに該当するか？",
+        "decision_type": "binary",
+        "description": "法27条3項各号（別の機序図で判定）のいずれかに該当するか"
+      },
+      {
+        "id": "proc-category-yes",
+        "type": "process",
+        "title": "各号該当",
+        "process_type": "mechanical"
+      },
+      {
+        "id": "dec-use-garage",
+        "type": "decision",
+        "title": "建築物の用途は別表第一(い)欄(六)項（自動車車庫等）か？",
+        "decision_type": "binary",
+        "description": "自動車車庫、自動車修理工場等の用途に該当するか"
+      },
+      {
+        "id": "proc-garage-yes",
+        "type": "process",
+        "title": "(六)項該当：特定避難時間倒壊等防止建築物要件",
+        "process_type": "mechanical"
+      },
+      {
+        "id": "dec-building-type-garage",
+        "type": "decision",
+        "title": "建築物の種別は？",
+        "decision_type": "multi",
+        "description": "(六)項の場合は特定避難時間倒壊等防止建築物が必要",
+        "options": [
+          { "value": "耐火建築物" },
+          { "value": "特定避難時間倒壊等防止建築物" },
+          { "value": "その他準耐火建築物" },
+          { "value": "その他" }
+        ]
+      },
+      {
+        "id": "dec-building-type",
+        "type": "decision",
+        "title": "建築物の種別は？",
+        "decision_type": "multi",
+        "description": "耐火建築物又は準耐火建築物に該当するか",
+        "options": [
+          { "value": "耐火建築物" },
+          { "value": "準耐火建築物" },
+          { "value": "その他" }
+        ]
+      },
+      {
+        "id": "proc-fireproof",
+        "type": "process",
+        "title": "耐火建築物該当",
+        "process_type": "mechanical"
+      },
+      {
+        "id": "proc-quasi-fireproof",
+        "type": "process",
+        "title": "準耐火建築物該当",
+        "process_type": "mechanical"
+      },
+      {
+        "id": "proc-quasi-special",
+        "type": "process",
+        "title": "特定避難時間倒壊等防止建築物該当",
+        "process_type": "mechanical"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "法27条3項適合",
+        "result": "pass",
+        "description": "耐火建築物又は準耐火建築物（(六)項は特定避難時間倒壊等防止建築物）であり適合"
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "法27条3項不適合",
+        "result": "fail",
+        "description": "要求される建築物種別を満たさないため不適合"
+      },
+      {
+        "id": "end-not-applicable",
+        "type": "terminal",
+        "title": "法27条3項適用外",
+        "result": "end",
+        "description": "各号非該当のため規定適用外"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "dec-category", "role": "flow" },
+      { "id": "e02", "from": "dec-category", "to": "proc-category-yes", "role": "yes" },
+      { "id": "e03", "from": "dec-category", "to": "end-not-applicable", "role": "no" },
+      { "id": "e04", "from": "proc-category-yes", "to": "dec-use-garage", "role": "flow" },
+      { "id": "e05", "from": "dec-use-garage", "to": "proc-garage-yes", "role": "yes" },
+      { "id": "e06", "from": "dec-use-garage", "to": "dec-building-type", "role": "no" },
+      { "id": "e07", "from": "proc-garage-yes", "to": "dec-building-type-garage", "role": "flow" },
+      { "id": "e08", "from": "dec-building-type-garage", "to": "proc-fireproof", "role": "option", "label": "耐火建築物" },
+      { "id": "e09", "from": "dec-building-type-garage", "to": "proc-quasi-special", "role": "option", "label": "特定避難時間倒壊等防止建築物" },
+      { "id": "e10", "from": "dec-building-type-garage", "to": "end-fail", "role": "option", "label": "その他準耐火建築物" },
+      { "id": "e11", "from": "dec-building-type-garage", "to": "end-fail", "role": "option", "label": "その他" },
+      { "id": "e12", "from": "dec-building-type", "to": "proc-fireproof", "role": "option", "label": "耐火建築物" },
+      { "id": "e13", "from": "dec-building-type", "to": "proc-quasi-fireproof", "role": "option", "label": "準耐火建築物" },
+      { "id": "e14", "from": "dec-building-type", "to": "end-fail", "role": "option", "label": "その他" },
+      { "id": "e15", "from": "proc-fireproof", "to": "end-pass", "role": "flow" },
+      { "id": "e16", "from": "proc-quasi-fireproof", "to": "end-pass", "role": "flow" },
+      { "id": "e17", "from": "proc-quasi-special", "to": "end-pass", "role": "flow" }
+    ]
+  },
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00Z",
+    "generator": "claude-code-flow-generator",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

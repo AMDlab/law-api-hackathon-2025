@@ -1,0 +1,212 @@
+{
+  "id": "A57_5_P3_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "敷地面積の最低限度の適用",
+    "target_subject": "建築物",
+    "description": "高層住居誘導地区に関する都市計画において建築物の敷地面積の最低限度が定められた場合、第53条の2の規定を準用することを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "57の5",
+    "paragraph": "3",
+    "item": null
+  },
+  "labels": [
+    "集団規定",
+    "用途地域・地区"
+  ],
+  "text_raw": "高層住居誘導地区に関する都市計画において建築物の敷地面積の最低限度が定められた場合については、第五十三条の二（第二項を除く。）の規定を準用する。この場合において、同条第一項中「用途地域」とあるのは、「高層住居誘導地区」と読み替えるものとする。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "高層住居誘導地区内"
+        },
+        {
+          "type": "regulation",
+          "value": "都市計画において敷地面積の最低限度が定められた場合"
+        }
+      ],
+      "note": "高層住居誘導地区に関する都市計画において建築物の敷地面積の最低限度が定められたときに適用"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-site-area",
+          "operator": ">=",
+          "reference": "info-min-site-area"
+        }
+      ]
+    }
+  },
+  "flow_diagram": {
+    "title": "法第57条の5第3項 敷地面積最低限度判定フロー",
+    "description": "高層住居誘導地区における敷地面積の最低限度への適合判定フロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "法第57条の5第3項の適合判定を開始"
+      },
+      {
+        "id": "dec-district",
+        "type": "decision",
+        "title": "敷地は高層住居誘導地区内か？",
+        "decision_type": "binary",
+        "description": "敷地が高層住居誘導地区内に位置するか確認"
+      },
+      {
+        "id": "dec-min-limit-defined",
+        "type": "decision",
+        "title": "都市計画で敷地面積の最低限度が定められているか？",
+        "decision_type": "binary",
+        "description": "高層住居誘導地区に関する都市計画において敷地面積の最低限度が定められているか確認"
+      },
+      {
+        "id": "proc-get-min-limit",
+        "type": "process",
+        "title": "最低限度値を確認",
+        "process_type": "mechanical",
+        "description": "都市計画で定められた敷地面積の最低限度を確認"
+      },
+      {
+        "id": "dec-area-compliance",
+        "type": "decision",
+        "title": "敷地面積は最低限度以上か？",
+        "decision_type": "binary",
+        "description": "敷地面積が都市計画で定められた最低限度以上であるか判定",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "A", "desc": "敷地面積" },
+          "rhs": { "var": "M", "desc": "敷地面積の最低限度", "unit": "m2" }
+        }
+      },
+      {
+        "id": "proc-area-compliant",
+        "type": "process",
+        "title": "敷地面積に適合",
+        "process_type": "mechanical",
+        "description": "敷地面積が最低限度以上であることを確認"
+      },
+      {
+        "id": "pass-not-applicable",
+        "type": "terminal",
+        "title": "適用対象外（適合）",
+        "result": "pass",
+        "description": "高層住居誘導地区外のため本規定は適用されない"
+      },
+      {
+        "id": "pass-no-limit",
+        "type": "terminal",
+        "title": "適用対象外（適合）",
+        "result": "pass",
+        "description": "敷地面積の最低限度が定められていないため本規定は適用されない"
+      },
+      {
+        "id": "pass-compliant",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "敷地面積が最低限度以上で法第57条の5第3項に適合"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "敷地面積が最低限度未満で不適合"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-district",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-district",
+        "to": "dec-min-limit-defined",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "dec-district",
+        "to": "pass-not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e04",
+        "from": "dec-min-limit-defined",
+        "to": "proc-get-min-limit",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e05",
+        "from": "dec-min-limit-defined",
+        "to": "pass-no-limit",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e06",
+        "from": "proc-get-min-limit",
+        "to": "dec-area-compliance",
+        "role": "flow"
+      },
+      {
+        "id": "e07",
+        "from": "dec-area-compliance",
+        "to": "proc-area-compliant",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e08",
+        "from": "dec-area-compliance",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e09",
+        "from": "proc-area-compliant",
+        "to": "pass-compliant",
+        "role": "flow"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-A57-5-P3",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": [
+        "A53_2"
+      ],
+      "description": "敷地面積の最低限度に関する規定を準用"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

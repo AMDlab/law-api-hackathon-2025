@@ -1,0 +1,131 @@
+{
+  "id": "A48_P12_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "工業地域における建築物の用途制限（適合判定フロー）",
+    "target_subject": "建築物",
+    "description": "工業地域内において建築が禁止される建築物の用途が別表第二(を)項に該当しないこと、又は特定行政庁の許可を受けていることを判定するフロー"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "48",
+    "paragraph": "12",
+    "item": null
+  },
+  "labels": ["集団規定", "用途制限"],
+  "text_raw": "工業地域内においては、別表第二（を）項に掲げる建築物は、建築してはならない。ただし、特定行政庁が工業の利便上又は公益上必要と認めて許可した場合においては、この限りでない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        { "type": "location", "value": "工業地域内" }
+      ],
+      "note": "都市計画で定められた工業地域"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        { "ref": "info-table2-non-compliance", "operator": "==", "value": true },
+        { "ref": "info-special-approval", "operator": "==", "value": true }
+      ]
+    },
+    "exceptions": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "note": "特定行政庁の許可を受けた場合（工業の利便上又は公益上必要）",
+          "ref": "info-special-approval",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "effect": "EXEMPT"
+    }
+  },
+  "flow_diagram": {
+    "title": "法48条12項 工業地域の用途制限 適合判定フロー",
+    "description": "工業地域内における建築禁止用途の判定フロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "法48条12項の適合判定を開始"
+      },
+      {
+        "id": "dec-table2-wo",
+        "type": "decision",
+        "title": "別表第二(を)項該当用途か？",
+        "decision_type": "binary",
+        "description": "建築物の用途が別表第二(を)項に掲げる用途（幼保連携型認定こども園、幼稚園、小学校、中学校、高等学校、中等教育学校、特別支援学校、各種学校、図書館、病院、公衆浴場、ホテル・旅館等）に該当するか",
+        "related_articles": ["法::別表第二(を)"]
+      },
+      {
+        "id": "proc-table2-wo-match",
+        "type": "process",
+        "title": "別表第二(を)項該当",
+        "process_type": "mechanical",
+        "description": "建築禁止用途に該当（例外許可がない限り建築不可）"
+      },
+      {
+        "id": "dec-special-approval",
+        "type": "decision",
+        "title": "特定行政庁の許可を受けているか？",
+        "decision_type": "binary",
+        "description": "工業の利便上又は公益上必要と認められ、特定行政庁の許可を受けているか"
+      },
+      {
+        "id": "proc-approved",
+        "type": "process",
+        "title": "特定行政庁許可あり",
+        "process_type": "mechanical",
+        "description": "ただし書による許可を受けている"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "法48条12項に適合（建築可能）"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "法48条12項に不適合（建築禁止）"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "dec-table2-wo", "role": "flow" },
+      { "id": "e02", "from": "dec-table2-wo", "to": "pass", "role": "no", "label": "いいえ" },
+      { "id": "e03", "from": "dec-table2-wo", "to": "proc-table2-wo-match", "role": "yes", "label": "はい" },
+      { "id": "e04", "from": "proc-table2-wo-match", "to": "dec-special-approval", "role": "flow" },
+      { "id": "e05", "from": "dec-special-approval", "to": "proc-approved", "role": "yes", "label": "はい" },
+      { "id": "e06", "from": "proc-approved", "to": "pass", "role": "flow" },
+      { "id": "e07", "from": "dec-special-approval", "to": "fail", "role": "no", "label": "いいえ" }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-A48-P12",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["別表第二(を)"],
+      "description": "工業地域において建築が禁止される建築物を定める"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-skill",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

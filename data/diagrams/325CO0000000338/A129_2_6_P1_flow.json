@@ -1,0 +1,324 @@
+{
+  "id": "A129_2_6_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "冷却塔設備の設置及び構造基準",
+    "target_subject": "冷却塔設備",
+    "description": "地階を除く階数が11以上の建築物の屋上に設ける冷房のための冷却塔設備が、不燃材料構造・離隔距離・認定のいずれかの要件を満たすことの判定フロー"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "129の2の6",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "建築設備",
+    "防火"
+  ],
+  "kijo_diagram_ref": "CHK-BSL-KIJO-A129_2_6-P1",
+  "flow_diagram": {
+    "title": "令第129条の2の6第1項適合判定フロー",
+    "description": "冷却塔設備が第1号（不燃材料・大臣定め構造）、第2号（離隔距離）、第3号（大臣認定）のいずれかに適合するかを判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "冷却塔設備の設置及び構造基準の判定を開始"
+      },
+      {
+        "id": "dec-floors-check",
+        "type": "decision",
+        "title": "地階を除く階数が11以上か？",
+        "decision_type": "binary",
+        "description": "建築物の地階を除く階数が11以上であるか確認",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "F", "desc": "地階を除く階数" },
+          "rhs": { "value": 11, "unit": "階" }
+        }
+      },
+      {
+        "id": "dec-tower-exists",
+        "type": "decision",
+        "title": "屋上に冷却塔設備があるか？",
+        "decision_type": "binary",
+        "description": "屋上に設ける冷房のための冷却塔設備が存在するか確認"
+      },
+      {
+        "id": "dec-item1-material",
+        "type": "decision",
+        "title": "主要な部分の材料は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "不燃材料" },
+          { "value": "不燃材料以外" }
+        ],
+        "description": "冷却塔設備の主要な部分の材料種別を判定（第1号前段）"
+      },
+      {
+        "id": "proc-item1-noncombustible",
+        "type": "process",
+        "title": "第1号該当（不燃材料）",
+        "process_type": "mechanical",
+        "description": "主要な部分を不燃材料で造っている"
+      },
+      {
+        "id": "dec-item1-minister-method",
+        "type": "decision",
+        "title": "大臣定め構造方法を用いているか？",
+        "decision_type": "binary",
+        "description": "防火上支障がないものとして国土交通大臣が定めた構造方法を用いているか（第1号後段）",
+        "related_articles": ["告示::昭和45年建設省告示第1832号"]
+      },
+      {
+        "id": "proc-item1-minister",
+        "type": "process",
+        "title": "第1号該当（大臣定め構造）",
+        "process_type": "mechanical",
+        "description": "国土交通大臣が定めた構造方法を用いている"
+      },
+      {
+        "id": "dec-item2-structure",
+        "type": "decision",
+        "title": "冷却塔の構造種別は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "開放型" },
+          { "value": "密閉型" },
+          { "value": "その他" }
+        ],
+        "description": "冷却塔の構造種別を特定（第2号判定の前提）"
+      },
+      {
+        "id": "proc-item2-distance-calc",
+        "type": "process",
+        "title": "必要離隔距離の照合",
+        "process_type": "mechanical",
+        "description": "冷却塔の構造に応じた必要離隔距離を照合（昭和45年建設省告示第1833号）",
+        "related_articles": ["告示::昭和45年建設省告示第1833号"]
+      },
+      {
+        "id": "dec-item2-distance",
+        "type": "decision",
+        "title": "実際の離隔距離 >= 必要離隔距離か？",
+        "decision_type": "binary",
+        "description": "建築物の他の部分までの距離が国土交通大臣が定める距離以上か",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "Da", "desc": "実際の離隔距離" },
+          "rhs": { "var": "Dr", "desc": "必要離隔距離", "unit": "m" }
+        }
+      },
+      {
+        "id": "proc-item2-ok",
+        "type": "process",
+        "title": "第2号該当",
+        "process_type": "mechanical",
+        "description": "離隔距離要件を満たしている"
+      },
+      {
+        "id": "dec-item3-certification",
+        "type": "decision",
+        "title": "大臣認定を受けているか？",
+        "decision_type": "binary",
+        "description": "内部燃焼時の温度上昇防止について国土交通大臣の認定を受けているか（第3号）"
+      },
+      {
+        "id": "proc-item3-ok",
+        "type": "process",
+        "title": "第3号該当",
+        "process_type": "mechanical",
+        "description": "国土交通大臣の認定を受けている"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "第1項適合",
+        "result": "pass",
+        "description": "令第129条の2の6第1項に適合（第1号〜第3号のいずれかに該当）"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "第1項不適合",
+        "result": "fail",
+        "description": "令第129条の2の6第1項に不適合（いずれの号にも該当しない）"
+      },
+      {
+        "id": "end-not-applicable",
+        "type": "terminal",
+        "title": "対象外",
+        "result": "end",
+        "description": "本条の適用対象外（階数11未満または屋上に冷却塔設備なし）"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-floors-check",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-floors-check",
+        "to": "dec-tower-exists",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "dec-floors-check",
+        "to": "end-not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e04",
+        "from": "dec-tower-exists",
+        "to": "dec-item1-material",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e05",
+        "from": "dec-tower-exists",
+        "to": "end-not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e06",
+        "from": "dec-item1-material",
+        "to": "proc-item1-noncombustible",
+        "role": "option",
+        "label": "不燃材料"
+      },
+      {
+        "id": "e07",
+        "from": "dec-item1-material",
+        "to": "dec-item1-minister-method",
+        "role": "option",
+        "label": "不燃材料以外"
+      },
+      {
+        "id": "e08",
+        "from": "proc-item1-noncombustible",
+        "to": "pass",
+        "role": "flow"
+      },
+      {
+        "id": "e09",
+        "from": "dec-item1-minister-method",
+        "to": "proc-item1-minister",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e10",
+        "from": "dec-item1-minister-method",
+        "to": "dec-item2-structure",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e11",
+        "from": "proc-item1-minister",
+        "to": "pass",
+        "role": "flow"
+      },
+      {
+        "id": "e12",
+        "from": "dec-item2-structure",
+        "to": "proc-item2-distance-calc",
+        "role": "option",
+        "label": "開放型"
+      },
+      {
+        "id": "e13",
+        "from": "dec-item2-structure",
+        "to": "proc-item2-distance-calc",
+        "role": "option",
+        "label": "密閉型"
+      },
+      {
+        "id": "e14",
+        "from": "dec-item2-structure",
+        "to": "proc-item2-distance-calc",
+        "role": "option",
+        "label": "その他"
+      },
+      {
+        "id": "e15",
+        "from": "proc-item2-distance-calc",
+        "to": "dec-item2-distance",
+        "role": "flow"
+      },
+      {
+        "id": "e16",
+        "from": "dec-item2-distance",
+        "to": "proc-item2-ok",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e17",
+        "from": "dec-item2-distance",
+        "to": "dec-item3-certification",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e18",
+        "from": "proc-item2-ok",
+        "to": "pass",
+        "role": "flow"
+      },
+      {
+        "id": "e19",
+        "from": "dec-item3-certification",
+        "to": "proc-item3-ok",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e20",
+        "from": "dec-item3-certification",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e21",
+        "from": "proc-item3-ok",
+        "to": "pass",
+        "role": "flow"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": ["A36:P1"],
+      "description": "法第36条から委任される建築設備の構造基準"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00Z",
+    "updated_at": "2025-12-25T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

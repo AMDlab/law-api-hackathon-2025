@@ -1,0 +1,166 @@
+{
+  "id": "A112_P7_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "高層区画（11階以上の防火区画）適合判定フロー",
+    "target_subject": "建築物",
+    "description": "11階以上の部分で床面積100平方メートル超のものに対する防火区画要件の判定"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "112",
+    "paragraph": "7",
+    "item": null
+  },
+  "labels": ["単体規定", "防火区画", "高層区画"],
+  "text_raw": "建築物の十一階以上の部分で、各階の床面積の合計が百平方メートルを超えるものは、第一項の規定にかかわらず、床面積の合計百平方メートル以内ごとに耐火構造の床若しくは壁又は法第二条第九号の二ロに規定する防火設備で区画しなければならない。",
+  "flow_diagram": {
+    "title": "令112条7項 高層区画適合判定フロー",
+    "description": "11階以上の部分における100平方メートル区画要件を判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "令112条7項の適合判定を開始"
+      },
+      {
+        "id": "dec-floor-level",
+        "type": "decision",
+        "title": "建築物に11階以上の部分があるか？",
+        "decision_type": "binary",
+        "description": "建築物に11階以上の部分が存在するか判定",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "N", "desc": "最高階" },
+          "rhs": { "value": 11, "desc": "階" }
+        }
+      },
+      {
+        "id": "proc-not-applicable-floor",
+        "type": "process",
+        "title": "適用対象外（階数）",
+        "process_type": "mechanical",
+        "description": "11階以上の部分がないため本項の適用対象外"
+      },
+      {
+        "id": "proc-high-floor-exist",
+        "type": "process",
+        "title": "高層部分あり",
+        "process_type": "mechanical",
+        "description": "11階以上の部分が存在"
+      },
+      {
+        "id": "dec-floor-area",
+        "type": "decision",
+        "title": "11階以上部分の各階床面積合計 > 100平方メートルか？",
+        "decision_type": "binary",
+        "description": "11階以上の各階の床面積の合計が100平方メートルを超えるか判定",
+        "condition": {
+          "operator": "GT",
+          "lhs": { "var": "FA", "desc": "各階床面積合計" },
+          "rhs": { "value": 100, "unit": "平方メートル" }
+        }
+      },
+      {
+        "id": "proc-not-applicable-area",
+        "type": "process",
+        "title": "適用対象外（面積）",
+        "process_type": "mechanical",
+        "description": "各階床面積合計が100平方メートル以下のため本項の適用対象外"
+      },
+      {
+        "id": "proc-applicable",
+        "type": "process",
+        "title": "本項適用",
+        "process_type": "mechanical",
+        "description": "11階以上で床面積合計100平方メートル超のため本項を適用"
+      },
+      {
+        "id": "dec-compartment",
+        "type": "decision",
+        "title": "100平方メートル以内ごとに区画されているか？",
+        "decision_type": "binary",
+        "description": "床面積の合計100平方メートル以内ごとに区画されているか判定"
+      },
+      {
+        "id": "proc-compartment-ok",
+        "type": "process",
+        "title": "区画面積適合",
+        "process_type": "mechanical",
+        "description": "100平方メートル以内ごとの区画要件を満たしている"
+      },
+      {
+        "id": "dec-compartment-structure",
+        "type": "decision",
+        "title": "区画の構造は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "耐火構造の床・壁", "description": "耐火構造の床又は壁" },
+          { "value": "防火設備", "description": "法第2条第9号の2ロに規定する防火設備" },
+          { "value": "その他", "description": "上記以外の構造" }
+        ],
+        "description": "防火区画に使用する構造を確認",
+        "related_articles": ["法::A2:I9-2ロ"]
+      },
+      {
+        "id": "proc-structure-ok",
+        "type": "process",
+        "title": "構造要件適合",
+        "process_type": "mechanical",
+        "description": "区画の構造が要件を満たしている"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令112条7項の規定に適合"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "令112条7項の規定に不適合"
+      },
+      {
+        "id": "end-not-applicable",
+        "type": "terminal",
+        "title": "適用対象外",
+        "result": "end",
+        "description": "本項の適用対象外"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "dec-floor-level", "role": "flow" },
+      { "id": "e02", "from": "dec-floor-level", "to": "proc-high-floor-exist", "role": "yes", "label": "はい" },
+      { "id": "e03", "from": "dec-floor-level", "to": "proc-not-applicable-floor", "role": "no", "label": "いいえ" },
+      { "id": "e04", "from": "proc-not-applicable-floor", "to": "end-not-applicable", "role": "flow" },
+      { "id": "e05", "from": "proc-high-floor-exist", "to": "dec-floor-area", "role": "flow" },
+      { "id": "e06", "from": "dec-floor-area", "to": "proc-applicable", "role": "yes", "label": "はい" },
+      { "id": "e07", "from": "dec-floor-area", "to": "proc-not-applicable-area", "role": "no", "label": "いいえ" },
+      { "id": "e08", "from": "proc-not-applicable-area", "to": "end-not-applicable", "role": "flow" },
+      { "id": "e09", "from": "proc-applicable", "to": "dec-compartment", "role": "flow" },
+      { "id": "e10", "from": "dec-compartment", "to": "proc-compartment-ok", "role": "yes", "label": "はい" },
+      { "id": "e11", "from": "dec-compartment", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e12", "from": "proc-compartment-ok", "to": "dec-compartment-structure", "role": "flow" },
+      { "id": "e13", "from": "dec-compartment-structure", "to": "proc-structure-ok", "role": "option", "label": "耐火構造の床・壁" },
+      { "id": "e14", "from": "dec-compartment-structure", "to": "proc-structure-ok", "role": "option", "label": "防火設備" },
+      { "id": "e15", "from": "dec-compartment-structure", "to": "fail", "role": "option", "label": "その他" },
+      { "id": "e16", "from": "proc-structure-ok", "to": "pass", "role": "flow" }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-KIJO-A112-P7",
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

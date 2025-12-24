@@ -1,0 +1,169 @@
+{
+  "id": "A87_3_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "災害救助用建築物の適用除外判定（適合判定フロー）",
+    "target_subject": "建築物",
+    "description": "非常災害時に用途変更された災害救助用建築物が建築基準法令の適用を除外できるかを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "87の3",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": ["単体規定", "防災", "規制緩和"],
+  "text_raw": "非常災害があつた場合において、非常災害区域等内にある建築物の用途を変更して災害救助用建築物（住宅、病院その他これらに類する建築物で、国、地方公共団体又は日本赤十字社が災害救助のために使用するものをいう。以下この条及び第百一条第一項第十六号において同じ。）として使用するとき（その災害が発生した日から一月以内に当該用途の変更に着手するときに限る。）における当該災害救助用建築物については、建築基準法令の規定は、適用しない。ただし、非常災害区域等のうち防火地域内にある建築物については、この限りでない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        { "type": "event", "value": "非常災害が発生している" },
+        { "type": "location", "value": "非常災害区域等内" }
+      ],
+      "note": "非常災害時の指定された災害区域内"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        { "ref": "info-disaster-event", "operator": "==", "value": true },
+        { "ref": "info-location-in-zone", "operator": "==", "value": true },
+        { "ref": "info-use-change-purpose", "operator": "==", "value": "災害救助用建築物" },
+        { "ref": "info-change-timeline", "operator": "<=", "value": "発生から一月以内に着手" }
+      ]
+    },
+    "exceptions": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "note": "防火地域内の建築物は除外されない",
+          "ref": "info-location-firearea",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "effect": "EXEMPT_CANCELLED"
+    }
+  },
+  "flow_diagram": {
+    "title": "法87条の3第1項 災害救助用建築物の適用除外判定フロー",
+    "description": "非常災害時の災害救助用建築物への用途変更において、建築基準法令の適用除外要件を満たすか判定する",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "災害救助用建築物の適用除外判定を開始"
+      },
+      {
+        "id": "dec-disaster",
+        "type": "decision",
+        "title": "非常災害が発生しているか？",
+        "decision_type": "binary",
+        "description": "暴風、豪雨、洪水、地震等の非常災害が現に発生しているか判定"
+      },
+      {
+        "id": "dec-zone",
+        "type": "decision",
+        "title": "非常災害区域等内に位置するか？",
+        "decision_type": "binary",
+        "description": "当該建築物が非常災害区域等内に位置しているか判定"
+      },
+      {
+        "id": "dec-use-type",
+        "type": "decision",
+        "title": "用途変更後の用途は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "災害救助用建築物", "description": "住宅、病院等で国・地方公共団体・日本赤十字社が災害救助に使用" },
+          { "value": "その他", "description": "災害救助用建築物に該当しない" }
+        ],
+        "description": "変更後の用途が災害救助用建築物の定義に該当するか判定"
+      },
+      {
+        "id": "proc-use-match",
+        "type": "process",
+        "title": "災害救助用建築物に該当",
+        "process_type": "mechanical",
+        "description": "用途変更後の建築物が災害救助用建築物の定義に合致"
+      },
+      {
+        "id": "dec-timeline",
+        "type": "decision",
+        "title": "災害発生から1月以内に着手か？",
+        "decision_type": "binary",
+        "description": "災害発生日から用途変更への着手までが1月（30日）以内であるか判定",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "T", "desc": "用途変更着手までの日数" },
+          "rhs": { "value": 30, "unit": "日" }
+        }
+      },
+      {
+        "id": "dec-fire-zone",
+        "type": "decision",
+        "title": "防火地域内に位置するか？",
+        "decision_type": "binary",
+        "description": "当該建築物が非常災害区域等のうち防火地域内に位置しているか判定（ただし書きの適用）"
+      },
+      {
+        "id": "proc-exempt",
+        "type": "process",
+        "title": "適用除外要件充足",
+        "process_type": "mechanical",
+        "description": "全ての要件を満たし、防火地域外のため適用除外が認められる"
+      },
+      {
+        "id": "pass-exempt",
+        "type": "terminal",
+        "title": "適用除外（建築基準法令不適用）",
+        "result": "pass",
+        "description": "法87条の3第1項により建築基準法令の規定が適用除外される"
+      },
+      {
+        "id": "fail-not-exempt",
+        "type": "terminal",
+        "title": "適用除外不可（建築基準法令適用）",
+        "result": "fail",
+        "description": "適用除外の要件を満たさないため、建築基準法令の規定が適用される"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "dec-disaster", "role": "flow" },
+      { "id": "e02", "from": "dec-disaster", "to": "dec-zone", "role": "yes", "label": "はい" },
+      { "id": "e03", "from": "dec-disaster", "to": "fail-not-exempt", "role": "no", "label": "いいえ" },
+      { "id": "e04", "from": "dec-zone", "to": "dec-use-type", "role": "yes", "label": "はい" },
+      { "id": "e05", "from": "dec-zone", "to": "fail-not-exempt", "role": "no", "label": "いいえ" },
+      { "id": "e06", "from": "dec-use-type", "to": "proc-use-match", "role": "option", "label": "災害救助用建築物" },
+      { "id": "e07", "from": "dec-use-type", "to": "fail-not-exempt", "role": "option", "label": "その他" },
+      { "id": "e08", "from": "proc-use-match", "to": "dec-timeline", "role": "flow" },
+      { "id": "e09", "from": "dec-timeline", "to": "dec-fire-zone", "role": "yes", "label": "はい" },
+      { "id": "e10", "from": "dec-timeline", "to": "fail-not-exempt", "role": "no", "label": "いいえ" },
+      { "id": "e11", "from": "dec-fire-zone", "to": "fail-not-exempt", "role": "yes", "label": "はい" },
+      { "id": "e12", "from": "dec-fire-zone", "to": "proc-exempt", "role": "no", "label": "いいえ" },
+      { "id": "e13", "from": "proc-exempt", "to": "pass-exempt", "role": "flow" }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-A87-3-P1",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A101:P1:I16"],
+      "description": "第101条第1項第16号で災害救助用建築物等を適用除外の対象として規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

@@ -1,0 +1,184 @@
+{
+  "id": "A20_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "構造耐力の適合判定（適合判定フロー）",
+    "target_subject": "建築物",
+    "description": "建築物の区分に応じた構造耐力基準への適合を判定するフロー"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "20",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": ["単体規定", "構造"],
+  "text_raw": "建築物は、自重、積載荷重、積雪荷重、風圧、土圧及び水圧並びに地震その他の震動及び衝撃に対して安全な構造のものとして、次の各号に掲げる建築物の区分に応じ、当該各号に定める基準に適合するものでなければならない。",
+  "compliance_logic": {
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        { "note": "第1号（高さ60m超）", "ref": "info-item1-compliance" },
+        { "note": "第2号（60m以下・大規模）", "ref": "info-item2-compliance" },
+        { "note": "第3号（60m以下・中規模）", "ref": "info-item3-compliance" },
+        { "note": "第4号（その他）", "ref": "info-item4-compliance" }
+      ]
+    }
+  },
+  "flow_diagram": {
+    "title": "法20条1項 構造耐力の適合判定フロー",
+    "description": "建築物の高さ・規模に応じた構造基準への適合を判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "法20条1項の適合判定を開始"
+      },
+      {
+        "id": "dec-height-60m",
+        "type": "decision",
+        "title": "高さ > 60mか？",
+        "decision_type": "binary",
+        "description": "建築物の高さが60メートルを超えるか判定",
+        "condition": {
+          "operator": "GT",
+          "lhs": { "var": "H", "desc": "建築物の高さ" },
+          "rhs": { "value": 60, "unit": "m" }
+        }
+      },
+      {
+        "id": "proc-item1",
+        "type": "process",
+        "title": "第1号該当",
+        "process_type": "mechanical",
+        "description": "高さ60m超の建築物として第1号基準を適用"
+      },
+      {
+        "id": "dec-item1-std",
+        "type": "decision",
+        "title": "第1号基準に適合するか？",
+        "decision_type": "binary",
+        "description": "政令技術基準適合かつ構造計算（大臣認定）により安全性が確認されるか判定",
+        "related_articles": ["令::A36"]
+      },
+      {
+        "id": "dec-item2-category",
+        "type": "decision",
+        "title": "第2号建築物に該当するか？",
+        "decision_type": "binary",
+        "description": "木造（4階以上又はH>16m）、鉄骨造（4階以上）、RC/SRC造（H>20m）等に該当するか判定"
+      },
+      {
+        "id": "proc-item2",
+        "type": "process",
+        "title": "第2号該当",
+        "process_type": "mechanical",
+        "description": "大規模建築物として第2号基準を適用"
+      },
+      {
+        "id": "dec-item2-std",
+        "type": "decision",
+        "title": "第2号基準に適合するか？",
+        "decision_type": "binary",
+        "description": "政令技術基準適合かつ構造計算（大臣定め方法又は認定プログラム）により安全性が確認されるか判定",
+        "related_articles": ["令::A36"]
+      },
+      {
+        "id": "dec-item3-category",
+        "type": "decision",
+        "title": "第3号建築物に該当するか？",
+        "decision_type": "binary",
+        "description": "法6条1項1号又は2号該当で木造（3階以上又はA>300㎡）等に該当するか判定",
+        "related_articles": ["法::A6:P1:I1", "法::A6:P1:I2"]
+      },
+      {
+        "id": "proc-item3",
+        "type": "process",
+        "title": "第3号該当",
+        "process_type": "mechanical",
+        "description": "中規模建築物として第3号基準を適用"
+      },
+      {
+        "id": "dec-item3-std",
+        "type": "decision",
+        "title": "第3号基準に適合するか？",
+        "decision_type": "binary",
+        "description": "政令技術基準適合かつ構造計算（大臣定め方法又は認定プログラム）により安全性が確認されるか判定",
+        "related_articles": ["令::A36"]
+      },
+      {
+        "id": "proc-item4",
+        "type": "process",
+        "title": "第4号該当",
+        "process_type": "mechanical",
+        "description": "小規模建築物として第4号基準を適用"
+      },
+      {
+        "id": "dec-item4-std",
+        "type": "decision",
+        "title": "第4号基準に適合するか？",
+        "decision_type": "binary",
+        "description": "政令技術基準に適合するか判定",
+        "related_articles": ["令::A36"]
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "法20条1項の規定に適合"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "法20条1項の規定に不適合"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "dec-height-60m", "role": "flow" },
+      { "id": "e02", "from": "dec-height-60m", "to": "proc-item1", "role": "yes", "label": "はい" },
+      { "id": "e03", "from": "dec-height-60m", "to": "dec-item2-category", "role": "no", "label": "いいえ" },
+      { "id": "e04", "from": "proc-item1", "to": "dec-item1-std", "role": "flow" },
+      { "id": "e05", "from": "dec-item1-std", "to": "pass", "role": "yes", "label": "はい" },
+      { "id": "e06", "from": "dec-item1-std", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e07", "from": "dec-item2-category", "to": "proc-item2", "role": "yes", "label": "はい" },
+      { "id": "e08", "from": "dec-item2-category", "to": "dec-item3-category", "role": "no", "label": "いいえ" },
+      { "id": "e09", "from": "proc-item2", "to": "dec-item2-std", "role": "flow" },
+      { "id": "e10", "from": "dec-item2-std", "to": "pass", "role": "yes", "label": "はい" },
+      { "id": "e11", "from": "dec-item2-std", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e12", "from": "dec-item3-category", "to": "proc-item3", "role": "yes", "label": "はい" },
+      { "id": "e13", "from": "dec-item3-category", "to": "proc-item4", "role": "no", "label": "いいえ" },
+      { "id": "e14", "from": "proc-item3", "to": "dec-item3-std", "role": "flow" },
+      { "id": "e15", "from": "dec-item3-std", "to": "pass", "role": "yes", "label": "はい" },
+      { "id": "e16", "from": "dec-item3-std", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e17", "from": "proc-item4", "to": "dec-item4-std", "role": "flow" },
+      { "id": "e18", "from": "dec-item4-std", "to": "pass", "role": "yes", "label": "はい" },
+      { "id": "e19", "from": "dec-item4-std", "to": "fail", "role": "no", "label": "いいえ" }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-A20-P1",
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "delegates_to",
+      "articles": ["A36"],
+      "description": "法20条1項の技術的基準を定める"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

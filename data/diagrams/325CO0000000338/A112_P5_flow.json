@@ -1,0 +1,190 @@
+{
+  "id": "A112_P5_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "特定避難時間1時間以上の建築物の防火区画（1000平方メートル区画）適合判定フロー",
+    "target_subject": "建築物",
+    "description": "延べ面積1000平方メートル超の特定基準適合建築物における防火区画要件の判定"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "112",
+    "paragraph": "5",
+    "item": null
+  },
+  "labels": ["防火区画", "特定避難時間が1時間以上", "集団規定"],
+  "text_raw": "法第二十一条第一項若しくは第二項若しくは法第二十七条第一項の規定により第百九条の五第一号に掲げる基準に適合する建築物（通常火災終了時間が一時間以上であるものに限る。）とした建築物、同項の規定により第百十条第一号に掲げる基準に適合する特殊建築物（特定避難時間が一時間以上であるものに限る。）とした建築物、法第二十七条第三項の規定により準耐火建築物（第百九条の三第二号に掲げる基準又は一時間準耐火基準に適合するものに限る。）とした建築物、法第六十一条第一項の規定により第百三十六条の二第二号に定める基準に適合する建築物（準防火地域内にあり、かつ、第百九条の三第二号に掲げる基準又は一時間準耐火基準に適合するものに限る。）とした建築物又は法第六十七条第一項の規定により準耐火建築物等（第百九条の三第二号に掲げる基準又は一時間準耐火基準に適合するものに限る。）とした建築物で、延べ面積が千平方メートルを超えるものについては、第一項の規定にかかわらず、床面積の合計千平方メートル以内ごとに一時間準耐火基準に適合する準耐火構造の床若しくは壁又は特定防火設備で区画しなければならない。",
+  "flow_diagram": {
+    "title": "令112条5項 1000平方メートル区画適合判定フロー",
+    "description": "特定避難時間が1時間以上等の建築物で延べ面積1000平方メートル超の場合の防火区画要件を判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "令112条5項の適合判定を開始"
+      },
+      {
+        "id": "dec-building-category",
+        "type": "decision",
+        "title": "建築物の適用基準区分は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "通常火災終了時間1時間以上", "description": "法第21条第1項・2項による基準適合建築物" },
+          { "value": "特定避難時間1時間以上", "description": "法第27条第1項による特殊建築物" },
+          { "value": "準耐火建築物（法27条3項）", "description": "法第27条第3項による準耐火建築物" },
+          { "value": "準防火地域内準耐火建築物", "description": "法第61条第1項による建築物" },
+          { "value": "準耐火建築物等（法67条）", "description": "法第67条第1項による準耐火建築物等" },
+          { "value": "その他", "description": "上記に該当しない" }
+        ],
+        "description": "建築物が本項の適用対象となる基準区分を判定"
+      },
+      {
+        "id": "proc-category-match",
+        "type": "process",
+        "title": "基準区分該当",
+        "process_type": "mechanical",
+        "description": "本項の適用対象となる基準区分に該当"
+      },
+      {
+        "id": "proc-not-applicable-category",
+        "type": "process",
+        "title": "適用対象外（基準区分）",
+        "process_type": "mechanical",
+        "description": "本項の適用対象となる基準区分に該当しない"
+      },
+      {
+        "id": "dec-area",
+        "type": "decision",
+        "title": "延べ面積 > 1000平方メートルか？",
+        "decision_type": "binary",
+        "description": "延べ面積が1000平方メートルを超えるか判定",
+        "condition": {
+          "operator": "GT",
+          "lhs": { "var": "A", "desc": "延べ面積" },
+          "rhs": { "value": 1000, "unit": "平方メートル" }
+        }
+      },
+      {
+        "id": "proc-not-applicable-area",
+        "type": "process",
+        "title": "適用対象外（面積）",
+        "process_type": "mechanical",
+        "description": "延べ面積1000平方メートル以下のため本項の適用対象外"
+      },
+      {
+        "id": "proc-applicable",
+        "type": "process",
+        "title": "本項適用",
+        "process_type": "mechanical",
+        "description": "本項の適用対象建築物として防火区画要件を確認"
+      },
+      {
+        "id": "dec-compartment",
+        "type": "decision",
+        "title": "1000平方メートル以内ごとに区画されているか？",
+        "decision_type": "binary",
+        "description": "床面積の合計1000平方メートル以内ごとに一時間準耐火基準適合の準耐火構造の床・壁又は特定防火設備で区画されているか判定"
+      },
+      {
+        "id": "proc-compartment-ok",
+        "type": "process",
+        "title": "区画要件適合",
+        "process_type": "mechanical",
+        "description": "1000平方メートル以内ごとの防火区画要件を満たしている"
+      },
+      {
+        "id": "dec-structure-type",
+        "type": "decision",
+        "title": "区画の構造は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "一時間準耐火基準の床・壁", "description": "一時間準耐火基準に適合する準耐火構造の床又は壁" },
+          { "value": "特定防火設備", "description": "令第109条に定める特定防火設備" },
+          { "value": "その他", "description": "上記以外の構造" }
+        ],
+        "description": "防火区画に使用する構造を確認"
+      },
+      {
+        "id": "proc-structure-ok",
+        "type": "process",
+        "title": "構造要件適合",
+        "process_type": "mechanical",
+        "description": "区画の構造が要件を満たしている"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令112条5項の規定に適合"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "令112条5項の規定に不適合"
+      },
+      {
+        "id": "end-not-applicable",
+        "type": "terminal",
+        "title": "適用対象外",
+        "result": "end",
+        "description": "本項の適用対象外"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "dec-building-category", "role": "flow" },
+      { "id": "e02", "from": "dec-building-category", "to": "proc-category-match", "role": "option", "label": "通常火災終了時間1時間以上" },
+      { "id": "e03", "from": "dec-building-category", "to": "proc-category-match", "role": "option", "label": "特定避難時間1時間以上" },
+      { "id": "e04", "from": "dec-building-category", "to": "proc-category-match", "role": "option", "label": "準耐火建築物（法27条3項）" },
+      { "id": "e05", "from": "dec-building-category", "to": "proc-category-match", "role": "option", "label": "準防火地域内準耐火建築物" },
+      { "id": "e06", "from": "dec-building-category", "to": "proc-category-match", "role": "option", "label": "準耐火建築物等（法67条）" },
+      { "id": "e07", "from": "dec-building-category", "to": "proc-not-applicable-category", "role": "option", "label": "その他" },
+      { "id": "e08", "from": "proc-not-applicable-category", "to": "end-not-applicable", "role": "flow" },
+      { "id": "e09", "from": "proc-category-match", "to": "dec-area", "role": "flow" },
+      { "id": "e10", "from": "dec-area", "to": "proc-applicable", "role": "yes", "label": "はい" },
+      { "id": "e11", "from": "dec-area", "to": "proc-not-applicable-area", "role": "no", "label": "いいえ" },
+      { "id": "e12", "from": "proc-not-applicable-area", "to": "end-not-applicable", "role": "flow" },
+      { "id": "e13", "from": "proc-applicable", "to": "dec-compartment", "role": "flow" },
+      { "id": "e14", "from": "dec-compartment", "to": "proc-compartment-ok", "role": "yes", "label": "はい" },
+      { "id": "e15", "from": "dec-compartment", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e16", "from": "proc-compartment-ok", "to": "dec-structure-type", "role": "flow" },
+      { "id": "e17", "from": "dec-structure-type", "to": "proc-structure-ok", "role": "option", "label": "一時間準耐火基準の床・壁" },
+      { "id": "e18", "from": "dec-structure-type", "to": "proc-structure-ok", "role": "option", "label": "特定防火設備" },
+      { "id": "e19", "from": "dec-structure-type", "to": "fail", "role": "option", "label": "その他" },
+      { "id": "e20", "from": "proc-structure-ok", "to": "pass", "role": "flow" }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-A112-P5",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A21:P1", "A21:P2", "A27:P1", "A27:P3", "A61:P1", "A67:P1"],
+      "description": "第112条第5項の適用対象建築物を定める基準"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": ["A109", "A109_5:P1", "A110:P1", "A109_3:P2", "A112:P1", "A136_2:P1"],
+      "description": "防火区画の基準・定義と関連規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

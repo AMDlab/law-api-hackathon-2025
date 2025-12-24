@@ -1,0 +1,170 @@
+{
+  "id": "A28_P4_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "仕切られた二室の一室判定フロー",
+    "target_subject": "居室",
+    "description": "随時開放可能な仕切りで区切られた二室を一室とみなす判定処理のフローチャート"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "28",
+    "paragraph": "4",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "居室の採光及び換気",
+    "解釈規定"
+  ],
+  "text_raw": "ふすま、障子その他随時開放することができるもので仕切られた二室は、前三項の規定の適用については、一室とみなす。",
+  "kijo_diagram_ref": "CHK-BSL-A28-P4",
+  "flow_diagram": {
+    "title": "法28条4項 二室一室判定フロー",
+    "description": "二室が随時開放可能な仕切りで区切られている場合に一室とみなす判定を行う",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start"
+      },
+      {
+        "id": "dec-partition-type",
+        "type": "decision",
+        "title": "仕切りの種類は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "ふすま" },
+          { "value": "障子" },
+          { "value": "その他開放可能なもの" },
+          { "value": "固定壁等" }
+        ],
+        "description": "二室を仕切る建具・構造の種類を判定"
+      },
+      {
+        "id": "proc-partition-identified",
+        "type": "process",
+        "title": "開放可能な仕切り",
+        "process_type": "mechanical",
+        "description": "ふすま、障子等の開放可能な仕切りであることを確認"
+      },
+      {
+        "id": "dec-openability",
+        "type": "decision",
+        "title": "随時開放することができるか？",
+        "decision_type": "binary",
+        "description": "仕切りが常時開放可能な構造であるか確認（固定されていない、開閉が容易等）"
+      },
+      {
+        "id": "proc-single-room",
+        "type": "process",
+        "title": "一室とみなす",
+        "process_type": "mechanical",
+        "description": "法28条1項から3項（採光・換気）の適用において二室を一室として扱う"
+      },
+      {
+        "id": "end-single",
+        "type": "terminal",
+        "title": "一室とみなす",
+        "result": "pass",
+        "description": "二室を一室として採光・換気規定を適用"
+      },
+      {
+        "id": "end-separate",
+        "type": "terminal",
+        "title": "各室として判定",
+        "result": "end",
+        "description": "二室を別々の室として採光・換気規定を適用"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-partition-type",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-partition-type",
+        "to": "proc-partition-identified",
+        "role": "option",
+        "label": "ふすま"
+      },
+      {
+        "id": "e03",
+        "from": "dec-partition-type",
+        "to": "proc-partition-identified",
+        "role": "option",
+        "label": "障子"
+      },
+      {
+        "id": "e04",
+        "from": "dec-partition-type",
+        "to": "dec-openability",
+        "role": "option",
+        "label": "その他開放可能なもの"
+      },
+      {
+        "id": "e05",
+        "from": "dec-partition-type",
+        "to": "end-separate",
+        "role": "option",
+        "label": "固定壁等"
+      },
+      {
+        "id": "e06",
+        "from": "proc-partition-identified",
+        "to": "dec-openability",
+        "role": "flow"
+      },
+      {
+        "id": "e07",
+        "from": "dec-openability",
+        "to": "proc-single-room",
+        "role": "yes"
+      },
+      {
+        "id": "e08",
+        "from": "dec-openability",
+        "to": "end-separate",
+        "role": "no"
+      },
+      {
+        "id": "e09",
+        "from": "proc-single-room",
+        "to": "end-single",
+        "role": "flow"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A28:P1", "A28:P2", "A28:P3"],
+      "description": "前三項の規定（採光及び換気の基準）の適用時の解釈規定"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "delegates_to",
+      "articles": ["A19", "A20"],
+      "description": "採光及び換気の技術的基準"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

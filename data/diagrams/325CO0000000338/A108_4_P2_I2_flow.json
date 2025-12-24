@@ -1,0 +1,235 @@
+{
+  "id": "A108_4_P2_I2_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "屋内火災保有耐火時間の算出",
+    "target_subject": "特定主要構造部",
+    "description": "特定主要構造部ごとに、屋内火災による火熱に耐えられる加熱時間を算出するフロー"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "108の4",
+    "paragraph": "2",
+    "item": "2"
+  },
+  "labels": [
+    "単体規定",
+    "耐火関連",
+    "耐火性能検証法"
+  ],
+  "text_raw": "特定主要構造部ごとに、当該特定主要構造部が、当該建築物の屋内において発生が予測される火災による火熱が加えられた場合に、前項第一号イに掲げる要件に該当して耐えることができる加熱時間（以下この項において「屋内火災保有耐火時間」という。）を、当該特定主要構造部の構造方法、当該建築物の自重及び積載荷重並びに当該火熱による特定主要構造部の表面の温度の推移に応じて国土交通大臣が定める方法により求めること。",
+  "kijo_diagram_ref": "CHK-ORD-A108_4-P2-I2",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "verification_method",
+          "value": "耐火性能検証法を適用する建築物"
+        }
+      ]
+    },
+    "judgment_rule": {
+      "operator": "FORALL",
+      "target": "特定主要構造部",
+      "conditions": [
+        {
+          "type": "calculation",
+          "description": "屋内火災保有耐火時間を国土交通大臣が定める方法により求めること"
+        }
+      ]
+    }
+  },
+  "flow_diagram": {
+    "title": "屋内火災保有耐火時間算出フロー",
+    "description": "各特定主要構造部の屋内火災保有耐火時間を算出するフロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "算出開始",
+        "result": "start",
+        "description": "屋内火災保有耐火時間の算出開始"
+      },
+      {
+        "id": "proc-identify-components",
+        "type": "process",
+        "title": "特定主要構造部の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の特定主要構造部を特定する"
+      },
+      {
+        "id": "proc-get-structure-method",
+        "type": "process",
+        "title": "構造方法の特定",
+        "process_type": "undefined_input",
+        "description": "各特定主要構造部の構造方法（材料、断面寸法、構成等）を読み取る"
+      },
+      {
+        "id": "proc-get-loads",
+        "type": "process",
+        "title": "自重・積載荷重の特定",
+        "process_type": "undefined_input",
+        "description": "構造計算書等から建築物の自重及び積載荷重を読み取る"
+      },
+      {
+        "id": "proc-calc-temp-profile",
+        "type": "process",
+        "title": "表面温度推移の算出",
+        "process_type": "mechanical",
+        "description": "屋内火災による火熱が加えられた場合の特定主要構造部表面の温度推移を算出"
+      },
+      {
+        "id": "dec-temp-calc-valid",
+        "type": "decision",
+        "title": "表面温度推移は適切に算出されたか？",
+        "decision_type": "binary",
+        "description": "温度推移の計算が国土交通大臣が定める方法に従っているか確認"
+      },
+      {
+        "id": "proc-calc-tfi",
+        "type": "process",
+        "title": "屋内火災保有耐火時間（tfi）の算出",
+        "process_type": "mechanical",
+        "description": "構造方法、自重・積載荷重、表面温度推移に応じて国土交通大臣が定める方法により算出"
+      },
+      {
+        "id": "dec-tfi-valid",
+        "type": "decision",
+        "title": "屋内火災保有耐火時間は適切に算出されたか？",
+        "decision_type": "binary",
+        "description": "算出方法が適切であり、値が有効であることを確認"
+      },
+      {
+        "id": "dec-all-components-done",
+        "type": "decision",
+        "title": "全ての特定主要構造部について算出完了したか？",
+        "decision_type": "binary",
+        "description": "建築物の全ての特定主要構造部について算出が完了したか確認"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "算出完了",
+        "result": "pass",
+        "description": "全特定主要構造部の屋内火災保有耐火時間の算出が完了"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "算出不可",
+        "result": "fail",
+        "description": "屋内火災保有耐火時間の算出ができない"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "proc-identify-components",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "proc-identify-components",
+        "to": "proc-get-structure-method",
+        "role": "flow"
+      },
+      {
+        "id": "e03",
+        "from": "proc-get-structure-method",
+        "to": "proc-get-loads",
+        "role": "flow"
+      },
+      {
+        "id": "e04",
+        "from": "proc-get-loads",
+        "to": "proc-calc-temp-profile",
+        "role": "flow"
+      },
+      {
+        "id": "e05",
+        "from": "proc-calc-temp-profile",
+        "to": "dec-temp-calc-valid",
+        "role": "flow"
+      },
+      {
+        "id": "e06",
+        "from": "dec-temp-calc-valid",
+        "to": "proc-calc-tfi",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e07",
+        "from": "dec-temp-calc-valid",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e08",
+        "from": "proc-calc-tfi",
+        "to": "dec-tfi-valid",
+        "role": "flow"
+      },
+      {
+        "id": "e09",
+        "from": "dec-tfi-valid",
+        "to": "dec-all-components-done",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e10",
+        "from": "dec-tfi-valid",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e11",
+        "from": "dec-all-components-done",
+        "to": "pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e12",
+        "from": "dec-all-components-done",
+        "to": "proc-get-structure-method",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": ["A2:I9の2"],
+      "description": "耐火建築物の定義において政令で定める技術的基準を委任"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": ["A108_4:P1:I1:Sa"],
+      "description": "前項第1号イの耐火性能要件を参照"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00Z",
+    "updated_at": "2025-12-25T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

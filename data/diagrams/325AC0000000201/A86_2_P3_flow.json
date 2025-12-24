@@ -1,0 +1,305 @@
+{
+  "id": "A86_2_P3_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "公告許可対象区域における建築物新築・増築等の許可判定",
+    "target_subject": "建築物",
+    "description": "公告許可対象区域内で新築・増築等をしようとする建築物について、特定行政庁が許可する場合の適合条件を判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "86の2",
+    "paragraph": "3",
+    "item": null
+  },
+  "labels": [
+    "集団規定",
+    "総合設計",
+    "許可制度"
+  ],
+  "text_raw": "公告許可対象区域（前条第三項又は第四項の規定による許可に係る公告対象区域をいう。以下同じ。）内において、同条第三項又は第四項の規定により一の敷地内にあるものとみなされる建築物（以下「一敷地内許可建築物」という。）以外の建築物を新築し、又は一敷地内許可建築物について増築等をしようとする者は、国土交通省令で定めるところにより、特定行政庁の許可を受けなければならない。この場合において、特定行政庁は、当該新築又は増築等に係る建築物が、その位置及び建蔽率、容積率、各部分の高さその他の構造について、他の一敷地内許可建築物の位置及び建蔽率、容積率、各部分の高さその他の構造との関係において、交通上、安全上、防火上及び衛生上支障がなく、かつ、市街地の環境の整備改善を阻害することがないと認めるとともに、当該区域内に同条第三項又は第四項の政令で定める空地を維持することとなると認める場合に限り、許可するものとする。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "公告許可対象区域内"
+        }
+      ],
+      "note": "公告許可対象区域内での建築物の新築又は増築等に限定される"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-permit-applicability",
+          "operator": "==",
+          "value": true,
+          "description": "許可対象であること"
+        },
+        {
+          "ref": "info-position-structure-safety",
+          "operator": "==",
+          "value": true,
+          "description": "位置及び構造について交通上・安全上・防火上・衛生上支障がないこと"
+        },
+        {
+          "ref": "info-environment-improvement",
+          "operator": "==",
+          "value": true,
+          "description": "市街地の環境整備改善を阻害しないこと"
+        },
+        {
+          "ref": "info-open-space-maintenance",
+          "operator": "==",
+          "value": true,
+          "description": "政令で定める空地の維持"
+        }
+      ]
+    }
+  },
+  "kijo_diagram_ref": "CHK-BSL-A86-2-P3",
+  "flow_diagram": {
+    "title": "公告許可対象区域内建築許可の適合判定フロー",
+    "description": "法86条の2第3項に基づく特定行政庁の許可を判定するフローチャート",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "法86条の2第3項の適合判定を開始"
+      },
+      {
+        "id": "dec-building-type",
+        "type": "decision",
+        "title": "建築等の種別は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "新築", "description": "一敷地内許可建築物以外の建築物の新築" },
+          { "value": "増築等", "description": "一敷地内許可建築物の増築・改築・移転・大規模修繕・大規模模様替（位置又は構造変更を伴う）" },
+          { "value": "対象外", "description": "本条の適用対象外" }
+        ],
+        "description": "新築又は増築等（位置又は構造の変更を伴うもの）であるか"
+      },
+      {
+        "id": "proc-new-construction",
+        "type": "process",
+        "title": "新築対象",
+        "process_type": "mechanical",
+        "description": "一敷地内許可建築物以外の建築物の新築に該当"
+      },
+      {
+        "id": "proc-extension",
+        "type": "process",
+        "title": "増築等対象",
+        "process_type": "mechanical",
+        "description": "一敷地内許可建築物の増築等に該当"
+      },
+      {
+        "id": "dec-traffic-safety",
+        "type": "decision",
+        "title": "交通上・安全上支障がないか？",
+        "decision_type": "binary",
+        "description": "位置及び構造について既存建築物との関係で交通上・安全上支障がないか"
+      },
+      {
+        "id": "dec-fire-safety",
+        "type": "decision",
+        "title": "防火上支障がないか？",
+        "decision_type": "binary",
+        "description": "位置及び構造について既存建築物との関係で防火上支障がないか"
+      },
+      {
+        "id": "dec-hygiene",
+        "type": "decision",
+        "title": "衛生上支障がないか？",
+        "decision_type": "binary",
+        "description": "位置及び構造について既存建築物との関係で衛生上支障がないか"
+      },
+      {
+        "id": "dec-environment",
+        "type": "decision",
+        "title": "市街地環境整備改善を阻害しないか？",
+        "decision_type": "binary",
+        "description": "市街地の環境の整備改善を阻害することがないか"
+      },
+      {
+        "id": "dec-open-space",
+        "type": "decision",
+        "title": "政令で定める空地を維持できるか？",
+        "decision_type": "binary",
+        "description": "当該区域内に政令で定める空地を維持することとなるか"
+      },
+      {
+        "id": "proc-permit-granted",
+        "type": "process",
+        "title": "特定行政庁の許可",
+        "process_type": "mechanical",
+        "description": "全ての基準を満たし特定行政庁が許可"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "許可",
+        "result": "pass",
+        "description": "法86条の2第3項の許可要件を満たす"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "不許可",
+        "result": "fail",
+        "description": "法86条の2第3項の許可要件を満たさない"
+      },
+      {
+        "id": "pass-not-applicable",
+        "type": "terminal",
+        "title": "適用対象外",
+        "result": "pass",
+        "description": "本条の適用対象外のため許可不要"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-building-type",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-building-type",
+        "to": "proc-new-construction",
+        "role": "option",
+        "label": "新築"
+      },
+      {
+        "id": "e03",
+        "from": "dec-building-type",
+        "to": "proc-extension",
+        "role": "option",
+        "label": "増築等"
+      },
+      {
+        "id": "e04",
+        "from": "dec-building-type",
+        "to": "pass-not-applicable",
+        "role": "option",
+        "label": "対象外"
+      },
+      {
+        "id": "e05",
+        "from": "proc-new-construction",
+        "to": "dec-traffic-safety",
+        "role": "flow"
+      },
+      {
+        "id": "e06",
+        "from": "proc-extension",
+        "to": "dec-traffic-safety",
+        "role": "flow"
+      },
+      {
+        "id": "e07",
+        "from": "dec-traffic-safety",
+        "to": "dec-fire-safety",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e08",
+        "from": "dec-traffic-safety",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e09",
+        "from": "dec-fire-safety",
+        "to": "dec-hygiene",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e10",
+        "from": "dec-fire-safety",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e11",
+        "from": "dec-hygiene",
+        "to": "dec-environment",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e12",
+        "from": "dec-hygiene",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e13",
+        "from": "dec-environment",
+        "to": "dec-open-space",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e14",
+        "from": "dec-environment",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e15",
+        "from": "dec-open-space",
+        "to": "proc-permit-granted",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e16",
+        "from": "dec-open-space",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e17",
+        "from": "proc-permit-granted",
+        "to": "pass",
+        "role": "flow"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": [
+        "A85:P3",
+        "A85:P4"
+      ],
+      "description": "前条第3項、第4項における公告許可対象区域の指定と関連"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

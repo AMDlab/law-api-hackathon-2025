@@ -1,0 +1,258 @@
+{
+  "id": "A52_P8_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "住宅用建築物の容積率緩和判定（空地確保による特例）",
+    "target_subject": "建築物",
+    "description": "住宅用途を含む建築物が一定の空地を有する場合における容積率の緩和適用判定"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "52",
+    "paragraph": "8",
+    "item": null
+  },
+  "labels": [
+    "集団規定",
+    "容積率",
+    "住宅用途",
+    "空地確保",
+    "容積率緩和"
+  ],
+  "text_raw": "その全部又は一部を住宅の用途に供する建築物（居住環境向上用途誘導地区内の建築物であつてその一部を当該居住環境向上用途誘導地区に関する都市計画において定められた誘導すべき用途に供するもの及び特定用途誘導地区内の建築物であつてその一部を当該特定用途誘導地区に関する都市計画において定められた誘導すべき用途に供するものを除く。）であつて次に掲げる条件に該当するものについては、当該建築物がある地域に関する都市計画において定められた第一項第二号又は第三号に定める数値の一・五倍以下で当該建築物の住宅の用途に供する部分の床面積の合計のその延べ面積に対する割合に応じて政令で定める方法により算出した数値（特定行政庁が都道府県都市計画審議会の議を経て指定する区域内にあつては、当該都市計画において定められた数値から当該算出した数値までの範囲内で特定行政庁が都道府県都市計画審議会の議を経て別に定めた数値）を同項第二号又は第三号に定める数値とみなして、同項及び第三項から前項までの規定を適用する。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "第一種住居地域、第二種住居地域、準住居地域、近隣商業地域、準工業地域又は商業地域内（一部区域を除く）"
+        },
+        {
+          "type": "building_characteristic",
+          "value": "全部又は一部を住宅の用途に供する建築物"
+        },
+        {
+          "type": "exclusion",
+          "value": "居住環境向上用途誘導地区・特定用途誘導地区の誘導用途供給建築物を除く"
+        }
+      ],
+      "note": "特定の用途地域内で住宅用途を含み、かつ一定規模以上の空地を有する建築物が対象"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "proposition",
+          "description": "容積率緩和の適用要件を満たすか",
+          "logic": "(A1 = true) AND (B1 ≥ B1_min) AND (B2 ≥ B2_min) AND (B3 ≥ B3_min)"
+        }
+      ]
+    },
+    "exceptions": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "type": "proviso",
+          "description": "地階住宅部分を有する場合の上限容積率",
+          "note": "第3項により不算入部分を有する場合、容積率上限は基準数値の1.5倍まで"
+        }
+      ],
+      "effect": "MODIFIED_LIMIT"
+    }
+  },
+  "flow_diagram": {
+    "title": "住宅用建築物の容積率緩和判定フロー",
+    "description": "法52条8項による住宅用建築物の容積率緩和適用の判定フロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start"
+      },
+      {
+        "id": "dec-residential-use",
+        "type": "decision",
+        "title": "住宅用途を含むか？",
+        "decision_type": "binary",
+        "description": "建築物の全部または一部が住宅の用途に供されるか"
+      },
+      {
+        "id": "proc-not-applicable-use",
+        "type": "process",
+        "title": "本項非該当（住宅用途なし）",
+        "process_type": "mechanical",
+        "description": "住宅用途を含まないため本項は適用されない"
+      },
+      {
+        "id": "dec-exclusion",
+        "type": "decision",
+        "title": "誘導地区の誘導用途建築物か？",
+        "decision_type": "binary",
+        "description": "居住環境向上用途誘導地区・特定用途誘導地区の誘導用途供給建築物に該当するか"
+      },
+      {
+        "id": "proc-not-applicable-exclusion",
+        "type": "process",
+        "title": "本項非該当（適用除外）",
+        "process_type": "mechanical",
+        "description": "誘導地区の誘導用途建築物のため本項は適用されない"
+      },
+      {
+        "id": "dec-zone",
+        "type": "decision",
+        "title": "用途地域は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "第一種住居地域" },
+          { "value": "第二種住居地域" },
+          { "value": "準住居地域" },
+          { "value": "近隣商業地域" },
+          { "value": "準工業地域" },
+          { "value": "商業地域" },
+          { "value": "その他" }
+        ],
+        "description": "建築物が所在する用途地域を判定"
+      },
+      {
+        "id": "proc-item1-met",
+        "type": "process",
+        "title": "1号要件該当",
+        "process_type": "mechanical",
+        "description": "法52条8項1号の地域要件に該当"
+      },
+      {
+        "id": "proc-not-applicable-zone",
+        "type": "process",
+        "title": "本項非該当（地域外）",
+        "process_type": "mechanical",
+        "description": "対象用途地域外のため本項は適用されない"
+      },
+      {
+        "id": "dec-open-space",
+        "type": "decision",
+        "title": "空地面積が基準以上か？",
+        "decision_type": "binary",
+        "description": "敷地内空地が政令で定める規模以上（令135条の16第1項）であるか",
+        "related_articles": ["令::A135_16:P1"]
+      },
+      {
+        "id": "dec-road-facing-space",
+        "type": "decision",
+        "title": "道路接続空地が基準以上か？",
+        "decision_type": "binary",
+        "description": "道路に接して有効な空地が政令で定める規模以上（令135条の16第2項）であるか",
+        "related_articles": ["令::A135_16:P2"]
+      },
+      {
+        "id": "dec-site-area",
+        "type": "decision",
+        "title": "敷地面積が基準以上か？",
+        "decision_type": "binary",
+        "description": "敷地面積が政令で定める規模以上（令135条の16第3項）であるか",
+        "related_articles": ["令::A135_16:P3"]
+      },
+      {
+        "id": "proc-item2-met",
+        "type": "process",
+        "title": "2号要件該当",
+        "process_type": "mechanical",
+        "description": "法52条8項2号の空地・敷地規模要件に該当"
+      },
+      {
+        "id": "proc-calc-residential-ratio",
+        "type": "process",
+        "title": "住宅用途比率の算定",
+        "process_type": "mechanical",
+        "description": "住宅用途部分の床面積合計を延べ面積で除して住宅用途比率を算定"
+      },
+      {
+        "id": "proc-calc-bonus-far",
+        "type": "process",
+        "title": "緩和後容積率の算定",
+        "process_type": "mechanical",
+        "description": "住宅用途比率に応じて政令で定める方法により容積率緩和数値を算出（基準値の1.5倍が上限）",
+        "related_articles": ["令::A135_3"]
+      },
+      {
+        "id": "dec-far-compliance",
+        "type": "decision",
+        "title": "容積率が緩和限度以下か？",
+        "decision_type": "binary",
+        "description": "建築物の容積率が緩和後の容積率限度以下であるか判定"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合（容積率緩和適用）",
+        "result": "pass",
+        "description": "法52条8項に適合し容積率緩和が適用される"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "法52条8項に不適合"
+      },
+      {
+        "id": "end-other",
+        "type": "terminal",
+        "title": "本項対象外",
+        "result": "end",
+        "description": "本項は適用されない"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "dec-residential-use", "role": "flow" },
+      { "id": "e02", "from": "dec-residential-use", "to": "dec-exclusion", "role": "yes", "label": "はい" },
+      { "id": "e03", "from": "dec-residential-use", "to": "proc-not-applicable-use", "role": "no", "label": "いいえ" },
+      { "id": "e04", "from": "proc-not-applicable-use", "to": "end-other", "role": "flow" },
+      { "id": "e05", "from": "dec-exclusion", "to": "proc-not-applicable-exclusion", "role": "yes", "label": "はい" },
+      { "id": "e06", "from": "dec-exclusion", "to": "dec-zone", "role": "no", "label": "いいえ" },
+      { "id": "e07", "from": "proc-not-applicable-exclusion", "to": "end-other", "role": "flow" },
+      { "id": "e08", "from": "dec-zone", "to": "proc-item1-met", "role": "option", "label": "第一種住居地域" },
+      { "id": "e09", "from": "dec-zone", "to": "proc-item1-met", "role": "option", "label": "第二種住居地域" },
+      { "id": "e10", "from": "dec-zone", "to": "proc-item1-met", "role": "option", "label": "準住居地域" },
+      { "id": "e11", "from": "dec-zone", "to": "proc-item1-met", "role": "option", "label": "近隣商業地域" },
+      { "id": "e12", "from": "dec-zone", "to": "proc-item1-met", "role": "option", "label": "準工業地域" },
+      { "id": "e13", "from": "dec-zone", "to": "proc-item1-met", "role": "option", "label": "商業地域" },
+      { "id": "e14", "from": "dec-zone", "to": "proc-not-applicable-zone", "role": "option", "label": "その他" },
+      { "id": "e15", "from": "proc-not-applicable-zone", "to": "end-other", "role": "flow" },
+      { "id": "e16", "from": "proc-item1-met", "to": "dec-open-space", "role": "flow" },
+      { "id": "e17", "from": "dec-open-space", "to": "dec-road-facing-space", "role": "yes", "label": "はい" },
+      { "id": "e18", "from": "dec-open-space", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e19", "from": "dec-road-facing-space", "to": "dec-site-area", "role": "yes", "label": "はい" },
+      { "id": "e20", "from": "dec-road-facing-space", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e21", "from": "dec-site-area", "to": "proc-item2-met", "role": "yes", "label": "はい" },
+      { "id": "e22", "from": "dec-site-area", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e23", "from": "proc-item2-met", "to": "proc-calc-residential-ratio", "role": "flow" },
+      { "id": "e24", "from": "proc-calc-residential-ratio", "to": "proc-calc-bonus-far", "role": "flow" },
+      { "id": "e25", "from": "proc-calc-bonus-far", "to": "dec-far-compliance", "role": "flow" },
+      { "id": "e26", "from": "dec-far-compliance", "to": "pass", "role": "yes", "label": "はい" },
+      { "id": "e27", "from": "dec-far-compliance", "to": "fail", "role": "no", "label": "いいえ" }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-A52-P8",
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "defines_detail",
+      "articles": ["A135_2", "A135_3", "A135_16"],
+      "description": "空地の規模、敷地面積の最低限度、容積率算出方法を規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

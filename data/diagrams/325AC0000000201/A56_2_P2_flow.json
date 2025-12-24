@@ -1,0 +1,198 @@
+{
+  "id": "A56_2_P2_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "同一敷地内複数建築物の日影規制統一処理フロー",
+    "target_subject": "敷地内の複数建築物",
+    "description": "同一敷地内に二以上の建築物がある場合、これら複数建築物を一の建築物とみなして日影規制を適用する判定フロー"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "56の2",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": [
+    "集団規定",
+    "日影規制"
+  ],
+  "text_raw": "同一の敷地内に二以上の建築物がある場合においては、これらの建築物を一の建築物とみなして、前項の規定を適用する。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "法56条の2第1項の対象区域内"
+        },
+        {
+          "type": "building_condition",
+          "value": "同一敷地内の建築物が2以上"
+        }
+      ],
+      "note": "別表第四（い）欄の各項に掲げる地域又は区域の全部又は一部で地方公共団体の条例で指定する区域内"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "description": "複数建築物を一体として第一項の日影規制基準に適合することを判定"
+        }
+      ]
+    }
+  },
+  "flow_diagram": {
+    "title": "同一敷地内複数建築物の日影規制適合判定フロー",
+    "description": "敷地内に複数建築物がある場合の日影規制適用フロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "同一敷地内複数建築物の日影規制判定を開始"
+      },
+      {
+        "id": "dec-building-count",
+        "type": "decision",
+        "title": "敷地内の建築物数は2以上か？",
+        "decision_type": "binary",
+        "description": "同一敷地内に存在する建築物の棟数が2以上であるかを判定"
+      },
+      {
+        "id": "proc-single-building",
+        "type": "process",
+        "title": "単独建築物として判定",
+        "process_type": "sub_diagram_reference",
+        "description": "建築物が1棟のみの場合、通常の第1項の日影規制を適用",
+        "related_articles": ["法::A56_2:P1"]
+      },
+      {
+        "id": "proc-identify-buildings",
+        "type": "process",
+        "title": "敷地内全建築物の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書から同一敷地内のすべての建築物（既存・計画）を特定"
+      },
+      {
+        "id": "proc-combine-geometry",
+        "type": "process",
+        "title": "統合建築物の形状確認",
+        "process_type": "undefined_input",
+        "description": "複数建築物を一体化した場合の外周形状、高さ、敷地との位置関係を確認"
+      },
+      {
+        "id": "proc-apply-para1",
+        "type": "process",
+        "title": "統合建築物に第1項日影規制を適用",
+        "process_type": "sub_diagram_reference",
+        "description": "統合建築物に対して第1項の日影規制基準（別表第四参照）を適用",
+        "related_articles": ["法::A56_2:P1"]
+      },
+      {
+        "id": "dec-para1-compliance",
+        "type": "decision",
+        "title": "統合建築物は第1項の日影規制に適合するか？",
+        "decision_type": "binary",
+        "description": "複数建築物を一の建築物とみなした場合の日影規制への適合判定"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "統合建築物が第1項の日影規制基準を満たしている"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "統合建築物が第1項の日影規制基準を満たしていない"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-building-count",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-building-count",
+        "to": "proc-single-building",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e03",
+        "from": "dec-building-count",
+        "to": "proc-identify-buildings",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e04",
+        "from": "proc-single-building",
+        "to": "pass",
+        "role": "flow",
+        "label": "第1項の規定を個別適用"
+      },
+      {
+        "id": "e05",
+        "from": "proc-identify-buildings",
+        "to": "proc-combine-geometry",
+        "role": "flow"
+      },
+      {
+        "id": "e06",
+        "from": "proc-combine-geometry",
+        "to": "proc-apply-para1",
+        "role": "flow"
+      },
+      {
+        "id": "e07",
+        "from": "proc-apply-para1",
+        "to": "dec-para1-compliance",
+        "role": "flow"
+      },
+      {
+        "id": "e08",
+        "from": "dec-para1-compliance",
+        "to": "pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e09",
+        "from": "dec-para1-compliance",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-A56-2-P2",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A56_2:P1"],
+      "description": "日影による中高層建築物の高さ制限の基準及び適用方法"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00Z",
+    "updated_at": "2025-12-25T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

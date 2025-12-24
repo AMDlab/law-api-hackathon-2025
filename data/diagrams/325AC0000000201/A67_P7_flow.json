@@ -1,0 +1,224 @@
+{
+  "id": "A67_P7_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "最低限度の高さより低い建築物部分の防火構造確認",
+    "target_subject": "建築物",
+    "description": "特定防災街区整備地区内において、防災都市計画施設に接する敷地を有する建築物で、高さが最低限度より低い部分について、防火上有効な構造（空隙のない壁など）の確認"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "67",
+    "paragraph": "7",
+    "item": null
+  },
+  "labels": [
+    "集団規定",
+    "特定防災街区整備地区",
+    "防火構造"
+  ],
+  "text_raw": "前項の場合においては、同項に規定する建築物の高さの最低限度より低い高さの建築物の部分（同項に規定する建築物の防災都市計画施設に係る間口率の最低限度を超える部分を除く。）は、空隙のない壁が設けられる等防火上有効な構造としなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "特定防災街区整備地区内"
+        },
+        {
+          "type": "relation",
+          "value": "敷地が防災都市計画施設に接する"
+        }
+      ],
+      "note": "第67条第6項の適用対象建築物"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "height_comparison",
+          "description": "建築物部分の高さが第6項に規定される最低限度より低いか"
+        },
+        {
+          "type": "frontage_ratio",
+          "description": "当該部分が防災都市計画施設に係る間口率の最低限度を超えているか"
+        },
+        {
+          "type": "fireproof_structure",
+          "description": "空隙のない壁など防火上有効な構造となっているか"
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "kijo_diagram_ref": "CHK-BSL-A67-P7",
+  "flow_diagram": {
+    "title": "最低限度の高さより低い建築物部分の防火構造確認フロー",
+    "description": "高さが最低限度より低い部分について防火上有効な構造かを判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start"
+      },
+      {
+        "id": "dec-p6-applicable",
+        "type": "decision",
+        "title": "第6項の対象建築物か？",
+        "decision_type": "binary",
+        "description": "防災都市計画施設に接する敷地を有し、高さの最低限度が都市計画で定められた建築物か確認",
+        "related_articles": ["法::A67:P6"]
+      },
+      {
+        "id": "dec-has-lower-part",
+        "type": "decision",
+        "title": "高さが最低限度より低い部分があるか？",
+        "decision_type": "binary",
+        "description": "建築物に高さの最低限度より低い部分が存在するか確認"
+      },
+      {
+        "id": "dec-frontage-ratio-exceeds",
+        "type": "decision",
+        "title": "当該部分は間口率の最低限度を超えているか？",
+        "decision_type": "binary",
+        "description": "高さが低い部分が防災都市計画施設に係る間口率の最低限度を超えているか判定（超えている場合は除外）"
+      },
+      {
+        "id": "proc-exceeds-frontage",
+        "type": "process",
+        "title": "間口率最低限度超過部分（確認不要）",
+        "process_type": "mechanical",
+        "description": "間口率の最低限度を超える部分は防火構造確認の対象外"
+      },
+      {
+        "id": "dec-fireproof-structure",
+        "type": "decision",
+        "title": "空隙のない壁等防火上有効な構造か？",
+        "decision_type": "binary",
+        "description": "対象部分が空隙のない壁が設けられる等防火上有効な構造となっているか判定"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "法67条7項適合",
+        "result": "pass",
+        "description": "防火上有効な構造が確認され適合"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "法67条7項不適合",
+        "result": "fail",
+        "description": "防火上有効な構造でないため不適合"
+      },
+      {
+        "id": "not-applicable",
+        "type": "terminal",
+        "title": "規定対象外",
+        "result": "end",
+        "description": "本規定の適用範囲外"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-p6-applicable",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-p6-applicable",
+        "to": "dec-has-lower-part",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "dec-p6-applicable",
+        "to": "not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e04",
+        "from": "dec-has-lower-part",
+        "to": "dec-frontage-ratio-exceeds",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e05",
+        "from": "dec-has-lower-part",
+        "to": "pass",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e06",
+        "from": "dec-frontage-ratio-exceeds",
+        "to": "proc-exceeds-frontage",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e07",
+        "from": "dec-frontage-ratio-exceeds",
+        "to": "dec-fireproof-structure",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e08",
+        "from": "proc-exceeds-frontage",
+        "to": "pass",
+        "role": "flow"
+      },
+      {
+        "id": "e09",
+        "from": "dec-fireproof-structure",
+        "to": "pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e10",
+        "from": "dec-fireproof-structure",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A67:P6"],
+      "description": "第67条第6項による敷地が防災都市計画施設に接する建築物の高さの最低限度及び間口率の最低限度の規定を参照"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "defines_detail",
+      "articles": ["A135:P3"],
+      "description": "第67条第8項により、間口率及び高さの算定に関する事項を政令で定める"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00.000Z",
+    "updated_at": "2025-12-25T00:00:00.000Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-skill",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

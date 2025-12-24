@@ -1,0 +1,309 @@
+{
+  "id": "A68_5_4_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "住居等区分地区計画区域内の容積率特例",
+    "target_subject": "建築物",
+    "description": "住居と住居以外の用途とを区分して定める地区計画等の区域内における建築物の容積率の特例を判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "68の5の4",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "集団規定",
+    "容積率",
+    "地区計画"
+  ],
+  "text_raw": "次に掲げる条件に該当する地区計画、防災街区整備地区計画又は沿道地区計画の区域内にあるその全部又は一部を住宅の用途に供する建築物については、当該地区計画において定められた建築物の容積率の最高限度を第五十二条第一項第二号又は第三号に定める数値とみなして、同条の規定を適用する。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "地区計画等の区域内"
+        },
+        {
+          "type": "use",
+          "value": "住宅用途建築物"
+        }
+      ]
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-all-conditions-met",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "flow_diagram": {
+    "title": "法68条の5の4第1項 適合判定フロー",
+    "description": "住居等区分地区計画区域内の容積率特例の判定フロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start"
+      },
+      {
+        "id": "dec-plan-type",
+        "type": "decision",
+        "title": "地区計画等の種別は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "地区計画" },
+          { "value": "防災街区整備地区計画" },
+          { "value": "沿道地区計画" },
+          { "value": "該当なし" }
+        ],
+        "description": "地区計画、防災街区整備地区計画、沿道地区計画のいずれかの区域内か"
+      },
+      {
+        "id": "dec-housing-use",
+        "type": "decision",
+        "title": "全部又は一部を住宅の用途に供する建築物か？",
+        "decision_type": "binary",
+        "description": "建築物の全部又は一部が住宅の用途に供されるか"
+      },
+      {
+        "id": "dec-condition-1",
+        "type": "decision",
+        "title": "第1号の条件を満たすか？",
+        "decision_type": "binary",
+        "description": "イからニの事項が定められた地区整備計画等の区域であること"
+      },
+      {
+        "id": "proc-item1-met",
+        "type": "process",
+        "title": "第1号条件該当",
+        "process_type": "mechanical",
+        "description": "第1号の条件を満たすことを確認"
+      },
+      {
+        "id": "dec-condition-2",
+        "type": "decision",
+        "title": "第2号の条件を満たすか？",
+        "decision_type": "binary",
+        "description": "地区計画等において住居と住居以外の用途とを区分する区域が定められていること"
+      },
+      {
+        "id": "proc-item2-met",
+        "type": "process",
+        "title": "第2号条件該当",
+        "process_type": "mechanical",
+        "description": "第2号の条件を満たすことを確認"
+      },
+      {
+        "id": "dec-condition-3",
+        "type": "decision",
+        "title": "第3号の条件を満たすか？",
+        "decision_type": "binary",
+        "description": "第1号の区域において容積率の最高限度が定められていること"
+      },
+      {
+        "id": "proc-item3-met",
+        "type": "process",
+        "title": "第3号条件該当",
+        "process_type": "mechanical",
+        "description": "第3号の条件を満たすことを確認"
+      },
+      {
+        "id": "proc-all-conditions",
+        "type": "process",
+        "title": "全条件充足確認",
+        "process_type": "mechanical",
+        "description": "第1号から第3号の全条件を満たすことを確認"
+      },
+      {
+        "id": "proc-apply-special",
+        "type": "process",
+        "title": "容積率特例の適用",
+        "process_type": "mechanical",
+        "description": "地区計画で定められた容積率最高限度を法52条第1項第2号又は第3号の数値とみなして適用"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "容積率特例適合",
+        "result": "pass",
+        "description": "法68条の5の4第1項の容積率特例が適用される"
+      },
+      {
+        "id": "fail-plan",
+        "type": "terminal",
+        "title": "対象外（区域外）",
+        "result": "fail",
+        "description": "対象となる地区計画等の区域外"
+      },
+      {
+        "id": "fail-use",
+        "type": "terminal",
+        "title": "対象外（用途）",
+        "result": "fail",
+        "description": "住宅の用途に供する建築物ではない"
+      },
+      {
+        "id": "fail-conditions",
+        "type": "terminal",
+        "title": "条件非該当",
+        "result": "fail",
+        "description": "第1号から第3号のいずれかの条件を満たさない"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-plan-type",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-plan-type",
+        "to": "dec-housing-use",
+        "role": "option",
+        "label": "地区計画"
+      },
+      {
+        "id": "e03",
+        "from": "dec-plan-type",
+        "to": "dec-housing-use",
+        "role": "option",
+        "label": "防災街区整備地区計画"
+      },
+      {
+        "id": "e04",
+        "from": "dec-plan-type",
+        "to": "dec-housing-use",
+        "role": "option",
+        "label": "沿道地区計画"
+      },
+      {
+        "id": "e05",
+        "from": "dec-plan-type",
+        "to": "fail-plan",
+        "role": "option",
+        "label": "該当なし"
+      },
+      {
+        "id": "e06",
+        "from": "dec-housing-use",
+        "to": "dec-condition-1",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e07",
+        "from": "dec-housing-use",
+        "to": "fail-use",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e08",
+        "from": "dec-condition-1",
+        "to": "proc-item1-met",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e09",
+        "from": "dec-condition-1",
+        "to": "fail-conditions",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e10",
+        "from": "proc-item1-met",
+        "to": "dec-condition-2",
+        "role": "flow"
+      },
+      {
+        "id": "e11",
+        "from": "dec-condition-2",
+        "to": "proc-item2-met",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e12",
+        "from": "dec-condition-2",
+        "to": "fail-conditions",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e13",
+        "from": "proc-item2-met",
+        "to": "dec-condition-3",
+        "role": "flow"
+      },
+      {
+        "id": "e14",
+        "from": "dec-condition-3",
+        "to": "proc-item3-met",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e15",
+        "from": "dec-condition-3",
+        "to": "fail-conditions",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e16",
+        "from": "proc-item3-met",
+        "to": "proc-all-conditions",
+        "role": "flow"
+      },
+      {
+        "id": "e17",
+        "from": "proc-all-conditions",
+        "to": "proc-apply-special",
+        "role": "flow"
+      },
+      {
+        "id": "e18",
+        "from": "proc-apply-special",
+        "to": "pass",
+        "role": "flow"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-A68-5-4-P1",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": [
+        "A52",
+        "A68_2"
+      ],
+      "description": "容積率規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

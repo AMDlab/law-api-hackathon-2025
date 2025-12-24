@@ -1,0 +1,183 @@
+{
+  "id": "A112_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "防火区画（面積区画）（適合判定フロー）",
+    "target_subject": "建築物",
+    "description": "1500㎡超の建築物における防火区画区分要件の判定"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "112",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": ["集団規定", "防火区画"],
+  "text_raw": "法第二条第九号の三イ若しくはロのいずれかに該当する建築物（特定主要構造部を耐火構造とした建築物を含む。）又は第百三十六条の二第一号ロ若しくは第二号ロに掲げる基準に適合する建築物で、延べ面積（スプリンクラー設備、水噴霧消火設備、泡消火設備その他これらに類するもので自動式のものを設けた部分の床面積の二分の一に相当する床面積を除く。以下この条において同じ。）が千五百平方メートルを超えるものは、床面積の合計（スプリンクラー設備、水噴霧消火設備、泡消火設備その他これらに類するもので自動式のものを設けた部分の床面積の二分の一に相当する床面積を除く。以下この条において同じ。）千五百平方メートル以内ごとに一時間準耐火基準に適合する準耐火構造の床若しくは壁又は特定防火設備で区画しなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        { "type": "building_standard", "value": "法第2条第9号の3 イ・ロまたは令第136条の2適合" },
+        { "type": "floor_area", "operator": ">", "value": 1500, "unit": "m2" }
+      ]
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        { "ref": "info-exempt" },
+        { "ref": "info-compartment-compliance" }
+      ]
+    },
+    "exceptions": {
+      "operator": "OR",
+      "conditions": [
+        { "note": "劇場、映画館等の客席、体育館、工場等でその用途上やむを得ない部分" },
+        { "note": "階段室・昇降路で準耐火構造等で区画されたもの" }
+      ],
+      "effect": "EXEMPT"
+    }
+  },
+  "flow_diagram": {
+    "title": "令112条1項 防火区画（面積区画）適合判定フロー",
+    "description": "1500㎡超の建築物について、防火区画区分または適用除外を判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "令112条1項の適合判定を開始"
+      },
+      {
+        "id": "dec-building-type",
+        "type": "decision",
+        "title": "対象建築物種別か？",
+        "decision_type": "binary",
+        "description": "法第2条第9号の3イ・ロまたは令第136条の2第1号ロ・第2号ロに該当するか判定",
+        "related_articles": ["法::A2:I9の3", "令::A136_2"]
+      },
+      {
+        "id": "proc-not-applicable",
+        "type": "process",
+        "title": "適用対象外",
+        "process_type": "mechanical",
+        "description": "対象建築物種別に該当しないため令112条1項の適用対象外"
+      },
+      {
+        "id": "dec-floor-area",
+        "type": "decision",
+        "title": "延べ面積 > 1500㎡か？",
+        "decision_type": "binary",
+        "description": "延べ面積（スプリンクラー等設置部分1/2除外後）が1500㎡を超えるか判定",
+        "condition": {
+          "operator": "GT",
+          "lhs": { "var": "A", "desc": "延べ面積（スプリンクラー等除外後）" },
+          "rhs": { "value": 1500, "unit": "m2" }
+        }
+      },
+      {
+        "id": "dec-use-exempt",
+        "type": "decision",
+        "title": "用途上やむを得ない部分か？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "劇場等客席", "description": "劇場、映画館、演芸場、観覧場、公会堂又は集会場の客席" },
+          { "value": "体育館・工場等", "description": "体育館、工場その他これらに類する用途" },
+          { "value": "階段室・昇降路", "description": "階段室又は昇降機の昇降路で準耐火構造等で区画" },
+          { "value": "該当なし", "description": "上記のいずれにも該当しない" }
+        ],
+        "description": "ただし書きの用途上やむを得ない部分に該当するか判定"
+      },
+      {
+        "id": "proc-exempt",
+        "type": "process",
+        "title": "適用除外",
+        "process_type": "mechanical",
+        "description": "用途上やむを得ないためただし書き適用除外"
+      },
+      {
+        "id": "dec-compartment",
+        "type": "decision",
+        "title": "1500㎡以内ごとに区画されているか？",
+        "decision_type": "binary",
+        "description": "床面積の合計1500㎡以内ごとに防火区画がされているか判定"
+      },
+      {
+        "id": "dec-partition-type",
+        "type": "decision",
+        "title": "区画の仕様は適切か？",
+        "decision_type": "binary",
+        "description": "一時間準耐火基準の準耐火構造の床・壁又は特定防火設備で区画されているか判定"
+      },
+      {
+        "id": "proc-main-comply",
+        "type": "process",
+        "title": "本則適合",
+        "process_type": "mechanical",
+        "description": "防火区画区分要件を満たす"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令112条1項の規定に適合"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "令112条1項の規定に不適合"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "dec-building-type", "role": "flow" },
+      { "id": "e02", "from": "dec-building-type", "to": "dec-floor-area", "role": "yes", "label": "はい" },
+      { "id": "e03", "from": "dec-building-type", "to": "proc-not-applicable", "role": "no", "label": "いいえ" },
+      { "id": "e04", "from": "proc-not-applicable", "to": "pass", "role": "flow" },
+      { "id": "e05", "from": "dec-floor-area", "to": "dec-use-exempt", "role": "yes", "label": "はい" },
+      { "id": "e06", "from": "dec-floor-area", "to": "pass", "role": "no", "label": "いいえ" },
+      { "id": "e07", "from": "dec-use-exempt", "to": "proc-exempt", "role": "option", "label": "劇場等客席" },
+      { "id": "e08", "from": "dec-use-exempt", "to": "proc-exempt", "role": "option", "label": "体育館・工場等" },
+      { "id": "e09", "from": "dec-use-exempt", "to": "proc-exempt", "role": "option", "label": "階段室・昇降路" },
+      { "id": "e10", "from": "dec-use-exempt", "to": "dec-compartment", "role": "option", "label": "該当なし" },
+      { "id": "e11", "from": "proc-exempt", "to": "pass", "role": "flow" },
+      { "id": "e12", "from": "dec-compartment", "to": "dec-partition-type", "role": "yes", "label": "はい" },
+      { "id": "e13", "from": "dec-compartment", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e14", "from": "dec-partition-type", "to": "proc-main-comply", "role": "yes", "label": "はい" },
+      { "id": "e15", "from": "dec-partition-type", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e16", "from": "proc-main-comply", "to": "pass", "role": "flow" }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-KIJO-A112-P1",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A2:I9の3"],
+      "description": "対象建築物の定義"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "defines_detail",
+      "articles": ["A109", "A136_2"],
+      "description": "特定防火設備、一定基準適合建築物の定義"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

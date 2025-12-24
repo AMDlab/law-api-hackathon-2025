@@ -1,0 +1,322 @@
+{
+  "id": "A68_3_P4_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "再開発等促進区内の斜線制限緩和判定フロー",
+    "target_subject": "建築物",
+    "description": "再開発等促進区等内で敷地内に有効な空地が確保され、特定行政庁が許可した建築物について、第56条の斜線制限が適用されないかを判定するフロー"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "68の3",
+    "paragraph": "4",
+    "item": null
+  },
+  "labels": [
+    "集団規定",
+    "都市計画"
+  ],
+  "text_raw": "地区計画又は沿道地区計画の区域のうち再開発等促進区又は沿道再開発等促進区（地区整備計画又は沿道地区整備計画が定められている区域に限る。第六項において同じ。）内においては、敷地内に有効な空地が確保されていること等により、特定行政庁が交通上、安全上、防火上及び衛生上支障がないと認めて許可した建築物については、第五十六条の規定は、適用しない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "再開発等促進区又は沿道再開発等促進区内"
+        },
+        {
+          "type": "location",
+          "value": "地区整備計画又は沿道地区整備計画が定められている区域"
+        }
+      ]
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-lot-open-space",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "ref": "info-admin-approval",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "description": "敷地内有効空地確保かつ特定行政庁が許可した場合に適用除外"
+    },
+    "exemption": {
+      "article": "56",
+      "effect": "NOT_APPLICABLE"
+    }
+  },
+  "flow_diagram": {
+    "title": "第56条斜線制限適用除外判定フロー",
+    "description": "再開発等促進区等内における第56条適用除外の判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "第56条斜線制限の適用除外判定を開始"
+      },
+      {
+        "id": "dec-redevelopment-area",
+        "type": "decision",
+        "title": "再開発等促進区又は沿道再開発等促進区内か？",
+        "decision_type": "binary",
+        "description": "敷地が地区計画又は沿道地区計画の再開発等促進区・沿道再開発等促進区内に位置するか"
+      },
+      {
+        "id": "dec-district-plan-defined",
+        "type": "decision",
+        "title": "地区整備計画等が定められているか？",
+        "decision_type": "binary",
+        "description": "当該区域に地区整備計画又は沿道地区整備計画が定められているか"
+      },
+      {
+        "id": "proc-scope-confirmed",
+        "type": "process",
+        "title": "適用範囲該当確認",
+        "process_type": "mechanical",
+        "description": "本規定の適用範囲に該当することを確認"
+      },
+      {
+        "id": "dec-open-space",
+        "type": "decision",
+        "title": "敷地内に有効な空地が確保されているか？",
+        "decision_type": "binary",
+        "description": "設計図書等から敷地内に有効な空地が確保されていることが確認できるか"
+      },
+      {
+        "id": "proc-open-space-confirmed",
+        "type": "process",
+        "title": "有効空地確保確認",
+        "process_type": "human_judgment",
+        "description": "敷地内に有効な空地が確保されていることを確認した状態"
+      },
+      {
+        "id": "dec-traffic-safety",
+        "type": "decision",
+        "title": "交通上支障がないか？",
+        "decision_type": "binary",
+        "description": "特定行政庁が交通上支障がないと認めるか"
+      },
+      {
+        "id": "dec-general-safety",
+        "type": "decision",
+        "title": "安全上支障がないか？",
+        "decision_type": "binary",
+        "description": "特定行政庁が安全上支障がないと認めるか"
+      },
+      {
+        "id": "dec-fire-safety",
+        "type": "decision",
+        "title": "防火上支障がないか？",
+        "decision_type": "binary",
+        "description": "特定行政庁が防火上支障がないと認めるか"
+      },
+      {
+        "id": "dec-hygiene-safety",
+        "type": "decision",
+        "title": "衛生上支障がないか？",
+        "decision_type": "binary",
+        "description": "特定行政庁が衛生上支障がないと認めるか"
+      },
+      {
+        "id": "proc-authority-approved",
+        "type": "process",
+        "title": "特定行政庁の許可",
+        "process_type": "human_judgment",
+        "description": "特定行政庁が交通上、安全上、防火上及び衛生上支障がないと認めて許可した状態"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "第56条適用除外",
+        "result": "pass",
+        "description": "第56条の斜線制限は適用されない",
+        "related_articles": ["法::A56"]
+      },
+      {
+        "id": "fail-not-in-area",
+        "type": "terminal",
+        "title": "本規定の対象外",
+        "result": "fail",
+        "description": "再開発等促進区等に該当しないため本規定は適用されない"
+      },
+      {
+        "id": "fail-no-district-plan",
+        "type": "terminal",
+        "title": "本規定の対象外（整備計画なし）",
+        "result": "fail",
+        "description": "地区整備計画等が定められていないため本規定は適用されない"
+      },
+      {
+        "id": "fail-no-open-space",
+        "type": "terminal",
+        "title": "適用除外不可（有効空地なし）",
+        "result": "fail",
+        "description": "敷地内に有効な空地が確保されていないため第56条が適用される"
+      },
+      {
+        "id": "fail-authority-rejected",
+        "type": "terminal",
+        "title": "適用除外不可（許可なし）",
+        "result": "fail",
+        "description": "特定行政庁の許可が得られないため第56条が適用される"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-redevelopment-area",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-redevelopment-area",
+        "to": "dec-district-plan-defined",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "dec-redevelopment-area",
+        "to": "fail-not-in-area",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e04",
+        "from": "dec-district-plan-defined",
+        "to": "proc-scope-confirmed",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e05",
+        "from": "dec-district-plan-defined",
+        "to": "fail-no-district-plan",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e06",
+        "from": "proc-scope-confirmed",
+        "to": "dec-open-space",
+        "role": "flow"
+      },
+      {
+        "id": "e07",
+        "from": "dec-open-space",
+        "to": "proc-open-space-confirmed",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e08",
+        "from": "dec-open-space",
+        "to": "fail-no-open-space",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e09",
+        "from": "proc-open-space-confirmed",
+        "to": "dec-traffic-safety",
+        "role": "flow"
+      },
+      {
+        "id": "e10",
+        "from": "dec-traffic-safety",
+        "to": "dec-general-safety",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e11",
+        "from": "dec-traffic-safety",
+        "to": "fail-authority-rejected",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e12",
+        "from": "dec-general-safety",
+        "to": "dec-fire-safety",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e13",
+        "from": "dec-general-safety",
+        "to": "fail-authority-rejected",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e14",
+        "from": "dec-fire-safety",
+        "to": "dec-hygiene-safety",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e15",
+        "from": "dec-fire-safety",
+        "to": "fail-authority-rejected",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e16",
+        "from": "dec-hygiene-safety",
+        "to": "proc-authority-approved",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e17",
+        "from": "dec-hygiene-safety",
+        "to": "fail-authority-rejected",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e18",
+        "from": "proc-authority-approved",
+        "to": "pass",
+        "role": "flow"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-A68_3-P4",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": [
+        "A56"
+      ],
+      "description": "斜線制限に関する規定（適用除外の対象規定）"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00Z",
+    "updated_at": "2025-12-25T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

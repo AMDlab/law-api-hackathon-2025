@@ -1,0 +1,202 @@
+{
+  "id": "A28_2_P1_I1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "建築材料への石綿等の添加禁止",
+    "target_subject": "建築材料",
+    "description": "建築材料に石綿等を添加しないことを確認する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "28の2",
+    "paragraph": "1",
+    "item": "1"
+  },
+  "labels": [
+    "単体規定",
+    "衛生",
+    "石綿規制"
+  ],
+  "text_raw": "建築材料に石綿その他の著しく衛生上有害なものとして政令で定める物質（次号及び第三号において「石綿等」という。）を添加しないこと。",
+  "compliance_logic": {
+    "judgment_rule": {
+      "operator": "NOT",
+      "conditions": [
+        {
+          "ref": "info-asbestos-added",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    }
+  },
+  "flow_diagram": {
+    "title": "法第28条の2第1項第1号 適合判定フロー",
+    "description": "建築材料に石綿等を添加していないことを確認するフロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start"
+      },
+      {
+        "id": "dec-has-materials",
+        "type": "decision",
+        "title": "判定対象の建築材料があるか？",
+        "decision_type": "binary",
+        "description": "建築物に使用される建築材料を特定"
+      },
+      {
+        "id": "proc-select-material",
+        "type": "process",
+        "title": "未判定の建築材料を選択",
+        "process_type": "mechanical",
+        "description": "各建築材料について順次判定を行う"
+      },
+      {
+        "id": "dec-composition",
+        "type": "decision",
+        "title": "材料の組成は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "石綿等含有" },
+          { "value": "石綿等非含有" }
+        ],
+        "description": "建築材料に石綿その他の政令で定める有害物質（石綿、クロルピリホス等）が添加されているか",
+        "related_articles": ["令第20条の7"]
+      },
+      {
+        "id": "proc-asbestos-detected",
+        "type": "process",
+        "title": "石綿等添加あり",
+        "process_type": "mechanical",
+        "description": "当該材料に石綿等が添加されていることを確認"
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "建築材料に石綿等が添加されているため不適合"
+      },
+      {
+        "id": "proc-material-ok",
+        "type": "process",
+        "title": "当該材料適合",
+        "process_type": "mechanical",
+        "description": "当該建築材料は石綿等を添加していない"
+      },
+      {
+        "id": "dec-more-materials",
+        "type": "decision",
+        "title": "未判定の建築材料があるか？",
+        "decision_type": "binary",
+        "description": "全ての建築材料について判定が完了したか確認"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "全ての建築材料が石綿等を添加していないため適合"
+      },
+      {
+        "id": "end-na",
+        "type": "terminal",
+        "title": "該当なし",
+        "result": "end",
+        "description": "判定対象の建築材料がない"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-has-materials",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-has-materials",
+        "to": "proc-select-material",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "dec-has-materials",
+        "to": "end-na",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e04",
+        "from": "proc-select-material",
+        "to": "dec-composition",
+        "role": "flow"
+      },
+      {
+        "id": "e05",
+        "from": "dec-composition",
+        "to": "proc-asbestos-detected",
+        "role": "option",
+        "label": "石綿等含有"
+      },
+      {
+        "id": "e06",
+        "from": "dec-composition",
+        "to": "proc-material-ok",
+        "role": "option",
+        "label": "石綿等非含有"
+      },
+      {
+        "id": "e07",
+        "from": "proc-asbestos-detected",
+        "to": "end-fail",
+        "role": "flow"
+      },
+      {
+        "id": "e08",
+        "from": "proc-material-ok",
+        "to": "dec-more-materials",
+        "role": "flow"
+      },
+      {
+        "id": "e09",
+        "from": "dec-more-materials",
+        "to": "proc-select-material",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e10",
+        "from": "dec-more-materials",
+        "to": "end-pass",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-A28_2-P1-I1",
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "delegates_to",
+      "articles": ["A20_7"],
+      "description": "法28の2条1項1号の政令で定める物質を規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

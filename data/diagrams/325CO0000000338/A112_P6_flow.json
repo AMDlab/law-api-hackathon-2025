@@ -1,0 +1,143 @@
+{
+  "id": "A112_P6_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "防火区画の適用除外（体育館・工場等）適合判定フロー",
+    "target_subject": "建築物",
+    "description": "体育館・工場等の用途で内装制限を満たす場合の第4項・第5項の適用除外判定"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "112",
+    "paragraph": "6",
+    "item": null
+  },
+  "labels": ["単体規定", "防火区画", "適用除外"],
+  "text_raw": "前二項の規定は、次の各号のいずれかに該当する建築物の部分で、天井（天井のない場合においては、屋根。以下この条において同じ。）及び壁の室内に面する部分の仕上げを準不燃材料でしたものについては、適用しない。一 体育館、工場その他これらに類する用途に供する建築物の部分 二 第一項第二号に掲げる建築物の部分",
+  "flow_diagram": {
+    "title": "令112条6項 防火区画適用除外判定フロー",
+    "description": "第4項・第5項の防火区画規定の適用除外要件を判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "令112条6項の適用除外判定を開始"
+      },
+      {
+        "id": "dec-use-type",
+        "type": "decision",
+        "title": "建築物の用途は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "体育館", "description": "体育館用途" },
+          { "value": "工場", "description": "工場用途" },
+          { "value": "類似用途", "description": "体育館・工場に類する用途" },
+          { "value": "第1項第2号の部分", "description": "階段室、昇降機の昇降路、その他これらに類する部分" },
+          { "value": "その他", "description": "上記に該当しない用途" }
+        ],
+        "description": "建築物の用途が適用除外対象となるか判定"
+      },
+      {
+        "id": "proc-item1-match",
+        "type": "process",
+        "title": "第1号該当",
+        "process_type": "mechanical",
+        "description": "体育館、工場その他これらに類する用途に該当"
+      },
+      {
+        "id": "proc-item2-match",
+        "type": "process",
+        "title": "第2号該当",
+        "process_type": "mechanical",
+        "description": "第1項第2号の建築物の部分に該当"
+      },
+      {
+        "id": "proc-not-applicable-use",
+        "type": "process",
+        "title": "適用対象外（用途）",
+        "process_type": "mechanical",
+        "description": "適用除外対象となる用途に該当しない"
+      },
+      {
+        "id": "dec-ceiling-finish",
+        "type": "decision",
+        "title": "天井の仕上げは準不燃材料か？",
+        "decision_type": "binary",
+        "description": "天井（天井のない場合は屋根）の室内に面する部分の仕上げが準不燃材料であるか判定"
+      },
+      {
+        "id": "proc-ceiling-ok",
+        "type": "process",
+        "title": "天井仕上げ適合",
+        "process_type": "mechanical",
+        "description": "天井の仕上げが準不燃材料である"
+      },
+      {
+        "id": "dec-wall-finish",
+        "type": "decision",
+        "title": "壁の仕上げは準不燃材料か？",
+        "decision_type": "binary",
+        "description": "壁の室内に面する部分の仕上げが準不燃材料であるか判定"
+      },
+      {
+        "id": "proc-wall-ok",
+        "type": "process",
+        "title": "壁仕上げ適合",
+        "process_type": "mechanical",
+        "description": "壁の仕上げが準不燃材料である"
+      },
+      {
+        "id": "proc-exemption-applied",
+        "type": "process",
+        "title": "適用除外確定",
+        "process_type": "mechanical",
+        "description": "第4項・第5項の規定は適用されない"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適用除外",
+        "result": "pass",
+        "description": "令112条6項により第4項・第5項の防火区画規定の適用除外となる"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "適用除外不可",
+        "result": "fail",
+        "description": "適用除外要件を満たさないため第4項・第5項の規定が適用される"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "dec-use-type", "role": "flow" },
+      { "id": "e02", "from": "dec-use-type", "to": "proc-item1-match", "role": "option", "label": "体育館" },
+      { "id": "e03", "from": "dec-use-type", "to": "proc-item1-match", "role": "option", "label": "工場" },
+      { "id": "e04", "from": "dec-use-type", "to": "proc-item1-match", "role": "option", "label": "類似用途" },
+      { "id": "e05", "from": "dec-use-type", "to": "proc-item2-match", "role": "option", "label": "第1項第2号の部分" },
+      { "id": "e06", "from": "dec-use-type", "to": "proc-not-applicable-use", "role": "option", "label": "その他" },
+      { "id": "e07", "from": "proc-not-applicable-use", "to": "fail", "role": "flow" },
+      { "id": "e08", "from": "proc-item1-match", "to": "dec-ceiling-finish", "role": "flow" },
+      { "id": "e09", "from": "proc-item2-match", "to": "dec-ceiling-finish", "role": "flow" },
+      { "id": "e10", "from": "dec-ceiling-finish", "to": "proc-ceiling-ok", "role": "yes", "label": "はい" },
+      { "id": "e11", "from": "dec-ceiling-finish", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e12", "from": "proc-ceiling-ok", "to": "dec-wall-finish", "role": "flow" },
+      { "id": "e13", "from": "dec-wall-finish", "to": "proc-wall-ok", "role": "yes", "label": "はい" },
+      { "id": "e14", "from": "dec-wall-finish", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e15", "from": "proc-wall-ok", "to": "proc-exemption-applied", "role": "flow" },
+      { "id": "e16", "from": "proc-exemption-applied", "to": "pass", "role": "flow" }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-KIJO-A112-P6",
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

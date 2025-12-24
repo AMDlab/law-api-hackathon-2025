@@ -1,0 +1,294 @@
+{
+  "id": "A85_P4_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "応急仮設建築物の存続期間延長許可判定",
+    "target_subject": "応急仮設建築物",
+    "description": "特定行政庁が応急仮設建築物の3ヶ月を超える存続を許可する際の安全性・防火性・衛生性の確認判定フロー"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "85",
+    "paragraph": "4"
+  },
+  "labels": [
+    "単体規定",
+    "手続規定",
+    "応急仮設建築物"
+  ],
+  "text_raw": "特定行政庁は、前項の許可の申請があつた場合において、安全上、防火上及び衛生上支障がないと認めるときは、二年以内の期間を限つて、その許可をすることができる。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "temporal",
+          "value": "建築工事完了から3ヶ月超過時点"
+        },
+        {
+          "type": "procedural",
+          "value": "前項の許可申請がなされている"
+        }
+      ]
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "description": "安全上支障がない",
+          "value": true
+        },
+        {
+          "description": "防火上支障がない",
+          "value": true
+        },
+        {
+          "description": "衛生上支障がない",
+          "value": true
+        }
+      ],
+      "conclusion": "許可をすることができる（最大2年以内の期間を限定）"
+    }
+  },
+  "flow_diagram": {
+    "title": "応急仮設建築物存続期間延長許可判定フロー",
+    "description": "特定行政庁による応急仮設建築物の存続許可の可否判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start"
+      },
+      {
+        "id": "dec-application-exists",
+        "type": "decision",
+        "title": "前項の許可申請があるか？",
+        "decision_type": "binary",
+        "description": "法第85条第3項に基づく許可申請が提出されているか"
+      },
+      {
+        "id": "dec-safety-check",
+        "type": "decision",
+        "title": "安全上支障がないか？",
+        "decision_type": "binary",
+        "description": "応急仮設建築物の構造安全性、転倒防止、地震対策等に問題がないか"
+      },
+      {
+        "id": "proc-safety-ok",
+        "type": "process",
+        "title": "安全性確認済み",
+        "process_type": "human_judgment",
+        "description": "安全上支障がないことを確認"
+      },
+      {
+        "id": "dec-fire-check",
+        "type": "decision",
+        "title": "防火上支障がないか？",
+        "decision_type": "binary",
+        "description": "応急仮設建築物の外壁・屋根の防火性、防火区画、避難経路等に問題がないか"
+      },
+      {
+        "id": "proc-fire-ok",
+        "type": "process",
+        "title": "防火性確認済み",
+        "process_type": "human_judgment",
+        "description": "防火上支障がないことを確認"
+      },
+      {
+        "id": "dec-sanitation-check",
+        "type": "decision",
+        "title": "衛生上支障がないか？",
+        "decision_type": "binary",
+        "description": "応急仮設建築物の換気、採光、便所・洗面設備、排水等に問題がないか"
+      },
+      {
+        "id": "proc-sanitation-ok",
+        "type": "process",
+        "title": "衛生性確認済み",
+        "process_type": "human_judgment",
+        "description": "衛生上支障がないことを確認"
+      },
+      {
+        "id": "proc-all-conditions-met",
+        "type": "process",
+        "title": "全条件適合",
+        "process_type": "mechanical",
+        "description": "安全上・防火上・衛生上の全条件を満たす"
+      },
+      {
+        "id": "dec-period-setting",
+        "type": "decision",
+        "title": "許可期間は2年以内か？",
+        "decision_type": "binary",
+        "description": "特定行政庁が設定する許可期間が2年以内であるか"
+      },
+      {
+        "id": "pass-permitted",
+        "type": "terminal",
+        "title": "適合（許可可能）",
+        "result": "pass",
+        "description": "2年以内の期間を限って許可することができる"
+      },
+      {
+        "id": "fail-no-application",
+        "type": "terminal",
+        "title": "対象外",
+        "result": "end",
+        "description": "許可申請がないため本項の適用なし"
+      },
+      {
+        "id": "fail-safety",
+        "type": "terminal",
+        "title": "不適合（安全性）",
+        "result": "fail",
+        "description": "安全上支障があるため許可できない"
+      },
+      {
+        "id": "fail-fire",
+        "type": "terminal",
+        "title": "不適合（防火性）",
+        "result": "fail",
+        "description": "防火上支障があるため許可できない"
+      },
+      {
+        "id": "fail-sanitation",
+        "type": "terminal",
+        "title": "不適合（衛生性）",
+        "result": "fail",
+        "description": "衛生上支障があるため許可できない"
+      },
+      {
+        "id": "fail-period",
+        "type": "terminal",
+        "title": "不適合（期間超過）",
+        "result": "fail",
+        "description": "許可期間が2年を超えるため許可できない"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-application-exists",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-application-exists",
+        "to": "dec-safety-check",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "dec-application-exists",
+        "to": "fail-no-application",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e04",
+        "from": "dec-safety-check",
+        "to": "proc-safety-ok",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e05",
+        "from": "dec-safety-check",
+        "to": "fail-safety",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e06",
+        "from": "proc-safety-ok",
+        "to": "dec-fire-check",
+        "role": "flow"
+      },
+      {
+        "id": "e07",
+        "from": "dec-fire-check",
+        "to": "proc-fire-ok",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e08",
+        "from": "dec-fire-check",
+        "to": "fail-fire",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e09",
+        "from": "proc-fire-ok",
+        "to": "dec-sanitation-check",
+        "role": "flow"
+      },
+      {
+        "id": "e10",
+        "from": "dec-sanitation-check",
+        "to": "proc-sanitation-ok",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e11",
+        "from": "dec-sanitation-check",
+        "to": "fail-sanitation",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e12",
+        "from": "proc-sanitation-ok",
+        "to": "proc-all-conditions-met",
+        "role": "flow"
+      },
+      {
+        "id": "e13",
+        "from": "proc-all-conditions-met",
+        "to": "dec-period-setting",
+        "role": "flow"
+      },
+      {
+        "id": "e14",
+        "from": "dec-period-setting",
+        "to": "pass-permitted",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e15",
+        "from": "dec-period-setting",
+        "to": "fail-period",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-A85-P4",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A85:P1", "A85:P2", "A85:P3", "A85:P5", "A85:P8"],
+      "description": "同一条内の関連項（前項の許可申請、許可の期間延長・許可についての規定）"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00Z",
+    "updated_at": "2025-12-25T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-skill",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

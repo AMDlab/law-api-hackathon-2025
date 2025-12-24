@@ -1,0 +1,392 @@
+{
+  "id": "A68_4_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "地区計画等適合時の容積率適用除外フロー",
+    "target_subject": "建築物",
+    "description": "地区計画等に適合し、特定行政庁が支障がないと認める建築物について、公共施設整備状況に応じた容積率上限の適用を除外するか判定するフロー図"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "68の4",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": ["集団規定", "容積率"],
+  "text_raw": "次に掲げる条件に該当する地区計画、防災街区整備地区計画又は沿道地区計画（防災街区整備地区計画にあつては、密集市街地整備法第三十二条第二項第一号に規定する地区防災施設（以下単に「地区防災施設」という。）の区域が定められているものに限る。以下この条において同じ。）の区域内にある建築物で、当該地区計画、防災街区整備地区計画又は沿道地区計画の内容（都市計画法第十二条の六第二号、密集市街地整備法第三十二条の二第二号又は沿道整備法第九条の二第二号の規定による公共施設の整備の状況に応じた建築物の容積率の最高限度（以下この条において「公共施設の整備の状況に応じた建築物の容積率の最高限度」という。）を除く。）に適合し、かつ、特定行政庁が交通上、安全上、防火上及び衛生上支障がないと認めるものについては、公共施設の整備の状況に応じた建築物の容積率の最高限度に関する第二号の条例の規定は、適用しない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "地区計画等の区域内"
+        }
+      ],
+      "note": "地区計画、防災街区整備地区計画又は沿道地区計画の区域内（防災街区整備地区計画の場合は地区防災施設の区域が定められているもの）"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-plan-conformance",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "ref": "info-admin-approval",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "flow_diagram": {
+    "title": "第68条の4第1項容積率適用除外判定フロー",
+    "description": "地区計画等に適合し、特定行政庁が支障ないと認める場合に公共施設整備状況に応じた容積率上限を適用除外とするか判定する",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start"
+      },
+      {
+        "id": "dec-plan-type",
+        "type": "decision",
+        "title": "地区計画等の種別は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "地区計画" },
+          { "value": "防災街区整備地区計画" },
+          { "value": "沿道地区計画" },
+          { "value": "その他・該当なし" }
+        ],
+        "description": "対象地区がいかなる種別の計画の区域であるか"
+      },
+      {
+        "id": "proc-plan-type-ok",
+        "type": "process",
+        "title": "対象計画種別該当",
+        "description": "地区計画、防災街区整備地区計画又は沿道地区計画に該当"
+      },
+      {
+        "id": "proc-plan-type-ng",
+        "type": "process",
+        "title": "対象計画種別不該当",
+        "description": "本条の対象となる計画種別に該当しない"
+      },
+      {
+        "id": "dec-disaster-facility",
+        "type": "decision",
+        "title": "防災街区整備地区計画の場合、地区防災施設の区域が定められているか？",
+        "decision_type": "binary",
+        "description": "防災街区整備地区計画の場合は地区防災施設（密集市街地整備法第32条第2項第1号）の区域が定められている必要がある"
+      },
+      {
+        "id": "proc-disaster-facility-ng",
+        "type": "process",
+        "title": "地区防災施設区域未設定",
+        "description": "防災街区整備地区計画において地区防災施設の区域が定められていない"
+      },
+      {
+        "id": "dec-plan-conformance",
+        "type": "decision",
+        "title": "地区計画等の内容に適合するか？",
+        "decision_type": "binary",
+        "description": "建築計画が地区計画等の内容（公共施設整備状況に応じた容積率上限を除く）に適合するか"
+      },
+      {
+        "id": "proc-plan-conformance-ng",
+        "type": "process",
+        "title": "計画内容不適合",
+        "description": "建築計画が地区計画等の内容に適合しない"
+      },
+      {
+        "id": "dec-traffic-check",
+        "type": "decision",
+        "title": "交通上支障がないか？",
+        "decision_type": "binary",
+        "description": "特定行政庁が交通上支障がないと認めるか"
+      },
+      {
+        "id": "proc-traffic-ng",
+        "type": "process",
+        "title": "交通上支障あり",
+        "description": "交通上支障があると判定"
+      },
+      {
+        "id": "dec-safety-check",
+        "type": "decision",
+        "title": "安全上支障がないか？",
+        "decision_type": "binary",
+        "description": "特定行政庁が安全上支障がないと認めるか"
+      },
+      {
+        "id": "proc-safety-ng",
+        "type": "process",
+        "title": "安全上支障あり",
+        "description": "安全上支障があると判定"
+      },
+      {
+        "id": "dec-fire-check",
+        "type": "decision",
+        "title": "防火上支障がないか？",
+        "decision_type": "binary",
+        "description": "特定行政庁が防火上支障がないと認めるか"
+      },
+      {
+        "id": "proc-fire-ng",
+        "type": "process",
+        "title": "防火上支障あり",
+        "description": "防火上支障があると判定"
+      },
+      {
+        "id": "dec-health-check",
+        "type": "decision",
+        "title": "衛生上支障がないか？",
+        "decision_type": "binary",
+        "description": "特定行政庁が衛生上支障がないと認めるか"
+      },
+      {
+        "id": "proc-health-ng",
+        "type": "process",
+        "title": "衛生上支障あり",
+        "description": "衛生上支障があると判定"
+      },
+      {
+        "id": "proc-all-conditions-met",
+        "type": "process",
+        "title": "全要件充足",
+        "description": "計画種別、計画内容適合、特定行政庁の支障判定の全要件を満たす"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "公共施設整備容積率上限の適用除外",
+        "result": "pass",
+        "description": "公共施設の整備の状況に応じた建築物の容積率の最高限度に関する第二号の条例の規定は適用しない"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "適用除外なし",
+        "result": "fail",
+        "description": "容積率の適用除外を受けられない"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-plan-type",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-plan-type",
+        "to": "proc-plan-type-ok",
+        "role": "option",
+        "label": "地区計画"
+      },
+      {
+        "id": "e03",
+        "from": "dec-plan-type",
+        "to": "dec-disaster-facility",
+        "role": "option",
+        "label": "防災街区整備地区計画"
+      },
+      {
+        "id": "e04",
+        "from": "dec-plan-type",
+        "to": "proc-plan-type-ok",
+        "role": "option",
+        "label": "沿道地区計画"
+      },
+      {
+        "id": "e05",
+        "from": "dec-plan-type",
+        "to": "proc-plan-type-ng",
+        "role": "option",
+        "label": "その他・該当なし"
+      },
+      {
+        "id": "e06",
+        "from": "proc-plan-type-ng",
+        "to": "fail",
+        "role": "flow"
+      },
+      {
+        "id": "e07",
+        "from": "dec-disaster-facility",
+        "to": "proc-plan-type-ok",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e08",
+        "from": "dec-disaster-facility",
+        "to": "proc-disaster-facility-ng",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e09",
+        "from": "proc-disaster-facility-ng",
+        "to": "fail",
+        "role": "flow"
+      },
+      {
+        "id": "e10",
+        "from": "proc-plan-type-ok",
+        "to": "dec-plan-conformance",
+        "role": "flow"
+      },
+      {
+        "id": "e11",
+        "from": "dec-plan-conformance",
+        "to": "dec-traffic-check",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e12",
+        "from": "dec-plan-conformance",
+        "to": "proc-plan-conformance-ng",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e13",
+        "from": "proc-plan-conformance-ng",
+        "to": "fail",
+        "role": "flow"
+      },
+      {
+        "id": "e14",
+        "from": "dec-traffic-check",
+        "to": "dec-safety-check",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e15",
+        "from": "dec-traffic-check",
+        "to": "proc-traffic-ng",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e16",
+        "from": "proc-traffic-ng",
+        "to": "fail",
+        "role": "flow"
+      },
+      {
+        "id": "e17",
+        "from": "dec-safety-check",
+        "to": "dec-fire-check",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e18",
+        "from": "dec-safety-check",
+        "to": "proc-safety-ng",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e19",
+        "from": "proc-safety-ng",
+        "to": "fail",
+        "role": "flow"
+      },
+      {
+        "id": "e20",
+        "from": "dec-fire-check",
+        "to": "dec-health-check",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e21",
+        "from": "dec-fire-check",
+        "to": "proc-fire-ng",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e22",
+        "from": "proc-fire-ng",
+        "to": "fail",
+        "role": "flow"
+      },
+      {
+        "id": "e23",
+        "from": "dec-health-check",
+        "to": "proc-all-conditions-met",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e24",
+        "from": "dec-health-check",
+        "to": "proc-health-ng",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e25",
+        "from": "proc-health-ng",
+        "to": "fail",
+        "role": "flow"
+      },
+      {
+        "id": "e26",
+        "from": "proc-all-conditions-met",
+        "to": "pass",
+        "role": "flow"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-A68_4-P1",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A68_2"],
+      "description": "第68条の2による容積率の制限"
+    },
+    {
+      "law_id": "100231C2024000000002",
+      "law_name": "都市計画法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A12_6"],
+      "description": "地区計画の内容"
+    },
+    {
+      "law_id": "100000C2002000000039",
+      "law_name": "密集市街地整備法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A32_2"],
+      "description": "防災街区整備地区計画と地区防災施設"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00Z",
+    "updated_at": "2025-12-25T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

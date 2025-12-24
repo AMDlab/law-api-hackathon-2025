@@ -1,0 +1,160 @@
+{
+  "id": "A137_19_P2_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "用途変更の範囲の判定（法第87条第3項第3号関係）",
+    "target_subject": "建築物",
+    "description": "法第87条第3項第3号の規定により、用途変更が政令で定める範囲内であるかの判定フロー"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "137_19",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": [
+    "用途変更",
+    "用途変更範囲",
+    "法48条",
+    "既存不適格"
+  ],
+  "kijo_diagram_ref": "CHK-ORD-A137-19-P2",
+  "flow_diagram": {
+    "title": "用途変更範囲判定フロー（令第137条の19第2項）",
+    "description": "用途変更が第1号（用途グループ内）及び第2号（出力等の増加制限）の要件を満たすかを判定するフロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "用途変更範囲判定の開始"
+      },
+      {
+        "id": "dec-current-use-group",
+        "type": "decision",
+        "title": "現在の用途はどのグループに該当するか？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "イ（別表2(に)3-6号）", "description": "法別表第二(に)項第3号〜第6号に掲げる用途" },
+          { "value": "ロ（別表2(ほ)(へ)(と)）", "description": "法別表第二(ほ)項第2号・第3号、(へ)項第4号・第5号、(と)項第3号(一)〜(十六)" },
+          { "value": "ハ（別表2(り)(ぬ)）", "description": "法別表第二(り)項第2号、(ぬ)項第3号(一)〜(二十)" },
+          { "value": "ニ（別表2(る)1号）", "description": "法別表第二(る)項第1号(一)〜(三十一)" },
+          { "value": "ホ（別表2(を)(わ)）", "description": "法別表第二(を)項第5号・第6号、(わ)項第2号〜第6号" },
+          { "value": "該当なし" }
+        ],
+        "description": "現在の用途が第1号イ〜ホのいずれの用途グループに該当するか判定"
+      },
+      {
+        "id": "proc-no-group-match",
+        "type": "process",
+        "title": "グループ非該当",
+        "process_type": "mechanical",
+        "description": "現在の用途がいずれの用途グループにも該当しない"
+      },
+      {
+        "id": "dec-new-use-same-group",
+        "type": "decision",
+        "title": "変更後の用途は同一グループ内か？",
+        "decision_type": "binary",
+        "description": "変更後の用途が現在の用途と同一グループ（イ〜ホの同じ区分）に属するか判定"
+      },
+      {
+        "id": "proc-group-match",
+        "type": "process",
+        "title": "第1号適合確認",
+        "process_type": "mechanical",
+        "description": "用途変更がイ〜ホの同一グループ内であり、第1号に適合"
+      },
+      {
+        "id": "dec-nonconformity-type",
+        "type": "decision",
+        "title": "法第48条への不適合事由は原動機等によるものか？",
+        "decision_type": "binary",
+        "description": "法第48条への不適合事由が原動機の出力、機械の台数又は容器等の容量によるものであるかを判定"
+      },
+      {
+        "id": "proc-item2-not-applicable",
+        "type": "process",
+        "title": "第2号適用外",
+        "process_type": "mechanical",
+        "description": "不適合事由が原動機等によるものではないため、第2号の基準は適用されない（自動適合）"
+      },
+      {
+        "id": "dec-capacity-check",
+        "type": "decision",
+        "title": "変更後の出力等は基準時の1.2倍以下か？",
+        "decision_type": "binary",
+        "description": "用途変更後の原動機の出力、機械の台数又は容器等の容量の合計が、基準時における合計の1.2倍以下であるか判定"
+      },
+      {
+        "id": "proc-capacity-compliance",
+        "type": "process",
+        "title": "第2号適合確認",
+        "process_type": "mechanical",
+        "description": "出力等の増加が基準時の1.2倍以下であり、第2号に適合"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "政令で定める範囲内",
+        "result": "pass",
+        "description": "令第137条の19第2項に規定する政令で定める範囲内である（法第48条の緩和適用可）"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "政令で定める範囲外",
+        "result": "fail",
+        "description": "政令で定める範囲を超えるため、法第87条第3項第3号による緩和を受けられない"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "dec-current-use-group", "role": "flow" },
+      { "id": "e02", "from": "dec-current-use-group", "to": "proc-no-group-match", "role": "option", "label": "該当なし" },
+      { "id": "e03", "from": "dec-current-use-group", "to": "dec-new-use-same-group", "role": "option", "label": "イ（別表2(に)3-6号）" },
+      { "id": "e04", "from": "dec-current-use-group", "to": "dec-new-use-same-group", "role": "option", "label": "ロ（別表2(ほ)(へ)(と)）" },
+      { "id": "e05", "from": "dec-current-use-group", "to": "dec-new-use-same-group", "role": "option", "label": "ハ（別表2(り)(ぬ)）" },
+      { "id": "e06", "from": "dec-current-use-group", "to": "dec-new-use-same-group", "role": "option", "label": "ニ（別表2(る)1号）" },
+      { "id": "e07", "from": "dec-current-use-group", "to": "dec-new-use-same-group", "role": "option", "label": "ホ（別表2(を)(わ)）" },
+      { "id": "e08", "from": "proc-no-group-match", "to": "fail", "role": "flow" },
+      { "id": "e09", "from": "dec-new-use-same-group", "to": "proc-group-match", "role": "yes", "label": "はい" },
+      { "id": "e10", "from": "dec-new-use-same-group", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e11", "from": "proc-group-match", "to": "dec-nonconformity-type", "role": "flow" },
+      { "id": "e12", "from": "dec-nonconformity-type", "to": "dec-capacity-check", "role": "yes", "label": "はい" },
+      { "id": "e13", "from": "dec-nonconformity-type", "to": "proc-item2-not-applicable", "role": "no", "label": "いいえ" },
+      { "id": "e14", "from": "proc-item2-not-applicable", "to": "pass", "role": "flow" },
+      { "id": "e15", "from": "dec-capacity-check", "to": "proc-capacity-compliance", "role": "yes", "label": "はい" },
+      { "id": "e16", "from": "dec-capacity-check", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e17", "from": "proc-capacity-compliance", "to": "pass", "role": "flow" }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": ["A87:P3:I3", "A48:P1-P14"],
+      "description": "法第87条第3項第3号により政令で定める範囲、及び法第48条の用途制限"
+    },
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["別表第二"],
+      "description": "用途地域ごとの用途制限を定める別表第二"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T12:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

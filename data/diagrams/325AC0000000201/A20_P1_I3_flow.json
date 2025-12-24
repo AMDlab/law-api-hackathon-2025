@@ -1,0 +1,159 @@
+{
+  "id": "A20_P1_I3_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "第3号該当建築物の構造耐力適合判定",
+    "target_subject": "建築物",
+    "description": "高さ60m以下で第2号に該当しない木造（3階以下かつ延べ面積500m2以下等）又は木造以外の中規模建築物の第3号基準適合判定"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "20",
+    "paragraph": "1",
+    "item": "3"
+  },
+  "labels": ["単体規定", "構造"],
+  "kijo_diagram_ref": "CHK-BSL-A20-P1-I3",
+  "flow_diagram": {
+    "title": "法20条1項3号適合判定フロー",
+    "description": "第3号該当建築物の構造耐力基準適合判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start"
+      },
+      {
+        "id": "dec-height-60",
+        "type": "decision",
+        "title": "高さは60m以下か?",
+        "decision_type": "binary",
+        "description": "H <= 60m"
+      },
+      {
+        "id": "dec-item2",
+        "type": "decision",
+        "title": "第2号に該当するか?",
+        "decision_type": "binary",
+        "description": "第2号の規模要件に該当するか"
+      },
+      {
+        "id": "dec-item3-category",
+        "type": "decision",
+        "title": "建築物の区分は?",
+        "decision_type": "multi",
+        "options": [
+          {"value": "木造（3階以下かつ延べ面積500m2以下等）"},
+          {"value": "木造以外（2階以下かつ延べ面積200m2以下等）"},
+          {"value": "中規模建築物（イ号）"}
+        ],
+        "description": "第3号該当建築物の区分"
+      },
+      {
+        "id": "proc-item3-applicable",
+        "type": "process",
+        "title": "第3号該当",
+        "description": "第3号の適用範囲に該当"
+      },
+      {
+        "id": "dec-route",
+        "type": "decision",
+        "title": "適合ルートは?",
+        "decision_type": "multi",
+        "options": [
+          {"value": "イ号（技術的基準＋構造計算）"},
+          {"value": "ロ号（第1号・第2号基準）"}
+        ],
+        "description": "イ号又はロ号のいずれかで適合"
+      },
+      {
+        "id": "dec-item3-tech",
+        "type": "decision",
+        "title": "政令で定める技術的基準に適合するか?",
+        "decision_type": "binary",
+        "description": "イ号の技術的基準適合"
+      },
+      {
+        "id": "proc-tech-ok",
+        "type": "process",
+        "title": "技術的基準適合",
+        "description": "イ号の技術的基準に適合"
+      },
+      {
+        "id": "dec-item3-calc",
+        "type": "decision",
+        "title": "構造計算で安全性が確認されたか?",
+        "decision_type": "binary",
+        "description": "大臣定め方法による構造計算"
+      },
+      {
+        "id": "dec-item12-compliance",
+        "type": "decision",
+        "title": "第1号又は第2号基準に適合するか?",
+        "decision_type": "binary",
+        "description": "ロ号（第1号・第2号基準）"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "法20条1項3号に適合"
+      },
+      {
+        "id": "pass-not-applicable",
+        "type": "terminal",
+        "title": "適用外",
+        "result": "pass",
+        "description": "第3号の適用外（他の号で判定）"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "法20条1項3号に不適合"
+      }
+    ],
+    "edges": [
+      {"id": "e01", "from": "start", "to": "dec-height-60", "role": "flow"},
+      {"id": "e02", "from": "dec-height-60", "to": "dec-item2", "role": "yes"},
+      {"id": "e03", "from": "dec-height-60", "to": "pass-not-applicable", "role": "no"},
+      {"id": "e04", "from": "dec-item2", "to": "pass-not-applicable", "role": "yes"},
+      {"id": "e05", "from": "dec-item2", "to": "dec-item3-category", "role": "no"},
+      {"id": "e06", "from": "dec-item3-category", "to": "proc-item3-applicable", "role": "option", "label": "木造（3階以下かつ延べ面積500m2以下等）"},
+      {"id": "e07", "from": "dec-item3-category", "to": "proc-item3-applicable", "role": "option", "label": "木造以外（2階以下かつ延べ面積200m2以下等）"},
+      {"id": "e08", "from": "dec-item3-category", "to": "proc-item3-applicable", "role": "option", "label": "中規模建築物（イ号）"},
+      {"id": "e09", "from": "proc-item3-applicable", "to": "dec-route", "role": "flow"},
+      {"id": "e10", "from": "dec-route", "to": "dec-item3-tech", "role": "option", "label": "イ号（技術的基準＋構造計算）"},
+      {"id": "e11", "from": "dec-route", "to": "dec-item12-compliance", "role": "option", "label": "ロ号（第1号・第2号基準）"},
+      {"id": "e12", "from": "dec-item3-tech", "to": "proc-tech-ok", "role": "yes"},
+      {"id": "e13", "from": "dec-item3-tech", "to": "fail", "role": "no"},
+      {"id": "e14", "from": "proc-tech-ok", "to": "dec-item3-calc", "role": "flow"},
+      {"id": "e15", "from": "dec-item3-calc", "to": "pass", "role": "yes"},
+      {"id": "e16", "from": "dec-item3-calc", "to": "fail", "role": "no"},
+      {"id": "e17", "from": "dec-item12-compliance", "to": "pass", "role": "yes"},
+      {"id": "e18", "from": "dec-item12-compliance", "to": "fail", "role": "no"}
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "delegates_to",
+      "articles": ["A36"],
+      "description": "法20条1項3号の技術的基準を定める"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00Z",
+    "generator": "claude-code-flow-generator",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

@@ -1,0 +1,168 @@
+{
+  "id": "A55_P2_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "空地確保による高さ制限の緩和",
+    "target_subject": "建築物",
+    "description": "敷地内空地及び敷地面積が政令基準以上で特定行政庁の認定を受けた建築物の高さ限度を12mに緩和する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "55",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": ["集団規定", "高さ制限", "緩和規定"],
+  "text_raw": "前項の都市計画において建築物の高さの限度が十メートルと定められた第一種低層住居専用地域、第二種低層住居専用地域又は田園住居地域内においては、その敷地内に政令で定める空地を有し、かつ、その敷地面積が政令で定める規模以上である建築物であつて、特定行政庁が低層住宅に係る良好な住居の環境を害するおそれがないと認めるものの高さの限度は、同項の規定にかかわらず、十二メートルとする。",
+  "kijo_diagram_ref": "CHK-BSL-A55-P2",
+  "flow_diagram": {
+    "title": "法55条2項 高さ制限緩和判定フロー",
+    "description": "10m制限区域で空地・敷地面積要件と特定行政庁認定により12mまで緩和されるか判定",
+    "nodes": [
+      {
+        "id": "term-start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start"
+      },
+      {
+        "id": "dec-zone",
+        "type": "decision",
+        "title": "用途地域は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "第一種低層住居専用地域" },
+          { "value": "第二種低層住居専用地域" },
+          { "value": "田園住居地域" },
+          { "value": "その他" }
+        ],
+        "description": "建築物の敷地が属する用途地域を判定"
+      },
+      {
+        "id": "dec-height-limit-urban",
+        "type": "decision",
+        "title": "都市計画の高さ限度は10mか？",
+        "decision_type": "binary",
+        "description": "都市計画で建築物の高さの限度が10mと定められているか確認"
+      },
+      {
+        "id": "proc-scope",
+        "type": "process",
+        "title": "本条適用対象区域",
+        "description": "法55条2項の緩和規定が適用可能な区域"
+      },
+      {
+        "id": "dec-openspace",
+        "type": "decision",
+        "title": "政令基準の空地を有するか？",
+        "decision_type": "binary",
+        "description": "敷地内に令135条の16で定める空地を有しているか",
+        "related_articles": ["令::A135_16"]
+      },
+      {
+        "id": "dec-sitearea",
+        "type": "decision",
+        "title": "敷地面積は政令基準以上か？",
+        "decision_type": "binary",
+        "description": "敷地面積が令135条の16で定める規模以上であるか",
+        "related_articles": ["令::A135_16"]
+      },
+      {
+        "id": "dec-admin-approval",
+        "type": "decision",
+        "title": "特定行政庁の認定を受けているか？",
+        "decision_type": "binary",
+        "description": "特定行政庁が低層住宅に係る良好な住居の環境を害するおそれがないと認めたか"
+      },
+      {
+        "id": "proc-relaxation-granted",
+        "type": "process",
+        "title": "緩和規定適用",
+        "description": "高さ限度が12mに緩和される"
+      },
+      {
+        "id": "dec-height-12m",
+        "type": "decision",
+        "title": "建築物の高さは12m以下か？",
+        "decision_type": "binary",
+        "description": "緩和後の高さ限度12m以下であるか判定"
+      },
+      {
+        "id": "proc-no-relaxation",
+        "type": "process",
+        "title": "緩和不適用",
+        "description": "緩和要件を満たさないため、10m制限が適用"
+      },
+      {
+        "id": "dec-height-10m",
+        "type": "decision",
+        "title": "建築物の高さは10m以下か？",
+        "decision_type": "binary",
+        "description": "本則の高さ限度10m以下であるか判定"
+      },
+      {
+        "id": "term-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "法55条2項（又は1項）に適合"
+      },
+      {
+        "id": "term-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "高さ制限に不適合"
+      },
+      {
+        "id": "term-not-applicable",
+        "type": "terminal",
+        "title": "本条適用対象外",
+        "result": "end",
+        "description": "法55条2項の適用対象外"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "term-start", "to": "dec-zone", "role": "flow" },
+      { "id": "e02", "from": "dec-zone", "to": "dec-height-limit-urban", "role": "option", "label": "第一種低層住居専用地域" },
+      { "id": "e03", "from": "dec-zone", "to": "dec-height-limit-urban", "role": "option", "label": "第二種低層住居専用地域" },
+      { "id": "e04", "from": "dec-zone", "to": "dec-height-limit-urban", "role": "option", "label": "田園住居地域" },
+      { "id": "e05", "from": "dec-zone", "to": "term-not-applicable", "role": "option", "label": "その他" },
+      { "id": "e06", "from": "dec-height-limit-urban", "to": "proc-scope", "role": "yes", "label": "はい" },
+      { "id": "e07", "from": "dec-height-limit-urban", "to": "term-not-applicable", "role": "no", "label": "いいえ" },
+      { "id": "e08", "from": "proc-scope", "to": "dec-openspace", "role": "flow" },
+      { "id": "e09", "from": "dec-openspace", "to": "dec-sitearea", "role": "yes", "label": "はい" },
+      { "id": "e10", "from": "dec-openspace", "to": "proc-no-relaxation", "role": "no", "label": "いいえ" },
+      { "id": "e11", "from": "dec-sitearea", "to": "dec-admin-approval", "role": "yes", "label": "はい" },
+      { "id": "e12", "from": "dec-sitearea", "to": "proc-no-relaxation", "role": "no", "label": "いいえ" },
+      { "id": "e13", "from": "dec-admin-approval", "to": "proc-relaxation-granted", "role": "yes", "label": "はい" },
+      { "id": "e14", "from": "dec-admin-approval", "to": "proc-no-relaxation", "role": "no", "label": "いいえ" },
+      { "id": "e15", "from": "proc-relaxation-granted", "to": "dec-height-12m", "role": "flow" },
+      { "id": "e16", "from": "dec-height-12m", "to": "term-pass", "role": "yes", "label": "はい" },
+      { "id": "e17", "from": "dec-height-12m", "to": "term-fail", "role": "no", "label": "いいえ" },
+      { "id": "e18", "from": "proc-no-relaxation", "to": "dec-height-10m", "role": "flow" },
+      { "id": "e19", "from": "dec-height-10m", "to": "term-pass", "role": "yes", "label": "はい" },
+      { "id": "e20", "from": "dec-height-10m", "to": "term-fail", "role": "no", "label": "いいえ" }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "delegates_to",
+      "articles": ["A135_16"],
+      "description": "法55条2項の空地及び敷地面積の基準を定める"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

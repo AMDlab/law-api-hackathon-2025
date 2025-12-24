@@ -1,0 +1,107 @@
+{
+  "id": "A22_P2_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "法22条区域指定時の審議会意見聴取",
+    "target_subject": "特定行政庁",
+    "description": "法22条区域を指定する際に都市計画地方審議会又は建築審査会の意見を聴取する手続き"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "22",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": ["手続規定", "行政手続"],
+  "kijo_diagram_ref": "CHK-BSL-A22-P2",
+  "flow_diagram": {
+    "title": "法22条2項適合判定フロー",
+    "description": "法22条区域指定時の審議会意見聴取手続きの適合判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start"
+      },
+      {
+        "id": "dec-designation-action",
+        "type": "decision",
+        "title": "法22条1項による区域指定を行うか?",
+        "decision_type": "binary",
+        "description": "特定行政庁が法22条1項の区域指定を行う場合に適用"
+      },
+      {
+        "id": "dec-area-type",
+        "type": "decision",
+        "title": "指定する区域の種別は?",
+        "decision_type": "multi",
+        "options": [
+          {"value": "都市計画区域内"},
+          {"value": "都市計画区域外"}
+        ],
+        "description": "指定する区域が都市計画区域内か外かを判定"
+      },
+      {
+        "id": "proc-tokeishin",
+        "type": "process",
+        "title": "都市計画地方審議会の意見を聴取",
+        "description": "都市計画区域内の区域指定のため都市計画地方審議会の意見を聴取"
+      },
+      {
+        "id": "proc-kenshinshin",
+        "type": "process",
+        "title": "建築審査会の意見を聴取",
+        "description": "都市計画区域外の区域指定のため建築審査会の意見を聴取"
+      },
+      {
+        "id": "dec-opinion-heard",
+        "type": "decision",
+        "title": "審議会の意見を聴取したか?",
+        "decision_type": "binary",
+        "description": "所定の審議会の意見聴取を実施したか"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "法22条2項に適合（審議会意見聴取済）"
+      },
+      {
+        "id": "pass-not-applicable",
+        "type": "terminal",
+        "title": "適用外",
+        "result": "pass",
+        "description": "区域指定を行わないため法22条2項の適用外"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "審議会の意見を聴取していない"
+      }
+    ],
+    "edges": [
+      {"id": "e01", "from": "start", "to": "dec-designation-action", "role": "flow"},
+      {"id": "e02", "from": "dec-designation-action", "to": "dec-area-type", "role": "yes"},
+      {"id": "e03", "from": "dec-designation-action", "to": "pass-not-applicable", "role": "no"},
+      {"id": "e04", "from": "dec-area-type", "to": "proc-tokeishin", "role": "option", "label": "都市計画区域内"},
+      {"id": "e05", "from": "dec-area-type", "to": "proc-kenshinshin", "role": "option", "label": "都市計画区域外"},
+      {"id": "e06", "from": "proc-tokeishin", "to": "dec-opinion-heard", "role": "flow"},
+      {"id": "e07", "from": "proc-kenshinshin", "to": "dec-opinion-heard", "role": "flow"},
+      {"id": "e08", "from": "dec-opinion-heard", "to": "pass", "role": "yes"},
+      {"id": "e09", "from": "dec-opinion-heard", "to": "fail", "role": "no"}
+    ]
+  },
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00Z",
+    "generator": "claude-code-flow-generator",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

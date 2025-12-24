@@ -1,0 +1,193 @@
+{
+  "id": "A53_P6_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "建蔽率規定の適用除外判定フロー",
+    "target_subject": "建築物",
+    "description": "建築物が建蔽率規制の適用除外となる3つの類型（防火地域内耐火建築物等、公益施設、公共空間内建築物）のいずれかに該当するかを判定するフロー"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "53",
+    "paragraph": "6"
+  },
+  "labels": ["集団規定", "建蔽率", "適用除外"],
+  "text_raw": "前各項の規定は、次の各号のいずれかに該当する建築物については、適用しない。\n一　防火地域（第一項第二号から第四号までの規定により建蔽率の限度が十分の八とされている地域に限る。）内にある耐火建築物等\n二　巡査派出所、公衆便所、公共用歩廊その他これらに類するもの\n三　公園、広場、道路、川その他これらに類するものの内にある建築物で特定行政庁が安全上、防火上及び衛生上支障がないと認めて許可したもの",
+  "compliance_logic": {
+    "scope_condition": {
+      "value": true,
+      "note": "建築物全般に適用される適用除外規定"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "type": "exemption",
+          "ref": "第6項第1号",
+          "description": "防火地域（建蔽率限度8/10の地域）内の耐火建築物等"
+        },
+        {
+          "type": "exemption",
+          "ref": "第6項第2号",
+          "description": "巡査派出所、公衆便所、公共用歩廊等の公益施設"
+        },
+        {
+          "type": "exemption",
+          "ref": "第6項第3号",
+          "description": "公共空間内で特定行政庁の許可を受けた建築物"
+        }
+      ]
+    },
+    "exceptions": {
+      "effect": "EXEMPT",
+      "operator": "OR",
+      "conditions": [
+        {
+          "description": "いずれかの号に該当する場合、第1項から第5項までの建蔽率規制を適用しない"
+        }
+      ]
+    }
+  },
+  "kijo_diagram_ref": "CHK-BSL-A53-P6",
+  "flow_diagram": {
+    "title": "建蔽率規定の適用除外判定フロー",
+    "description": "法第53条第6項に基づき、建蔽率規制の適用除外となる3つの類型を判定する",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "建蔽率規定の適用除外判定を開始"
+      },
+      {
+        "id": "dec-fire-district",
+        "type": "decision",
+        "title": "敷地は防火地域（建蔽率8/10）内か？",
+        "decision_type": "binary",
+        "description": "敷地が防火地域内にあり、かつ第1項第2号から第4号により建蔽率限度が8/10とされている地域か判定"
+      },
+      {
+        "id": "dec-fireproof",
+        "type": "decision",
+        "title": "耐火建築物等か？",
+        "decision_type": "binary",
+        "description": "建築物が耐火建築物又は同等以上の延焼防止性能を有する建築物か判定"
+      },
+      {
+        "id": "proc-type1-match",
+        "type": "process",
+        "title": "第1号該当",
+        "process_type": "mechanical",
+        "description": "防火地域（建蔽率8/10）内の耐火建築物等に該当"
+      },
+      {
+        "id": "dec-public-facility",
+        "type": "decision",
+        "title": "公益施設か？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "巡査派出所" },
+          { "value": "公衆便所" },
+          { "value": "公共用歩廊" },
+          { "value": "これらに類するもの" },
+          { "value": "該当なし" }
+        ],
+        "description": "巡査派出所、公衆便所、公共用歩廊その他これらに類するものか判定"
+      },
+      {
+        "id": "proc-type2-match",
+        "type": "process",
+        "title": "第2号該当",
+        "process_type": "mechanical",
+        "description": "公益施設（巡査派出所、公衆便所、公共用歩廊等）に該当"
+      },
+      {
+        "id": "dec-public-space",
+        "type": "decision",
+        "title": "敷地は公共空間内か？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "公園内" },
+          { "value": "広場内" },
+          { "value": "道路内" },
+          { "value": "川内" },
+          { "value": "これらに類するもの内" },
+          { "value": "該当なし" }
+        ],
+        "description": "公園、広場、道路、川その他これらに類するものの内にあるか判定"
+      },
+      {
+        "id": "dec-permit",
+        "type": "decision",
+        "title": "特定行政庁の許可を受けているか？",
+        "decision_type": "binary",
+        "description": "特定行政庁が安全上、防火上及び衛生上支障がないと認めて許可したか確認"
+      },
+      {
+        "id": "proc-type3-match",
+        "type": "process",
+        "title": "第3号該当",
+        "process_type": "mechanical",
+        "description": "公共空間内で特定行政庁の許可を受けた建築物に該当"
+      },
+      {
+        "id": "pass-exempt",
+        "type": "terminal",
+        "title": "適用除外（適合）",
+        "result": "pass",
+        "description": "第53条第1項から第5項までの建蔽率規制を適用しない"
+      },
+      {
+        "id": "fail-not-exempt",
+        "type": "terminal",
+        "title": "適用除外に非該当",
+        "result": "fail",
+        "description": "いずれの号にも該当しないため、通常の建蔽率規制が適用される"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "dec-fire-district", "role": "flow" },
+      { "id": "e02", "from": "dec-fire-district", "to": "dec-fireproof", "role": "yes", "label": "はい" },
+      { "id": "e03", "from": "dec-fire-district", "to": "dec-public-facility", "role": "no", "label": "いいえ" },
+      { "id": "e04", "from": "dec-fireproof", "to": "proc-type1-match", "role": "yes", "label": "はい" },
+      { "id": "e05", "from": "dec-fireproof", "to": "dec-public-facility", "role": "no", "label": "いいえ" },
+      { "id": "e06", "from": "proc-type1-match", "to": "pass-exempt", "role": "flow" },
+      { "id": "e07", "from": "dec-public-facility", "to": "proc-type2-match", "role": "option", "label": "巡査派出所" },
+      { "id": "e08", "from": "dec-public-facility", "to": "proc-type2-match", "role": "option", "label": "公衆便所" },
+      { "id": "e09", "from": "dec-public-facility", "to": "proc-type2-match", "role": "option", "label": "公共用歩廊" },
+      { "id": "e10", "from": "dec-public-facility", "to": "proc-type2-match", "role": "option", "label": "これらに類するもの" },
+      { "id": "e11", "from": "dec-public-facility", "to": "dec-public-space", "role": "option", "label": "該当なし" },
+      { "id": "e12", "from": "proc-type2-match", "to": "pass-exempt", "role": "flow" },
+      { "id": "e13", "from": "dec-public-space", "to": "dec-permit", "role": "option", "label": "公園内" },
+      { "id": "e14", "from": "dec-public-space", "to": "dec-permit", "role": "option", "label": "広場内" },
+      { "id": "e15", "from": "dec-public-space", "to": "dec-permit", "role": "option", "label": "道路内" },
+      { "id": "e16", "from": "dec-public-space", "to": "dec-permit", "role": "option", "label": "川内" },
+      { "id": "e17", "from": "dec-public-space", "to": "dec-permit", "role": "option", "label": "これらに類するもの内" },
+      { "id": "e18", "from": "dec-public-space", "to": "fail-not-exempt", "role": "option", "label": "該当なし" },
+      { "id": "e19", "from": "dec-permit", "to": "proc-type3-match", "role": "yes", "label": "はい" },
+      { "id": "e20", "from": "dec-permit", "to": "fail-not-exempt", "role": "no", "label": "いいえ" },
+      { "id": "e21", "from": "proc-type3-match", "to": "pass-exempt", "role": "flow" }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A53:P1", "A53:P3"],
+      "description": "第1項（建蔽率の基準値）、第3項（耐火建築物等の定義）を参照"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

@@ -1,0 +1,110 @@
+{
+  "id": "A27_P4_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "建築物の部分のみなし規定",
+    "target_subject": "建築物",
+    "description": "法27条1項から3項の適用において、政令で定める部分を別の建築物とみなす判定"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "27",
+    "paragraph": "4",
+    "item": null
+  },
+  "labels": ["単体規定", "防火"],
+  "text_raw": "前三項に規定する基準の適用上一の建築物であつても別の建築物とみなすことができる部分として政令で定める部分が二以上ある建築物の当該建築物の部分は、これらの規定の適用については、それぞれ別の建築物とみなす。",
+  "kijo_diagram_ref": "CHK-BSL-A27-P4",
+  "flow_diagram": {
+    "title": "法27条4項別建築物みなし判定フロー",
+    "description": "法27条1項から3項の適用において、政令で定める部分を別の建築物とみなすかを判定するフロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start"
+      },
+      {
+        "id": "dec-prescribed-parts",
+        "type": "decision",
+        "title": "政令で定める部分（令115条の2第1項各号）に該当する構成があるか？",
+        "decision_type": "binary",
+        "description": "防火壁等で区画された部分、渡り廊下等で接続された部分等、令115条の2第1項各号に該当する部分があるか"
+      },
+      {
+        "id": "proc-prescribed-yes",
+        "type": "process",
+        "title": "政令定め部分該当",
+        "process_type": "mechanical"
+      },
+      {
+        "id": "dec-parts-count",
+        "type": "decision",
+        "title": "政令定め部分の数は？",
+        "decision_type": "multi",
+        "description": "政令で定める部分が二以上あるかを判定",
+        "options": [
+          { "value": "2以上" },
+          { "value": "1" }
+        ]
+      },
+      {
+        "id": "proc-parts-two-or-more",
+        "type": "process",
+        "title": "部分数2以上：別建築物みなし適用",
+        "process_type": "mechanical"
+      },
+      {
+        "id": "proc-identify-parts",
+        "type": "process",
+        "title": "各部分を個別に特定",
+        "process_type": "human_judgment",
+        "description": "別建築物とみなす各部分を具体的に特定"
+      },
+      {
+        "id": "end-deemed-separate",
+        "type": "terminal",
+        "title": "法27条4項適用：各部分を別建築物とみなす",
+        "result": "pass",
+        "description": "法27条1項から3項の適用において、それぞれの部分を別の建築物として扱う"
+      },
+      {
+        "id": "end-not-applicable",
+        "type": "terminal",
+        "title": "法27条4項適用外",
+        "result": "end",
+        "description": "政令定め部分非該当又は部分数1以下のため適用外（一の建築物として扱う）"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "dec-prescribed-parts", "role": "flow" },
+      { "id": "e02", "from": "dec-prescribed-parts", "to": "proc-prescribed-yes", "role": "yes" },
+      { "id": "e03", "from": "dec-prescribed-parts", "to": "end-not-applicable", "role": "no" },
+      { "id": "e04", "from": "proc-prescribed-yes", "to": "dec-parts-count", "role": "flow" },
+      { "id": "e05", "from": "dec-parts-count", "to": "proc-parts-two-or-more", "role": "option", "label": "2以上" },
+      { "id": "e06", "from": "dec-parts-count", "to": "end-not-applicable", "role": "option", "label": "1" },
+      { "id": "e07", "from": "proc-parts-two-or-more", "to": "proc-identify-parts", "role": "flow" },
+      { "id": "e08", "from": "proc-identify-parts", "to": "end-deemed-separate", "role": "flow" }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "defines_detail",
+      "articles": ["A115_2"],
+      "description": "別の建築物とみなすことができる部分を定める"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00Z",
+    "generator": "claude-code-flow-generator",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

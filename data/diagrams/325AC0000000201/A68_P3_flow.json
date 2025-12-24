@@ -1,0 +1,143 @@
+{
+  "id": "A68_P3_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "再開発等促進区内の高さ制限の緩和",
+    "target_subject": "建築物",
+    "description": "再開発等促進区内で地区計画に適合し、敷地面積が政令で定める規模以上の建築物について、第55条の高さ制限を適用しない"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "68の3",
+    "paragraph": "3",
+    "item": null
+  },
+  "labels": ["集団規定", "地区計画", "再開発"],
+  "text_raw": "地区計画又は沿道地区計画の区域のうち再開発等促進区又は沿道再開発等促進区（地区整備計画又は沿道地区整備計画が定められている区域のうち二十メートル以下の高さで建築物の高さの最高限度が定められている区域に限る。）内においては、当該地区計画又は沿道地区計画の内容に適合し、かつ、その敷地面積が政令で定める規模以上の建築物であつて特定行政庁が交通上、安全上、防火上及び衛生上支障がないと認めるものについては、第五十五条第一項及び第二項の規定は、適用しない。",
+  "kijo_diagram_ref": "CHK-BSL-A68-P3",
+  "flow_diagram": {
+    "title": "再開発等促進区内の高さ制限緩和判定フロー",
+    "description": "法68条の3第3項に基づき、第55条の高さ制限が適用除外となるかを判定するフロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start"
+      },
+      {
+        "id": "dec-in-promotion-zone",
+        "type": "decision",
+        "title": "再開発等促進区内か？",
+        "decision_type": "binary",
+        "description": "敷地が地区計画内の再開発等促進区又は沿道再開発等促進区内に位置するか"
+      },
+      {
+        "id": "dec-height-limit-exists",
+        "type": "decision",
+        "title": "高さ最高限度が20m以下で定められているか？",
+        "decision_type": "binary",
+        "description": "地区整備計画で建築物の高さの最高限度が20m以下で定められているか"
+      },
+      {
+        "id": "proc-scope-confirmed",
+        "type": "process",
+        "title": "適用範囲該当",
+        "process_type": "mechanical",
+        "description": "再開発等促進区で20m以下の高さ制限区域内であることを確認"
+      },
+      {
+        "id": "dec-plan-compliance",
+        "type": "decision",
+        "title": "地区計画に適合するか？",
+        "decision_type": "binary",
+        "description": "建築物が地区計画又は沿道地区計画の内容に適合するか"
+      },
+      {
+        "id": "dec-area-requirement",
+        "type": "decision",
+        "title": "敷地面積が政令規模以上か？",
+        "decision_type": "binary",
+        "description": "敷地面積が政令（施行令第108条）で定める規模以上であるか"
+      },
+      {
+        "id": "dec-admin-approval",
+        "type": "decision",
+        "title": "特定行政庁が支障なしと認めるか？",
+        "decision_type": "binary",
+        "description": "特定行政庁が交通上、安全上、防火上及び衛生上支障がないと認めるか"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "第55条適用除外",
+        "result": "pass",
+        "description": "第55条第1項及び第2項の高さ制限は適用しない"
+      },
+      {
+        "id": "fail-not-in-zone",
+        "type": "terminal",
+        "title": "適用対象外",
+        "result": "fail",
+        "description": "再開発等促進区内でないため本条の適用対象外"
+      },
+      {
+        "id": "fail-no-height-limit",
+        "type": "terminal",
+        "title": "適用対象外",
+        "result": "fail",
+        "description": "20m以下の高さ制限が定められていないため本条の適用対象外"
+      },
+      {
+        "id": "fail-not-compliant",
+        "type": "terminal",
+        "title": "緩和不可",
+        "result": "fail",
+        "description": "地区計画への適合、敷地面積要件、または特定行政庁の認定を満たさないため第55条が適用される"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "dec-in-promotion-zone", "role": "flow" },
+      { "id": "e02", "from": "dec-in-promotion-zone", "to": "dec-height-limit-exists", "role": "yes", "label": "はい" },
+      { "id": "e03", "from": "dec-in-promotion-zone", "to": "fail-not-in-zone", "role": "no", "label": "いいえ" },
+      { "id": "e04", "from": "dec-height-limit-exists", "to": "proc-scope-confirmed", "role": "yes", "label": "はい" },
+      { "id": "e05", "from": "dec-height-limit-exists", "to": "fail-no-height-limit", "role": "no", "label": "いいえ" },
+      { "id": "e06", "from": "proc-scope-confirmed", "to": "dec-plan-compliance", "role": "flow" },
+      { "id": "e07", "from": "dec-plan-compliance", "to": "dec-area-requirement", "role": "yes", "label": "はい" },
+      { "id": "e08", "from": "dec-plan-compliance", "to": "fail-not-compliant", "role": "no", "label": "いいえ" },
+      { "id": "e09", "from": "dec-area-requirement", "to": "dec-admin-approval", "role": "yes", "label": "はい" },
+      { "id": "e10", "from": "dec-area-requirement", "to": "fail-not-compliant", "role": "no", "label": "いいえ" },
+      { "id": "e11", "from": "dec-admin-approval", "to": "pass", "role": "yes", "label": "はい" },
+      { "id": "e12", "from": "dec-admin-approval", "to": "fail-not-compliant", "role": "no", "label": "いいえ" }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A55:P1", "A55:P2"],
+      "description": "第55条第1項及び第2項の高さ制限を適用しない"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "defines_detail",
+      "articles": ["A108"],
+      "description": "第108条で敷地面積の規模を定めている"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00+09:00",
+    "updated_at": "2025-12-25T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

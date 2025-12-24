@@ -1,0 +1,117 @@
+{
+  "id": "A43_P3_I3_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "条例制定対象の特定（開口部のない居室）（適合判定フロー）",
+    "target_subject": "建築物",
+    "description": "建築物が政令で定める窓その他の開口部を有しない居室を有するかを判定し、第43条第3項に基づく条例制定の対象に該当するかを確認するフロー"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "43",
+    "paragraph": "3",
+    "item": "3"
+  },
+  "labels": ["集団規定", "敷地と道路", "条例制定対象"],
+  "text_raw": "政令で定める窓その他の開口部を有しない居室を有する建築物",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "applicable_zone",
+          "value": "地方公共団体の条例制定区域"
+        }
+      ],
+      "note": "法43条3項に基づき条例で制限を付加できる対象建築物の要件の一つ"
+    },
+    "judgment_rule": {
+      "operator": "EXISTS",
+      "conditions": [
+        {
+          "ref": "info-has-windowless-rooms",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    }
+  },
+  "flow_diagram": {
+    "title": "法43条3項3号 開口部のない居室を有する建築物 該当判定フロー",
+    "description": "建築物内に政令で定める窓その他の開口部を有しない居室が存在するかを判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "法43条3項3号の該当判定を開始"
+      },
+      {
+        "id": "dec-has-rooms",
+        "type": "decision",
+        "title": "建築物に居室があるか？",
+        "decision_type": "binary",
+        "description": "建築物に居室（居住、執務、作業、娯楽等のために継続的に使用する室）が存在するか判定"
+      },
+      {
+        "id": "dec-has-openings",
+        "type": "decision",
+        "title": "居室に政令基準の開口部があるか？",
+        "decision_type": "binary",
+        "description": "各居室が政令（令116条の2第1項）で定める基準を満たす窓その他の開口部を有しているか判定",
+        "related_articles": ["令::A116_2:P1"]
+      },
+      {
+        "id": "proc-windowless-found",
+        "type": "process",
+        "title": "開口部なし居室あり",
+        "process_type": "mechanical",
+        "description": "政令で定める開口部を有しない居室が1つ以上存在することを確認"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "第3号該当",
+        "result": "pass",
+        "description": "法43条3項3号に該当（条例制定対象となり得る）"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "第3号非該当",
+        "result": "fail",
+        "description": "法43条3項3号に該当しない（本号による条例制定対象ではない）"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "dec-has-rooms", "role": "flow" },
+      { "id": "e02", "from": "dec-has-rooms", "to": "dec-has-openings", "role": "yes", "label": "はい" },
+      { "id": "e03", "from": "dec-has-rooms", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e04", "from": "dec-has-openings", "to": "fail", "role": "yes", "label": "全てあり" },
+      { "id": "e05", "from": "dec-has-openings", "to": "proc-windowless-found", "role": "no", "label": "一部なし" },
+      { "id": "e06", "from": "proc-windowless-found", "to": "pass", "role": "flow" }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-A43-P3-I3",
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "delegates_to",
+      "articles": ["A116_2:P1"],
+      "description": "法43条3項第3号の「政令で定める窓その他の開口部を有しない居室」の基準を定める"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

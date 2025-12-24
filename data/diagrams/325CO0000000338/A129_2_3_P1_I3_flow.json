@@ -1,0 +1,199 @@
+{
+  "id": "A129_2_3_P1_I3_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "屋上突出物の構造計算",
+    "target_subject": "屋上突出物",
+    "description": "法第20条第1項第1号から第3号建築物の屋上から突出する水槽、煙突等の構造計算"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "129の2の3",
+    "paragraph": "1",
+    "item": "3"
+  },
+  "labels": [
+    "単体規定",
+    "構造"
+  ],
+  "kijo_diagram_ref": "CHK-BSL-KIJO-A129_2_3-P1-I3",
+  "flow_diagram": {
+    "title": "屋上突出物構造計算適合判定フロー",
+    "description": "屋上から突出する水槽、煙突等の構造計算による安全性確認",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "屋上突出物の構造計算確認開始",
+        "result": "start"
+      },
+      {
+        "id": "dec-building-type",
+        "type": "decision",
+        "title": "建築物の構造区分は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "1号〜3号", "description": "法第20条第1項第1号から第3号に該当" },
+          { "value": "4号", "description": "法第20条第1項第4号に該当（本条適用対象外）" }
+        ],
+        "description": "法第20条第1項の該当号を判定"
+      },
+      {
+        "id": "dec-rooftop-exist",
+        "type": "decision",
+        "title": "屋上突出物があるか？",
+        "decision_type": "binary",
+        "description": "屋上から突出する水槽、煙突その他これらに類するものの有無"
+      },
+      {
+        "id": "dec-wind-calc",
+        "type": "decision",
+        "title": "風圧に対する構造計算で安全か？",
+        "decision_type": "binary",
+        "description": "国土交通大臣が定める基準に従った構造計算により風圧に対して構造耐力上安全であることを確認"
+      },
+      {
+        "id": "proc-wind-ok",
+        "type": "process",
+        "title": "風圧安全性確認",
+        "process_type": "mechanical",
+        "description": "風圧に対する構造耐力上の安全性を確認"
+      },
+      {
+        "id": "dec-seismic-calc",
+        "type": "decision",
+        "title": "地震等に対する構造計算で安全か？",
+        "decision_type": "binary",
+        "description": "国土交通大臣が定める基準に従った構造計算により地震その他の震動及び衝撃に対して構造耐力上安全であることを確認"
+      },
+      {
+        "id": "proc-seismic-ok",
+        "type": "process",
+        "title": "地震等安全性確認",
+        "process_type": "mechanical",
+        "description": "地震等に対する構造耐力上の安全性を確認"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令第129条の2の3第1項第3号に適合"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "令第129条の2の3第1項第3号に不適合"
+      },
+      {
+        "id": "pass-no-target",
+        "type": "terminal",
+        "title": "適用対象外",
+        "result": "pass",
+        "description": "屋上突出物がない又は4号建築物のため適用対象外"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-building-type",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-building-type",
+        "to": "dec-rooftop-exist",
+        "role": "option",
+        "label": "1号〜3号"
+      },
+      {
+        "id": "e03",
+        "from": "dec-building-type",
+        "to": "pass-no-target",
+        "role": "option",
+        "label": "4号"
+      },
+      {
+        "id": "e04",
+        "from": "dec-rooftop-exist",
+        "to": "dec-wind-calc",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e05",
+        "from": "dec-rooftop-exist",
+        "to": "pass-no-target",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e06",
+        "from": "dec-wind-calc",
+        "to": "proc-wind-ok",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e07",
+        "from": "dec-wind-calc",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e08",
+        "from": "proc-wind-ok",
+        "to": "dec-seismic-calc",
+        "role": "flow"
+      },
+      {
+        "id": "e09",
+        "from": "dec-seismic-calc",
+        "to": "proc-seismic-ok",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e10",
+        "from": "dec-seismic-calc",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e11",
+        "from": "proc-seismic-ok",
+        "to": "pass",
+        "role": "flow"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": [
+        "A20:P1:I1",
+        "A20:P1:I2",
+        "A20:P1:I3"
+      ],
+      "description": "法第20条から委任される構造計算基準"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00+09:00",
+    "author": "Claude",
+    "generator": "flow-generator",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

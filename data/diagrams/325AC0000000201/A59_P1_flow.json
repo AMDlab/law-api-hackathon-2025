@@ -1,0 +1,370 @@
+{
+  "id": "A59_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "高度利用地区内の建築物の容積率等",
+    "target_subject": "建築物",
+    "description": "高度利用地区内の建築物の容積率、建蔽率及び建築面積が都市計画で定められた内容に適合することを判定するフロー"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "59",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "集団規定",
+    "高度利用地区"
+  ],
+  "text_raw": "高度利用地区内においては、建築物の容積率及び建蔽率並びに建築物の建築面積（同一敷地内に二以上の建築物がある場合においては、それぞれの建築面積）は、高度利用地区に関する都市計画において定められた内容に適合するものでなければならない。ただし、次の各号のいずれかに該当する建築物については、この限りでない。",
+  "kijo_diagram_ref": "CHK-BSL-A59-P1",
+  "flow_diagram": {
+    "title": "法59条1項 高度利用地区内の建築物の容積率等の適合判定フロー",
+    "description": "高度利用地区内の建築物について、適用除外に該当するか、または容積率・建蔽率・建築面積が都市計画の制限に適合するかを判定するフロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "法59条1項の適合判定を開始"
+      },
+      {
+        "id": "dec-structure",
+        "type": "decision",
+        "title": "主要構造部の構造種別は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "木造" },
+          { "value": "鉄骨造" },
+          { "value": "CB造等" },
+          { "value": "その他" }
+        ],
+        "description": "主要構造部が木造、鉄骨造、コンクリートブロック造その他これらに類する構造かを確認"
+      },
+      {
+        "id": "dec-story-for-exempt1",
+        "type": "decision",
+        "title": "階数は2以下か？",
+        "decision_type": "binary",
+        "description": "建築物の階数が2以下であるかを確認（1号除外判定用）"
+      },
+      {
+        "id": "dec-basement-for-exempt1",
+        "type": "decision",
+        "title": "地階を有するか？",
+        "decision_type": "binary",
+        "description": "建築物が地階を有するかを確認（1号除外判定用）"
+      },
+      {
+        "id": "dec-removable",
+        "type": "decision",
+        "title": "容易に移転又は除却できるか？",
+        "decision_type": "binary",
+        "description": "建築物が容易に移転し又は除却することができるかを判定"
+      },
+      {
+        "id": "proc-exempt1",
+        "type": "process",
+        "title": "1号該当",
+        "process_type": "mechanical",
+        "description": "第59条1項1号の除外要件に該当"
+      },
+      {
+        "id": "dec-public-utility",
+        "type": "decision",
+        "title": "公衆便所・巡査派出所等の公益施設か？",
+        "decision_type": "binary",
+        "description": "公衆便所、巡査派出所等の公益上必要な建築物に該当するか"
+      },
+      {
+        "id": "proc-exempt2",
+        "type": "process",
+        "title": "2号該当",
+        "process_type": "mechanical",
+        "description": "第59条1項2号の除外要件に該当"
+      },
+      {
+        "id": "dec-public-building",
+        "type": "decision",
+        "title": "学校・駅舎・卸売市場等の公益的大規模施設か？",
+        "decision_type": "binary",
+        "description": "学校、駅舎、卸売市場等の公益上必要な建築物に該当するか"
+      },
+      {
+        "id": "dec-admin-permission",
+        "type": "decision",
+        "title": "特定行政庁の許可を受けているか？",
+        "decision_type": "binary",
+        "description": "用途上又は構造上やむを得ないと認める特定行政庁の許可を受けているか"
+      },
+      {
+        "id": "proc-exempt3",
+        "type": "process",
+        "title": "3号該当",
+        "process_type": "mechanical",
+        "description": "第59条1項3号の除外要件に該当"
+      },
+      {
+        "id": "pass-exempt",
+        "type": "terminal",
+        "title": "適合（適用除外）",
+        "result": "pass",
+        "description": "第59条1項各号のいずれかに該当し、本条の適用除外となる"
+      },
+      {
+        "id": "dec-volume-ratio",
+        "type": "decision",
+        "title": "容積率は都市計画の範囲内か？",
+        "decision_type": "binary",
+        "description": "容積率が都市計画で定められた最低限度以上かつ最高限度以下であるか"
+      },
+      {
+        "id": "dec-coverage-ratio",
+        "type": "decision",
+        "title": "建蔽率は都市計画の最高限度以下か？",
+        "decision_type": "binary",
+        "description": "建蔽率が都市計画で定められた最高限度以下であるか"
+      },
+      {
+        "id": "dec-building-area",
+        "type": "decision",
+        "title": "各建築物の建築面積は最低限度以上か？",
+        "decision_type": "binary",
+        "description": "同一敷地内の全ての建築物について、建築面積が都市計画で定められた最低限度以上であるか"
+      },
+      {
+        "id": "proc-all-compliance",
+        "type": "process",
+        "title": "本則基準適合",
+        "process_type": "mechanical",
+        "description": "容積率・建蔽率・建築面積の全てが都市計画の制限に適合"
+      },
+      {
+        "id": "pass-compliance",
+        "type": "terminal",
+        "title": "適合（本則基準適合）",
+        "result": "pass",
+        "description": "容積率、建蔽率及び建築面積が都市計画で定められた内容に適合"
+      },
+      {
+        "id": "fail-volume",
+        "type": "terminal",
+        "title": "不適合（容積率）",
+        "result": "fail",
+        "description": "容積率が都市計画で定められた範囲外のため不適合"
+      },
+      {
+        "id": "fail-coverage",
+        "type": "terminal",
+        "title": "不適合（建蔽率）",
+        "result": "fail",
+        "description": "建蔽率が都市計画で定められた最高限度を超過のため不適合"
+      },
+      {
+        "id": "fail-area",
+        "type": "terminal",
+        "title": "不適合（建築面積）",
+        "result": "fail",
+        "description": "建築面積が都市計画で定められた最低限度未満のため不適合"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-structure",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-structure",
+        "to": "dec-story-for-exempt1",
+        "role": "option",
+        "label": "木造"
+      },
+      {
+        "id": "e03",
+        "from": "dec-structure",
+        "to": "dec-story-for-exempt1",
+        "role": "option",
+        "label": "鉄骨造"
+      },
+      {
+        "id": "e04",
+        "from": "dec-structure",
+        "to": "dec-story-for-exempt1",
+        "role": "option",
+        "label": "CB造等"
+      },
+      {
+        "id": "e05",
+        "from": "dec-structure",
+        "to": "dec-public-utility",
+        "role": "option",
+        "label": "その他"
+      },
+      {
+        "id": "e06",
+        "from": "dec-story-for-exempt1",
+        "to": "dec-basement-for-exempt1",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e07",
+        "from": "dec-story-for-exempt1",
+        "to": "dec-public-utility",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e08",
+        "from": "dec-basement-for-exempt1",
+        "to": "dec-removable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e09",
+        "from": "dec-basement-for-exempt1",
+        "to": "dec-public-utility",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e10",
+        "from": "dec-removable",
+        "to": "proc-exempt1",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e11",
+        "from": "dec-removable",
+        "to": "dec-public-utility",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e12",
+        "from": "proc-exempt1",
+        "to": "pass-exempt",
+        "role": "flow"
+      },
+      {
+        "id": "e13",
+        "from": "dec-public-utility",
+        "to": "proc-exempt2",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e14",
+        "from": "dec-public-utility",
+        "to": "dec-public-building",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e15",
+        "from": "proc-exempt2",
+        "to": "pass-exempt",
+        "role": "flow"
+      },
+      {
+        "id": "e16",
+        "from": "dec-public-building",
+        "to": "dec-admin-permission",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e17",
+        "from": "dec-public-building",
+        "to": "dec-volume-ratio",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e18",
+        "from": "dec-admin-permission",
+        "to": "proc-exempt3",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e19",
+        "from": "dec-admin-permission",
+        "to": "dec-volume-ratio",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e20",
+        "from": "proc-exempt3",
+        "to": "pass-exempt",
+        "role": "flow"
+      },
+      {
+        "id": "e21",
+        "from": "dec-volume-ratio",
+        "to": "dec-coverage-ratio",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e22",
+        "from": "dec-volume-ratio",
+        "to": "fail-volume",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e23",
+        "from": "dec-coverage-ratio",
+        "to": "dec-building-area",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e24",
+        "from": "dec-coverage-ratio",
+        "to": "fail-coverage",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e25",
+        "from": "dec-building-area",
+        "to": "proc-all-compliance",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e26",
+        "from": "dec-building-area",
+        "to": "fail-area",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e27",
+        "from": "proc-all-compliance",
+        "to": "pass-compliance",
+        "role": "flow"
+      }
+    ]
+  },
+  "related_laws": [],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

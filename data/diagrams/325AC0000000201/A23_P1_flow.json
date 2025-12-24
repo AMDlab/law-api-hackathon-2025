@@ -1,0 +1,165 @@
+{
+  "id": "A23_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "外壁の構造",
+    "target_subject": "外壁",
+    "description": "法22条区域内の木造建築物等の外壁が準防火性能基準を満たすことを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "23",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": ["単体規定", "防火"],
+  "kijo_diagram_ref": "CHK-BSL-A23-P1",
+  "flow_diagram": {
+    "title": "法23条適合判定フロー",
+    "description": "法22条区域内木造建築物等の外壁の準防火性能適合判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start"
+      },
+      {
+        "id": "dec-wood-building",
+        "type": "decision",
+        "title": "木造建築物等に該当するか?",
+        "decision_type": "binary",
+        "description": "主要構造部の政令定め部分が可燃材料で造られた建築物か"
+      },
+      {
+        "id": "proc-wood-applicable",
+        "type": "process",
+        "title": "木造建築物等該当",
+        "description": "法23条の適用対象に該当"
+      },
+      {
+        "id": "dec-ensho-exists",
+        "type": "decision",
+        "title": "外壁に延焼のおそれのある部分があるか?",
+        "decision_type": "binary",
+        "description": "隣地境界線等からの距離に基づき延焼のおそれのある部分の有無を判定"
+      },
+      {
+        "id": "proc-ensho-exists",
+        "type": "process",
+        "title": "延焼のおそれのある部分あり",
+        "description": "外壁に延焼のおそれのある部分が存在"
+      },
+      {
+        "id": "dec-tech-standard",
+        "type": "decision",
+        "title": "準防火性能の技術的基準に適合するか?",
+        "decision_type": "binary",
+        "description": "令109条の10の技術的基準（延焼抑制性能）への適合"
+      },
+      {
+        "id": "proc-tech-ok",
+        "type": "process",
+        "title": "技術的基準適合",
+        "description": "準防火性能の技術的基準に適合"
+      },
+      {
+        "id": "dec-method-type",
+        "type": "decision",
+        "title": "構造方法の種別は?",
+        "decision_type": "multi",
+        "options": [
+          {"value": "大臣定め構造方法"},
+          {"value": "大臣認定"}
+        ],
+        "description": "大臣定め構造方法又は大臣認定のいずれか"
+      },
+      {
+        "id": "dec-minister-method",
+        "type": "decision",
+        "title": "大臣定め構造方法に該当するか?",
+        "decision_type": "binary",
+        "description": "国土交通大臣が定めた構造方法（告示）に該当するか"
+      },
+      {
+        "id": "dec-minister-approval",
+        "type": "decision",
+        "title": "大臣認定を受けているか?",
+        "decision_type": "binary",
+        "description": "国土交通大臣の認定を受けた構造方法か"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "法23条に適合"
+      },
+      {
+        "id": "pass-not-applicable",
+        "type": "terminal",
+        "title": "適用外（適合）",
+        "result": "pass",
+        "description": "木造建築物等に非該当のため法23条の適用外"
+      },
+      {
+        "id": "pass-no-ensho",
+        "type": "terminal",
+        "title": "適合（延焼のおそれなし）",
+        "result": "pass",
+        "description": "延焼のおそれのある部分がないため法23条に適合"
+      },
+      {
+        "id": "fail-tech",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "技術的基準に不適合"
+      },
+      {
+        "id": "fail-method",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "大臣定め構造方法・大臣認定のいずれにも該当しない"
+      }
+    ],
+    "edges": [
+      {"id": "e01", "from": "start", "to": "dec-wood-building", "role": "flow"},
+      {"id": "e02", "from": "dec-wood-building", "to": "proc-wood-applicable", "role": "yes"},
+      {"id": "e03", "from": "dec-wood-building", "to": "pass-not-applicable", "role": "no"},
+      {"id": "e04", "from": "proc-wood-applicable", "to": "dec-ensho-exists", "role": "flow"},
+      {"id": "e05", "from": "dec-ensho-exists", "to": "proc-ensho-exists", "role": "yes"},
+      {"id": "e06", "from": "dec-ensho-exists", "to": "pass-no-ensho", "role": "no"},
+      {"id": "e07", "from": "proc-ensho-exists", "to": "dec-tech-standard", "role": "flow"},
+      {"id": "e08", "from": "dec-tech-standard", "to": "proc-tech-ok", "role": "yes"},
+      {"id": "e09", "from": "dec-tech-standard", "to": "fail-tech", "role": "no"},
+      {"id": "e10", "from": "proc-tech-ok", "to": "dec-method-type", "role": "flow"},
+      {"id": "e11", "from": "dec-method-type", "to": "dec-minister-method", "role": "option", "label": "大臣定め構造方法"},
+      {"id": "e12", "from": "dec-method-type", "to": "dec-minister-approval", "role": "option", "label": "大臣認定"},
+      {"id": "e13", "from": "dec-minister-method", "to": "pass", "role": "yes"},
+      {"id": "e14", "from": "dec-minister-method", "to": "fail-method", "role": "no"},
+      {"id": "e15", "from": "dec-minister-approval", "to": "pass", "role": "yes"},
+      {"id": "e16", "from": "dec-minister-approval", "to": "fail-method", "role": "no"}
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "delegates_to",
+      "articles": ["A109_10"],
+      "description": "法23条の準防火性能に関する技術的基準を定める"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00Z",
+    "generator": "claude-code-flow-generator",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

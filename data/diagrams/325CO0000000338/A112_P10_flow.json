@@ -1,0 +1,377 @@
+{
+  "id": "A112_P10_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "第7項〜第9項適用除外の判定",
+    "target_subject": "建築物の部分",
+    "description": "建物の11階以上の部分において、特定の用途や規模の部分が耐火構造等で区画されている場合は、より厳しい区画基準の適用が除外される場合を判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "112",
+    "paragraph": "10",
+    "item": null
+  },
+  "labels": ["単体規定", "防火区画"],
+  "text_raw": "前三項の規定は、階段室の部分若しくは昇降機の昇降路の部分（当該昇降機の乗降のための乗降ロビーの部分を含む。）、廊下その他避難の用に供する部分又は床面積の合計が二百平方メートル以内の共同住宅の住戸で、耐火構造の床若しくは壁又は特定防火設備（第七項の規定により区画すべき建築物にあつては、法第二条第九号の二ロに規定する防火設備）で区画されたものについては、適用しない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "building_part",
+          "value": "11階以上の部分"
+        }
+      ],
+      "note": "令第112条第7項〜第9項の適用を除外する場合"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "type": "proposition",
+          "description": "対象部分が階段室の部分である"
+        },
+        {
+          "type": "proposition",
+          "description": "対象部分が昇降機の昇降路の部分（乗降ロビー含む）である"
+        },
+        {
+          "type": "proposition",
+          "description": "対象部分が廊下その他避難の用に供する部分である"
+        },
+        {
+          "type": "proposition",
+          "description": "対象部分が床面積200平方メートル以内の共同住宅の住戸である"
+        }
+      ]
+    },
+    "exceptions": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "condition",
+          "description": "当該部分が耐火構造の床若しくは壁で区画されている OR"
+        },
+        {
+          "type": "condition",
+          "description": "当該部分が特定防火設備で区画されている（第7項の規定により区画すべき建築物の場合は法第2条第9号の二ロに規定する防火設備）"
+        }
+      ],
+      "effect": "適用除外"
+    }
+  },
+  "flow_diagram": {
+    "title": "第7項〜第9項適用除外判定フロー",
+    "description": "11階以上の部分における第7項〜第9項の適用除外を判定するフロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "第7項〜第9項適用除外判定の開始"
+      },
+      {
+        "id": "dec-part-type",
+        "type": "decision",
+        "title": "対象部分の用途は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "階段室", "description": "階段室の部分" },
+          { "value": "昇降路・乗降ロビー", "description": "昇降機の昇降路の部分（乗降ロビー含む）" },
+          { "value": "廊下・避難部分", "description": "廊下その他避難の用に供する部分" },
+          { "value": "共同住宅の住戸", "description": "共同住宅の住戸" },
+          { "value": "その他", "description": "上記以外の部分" }
+        ],
+        "description": "対象部分がどの用途に該当するかを判定"
+      },
+      {
+        "id": "proc-stair-applicable",
+        "type": "process",
+        "title": "階段室部分に該当",
+        "process_type": "mechanical",
+        "description": "階段室の部分として適用除外の対象となる可能性あり"
+      },
+      {
+        "id": "proc-elevator-applicable",
+        "type": "process",
+        "title": "昇降路・乗降ロビー部分に該当",
+        "process_type": "mechanical",
+        "description": "昇降機の昇降路または乗降ロビーとして適用除外の対象となる可能性あり"
+      },
+      {
+        "id": "proc-corridor-applicable",
+        "type": "process",
+        "title": "廊下・避難部分に該当",
+        "process_type": "mechanical",
+        "description": "廊下その他避難の用に供する部分として適用除外の対象となる可能性あり"
+      },
+      {
+        "id": "dec-dwelling-area",
+        "type": "decision",
+        "title": "床面積の合計は200平方メートル以内か？",
+        "decision_type": "binary",
+        "description": "共同住宅の住戸の床面積の合計が200平方メートル以内であるか"
+      },
+      {
+        "id": "proc-dwelling-applicable",
+        "type": "process",
+        "title": "小規模共同住宅住戸に該当",
+        "process_type": "mechanical",
+        "description": "床面積200平方メートル以内の共同住宅住戸として適用除外の対象となる可能性あり"
+      },
+      {
+        "id": "dec-p7-building",
+        "type": "decision",
+        "title": "第7項により区画すべき建築物か？",
+        "decision_type": "binary",
+        "description": "対象建築物が第7項の規定により区画すべき建築物であるか"
+      },
+      {
+        "id": "dec-compartment-type-p7",
+        "type": "decision",
+        "title": "区画の種別は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "耐火構造の床・壁", "description": "耐火構造の床若しくは壁" },
+          { "value": "法2条9号の2ロの防火設備", "description": "法第2条第9号の二ロに規定する防火設備" },
+          { "value": "その他", "description": "上記以外" }
+        ],
+        "description": "第7項建築物の場合の区画の種別を確認"
+      },
+      {
+        "id": "dec-compartment-type-other",
+        "type": "decision",
+        "title": "区画の種別は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "耐火構造の床・壁", "description": "耐火構造の床若しくは壁" },
+          { "value": "特定防火設備", "description": "特定防火設備" },
+          { "value": "その他", "description": "上記以外" }
+        ],
+        "description": "第7項建築物以外の場合の区画の種別を確認"
+      },
+      {
+        "id": "proc-fireproof-compartment",
+        "type": "process",
+        "title": "耐火構造による区画",
+        "process_type": "mechanical",
+        "description": "耐火構造の床若しくは壁で区画されている"
+      },
+      {
+        "id": "proc-fire-equipment-p7",
+        "type": "process",
+        "title": "防火設備（法2条9号の2ロ）による区画",
+        "process_type": "mechanical",
+        "description": "法第2条第9号の二ロに規定する防火設備で区画されている"
+      },
+      {
+        "id": "proc-specific-fire-equipment",
+        "type": "process",
+        "title": "特定防火設備による区画",
+        "process_type": "mechanical",
+        "description": "特定防火設備で区画されている"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適用除外",
+        "result": "pass",
+        "description": "第7項〜第9項の規定は適用しない"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "適用除外なし",
+        "result": "fail",
+        "description": "第7項〜第9項の規定が適用される"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-part-type",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-part-type",
+        "to": "proc-stair-applicable",
+        "role": "option",
+        "label": "階段室"
+      },
+      {
+        "id": "e03",
+        "from": "dec-part-type",
+        "to": "proc-elevator-applicable",
+        "role": "option",
+        "label": "昇降路・乗降ロビー"
+      },
+      {
+        "id": "e04",
+        "from": "dec-part-type",
+        "to": "proc-corridor-applicable",
+        "role": "option",
+        "label": "廊下・避難部分"
+      },
+      {
+        "id": "e05",
+        "from": "dec-part-type",
+        "to": "dec-dwelling-area",
+        "role": "option",
+        "label": "共同住宅の住戸"
+      },
+      {
+        "id": "e06",
+        "from": "dec-part-type",
+        "to": "fail",
+        "role": "option",
+        "label": "その他"
+      },
+      {
+        "id": "e07",
+        "from": "dec-dwelling-area",
+        "to": "proc-dwelling-applicable",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e08",
+        "from": "dec-dwelling-area",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e09",
+        "from": "proc-stair-applicable",
+        "to": "dec-p7-building",
+        "role": "flow"
+      },
+      {
+        "id": "e10",
+        "from": "proc-elevator-applicable",
+        "to": "dec-p7-building",
+        "role": "flow"
+      },
+      {
+        "id": "e11",
+        "from": "proc-corridor-applicable",
+        "to": "dec-p7-building",
+        "role": "flow"
+      },
+      {
+        "id": "e12",
+        "from": "proc-dwelling-applicable",
+        "to": "dec-p7-building",
+        "role": "flow"
+      },
+      {
+        "id": "e13",
+        "from": "dec-p7-building",
+        "to": "dec-compartment-type-p7",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e14",
+        "from": "dec-p7-building",
+        "to": "dec-compartment-type-other",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e15",
+        "from": "dec-compartment-type-p7",
+        "to": "proc-fireproof-compartment",
+        "role": "option",
+        "label": "耐火構造の床・壁"
+      },
+      {
+        "id": "e16",
+        "from": "dec-compartment-type-p7",
+        "to": "proc-fire-equipment-p7",
+        "role": "option",
+        "label": "法2条9号の2ロの防火設備"
+      },
+      {
+        "id": "e17",
+        "from": "dec-compartment-type-p7",
+        "to": "fail",
+        "role": "option",
+        "label": "その他"
+      },
+      {
+        "id": "e18",
+        "from": "dec-compartment-type-other",
+        "to": "proc-fireproof-compartment",
+        "role": "option",
+        "label": "耐火構造の床・壁"
+      },
+      {
+        "id": "e19",
+        "from": "dec-compartment-type-other",
+        "to": "proc-specific-fire-equipment",
+        "role": "option",
+        "label": "特定防火設備"
+      },
+      {
+        "id": "e20",
+        "from": "dec-compartment-type-other",
+        "to": "fail",
+        "role": "option",
+        "label": "その他"
+      },
+      {
+        "id": "e21",
+        "from": "proc-fireproof-compartment",
+        "to": "pass",
+        "role": "flow"
+      },
+      {
+        "id": "e22",
+        "from": "proc-fire-equipment-p7",
+        "to": "pass",
+        "role": "flow"
+      },
+      {
+        "id": "e23",
+        "from": "proc-specific-fire-equipment",
+        "to": "pass",
+        "role": "flow"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-A112-P10",
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": ["A112:P7", "A112:P8", "A112:P9"],
+      "description": "第112条第7項〜第9項の規定の適用除外を判定する根拠条項"
+    },
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A2:P9-2ロ"],
+      "description": "防火設備の定義"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00.000Z",
+    "updated_at": "2025-12-25T00:00:00.000Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

@@ -1,0 +1,154 @@
+{
+  "id": "A37_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "指定建築材料の品質基準適合確認（適合判定フロー）",
+    "target_subject": "建築物",
+    "description": "建築物の基礎・主要構造部等の重要部分に使用する指定建築材料がJIS/JAS規格適合又は大臣認定を受けていることを判定するフロー"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "37",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": ["単体規定", "建築材料", "品質"],
+  "text_raw": "建築物の基礎、主要構造部その他安全上、防火上又は衛生上重要である政令で定める部分に使用する木材、鋼材、コンクリートその他の建築材料として国土交通大臣が定めるもの（以下この条において「指定建築材料」という。）は、次の各号のいずれかに該当するものでなければならない。一 その品質が、指定建築材料ごとに国土交通大臣の指定する日本産業規格又は日本農林規格に適合するもの 二 前号に掲げるもののほか、指定建築材料ごとに国土交通大臣が定める安全上、防火上又は衛生上必要な品質に関する技術的基準に適合するものであることについて国土交通大臣の認定を受けたもの",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        { "type": "building_component", "value": "基礎、主要構造部その他安全上・防火上・衛生上重要な政令で定める部分" }
+      ],
+      "note": "令144条の3で定める部分（基礎、主要構造部、屋根、外壁、軒裏等）が対象"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        { "ref": "info-jis-jas-compliance", "note": "第1号：JIS/JAS規格適合" },
+        { "ref": "info-minister-certification", "note": "第2号：国土交通大臣の認定取得" }
+      ]
+    }
+  },
+  "flow_diagram": {
+    "title": "法37条1項 指定建築材料の品質基準 適合判定フロー",
+    "description": "重要部分に使用する指定建築材料がJIS/JAS適合（第1号）又は大臣認定取得（第2号）のいずれかに該当するかを判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "法37条1項の適合判定を開始（各建築材料について繰り返し判定）"
+      },
+      {
+        "id": "dec-designated-material",
+        "type": "decision",
+        "title": "指定建築材料に該当するか？",
+        "decision_type": "binary",
+        "description": "当該建築材料が国土交通大臣告示で定める指定建築材料に該当するか判定"
+      },
+      {
+        "id": "proc-not-designated",
+        "type": "process",
+        "title": "指定建築材料非該当",
+        "process_type": "mechanical",
+        "description": "指定建築材料に該当しないため法37条1項は適用されない"
+      },
+      {
+        "id": "dec-jis-jas",
+        "type": "decision",
+        "title": "JIS又はJAS規格に適合するか？",
+        "decision_type": "binary",
+        "description": "指定建築材料ごとに大臣が指定するJIS又はJAS規格に適合するか判定（第1号）",
+        "related_articles": ["法::A37:P1:I1"]
+      },
+      {
+        "id": "proc-jis-jas-yes",
+        "type": "process",
+        "title": "第1号該当（JIS/JAS適合）",
+        "process_type": "mechanical",
+        "description": "JIS又はJAS規格に適合するため第1号に該当"
+      },
+      {
+        "id": "dec-minister-cert",
+        "type": "decision",
+        "title": "大臣認定を受けているか？",
+        "decision_type": "binary",
+        "description": "指定建築材料ごとに大臣が定める技術的基準に適合することについて大臣の認定を受けているか判定（第2号）",
+        "related_articles": ["法::A37:P1:I2"]
+      },
+      {
+        "id": "proc-minister-cert-yes",
+        "type": "process",
+        "title": "第2号該当（大臣認定取得）",
+        "process_type": "mechanical",
+        "description": "国土交通大臣の認定を受けているため第2号に該当"
+      },
+      {
+        "id": "dec-all-materials",
+        "type": "decision",
+        "title": "全ての指定建築材料を確認したか？",
+        "decision_type": "binary",
+        "description": "重要部分に使用される全ての指定建築材料について判定が完了したか確認"
+      },
+      {
+        "id": "proc-next-material",
+        "type": "process",
+        "title": "次の材料へ",
+        "process_type": "mechanical",
+        "description": "次の指定建築材料の判定へ移行"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "法37条1項の規定に適合（全ての指定建築材料が第1号又は第2号に該当）"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "法37条1項の規定に不適合（第1号・第2号のいずれにも該当しない材料あり）"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "dec-designated-material", "role": "flow" },
+      { "id": "e02", "from": "dec-designated-material", "to": "dec-jis-jas", "role": "yes", "label": "はい" },
+      { "id": "e03", "from": "dec-designated-material", "to": "proc-not-designated", "role": "no", "label": "いいえ" },
+      { "id": "e04", "from": "proc-not-designated", "to": "dec-all-materials", "role": "flow" },
+      { "id": "e05", "from": "dec-jis-jas", "to": "proc-jis-jas-yes", "role": "yes", "label": "はい" },
+      { "id": "e06", "from": "dec-jis-jas", "to": "dec-minister-cert", "role": "no", "label": "いいえ" },
+      { "id": "e07", "from": "proc-jis-jas-yes", "to": "dec-all-materials", "role": "flow" },
+      { "id": "e08", "from": "dec-minister-cert", "to": "proc-minister-cert-yes", "role": "yes", "label": "はい" },
+      { "id": "e09", "from": "dec-minister-cert", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e10", "from": "proc-minister-cert-yes", "to": "dec-all-materials", "role": "flow" },
+      { "id": "e11", "from": "dec-all-materials", "to": "pass", "role": "yes", "label": "はい" },
+      { "id": "e12", "from": "dec-all-materials", "to": "proc-next-material", "role": "no", "label": "いいえ" },
+      { "id": "e13", "from": "proc-next-material", "to": "dec-designated-material", "role": "flow" }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-A37-P1",
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "delegates_to",
+      "articles": ["A144_3"],
+      "description": "法37条の「安全上、防火上又は衛生上重要である政令で定める部分」を定める"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

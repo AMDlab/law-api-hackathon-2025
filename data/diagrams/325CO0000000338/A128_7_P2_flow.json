@@ -1,0 +1,189 @@
+{
+  "id": "A128_7_P2_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "区画避難安全性能",
+    "target_subject": "区画部分",
+    "description": "区画避難安全性能の定義（火災時に煙又はガスが避難上支障のある高さまで降下しないこと）の判定フロー"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "128の7",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "避難",
+    "区画避難安全性能"
+  ],
+  "kijo_diagram_ref": "CHK-BSL-ORD-A128_7-P2",
+  "flow_diagram": {
+    "title": "区画避難安全性能判定フロー",
+    "description": "区画部分の全火災室について、避難完了時間が煙降下限界時間を超えないか判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start"
+      },
+      {
+        "id": "dec-floor-type",
+        "type": "decision",
+        "title": "区画部分の所在階は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "避難階以外" },
+          { "value": "避難階" }
+        ],
+        "description": "区画部分が避難階以外にあるか、避難階にあるかを確認"
+      },
+      {
+        "id": "proc-dest-stair",
+        "type": "process",
+        "title": "避難先：直通階段に通ずる部分",
+        "description": "避難階以外の場合の避難先は直通階段に通ずる部分（一号）"
+      },
+      {
+        "id": "proc-dest-ground",
+        "type": "process",
+        "title": "避難先：地上又は地上に通ずる部分",
+        "description": "避難階の場合の避難先は地上又は地上に通ずる部分（二号）"
+      },
+      {
+        "id": "proc-fire-room-identify",
+        "type": "process",
+        "title": "火災室の特定",
+        "description": "火災の発生のおそれの少ない室を除く各室を火災室として特定"
+      },
+      {
+        "id": "dec-evac-time-calc",
+        "type": "decision",
+        "title": "避難完了時間を算定したか？",
+        "decision_type": "binary",
+        "description": "区画部分に存する者全員が避難先まで避難を終了するまでの時間を算定"
+      },
+      {
+        "id": "dec-smoke-time-calc",
+        "type": "decision",
+        "title": "煙降下限界時間を算定したか？",
+        "decision_type": "binary",
+        "description": "各居室及び主たる廊下等において煙又はガスが避難上支障のある高さまで降下するまでの時間を算定"
+      },
+      {
+        "id": "dec-safety-check",
+        "type": "decision",
+        "title": "避難完了時間 <= 煙降下限界時間か？",
+        "decision_type": "binary",
+        "description": "全ての火災室について避難完了時間が煙降下限界時間を超えないか確認"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "区画避難安全性能あり",
+        "result": "pass",
+        "description": "区画避難安全性能を有する"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "区画避難安全性能なし",
+        "result": "fail",
+        "description": "区画避難安全性能を有しない"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-floor-type",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-floor-type",
+        "to": "proc-dest-stair",
+        "role": "option",
+        "label": "避難階以外"
+      },
+      {
+        "id": "e03",
+        "from": "dec-floor-type",
+        "to": "proc-dest-ground",
+        "role": "option",
+        "label": "避難階"
+      },
+      {
+        "id": "e04",
+        "from": "proc-dest-stair",
+        "to": "proc-fire-room-identify",
+        "role": "flow"
+      },
+      {
+        "id": "e05",
+        "from": "proc-dest-ground",
+        "to": "proc-fire-room-identify",
+        "role": "flow"
+      },
+      {
+        "id": "e06",
+        "from": "proc-fire-room-identify",
+        "to": "dec-evac-time-calc",
+        "role": "flow"
+      },
+      {
+        "id": "e07",
+        "from": "dec-evac-time-calc",
+        "to": "dec-smoke-time-calc",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e08",
+        "from": "dec-evac-time-calc",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e09",
+        "from": "dec-smoke-time-calc",
+        "to": "dec-safety-check",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e10",
+        "from": "dec-smoke-time-calc",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e11",
+        "from": "dec-safety-check",
+        "to": "pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e12",
+        "from": "dec-safety-check",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00+09:00",
+    "author": "Claude",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

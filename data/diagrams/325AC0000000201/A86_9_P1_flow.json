@@ -1,0 +1,394 @@
+{
+  "id": "A86_9_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "公共事業による敷地面積減少時の適用",
+    "target_subject": "建築物・敷地",
+    "description": "公共事業施行により敷地面積が減少した場合に、建築物が法令に適合しないこととなった時の第三条の準用適用を判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "86-9",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "適用除外"
+  ],
+  "text_raw": "第三条第二項及び第三項（第一号及び第二号を除く。）の規定は、次に掲げる事業の施行の際現に存する建築物若しくはその敷地又は現に建築、修繕若しくは模様替の工事中の建築物若しくはその敷地が、当該事業の施行によるこれらの建築物の敷地面積の減少により、この法律若しくはこれに基づく命令若しくは条例の規定に適合しないこととなつた場合又はこれらの規定に適合しない部分を有するに至つた場合について準用する。この場合において、同項第三号中「この法律又はこれに基づく命令若しくは条例の規定の施行又は適用」とあるのは、「第八十六条の九第一項各号に掲げる事業の施行による建築物の敷地面積の減少」と読み替えるものとする。",
+  "kijo_diagram_ref": "CHK-BSL-A86-9-P1",
+  "flow_diagram": {
+    "title": "公共事業による敷地面積減少時の第3条準用判定フロー",
+    "description": "土地収用法事業・都市計画事業・政令で定める事業の施行による敷地面積減少で法令不適合となった場合の第3条準用適用を判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "公共事業による敷地面積減少時の第3条準用判定を開始"
+      },
+      {
+        "id": "dec-project-type",
+        "type": "decision",
+        "title": "公共事業の種類は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "土地収用法事業", "description": "土地収用法第3条各号に掲げる事業" },
+          { "value": "都市計画事業", "description": "都市計画法により土地を収用・使用できる事業" },
+          { "value": "政令で定める準ずる事業", "description": "前号に準ずる事業で政令で定めるもの" },
+          { "value": "その他", "description": "対象事業に該当しない" }
+        ],
+        "description": "施行中の事業が土地収用法第3条事業、都市計画事業、又はこれらに準ずる政令で定める事業に該当するか",
+        "related_articles": ["法::A86_9:P1:I1", "法::A86_9:P1:I2"]
+      },
+      {
+        "id": "proc-target-project",
+        "type": "process",
+        "title": "対象事業に該当",
+        "process_type": "mechanical",
+        "description": "第86条の9第1項各号に掲げる公共事業に該当"
+      },
+      {
+        "id": "proc-not-target",
+        "type": "process",
+        "title": "対象事業に非該当",
+        "process_type": "mechanical",
+        "description": "本項の対象となる公共事業に該当しない"
+      },
+      {
+        "id": "dec-building-status",
+        "type": "decision",
+        "title": "建築物の存在状態は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "既存建築物" },
+          { "value": "建築工事中" },
+          { "value": "修繕工事中" },
+          { "value": "模様替工事中" },
+          { "value": "建築物なし" }
+        ],
+        "description": "事業施行時における建築物の存在状態"
+      },
+      {
+        "id": "proc-building-confirmed",
+        "type": "process",
+        "title": "建築物の存在を確認",
+        "process_type": "undefined_input",
+        "description": "事業施行時に建築物が現に存在、又は工事中であることを確認"
+      },
+      {
+        "id": "proc-no-building",
+        "type": "process",
+        "title": "建築物が存在しない",
+        "process_type": "mechanical",
+        "description": "事業施行時に建築物が存在しないため本項の適用対象外"
+      },
+      {
+        "id": "dec-area-reduction",
+        "type": "decision",
+        "title": "敷地面積が減少したか？",
+        "decision_type": "binary",
+        "description": "公共事業の施行によって敷地面積が減少したか"
+      },
+      {
+        "id": "proc-area-reduced",
+        "type": "process",
+        "title": "敷地面積減少を確認",
+        "process_type": "mechanical",
+        "description": "公共事業による敷地面積の減少を確認"
+      },
+      {
+        "id": "proc-no-reduction",
+        "type": "process",
+        "title": "敷地面積減少なし",
+        "process_type": "mechanical",
+        "description": "敷地面積が減少していないため本項の適用対象外"
+      },
+      {
+        "id": "dec-compliance-before",
+        "type": "decision",
+        "title": "事業施行前は法令に適合していたか？",
+        "decision_type": "binary",
+        "description": "敷地面積減少前に建築物・敷地が法令に適合していたか"
+      },
+      {
+        "id": "proc-was-compliant",
+        "type": "process",
+        "title": "施行前の適合を確認",
+        "process_type": "mechanical",
+        "description": "事業施行前に法令に適合していたことを確認"
+      },
+      {
+        "id": "dec-noncompliance-type",
+        "type": "decision",
+        "title": "不適合の種類は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "全体的に不適合", "description": "建築物又は敷地全体が法令に適合しなくなった" },
+          { "value": "部分的に不適合", "description": "適合しない部分を有するに至った" },
+          { "value": "適合を維持", "description": "敷地面積減少後も法令に適合" }
+        ],
+        "description": "敷地面積減少後の法令適合状態"
+      },
+      {
+        "id": "proc-became-noncompliant-all",
+        "type": "process",
+        "title": "全体的な法令不適合",
+        "process_type": "mechanical",
+        "description": "敷地面積減少により建築物又は敷地全体が法令に適合しなくなった"
+      },
+      {
+        "id": "proc-became-noncompliant-part",
+        "type": "process",
+        "title": "部分的な法令不適合",
+        "process_type": "mechanical",
+        "description": "敷地面積減少により適合しない部分を有するに至った"
+      },
+      {
+        "id": "proc-still-compliant",
+        "type": "process",
+        "title": "法令適合を維持",
+        "process_type": "mechanical",
+        "description": "敷地面積減少後も法令に適合しているため本項の適用対象外"
+      },
+      {
+        "id": "proc-article3-applied",
+        "type": "process",
+        "title": "第3条第2項・第3項の準用",
+        "process_type": "mechanical",
+        "description": "第3条第2項及び第3項（第1号及び第2号を除く）の規定を準用する。同項第3号は読替え適用。",
+        "related_articles": ["法::A3:P2", "法::A3:P3"]
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "第3条準用適用",
+        "result": "pass",
+        "description": "第3条の規定が準用され、既存不適格として扱われる"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "本項適用対象外",
+        "result": "fail",
+        "description": "本項の適用要件を満たさない"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-project-type",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-project-type",
+        "to": "proc-target-project",
+        "role": "option",
+        "label": "土地収用法事業"
+      },
+      {
+        "id": "e03",
+        "from": "dec-project-type",
+        "to": "proc-target-project",
+        "role": "option",
+        "label": "都市計画事業"
+      },
+      {
+        "id": "e04",
+        "from": "dec-project-type",
+        "to": "proc-target-project",
+        "role": "option",
+        "label": "政令で定める準ずる事業"
+      },
+      {
+        "id": "e05",
+        "from": "dec-project-type",
+        "to": "proc-not-target",
+        "role": "option",
+        "label": "その他"
+      },
+      {
+        "id": "e06",
+        "from": "proc-not-target",
+        "to": "fail",
+        "role": "flow"
+      },
+      {
+        "id": "e07",
+        "from": "proc-target-project",
+        "to": "dec-building-status",
+        "role": "flow"
+      },
+      {
+        "id": "e08",
+        "from": "dec-building-status",
+        "to": "proc-building-confirmed",
+        "role": "option",
+        "label": "既存建築物"
+      },
+      {
+        "id": "e09",
+        "from": "dec-building-status",
+        "to": "proc-building-confirmed",
+        "role": "option",
+        "label": "建築工事中"
+      },
+      {
+        "id": "e10",
+        "from": "dec-building-status",
+        "to": "proc-building-confirmed",
+        "role": "option",
+        "label": "修繕工事中"
+      },
+      {
+        "id": "e11",
+        "from": "dec-building-status",
+        "to": "proc-building-confirmed",
+        "role": "option",
+        "label": "模様替工事中"
+      },
+      {
+        "id": "e12",
+        "from": "dec-building-status",
+        "to": "proc-no-building",
+        "role": "option",
+        "label": "建築物なし"
+      },
+      {
+        "id": "e13",
+        "from": "proc-no-building",
+        "to": "fail",
+        "role": "flow"
+      },
+      {
+        "id": "e14",
+        "from": "proc-building-confirmed",
+        "to": "dec-area-reduction",
+        "role": "flow"
+      },
+      {
+        "id": "e15",
+        "from": "dec-area-reduction",
+        "to": "proc-area-reduced",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e16",
+        "from": "dec-area-reduction",
+        "to": "proc-no-reduction",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e17",
+        "from": "proc-no-reduction",
+        "to": "fail",
+        "role": "flow"
+      },
+      {
+        "id": "e18",
+        "from": "proc-area-reduced",
+        "to": "dec-compliance-before",
+        "role": "flow"
+      },
+      {
+        "id": "e19",
+        "from": "dec-compliance-before",
+        "to": "proc-was-compliant",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e20",
+        "from": "dec-compliance-before",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e21",
+        "from": "proc-was-compliant",
+        "to": "dec-noncompliance-type",
+        "role": "flow"
+      },
+      {
+        "id": "e22",
+        "from": "dec-noncompliance-type",
+        "to": "proc-became-noncompliant-all",
+        "role": "option",
+        "label": "全体的に不適合"
+      },
+      {
+        "id": "e23",
+        "from": "dec-noncompliance-type",
+        "to": "proc-became-noncompliant-part",
+        "role": "option",
+        "label": "部分的に不適合"
+      },
+      {
+        "id": "e24",
+        "from": "dec-noncompliance-type",
+        "to": "proc-still-compliant",
+        "role": "option",
+        "label": "適合を維持"
+      },
+      {
+        "id": "e25",
+        "from": "proc-still-compliant",
+        "to": "fail",
+        "role": "flow"
+      },
+      {
+        "id": "e26",
+        "from": "proc-became-noncompliant-all",
+        "to": "proc-article3-applied",
+        "role": "flow"
+      },
+      {
+        "id": "e27",
+        "from": "proc-became-noncompliant-part",
+        "to": "proc-article3-applied",
+        "role": "flow"
+      },
+      {
+        "id": "e28",
+        "from": "proc-article3-applied",
+        "to": "pass",
+        "role": "flow"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A3:P2", "A3:P3"],
+      "description": "第3条第2項及び第3項（第1号及び第2号を除く）の規定が準用される"
+    },
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A86-9:P2"],
+      "description": "敷地面積最低限度に関する第2項の準用規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

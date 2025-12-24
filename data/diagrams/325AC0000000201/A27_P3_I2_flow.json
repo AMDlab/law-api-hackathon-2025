@@ -1,0 +1,195 @@
+{
+  "id": "A27_P3_I2_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "危険物貯蔵・処理場の耐火・準耐火建築物要件",
+    "target_subject": "特殊建築物",
+    "description": "別表第二(と)項第四号に規定する危険物の貯蔵場又は処理場の耐火・準耐火建築物要件"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "27",
+    "paragraph": "3",
+    "item": "2"
+  },
+  "labels": ["単体規定", "防火", "準耐火建築物", "危険物"],
+  "text_raw": "別表第二（と）項第四号に規定する危険物（安全上及び防火上支障がないものとして政令で定めるものを除く。以下この号において同じ。）の貯蔵場又は処理場の用途に供するもの（貯蔵又は処理に係る危険物の数量が政令で定める限度を超えないものを除く。）",
+  "kijo_diagram_ref": "CHK-BSL-A27-P3-I2",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        { "type": "use", "value": "別表第二(と)項第四号の危険物貯蔵場・処理場" },
+        { "type": "quantity", "operator": ">", "value": "政令で定める限度" }
+      ]
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        { "ref": "info-fireproof", "value": true },
+        { "ref": "info-quasi-fireproof", "value": true }
+      ]
+    },
+    "exceptions": {
+      "operator": "OR",
+      "conditions": [
+        { "type": "regulation", "note": "安全上及び防火上支障がないものとして政令で定めるもの" },
+        { "type": "quantity", "operator": "<=", "note": "危険物の数量が政令で定める限度以下" }
+      ],
+      "effect": "EXEMPT"
+    }
+  },
+  "flow_diagram": {
+    "title": "法27条3項2号該当判定フロー",
+    "description": "危険物貯蔵場・処理場が法27条3項2号に該当し、耐火建築物又は準耐火建築物としなければならないかを判定するフロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start"
+      },
+      {
+        "id": "dec-use",
+        "type": "decision",
+        "title": "建築物の用途は？",
+        "decision_type": "multi",
+        "description": "別表第二(と)項第四号に規定する危険物の貯蔵場又は処理場に該当するか",
+        "options": [
+          { "value": "危険物貯蔵場" },
+          { "value": "危険物処理場" },
+          { "value": "その他" }
+        ]
+      },
+      {
+        "id": "proc-use-storage",
+        "type": "process",
+        "title": "危険物貯蔵場該当",
+        "process_type": "mechanical"
+      },
+      {
+        "id": "proc-use-process",
+        "type": "process",
+        "title": "危険物処理場該当",
+        "process_type": "mechanical"
+      },
+      {
+        "id": "dec-material-type",
+        "type": "decision",
+        "title": "危険物は政令除外対象か？",
+        "decision_type": "binary",
+        "description": "安全上及び防火上支障がないものとして政令で定めるものに該当するか（令115条1項）"
+      },
+      {
+        "id": "proc-material-exempt",
+        "type": "process",
+        "title": "政令除外該当",
+        "process_type": "mechanical"
+      },
+      {
+        "id": "dec-quantity",
+        "type": "decision",
+        "title": "危険物数量は政令限度を超えるか？",
+        "decision_type": "binary",
+        "description": "貯蔵又は処理に係る危険物の数量が政令で定める限度（令115条1項）を超えるか"
+      },
+      {
+        "id": "proc-quantity-exceed",
+        "type": "process",
+        "title": "政令限度超過",
+        "process_type": "mechanical"
+      },
+      {
+        "id": "proc-applicable",
+        "type": "process",
+        "title": "2号該当",
+        "process_type": "mechanical",
+        "description": "法27条3項2号に該当"
+      },
+      {
+        "id": "dec-building-type",
+        "type": "decision",
+        "title": "建築物の種別は？",
+        "decision_type": "multi",
+        "description": "耐火建築物又は準耐火建築物に該当するか",
+        "options": [
+          { "value": "耐火建築物" },
+          { "value": "準耐火建築物" },
+          { "value": "その他" }
+        ]
+      },
+      {
+        "id": "proc-fireproof",
+        "type": "process",
+        "title": "耐火建築物該当",
+        "process_type": "mechanical"
+      },
+      {
+        "id": "proc-quasi-fireproof",
+        "type": "process",
+        "title": "準耐火建築物該当",
+        "process_type": "mechanical"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "法27条3項適合",
+        "result": "pass",
+        "description": "耐火建築物又は準耐火建築物であり適合"
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "法27条3項不適合",
+        "result": "fail",
+        "description": "耐火建築物又は準耐火建築物でないため不適合"
+      },
+      {
+        "id": "end-exempt",
+        "type": "terminal",
+        "title": "法27条3項2号適用除外",
+        "result": "end",
+        "description": "用途非該当、政令除外、又は数量限度以下のため適用除外"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "dec-use", "role": "flow" },
+      { "id": "e02", "from": "dec-use", "to": "proc-use-storage", "role": "option", "label": "危険物貯蔵場" },
+      { "id": "e03", "from": "dec-use", "to": "proc-use-process", "role": "option", "label": "危険物処理場" },
+      { "id": "e04", "from": "dec-use", "to": "end-exempt", "role": "option", "label": "その他" },
+      { "id": "e05", "from": "proc-use-storage", "to": "dec-material-type", "role": "flow" },
+      { "id": "e06", "from": "proc-use-process", "to": "dec-material-type", "role": "flow" },
+      { "id": "e07", "from": "dec-material-type", "to": "proc-material-exempt", "role": "yes" },
+      { "id": "e08", "from": "dec-material-type", "to": "dec-quantity", "role": "no" },
+      { "id": "e09", "from": "proc-material-exempt", "to": "end-exempt", "role": "flow" },
+      { "id": "e10", "from": "dec-quantity", "to": "proc-quantity-exceed", "role": "yes" },
+      { "id": "e11", "from": "dec-quantity", "to": "end-exempt", "role": "no" },
+      { "id": "e12", "from": "proc-quantity-exceed", "to": "proc-applicable", "role": "flow" },
+      { "id": "e13", "from": "proc-applicable", "to": "dec-building-type", "role": "flow" },
+      { "id": "e14", "from": "dec-building-type", "to": "proc-fireproof", "role": "option", "label": "耐火建築物" },
+      { "id": "e15", "from": "dec-building-type", "to": "proc-quasi-fireproof", "role": "option", "label": "準耐火建築物" },
+      { "id": "e16", "from": "dec-building-type", "to": "end-fail", "role": "option", "label": "その他" },
+      { "id": "e17", "from": "proc-fireproof", "to": "end-pass", "role": "flow" },
+      { "id": "e18", "from": "proc-quasi-fireproof", "to": "end-pass", "role": "flow" }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "delegates_to",
+      "articles": ["A115:P1"],
+      "description": "政令で定める技術的基準（危険物の除外規定、数量限度）"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00Z",
+    "generator": "claude-code-flow-generator",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

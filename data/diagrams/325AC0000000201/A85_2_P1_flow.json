@@ -1,0 +1,256 @@
+{
+  "id": "A85_2_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "災害時の応急仮設建築物の適用除外判定",
+    "target_subject": "応急仮設建築物",
+    "description": "災害時に建築する停車場、官公署、工事関連施設等の応急仮設建築物について、建築基準法令の適用除外要件を判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "85",
+    "paragraph": "2",
+    "item": "1"
+  },
+  "labels": ["集団規定", "災害対応"],
+  "text_raw": "第八十五条第２項 災害があつた場合において建築する停車場、官公署その他これらに類する公益上必要な用途に供する応急仮設建築物又は工事を施工するために現場に設ける事務所、下小屋、材料置場その他これらに類する仮設建築物については、第六条から第七条の六まで、第十二条第一項から第四項まで、第十五条、第十八条（第四十一項を除く。）、第十九条、第二十一条から第二十三条まで、第二十六条、第三十一条、第三十三条、第三十四条第二項、第三十五条、第三十六条（第十九条、第二十一条、第二十六条、第三十一条、第三十三条、第三十四条第二項及び第三十五条に係る部分に限る。）、第三十七条、第三十九条及び第四十条の規定並びに第三章の規定は、適用しない。ただし、防火地域又は準防火地域内にある延べ面積が五十平方メートルを超えるものについては、第六十二条の規定の適用があるものとする。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "event",
+          "value": "災害があった場合"
+        }
+      ],
+      "note": "非常災害区域内において災害が発生した場合"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "proposition",
+          "description": "応急仮設建築物の用途が停車場、官公署等の公益用途、または工事関連施設である"
+        },
+        {
+          "type": "proposition",
+          "description": "指定条項の適用除外が認められる"
+        }
+      ]
+    },
+    "exceptions": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "type": "location_and_scale",
+          "description": "防火地域または準防火地域内にあり、かつ延べ面積が50m2を超える場合"
+        }
+      ],
+      "effect": "第62条（防火地域及び準防火地域内の建築物）の規定を適用"
+    }
+  },
+  "flow_diagram": {
+    "title": "法85条2項 災害時応急仮設建築物の適用除外判定フロー",
+    "description": "災害時の応急仮設建築物について適用除外要件と例外規定を判定するフロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start"
+      },
+      {
+        "id": "dec-disaster",
+        "type": "decision",
+        "title": "災害が発生したか？",
+        "decision_type": "binary",
+        "description": "非常災害が発生したか確認"
+      },
+      {
+        "id": "dec-purpose",
+        "type": "decision",
+        "title": "応急仮設建築物の用途は？",
+        "decision_type": "multi",
+        "description": "応急仮設建築物の用途区分を判定",
+        "options": [
+          { "value": "停車場・官公署等の公益用途" },
+          { "value": "工事関連施設" },
+          { "value": "その他" }
+        ]
+      },
+      {
+        "id": "proc-public-purpose",
+        "type": "process",
+        "title": "公益用途該当",
+        "process_type": "mechanical",
+        "description": "停車場、官公署その他公益上必要な用途に該当"
+      },
+      {
+        "id": "proc-construction-purpose",
+        "type": "process",
+        "title": "工事関連施設該当",
+        "process_type": "mechanical",
+        "description": "工事現場の事務所、下小屋、材料置場等に該当"
+      },
+      {
+        "id": "dec-fire-area",
+        "type": "decision",
+        "title": "敷地は防火地域・準防火地域内か？",
+        "decision_type": "binary",
+        "description": "敷地が防火地域または準防火地域内に位置するか判定"
+      },
+      {
+        "id": "dec-floor-area",
+        "type": "decision",
+        "title": "延べ面積は50m2を超えるか？",
+        "decision_type": "binary",
+        "description": "応急仮設建築物の延べ面積が50m2を超えるか判定"
+      },
+      {
+        "id": "proc-area-exceeded",
+        "type": "process",
+        "title": "50m2超過確認",
+        "process_type": "mechanical",
+        "description": "延べ面積が50m2を超えることを確認"
+      },
+      {
+        "id": "pass-full-exemption",
+        "type": "terminal",
+        "title": "適合（全面的適用除外）",
+        "result": "pass",
+        "description": "法6条～40条及び第3章の規定が適用除外される"
+      },
+      {
+        "id": "pass-partial-exemption",
+        "type": "terminal",
+        "title": "適合（部分的適用除外）",
+        "result": "pass",
+        "description": "法6条～40条及び第3章の規定は適用除外されるが、法62条（防火規制）は適用される"
+      },
+      {
+        "id": "fail-no-disaster",
+        "type": "terminal",
+        "title": "不適合（災害なし）",
+        "result": "fail",
+        "description": "災害が発生していないため、本条項の適用除外は受けられない"
+      },
+      {
+        "id": "fail-purpose",
+        "type": "terminal",
+        "title": "不適合（用途不適合）",
+        "result": "fail",
+        "description": "用途が適用除外対象に該当しないため、通常の建築基準法令が適用される"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-disaster",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-disaster",
+        "to": "dec-purpose",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "dec-disaster",
+        "to": "fail-no-disaster",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e04",
+        "from": "dec-purpose",
+        "to": "proc-public-purpose",
+        "role": "option",
+        "label": "停車場・官公署等の公益用途"
+      },
+      {
+        "id": "e05",
+        "from": "dec-purpose",
+        "to": "proc-construction-purpose",
+        "role": "option",
+        "label": "工事関連施設"
+      },
+      {
+        "id": "e06",
+        "from": "dec-purpose",
+        "to": "fail-purpose",
+        "role": "option",
+        "label": "その他"
+      },
+      {
+        "id": "e07",
+        "from": "proc-public-purpose",
+        "to": "dec-fire-area",
+        "role": "flow"
+      },
+      {
+        "id": "e08",
+        "from": "proc-construction-purpose",
+        "to": "dec-fire-area",
+        "role": "flow"
+      },
+      {
+        "id": "e09",
+        "from": "dec-fire-area",
+        "to": "dec-floor-area",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e10",
+        "from": "dec-fire-area",
+        "to": "pass-full-exemption",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e11",
+        "from": "dec-floor-area",
+        "to": "proc-area-exceeded",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e12",
+        "from": "dec-floor-area",
+        "to": "pass-full-exemption",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e13",
+        "from": "proc-area-exceeded",
+        "to": "pass-partial-exemption",
+        "role": "flow"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-A85-P2-I1",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A6", "A7_6", "A12", "A15", "A18", "A19", "A21", "A22", "A23", "A26", "A31", "A33", "A34", "A35", "A36", "A37", "A39", "A40", "A62"],
+      "description": "第85条第2項で適用除外が定められている各条項（ただし防火地域等では第62条を適用）"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

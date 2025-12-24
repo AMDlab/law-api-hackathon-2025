@@ -1,0 +1,201 @@
+{
+  "id": "A137_8_P1_I3_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "容積率に係る対象部分床面積の割合判定（第3号）",
+    "target_subject": "対象部分",
+    "description": "増築又は改築後における対象部分（自動車車庫等、備蓄倉庫、蓄電池、自家発電、貯水槽、宅配ボックス）の床面積が令2条3項各号の割合を超えないかの判定フロー"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "137_8",
+    "paragraph": "1",
+    "item": "3"
+  },
+  "labels": [
+    "既存不適格建築物",
+    "増改築",
+    "容積率",
+    "床面積不算入"
+  ],
+  "kijo_diagram_ref": "CHK-EXT-A137-8-P1-I3",
+  "flow_diagram": {
+    "title": "容積率に係る対象部分床面積の割合判定フロー（第3号）",
+    "description": "対象部分（車庫、備蓄倉庫、蓄電池等）の床面積が令第137条の8第1項第3号に適合するかを判定するフローチャート",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "対象部分床面積の割合判定（第3号）を開始"
+      },
+      {
+        "id": "dec-work-type",
+        "type": "decision",
+        "title": "工事種別は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "増築" },
+          { "value": "改築" }
+        ],
+        "description": "工事が増築か改築かを判定"
+      },
+      {
+        "id": "dec-target-part",
+        "type": "decision",
+        "title": "対象部分の種類は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "自動車車庫等", "description": "割合1/5" },
+          { "value": "備蓄倉庫", "description": "割合1/50" },
+          { "value": "蓄電池設置部分", "description": "割合1/50" },
+          { "value": "自家発電設備設置部分", "description": "割合1/100" },
+          { "value": "貯水槽設置部分", "description": "割合1/100" },
+          { "value": "宅配ボックス設置部分", "description": "割合1/100" }
+        ],
+        "description": "令第2条第3項各号の対象部分の区分を特定"
+      },
+      {
+        "id": "proc-calc-ratio-limit",
+        "type": "process",
+        "title": "割合上限を算定",
+        "process_type": "mechanical",
+        "description": "増改築後床面積に令2条3項各号の割合を乗じて上限（Alim1）を算出"
+      },
+      {
+        "id": "dec-is-rebuild",
+        "type": "decision",
+        "title": "改築か？",
+        "decision_type": "binary",
+        "description": "工事が改築であるか確認（改築の場合は基準時超過の特例判定が必要）"
+      },
+      {
+        "id": "proc-extension-route",
+        "type": "process",
+        "title": "増築ルート",
+        "description": "増築の場合は割合上限のみで判定"
+      },
+      {
+        "id": "dec-base-exceeded",
+        "type": "decision",
+        "title": "基準時に割合を超過していたか？",
+        "decision_type": "binary",
+        "description": "改築の場合、基準時における対象部分床面積が基準時割合上限を超えていたか判定",
+        "condition": {
+          "operator": "GT",
+          "lhs": { "var": "Apb", "desc": "基準時対象部分床面積" },
+          "rhs": { "var": "Alim2", "desc": "基準時割合上限" }
+        }
+      },
+      {
+        "id": "proc-base-exceeded",
+        "type": "process",
+        "title": "基準時超過該当",
+        "description": "基準時に割合を超過していたため、基準時対象部分床面積を上限とする特例適用"
+      },
+      {
+        "id": "proc-normal-limit",
+        "type": "process",
+        "title": "通常上限適用",
+        "description": "基準時に割合を超過していなかったため、通常の割合上限を適用"
+      },
+      {
+        "id": "dec-area-check-base",
+        "type": "decision",
+        "title": "対象部分床面積が基準時床面積以下か？",
+        "decision_type": "binary",
+        "description": "対象部分の床面積が基準時における対象部分床面積を超えないか判定",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "Ap", "desc": "対象部分床面積" },
+          "rhs": { "var": "Apb", "desc": "基準時対象部分床面積" }
+        }
+      },
+      {
+        "id": "dec-area-check-ratio",
+        "type": "decision",
+        "title": "対象部分床面積が割合上限以下か？",
+        "decision_type": "binary",
+        "description": "対象部分の床面積が令2条3項の割合による上限を超えないか判定",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "Ap", "desc": "対象部分床面積" },
+          "rhs": { "var": "Alim1", "desc": "割合上限" }
+        }
+      },
+      {
+        "id": "proc-item3-pass",
+        "type": "process",
+        "title": "第3号適合",
+        "description": "対象部分床面積が適用上限以下"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合（第3号該当）",
+        "result": "pass",
+        "description": "令第137条の8第1項第3号に適合"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "不適合（第3号不該当）",
+        "result": "fail",
+        "description": "令第137条の8第1項第3号に不適合"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "dec-work-type", "role": "flow" },
+      { "id": "e02", "from": "dec-work-type", "to": "dec-target-part", "role": "option", "label": "増築" },
+      { "id": "e03", "from": "dec-work-type", "to": "dec-target-part", "role": "option", "label": "改築" },
+      { "id": "e04", "from": "dec-target-part", "to": "proc-calc-ratio-limit", "role": "option", "label": "自動車車庫等" },
+      { "id": "e05", "from": "dec-target-part", "to": "proc-calc-ratio-limit", "role": "option", "label": "備蓄倉庫" },
+      { "id": "e06", "from": "dec-target-part", "to": "proc-calc-ratio-limit", "role": "option", "label": "蓄電池設置部分" },
+      { "id": "e07", "from": "dec-target-part", "to": "proc-calc-ratio-limit", "role": "option", "label": "自家発電設備設置部分" },
+      { "id": "e08", "from": "dec-target-part", "to": "proc-calc-ratio-limit", "role": "option", "label": "貯水槽設置部分" },
+      { "id": "e09", "from": "dec-target-part", "to": "proc-calc-ratio-limit", "role": "option", "label": "宅配ボックス設置部分" },
+      { "id": "e10", "from": "proc-calc-ratio-limit", "to": "dec-is-rebuild", "role": "flow" },
+      { "id": "e11", "from": "dec-is-rebuild", "to": "dec-base-exceeded", "role": "yes", "label": "はい" },
+      { "id": "e12", "from": "dec-is-rebuild", "to": "proc-extension-route", "role": "no", "label": "いいえ" },
+      { "id": "e13", "from": "proc-extension-route", "to": "dec-area-check-ratio", "role": "flow" },
+      { "id": "e14", "from": "dec-base-exceeded", "to": "proc-base-exceeded", "role": "yes", "label": "はい" },
+      { "id": "e15", "from": "dec-base-exceeded", "to": "proc-normal-limit", "role": "no", "label": "いいえ" },
+      { "id": "e16", "from": "proc-base-exceeded", "to": "dec-area-check-base", "role": "flow" },
+      { "id": "e17", "from": "proc-normal-limit", "to": "dec-area-check-ratio", "role": "flow" },
+      { "id": "e18", "from": "dec-area-check-base", "to": "proc-item3-pass", "role": "yes", "label": "はい" },
+      { "id": "e19", "from": "dec-area-check-base", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e20", "from": "dec-area-check-ratio", "to": "proc-item3-pass", "role": "yes", "label": "はい" },
+      { "id": "e21", "from": "dec-area-check-ratio", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e22", "from": "proc-item3-pass", "to": "pass", "role": "flow" }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": ["A3:P2", "A52", "A86_7:P1"],
+      "description": "法第3条第2項の既存不適格建築物の取扱、容積率に関する規定、法第86条の7第1項の緩和規定"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": ["A2:P3"],
+      "description": "床面積不算入部分の割合（自動車車庫等1/5、備蓄倉庫1/50、蓄電池1/50、自家発電1/100、貯水槽1/100、宅配ボックス1/100）"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T17:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

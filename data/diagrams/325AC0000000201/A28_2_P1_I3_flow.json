@@ -1,0 +1,297 @@
+{
+  "id": "A28_2_P1_I3_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "居室を有する建築物の衛生上の措置（建材・換気）",
+    "target_subject": "建築物",
+    "description": "居室内で衛生上の支障を生ずるおそれのある物質について、建築材料及び換気設備が政令で定める技術的基準に適合することを確認"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "28の2",
+    "paragraph": "1",
+    "item": "3"
+  },
+  "labels": [
+    "単体規定",
+    "衛生",
+    "居室",
+    "換気",
+    "建築材料"
+  ],
+  "text_raw": "居室を有する建築物にあつては、前二号に定めるもののほか、石綿等以外の物質でその居室内において衛生上の支障を生ずるおそれがあるものとして政令で定める物質の区分に応じ、建築材料及び換気設備について政令で定める技術的基準に適合すること。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "building_attribute",
+          "property": "has_habitable_rooms",
+          "value": true,
+          "note": "居室を有する建築物"
+        }
+      ]
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "compliance",
+          "subject": "建築材料",
+          "property": "技術的基準適合"
+        },
+        {
+          "type": "compliance",
+          "subject": "換気設備",
+          "property": "技術的基準適合"
+        }
+      ]
+    }
+  },
+  "flow_diagram": {
+    "title": "法第28条の2第1項第3号 適合判定フロー",
+    "description": "居室を有する建築物における建築材料及び換気設備の技術的基準適合を確認するフロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start"
+      },
+      {
+        "id": "dec-has-rooms",
+        "type": "decision",
+        "title": "居室を有するか？",
+        "decision_type": "binary",
+        "description": "建築物が居室を有するかどうかを確認"
+      },
+      {
+        "id": "end-na",
+        "type": "terminal",
+        "title": "規定適用外",
+        "result": "end",
+        "description": "居室を有しない建築物は第3号の適用対象外"
+      },
+      {
+        "id": "proc-scope-applicable",
+        "type": "process",
+        "title": "第3号適用対象",
+        "process_type": "mechanical",
+        "description": "居室を有する建築物として第3号の適用対象となる"
+      },
+      {
+        "id": "dec-substance-category",
+        "type": "decision",
+        "title": "対象物質の区分は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "ホルムアルデヒド" },
+          { "value": "クロルピリホス" },
+          { "value": "その他政令指定物質" }
+        ],
+        "description": "石綿等以外の物質で居室内において衛生上の支障を生ずるおそれがある政令で定める物質の区分",
+        "related_articles": ["令第20条の7"]
+      },
+      {
+        "id": "proc-substance-identified",
+        "type": "process",
+        "title": "物質区分特定",
+        "process_type": "mechanical",
+        "description": "対象物質の区分を特定"
+      },
+      {
+        "id": "dec-materials-compliance",
+        "type": "decision",
+        "title": "建築材料が技術的基準に適合するか？",
+        "decision_type": "binary",
+        "description": "物質区分に応じた建築材料の技術的基準への適合を判定",
+        "related_articles": ["令第20条の8", "令第20条の9"]
+      },
+      {
+        "id": "proc-materials-fail",
+        "type": "process",
+        "title": "建築材料不適合",
+        "process_type": "mechanical",
+        "description": "建築材料が政令で定める技術的基準に適合しない"
+      },
+      {
+        "id": "end-fail-materials",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "建築材料が技術的基準に不適合"
+      },
+      {
+        "id": "proc-materials-ok",
+        "type": "process",
+        "title": "建築材料適合",
+        "process_type": "mechanical",
+        "description": "建築材料が政令で定める技術的基準に適合"
+      },
+      {
+        "id": "dec-ventilation-compliance",
+        "type": "decision",
+        "title": "換気設備が技術的基準に適合するか？",
+        "decision_type": "binary",
+        "description": "物質区分に応じた換気設備の技術的基準への適合を判定",
+        "related_articles": ["令第20条の8", "令第20条の9"]
+      },
+      {
+        "id": "proc-ventilation-fail",
+        "type": "process",
+        "title": "換気設備不適合",
+        "process_type": "mechanical",
+        "description": "換気設備が政令で定める技術的基準に適合しない"
+      },
+      {
+        "id": "end-fail-ventilation",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "換気設備が技術的基準に不適合"
+      },
+      {
+        "id": "proc-ventilation-ok",
+        "type": "process",
+        "title": "換気設備適合",
+        "process_type": "mechanical",
+        "description": "換気設備が政令で定める技術的基準に適合"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "建築材料及び換気設備が政令で定める技術的基準に適合"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-has-rooms",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-has-rooms",
+        "to": "end-na",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e03",
+        "from": "dec-has-rooms",
+        "to": "proc-scope-applicable",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e04",
+        "from": "proc-scope-applicable",
+        "to": "dec-substance-category",
+        "role": "flow"
+      },
+      {
+        "id": "e05",
+        "from": "dec-substance-category",
+        "to": "proc-substance-identified",
+        "role": "option",
+        "label": "ホルムアルデヒド"
+      },
+      {
+        "id": "e06",
+        "from": "dec-substance-category",
+        "to": "proc-substance-identified",
+        "role": "option",
+        "label": "クロルピリホス"
+      },
+      {
+        "id": "e07",
+        "from": "dec-substance-category",
+        "to": "proc-substance-identified",
+        "role": "option",
+        "label": "その他政令指定物質"
+      },
+      {
+        "id": "e08",
+        "from": "proc-substance-identified",
+        "to": "dec-materials-compliance",
+        "role": "flow"
+      },
+      {
+        "id": "e09",
+        "from": "dec-materials-compliance",
+        "to": "proc-materials-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e10",
+        "from": "proc-materials-fail",
+        "to": "end-fail-materials",
+        "role": "flow"
+      },
+      {
+        "id": "e11",
+        "from": "dec-materials-compliance",
+        "to": "proc-materials-ok",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e12",
+        "from": "proc-materials-ok",
+        "to": "dec-ventilation-compliance",
+        "role": "flow"
+      },
+      {
+        "id": "e13",
+        "from": "dec-ventilation-compliance",
+        "to": "proc-ventilation-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e14",
+        "from": "proc-ventilation-fail",
+        "to": "end-fail-ventilation",
+        "role": "flow"
+      },
+      {
+        "id": "e15",
+        "from": "dec-ventilation-compliance",
+        "to": "proc-ventilation-ok",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e16",
+        "from": "proc-ventilation-ok",
+        "to": "end-pass",
+        "role": "flow"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-A28_2-P1-I3",
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "defines_detail",
+      "articles": ["A20の7", "A20の8", "A20の9"],
+      "description": "政令で定める物質の区分及び建築材料・換気設備の技術的基準"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

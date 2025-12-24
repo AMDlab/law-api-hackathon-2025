@@ -1,0 +1,165 @@
+{
+  "id": "A40_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "地方公共団体の条例による制限の附加（適合判定フロー）",
+    "target_subject": "建築物",
+    "description": "法40条に基づく地方公共団体の条例による附加的制限への適合を判定するフロー"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "40",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": ["単体規定", "地方条例"],
+  "text_raw": "地方公共団体は、その地方の気候若しくは風土の特殊性又は特殊建築物の用途若しくは規模に因り、この章の規定又はこれに基づく命令の規定のみによつては建築物の安全、防火又は衛生の目的を充分に達し難いと認める場合においては、条例で、建築物の敷地、構造又は建築設備に関して安全上、防火上又は衛生上必要な制限を附加することができる。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        { "type": "existence", "value": "法40条に基づく条例が制定されている地方公共団体の区域内" }
+      ],
+      "note": "当該敷地の所在する地方公共団体において法40条に基づく条例が制定されている場合に適用"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        { "ref": "info-ordinance-applicable", "operator": "==", "value": false, "note": "条例が適用されない場合は適合" },
+        { "ref": "info-ordinance-compliance", "operator": "==", "value": true, "note": "条例基準に適合する場合は適合" }
+      ]
+    }
+  },
+  "flow_diagram": {
+    "title": "法40条1項 条例による附加制限 適合判定フロー",
+    "description": "地方公共団体の条例による附加的制限が適用される場合、その基準に適合するかを判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "法40条1項の適合判定を開始"
+      },
+      {
+        "id": "dec-ordinance-exists",
+        "type": "decision",
+        "title": "当該自治体に法40条条例があるか？",
+        "decision_type": "binary",
+        "description": "敷地が所在する地方公共団体において法40条に基づく条例が制定されているか判定"
+      },
+      {
+        "id": "proc-no-ordinance",
+        "type": "process",
+        "title": "法40条条例なし",
+        "process_type": "mechanical",
+        "description": "当該地方公共団体には法40条に基づく条例がない"
+      },
+      {
+        "id": "dec-building-type",
+        "type": "decision",
+        "title": "建築物の種別は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "特殊建築物", "description": "法別表第一に掲げる用途" },
+          { "value": "一般建築物", "description": "特殊建築物以外" }
+        ],
+        "description": "建築物が特殊建築物に該当するか判定"
+      },
+      {
+        "id": "dec-ordinance-applicable",
+        "type": "decision",
+        "title": "条例の適用対象か？",
+        "decision_type": "binary",
+        "description": "当該建築計画が条例の適用対象（用途、規模、構造等の条件）に該当するか判定"
+      },
+      {
+        "id": "proc-not-applicable",
+        "type": "process",
+        "title": "条例適用対象外",
+        "process_type": "mechanical",
+        "description": "条例の適用対象条件に該当しないため法40条条例は適用されない"
+      },
+      {
+        "id": "dec-site-compliance",
+        "type": "decision",
+        "title": "敷地に関する条例基準に適合するか？",
+        "decision_type": "binary",
+        "description": "条例で定められた敷地に関する附加制限（敷地面積、接道等）に適合するか判定"
+      },
+      {
+        "id": "dec-structure-compliance",
+        "type": "decision",
+        "title": "構造に関する条例基準に適合するか？",
+        "decision_type": "binary",
+        "description": "条例で定められた構造に関する附加制限（構造種別、部材仕様等）に適合するか判定"
+      },
+      {
+        "id": "dec-equipment-compliance",
+        "type": "decision",
+        "title": "建築設備に関する条例基準に適合するか？",
+        "decision_type": "binary",
+        "description": "条例で定められた建築設備に関する附加制限に適合するか判定"
+      },
+      {
+        "id": "proc-all-comply",
+        "type": "process",
+        "title": "条例基準全項目適合",
+        "process_type": "mechanical",
+        "description": "敷地、構造、建築設備の全ての条例基準に適合"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "法40条1項の規定に適合（条例なし、適用対象外、又は条例基準に適合）"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "法40条1項の規定に不適合（条例基準に違反）"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "dec-ordinance-exists", "role": "flow" },
+      { "id": "e02", "from": "dec-ordinance-exists", "to": "dec-building-type", "role": "yes", "label": "はい" },
+      { "id": "e03", "from": "dec-ordinance-exists", "to": "proc-no-ordinance", "role": "no", "label": "いいえ" },
+      { "id": "e04", "from": "proc-no-ordinance", "to": "pass", "role": "flow" },
+      { "id": "e05", "from": "dec-building-type", "to": "dec-ordinance-applicable", "role": "option", "label": "特殊建築物" },
+      { "id": "e06", "from": "dec-building-type", "to": "dec-ordinance-applicable", "role": "option", "label": "一般建築物" },
+      { "id": "e07", "from": "dec-ordinance-applicable", "to": "dec-site-compliance", "role": "yes", "label": "はい" },
+      { "id": "e08", "from": "dec-ordinance-applicable", "to": "proc-not-applicable", "role": "no", "label": "いいえ" },
+      { "id": "e09", "from": "proc-not-applicable", "to": "pass", "role": "flow" },
+      { "id": "e10", "from": "dec-site-compliance", "to": "dec-structure-compliance", "role": "yes", "label": "はい" },
+      { "id": "e11", "from": "dec-site-compliance", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e12", "from": "dec-structure-compliance", "to": "dec-equipment-compliance", "role": "yes", "label": "はい" },
+      { "id": "e13", "from": "dec-structure-compliance", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e14", "from": "dec-equipment-compliance", "to": "proc-all-comply", "role": "yes", "label": "はい" },
+      { "id": "e15", "from": "dec-equipment-compliance", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e16", "from": "proc-all-comply", "to": "pass", "role": "flow" }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-A40-P1",
+  "related_laws": [
+    {
+      "law_id": "各地方公共団体の条例",
+      "law_name": "地方公共団体の条例（法40条に基づく）",
+      "law_type": "regulation",
+      "relationship": "delegated_from",
+      "description": "法40条に基づき地方公共団体が制定する条例で、建築物の敷地、構造、建築設備に関する附加的制限を定める"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

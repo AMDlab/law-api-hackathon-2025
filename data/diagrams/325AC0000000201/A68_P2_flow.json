@@ -1,0 +1,246 @@
+{
+  "id": "A68_P2_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "壁面の位置の制限への適合",
+    "target_subject": "建築物",
+    "description": "景観地区内の建築物の壁又はこれに代わる柱が壁面の位置の制限に適合することを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "68",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": ["単体規定", "景観"],
+  "text_raw": "景観地区内においては、建築物の壁又はこれに代わる柱は、景観地区に関する都市計画において壁面の位置の制限が定められたときは、建築物の地盤面下の部分を除き、当該壁面の位置の制限に反して建築してはならない。ただし、次の各号のいずれかに該当する建築物については、この限りでない。一前項第一号に掲げる建築物二学校、駅舎、卸売市場その他これらに類する公益上必要な建築物で、特定行政庁が用途上又は構造上やむを得ないと認めて許可したもの",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "景観地区内"
+        },
+        {
+          "type": "urban_plan",
+          "value": "壁面の位置の制限が定められている"
+        }
+      ],
+      "note": "景観地区に関する都市計画において壁面の位置の制限が定められた場合のみ適用"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "note": "地盤面上の部分",
+          "ref": "info-wall-location",
+          "operator": "!=",
+          "value": "below-grade"
+        },
+        {
+          "ref": "info-wall-compliance",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    },
+    "exceptions": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "note": "法68条1項1号の建築物（公益上必要な建築物）",
+          "ref": "info-building-type",
+          "value": "public-interest-building-1"
+        },
+        {
+          "note": "学校、駅舎、卸売市場等で特定行政庁が許可したもの",
+          "operator": "AND",
+          "conditions": [
+            {
+              "ref": "info-building-type",
+              "value": "public-interest-building-2"
+            },
+            {
+              "ref": "info-authority-approval",
+              "operator": "==",
+              "value": true
+            }
+          ]
+        }
+      ],
+      "effect": "EXEMPT"
+    }
+  },
+  "flow_diagram": {
+    "title": "景観地区内壁面位置制限の判定フロー",
+    "description": "景観地区内の建築物の壁・柱が壁面の位置の制限に適合するか判定するフロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start"
+      },
+      {
+        "id": "dec-in-landscape-area",
+        "type": "decision",
+        "title": "景観地区内か？",
+        "decision_type": "binary",
+        "description": "敷地が景観地区内に位置するか確認"
+      },
+      {
+        "id": "dec-wall-limit-exists",
+        "type": "decision",
+        "title": "壁面の位置の制限が定められているか？",
+        "decision_type": "binary",
+        "description": "景観地区に関する都市計画において壁面の位置の制限が定められているか確認"
+      },
+      {
+        "id": "dec-building-type",
+        "type": "decision",
+        "title": "建築物の種類は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "公衆便所・巡査派出所等（第1項第1号）" },
+          { "value": "学校・駅舎・卸売市場等" },
+          { "value": "一般建築物" }
+        ],
+        "description": "建築物の用途種別を確認"
+      },
+      {
+        "id": "proc-item1-match",
+        "type": "process",
+        "title": "第1号該当（公益上必要な建築物）",
+        "process_type": "mechanical",
+        "description": "前項（第1項）第1号に掲げる公益上必要な建築物に該当"
+      },
+      {
+        "id": "dec-public-necessity-item1",
+        "type": "decision",
+        "title": "公益上必要な建築物か？",
+        "decision_type": "binary",
+        "description": "公衆便所、巡査派出所その他これらに類する建築物で公益上必要なものであるか確認"
+      },
+      {
+        "id": "proc-item2-check",
+        "type": "process",
+        "title": "第2号該当確認（学校・駅舎等）",
+        "process_type": "mechanical",
+        "description": "学校、駅舎、卸売市場その他これらに類する公益上必要な建築物に該当"
+      },
+      {
+        "id": "dec-authority-approval",
+        "type": "decision",
+        "title": "特定行政庁の許可を受けているか？",
+        "decision_type": "binary",
+        "description": "特定行政庁が用途上又は構造上やむを得ないと認めて許可したか確認"
+      },
+      {
+        "id": "proc-item2-match",
+        "type": "process",
+        "title": "第2号該当（特定行政庁の許可）",
+        "process_type": "mechanical",
+        "description": "学校・駅舎等で特定行政庁の許可を受けたものに該当"
+      },
+      {
+        "id": "dec-wall-below-grade",
+        "type": "decision",
+        "title": "壁・柱は地盤面下の部分か？",
+        "decision_type": "binary",
+        "description": "判定対象の壁又はこれに代わる柱が建築物の地盤面下の部分に該当するか確認"
+      },
+      {
+        "id": "dec-wall-position-compliance",
+        "type": "decision",
+        "title": "壁面の位置の制限に適合するか？",
+        "decision_type": "binary",
+        "description": "壁又は柱の位置が都市計画に定められた壁面の位置の制限に適合するか判定"
+      },
+      {
+        "id": "pass-exempt",
+        "type": "terminal",
+        "title": "適合（適用除外）",
+        "result": "pass",
+        "description": "ただし書きの適用除外に該当するため適合"
+      },
+      {
+        "id": "pass-below-grade",
+        "type": "terminal",
+        "title": "適合（地盤面下の部分）",
+        "result": "pass",
+        "description": "地盤面下の部分は壁面の位置の制限の対象外"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "壁面の位置の制限に適合"
+      },
+      {
+        "id": "pass-no-limit",
+        "type": "terminal",
+        "title": "規定対象外（制限なし）",
+        "result": "pass",
+        "description": "壁面の位置の制限が定められていないため規制対象外"
+      },
+      {
+        "id": "fail-outside-area",
+        "type": "terminal",
+        "title": "規定対象外（区域外）",
+        "result": "pass",
+        "description": "景観地区外のため本規定の対象外"
+      },
+      {
+        "id": "fail-wall-position",
+        "type": "terminal",
+        "title": "不適合（壁面位置違反）",
+        "result": "fail",
+        "description": "壁又は柱の位置が壁面の位置の制限に違反"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "dec-in-landscape-area", "role": "flow" },
+      { "id": "e02", "from": "dec-in-landscape-area", "to": "dec-wall-limit-exists", "role": "yes", "label": "はい" },
+      { "id": "e03", "from": "dec-in-landscape-area", "to": "fail-outside-area", "role": "no", "label": "いいえ" },
+      { "id": "e04", "from": "dec-wall-limit-exists", "to": "dec-building-type", "role": "yes", "label": "はい" },
+      { "id": "e05", "from": "dec-wall-limit-exists", "to": "pass-no-limit", "role": "no", "label": "いいえ" },
+      { "id": "e06", "from": "dec-building-type", "to": "proc-item1-match", "role": "option", "label": "公衆便所・巡査派出所等（第1項第1号）" },
+      { "id": "e07", "from": "dec-building-type", "to": "proc-item2-check", "role": "option", "label": "学校・駅舎・卸売市場等" },
+      { "id": "e08", "from": "dec-building-type", "to": "dec-wall-below-grade", "role": "option", "label": "一般建築物" },
+      { "id": "e09", "from": "proc-item1-match", "to": "dec-public-necessity-item1", "role": "flow" },
+      { "id": "e10", "from": "dec-public-necessity-item1", "to": "pass-exempt", "role": "yes", "label": "はい" },
+      { "id": "e11", "from": "dec-public-necessity-item1", "to": "dec-wall-below-grade", "role": "no", "label": "いいえ" },
+      { "id": "e12", "from": "proc-item2-check", "to": "dec-authority-approval", "role": "flow" },
+      { "id": "e13", "from": "dec-authority-approval", "to": "proc-item2-match", "role": "yes", "label": "はい" },
+      { "id": "e14", "from": "proc-item2-match", "to": "pass-exempt", "role": "flow" },
+      { "id": "e15", "from": "dec-authority-approval", "to": "dec-wall-below-grade", "role": "no", "label": "いいえ" },
+      { "id": "e16", "from": "dec-wall-below-grade", "to": "pass-below-grade", "role": "yes", "label": "はい" },
+      { "id": "e17", "from": "dec-wall-below-grade", "to": "dec-wall-position-compliance", "role": "no", "label": "いいえ" },
+      { "id": "e18", "from": "dec-wall-position-compliance", "to": "pass", "role": "yes", "label": "はい" },
+      { "id": "e19", "from": "dec-wall-position-compliance", "to": "fail-wall-position", "role": "no", "label": "いいえ" }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-A68-P2",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A68:P1:I1", "A68:P1:I2"],
+      "description": "第68条第1項の例外要件を参照"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

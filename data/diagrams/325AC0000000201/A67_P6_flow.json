@@ -1,0 +1,230 @@
+{
+  "id": "A67_P6_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "防災都市計画施設に面する建築物の間口率と高さ",
+    "target_subject": "建築物",
+    "description": "特定防災街区整備地区内で敷地が防災都市計画施設に接する建築物について、防災都市計画施設に係る間口率及び高さが最低限度以上であることを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "67",
+    "paragraph": "6",
+    "item": null
+  },
+  "labels": [
+    "集団規定",
+    "防災街区"
+  ],
+  "text_raw": "特定防災街区整備地区内においては、その敷地が防災都市計画施設（密集市街地整備法第三十一条第二項に規定する防災都市計画施設をいう。以下この条において同じ。）に接する建築物の防災都市計画施設に係る間口率（防災都市計画施設に面する部分の長さの敷地の当該防災都市計画施設に接する部分の長さに対する割合をいう。以下この条において同じ。）及び高さは、特定防災街区整備地区に関する都市計画において建築物の防災都市計画施設に係る間口率の最低限度及び建築物の高さの最低限度が定められたときは、それぞれ、これらの最低限度以上でなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "特定防災街区整備地区内"
+        },
+        {
+          "type": "geometry",
+          "value": "敷地が防災都市計画施設に接する"
+        }
+      ],
+      "note": "特定防災街区整備地区に関する都市計画において、防災都市計画施設に係る間口率の最低限度及び高さの最低限度が定められた場合"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-frontage-ratio",
+          "operator": ">=",
+          "ref2": "info-frontage-ratio-min"
+        },
+        {
+          "ref": "info-height",
+          "operator": ">=",
+          "ref2": "info-height-min"
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "kijo_diagram_ref": "CHK-BSL-A67-P6",
+  "flow_diagram": {
+    "title": "防災都市計画施設に面する建築物の間口率・高さ適合判定フロー",
+    "description": "敷地が防災都市計画施設に接する建築物について、間口率と高さが最低限度以上かを判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start"
+      },
+      {
+        "id": "dec-location",
+        "type": "decision",
+        "title": "特定防災街区整備地区内か？",
+        "decision_type": "binary",
+        "description": "敷地が特定防災街区整備地区内に位置するか確認"
+      },
+      {
+        "id": "dec-site-contact",
+        "type": "decision",
+        "title": "敷地は防災都市計画施設に接するか？",
+        "decision_type": "binary",
+        "description": "敷地が防災都市計画施設（密集市街地整備法第31条第2項）に接しているか確認"
+      },
+      {
+        "id": "dec-urban-plan-defined",
+        "type": "decision",
+        "title": "都市計画で間口率・高さの最低限度が定められているか？",
+        "decision_type": "binary",
+        "description": "特定防災街区整備地区に関する都市計画において間口率の最低限度及び高さの最低限度が定められているか確認"
+      },
+      {
+        "id": "dec-frontage-ratio",
+        "type": "decision",
+        "title": "間口率は最低限度以上か？",
+        "decision_type": "binary",
+        "description": "建築物の防災都市計画施設に係る間口率(R)が最低限度(Rm)以上か判定",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "R", "desc": "防災都市計画施設に係る間口率" },
+          "rhs": { "var": "Rm", "desc": "間口率の最低限度" }
+        }
+      },
+      {
+        "id": "dec-height",
+        "type": "decision",
+        "title": "建築物の高さは最低限度以上か？",
+        "decision_type": "binary",
+        "description": "建築物の高さ(H)が最低限度(Hm)以上か判定",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "H", "desc": "建築物の高さ", "unit": "m" },
+          "rhs": { "var": "Hm", "desc": "高さの最低限度", "unit": "m" }
+        }
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "法67条6項適合",
+        "result": "pass",
+        "description": "間口率及び高さが最低限度以上で適合"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "法67条6項不適合",
+        "result": "fail",
+        "description": "間口率又は高さが最低限度未満で不適合"
+      },
+      {
+        "id": "not-applicable",
+        "type": "terminal",
+        "title": "規定対象外",
+        "result": "end",
+        "description": "本規定の適用範囲外"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-location",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-location",
+        "to": "dec-site-contact",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "dec-location",
+        "to": "not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e04",
+        "from": "dec-site-contact",
+        "to": "dec-urban-plan-defined",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e05",
+        "from": "dec-site-contact",
+        "to": "not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e06",
+        "from": "dec-urban-plan-defined",
+        "to": "dec-frontage-ratio",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e07",
+        "from": "dec-urban-plan-defined",
+        "to": "pass",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e08",
+        "from": "dec-frontage-ratio",
+        "to": "dec-height",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e09",
+        "from": "dec-frontage-ratio",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e10",
+        "from": "dec-height",
+        "to": "pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e11",
+        "from": "dec-height",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A67:P1", "A67:P7"],
+      "description": "同一条の他項との関連"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00.000Z",
+    "updated_at": "2025-12-25T00:00:00.000Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-skill",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

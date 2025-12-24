@@ -1,0 +1,252 @@
+{
+  "id": "A53_2_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "建築物の敷地面積の最低限度",
+    "target_subject": "建築物",
+    "description": "用途地域で最低敷地面積が指定された場合の建築物敷地面積の適合判定"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "53の2",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "集団規定",
+    "敷地面積"
+  ],
+  "text_raw": "建築物の敷地面積は、用途地域に関する都市計画において建築物の敷地面積の最低限度が定められたときは、当該最低限度以上でなければならない。ただし、次の各号のいずれかに該当する建築物の敷地については、この限りでない。一前条第六項第一号に掲げる建築物二公衆便所、巡査派出所その他これらに類する建築物で公益上必要なもの三その敷地の周囲に広い公園、広場、道路その他の空地を有する建築物であつて、特定行政庁が市街地の環境を害するおそれがないと認めて許可したもの四特定行政庁が用途上又は構造上やむを得ないと認めて許可したもの",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "用途地域に関する都市計画において建築物の敷地面積の最低限度が定められた区域"
+        }
+      ],
+      "note": "用途地域で最低敷地面積の指定がある場合に適用"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "operator": ">=",
+          "lhs": {
+            "type": "numeric",
+            "ref": "As",
+            "description": "建築物の敷地面積"
+          },
+          "rhs": {
+            "type": "numeric",
+            "ref": "Amin",
+            "description": "都市計画で定められた最低限度"
+          }
+        },
+        {
+          "type": "exception",
+          "value": "各号のいずれかに該当"
+        }
+      ]
+    },
+    "exceptions": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "type": "reference",
+          "value": "法::A53:P6:I1",
+          "description": "法第53条第6項第1号に掲げる建築物"
+        },
+        {
+          "type": "classification",
+          "value": "公益上必要な建築物",
+          "description": "公衆便所、巡査派出所その他これらに類する建築物で公益上必要なもの"
+        },
+        {
+          "type": "permission",
+          "value": "特定行政庁許可",
+          "description": "敷地周囲に広い公園等を有し市街地環境を害するおそれがないと認められたもの"
+        },
+        {
+          "type": "permission",
+          "value": "特定行政庁許可",
+          "description": "用途上又は構造上やむを得ないと認められたもの"
+        }
+      ],
+      "effect": "EXEMPT"
+    }
+  },
+  "flow_diagram": {
+    "title": "建築物の敷地面積の最低限度判定フロー",
+    "description": "法53条の2第1項による敷地面積の最低限度適合判定のフロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start"
+      },
+      {
+        "id": "dec-min-area-designated",
+        "type": "decision",
+        "title": "最低敷地面積が指定されているか？",
+        "decision_type": "binary",
+        "description": "用途地域に関する都市計画において建築物の敷地面積の最低限度が定められているか"
+      },
+      {
+        "id": "proc-not-applicable",
+        "type": "process",
+        "title": "本項非該当",
+        "process_type": "mechanical",
+        "description": "最低敷地面積が定められていないため本項は適用されない"
+      },
+      {
+        "id": "dec-item1",
+        "type": "decision",
+        "title": "法53条6項1号の建築物か？",
+        "decision_type": "binary",
+        "description": "法第53条第6項第1号に掲げる建築物（巡査派出所、公衆便所等）に該当するか",
+        "related_articles": ["法::A53:P6:I1"]
+      },
+      {
+        "id": "proc-item1-exempt",
+        "type": "process",
+        "title": "1号該当（適用除外）",
+        "process_type": "mechanical",
+        "description": "法53条6項1号に該当するため適用除外"
+      },
+      {
+        "id": "dec-item2",
+        "type": "decision",
+        "title": "公益上必要な建築物か？",
+        "decision_type": "binary",
+        "description": "公衆便所、巡査派出所その他これらに類する建築物で公益上必要なものに該当するか"
+      },
+      {
+        "id": "proc-item2-exempt",
+        "type": "process",
+        "title": "2号該当（適用除外）",
+        "process_type": "mechanical",
+        "description": "公益上必要な建築物のため適用除外"
+      },
+      {
+        "id": "dec-item3",
+        "type": "decision",
+        "title": "周囲空地があり許可を受けたか？",
+        "decision_type": "binary",
+        "description": "敷地周囲に広い公園等を有し、特定行政庁が市街地環境を害するおそれがないと認めて許可したものに該当するか"
+      },
+      {
+        "id": "proc-item3-exempt",
+        "type": "process",
+        "title": "3号該当（適用除外）",
+        "process_type": "mechanical",
+        "description": "周囲空地による許可を受けているため適用除外"
+      },
+      {
+        "id": "dec-item4",
+        "type": "decision",
+        "title": "用途上・構造上やむを得ない許可を受けたか？",
+        "decision_type": "binary",
+        "description": "特定行政庁が用途上又は構造上やむを得ないと認めて許可したものに該当するか"
+      },
+      {
+        "id": "proc-item4-exempt",
+        "type": "process",
+        "title": "4号該当（適用除外）",
+        "process_type": "mechanical",
+        "description": "用途上・構造上やむを得ない許可を受けているため適用除外"
+      },
+      {
+        "id": "proc-get-min-area",
+        "type": "process",
+        "title": "最低敷地面積の取得",
+        "process_type": "mechanical",
+        "description": "都市計画情報から最低敷地面積の指定値を取得"
+      },
+      {
+        "id": "dec-site-area-compliance",
+        "type": "decision",
+        "title": "敷地面積が最低限度以上か？",
+        "decision_type": "binary",
+        "description": "建築物の敷地面積が都市計画で定められた最低限度以上であるか判定",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "As", "desc": "敷地面積" },
+          "rhs": { "var": "Amin", "desc": "最低敷地面積" }
+        }
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "法53条の2第1項に適合"
+      },
+      {
+        "id": "pass-exempt",
+        "type": "terminal",
+        "title": "適合（適用除外）",
+        "result": "pass",
+        "description": "ただし書の適用除外により法53条の2第1項に適合"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "法53条の2第1項に不適合"
+      },
+      {
+        "id": "end-not-applicable",
+        "type": "terminal",
+        "title": "本項対象外",
+        "result": "end",
+        "description": "本項は適用されない"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "dec-min-area-designated", "role": "flow" },
+      { "id": "e02", "from": "dec-min-area-designated", "to": "dec-item1", "role": "yes", "label": "はい" },
+      { "id": "e03", "from": "dec-min-area-designated", "to": "proc-not-applicable", "role": "no", "label": "いいえ" },
+      { "id": "e04", "from": "proc-not-applicable", "to": "end-not-applicable", "role": "flow" },
+      { "id": "e05", "from": "dec-item1", "to": "proc-item1-exempt", "role": "yes", "label": "はい" },
+      { "id": "e06", "from": "dec-item1", "to": "dec-item2", "role": "no", "label": "いいえ" },
+      { "id": "e07", "from": "proc-item1-exempt", "to": "pass-exempt", "role": "flow" },
+      { "id": "e08", "from": "dec-item2", "to": "proc-item2-exempt", "role": "yes", "label": "はい" },
+      { "id": "e09", "from": "dec-item2", "to": "dec-item3", "role": "no", "label": "いいえ" },
+      { "id": "e10", "from": "proc-item2-exempt", "to": "pass-exempt", "role": "flow" },
+      { "id": "e11", "from": "dec-item3", "to": "proc-item3-exempt", "role": "yes", "label": "はい" },
+      { "id": "e12", "from": "dec-item3", "to": "dec-item4", "role": "no", "label": "いいえ" },
+      { "id": "e13", "from": "proc-item3-exempt", "to": "pass-exempt", "role": "flow" },
+      { "id": "e14", "from": "dec-item4", "to": "proc-item4-exempt", "role": "yes", "label": "はい" },
+      { "id": "e15", "from": "dec-item4", "to": "proc-get-min-area", "role": "no", "label": "いいえ" },
+      { "id": "e16", "from": "proc-item4-exempt", "to": "pass-exempt", "role": "flow" },
+      { "id": "e17", "from": "proc-get-min-area", "to": "dec-site-area-compliance", "role": "flow" },
+      { "id": "e18", "from": "dec-site-area-compliance", "to": "pass", "role": "yes", "label": "はい" },
+      { "id": "e19", "from": "dec-site-area-compliance", "to": "fail", "role": "no", "label": "いいえ" }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-A53_2-P1",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A53:P6:I1"],
+      "description": "第1項第1号の適用除外規定で参照"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

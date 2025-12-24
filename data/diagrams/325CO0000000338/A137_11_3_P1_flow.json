@@ -1,0 +1,167 @@
+{
+  "id": "A137_11_3_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "特定防災街区整備地区における既存不適格緩和",
+    "target_subject": "既存不適格建築物",
+    "description": "法第3条第2項により法第67条第1項の規定の適用を受けない建築物について、法第86条の7第1項の緩和適用範囲を判定"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "137_11_3",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "既存不適格建築物",
+    "大規模修繕・模様替",
+    "特定防災街区整備地区",
+    "防火規制"
+  ],
+  "text_raw": "法第三条第二項の規定により法第六十七条第一項の規定の適用を受けない建築物（木造の建築物にあつては、外壁及び軒裏が防火構造のものに限る。）についての法第八十六条の七第一項の政令で定める範囲は、大規模の修繕又は大規模の模様替については、当該建築物の主要構造部（床及び屋根を除く。）の構造を変更しない大規模の修繕又は大規模の模様替に係る部分とする。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "building_type",
+          "value": "法第3条第2項の規定により法第67条第1項の規定の適用を受けない建築物"
+        },
+        {
+          "type": "building_type_limit",
+          "value": "木造の建築物にあつては、外壁及び軒裏が防火構造のものに限る"
+        },
+        {
+          "type": "work_type",
+          "value": "大規模の修繕又は大規模の模様替"
+        }
+      ],
+      "note": "特定防災街区整備地区内における既存不適格建築物の大規模修繕・模様替"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "description": "当該建築物の主要構造部（床及び屋根を除く）の構造を変更しない大規模の修繕又は大規模の模様替に係る部分であること"
+        }
+      ]
+    }
+  },
+  "flow_diagram": {
+    "title": "令137条の11の3第1項 適合判定フロー",
+    "description": "特定防災街区整備地区内の既存不適格建築物の大規模修繕・模様替における緩和適用範囲の判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start"
+      },
+      {
+        "id": "dec-existing-status",
+        "type": "decision",
+        "title": "法67条1項の規定適用除外建築物か？",
+        "decision_type": "binary",
+        "description": "法第3条第2項の規定により法第67条第1項の規定の適用を受けない既存不適格建築物であるか"
+      },
+      {
+        "id": "dec-structure-type",
+        "type": "decision",
+        "title": "構造種別は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "木造" },
+          { "value": "非木造" }
+        ],
+        "description": "当該建築物が木造か否か"
+      },
+      {
+        "id": "dec-exterior-fireproof",
+        "type": "decision",
+        "title": "外壁・軒裏が防火構造か？",
+        "decision_type": "binary",
+        "description": "木造建築物の場合、外壁及び軒裏が防火構造であるか"
+      },
+      {
+        "id": "proc-applicable-building",
+        "type": "process",
+        "title": "対象建築物該当",
+        "process_type": "mechanical",
+        "description": "本条の適用対象建築物に該当"
+      },
+      {
+        "id": "dec-work-type",
+        "type": "decision",
+        "title": "工事種別は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "大規模修繕" },
+          { "value": "大規模模様替" },
+          { "value": "その他" }
+        ],
+        "description": "当該工事が大規模の修繕又は大規模の模様替であるか"
+      },
+      {
+        "id": "dec-main-structure-change",
+        "type": "decision",
+        "title": "主要構造部（床・屋根除く）の構造を変更するか？",
+        "decision_type": "binary",
+        "description": "大規模の修繕又は大規模の模様替において主要構造部（床及び屋根を除く）の構造を変更するか否か"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合（緩和適用範囲）",
+        "result": "pass",
+        "description": "法第86条の7第1項の政令で定める範囲に該当し、法第67条第1項の規定が適用されない"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "不適合（緩和適用外）",
+        "result": "fail",
+        "description": "法第86条の7第1項の政令で定める範囲に該当せず、法第67条第1項の規定が適用される"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "dec-existing-status", "role": "flow" },
+      { "id": "e02", "from": "dec-existing-status", "to": "dec-structure-type", "role": "yes", "label": "はい" },
+      { "id": "e03", "from": "dec-existing-status", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e04", "from": "dec-structure-type", "to": "dec-exterior-fireproof", "role": "option", "label": "木造" },
+      { "id": "e05", "from": "dec-structure-type", "to": "proc-applicable-building", "role": "option", "label": "非木造" },
+      { "id": "e06", "from": "dec-exterior-fireproof", "to": "proc-applicable-building", "role": "yes", "label": "はい" },
+      { "id": "e07", "from": "dec-exterior-fireproof", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e08", "from": "proc-applicable-building", "to": "dec-work-type", "role": "flow" },
+      { "id": "e09", "from": "dec-work-type", "to": "dec-main-structure-change", "role": "option", "label": "大規模修繕" },
+      { "id": "e10", "from": "dec-work-type", "to": "dec-main-structure-change", "role": "option", "label": "大規模模様替" },
+      { "id": "e11", "from": "dec-work-type", "to": "fail", "role": "option", "label": "その他" },
+      { "id": "e12", "from": "dec-main-structure-change", "to": "fail", "role": "yes", "label": "はい" },
+      { "id": "e13", "from": "dec-main-structure-change", "to": "pass", "role": "no", "label": "いいえ" }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-ORD-A137-11-3-P1",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": [
+        "A3:P2",
+        "A67:P1",
+        "A86_7:P1"
+      ],
+      "description": "法第3条第2項の既存不適格建築物の取扱、法第67条第1項の特定防災街区整備地区内規制、法第86条の7第1項の緩和規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T12:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

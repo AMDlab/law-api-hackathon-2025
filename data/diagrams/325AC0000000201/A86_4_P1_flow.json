@@ -1,0 +1,299 @@
+{
+  "id": "A86_4_P1_flow",
+  "version": "3.2.0",
+  "page_title": {
+    "title": "一敷地内建築物に対する耐火性能みなし規定フロー",
+    "target_subject": "建築物",
+    "description": "第86条の認定・許可を受けた建築物について、第27条または第67条を適用する際の耐火建築物等とみなす判定フロー"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "86-4",
+    "paragraph": "1"
+  },
+  "labels": ["単体規定", "特例規定", "みなし規定"],
+  "text_raw": "次の各号のいずれかに該当する建築物について第二十七条第二項若しくは第三項又は第六十七条第一項の規定を適用する場合においては、第一号イに該当する建築物は耐火建築物と、同号ロに該当する建築物は準耐火建築物とみなす。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "reference",
+          "value": "第27条第2項・3項または第67条第1項を適用"
+        },
+        {
+          "type": "certification",
+          "value": "第86条の認定・許可を受けた建築物"
+        }
+      ]
+    },
+    "judgment_rule": {
+      "operator": "IF",
+      "conditions": [
+        {
+          "type": "classification",
+          "value": "第2条第9号の2イ（一定規模以上）",
+          "interpretation": "該当 → 耐火建築物とみなす"
+        },
+        {
+          "type": "classification",
+          "value": "第2条第9号の3イ・ロ（公共施設等）",
+          "interpretation": "該当 → 準耐火建築物とみなす"
+        }
+      ]
+    }
+  },
+  "flow_diagram": {
+    "title": "一敷地内建築物の耐火性能みなし判定フロー",
+    "description": "第86条の4第1項に基づく耐火建築物等へのみなし判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "審査開始"
+      },
+      {
+        "id": "dec-certification-type",
+        "type": "decision",
+        "title": "第86条の認定・許可の種類は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "第86条第1項・第3項", "description": "一敷地内認定建築物" },
+          { "value": "第86条第2項・第4項", "description": "一敷地内許可建築物" },
+          { "value": "第86条の2第1項〜第3項", "description": "位置・構造の認定・許可" },
+          { "value": "該当なし", "description": "認定・許可を受けていない" }
+        ],
+        "description": "建築物が受けている第86条関連の認定・許可の種類を判定"
+      },
+      {
+        "id": "proc-not-applicable",
+        "type": "process",
+        "title": "本規定の適用対象外",
+        "description": "第86条の認定・許可を受けていない場合は本規定適用対象外"
+      },
+      {
+        "id": "dec-applicable-regulation",
+        "type": "decision",
+        "title": "適用する規定は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "第27条第2項", "description": "耐火建築物等の規制" },
+          { "value": "第27条第3項", "description": "耐火建築物等の規制" },
+          { "value": "第67条第1項", "description": "特定防災街区整備地区" },
+          { "value": "その他", "description": "上記以外の規定" }
+        ],
+        "description": "適用対象となる規定を判定"
+      },
+      {
+        "id": "proc-other-regulation",
+        "type": "process",
+        "title": "本規定の適用対象外（規定外）",
+        "description": "第27条第2項・3項または第67条第1項以外の場合は本規定適用対象外"
+      },
+      {
+        "id": "dec-building-category",
+        "type": "decision",
+        "title": "建築物の種別は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "第2条第9号の2イ該当", "description": "大規模建築物等（耐火建築物とみなす）" },
+          { "value": "第2条第9号の3イ・ロ該当", "description": "特定用途等（準耐火建築物とみなす）" },
+          { "value": "いずれにも該当しない", "description": "みなし規定適用外" }
+        ],
+        "description": "建築物が第2条第9号の2イまたは第9号の3イ・ロに該当するか判定"
+      },
+      {
+        "id": "proc-deemed-fireproof",
+        "type": "process",
+        "title": "耐火建築物とみなす",
+        "description": "第2条第9号の2イ該当により耐火建築物とみなされる"
+      },
+      {
+        "id": "proc-deemed-quasi-fireproof",
+        "type": "process",
+        "title": "準耐火建築物とみなす",
+        "description": "第2条第9号の3イ・ロ該当により準耐火建築物とみなされる"
+      },
+      {
+        "id": "proc-no-deeming",
+        "type": "process",
+        "title": "みなし規定適用外",
+        "description": "いずれの要件にも該当しないためみなし規定は適用されない"
+      },
+      {
+        "id": "pass-fireproof",
+        "type": "terminal",
+        "title": "耐火建築物として適合判定",
+        "result": "pass",
+        "description": "耐火建築物とみなして第27条・第67条を適用"
+      },
+      {
+        "id": "pass-quasi-fireproof",
+        "type": "terminal",
+        "title": "準耐火建築物として適合判定",
+        "result": "pass",
+        "description": "準耐火建築物とみなして第27条・第67条を適用"
+      },
+      {
+        "id": "end-not-applicable",
+        "type": "terminal",
+        "title": "適用対象外",
+        "result": "end",
+        "description": "本規定の適用対象外"
+      },
+      {
+        "id": "end-no-deeming",
+        "type": "terminal",
+        "title": "みなし規定適用なし",
+        "result": "end",
+        "description": "みなし規定は適用されず、通常の耐火性能判定を行う"
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge-start-to-certification",
+        "from": "start",
+        "to": "dec-certification-type",
+        "role": "flow"
+      },
+      {
+        "id": "edge-certification-86-1-3",
+        "from": "dec-certification-type",
+        "to": "dec-applicable-regulation",
+        "role": "option",
+        "label": "第86条第1項・第3項"
+      },
+      {
+        "id": "edge-certification-86-2-4",
+        "from": "dec-certification-type",
+        "to": "dec-applicable-regulation",
+        "role": "option",
+        "label": "第86条第2項・第4項"
+      },
+      {
+        "id": "edge-certification-86-2",
+        "from": "dec-certification-type",
+        "to": "dec-applicable-regulation",
+        "role": "option",
+        "label": "第86条の2第1項〜第3項"
+      },
+      {
+        "id": "edge-certification-none",
+        "from": "dec-certification-type",
+        "to": "proc-not-applicable",
+        "role": "option",
+        "label": "該当なし"
+      },
+      {
+        "id": "edge-not-applicable-to-end",
+        "from": "proc-not-applicable",
+        "to": "end-not-applicable",
+        "role": "flow"
+      },
+      {
+        "id": "edge-regulation-27-2",
+        "from": "dec-applicable-regulation",
+        "to": "dec-building-category",
+        "role": "option",
+        "label": "第27条第2項"
+      },
+      {
+        "id": "edge-regulation-27-3",
+        "from": "dec-applicable-regulation",
+        "to": "dec-building-category",
+        "role": "option",
+        "label": "第27条第3項"
+      },
+      {
+        "id": "edge-regulation-67-1",
+        "from": "dec-applicable-regulation",
+        "to": "dec-building-category",
+        "role": "option",
+        "label": "第67条第1項"
+      },
+      {
+        "id": "edge-regulation-other",
+        "from": "dec-applicable-regulation",
+        "to": "proc-other-regulation",
+        "role": "option",
+        "label": "その他"
+      },
+      {
+        "id": "edge-other-regulation-to-end",
+        "from": "proc-other-regulation",
+        "to": "end-not-applicable",
+        "role": "flow"
+      },
+      {
+        "id": "edge-category-fireproof",
+        "from": "dec-building-category",
+        "to": "proc-deemed-fireproof",
+        "role": "option",
+        "label": "第2条第9号の2イ該当"
+      },
+      {
+        "id": "edge-category-quasi-fireproof",
+        "from": "dec-building-category",
+        "to": "proc-deemed-quasi-fireproof",
+        "role": "option",
+        "label": "第2条第9号の3イ・ロ該当"
+      },
+      {
+        "id": "edge-category-none",
+        "from": "dec-building-category",
+        "to": "proc-no-deeming",
+        "role": "option",
+        "label": "いずれにも該当しない"
+      },
+      {
+        "id": "edge-deemed-fireproof-to-pass",
+        "from": "proc-deemed-fireproof",
+        "to": "pass-fireproof",
+        "role": "flow"
+      },
+      {
+        "id": "edge-deemed-quasi-fireproof-to-pass",
+        "from": "proc-deemed-quasi-fireproof",
+        "to": "pass-quasi-fireproof",
+        "role": "flow"
+      },
+      {
+        "id": "edge-no-deeming-to-end",
+        "from": "proc-no-deeming",
+        "to": "end-no-deeming",
+        "role": "flow"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-A86-4-P1",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["27:2", "27:3", "67:1", "2:9-2", "2:9-3"],
+      "description": "第27条第2項・3項（耐火建築物等の規制）、第67条第1項（特定防災街区整備地区）の適用対象建築物をみなす"
+    },
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": ["86:1", "86:2", "86:3", "86:4", "86-2:1"],
+      "description": "第86条の認定・許可を受けた建築物が対象"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

@@ -1,0 +1,182 @@
+{
+  "id": "A35_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "特殊建築物等の避難及び消火に関する技術的基準（適合判定フロー）",
+    "target_subject": "建築物",
+    "description": "特殊建築物等について避難施設・消火設備等が技術的基準に適合するかを判定するフロー"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "35",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": ["単体規定", "避難", "消防"],
+  "text_raw": "別表第一（い）欄（一）項から（四）項までに掲げる用途に供する特殊建築物、階数が三以上である建築物、政令で定める窓その他の開口部を有しない居室を有する建築物又は延べ面積（同一敷地内に二以上の建築物がある場合においては、その延べ面積の合計）が千平方メートルをこえる建築物については、廊下、階段、出入口その他の避難施設、消火栓、スプリンクラー、貯水槽その他の消火設備、排煙設備、非常用の照明装置及び進入口並びに敷地内の避難上及び消火上必要な通路は、政令で定める技術的基準に従つて、避難上及び消火上支障がないようにしなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "OR",
+      "conditions": [
+        { "type": "use", "value": "別表第一（い）欄（一）〜（四）項の用途" },
+        { "type": "scale", "value": "階数≧3" },
+        { "type": "feature", "value": "無窓居室あり" },
+        { "type": "scale", "value": "延べ面積>1000㎡" }
+      ]
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        { "ref": "info-facility-compliance", "operator": "==", "value": true }
+      ]
+    }
+  },
+  "flow_diagram": {
+    "title": "法35条1項 特殊建築物等の避難及び消火 適合判定フロー",
+    "description": "4つの適用条件に該当する場合、避難・消火施設が技術的基準に適合するかを判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "法35条の適合判定を開始"
+      },
+      {
+        "id": "dec-special-use",
+        "type": "decision",
+        "title": "別表第一（い）欄（一）〜（四）項の用途か？",
+        "decision_type": "binary",
+        "description": "劇場、病院、学校、百貨店等の特殊建築物に該当するか判定"
+      },
+      {
+        "id": "proc-scope-1",
+        "type": "process",
+        "title": "特殊建築物該当",
+        "process_type": "mechanical",
+        "description": "特殊建築物として法35条の適用対象"
+      },
+      {
+        "id": "dec-floors",
+        "type": "decision",
+        "title": "階数 ≥ 3か？",
+        "decision_type": "binary",
+        "description": "階数が3以上であるか判定",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "F", "desc": "階数" },
+          "rhs": { "value": 3 }
+        }
+      },
+      {
+        "id": "proc-scope-2",
+        "type": "process",
+        "title": "3階以上建築物該当",
+        "process_type": "mechanical",
+        "description": "3階以上建築物として法35条の適用対象"
+      },
+      {
+        "id": "dec-windowless",
+        "type": "decision",
+        "title": "無窓居室を有するか？",
+        "decision_type": "binary",
+        "description": "政令で定める窓その他の開口部を有しない居室があるか判定",
+        "related_articles": ["令::A111"]
+      },
+      {
+        "id": "proc-scope-3",
+        "type": "process",
+        "title": "無窓居室あり該当",
+        "process_type": "mechanical",
+        "description": "無窓居室を有する建築物として法35条の適用対象"
+      },
+      {
+        "id": "dec-floor-area",
+        "type": "decision",
+        "title": "延べ面積 > 1000㎡か？",
+        "decision_type": "binary",
+        "description": "延べ面積（敷地内合計）が1000㎡を超えるか判定",
+        "condition": {
+          "operator": "GT",
+          "lhs": { "var": "A", "desc": "延べ面積" },
+          "rhs": { "value": 1000, "unit": "m2" }
+        }
+      },
+      {
+        "id": "proc-scope-4",
+        "type": "process",
+        "title": "1000㎡超該当",
+        "process_type": "mechanical",
+        "description": "延べ面積1000㎡超建築物として法35条の適用対象"
+      },
+      {
+        "id": "proc-not-applicable",
+        "type": "process",
+        "title": "適用対象外",
+        "process_type": "mechanical",
+        "description": "法35条の適用対象外"
+      },
+      {
+        "id": "dec-tech-std",
+        "type": "decision",
+        "title": "避難・消火施設が技術的基準に適合するか？",
+        "decision_type": "binary",
+        "description": "廊下、階段、出入口、消火設備、排煙設備、非常用照明、進入口、敷地内通路が政令技術基準に適合するか判定",
+        "related_articles": ["令::A117", "令::A118", "令::A119", "令::A120", "令::A126_2", "令::A126_4", "令::A128"]
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "法35条の規定に適合"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "法35条の規定に不適合"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "dec-special-use", "role": "flow" },
+      { "id": "e02", "from": "dec-special-use", "to": "proc-scope-1", "role": "yes", "label": "はい" },
+      { "id": "e03", "from": "dec-special-use", "to": "dec-floors", "role": "no", "label": "いいえ" },
+      { "id": "e04", "from": "proc-scope-1", "to": "dec-tech-std", "role": "flow" },
+      { "id": "e05", "from": "dec-floors", "to": "proc-scope-2", "role": "yes", "label": "はい" },
+      { "id": "e06", "from": "dec-floors", "to": "dec-windowless", "role": "no", "label": "いいえ" },
+      { "id": "e07", "from": "proc-scope-2", "to": "dec-tech-std", "role": "flow" },
+      { "id": "e08", "from": "dec-windowless", "to": "proc-scope-3", "role": "yes", "label": "はい" },
+      { "id": "e09", "from": "dec-windowless", "to": "dec-floor-area", "role": "no", "label": "いいえ" },
+      { "id": "e10", "from": "proc-scope-3", "to": "dec-tech-std", "role": "flow" },
+      { "id": "e11", "from": "dec-floor-area", "to": "proc-scope-4", "role": "yes", "label": "はい" },
+      { "id": "e12", "from": "dec-floor-area", "to": "proc-not-applicable", "role": "no", "label": "いいえ" },
+      { "id": "e13", "from": "proc-scope-4", "to": "dec-tech-std", "role": "flow" },
+      { "id": "e14", "from": "proc-not-applicable", "to": "pass", "role": "flow" },
+      { "id": "e15", "from": "dec-tech-std", "to": "pass", "role": "yes", "label": "はい" },
+      { "id": "e16", "from": "dec-tech-std", "to": "fail", "role": "no", "label": "いいえ" }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-A35-P1",
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "delegates_to",
+      "articles": ["A111", "A117", "A118", "A119", "A120", "A126_2", "A126_4", "A128"],
+      "description": "法35条の技術的基準を定める"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

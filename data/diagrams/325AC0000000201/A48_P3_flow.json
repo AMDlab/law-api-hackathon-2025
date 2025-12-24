@@ -1,0 +1,170 @@
+{
+  "id": "A48_P3_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "第一種中高層住居専用地域における建築物の用途制限",
+    "target_subject": "建築物",
+    "description": "第一種中高層住居専用地域内において建築可能な建築物の用途が別表第二(は)項に適合することを判定するフロー"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "48",
+    "paragraph": "3",
+    "item": null
+  },
+  "labels": ["集団規定", "用途制限"],
+  "text_raw": "第一種中高層住居専用地域内においては、別表第二（は）項に掲げる建築物以外の建築物は、建築してはならない。ただし、特定行政庁が第一種中高層住居専用地域における良好な住居の環境を害するおそれがないと認め、又は公益上やむを得ないと認めて許可した場合においては、この限りでない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        { "type": "location", "value": "第一種中高層住居専用地域内" }
+      ],
+      "note": "都市計画で定められた第一種中高層住居専用地域"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        { "ref": "info-table2-compliance", "operator": "==", "value": true },
+        { "ref": "info-special-approval", "operator": "==", "value": true }
+      ]
+    },
+    "exceptions": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "note": "特定行政庁の許可を受けた場合（環境を害するおそれがない、又は公益上やむを得ない）",
+          "ref": "info-special-approval",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "effect": "EXEMPT"
+    }
+  },
+  "flow_diagram": {
+    "title": "第一種中高層住居専用地域における用途制限の適合判定フロー",
+    "description": "建築物の用途が別表第二(は)項に掲げるものか、又は特定行政庁の許可を受けているかを判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "第一種中高層住居専用地域における用途制限の適合判定を開始"
+      },
+      {
+        "id": "dec-table2-ha-compliance",
+        "type": "decision",
+        "title": "別表第二(は)項に掲げる建築物か？",
+        "decision_type": "binary",
+        "description": "建築物の用途が別表第二(は)項（第一種中高層住居専用地域内で建築可能な建築物：住宅、学校、図書館、店舗・飲食店等で床面積500㎡以内かつ2階以下のもの等）に該当するか",
+        "related_articles": ["法::別表第二(は)"]
+      },
+      {
+        "id": "proc-table2-applicable",
+        "type": "process",
+        "title": "別表第二(は)項適合",
+        "process_type": "mechanical",
+        "description": "建築物の用途が別表第二(は)項に該当し、用途制限に適合"
+      },
+      {
+        "id": "dec-special-approval",
+        "type": "decision",
+        "title": "特定行政庁の許可を受けているか？",
+        "decision_type": "binary",
+        "description": "特定行政庁が良好な住居の環境を害するおそれがない、又は公益上やむを得ないと認めて許可したか"
+      },
+      {
+        "id": "proc-special-approval-applicable",
+        "type": "process",
+        "title": "特例許可適用",
+        "process_type": "mechanical",
+        "description": "特定行政庁の許可を受けており、ただし書が適用される"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "法48条3項適合",
+        "result": "pass",
+        "description": "第一種中高層住居専用地域における用途制限に適合"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "法48条3項不適合",
+        "result": "fail",
+        "description": "第一種中高層住居専用地域における用途制限に不適合"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-table2-ha-compliance",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-table2-ha-compliance",
+        "to": "proc-table2-applicable",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "dec-table2-ha-compliance",
+        "to": "dec-special-approval",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e04",
+        "from": "proc-table2-applicable",
+        "to": "pass",
+        "role": "flow"
+      },
+      {
+        "id": "e05",
+        "from": "dec-special-approval",
+        "to": "proc-special-approval-applicable",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e06",
+        "from": "dec-special-approval",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e07",
+        "from": "proc-special-approval-applicable",
+        "to": "pass",
+        "role": "flow"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-A48-P3",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["別表第二(は)"],
+      "description": "第一種中高層住居専用地域において建築可能な建築物を定める"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

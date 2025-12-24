@@ -1,0 +1,194 @@
+{
+  "id": "A56_P7_I1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "採光・通風による高さ制限の適用除外判定（第1号）",
+    "target_subject": "建築物",
+    "description": "第1項第1号等による高さ制限が適用される場合に、政令で定める基準に適合する採光・通風を確保する建築物について当該規定を適用しないことを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "56",
+    "paragraph": "7",
+    "item": "1"
+  },
+  "labels": [
+    "集団規定",
+    "高さ制限",
+    "適用除外",
+    "採光",
+    "通風"
+  ],
+  "text_raw": "次の各号のいずれかに掲げる規定によりその高さが制限された場合にそれぞれ当該各号に定める位置において確保される採光、通風等と同程度以上の採光、通風等が当該位置において確保されるものとして政令で定める基準に適合する建築物については、それぞれ当該各号に掲げる規定は、適用しない。一第一項第一号、第二項から第四項まで及び前項（同号の規定の適用の緩和に係る部分に限る。）前面道路の反対側の境界線上の政令で定める位置",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "regulation",
+          "value": "第1項第1号又は第2項から第4項までの高さ制限が適用される"
+        }
+      ],
+      "note": "各号に定める位置での高さ制限が存在する建築物"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-light-ventilation",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "ref": "info-standard-compliance",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    },
+    "exceptions": null,
+    "note": "第1号は前面道路の反対側の境界線上の政令で定める位置における採光・通風を基準として判定"
+  },
+  "flow_diagram": {
+    "title": "法56条7項第1号 採光・通風による高さ制限適用除外フロー",
+    "description": "採光・通風が同程度以上確保される場合の高さ制限適用除外を判定する",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "法56条7項第1号の採光・通風による適用除外判定を開始"
+      },
+      {
+        "id": "dec-applicable-regulation",
+        "type": "decision",
+        "title": "適用される高さ制限規定は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "第1項第1号", "description": "道路斜線制限" },
+          { "value": "第2項", "description": "後退建築物の道路斜線制限修正" },
+          { "value": "第3項", "description": "住居系地域の高さ制限" },
+          { "value": "第4項", "description": "後退建築物の高さ制限特例" },
+          { "value": "対象外", "description": "適用除外の対象外" }
+        ],
+        "description": "第1項第1号、第2項から第4項までのいずれの高さ制限が適用されるかを確認"
+      },
+      {
+        "id": "proc-not-applicable",
+        "type": "process",
+        "title": "本項適用対象外",
+        "description": "第1項第1号、第2項から第4項までの高さ制限が適用されないため適用除外の対象外"
+      },
+      {
+        "id": "proc-target-regulation",
+        "type": "process",
+        "title": "適用除外対象規定確認",
+        "description": "当該高さ制限規定が適用除外の対象であることを確認"
+      },
+      {
+        "id": "proc-reference-position",
+        "type": "process",
+        "title": "基準位置の特定",
+        "process_type": "mechanical",
+        "description": "前面道路の反対側の境界線上の政令で定める位置を特定"
+      },
+      {
+        "id": "proc-light-ventilation-baseline",
+        "type": "process",
+        "title": "基準位置での基準採光・通風量測定",
+        "process_type": "human_judgment",
+        "description": "高さ制限を満たす場合に基準位置で確保される採光・通風を測定・評価"
+      },
+      {
+        "id": "proc-light-ventilation-proposed",
+        "type": "process",
+        "title": "計画建築物での採光・通風量測定",
+        "process_type": "human_judgment",
+        "description": "計画建築物がある場合に基準位置で確保される採光・通風を測定・評価"
+      },
+      {
+        "id": "dec-light-ventilation-compare",
+        "type": "decision",
+        "title": "採光・通風は同程度以上確保されるか？",
+        "decision_type": "binary",
+        "description": "計画建築物での採光・通風量が基準値以上であるか判定（L1 >= L0）"
+      },
+      {
+        "id": "proc-same-level-confirmed",
+        "type": "process",
+        "title": "採光・通風同程度確保確認",
+        "description": "基準位置において同程度以上の採光・通風が確保されることを確認"
+      },
+      {
+        "id": "dec-standard-compliance",
+        "type": "decision",
+        "title": "政令で定める基準に適合するか？",
+        "decision_type": "binary",
+        "description": "令第135条等で定める具体的な採光・通風基準に適合するか判定",
+        "related_articles": ["令::A135"]
+      },
+      {
+        "id": "proc-standard-pass",
+        "type": "process",
+        "title": "政令基準適合確認",
+        "description": "政令で定める採光・通風基準に適合することを確認"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適用除外",
+        "result": "pass",
+        "description": "法56条7項第1号により高さ制限の適用が除外される"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "適用除外なし",
+        "result": "fail",
+        "description": "法56条7項第1号による高さ制限の適用除外は認められない"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "dec-applicable-regulation", "role": "flow" },
+      { "id": "e02", "from": "dec-applicable-regulation", "to": "proc-target-regulation", "role": "option", "label": "第1項第1号" },
+      { "id": "e03", "from": "dec-applicable-regulation", "to": "proc-target-regulation", "role": "option", "label": "第2項" },
+      { "id": "e04", "from": "dec-applicable-regulation", "to": "proc-target-regulation", "role": "option", "label": "第3項" },
+      { "id": "e05", "from": "dec-applicable-regulation", "to": "proc-target-regulation", "role": "option", "label": "第4項" },
+      { "id": "e06", "from": "dec-applicable-regulation", "to": "proc-not-applicable", "role": "option", "label": "対象外" },
+      { "id": "e07", "from": "proc-not-applicable", "to": "fail", "role": "flow" },
+      { "id": "e08", "from": "proc-target-regulation", "to": "proc-reference-position", "role": "flow" },
+      { "id": "e09", "from": "proc-reference-position", "to": "proc-light-ventilation-baseline", "role": "flow" },
+      { "id": "e10", "from": "proc-light-ventilation-baseline", "to": "proc-light-ventilation-proposed", "role": "flow" },
+      { "id": "e11", "from": "proc-light-ventilation-proposed", "to": "dec-light-ventilation-compare", "role": "flow" },
+      { "id": "e12", "from": "dec-light-ventilation-compare", "to": "proc-same-level-confirmed", "role": "yes", "label": "はい" },
+      { "id": "e13", "from": "dec-light-ventilation-compare", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e14", "from": "proc-same-level-confirmed", "to": "dec-standard-compliance", "role": "flow" },
+      { "id": "e15", "from": "dec-standard-compliance", "to": "proc-standard-pass", "role": "yes", "label": "はい" },
+      { "id": "e16", "from": "dec-standard-compliance", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e17", "from": "proc-standard-pass", "to": "pass", "role": "flow" }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-A56-P7-I1",
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "defines_detail",
+      "articles": ["A135"],
+      "description": "法56条7項の採光・通風基準を定める"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00+09:00",
+    "updated_at": "2025-12-25T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

@@ -1,0 +1,278 @@
+{
+  "id": "A129_2_3_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "建築設備に係る構造計算基準",
+    "target_subject": "建築設備",
+    "description": "法第20条の政令で定める技術的基準のうち建築設備に係るもの"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "129の2の3",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造"
+  ],
+  "kijo_diagram_ref": "CHK-BSL-KIJO-A129_2_3-P1",
+  "flow_diagram": {
+    "title": "建築設備構造計算基準適合判定フロー",
+    "description": "建築設備に係る構造計算基準への適合性を判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "建築設備の構造計算確認開始",
+        "result": "start"
+      },
+      {
+        "id": "dec-equipment-exist",
+        "type": "decision",
+        "title": "建築設備があるか？",
+        "decision_type": "binary",
+        "description": "建築物に設ける建築設備の有無を確認"
+      },
+      {
+        "id": "dec-equipment-type",
+        "type": "decision",
+        "title": "建築設備の種別は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "昇降機", "description": "令第129条の3第1項第1号・第2号の昇降機" },
+          { "value": "昇降機以外", "description": "昇降機以外の建築設備" },
+          { "value": "屋上突出物", "description": "屋上から突出する水槽、煙突等" }
+        ],
+        "description": "建築設備の種別を判定"
+      },
+      {
+        "id": "dec-elevator-check",
+        "type": "decision",
+        "title": "昇降機は令129条の4等に適合か？",
+        "decision_type": "binary",
+        "description": "令第129条の4、第129条の5、第129条の6第1号、第129条の8第1項、第129条の12第1項第6号の規定に適合するか確認"
+      },
+      {
+        "id": "proc-elevator-ok",
+        "type": "process",
+        "title": "1号適合（昇降機）",
+        "process_type": "sub_diagram_reference",
+        "description": "昇降機が関連規定に適合"
+      },
+      {
+        "id": "dec-other-equipment-check",
+        "type": "decision",
+        "title": "大臣が定める構造方法を用いているか？",
+        "decision_type": "binary",
+        "description": "構造耐力上安全なものとして国土交通大臣が定めた構造方法を用いているか確認"
+      },
+      {
+        "id": "proc-other-equipment-ok",
+        "type": "process",
+        "title": "2号適合（昇降機以外）",
+        "process_type": "mechanical",
+        "description": "昇降機以外の設備が大臣基準に適合"
+      },
+      {
+        "id": "dec-rooftop-check",
+        "type": "decision",
+        "title": "屋上突出物は構造計算で安全か？",
+        "decision_type": "binary",
+        "description": "法第20条第1項第1号から第3号建築物の屋上突出物について構造計算による安全性確認"
+      },
+      {
+        "id": "proc-rooftop-ok",
+        "type": "process",
+        "title": "3号適合（屋上突出物）",
+        "process_type": "sub_diagram_reference",
+        "description": "屋上突出物が構造計算で安全"
+      },
+      {
+        "id": "dec-all-checked",
+        "type": "decision",
+        "title": "全ての建築設備を確認したか？",
+        "decision_type": "binary",
+        "description": "全ての建築設備について各号の基準に適合することを確認"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令第129条の2の3第1項に適合"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "令第129条の2の3第1項に不適合"
+      },
+      {
+        "id": "pass-no-target",
+        "type": "terminal",
+        "title": "適用対象外",
+        "result": "pass",
+        "description": "建築設備がないため適用対象外"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-equipment-exist",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-equipment-exist",
+        "to": "dec-equipment-type",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "dec-equipment-exist",
+        "to": "pass-no-target",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e04",
+        "from": "dec-equipment-type",
+        "to": "dec-elevator-check",
+        "role": "option",
+        "label": "昇降機"
+      },
+      {
+        "id": "e05",
+        "from": "dec-equipment-type",
+        "to": "dec-other-equipment-check",
+        "role": "option",
+        "label": "昇降機以外"
+      },
+      {
+        "id": "e06",
+        "from": "dec-equipment-type",
+        "to": "dec-rooftop-check",
+        "role": "option",
+        "label": "屋上突出物"
+      },
+      {
+        "id": "e07",
+        "from": "dec-elevator-check",
+        "to": "proc-elevator-ok",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e08",
+        "from": "dec-elevator-check",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e09",
+        "from": "proc-elevator-ok",
+        "to": "dec-all-checked",
+        "role": "flow"
+      },
+      {
+        "id": "e10",
+        "from": "dec-other-equipment-check",
+        "to": "proc-other-equipment-ok",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e11",
+        "from": "dec-other-equipment-check",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e12",
+        "from": "proc-other-equipment-ok",
+        "to": "dec-all-checked",
+        "role": "flow"
+      },
+      {
+        "id": "e13",
+        "from": "dec-rooftop-check",
+        "to": "proc-rooftop-ok",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e14",
+        "from": "dec-rooftop-check",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e15",
+        "from": "proc-rooftop-ok",
+        "to": "dec-all-checked",
+        "role": "flow"
+      },
+      {
+        "id": "e16",
+        "from": "dec-all-checked",
+        "to": "dec-equipment-type",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e17",
+        "from": "dec-all-checked",
+        "to": "pass",
+        "role": "yes",
+        "label": "はい"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": [
+        "A20:P1:I1",
+        "A20:P1:I2:イ",
+        "A20:P1:I3:イ",
+        "A20:P1:I4:イ"
+      ],
+      "description": "法第20条から委任される構造計算基準"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": [
+        "A129_3:P1",
+        "A129_4:P1",
+        "A129_5:P1",
+        "A129_6:I1",
+        "A129_8:P1",
+        "A129_12:P1:I6"
+      ],
+      "description": "昇降機に関する規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00+09:00",
+    "author": "Claude",
+    "generator": "flow-generator",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

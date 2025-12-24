@@ -1,0 +1,253 @@
+{
+  "id": "A57_4_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "特例容積率適用地区内の建築物高さの限度判定",
+    "target_subject": "建築物",
+    "description": "特例容積率適用地区内における建築物の高さが都市計画で定められた最高限度以下であることを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "57の4",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "容積率"
+  ],
+  "text_raw": "特例容積率適用地区内においては、建築物の高さは、特例容積率適用地区に関する都市計画において建築物の高さの最高限度が定められたときは、当該最高限度以下でなければならない。ただし、特定行政庁が用途上又は構造上やむを得ないと認めて許可したものについては、この限りでない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "特例容積率適用地区内"
+        },
+        {
+          "type": "condition",
+          "value": "都市計画において建築物高さの最高限度が定められている"
+        }
+      ],
+      "note": "特例容積率適用地区で高さ制限が設定されている場合に適用"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-height-limit-compliance",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    },
+    "exceptions": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "note": "特定行政庁が用途上又は構造上やむを得ないと認めて許可",
+          "ref": "info-authority-permission",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "effect": "EXEMPT"
+    }
+  },
+  "flow_diagram": {
+    "title": "法第57条の4第1項 高さ限度判定フロー",
+    "description": "特例容積率適用地区内における建築物の高さ最高限度への適合判定フロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "法第57条の4第1項の適合判定を開始"
+      },
+      {
+        "id": "dec-district",
+        "type": "decision",
+        "title": "敷地は特例容積率適用地区内か？",
+        "decision_type": "binary",
+        "description": "敷地が特例容積率適用地区内に位置するか確認"
+      },
+      {
+        "id": "dec-height-limit-defined",
+        "type": "decision",
+        "title": "都市計画で高さ最高限度が定められているか？",
+        "decision_type": "binary",
+        "description": "特例容積率適用地区に関する都市計画において建築物高さの最高限度が定められているか確認"
+      },
+      {
+        "id": "dec-authority-permission",
+        "type": "decision",
+        "title": "特定行政庁の許可を受けているか？",
+        "decision_type": "binary",
+        "description": "特定行政庁が用途上又は構造上やむを得ないと認めて許可しているか確認（ただし書き）"
+      },
+      {
+        "id": "proc-exemption",
+        "type": "process",
+        "title": "ただし書き適用",
+        "process_type": "mechanical",
+        "description": "特定行政庁の許可により高さ制限の適用除外"
+      },
+      {
+        "id": "dec-height-compliance",
+        "type": "decision",
+        "title": "建築物の高さは最高限度以下か？",
+        "decision_type": "binary",
+        "description": "建築物の高さが都市計画で定められた最高限度以下であるか判定",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "H_building", "desc": "建築物の高さ" },
+          "rhs": { "var": "H_limit", "desc": "高さ最高限度", "unit": "m" }
+        }
+      },
+      {
+        "id": "proc-height-compliant",
+        "type": "process",
+        "title": "高さ限度に適合",
+        "process_type": "mechanical",
+        "description": "建築物の高さが最高限度以下であることを確認"
+      },
+      {
+        "id": "pass-not-applicable",
+        "type": "terminal",
+        "title": "適用対象外（適合）",
+        "result": "pass",
+        "description": "特例容積率適用地区外のため本規定は適用されない"
+      },
+      {
+        "id": "pass-no-limit",
+        "type": "terminal",
+        "title": "適用対象外（適合）",
+        "result": "pass",
+        "description": "高さ最高限度が定められていないため本規定は適用されない"
+      },
+      {
+        "id": "pass-exempt",
+        "type": "terminal",
+        "title": "適合（ただし書き）",
+        "result": "pass",
+        "description": "特定行政庁の許可により適用除外で適合"
+      },
+      {
+        "id": "pass-compliant",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "建築物の高さが最高限度以下で法第57条の4第1項に適合"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "建築物の高さが最高限度を超過し不適合"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-district",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-district",
+        "to": "dec-height-limit-defined",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "dec-district",
+        "to": "pass-not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e04",
+        "from": "dec-height-limit-defined",
+        "to": "dec-authority-permission",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e05",
+        "from": "dec-height-limit-defined",
+        "to": "pass-no-limit",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e06",
+        "from": "dec-authority-permission",
+        "to": "proc-exemption",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e07",
+        "from": "dec-authority-permission",
+        "to": "dec-height-compliance",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e08",
+        "from": "proc-exemption",
+        "to": "pass-exempt",
+        "role": "flow"
+      },
+      {
+        "id": "e09",
+        "from": "dec-height-compliance",
+        "to": "proc-height-compliant",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e10",
+        "from": "dec-height-compliance",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e11",
+        "from": "proc-height-compliant",
+        "to": "pass-compliant",
+        "role": "flow"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-A57-4-P1",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": [
+        "A57_2",
+        "A57_3"
+      ],
+      "description": "他の特例容積率適用地区関連条項"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

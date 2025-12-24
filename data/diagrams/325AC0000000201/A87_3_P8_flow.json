@@ -1,0 +1,296 @@
+{
+  "id": "A87_3_P8_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "用途変更許可時の建築審査会同意要否判定フロー",
+    "target_subject": "建築物",
+    "description": "災害救助用建築物、公益的建築物又は特別興行場等の用途変更許可期間の延長又は許可時に、建築審査会の事前同意が必要か否かを判定"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "87",
+    "paragraph": "8",
+    "item": null
+  },
+  "labels": [
+    "用途変更",
+    "許可",
+    "手続き要件"
+  ],
+  "text_raw": "特定行政庁は、第五項の規定により許可の期間を延長する場合又は前項の規定による許可をする場合においては、あらかじめ、建築審査会の同意を得なければならない。ただし、病院、学校その他の公益上特に必要なものとして国土交通省令で定める用途に供する災害救助用建築物又は公益的建築物について第五項の規定により許可の期間を延長する場合は、この限りでない。",
+  "kijo_diagram_ref": "CHK-BSL-A87-3-P8",
+  "flow_diagram": {
+    "title": "建築審査会同意要否判定フロー",
+    "description": "用途変更許可の期間延長又は特別興行場等許可時における建築審査会の同意要否を判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "建築審査会同意要否判定を開始"
+      },
+      {
+        "id": "dec-permit-type",
+        "type": "decision",
+        "title": "許可の種類は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "第5項の許可期間延長" },
+          { "value": "第7項の特別興行場等許可" },
+          { "value": "その他" }
+        ],
+        "description": "第5項の許可期間延長か、第7項の特別興行場等許可かを判別"
+      },
+      {
+        "id": "proc-period-extension",
+        "type": "process",
+        "title": "許可期間延長の手続き",
+        "process_type": "mechanical",
+        "description": "第5項の規定による許可期間延長の手続きを行う"
+      },
+      {
+        "id": "proc-special-kougyo-permit",
+        "type": "process",
+        "title": "特別興行場等許可の手続き",
+        "process_type": "mechanical",
+        "description": "第7項の規定による特別興行場等許可の手続きを行う"
+      },
+      {
+        "id": "dec-building-use",
+        "type": "decision",
+        "title": "建築物の用途は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "病院" },
+          { "value": "学校" },
+          { "value": "その他公益上特に必要な用途（省令指定）" },
+          { "value": "上記以外" }
+        ],
+        "description": "建築物の用途が公益上特に必要なものとして国土交通省令で定める用途に該当するか"
+      },
+      {
+        "id": "dec-building-category",
+        "type": "decision",
+        "title": "建築物の区分は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "災害救助用建築物" },
+          { "value": "公益的建築物" },
+          { "value": "その他" }
+        ],
+        "description": "建築物が災害救助用建築物又は公益的建築物に該当するか"
+      },
+      {
+        "id": "proc-public-interest-confirmed",
+        "type": "process",
+        "title": "公益上特に必要な用途確認",
+        "process_type": "mechanical",
+        "description": "公益上特に必要な用途に該当することを確認"
+      },
+      {
+        "id": "proc-disaster-or-public-confirmed",
+        "type": "process",
+        "title": "災害救助用又は公益的建築物確認",
+        "process_type": "mechanical",
+        "description": "災害救助用建築物又は公益的建築物に該当することを確認"
+      },
+      {
+        "id": "pass-no-consent",
+        "type": "terminal",
+        "title": "同意不要",
+        "result": "pass",
+        "description": "建築審査会の同意を得ることなく許可期間の延長が可能（ただし書の適用）"
+      },
+      {
+        "id": "proc-consent-required",
+        "type": "process",
+        "title": "建築審査会の同意手続き",
+        "process_type": "human_judgment",
+        "description": "あらかじめ建築審査会の同意を得る手続きを行う"
+      },
+      {
+        "id": "dec-consent-obtained",
+        "type": "decision",
+        "title": "建築審査会の同意を得たか？",
+        "decision_type": "binary",
+        "description": "建築審査会から事前同意を取得したか否か"
+      },
+      {
+        "id": "pass-with-consent",
+        "type": "terminal",
+        "title": "許可可能（同意取得済）",
+        "result": "pass",
+        "description": "建築審査会の同意を得たため、許可が可能"
+      },
+      {
+        "id": "fail-no-consent",
+        "type": "terminal",
+        "title": "許可不可（同意未取得）",
+        "result": "fail",
+        "description": "建築審査会の同意を得ていないため、許可不可"
+      },
+      {
+        "id": "fail-not-applicable",
+        "type": "terminal",
+        "title": "対象外",
+        "result": "fail",
+        "description": "第5項の期間延長又は第7項の特別興行場等許可のいずれでもないため、本項の適用対象外"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-permit-type",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-permit-type",
+        "to": "proc-period-extension",
+        "role": "option",
+        "label": "第5項の許可期間延長"
+      },
+      {
+        "id": "e03",
+        "from": "dec-permit-type",
+        "to": "proc-special-kougyo-permit",
+        "role": "option",
+        "label": "第7項の特別興行場等許可"
+      },
+      {
+        "id": "e04",
+        "from": "dec-permit-type",
+        "to": "fail-not-applicable",
+        "role": "option",
+        "label": "その他"
+      },
+      {
+        "id": "e05",
+        "from": "proc-period-extension",
+        "to": "dec-building-use",
+        "role": "flow"
+      },
+      {
+        "id": "e06",
+        "from": "dec-building-use",
+        "to": "proc-public-interest-confirmed",
+        "role": "option",
+        "label": "病院"
+      },
+      {
+        "id": "e07",
+        "from": "dec-building-use",
+        "to": "proc-public-interest-confirmed",
+        "role": "option",
+        "label": "学校"
+      },
+      {
+        "id": "e08",
+        "from": "dec-building-use",
+        "to": "proc-public-interest-confirmed",
+        "role": "option",
+        "label": "その他公益上特に必要な用途（省令指定）"
+      },
+      {
+        "id": "e09",
+        "from": "dec-building-use",
+        "to": "proc-consent-required",
+        "role": "option",
+        "label": "上記以外"
+      },
+      {
+        "id": "e10",
+        "from": "proc-public-interest-confirmed",
+        "to": "dec-building-category",
+        "role": "flow"
+      },
+      {
+        "id": "e11",
+        "from": "dec-building-category",
+        "to": "proc-disaster-or-public-confirmed",
+        "role": "option",
+        "label": "災害救助用建築物"
+      },
+      {
+        "id": "e12",
+        "from": "dec-building-category",
+        "to": "proc-disaster-or-public-confirmed",
+        "role": "option",
+        "label": "公益的建築物"
+      },
+      {
+        "id": "e13",
+        "from": "dec-building-category",
+        "to": "proc-consent-required",
+        "role": "option",
+        "label": "その他"
+      },
+      {
+        "id": "e14",
+        "from": "proc-disaster-or-public-confirmed",
+        "to": "pass-no-consent",
+        "role": "flow"
+      },
+      {
+        "id": "e15",
+        "from": "proc-special-kougyo-permit",
+        "to": "proc-consent-required",
+        "role": "flow"
+      },
+      {
+        "id": "e16",
+        "from": "proc-consent-required",
+        "to": "dec-consent-obtained",
+        "role": "flow"
+      },
+      {
+        "id": "e17",
+        "from": "dec-consent-obtained",
+        "to": "pass-with-consent",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e18",
+        "from": "dec-consent-obtained",
+        "to": "fail-no-consent",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": [
+        "A87_3:P5",
+        "A87_3:P7"
+      ],
+      "description": "第87条の3第5項の許可期間延長要件と第7項の特別興行場等許可要件"
+    },
+    {
+      "law_id": "325M50004000040",
+      "law_name": "建築基準法施行規則",
+      "law_type": "regulation",
+      "relationship": "defines_detail",
+      "articles": [],
+      "description": "公益上特に必要なものとして定める用途の詳細"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00Z",
+    "updated_at": "2025-12-25T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-skill",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

@@ -1,0 +1,161 @@
+{
+  "id": "A48_P16_I1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "特例許可手続きの簡略化（既存特例許可物件の増改築・移転）（適合判定フロー）",
+    "target_subject": "特例許可手続",
+    "description": "特例許可を受けた建築物の増築、改築又は移転について特例許可をする場合、意見聴取及び建築審査会の同意取得を不要とする判定フロー"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "48",
+    "paragraph": "16",
+    "item": "1"
+  },
+  "labels": ["集団規定", "用途制限", "特例許可手続"],
+  "text_raw": "前項の規定にかかわらず、特定行政庁は、第一号に該当する場合においては同項の規定による意見の聴取及び同意の取得を要せず、第二号に該当する場合においては同項の規定による同意の取得を要しない。一 特例許可を受けた建築物の増築、改築又は移転（これらのうち、政令で定める場合に限る。）について特例許可をする場合",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        { "type": "procedure", "value": "第48条第1項から第14項のただし書による特例許可を行う場合" }
+      ],
+      "note": "用途地域における建築制限の特例許可手続に適用"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        { "ref": "info-prior-permit", "operator": "==", "value": true },
+        { "ref": "info-alteration-type", "operator": "IN", "value": ["増築", "改築", "移転"] },
+        { "ref": "info-ordinance-condition", "operator": "==", "value": true }
+      ]
+    }
+  },
+  "flow_diagram": {
+    "title": "法48条16項1号 特例許可手続簡略化 適合判定フロー",
+    "description": "既存特例許可物件の増改築・移転について意見聴取・同意取得を不要とする条件の判定フロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "法48条16項1号の適合判定を開始"
+      },
+      {
+        "id": "dec-prior-permit",
+        "type": "decision",
+        "title": "既往特例許可を受けた建築物か？",
+        "decision_type": "binary",
+        "description": "当該建築物が法48条1項〜14項のただし書による特例許可を過去に受けているか"
+      },
+      {
+        "id": "proc-prior-permit-exists",
+        "type": "process",
+        "title": "既往特例許可あり",
+        "process_type": "undefined_input",
+        "description": "当該建築物は過去に特例許可を受けている"
+      },
+      {
+        "id": "dec-alteration-type",
+        "type": "decision",
+        "title": "建築行為種別は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "増築" },
+          { "value": "改築" },
+          { "value": "移転" },
+          { "value": "その他" }
+        ],
+        "description": "今回の特例許可申請の建築行為種別"
+      },
+      {
+        "id": "proc-alteration-applicable",
+        "type": "process",
+        "title": "増築・改築・移転に該当",
+        "process_type": "mechanical",
+        "description": "建築行為が増築、改築又は移転に該当する"
+      },
+      {
+        "id": "dec-ordinance-condition",
+        "type": "decision",
+        "title": "政令で定める要件に該当するか？",
+        "decision_type": "binary",
+        "description": "増築、改築又は移転が政令（施行令第130条の8等）で定める場合に該当するか",
+        "related_articles": ["令::A130_8"]
+      },
+      {
+        "id": "proc-ordinance-satisfied",
+        "type": "process",
+        "title": "政令要件該当",
+        "process_type": "human_judgment",
+        "description": "政令で定める範囲・規模等の条件を満たす"
+      },
+      {
+        "id": "proc-1go-applicable",
+        "type": "process",
+        "title": "第1号該当",
+        "process_type": "mechanical",
+        "description": "法48条16項1号に該当し、意見聴取及び同意取得を不要とする"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合（手続簡略化）",
+        "result": "pass",
+        "description": "法48条16項1号に該当し、意見聴取及び建築審査会の同意取得を要しない"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "不該当",
+        "result": "fail",
+        "description": "法48条16項1号に該当しない（通常の手続が必要）"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "dec-prior-permit", "role": "flow" },
+      { "id": "e02", "from": "dec-prior-permit", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e03", "from": "dec-prior-permit", "to": "proc-prior-permit-exists", "role": "yes", "label": "はい" },
+      { "id": "e04", "from": "proc-prior-permit-exists", "to": "dec-alteration-type", "role": "flow" },
+      { "id": "e05", "from": "dec-alteration-type", "to": "proc-alteration-applicable", "role": "option", "label": "増築" },
+      { "id": "e06", "from": "dec-alteration-type", "to": "proc-alteration-applicable", "role": "option", "label": "改築" },
+      { "id": "e07", "from": "dec-alteration-type", "to": "proc-alteration-applicable", "role": "option", "label": "移転" },
+      { "id": "e08", "from": "dec-alteration-type", "to": "fail", "role": "option", "label": "その他" },
+      { "id": "e09", "from": "proc-alteration-applicable", "to": "dec-ordinance-condition", "role": "flow" },
+      { "id": "e10", "from": "dec-ordinance-condition", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e11", "from": "dec-ordinance-condition", "to": "proc-ordinance-satisfied", "role": "yes", "label": "はい" },
+      { "id": "e12", "from": "proc-ordinance-satisfied", "to": "proc-1go-applicable", "role": "flow" },
+      { "id": "e13", "from": "proc-1go-applicable", "to": "pass", "role": "flow" }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-A48-P16-I1",
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "delegates_to",
+      "articles": ["A130_8"],
+      "description": "特例許可の増築・改築・移転の範囲を定める政令"
+    },
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A48:P15"],
+      "description": "特例許可の原則的手続（意見聴取・建築審査会の同意）を定める"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-skill",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

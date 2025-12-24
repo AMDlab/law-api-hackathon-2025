@@ -1,0 +1,401 @@
+{
+  "id": "A112_P11_I1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "竪穴区画の除外（内装不燃の吹抜き等）",
+    "target_subject": "竪穴部分",
+    "description": "避難階から直上・直下階のみに通ずる吹抜き等で内装不燃の場合の竪穴区画除外"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "112",
+    "paragraph": "11",
+    "item": "1"
+  },
+  "labels": [
+    "単体規定",
+    "防火区画",
+    "竪穴区画",
+    "適用除外"
+  ],
+  "text_raw": "避難階からその直上階又は直下階のみに通ずる吹抜きとなつている部分、階段の部分その他これらに類する部分で、国土交通大臣が定める基準に従い、その壁及び天井の室内に面する部分の仕上げを不燃材料でし、かつ、その下地を不燃材料で造ることその他これに準ずる措置が講じられたもの",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "building_part",
+          "value": "避難階から直上階または直下階のみに通ずる吹抜き・階段等"
+        },
+        {
+          "type": "finish_material",
+          "value": "壁・天井の仕上げ及び下地が不燃材料"
+        }
+      ]
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "requirement",
+          "value": "竪穴区画を要しない"
+        }
+      ]
+    }
+  },
+  "flow_diagram": {
+    "title": "竪穴区画除外（内装不燃の吹抜き等）判定フロー",
+    "description": "避難階から直上・直下階のみに通ずる吹抜き等の竪穴区画除外を判定するフロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "竪穴区画除外（第1号）判定の開始"
+      },
+      {
+        "id": "dec-shaft-type",
+        "type": "decision",
+        "title": "竪穴部分の種別は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "吹抜き", "description": "吹抜きとなっている部分" },
+          { "value": "階段", "description": "階段の部分" },
+          { "value": "類似部分", "description": "これらに類する部分" },
+          { "value": "その他", "description": "上記以外" }
+        ],
+        "description": "竪穴部分が吹抜き、階段、またはこれらに類する部分かを判定"
+      },
+      {
+        "id": "proc-shaft-applicable",
+        "type": "process",
+        "title": "対象竪穴部分に該当",
+        "process_type": "mechanical",
+        "description": "吹抜き、階段、またはこれらに類する部分として除外の対象となる可能性あり"
+      },
+      {
+        "id": "dec-connection",
+        "type": "decision",
+        "title": "接続する階は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "避難階から直上階のみ", "description": "避難階から直上階のみに通じる" },
+          { "value": "避難階から直下階のみ", "description": "避難階から直下階のみに通じる" },
+          { "value": "避難階から直上下階のみ", "description": "避難階から直上階と直下階の両方のみに通じる" },
+          { "value": "2階以上に跨る", "description": "直上・直下階を超えて複数階に跨る" }
+        ],
+        "description": "竪穴部分が避難階から直上階または直下階のみに通じるかを確認"
+      },
+      {
+        "id": "proc-connection-ok",
+        "type": "process",
+        "title": "接続階の条件を満たす",
+        "process_type": "mechanical",
+        "description": "避難階から直上階または直下階のみに通じる条件を満たす"
+      },
+      {
+        "id": "dec-wall-finish",
+        "type": "decision",
+        "title": "壁の仕上げ材料は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "不燃材料", "description": "不燃材料" },
+          { "value": "準不燃材料", "description": "準不燃材料" },
+          { "value": "難燃材料", "description": "難燃材料" },
+          { "value": "その他", "description": "上記以外" }
+        ],
+        "description": "壁の室内に面する部分の仕上げが不燃材料か確認"
+      },
+      {
+        "id": "proc-wall-finish-ok",
+        "type": "process",
+        "title": "壁仕上げ不燃材料",
+        "process_type": "mechanical",
+        "description": "壁の仕上げが不燃材料で施されている"
+      },
+      {
+        "id": "dec-wall-base",
+        "type": "decision",
+        "title": "壁の下地材料は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "不燃材料", "description": "不燃材料" },
+          { "value": "準不燃材料", "description": "準不燃材料" },
+          { "value": "その他", "description": "上記以外" }
+        ],
+        "description": "壁の下地が不燃材料か確認"
+      },
+      {
+        "id": "proc-wall-base-ok",
+        "type": "process",
+        "title": "壁下地不燃材料",
+        "process_type": "mechanical",
+        "description": "壁の下地が不燃材料で造られている"
+      },
+      {
+        "id": "dec-ceiling-finish",
+        "type": "decision",
+        "title": "天井の仕上げ材料は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "不燃材料", "description": "不燃材料" },
+          { "value": "準不燃材料", "description": "準不燃材料" },
+          { "value": "難燃材料", "description": "難燃材料" },
+          { "value": "その他", "description": "上記以外" }
+        ],
+        "description": "天井の室内に面する部分の仕上げが不燃材料か確認"
+      },
+      {
+        "id": "proc-ceiling-finish-ok",
+        "type": "process",
+        "title": "天井仕上げ不燃材料",
+        "process_type": "mechanical",
+        "description": "天井の仕上げが不燃材料で施されている"
+      },
+      {
+        "id": "dec-ceiling-base",
+        "type": "decision",
+        "title": "天井の下地材料は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "不燃材料", "description": "不燃材料" },
+          { "value": "準不燃材料", "description": "準不燃材料" },
+          { "value": "その他", "description": "上記以外" }
+        ],
+        "description": "天井の下地が不燃材料か確認"
+      },
+      {
+        "id": "proc-ceiling-base-ok",
+        "type": "process",
+        "title": "天井下地不燃材料",
+        "process_type": "mechanical",
+        "description": "天井の下地が不燃材料で造られている"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "竪穴区画除外",
+        "result": "pass",
+        "description": "第1号に該当し、竪穴区画が不要"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "竪穴区画除外なし",
+        "result": "fail",
+        "description": "第1号に該当せず、竪穴区画が必要"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-shaft-type",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-shaft-type",
+        "to": "proc-shaft-applicable",
+        "role": "option",
+        "label": "吹抜き"
+      },
+      {
+        "id": "e03",
+        "from": "dec-shaft-type",
+        "to": "proc-shaft-applicable",
+        "role": "option",
+        "label": "階段"
+      },
+      {
+        "id": "e04",
+        "from": "dec-shaft-type",
+        "to": "proc-shaft-applicable",
+        "role": "option",
+        "label": "類似部分"
+      },
+      {
+        "id": "e05",
+        "from": "dec-shaft-type",
+        "to": "fail",
+        "role": "option",
+        "label": "その他"
+      },
+      {
+        "id": "e06",
+        "from": "proc-shaft-applicable",
+        "to": "dec-connection",
+        "role": "flow"
+      },
+      {
+        "id": "e07",
+        "from": "dec-connection",
+        "to": "proc-connection-ok",
+        "role": "option",
+        "label": "避難階から直上階のみ"
+      },
+      {
+        "id": "e08",
+        "from": "dec-connection",
+        "to": "proc-connection-ok",
+        "role": "option",
+        "label": "避難階から直下階のみ"
+      },
+      {
+        "id": "e09",
+        "from": "dec-connection",
+        "to": "proc-connection-ok",
+        "role": "option",
+        "label": "避難階から直上下階のみ"
+      },
+      {
+        "id": "e10",
+        "from": "dec-connection",
+        "to": "fail",
+        "role": "option",
+        "label": "2階以上に跨る"
+      },
+      {
+        "id": "e11",
+        "from": "proc-connection-ok",
+        "to": "dec-wall-finish",
+        "role": "flow"
+      },
+      {
+        "id": "e12",
+        "from": "dec-wall-finish",
+        "to": "proc-wall-finish-ok",
+        "role": "option",
+        "label": "不燃材料"
+      },
+      {
+        "id": "e13",
+        "from": "dec-wall-finish",
+        "to": "fail",
+        "role": "option",
+        "label": "準不燃材料"
+      },
+      {
+        "id": "e14",
+        "from": "dec-wall-finish",
+        "to": "fail",
+        "role": "option",
+        "label": "難燃材料"
+      },
+      {
+        "id": "e15",
+        "from": "dec-wall-finish",
+        "to": "fail",
+        "role": "option",
+        "label": "その他"
+      },
+      {
+        "id": "e16",
+        "from": "proc-wall-finish-ok",
+        "to": "dec-wall-base",
+        "role": "flow"
+      },
+      {
+        "id": "e17",
+        "from": "dec-wall-base",
+        "to": "proc-wall-base-ok",
+        "role": "option",
+        "label": "不燃材料"
+      },
+      {
+        "id": "e18",
+        "from": "dec-wall-base",
+        "to": "fail",
+        "role": "option",
+        "label": "準不燃材料"
+      },
+      {
+        "id": "e19",
+        "from": "dec-wall-base",
+        "to": "fail",
+        "role": "option",
+        "label": "その他"
+      },
+      {
+        "id": "e20",
+        "from": "proc-wall-base-ok",
+        "to": "dec-ceiling-finish",
+        "role": "flow"
+      },
+      {
+        "id": "e21",
+        "from": "dec-ceiling-finish",
+        "to": "proc-ceiling-finish-ok",
+        "role": "option",
+        "label": "不燃材料"
+      },
+      {
+        "id": "e22",
+        "from": "dec-ceiling-finish",
+        "to": "fail",
+        "role": "option",
+        "label": "準不燃材料"
+      },
+      {
+        "id": "e23",
+        "from": "dec-ceiling-finish",
+        "to": "fail",
+        "role": "option",
+        "label": "難燃材料"
+      },
+      {
+        "id": "e24",
+        "from": "dec-ceiling-finish",
+        "to": "fail",
+        "role": "option",
+        "label": "その他"
+      },
+      {
+        "id": "e25",
+        "from": "proc-ceiling-finish-ok",
+        "to": "dec-ceiling-base",
+        "role": "flow"
+      },
+      {
+        "id": "e26",
+        "from": "dec-ceiling-base",
+        "to": "proc-ceiling-base-ok",
+        "role": "option",
+        "label": "不燃材料"
+      },
+      {
+        "id": "e27",
+        "from": "dec-ceiling-base",
+        "to": "fail",
+        "role": "option",
+        "label": "準不燃材料"
+      },
+      {
+        "id": "e28",
+        "from": "dec-ceiling-base",
+        "to": "fail",
+        "role": "option",
+        "label": "その他"
+      },
+      {
+        "id": "e29",
+        "from": "proc-ceiling-base-ok",
+        "to": "pass",
+        "role": "flow"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-KIJO-A112-P11-I1",
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00.000Z",
+    "updated_at": "2025-12-25T00:00:00.000Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

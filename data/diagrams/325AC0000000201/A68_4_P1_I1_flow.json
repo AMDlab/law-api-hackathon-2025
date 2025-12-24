@@ -1,0 +1,257 @@
+{
+  "id": "A68_4_P1_I1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "容積率の最高限度の特例適用判定フロー（第1号要件）",
+    "target_subject": "建築物",
+    "description": "区域の特性に応じた容積率と公共施設の整備状況に応じた容積率に区分する地区計画等の区域内にある建築物について、第1号の条件を満たすか判定するフロー図"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "68の4",
+    "paragraph": "1",
+    "item": "1"
+  },
+  "labels": ["集団規定", "都市計画"],
+  "text_raw": "地区整備計画、特定建築物地区整備計画、防災街区整備地区整備計画又は沿道地区整備計画が定められている区域のうち、次に掲げる事項が定められている区域であること。イ都市計画法第十二条の六、密集市街地整備法第三十二条の二又は沿道整備法第九条の二の規定による区域の特性に応じたものと公共施設の整備の状況に応じたものとに区分した建築物の容積率の最高限度ロ（１）から（３）までに掲げる区域の区分に従い、当該（１）から（３）までに定める施設の配置及び規模",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "地区整備計画等の区域内"
+        }
+      ],
+      "note": "地区整備計画、特定建築物地区整備計画、防災街区整備地区整備計画又は沿道地区整備計画が定められている区域"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-plan-type",
+          "operator": "IN",
+          "value": ["地区整備計画", "特定建築物地区整備計画", "防災街区整備地区整備計画", "沿道地区整備計画"]
+        },
+        {
+          "ref": "info-capacity-division",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "ref": "info-facility-definition",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "flow_diagram": {
+    "title": "第68条の4第1項第1号要件判定フロー",
+    "description": "容積率特例の第1号要件（計画種別・容積率区分・施設配置規模）を満たすか判定する",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start"
+      },
+      {
+        "id": "dec-plan-type",
+        "type": "decision",
+        "title": "地区計画等の種別は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "地区整備計画" },
+          { "value": "特定建築物地区整備計画" },
+          { "value": "防災街区整備地区整備計画" },
+          { "value": "沿道地区整備計画" },
+          { "value": "その他・該当なし" }
+        ],
+        "description": "敷地が属する地区計画等の種別を判定"
+      },
+      {
+        "id": "proc-plan-type-ok",
+        "type": "process",
+        "title": "計画種別要件充足",
+        "description": "地区整備計画、特定建築物地区整備計画、防災街区整備地区整備計画又は沿道地区整備計画のいずれかに該当"
+      },
+      {
+        "id": "proc-plan-type-ng",
+        "type": "process",
+        "title": "計画種別要件不該当",
+        "description": "指定の計画種別に該当しない"
+      },
+      {
+        "id": "dec-capacity-division",
+        "type": "decision",
+        "title": "容積率の区分が定められているか？",
+        "decision_type": "binary",
+        "description": "区域の特性に応じた容積率と公共施設整備状況に応じた容積率の区分が定められているか（都市計画法第12条の6、密集市街地整備法第32条の2、沿道整備法第9条の2）"
+      },
+      {
+        "id": "proc-capacity-division-ng",
+        "type": "process",
+        "title": "容積率区分未定義",
+        "description": "容積率の最高限度の区分が定められていない"
+      },
+      {
+        "id": "dec-facility-definition",
+        "type": "decision",
+        "title": "施設配置・規模が定められているか？",
+        "decision_type": "binary",
+        "description": "計画区域に応じた地区施設等の配置及び規模が定められているか"
+      },
+      {
+        "id": "proc-facility-definition-ng",
+        "type": "process",
+        "title": "施設配置未定義",
+        "description": "施設の配置及び規模が定められていない"
+      },
+      {
+        "id": "proc-all-requirements-met",
+        "type": "process",
+        "title": "第1号要件充足",
+        "description": "計画種別、容積率区分、施設配置規模の全要件を満たす"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "第1号要件適合",
+        "result": "pass",
+        "description": "第68条の4第1項第1号の要件を全て満たす"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "第1号要件不適合",
+        "result": "fail",
+        "description": "第1号の要件を満たさない"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-plan-type",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-plan-type",
+        "to": "proc-plan-type-ok",
+        "role": "option",
+        "label": "地区整備計画"
+      },
+      {
+        "id": "e03",
+        "from": "dec-plan-type",
+        "to": "proc-plan-type-ok",
+        "role": "option",
+        "label": "特定建築物地区整備計画"
+      },
+      {
+        "id": "e04",
+        "from": "dec-plan-type",
+        "to": "proc-plan-type-ok",
+        "role": "option",
+        "label": "防災街区整備地区整備計画"
+      },
+      {
+        "id": "e05",
+        "from": "dec-plan-type",
+        "to": "proc-plan-type-ok",
+        "role": "option",
+        "label": "沿道地区整備計画"
+      },
+      {
+        "id": "e06",
+        "from": "dec-plan-type",
+        "to": "proc-plan-type-ng",
+        "role": "option",
+        "label": "その他・該当なし"
+      },
+      {
+        "id": "e07",
+        "from": "proc-plan-type-ng",
+        "to": "fail",
+        "role": "flow"
+      },
+      {
+        "id": "e08",
+        "from": "proc-plan-type-ok",
+        "to": "dec-capacity-division",
+        "role": "flow"
+      },
+      {
+        "id": "e09",
+        "from": "dec-capacity-division",
+        "to": "dec-facility-definition",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e10",
+        "from": "dec-capacity-division",
+        "to": "proc-capacity-division-ng",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e11",
+        "from": "proc-capacity-division-ng",
+        "to": "fail",
+        "role": "flow"
+      },
+      {
+        "id": "e12",
+        "from": "dec-facility-definition",
+        "to": "proc-all-requirements-met",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e13",
+        "from": "dec-facility-definition",
+        "to": "proc-facility-definition-ng",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e14",
+        "from": "proc-facility-definition-ng",
+        "to": "fail",
+        "role": "flow"
+      },
+      {
+        "id": "e15",
+        "from": "proc-all-requirements-met",
+        "to": "pass",
+        "role": "flow"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-A68-4-P1-I1",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A68_2"],
+      "description": "地区計画に関する条例の規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00Z",
+    "updated_at": "2025-12-25T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

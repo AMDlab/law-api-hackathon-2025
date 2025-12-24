@@ -1,0 +1,133 @@
+{
+  "id": "A129_P2_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "階避難安全性能の定義",
+    "target_subject": "建築物の階",
+    "description": "火災発生時に階からの避難完了まで煙が降下しないこと"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "129",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "避難安全検証"
+  ],
+  "text_raw": "前項の「階避難安全性能」とは、当該階のいずれの火災室で火災が発生した場合においても、当該階に存する者（当該階を通らなければ避難することができない者を含む。次項第一号ニにおいて「階に存する者」という。）の全てが当該階から直通階段の一までの避難（避難階にあつては、地上までの避難）を終了するまでの間、当該階の各居室及び各居室から直通階段（避難階にあつては、地上。以下この条において同じ。）に通ずる主たる廊下その他の建築物の部分において、避難上支障がある高さまで煙又はガスが降下しないものであることとする。",
+  "kijo_diagram_ref": "CHK-BSL-KIJO-A129-P2",
+  "flow_diagram": {
+    "title": "階避難安全性能の定義フロー",
+    "description": "火災発生から避難完了まで避難上支障のある高さまで煙が降下しないことを確認",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "検証開始",
+        "result": "start",
+        "description": "階避難安全性能の検証開始"
+      },
+      {
+        "id": "proc-fire-room-identify",
+        "type": "process",
+        "title": "火災室を特定",
+        "process_type": "undefined_input",
+        "description": "当該階の火災室を特定"
+      },
+      {
+        "id": "proc-occupants-identify",
+        "type": "process",
+        "title": "在館者を特定",
+        "process_type": "undefined_input",
+        "description": "当該階に存する者（当該階を通らなければ避難できない者を含む）を特定"
+      },
+      {
+        "id": "proc-route-identify",
+        "type": "process",
+        "title": "避難経路を特定",
+        "process_type": "undefined_input",
+        "description": "直通階段または地上への避難経路を特定"
+      },
+      {
+        "id": "proc-evac-time-calc",
+        "type": "process",
+        "title": "避難完了時間を算定",
+        "process_type": "mechanical",
+        "description": "火災発生から避難完了までに要する時間を算定"
+      },
+      {
+        "id": "proc-smoke-descent-calc",
+        "type": "process",
+        "title": "煙降下時間を算定",
+        "process_type": "mechanical",
+        "description": "煙が避難上支障のある高さまで降下する時間を算定"
+      },
+      {
+        "id": "dec-evac-vs-smoke",
+        "type": "decision",
+        "title": "避難完了時間は煙降下時間以下か？",
+        "decision_type": "binary",
+        "description": "避難完了時間（Te）が煙降下時間（Ts）を超えないか判定（Te <= Ts）"
+      },
+      {
+        "id": "dec-all-fire-rooms",
+        "type": "decision",
+        "title": "全ての火災室について検証完了か？",
+        "decision_type": "binary",
+        "description": "当該階のいずれの火災室についても検証が完了したか"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "階避難安全性能あり",
+        "result": "pass",
+        "description": "当該階が階避難安全性能を有する"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "階避難安全性能なし",
+        "result": "fail",
+        "description": "避難完了前に煙が降下するため、階避難安全性能を有しない"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "proc-fire-room-identify", "role": "flow" },
+      { "id": "e02", "from": "proc-fire-room-identify", "to": "proc-occupants-identify", "role": "flow" },
+      { "id": "e03", "from": "proc-occupants-identify", "to": "proc-route-identify", "role": "flow" },
+      { "id": "e04", "from": "proc-route-identify", "to": "proc-evac-time-calc", "role": "flow" },
+      { "id": "e05", "from": "proc-evac-time-calc", "to": "proc-smoke-descent-calc", "role": "flow" },
+      { "id": "e06", "from": "proc-smoke-descent-calc", "to": "dec-evac-vs-smoke", "role": "flow" },
+      { "id": "e07", "from": "dec-evac-vs-smoke", "to": "dec-all-fire-rooms", "role": "yes", "label": "はい" },
+      { "id": "e08", "from": "dec-evac-vs-smoke", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e09", "from": "dec-all-fire-rooms", "to": "pass", "role": "yes", "label": "はい" },
+      { "id": "e10", "from": "dec-all-fire-rooms", "to": "proc-fire-room-identify", "role": "no", "label": "いいえ（次の火災室へ）" }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": [
+        "A129:P1",
+        "A129:P3"
+      ],
+      "description": "階避難安全性能の定義および検証法"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00Z",
+    "updated_at": "2025-12-25T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

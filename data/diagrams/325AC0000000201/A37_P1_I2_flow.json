@@ -1,0 +1,144 @@
+{
+  "id": "A37_P1_I2_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "指定建築材料の大臣認定による品質適合判定（適合判定フロー）",
+    "target_subject": "指定建築材料",
+    "description": "指定建築材料が国土交通大臣の定める技術的基準に適合し大臣認定を受けているかを判定するフロー"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "37",
+    "paragraph": "1",
+    "item": "2"
+  },
+  "labels": ["単体規定", "構造", "建築材料"],
+  "text_raw": "前号に掲げるもののほか、指定建築材料ごとに国土交通大臣が定める安全上、防火上又は衛生上必要な品質に関する技術的基準に適合するものであることについて国土交通大臣の認定を受けたもの",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        { "type": "building_element", "value": "基礎、主要構造部その他安全上、防火上又は衛生上重要である政令で定める部分" },
+        { "type": "material", "value": "国土交通大臣が定める指定建築材料" }
+      ],
+      "note": "第37条第1項本文の対象範囲。第1号（JIS/JAS適合）以外の方法として第2号（大臣認定）を選択する場合。"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        { "type": "proposition", "subject": "指定建築材料", "property": "技術的基準適合性", "value": true },
+        { "type": "proposition", "subject": "指定建築材料", "property": "大臣認定取得", "value": true }
+      ]
+    }
+  },
+  "flow_diagram": {
+    "title": "法37条1項第2号 大臣認定による品質適合 適合判定フロー",
+    "description": "指定建築材料が大臣認定を受け、技術的基準に適合しているかを判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "法37条1項第2号の適合判定を開始"
+      },
+      {
+        "id": "dec-material-type",
+        "type": "decision",
+        "title": "建築材料の種類は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "木材", "description": "構造用製材、集成材等" },
+          { "value": "鋼材", "description": "鉄骨、鉄筋等" },
+          { "value": "コンクリート", "description": "コンクリート製品" },
+          { "value": "その他", "description": "ガラス、接着剤等" }
+        ],
+        "description": "使用する建築材料の種類（材料種別）を判定"
+      },
+      {
+        "id": "proc-material-identified",
+        "type": "process",
+        "title": "材料種別特定",
+        "process_type": "mechanical",
+        "description": "材料種別に基づき該当する技術的基準を特定"
+      },
+      {
+        "id": "dec-certification-exists",
+        "type": "decision",
+        "title": "大臣認定書があるか？",
+        "decision_type": "binary",
+        "description": "国土交通大臣の認定を受けた認定書が存在するか判定"
+      },
+      {
+        "id": "proc-certification-yes",
+        "type": "process",
+        "title": "認定書あり",
+        "process_type": "mechanical",
+        "description": "大臣認定書の存在を確認"
+      },
+      {
+        "id": "dec-certification-scope",
+        "type": "decision",
+        "title": "認定範囲は使用材料を含むか？",
+        "decision_type": "binary",
+        "description": "認定書記載の適合範囲が、使用する材料種別と要求される技術的基準を満たしているか判定"
+      },
+      {
+        "id": "proc-scope-match",
+        "type": "process",
+        "title": "認定範囲適合",
+        "process_type": "mechanical",
+        "description": "材料種別が一致し、必要な技術的基準が認定範囲に含まれることを確認"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "法37条1項第2号（大臣認定）の規定に適合"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "法37条1項第2号（大臣認定）の規定に不適合"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "dec-material-type", "role": "flow" },
+      { "id": "e02", "from": "dec-material-type", "to": "proc-material-identified", "role": "option", "label": "木材" },
+      { "id": "e03", "from": "dec-material-type", "to": "proc-material-identified", "role": "option", "label": "鋼材" },
+      { "id": "e04", "from": "dec-material-type", "to": "proc-material-identified", "role": "option", "label": "コンクリート" },
+      { "id": "e05", "from": "dec-material-type", "to": "proc-material-identified", "role": "option", "label": "その他" },
+      { "id": "e06", "from": "proc-material-identified", "to": "dec-certification-exists", "role": "flow" },
+      { "id": "e07", "from": "dec-certification-exists", "to": "proc-certification-yes", "role": "yes", "label": "はい" },
+      { "id": "e08", "from": "dec-certification-exists", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e09", "from": "proc-certification-yes", "to": "dec-certification-scope", "role": "flow" },
+      { "id": "e10", "from": "dec-certification-scope", "to": "proc-scope-match", "role": "yes", "label": "はい" },
+      { "id": "e11", "from": "dec-certification-scope", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e12", "from": "proc-scope-match", "to": "pass", "role": "flow" }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-A37-P1-I2",
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "delegates_to",
+      "articles": ["A144_3"],
+      "description": "指定建築材料の指定および技術的基準の委任"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

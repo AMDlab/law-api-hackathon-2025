@@ -1,0 +1,390 @@
+{
+  "id": "A62_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "準防火地域内建築物の外壁・軒裏判定フロー",
+    "target_subject": "建築物",
+    "description": "準防火地域内の建築物の外壁及び軒裏で延焼のおそれのある部分が防火構造であることを判定するフロー"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "62",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "集団規定",
+    "防火"
+  ],
+  "text_raw": "準防火地域内にある建築物(法第61条の規定により準耐火建築物等としなければならないものを除く。)は、その外壁及び軒裏で延焼のおそれのある部分を防火構造とし、これに附属する高さ2メートルを超える門又は塀で当該建築物の1階であつて延焼のおそれのある部分に面するものを不燃材料で造り、又は覆わなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "準防火地域内"
+        },
+        {
+          "type": "exclusion",
+          "value": "法61条により準耐火建築物等としなければならないものを除く"
+        }
+      ],
+      "note": "準防火地域内かつ法61条対象外の建築物"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-outer-wall-compliance",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "ref": "info-eaves-compliance",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "ref": "info-fence-compliance",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    }
+  },
+  "kijo_diagram_ref": "CHK-BSL-A62-P1",
+  "flow_diagram": {
+    "title": "準防火地域内建築物の外壁・軒裏・門塀判定",
+    "description": "準防火地域内の建築物（法61条対象外）について、外壁・軒裏・門塀の防火性能を確認するフロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "法62条1項の判定を開始"
+      },
+      {
+        "id": "dec-a61-applicable",
+        "type": "decision",
+        "title": "法61条対象（準耐火建築物等）か？",
+        "decision_type": "binary",
+        "description": "当該建築物が法61条により準耐火建築物等としなければならないものに該当するか",
+        "related_articles": [
+          "法::A61"
+        ]
+      },
+      {
+        "id": "end-a61-applicable",
+        "type": "terminal",
+        "title": "法62条1項対象外",
+        "result": "end",
+        "description": "法61条対象のため法62条1項は適用されない（法61条で判定）"
+      },
+      {
+        "id": "dec-outer-wall-ensho",
+        "type": "decision",
+        "title": "外壁に延焼のおそれのある部分があるか？",
+        "decision_type": "binary",
+        "description": "隣地境界線等からの距離に基づき、外壁に延焼のおそれのある部分があるかを判定",
+        "related_articles": [
+          "法::A2:I6"
+        ]
+      },
+      {
+        "id": "dec-outer-wall-structure",
+        "type": "decision",
+        "title": "外壁の延焼部分の構造は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "防火構造", "description": "防火構造に該当" },
+          { "value": "その他", "description": "防火構造以外" }
+        ],
+        "description": "延焼のおそれのある部分の外壁が防火構造であるかを判定",
+        "related_articles": [
+          "法::A2:I8"
+        ]
+      },
+      {
+        "id": "proc-outer-wall-ok",
+        "type": "process",
+        "title": "外壁適合",
+        "process_type": "mechanical",
+        "description": "外壁が規定に適合"
+      },
+      {
+        "id": "dec-eaves-ensho",
+        "type": "decision",
+        "title": "軒裏に延焼のおそれのある部分があるか？",
+        "decision_type": "binary",
+        "description": "隣地境界線等からの距離に基づき、軒裏に延焼のおそれのある部分があるかを判定",
+        "related_articles": [
+          "法::A2:I6"
+        ]
+      },
+      {
+        "id": "dec-eaves-structure",
+        "type": "decision",
+        "title": "軒裏の延焼部分の構造は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "防火構造", "description": "防火構造に該当" },
+          { "value": "その他", "description": "防火構造以外" }
+        ],
+        "description": "延焼のおそれのある部分の軒裏が防火構造であるかを判定",
+        "related_articles": [
+          "法::A2:I8"
+        ]
+      },
+      {
+        "id": "proc-eaves-ok",
+        "type": "process",
+        "title": "軒裏適合",
+        "process_type": "mechanical",
+        "description": "軒裏が規定に適合"
+      },
+      {
+        "id": "dec-fence-exists",
+        "type": "decision",
+        "title": "附属の門・塀があるか？",
+        "decision_type": "binary",
+        "description": "建築物に附属する門又は塀があるかを確認"
+      },
+      {
+        "id": "dec-fence-height",
+        "type": "decision",
+        "title": "門・塀の高さは2mを超えるか？",
+        "decision_type": "binary",
+        "description": "門又は塀の高さが2メートルを超えるかを判定",
+        "condition": {
+          "operator": "GT",
+          "lhs": {
+            "var": "HF",
+            "desc": "門・塀の高さ"
+          },
+          "rhs": {
+            "value": 2,
+            "unit": "m"
+          }
+        }
+      },
+      {
+        "id": "dec-fence-location",
+        "type": "decision",
+        "title": "1階の延焼部分に面しているか？",
+        "decision_type": "binary",
+        "description": "門・塀が建築物の1階であって延焼のおそれのある部分に面しているか"
+      },
+      {
+        "id": "dec-fence-material",
+        "type": "decision",
+        "title": "門・塀の材料は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "不燃材料", "description": "不燃材料で造られ又は覆われている" },
+          { "value": "その他", "description": "不燃材料以外" }
+        ],
+        "description": "門・塀が不燃材料で造られ又は覆われているかを判定"
+      },
+      {
+        "id": "proc-fence-ok",
+        "type": "process",
+        "title": "門・塀適合",
+        "process_type": "mechanical",
+        "description": "門・塀が規定に適合（該当なし、または不燃材料）"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "法62条1項の規定に適合"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "法62条1項の規定に不適合"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-a61-applicable",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-a61-applicable",
+        "to": "end-a61-applicable",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "dec-a61-applicable",
+        "to": "dec-outer-wall-ensho",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e04",
+        "from": "dec-outer-wall-ensho",
+        "to": "dec-outer-wall-structure",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e05",
+        "from": "dec-outer-wall-ensho",
+        "to": "proc-outer-wall-ok",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e06",
+        "from": "dec-outer-wall-structure",
+        "to": "proc-outer-wall-ok",
+        "role": "option",
+        "label": "防火構造"
+      },
+      {
+        "id": "e07",
+        "from": "dec-outer-wall-structure",
+        "to": "fail",
+        "role": "option",
+        "label": "その他"
+      },
+      {
+        "id": "e08",
+        "from": "proc-outer-wall-ok",
+        "to": "dec-eaves-ensho",
+        "role": "flow"
+      },
+      {
+        "id": "e09",
+        "from": "dec-eaves-ensho",
+        "to": "dec-eaves-structure",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e10",
+        "from": "dec-eaves-ensho",
+        "to": "proc-eaves-ok",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e11",
+        "from": "dec-eaves-structure",
+        "to": "proc-eaves-ok",
+        "role": "option",
+        "label": "防火構造"
+      },
+      {
+        "id": "e12",
+        "from": "dec-eaves-structure",
+        "to": "fail",
+        "role": "option",
+        "label": "その他"
+      },
+      {
+        "id": "e13",
+        "from": "proc-eaves-ok",
+        "to": "dec-fence-exists",
+        "role": "flow"
+      },
+      {
+        "id": "e14",
+        "from": "dec-fence-exists",
+        "to": "dec-fence-height",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e15",
+        "from": "dec-fence-exists",
+        "to": "proc-fence-ok",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e16",
+        "from": "dec-fence-height",
+        "to": "dec-fence-location",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e17",
+        "from": "dec-fence-height",
+        "to": "proc-fence-ok",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e18",
+        "from": "dec-fence-location",
+        "to": "dec-fence-material",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e19",
+        "from": "dec-fence-location",
+        "to": "proc-fence-ok",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e20",
+        "from": "dec-fence-material",
+        "to": "proc-fence-ok",
+        "role": "option",
+        "label": "不燃材料"
+      },
+      {
+        "id": "e21",
+        "from": "dec-fence-material",
+        "to": "fail",
+        "role": "option",
+        "label": "その他"
+      },
+      {
+        "id": "e22",
+        "from": "proc-fence-ok",
+        "to": "pass",
+        "role": "flow"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": [
+        "A2:I6",
+        "A2:I8",
+        "A61"
+      ],
+      "description": "法2条6号(延焼のおそれのある部分)、法2条8号(防火構造)、法61条(準耐火建築物等)"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00+09:00",
+    "updated_at": "2025-12-25T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

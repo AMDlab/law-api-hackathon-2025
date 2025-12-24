@@ -1,0 +1,171 @@
+{
+  "id": "A55_P3_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "再生可能エネルギー設備設置による高さ制限緩和",
+    "target_subject": "建築物",
+    "description": "再生可能エネルギー源の利用設備設置のため必要な工事を行う建築物が、特定行政庁の許可により高さ制限を超えることができるかの判定"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "55",
+    "paragraph": "3",
+    "item": null
+  },
+  "labels": ["集団規定", "高さ制限", "再生可能エネルギー", "特定行政庁許可"],
+  "text_raw": "再生可能エネルギー源（太陽光、風力その他非化石エネルギー源のうち、エネルギー源として永続的に利用することができると認められるものをいう。第五十八条第二項において同じ。）の利用に資する設備の設置のため必要な屋根に関する工事その他の屋外に面する建築物の部分に関する工事を行う建築物で構造上やむを得ないものとして国土交通省令で定めるものであつて、特定行政庁が低層住宅に係る良好な住居の環境を害するおそれがないと認めて許可したものの高さは、前二項の規定にかかわらず、その許可の範囲内において、これらの規定による限度を超えるものとすることができる。",
+  "kijo_diagram_ref": "CHK-BSL-A55-P3",
+  "flow_diagram": {
+    "title": "法55条3項 再生可能エネルギー設備による高さ緩和判定フロー",
+    "description": "再生可能エネルギー設備設置のための工事で、省令基準と特定行政庁許可により高さ制限を超えることができるか判定",
+    "nodes": [
+      {
+        "id": "term-start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start"
+      },
+      {
+        "id": "dec-zone",
+        "type": "decision",
+        "title": "低層住居専用地域等か？",
+        "decision_type": "binary",
+        "description": "第一種低層住居専用地域、第二種低層住居専用地域又は田園住居地域内か"
+      },
+      {
+        "id": "dec-renewable-equipment",
+        "type": "decision",
+        "title": "再生可能エネルギー設備を設置するか？",
+        "decision_type": "binary",
+        "description": "太陽光、風力等の再生可能エネルギー源の利用に資する設備の設置の有無"
+      },
+      {
+        "id": "dec-construction-type",
+        "type": "decision",
+        "title": "工事の種別は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "屋根に関する工事" },
+          { "value": "屋外に面する部分の工事" },
+          { "value": "その他" }
+        ],
+        "description": "設備設置のため必要な工事の種別"
+      },
+      {
+        "id": "proc-construction-applicable",
+        "type": "process",
+        "title": "対象工事該当",
+        "description": "屋根又は屋外に面する建築物の部分に関する工事に該当"
+      },
+      {
+        "id": "dec-structural-necessity",
+        "type": "decision",
+        "title": "構造上やむを得ないものに該当するか？",
+        "decision_type": "binary",
+        "description": "国土交通省令で定める「構造上やむを得ないもの」に該当するか"
+      },
+      {
+        "id": "dec-permission",
+        "type": "decision",
+        "title": "特定行政庁の許可を受けているか？",
+        "decision_type": "binary",
+        "description": "特定行政庁が低層住宅に係る良好な住居の環境を害するおそれがないと認めて許可したか"
+      },
+      {
+        "id": "proc-exemption-granted",
+        "type": "process",
+        "title": "高さ制限緩和適用",
+        "description": "許可の範囲内において高さ制限を超えることができる"
+      },
+      {
+        "id": "dec-height-within-permission",
+        "type": "decision",
+        "title": "許可された高さの範囲内か？",
+        "decision_type": "binary",
+        "description": "建築物の高さが許可で認められた上限以下か"
+      },
+      {
+        "id": "proc-no-exemption",
+        "type": "process",
+        "title": "本項緩和不適用",
+        "description": "第55条3項の緩和は適用されない"
+      },
+      {
+        "id": "dec-height-normal-limit",
+        "type": "decision",
+        "title": "通常の高さ制限以下か？",
+        "decision_type": "binary",
+        "description": "法55条1項又は2項で定める高さ限度以下か"
+      },
+      {
+        "id": "term-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "法55条の規定に適合"
+      },
+      {
+        "id": "term-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "高さ制限に不適合"
+      },
+      {
+        "id": "term-not-applicable",
+        "type": "terminal",
+        "title": "本条適用対象外",
+        "result": "end",
+        "description": "法55条の適用対象外"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "term-start", "to": "dec-zone", "role": "flow" },
+      { "id": "e02", "from": "dec-zone", "to": "dec-renewable-equipment", "role": "yes", "label": "はい" },
+      { "id": "e03", "from": "dec-zone", "to": "term-not-applicable", "role": "no", "label": "いいえ" },
+      { "id": "e04", "from": "dec-renewable-equipment", "to": "dec-construction-type", "role": "yes", "label": "はい" },
+      { "id": "e05", "from": "dec-renewable-equipment", "to": "proc-no-exemption", "role": "no", "label": "いいえ" },
+      { "id": "e06", "from": "dec-construction-type", "to": "proc-construction-applicable", "role": "option", "label": "屋根に関する工事" },
+      { "id": "e07", "from": "dec-construction-type", "to": "proc-construction-applicable", "role": "option", "label": "屋外に面する部分の工事" },
+      { "id": "e08", "from": "dec-construction-type", "to": "proc-no-exemption", "role": "option", "label": "その他" },
+      { "id": "e09", "from": "proc-construction-applicable", "to": "dec-structural-necessity", "role": "flow" },
+      { "id": "e10", "from": "dec-structural-necessity", "to": "dec-permission", "role": "yes", "label": "はい" },
+      { "id": "e11", "from": "dec-structural-necessity", "to": "proc-no-exemption", "role": "no", "label": "いいえ" },
+      { "id": "e12", "from": "dec-permission", "to": "proc-exemption-granted", "role": "yes", "label": "はい" },
+      { "id": "e13", "from": "dec-permission", "to": "proc-no-exemption", "role": "no", "label": "いいえ" },
+      { "id": "e14", "from": "proc-exemption-granted", "to": "dec-height-within-permission", "role": "flow" },
+      { "id": "e15", "from": "dec-height-within-permission", "to": "term-pass", "role": "yes", "label": "はい" },
+      { "id": "e16", "from": "dec-height-within-permission", "to": "term-fail", "role": "no", "label": "いいえ" },
+      { "id": "e17", "from": "proc-no-exemption", "to": "dec-height-normal-limit", "role": "flow" },
+      { "id": "e18", "from": "dec-height-normal-limit", "to": "term-pass", "role": "yes", "label": "はい" },
+      { "id": "e19", "from": "dec-height-normal-limit", "to": "term-fail", "role": "no", "label": "いいえ" }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A55:P1", "A55:P2"],
+      "description": "第1項・第2項の高さ制限規定を参照"
+    },
+    {
+      "law_id": "325M50004000040",
+      "law_name": "建築基準法施行規則",
+      "law_type": "regulation",
+      "relationship": "delegates_to",
+      "description": "構造上やむを得ないものの基準を国土交通省令で定める"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

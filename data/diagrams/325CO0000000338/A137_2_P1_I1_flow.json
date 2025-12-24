@@ -1,0 +1,160 @@
+{
+  "id": "A137_2_P1_I1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "構造耐力に係る既存不適格建築物の増改築 第1号基準",
+    "target_subject": "増築及び改築",
+    "description": "増築又は改築の全て（第2号・第3号を除く）について、構造方法がイ又はロのいずれかに適合するかの判定フロー"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "137_2",
+    "paragraph": "1",
+    "item": "1"
+  },
+  "labels": [
+    "既存不適格建築物",
+    "増改築",
+    "構造耐力",
+    "第1号"
+  ],
+  "kijo_diagram_ref": "CHK-EXT-A137-2-P1-I1",
+  "flow_diagram": {
+    "title": "令137条の2第1項第1号 適合判定フロー",
+    "description": "構造耐力に係る既存不適格建築物の増改築について、一体型（イ）又は分離型（ロ）のいずれかに適合するかの判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start"
+      },
+      {
+        "id": "dec-structure-type",
+        "type": "decision",
+        "title": "構造方式は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "一体型", "description": "増改築部分と既存部分が構造一体" },
+          { "value": "分離型", "description": "EXPジョイント等で分離" }
+        ],
+        "description": "増改築部分と既存部分の構造的接続方式を選択"
+      },
+      {
+        "id": "dec-chap8",
+        "type": "decision",
+        "title": "建築物全体が第3章第8節（構造計算）に適合するか？",
+        "decision_type": "binary",
+        "description": "建築物全体が第3章第8節の規定に適合するか判定（イ（１））"
+      },
+      {
+        "id": "dec-target-struct",
+        "type": "decision",
+        "title": "増改築部分が構造規定等に適合するか？",
+        "decision_type": "binary",
+        "description": "増改築部分が第3章第1節〜第7節の2及び令129条の2の3、条例規定に適合するか（イ（２））"
+      },
+      {
+        "id": "dec-existing-durability",
+        "type": "decision",
+        "title": "既存部分が耐久性等関係規定に適合するか？",
+        "decision_type": "binary",
+        "description": "既存部分が耐久性等関係規定に適合するか"
+      },
+      {
+        "id": "dec-existing-safety",
+        "type": "decision",
+        "title": "既存部分が大臣基準（倒壊・崩落等のおそれなし）に適合するか？",
+        "decision_type": "binary",
+        "description": "既存部分が倒壊・崩落・脱落のおそれがないとして大臣が定める基準に適合するか（イ（３）、ロ（３））"
+      },
+      {
+        "id": "proc-existing-ok",
+        "type": "process",
+        "title": "既存部分要件適合",
+        "description": "既存部分が耐久性等関係規定及び大臣基準の両方に適合"
+      },
+      {
+        "id": "proc-route-a-ok",
+        "type": "process",
+        "title": "イ（一体型）適合",
+        "description": "イの全要件（１）〜（３）に適合"
+      },
+      {
+        "id": "dec-exp-joint",
+        "type": "decision",
+        "title": "EXPジョイント等で応力非伝達か？",
+        "decision_type": "binary",
+        "description": "増改築部分がそれ以外の部分とEXPジョイント等で相互に応力を伝えない構造方法のみで接しているか（ロ（１））"
+      },
+      {
+        "id": "dec-target-full-struct",
+        "type": "decision",
+        "title": "増改築部分が第3章全体に適合するか？",
+        "decision_type": "binary",
+        "description": "増改築部分が第3章及び令129条の2の3、条例規定に適合するか（ロ（２））"
+      },
+      {
+        "id": "proc-route-b-ok",
+        "type": "process",
+        "title": "ロ（分離型）適合",
+        "description": "ロの全要件（１）〜（３）に適合"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "第1号適合",
+        "result": "pass",
+        "description": "令第137条の2第1項第1号に適合"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "第1号不適合",
+        "result": "fail",
+        "description": "令第137条の2第1項第1号に不適合"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "dec-structure-type", "role": "flow" },
+      { "id": "e02", "from": "dec-structure-type", "to": "dec-chap8", "role": "option", "label": "一体型" },
+      { "id": "e03", "from": "dec-structure-type", "to": "dec-exp-joint", "role": "option", "label": "分離型" },
+      { "id": "e04", "from": "dec-chap8", "to": "dec-target-struct", "role": "yes", "label": "はい" },
+      { "id": "e05", "from": "dec-chap8", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e06", "from": "dec-target-struct", "to": "dec-existing-durability", "role": "yes", "label": "はい" },
+      { "id": "e07", "from": "dec-target-struct", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e08", "from": "dec-existing-durability", "to": "dec-existing-safety", "role": "yes", "label": "はい" },
+      { "id": "e09", "from": "dec-existing-durability", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e10", "from": "dec-existing-safety", "to": "proc-existing-ok", "role": "yes", "label": "はい" },
+      { "id": "e11", "from": "dec-existing-safety", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e12", "from": "proc-existing-ok", "to": "proc-route-a-ok", "role": "flow" },
+      { "id": "e13", "from": "proc-route-a-ok", "to": "pass", "role": "flow" },
+      { "id": "e14", "from": "dec-exp-joint", "to": "dec-target-full-struct", "role": "yes", "label": "はい" },
+      { "id": "e15", "from": "dec-exp-joint", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e16", "from": "dec-target-full-struct", "to": "dec-existing-durability", "role": "yes", "label": "はい" },
+      { "id": "e17", "from": "dec-target-full-struct", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e18", "from": "proc-existing-ok", "to": "proc-route-b-ok", "role": "flow" },
+      { "id": "e19", "from": "proc-route-b-ok", "to": "pass", "role": "flow" }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A40"],
+      "description": "法第40条に基づく条例の構造耐力規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T16:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

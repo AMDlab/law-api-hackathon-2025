@@ -1,0 +1,172 @@
+{
+  "id": "A114_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "界壁の構造適合判定フロー",
+    "target_subject": "界壁",
+    "description": "長屋又は共同住宅の各戸の界壁を準耐火構造とし小屋裏又は天井裏に達せしめる"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "114",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": ["単体規定", "防火", "界壁"],
+  "flow_diagram": {
+    "title": "令114条1項 界壁の構造適合判定フロー",
+    "description": "長屋又は共同住宅の各戸の界壁に係る構造要件を判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "令114条1項の適合判定を開始"
+      },
+      {
+        "id": "dec-use-type",
+        "type": "decision",
+        "title": "建築物の用途は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "長屋", "description": "長屋" },
+          { "value": "共同住宅", "description": "共同住宅" },
+          { "value": "その他", "description": "長屋・共同住宅以外" }
+        ],
+        "description": "建築物の用途が長屋又は共同住宅であるか判定"
+      },
+      {
+        "id": "proc-applicable",
+        "type": "process",
+        "title": "本項適用",
+        "process_type": "mechanical",
+        "description": "長屋又は共同住宅のため本項を適用"
+      },
+      {
+        "id": "proc-not-applicable-use",
+        "type": "process",
+        "title": "適用対象外（用途）",
+        "process_type": "mechanical",
+        "description": "長屋又は共同住宅でないため本項の適用対象外"
+      },
+      {
+        "id": "proc-identify-walls",
+        "type": "process",
+        "title": "界壁の特定",
+        "process_type": "undefined_input",
+        "description": "各戸の界壁を特定"
+      },
+      {
+        "id": "dec-exempt-part",
+        "type": "decision",
+        "title": "大臣定め部分に該当するか？",
+        "decision_type": "binary",
+        "description": "自動スプリンクラー設備等設置部分その他国土交通大臣が定める部分に該当するか判定"
+      },
+      {
+        "id": "proc-exempt-match",
+        "type": "process",
+        "title": "除外部分該当",
+        "process_type": "mechanical",
+        "description": "大臣定め部分に該当するため構造規定の適用除外"
+      },
+      {
+        "id": "dec-structure",
+        "type": "decision",
+        "title": "界壁の構造は準耐火構造か？",
+        "decision_type": "binary",
+        "description": "界壁が準耐火構造であるか判定"
+      },
+      {
+        "id": "proc-structure-ok",
+        "type": "process",
+        "title": "準耐火構造適合",
+        "process_type": "mechanical",
+        "description": "界壁が準耐火構造である"
+      },
+      {
+        "id": "dec-112-4-exempt",
+        "type": "decision",
+        "title": "令112条4項各号の部分に該当するか？",
+        "decision_type": "binary",
+        "description": "第112条第4項各号のいずれかに該当する部分であるか判定（該当する場合は小屋裏等到達不要）",
+        "related_articles": ["令::A112:P4"]
+      },
+      {
+        "id": "proc-112-4-match",
+        "type": "process",
+        "title": "令112条4項各号該当",
+        "process_type": "mechanical",
+        "description": "令112条4項各号に該当するため小屋裏等到達は不要"
+      },
+      {
+        "id": "dec-attic-reach",
+        "type": "decision",
+        "title": "界壁が小屋裏又は天井裏に達しているか？",
+        "decision_type": "binary",
+        "description": "界壁が小屋裏又は天井裏に達しているか判定"
+      },
+      {
+        "id": "proc-attic-ok",
+        "type": "process",
+        "title": "小屋裏等到達適合",
+        "process_type": "mechanical",
+        "description": "界壁が小屋裏又は天井裏に達している"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令114条1項の規定に適合"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "令114条1項の規定に不適合"
+      },
+      {
+        "id": "end-not-applicable",
+        "type": "terminal",
+        "title": "適用対象外",
+        "result": "end",
+        "description": "本項の適用対象外"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "dec-use-type", "role": "flow" },
+      { "id": "e02", "from": "dec-use-type", "to": "proc-applicable", "role": "option", "label": "長屋" },
+      { "id": "e03", "from": "dec-use-type", "to": "proc-applicable", "role": "option", "label": "共同住宅" },
+      { "id": "e04", "from": "dec-use-type", "to": "proc-not-applicable-use", "role": "option", "label": "その他" },
+      { "id": "e05", "from": "proc-not-applicable-use", "to": "end-not-applicable", "role": "flow" },
+      { "id": "e06", "from": "proc-applicable", "to": "proc-identify-walls", "role": "flow" },
+      { "id": "e07", "from": "proc-identify-walls", "to": "dec-exempt-part", "role": "flow" },
+      { "id": "e08", "from": "dec-exempt-part", "to": "proc-exempt-match", "role": "yes", "label": "はい" },
+      { "id": "e09", "from": "dec-exempt-part", "to": "dec-structure", "role": "no", "label": "いいえ" },
+      { "id": "e10", "from": "proc-exempt-match", "to": "pass", "role": "flow" },
+      { "id": "e11", "from": "dec-structure", "to": "proc-structure-ok", "role": "yes", "label": "はい" },
+      { "id": "e12", "from": "dec-structure", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e13", "from": "proc-structure-ok", "to": "dec-112-4-exempt", "role": "flow" },
+      { "id": "e14", "from": "dec-112-4-exempt", "to": "proc-112-4-match", "role": "yes", "label": "はい" },
+      { "id": "e15", "from": "dec-112-4-exempt", "to": "dec-attic-reach", "role": "no", "label": "いいえ" },
+      { "id": "e16", "from": "proc-112-4-match", "to": "pass", "role": "flow" },
+      { "id": "e17", "from": "dec-attic-reach", "to": "proc-attic-ok", "role": "yes", "label": "はい" },
+      { "id": "e18", "from": "dec-attic-reach", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e19", "from": "proc-attic-ok", "to": "pass", "role": "flow" }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-ORD-A114-P1",
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

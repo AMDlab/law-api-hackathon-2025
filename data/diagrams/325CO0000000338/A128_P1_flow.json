@@ -1,0 +1,213 @@
+{
+  "id": "A128_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "敷地内の通路",
+    "target_subject": "敷地内通路",
+    "description": "屋外避難階段及び出口から道等に通ずる通路の幅員基準"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "128",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "避難",
+    "敷地内通路"
+  ],
+  "kijo_diagram_ref": "CHK-BSL-ORD-A128-P1",
+  "flow_diagram": {
+    "title": "敷地内通路幅員判定フロー",
+    "description": "屋外避難階段及び出口から道等に通ずる通路の幅員が基準に適合するかを判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "敷地内通路の確認開始",
+        "result": "start"
+      },
+      {
+        "id": "dec-stair-exist",
+        "type": "decision",
+        "title": "屋外避難階段があるか？",
+        "decision_type": "binary",
+        "description": "令123条2項の屋外に設ける避難階段の有無を確認"
+      },
+      {
+        "id": "dec-exit-exist",
+        "type": "decision",
+        "title": "出口があるか？",
+        "decision_type": "binary",
+        "description": "令125条1項の出口の有無を確認"
+      },
+      {
+        "id": "dec-scale",
+        "type": "decision",
+        "title": "小規模建築物か？",
+        "decision_type": "binary",
+        "description": "階数3以下かつ延べ面積200㎡未満か判定"
+      },
+      {
+        "id": "proc-width-90",
+        "type": "process",
+        "title": "必要幅員90cm",
+        "process_type": "mechanical",
+        "description": "小規模建築物の場合、必要幅員は90cm"
+      },
+      {
+        "id": "proc-width-150",
+        "type": "process",
+        "title": "必要幅員1.5m",
+        "process_type": "mechanical",
+        "description": "その他の建築物の場合、必要幅員は1.5m"
+      },
+      {
+        "id": "dec-path-width-90",
+        "type": "decision",
+        "title": "全通路の幅員 >= 90cm か？",
+        "decision_type": "binary",
+        "description": "全ての通路について幅員が90cm以上か確認"
+      },
+      {
+        "id": "dec-path-width-150",
+        "type": "decision",
+        "title": "全通路の幅員 >= 1.5m か？",
+        "decision_type": "binary",
+        "description": "全ての通路について幅員が1.5m以上か確認"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令第128条第1項に適合"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "令第128条第1項に不適合"
+      },
+      {
+        "id": "pass-no-target",
+        "type": "terminal",
+        "title": "適用対象外",
+        "result": "pass",
+        "description": "屋外避難階段及び出口がないため適用対象外"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-stair-exist",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-stair-exist",
+        "to": "dec-exit-exist",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e03",
+        "from": "dec-stair-exist",
+        "to": "dec-scale",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e04",
+        "from": "dec-exit-exist",
+        "to": "pass-no-target",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e05",
+        "from": "dec-exit-exist",
+        "to": "dec-scale",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e06",
+        "from": "dec-scale",
+        "to": "proc-width-90",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e07",
+        "from": "dec-scale",
+        "to": "proc-width-150",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e08",
+        "from": "proc-width-90",
+        "to": "dec-path-width-90",
+        "role": "flow"
+      },
+      {
+        "id": "e09",
+        "from": "proc-width-150",
+        "to": "dec-path-width-150",
+        "role": "flow"
+      },
+      {
+        "id": "e10",
+        "from": "dec-path-width-90",
+        "to": "pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e11",
+        "from": "dec-path-width-90",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e12",
+        "from": "dec-path-width-150",
+        "to": "pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e13",
+        "from": "dec-path-width-150",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": ["A123:P2", "A125:P1"],
+      "description": "屋外避難階段（令123条2項）及び出口（令125条1項）を参照"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00+09:00",
+    "author": "Claude",
+    "generator": "flow-generator",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

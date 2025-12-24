@@ -1,0 +1,180 @@
+{
+  "id": "A34_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "外壁の構造（適合判定フロー）",
+    "target_subject": "外壁",
+    "description": "建築物の外壁が防火構造等の所定の基準を満たすことを判定するフロー"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "34",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": ["単体規定", "防火"],
+  "text_raw": "建築物の外壁は、延焼のおそれのある部分(木造建築物等の外壁及び軒裏で延焼のおそれのある部分以外の部分を除く。)について、防火構造とし、又は政令で定める構造としなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "application",
+          "value": "延焼のおそれのある部分を有する外壁"
+        }
+      ],
+      "note": "木造建築物等の外壁及び軒裏で延焼のおそれのある部分以外の部分を除く"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "ref": "info-bouka-compliance",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "ref": "info-ordinance-compliance",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    }
+  },
+  "flow_diagram": {
+    "title": "法34条1項 外壁の構造 適合判定フロー",
+    "description": "外壁の延焼のおそれのある部分について防火構造等の基準を満たすか判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "法34条1項の適合判定を開始"
+      },
+      {
+        "id": "dec-building-type",
+        "type": "decision",
+        "title": "建築物の構造種別は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "木造建築物等", "description": "木造建築物等" },
+          { "value": "その他", "description": "木造建築物等以外" }
+        ],
+        "description": "建築物が木造建築物等に該当するかその他の構造か判定"
+      },
+      {
+        "id": "dec-ensho-mokuzou",
+        "type": "decision",
+        "title": "外壁は延焼のおそれのある部分か？",
+        "decision_type": "binary",
+        "description": "木造建築物等の外壁が延焼のおそれのある部分に該当するか判定",
+        "related_articles": ["法::A2:I6"]
+      },
+      {
+        "id": "proc-exempt",
+        "type": "process",
+        "title": "適用除外（木造・延焼のおそれなし）",
+        "process_type": "mechanical",
+        "description": "木造建築物等の外壁で延焼のおそれのある部分以外のため適用除外"
+      },
+      {
+        "id": "dec-ensho-other",
+        "type": "decision",
+        "title": "外壁は延焼のおそれのある部分か？",
+        "decision_type": "binary",
+        "description": "外壁が延焼のおそれのある部分に該当するか判定",
+        "related_articles": ["法::A2:I6"]
+      },
+      {
+        "id": "proc-no-ensho",
+        "type": "process",
+        "title": "適用対象外（延焼のおそれなし）",
+        "process_type": "mechanical",
+        "description": "延焼のおそれのある部分がないため本条適用対象外"
+      },
+      {
+        "id": "dec-bouka",
+        "type": "decision",
+        "title": "外壁は防火構造か？",
+        "decision_type": "binary",
+        "description": "外壁が防火構造に該当するか判定",
+        "related_articles": ["法::A2:I8"]
+      },
+      {
+        "id": "proc-bouka-comply",
+        "type": "process",
+        "title": "防火構造該当",
+        "process_type": "mechanical",
+        "description": "外壁が防火構造であるため基準適合"
+      },
+      {
+        "id": "dec-ordinance",
+        "type": "decision",
+        "title": "政令で定める構造か？",
+        "decision_type": "binary",
+        "description": "外壁が政令で定める構造（令第109条の5）に該当するか判定",
+        "related_articles": ["令::A109_5"]
+      },
+      {
+        "id": "proc-ordinance-comply",
+        "type": "process",
+        "title": "政令で定める構造該当",
+        "process_type": "mechanical",
+        "description": "外壁が政令で定める構造であるため基準適合"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "法34条1項の規定に適合"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "法34条1項の規定に不適合"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "dec-building-type", "role": "flow" },
+      { "id": "e02", "from": "dec-building-type", "to": "dec-ensho-mokuzou", "role": "option", "label": "木造建築物等" },
+      { "id": "e03", "from": "dec-building-type", "to": "dec-ensho-other", "role": "option", "label": "その他" },
+      { "id": "e04", "from": "dec-ensho-mokuzou", "to": "dec-bouka", "role": "yes", "label": "はい" },
+      { "id": "e05", "from": "dec-ensho-mokuzou", "to": "proc-exempt", "role": "no", "label": "いいえ" },
+      { "id": "e06", "from": "proc-exempt", "to": "pass", "role": "flow" },
+      { "id": "e07", "from": "dec-ensho-other", "to": "dec-bouka", "role": "yes", "label": "はい" },
+      { "id": "e08", "from": "dec-ensho-other", "to": "proc-no-ensho", "role": "no", "label": "いいえ" },
+      { "id": "e09", "from": "proc-no-ensho", "to": "pass", "role": "flow" },
+      { "id": "e10", "from": "dec-bouka", "to": "proc-bouka-comply", "role": "yes", "label": "はい" },
+      { "id": "e11", "from": "dec-bouka", "to": "dec-ordinance", "role": "no", "label": "いいえ" },
+      { "id": "e12", "from": "proc-bouka-comply", "to": "pass", "role": "flow" },
+      { "id": "e13", "from": "dec-ordinance", "to": "proc-ordinance-comply", "role": "yes", "label": "はい" },
+      { "id": "e14", "from": "dec-ordinance", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e15", "from": "proc-ordinance-comply", "to": "pass", "role": "flow" }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-A34-P1",
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "delegates_to",
+      "articles": ["A109_5"],
+      "description": "法34条1項の政令で定める構造を規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

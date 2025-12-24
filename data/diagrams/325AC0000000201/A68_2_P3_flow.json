@@ -1,0 +1,157 @@
+{
+  "id": "A68_2_P3_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "敷地面積制限における経過措置規定の確認（適合判定フロー）",
+    "target_subject": "敷地",
+    "description": "地区計画等の区域内で市町村が定める敷地面積制限の条例に、経過措置（既存敷地・権利に基づく敷地の適用除外規定）が定められているか確認するフロー"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "68_2",
+    "paragraph": "3",
+    "item": null
+  },
+  "labels": [
+    "市町村条例",
+    "地区計画",
+    "敷地面積",
+    "経過措置"
+  ],
+  "text_raw": "第一項の規定に基づく条例で建築物の敷地面積に関する制限を定める場合においては、当該条例に、当該条例の規定の施行又は適用の際、現に建築物の敷地として使用されている土地で当該規定に適合しないもの又は現に存する所有権その他の権利に基づいて建築物の敷地として使用するならば当該規定に適合しないこととなる土地について、その全部を一の敷地として使用する場合の適用の除外に関する規定（第三条第三項第一号及び第五号の規定に相当する規定を含む。）を定めるものとする。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "地区計画等の区域内"
+        },
+        {
+          "type": "condition",
+          "value": "市町村が敷地面積に関する制限を条例で定める場合"
+        }
+      ],
+      "note": "本項の対象は、第68条の2第1項の規定に基づいて市町村が定める条例で敷地面積制限を定める場合に限定される"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "requirement",
+          "description": "条例に経過措置規定が定められていること"
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "flow_diagram": {
+    "title": "法68条の2第3項 敷地面積制限における経過措置規定 適合判定フロー",
+    "description": "市町村条例で敷地面積制限を定める場合に、法定の経過措置規定（既存敷地除外、権利保護除外、複合敷地除外）が全て定められているかを判定する",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "敷地面積制限条例の経過措置規定適合判定を開始"
+      },
+      {
+        "id": "dec-site-area-restriction",
+        "type": "decision",
+        "title": "敷地面積に関する制限を定めるか？",
+        "decision_type": "binary",
+        "description": "市町村条例で建築物の敷地面積に関する制限を定めているか否かを確認"
+      },
+      {
+        "id": "dec-existing-site-exempt",
+        "type": "decision",
+        "title": "既存敷地の適用除外規定があるか？",
+        "decision_type": "binary",
+        "description": "条例施行・適用時に現に建築物の敷地として使用されている土地で不適合なものについての適用除外規定が定められているかを確認",
+        "related_articles": ["法::A3:P3:I1"]
+      },
+      {
+        "id": "dec-rights-based-exempt",
+        "type": "decision",
+        "title": "権利に基づく敷地の適用除外規定があるか？",
+        "decision_type": "binary",
+        "description": "現に存する所有権その他の権利に基づいて使用すれば不適合となる土地についての適用除外規定が定められているかを確認",
+        "related_articles": ["法::A3:P3:I5"]
+      },
+      {
+        "id": "dec-combined-site-exempt",
+        "type": "decision",
+        "title": "一敷地使用時の適用除外規定があるか？",
+        "decision_type": "binary",
+        "description": "不適合となる土地について、その全部を一の敷地として使用する場合の適用除外規定が定められているかを確認"
+      },
+      {
+        "id": "proc-all-transitional-provisions",
+        "type": "process",
+        "title": "経過措置規定完備確認",
+        "process_type": "mechanical",
+        "description": "既存敷地除外、権利保護除外、複合敷地除外の3つの経過措置規定が全て定められていることを確認"
+      },
+      {
+        "id": "pass-no-restriction",
+        "type": "terminal",
+        "title": "適合（敷地面積制限なし）",
+        "result": "pass",
+        "description": "敷地面積に関する制限を定めないため、本項の経過措置規定は不要"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "法68条の2第3項に定める全ての経過措置規定が条例に定められている"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "法68条の2第3項に定める経過措置規定が条例に不足している"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "dec-site-area-restriction", "role": "flow" },
+      { "id": "e02", "from": "dec-site-area-restriction", "to": "dec-existing-site-exempt", "role": "yes", "label": "はい" },
+      { "id": "e03", "from": "dec-site-area-restriction", "to": "pass-no-restriction", "role": "no", "label": "いいえ" },
+      { "id": "e04", "from": "dec-existing-site-exempt", "to": "dec-rights-based-exempt", "role": "yes", "label": "はい" },
+      { "id": "e05", "from": "dec-existing-site-exempt", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e06", "from": "dec-rights-based-exempt", "to": "dec-combined-site-exempt", "role": "yes", "label": "はい" },
+      { "id": "e07", "from": "dec-rights-based-exempt", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e08", "from": "dec-combined-site-exempt", "to": "proc-all-transitional-provisions", "role": "yes", "label": "はい" },
+      { "id": "e09", "from": "dec-combined-site-exempt", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e10", "from": "proc-all-transitional-provisions", "to": "pass", "role": "flow" }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-A68-2-P3",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": [
+        "A68_2:P1",
+        "A3:P3:I1",
+        "A3:P3:I5"
+      ],
+      "description": "第68条の2第1項は市町村条例の根拠規定、第3条第3項第1号・第5号は経過措置規定の参考"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00Z",
+    "updated_at": "2025-12-25T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

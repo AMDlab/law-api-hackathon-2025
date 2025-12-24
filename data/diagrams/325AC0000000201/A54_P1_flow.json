@@ -1,0 +1,213 @@
+{
+  "id": "A54_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "外壁の後退距離判定フロー",
+    "target_subject": "建築物",
+    "description": "第一種低層住居専用地域等内の建築物の外壁の後退距離が都市計画で定められた限度以上であることを判定するフロー"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "54",
+    "paragraph": "1"
+  },
+  "labels": ["集団規定", "低層住居専用地域"],
+  "text_raw": "第一種低層住居専用地域、第二種低層住居専用地域又は田園住居地域内においては、建築物の外壁又はこれに代わる柱の面から敷地境界線までの距離（以下この条及び第八十六条の六第一項において「外壁の後退距離」という。）は、当該地域に関する都市計画において外壁の後退距離の限度が定められた場合においては、政令で定める場合を除き、当該限度以上でなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "第一種低層住居専用地域、第二種低層住居専用地域又は田園住居地域内"
+        },
+        {
+          "type": "urban_plan",
+          "value": "都市計画において外壁の後退距離の限度が定められている"
+        }
+      ],
+      "note": "都市計画で外壁の後退距離の限度が定められた低層住居専用地域等に適用"
+    },
+    "judgment_rule": {
+      "operator": ">=",
+      "lhs": {
+        "ref": "info-setback-distance",
+        "description": "実際の外壁の後退距離"
+      },
+      "rhs": {
+        "ref": "info-limit-value",
+        "description": "都市計画で定められた限度"
+      }
+    },
+    "exceptions": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "note": "令第135条の22第1号: 外壁等の中心線の長さの合計が3m以下",
+          "ref": "info-wall-length-exempt"
+        },
+        {
+          "note": "令第135条の22第2号: 物置等で軒高2.3m以下かつ床面積5平方メートル以内",
+          "ref": "info-utility-exempt"
+        }
+      ],
+      "effect": "EXEMPT"
+    }
+  },
+  "kijo_diagram_ref": "CHK-BSL-A54-P1",
+  "flow_diagram": {
+    "title": "外壁の後退距離判定フロー",
+    "description": "法第54条第1項に基づき、外壁の後退距離が限度以上であることを判定する",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "外壁の後退距離の判定を開始"
+      },
+      {
+        "id": "dec-zone",
+        "type": "decision",
+        "title": "用途地域は低層住居専用地域等か？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "第一種低層住居専用地域" },
+          { "value": "第二種低層住居専用地域" },
+          { "value": "田園住居地域" },
+          { "value": "その他" }
+        ],
+        "description": "第一種低層住居専用地域、第二種低層住居専用地域又は田園住居地域か判定"
+      },
+      {
+        "id": "dec-urban-plan",
+        "type": "decision",
+        "title": "都市計画で後退距離の限度が定められているか？",
+        "decision_type": "binary",
+        "description": "当該地域に関する都市計画において外壁の後退距離の限度が定められているか確認"
+      },
+      {
+        "id": "dec-wall-length",
+        "type": "decision",
+        "title": "後退不足外壁の長さ合計は3m以下か？",
+        "decision_type": "binary",
+        "description": "外壁の後退距離の限度に満たない距離にある外壁等の中心線の長さの合計が3m以下か判定（令第135条の22第1号）"
+      },
+      {
+        "id": "proc-wall-length-exempt",
+        "type": "process",
+        "title": "第1号除外該当",
+        "process_type": "mechanical",
+        "description": "令第135条の22第1号に該当（外壁等の中心線の長さの合計が3m以下）"
+      },
+      {
+        "id": "dec-use",
+        "type": "decision",
+        "title": "建築物の用途は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "物置等" },
+          { "value": "その他" }
+        ],
+        "description": "建築物の用途が物置その他これに類する用途か判定"
+      },
+      {
+        "id": "dec-eave-height",
+        "type": "decision",
+        "title": "軒の高さは2.3m以下か？",
+        "decision_type": "binary",
+        "description": "建築物の軒の高さが2.3m以下か判定"
+      },
+      {
+        "id": "dec-floor-area",
+        "type": "decision",
+        "title": "床面積の合計は5平方メートル以内か？",
+        "decision_type": "binary",
+        "description": "建築物の床面積の合計が5平方メートル以内か判定"
+      },
+      {
+        "id": "proc-utility-exempt",
+        "type": "process",
+        "title": "第2号除外該当",
+        "process_type": "mechanical",
+        "description": "令第135条の22第2号に該当（物置等で軒高2.3m以下かつ床面積5平方メートル以内）"
+      },
+      {
+        "id": "dec-setback-distance",
+        "type": "decision",
+        "title": "全外壁の後退距離が限度以上か？",
+        "decision_type": "binary",
+        "description": "全ての外壁又はこれに代わる柱の面から敷地境界線までの距離が、都市計画で定められた限度以上か判定"
+      },
+      {
+        "id": "pass-compliant",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "法第54条第1項の規定に適合"
+      },
+      {
+        "id": "pass-exempt",
+        "type": "terminal",
+        "title": "適合（適用除外）",
+        "result": "pass",
+        "description": "政令で定める場合に該当し、本項の規制は適用除外"
+      },
+      {
+        "id": "pass-not-applicable",
+        "type": "terminal",
+        "title": "適合（規定対象外）",
+        "result": "pass",
+        "description": "本項の適用対象外（低層住居専用地域等でない又は都市計画で限度が定められていない）"
+      },
+      {
+        "id": "fail-non-compliant",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "外壁の後退距離が限度未満であり、法第54条第1項に不適合"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "dec-zone", "role": "flow" },
+      { "id": "e02", "from": "dec-zone", "to": "dec-urban-plan", "role": "option", "label": "第一種低層住居専用地域" },
+      { "id": "e03", "from": "dec-zone", "to": "dec-urban-plan", "role": "option", "label": "第二種低層住居専用地域" },
+      { "id": "e04", "from": "dec-zone", "to": "dec-urban-plan", "role": "option", "label": "田園住居地域" },
+      { "id": "e05", "from": "dec-zone", "to": "pass-not-applicable", "role": "option", "label": "その他" },
+      { "id": "e06", "from": "dec-urban-plan", "to": "dec-wall-length", "role": "yes", "label": "はい" },
+      { "id": "e07", "from": "dec-urban-plan", "to": "pass-not-applicable", "role": "no", "label": "いいえ" },
+      { "id": "e08", "from": "dec-wall-length", "to": "proc-wall-length-exempt", "role": "yes", "label": "はい" },
+      { "id": "e09", "from": "dec-wall-length", "to": "dec-use", "role": "no", "label": "いいえ" },
+      { "id": "e10", "from": "proc-wall-length-exempt", "to": "pass-exempt", "role": "flow" },
+      { "id": "e11", "from": "dec-use", "to": "dec-eave-height", "role": "option", "label": "物置等" },
+      { "id": "e12", "from": "dec-use", "to": "dec-setback-distance", "role": "option", "label": "その他" },
+      { "id": "e13", "from": "dec-eave-height", "to": "dec-floor-area", "role": "yes", "label": "はい" },
+      { "id": "e14", "from": "dec-eave-height", "to": "dec-setback-distance", "role": "no", "label": "いいえ" },
+      { "id": "e15", "from": "dec-floor-area", "to": "proc-utility-exempt", "role": "yes", "label": "はい" },
+      { "id": "e16", "from": "dec-floor-area", "to": "dec-setback-distance", "role": "no", "label": "いいえ" },
+      { "id": "e17", "from": "proc-utility-exempt", "to": "pass-exempt", "role": "flow" },
+      { "id": "e18", "from": "dec-setback-distance", "to": "pass-compliant", "role": "yes", "label": "はい" },
+      { "id": "e19", "from": "dec-setback-distance", "to": "fail-non-compliant", "role": "no", "label": "いいえ" }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "delegates_to",
+      "articles": ["A135_22"],
+      "description": "法54条1項の適用除外（政令で定める場合）を規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

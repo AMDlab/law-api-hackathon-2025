@@ -1,0 +1,225 @@
+{
+  "id": "A31_P2_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "屎尿浄化槽の設置",
+    "target_subject": "屎尿浄化槽",
+    "description": "終末処理場を有する公共下水道以外に放流する場合に技術基準に適合した屎尿浄化槽を設置することを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "31",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "衛生"
+  ],
+  "text_raw": "便所から排出する汚物を下水道法第二条第六号に規定する終末処理場を有する公共下水道以外に放流しようとする場合においては、屎尿浄化槽（その構造が汚物処理性能（当該汚物を衛生上支障がないように処理するために屎尿浄化槽に必要とされる性能をいう。）に関して政令で定める技術的基準に適合するもので、国土交通大臣が定めた構造方法を用いるもの又は国土交通大臣の認定を受けたものに限る。）を設けなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "discharge_target",
+          "value": "終末処理場を有する公共下水道以外"
+        }
+      ],
+      "note": "便所から排出する汚物を終末処理場を有する公共下水道以外に放流する場合"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-septic-installed",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "ref": "info-tech-compliance",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "ref": "info-method-compliance",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    }
+  },
+  "flow_diagram": {
+    "title": "第31条第2項 屎尿浄化槽設置判定フロー",
+    "description": "終末処理場を有する公共下水道以外に放流する場合に、技術基準に適合した屎尿浄化槽の設置を判定する",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start"
+      },
+      {
+        "id": "dec-discharge-target",
+        "type": "decision",
+        "title": "汚物の放流先は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "終末処理場を有する公共下水道" },
+          { "value": "その他（終末処理場なし等）" }
+        ],
+        "description": "便所から排出する汚物の放流先（下水道法第2条第6号）",
+        "related_articles": ["下水道法::A2:I6"]
+      },
+      {
+        "id": "dec-septic-installed",
+        "type": "decision",
+        "title": "屎尿浄化槽が設置されているか？",
+        "decision_type": "binary",
+        "description": "屎尿浄化槽の設置有無"
+      },
+      {
+        "id": "dec-tech-standard",
+        "type": "decision",
+        "title": "政令の技術的基準に適合するか？",
+        "decision_type": "binary",
+        "description": "屎尿浄化槽の構造が汚物処理性能に関して政令で定める技術的基準に適合するか",
+        "related_articles": ["令::A32"]
+      },
+      {
+        "id": "dec-method-or-cert",
+        "type": "decision",
+        "title": "大臣定め構造方法又は大臣認定か？",
+        "decision_type": "binary",
+        "description": "国土交通大臣が定めた構造方法を用いるもの、又は国土交通大臣の認定を受けたもの"
+      },
+      {
+        "id": "proc-compliant",
+        "type": "process",
+        "title": "屎尿浄化槽適合確認",
+        "description": "設置あり、技術基準適合、かつ大臣定め構造方法又は認定を確認"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "法31条2項に適合"
+      },
+      {
+        "id": "end-not-applicable",
+        "type": "terminal",
+        "title": "対象外（終末処理場を有する公共下水道へ放流）",
+        "result": "end",
+        "description": "終末処理場を有する公共下水道へ放流するため本項の適用対象外"
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "法31条2項に不適合"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e1",
+        "from": "start",
+        "to": "dec-discharge-target",
+        "role": "flow"
+      },
+      {
+        "id": "e2",
+        "from": "dec-discharge-target",
+        "to": "end-not-applicable",
+        "role": "option",
+        "label": "終末処理場を有する公共下水道"
+      },
+      {
+        "id": "e3",
+        "from": "dec-discharge-target",
+        "to": "dec-septic-installed",
+        "role": "option",
+        "label": "その他（終末処理場なし等）"
+      },
+      {
+        "id": "e4",
+        "from": "dec-septic-installed",
+        "to": "dec-tech-standard",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e5",
+        "from": "dec-septic-installed",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e6",
+        "from": "dec-tech-standard",
+        "to": "dec-method-or-cert",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e7",
+        "from": "dec-tech-standard",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e8",
+        "from": "dec-method-or-cert",
+        "to": "proc-compliant",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e9",
+        "from": "dec-method-or-cert",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e10",
+        "from": "proc-compliant",
+        "to": "end-pass",
+        "role": "flow"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-A31-P2",
+  "related_laws": [
+    {
+      "law_id": "333AC0000000079",
+      "law_name": "下水道法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A2:I6"],
+      "description": "終末処理場を有する公共下水道の定義"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "delegates_to",
+      "articles": ["A32"],
+      "description": "屎尿浄化槽の技術的基準"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00Z",
+    "updated_at": "2025-12-25T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-skill",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

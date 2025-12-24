@@ -1,0 +1,283 @@
+{
+  "id": "A56_2_P4_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "対象区域外建築物の日影制限適用判定フロー",
+    "target_subject": "対象区域外にある建築物",
+    "description": "対象区域外にある建築物が対象区域内の土地に日影を生じさせる場合の日影制限適用判定"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "56の2",
+    "paragraph": "4",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "日影制限"
+  ],
+  "text_raw": "対象区域外にある高さが十メートルを超える建築物で、冬至日において、対象区域内の土地に日影を生じさせるものは、当該対象区域内にある建築物とみなして、第一項の規定を適用する。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "対象区域外"
+        },
+        {
+          "type": "winter_solstice",
+          "value": "true"
+        }
+      ],
+      "note": "対象区域は法56条の2の規定に基づき地方公共団体が条例で指定する区域"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "numeric_comparison",
+          "variable": "建築物の高さ",
+          "operator": ">",
+          "value": 10,
+          "unit": "m"
+        },
+        {
+          "type": "shadow_detection",
+          "variable": "冬至日における対象区域内の土地への日影",
+          "operator": "exists",
+          "value": true
+        }
+      ],
+      "conclusion": "対象区域内にある建築物とみなして、法56条の2第1項の規定を適用する"
+    }
+  },
+  "flow_diagram": {
+    "title": "対象区域外建築物の日影制限適用判定フロー",
+    "description": "対象区域外の建築物が対象区域内の土地に日影を生じさせる場合の適用判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "対象区域外建築物の日影制限適用判定を開始"
+      },
+      {
+        "id": "dec-site-location",
+        "type": "decision",
+        "title": "敷地の位置は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "対象区域内", "description": "日影制限の対象区域内" },
+          { "value": "対象区域外", "description": "日影制限の対象区域外" }
+        ],
+        "description": "建築物の敷地が対象区域内か対象区域外かを判定"
+      },
+      {
+        "id": "proc-inside-zone",
+        "type": "process",
+        "title": "対象区域内として通常の第1項を適用",
+        "process_type": "sub_diagram_reference",
+        "description": "対象区域内の建築物として第1項の日影規制を適用",
+        "related_articles": ["法::A56_2:P1"]
+      },
+      {
+        "id": "dec-height-over-10m",
+        "type": "decision",
+        "title": "建築物の高さは10mを超えるか？",
+        "decision_type": "binary",
+        "description": "建築物の平均地盤面からの高さが10メートルを超えるかを判定",
+        "condition": {
+          "operator": "GT",
+          "lhs": { "var": "H", "desc": "建築物の高さ" },
+          "rhs": { "value": 10, "unit": "m" }
+        }
+      },
+      {
+        "id": "proc-height-not-applicable",
+        "type": "process",
+        "title": "高さ基準未達",
+        "process_type": "mechanical",
+        "description": "高さ10m以下のため、本項の適用対象外"
+      },
+      {
+        "id": "dec-shadow-reaches-zone",
+        "type": "decision",
+        "title": "冬至日に対象区域内の土地に日影を生じさせるか？",
+        "decision_type": "binary",
+        "description": "冬至日における建築物の日影が対象区域内の土地に及ぶかを判定"
+      },
+      {
+        "id": "proc-shadow-not-applicable",
+        "type": "process",
+        "title": "日影が対象区域内に及ばない",
+        "process_type": "mechanical",
+        "description": "対象区域内に日影を生じさせないため、本項の適用対象外"
+      },
+      {
+        "id": "proc-applicable-as-inside",
+        "type": "process",
+        "title": "対象区域内建築物とみなす",
+        "process_type": "mechanical",
+        "description": "全条件を満たすため、対象区域内にある建築物とみなして第1項を適用"
+      },
+      {
+        "id": "proc-apply-para1",
+        "type": "process",
+        "title": "第1項の日影規制を適用",
+        "process_type": "sub_diagram_reference",
+        "description": "当該建築物に対して第1項の日影規制基準を適用して判定",
+        "related_articles": ["法::A56_2:P1"]
+      },
+      {
+        "id": "dec-para1-compliance",
+        "type": "decision",
+        "title": "第1項の日影規制に適合するか？",
+        "decision_type": "binary",
+        "description": "対象区域内建築物とみなした場合の日影規制への適合判定"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "日影規制に適合（または適用対象外）"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "第1項の日影規制に不適合"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-site-location",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-site-location",
+        "to": "proc-inside-zone",
+        "role": "option",
+        "label": "対象区域内"
+      },
+      {
+        "id": "e03",
+        "from": "dec-site-location",
+        "to": "dec-height-over-10m",
+        "role": "option",
+        "label": "対象区域外"
+      },
+      {
+        "id": "e04",
+        "from": "proc-inside-zone",
+        "to": "pass",
+        "role": "flow",
+        "label": "第1項で判定"
+      },
+      {
+        "id": "e05",
+        "from": "dec-height-over-10m",
+        "to": "dec-shadow-reaches-zone",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e06",
+        "from": "dec-height-over-10m",
+        "to": "proc-height-not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e07",
+        "from": "proc-height-not-applicable",
+        "to": "pass",
+        "role": "flow",
+        "label": "適用対象外"
+      },
+      {
+        "id": "e08",
+        "from": "dec-shadow-reaches-zone",
+        "to": "proc-applicable-as-inside",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e09",
+        "from": "dec-shadow-reaches-zone",
+        "to": "proc-shadow-not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e10",
+        "from": "proc-shadow-not-applicable",
+        "to": "pass",
+        "role": "flow",
+        "label": "適用対象外"
+      },
+      {
+        "id": "e11",
+        "from": "proc-applicable-as-inside",
+        "to": "proc-apply-para1",
+        "role": "flow"
+      },
+      {
+        "id": "e12",
+        "from": "proc-apply-para1",
+        "to": "dec-para1-compliance",
+        "role": "flow"
+      },
+      {
+        "id": "e13",
+        "from": "dec-para1-compliance",
+        "to": "pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e14",
+        "from": "dec-para1-compliance",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-A56-2-P4",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A56_2:P1"],
+      "description": "第1項の日影制限規定を対象区域外の建築物にも適用する"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": ["A130", "A131"],
+      "description": "日影制限の具体的な計算方法や基準を定める"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00Z",
+    "updated_at": "2025-12-25T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

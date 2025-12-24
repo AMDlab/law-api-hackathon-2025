@@ -1,0 +1,212 @@
+{
+  "id": "A84_P2_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "被災市街地における建築制限期間の延長確認",
+    "target_subject": "建築計画",
+    "description": "市街地の災害発生時に特定行政庁が指定区域における建築制限期間を延長できる条件の確認"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "84",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "総則"
+  ],
+  "text_raw": "特定行政庁は、更に一月を超えない範囲内において前項の期間を延長することができる。",
+  "compliance_logic": {
+    "scope_condition": {
+      "note": "法第84条第1項で指定された区域内における建築物の建築"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "note": "建築制限期間内に建築物の建築を行う場合、特定行政庁の延長決定が有効か確認",
+          "ref": "info-extension-validity",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    }
+  },
+  "flow_diagram": {
+    "title": "法84条2項 建築制限期間延長の適合判定フロー",
+    "description": "特定行政庁による建築制限期間の延長が適正に行われているかを判定するフロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start"
+      },
+      {
+        "id": "dec-initial-period",
+        "type": "decision",
+        "title": "法84条1項の建築制限期間が設定されているか？",
+        "decision_type": "binary",
+        "description": "災害発生日から起算した初期の建築制限期間（最大1ヶ月）が設定されているか確認"
+      },
+      {
+        "id": "dec-extension-decision",
+        "type": "decision",
+        "title": "特定行政庁が延長を決定したか？",
+        "decision_type": "binary",
+        "description": "特定行政庁が建築制限期間の延長を決定したか確認"
+      },
+      {
+        "id": "proc-extension-confirmed",
+        "type": "process",
+        "title": "延長決定確認",
+        "process_type": "mechanical",
+        "description": "特定行政庁による延長決定が存在することを確認"
+      },
+      {
+        "id": "dec-extension-period-valid",
+        "type": "decision",
+        "title": "延長期間は1ヶ月以内か？",
+        "decision_type": "binary",
+        "description": "延長期間が法定上限（1ヶ月）を超えていないか判定"
+      },
+      {
+        "id": "proc-period-valid",
+        "type": "process",
+        "title": "延長期間適正確認",
+        "process_type": "mechanical",
+        "description": "延長期間が1ヶ月以内であることを確認"
+      },
+      {
+        "id": "dec-current-within-period",
+        "type": "decision",
+        "title": "建築時点は延長後の制限期間内か？",
+        "decision_type": "binary",
+        "description": "建築計画の実施時点が延長後の総制限期間内にあるか判定"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合（延長規定に適合）",
+        "result": "pass",
+        "description": "建築制限期間の延長が適正に行われており、当該期間内の建築制限が有効"
+      },
+      {
+        "id": "fail-no-initial",
+        "type": "terminal",
+        "title": "不適合（初期制限期間なし）",
+        "result": "fail",
+        "description": "法84条1項の建築制限期間が設定されていないため、延長規定は適用されない"
+      },
+      {
+        "id": "pass-no-extension",
+        "type": "terminal",
+        "title": "適合（延長なし）",
+        "result": "pass",
+        "description": "延長決定がないため、初期の制限期間のみが適用される"
+      },
+      {
+        "id": "fail-period-exceeded",
+        "type": "terminal",
+        "title": "不適合（延長期間超過）",
+        "result": "fail",
+        "description": "延長期間が1ヶ月を超えており、法定上限違反"
+      },
+      {
+        "id": "pass-outside-period",
+        "type": "terminal",
+        "title": "適合（制限期間外）",
+        "result": "pass",
+        "description": "建築時点が制限期間を経過しているため、建築制限は適用されない"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-initial-period",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-initial-period",
+        "to": "dec-extension-decision",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "dec-initial-period",
+        "to": "fail-no-initial",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e04",
+        "from": "dec-extension-decision",
+        "to": "proc-extension-confirmed",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e05",
+        "from": "dec-extension-decision",
+        "to": "pass-no-extension",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e06",
+        "from": "proc-extension-confirmed",
+        "to": "dec-extension-period-valid",
+        "role": "flow"
+      },
+      {
+        "id": "e07",
+        "from": "dec-extension-period-valid",
+        "to": "proc-period-valid",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e08",
+        "from": "dec-extension-period-valid",
+        "to": "fail-period-exceeded",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e09",
+        "from": "proc-period-valid",
+        "to": "dec-current-within-period",
+        "role": "flow"
+      },
+      {
+        "id": "e10",
+        "from": "dec-current-within-period",
+        "to": "pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e11",
+        "from": "dec-current-within-period",
+        "to": "pass-outside-period",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-A84-P2",
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

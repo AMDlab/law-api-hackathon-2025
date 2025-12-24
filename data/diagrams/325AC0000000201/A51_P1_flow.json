@@ -1,0 +1,397 @@
+{
+  "id": "A51_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "特殊建築物の位置制限適合判定フロー",
+    "target_subject": "建築物",
+    "description": "都市計画区域内における特殊処理施設の敷地位置が適法であることを判定するフロー"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "51",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "集団規定",
+    "敷地・用途"
+  ],
+  "text_raw": "都市計画区域内においては、卸売市場、火葬場又はと畜場、汚物処理場、ごみ焼却場その他政令で定める処理施設の用途に供する建築物は、都市計画においてその敷地の位置が決定しているものでなければ、新築し、又は増築してはならない。ただし、特定行政庁が都市計画審議会の議を経てその敷地の位置が都市計画上支障がないと認めて許可した場合又は政令で定める規模の範囲内において新築し、若しくは増築する場合においては、この限りでない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "都市計画区域内"
+        },
+        {
+          "type": "use",
+          "value": "特殊処理施設"
+        },
+        {
+          "type": "construction_type",
+          "value": "新築又は増築"
+        }
+      ],
+      "note": "都市計画区域内で特殊処理施設を新築・増築する場合に適用"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "ref": "info-site-designated",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "ref": "info-permission-granted",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "ref": "info-within-scale",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "flow_diagram": {
+    "title": "法51条1項 特殊建築物位置制限適合判定フロー",
+    "description": "特殊処理施設の敷地位置が法51条の規定に適合するかを判定する",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "特殊建築物の位置制限適合判定を開始"
+      },
+      {
+        "id": "dec-location",
+        "type": "decision",
+        "title": "都市計画区域内か？",
+        "decision_type": "binary",
+        "description": "敷地が都市計画区域内に所在するかを確認"
+      },
+      {
+        "id": "dec-facility-type",
+        "type": "decision",
+        "title": "特殊処理施設に該当するか？",
+        "decision_type": "multi",
+        "description": "建築物用途が法51条の規制対象施設に該当するかを判定",
+        "options": [
+          { "value": "卸売市場" },
+          { "value": "火葬場" },
+          { "value": "と畜場" },
+          { "value": "汚物処理場" },
+          { "value": "ごみ焼却場" },
+          { "value": "その他政令で定める施設", "description": "令130条の2の3に定める施設" },
+          { "value": "非該当" }
+        ],
+        "related_articles": [
+          "令::A130_2_3"
+        ]
+      },
+      {
+        "id": "proc-facility-applicable",
+        "type": "process",
+        "title": "規制対象施設該当",
+        "process_type": "mechanical",
+        "description": "法51条の規制対象となる特殊処理施設に該当"
+      },
+      {
+        "id": "dec-construction-type",
+        "type": "decision",
+        "title": "工事種別は新築又は増築か？",
+        "decision_type": "multi",
+        "description": "工事種別を確認し、新築または増築であるかを判定",
+        "options": [
+          { "value": "新築" },
+          { "value": "増築" },
+          { "value": "その他（改築・移転等）" }
+        ]
+      },
+      {
+        "id": "proc-regulation-target",
+        "type": "process",
+        "title": "位置制限規制対象",
+        "process_type": "mechanical",
+        "description": "法51条の位置制限規制の対象に該当"
+      },
+      {
+        "id": "dec-site-designated",
+        "type": "decision",
+        "title": "都市計画で敷地位置が決定されているか？",
+        "decision_type": "binary",
+        "description": "都市計画において当該敷地の位置が決定されているかを確認"
+      },
+      {
+        "id": "proc-site-designated",
+        "type": "process",
+        "title": "都市計画決定あり",
+        "process_type": "mechanical",
+        "description": "都市計画において敷地位置が決定されている"
+      },
+      {
+        "id": "dec-permission",
+        "type": "decision",
+        "title": "特定行政庁の許可を受けているか？",
+        "decision_type": "binary",
+        "description": "特定行政庁が都市計画審議会の議を経て敷地位置が都市計画上支障ないと認めて許可したかを確認"
+      },
+      {
+        "id": "proc-permission-granted",
+        "type": "process",
+        "title": "特定行政庁許可あり",
+        "process_type": "mechanical",
+        "description": "特定行政庁の許可（都市計画審議会の議を経た許可）を受けている"
+      },
+      {
+        "id": "dec-scale",
+        "type": "decision",
+        "title": "政令で定める規模の範囲内か？",
+        "decision_type": "binary",
+        "description": "施設規模が令130条の2の4に定める規模の範囲内であるかを判定",
+        "related_articles": [
+          "令::A130_2_4"
+        ]
+      },
+      {
+        "id": "proc-within-scale",
+        "type": "process",
+        "title": "政令規模範囲内",
+        "process_type": "mechanical",
+        "description": "政令で定める規模の範囲内である",
+        "related_articles": [
+          "令::A130_2_4"
+        ]
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "法51条1項の位置制限規定に適合"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "法51条1項の位置制限規定に不適合"
+      },
+      {
+        "id": "pass-outside",
+        "type": "terminal",
+        "title": "適用対象外（適合）",
+        "result": "pass",
+        "description": "都市計画区域外のため、本規定の適用対象外"
+      },
+      {
+        "id": "pass-non-target-use",
+        "type": "terminal",
+        "title": "適用対象外（適合）",
+        "result": "pass",
+        "description": "特殊処理施設に該当しないため、本規定の適用対象外"
+      },
+      {
+        "id": "pass-non-target-construction",
+        "type": "terminal",
+        "title": "適用対象外（適合）",
+        "result": "pass",
+        "description": "新築・増築ではないため、本規定の適用対象外"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-location",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-location",
+        "to": "dec-facility-type",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "dec-location",
+        "to": "pass-outside",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e04",
+        "from": "dec-facility-type",
+        "to": "proc-facility-applicable",
+        "role": "option",
+        "label": "卸売市場"
+      },
+      {
+        "id": "e05",
+        "from": "dec-facility-type",
+        "to": "proc-facility-applicable",
+        "role": "option",
+        "label": "火葬場"
+      },
+      {
+        "id": "e06",
+        "from": "dec-facility-type",
+        "to": "proc-facility-applicable",
+        "role": "option",
+        "label": "と畜場"
+      },
+      {
+        "id": "e07",
+        "from": "dec-facility-type",
+        "to": "proc-facility-applicable",
+        "role": "option",
+        "label": "汚物処理場"
+      },
+      {
+        "id": "e08",
+        "from": "dec-facility-type",
+        "to": "proc-facility-applicable",
+        "role": "option",
+        "label": "ごみ焼却場"
+      },
+      {
+        "id": "e09",
+        "from": "dec-facility-type",
+        "to": "proc-facility-applicable",
+        "role": "option",
+        "label": "その他政令で定める施設"
+      },
+      {
+        "id": "e10",
+        "from": "dec-facility-type",
+        "to": "pass-non-target-use",
+        "role": "option",
+        "label": "非該当"
+      },
+      {
+        "id": "e11",
+        "from": "proc-facility-applicable",
+        "to": "dec-construction-type",
+        "role": "flow"
+      },
+      {
+        "id": "e12",
+        "from": "dec-construction-type",
+        "to": "proc-regulation-target",
+        "role": "option",
+        "label": "新築"
+      },
+      {
+        "id": "e13",
+        "from": "dec-construction-type",
+        "to": "proc-regulation-target",
+        "role": "option",
+        "label": "増築"
+      },
+      {
+        "id": "e14",
+        "from": "dec-construction-type",
+        "to": "pass-non-target-construction",
+        "role": "option",
+        "label": "その他（改築・移転等）"
+      },
+      {
+        "id": "e15",
+        "from": "proc-regulation-target",
+        "to": "dec-site-designated",
+        "role": "flow"
+      },
+      {
+        "id": "e16",
+        "from": "dec-site-designated",
+        "to": "proc-site-designated",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e17",
+        "from": "proc-site-designated",
+        "to": "pass",
+        "role": "flow"
+      },
+      {
+        "id": "e18",
+        "from": "dec-site-designated",
+        "to": "dec-permission",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e19",
+        "from": "dec-permission",
+        "to": "proc-permission-granted",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e20",
+        "from": "proc-permission-granted",
+        "to": "pass",
+        "role": "flow"
+      },
+      {
+        "id": "e21",
+        "from": "dec-permission",
+        "to": "dec-scale",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e22",
+        "from": "dec-scale",
+        "to": "proc-within-scale",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e23",
+        "from": "proc-within-scale",
+        "to": "pass",
+        "role": "flow"
+      },
+      {
+        "id": "e24",
+        "from": "dec-scale",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-A51-P1",
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "delegates_to",
+      "articles": [
+        "A130_2_3",
+        "A130_2_4"
+      ],
+      "description": "法51条の政令で定める処理施設及び規模を規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00.000Z",
+    "generator": "flow-generator-skill-v3",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法",
+    "author": "Claude Code"
+  }
+}

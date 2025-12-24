@@ -1,0 +1,166 @@
+{
+  "id": "A56_2_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "日影制限",
+    "target_subject": "建築物",
+    "description": "対象区域内の建築物が冬至日の日中における日影制限を満たすことを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "56の2",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": ["集団規定", "日影制限"],
+  "text_raw": "別表第四（い）欄の各項に掲げる地域又は区域の全部又は一部で地方公共団体の条例で指定する区域（以下この条において「対象区域」という。）内にある同表（ろ）欄の当該各項（四の項にあつては、同項イ又はロのうちから地方公共団体がその地方の気候及び風土、当該区域の土地利用の状況等を勘案して条例で指定するもの）に掲げる建築物は、冬至日の真太陽時による午前八時から午後四時まで（道の区域内にあつては、午前九時から午後三時まで）の間において、それぞれ、同表（は）欄の各項（四の項にあつては、同項イ又はロ）に掲げる平均地盤面からの高さ（二の項及び三の項にあつては、当該各項に掲げる平均地盤面からの高さのうちから地方公共団体が当該区域の土地利用の状況等を勘案して条例で指定するもの）の水平面（対象区域外の部分、高層住居誘導地区内の部分、都市再生特別地区内の部分及び当該建築物の敷地内の部分を除く。）に、敷地境界線からの水平距離が五メートルを超える範囲において、同表（に）欄の（一）、（二）又は（三）の号（同表の三の項にあつては、（一）又は（二）の号）のうちから地方公共団体がその地方の気候及び風土、土地利用の状況等を勘案して条例で指定する号に掲げる時間以上日影となる部分を生じさせることのないものとしなければならない。ただし、特定行政庁が土地の状況等により周囲の居住環境を害するおそれがないと認めて建築審査会の同意を得て許可した場合又は当該許可を受けた建築物を周囲の居住環境を害するおそれがないものとして政令で定める位置及び規模の範囲内において増築し、改築し、若しくは移転する場合においては、この限りでない。",
+  "kijo_diagram_ref": "CHK-BSL-A56-2-P1",
+  "flow_diagram": {
+    "title": "法56条の2第1項 日影制限適合判定フロー",
+    "description": "対象区域内の建築物が冬至日の日影制限基準に適合するか、又は適用除外に該当するか判定",
+    "nodes": [
+      {
+        "id": "term-start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start"
+      },
+      {
+        "id": "dec-target-area",
+        "type": "decision",
+        "title": "対象区域内か？",
+        "decision_type": "binary",
+        "description": "敷地が別表第四（い）欄に掲げる対象区域（地方公共団体の条例で指定）に属するか"
+      },
+      {
+        "id": "dec-building-category",
+        "type": "decision",
+        "title": "建築物の用途区分は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "別表第四(1)項", "description": "第一種低層住居専用地域等" },
+          { "value": "別表第四(2)項", "description": "第一種・第二種中高層住居専用地域" },
+          { "value": "別表第四(3)項", "description": "第一種・第二種住居地域等" },
+          { "value": "別表第四(4)項", "description": "用途地域の指定のない区域" },
+          { "value": "対象外" }
+        ],
+        "description": "別表第四（ろ）欄に掲げる建築物の用途区分"
+      },
+      {
+        "id": "proc-category-applicable",
+        "type": "process",
+        "title": "規制対象用途該当",
+        "description": "日影規制の対象となる建築物用途に該当"
+      },
+      {
+        "id": "dec-building-height",
+        "type": "decision",
+        "title": "建築物の高さは規制高さを超えるか？",
+        "decision_type": "binary",
+        "description": "建築物の高さが別表第四（は）欄に掲げる平均地盤面からの高さを超えるか"
+      },
+      {
+        "id": "proc-height-exceed",
+        "type": "process",
+        "title": "規制高さ超過",
+        "description": "日影規制の高さ基準を超えるため日影チェックが必要"
+      },
+      {
+        "id": "dec-shadow-compliance",
+        "type": "decision",
+        "title": "日影時間は規制時間以下か？",
+        "decision_type": "binary",
+        "description": "冬至日の指定時間帯に、敷地境界線から5mを超える範囲の規制水平面において、規制日影時間以下か"
+      },
+      {
+        "id": "dec-special-approval",
+        "type": "decision",
+        "title": "特定行政庁の許可を受けているか？",
+        "decision_type": "binary",
+        "description": "土地の状況等により周囲の居住環境を害するおそれがないと認めて建築審査会の同意を得て許可したか"
+      },
+      {
+        "id": "proc-approval-granted",
+        "type": "process",
+        "title": "許可取得",
+        "description": "特定行政庁が建築審査会の同意を得て許可"
+      },
+      {
+        "id": "dec-permitted-modification",
+        "type": "decision",
+        "title": "許可建築物の政令範囲内の増改築か？",
+        "decision_type": "binary",
+        "description": "許可を受けた建築物を政令で定める位置及び規模の範囲内において増築・改築・移転する場合か"
+      },
+      {
+        "id": "proc-modification-applicable",
+        "type": "process",
+        "title": "政令範囲内増改築該当",
+        "description": "許可建築物の政令で定める位置及び規模の範囲内における増改築"
+      },
+      {
+        "id": "term-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "法56条の2第1項に適合（日影基準充足又は適用除外）"
+      },
+      {
+        "id": "term-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "法56条の2第1項に不適合（日影時間超過）"
+      },
+      {
+        "id": "term-not-applicable",
+        "type": "terminal",
+        "title": "規制適用対象外",
+        "result": "end",
+        "description": "日影規制の適用対象外"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "term-start", "to": "dec-target-area", "role": "flow" },
+      { "id": "e02", "from": "dec-target-area", "to": "dec-building-category", "role": "yes", "label": "はい" },
+      { "id": "e03", "from": "dec-target-area", "to": "term-not-applicable", "role": "no", "label": "いいえ" },
+      { "id": "e04", "from": "dec-building-category", "to": "proc-category-applicable", "role": "option", "label": "別表第四(1)項" },
+      { "id": "e05", "from": "dec-building-category", "to": "proc-category-applicable", "role": "option", "label": "別表第四(2)項" },
+      { "id": "e06", "from": "dec-building-category", "to": "proc-category-applicable", "role": "option", "label": "別表第四(3)項" },
+      { "id": "e07", "from": "dec-building-category", "to": "proc-category-applicable", "role": "option", "label": "別表第四(4)項" },
+      { "id": "e08", "from": "dec-building-category", "to": "term-not-applicable", "role": "option", "label": "対象外" },
+      { "id": "e09", "from": "proc-category-applicable", "to": "dec-building-height", "role": "flow" },
+      { "id": "e10", "from": "dec-building-height", "to": "proc-height-exceed", "role": "yes", "label": "はい" },
+      { "id": "e11", "from": "dec-building-height", "to": "term-pass", "role": "no", "label": "いいえ" },
+      { "id": "e12", "from": "proc-height-exceed", "to": "dec-shadow-compliance", "role": "flow" },
+      { "id": "e13", "from": "dec-shadow-compliance", "to": "term-pass", "role": "yes", "label": "はい" },
+      { "id": "e14", "from": "dec-shadow-compliance", "to": "dec-special-approval", "role": "no", "label": "いいえ" },
+      { "id": "e15", "from": "dec-special-approval", "to": "proc-approval-granted", "role": "yes", "label": "はい" },
+      { "id": "e16", "from": "dec-special-approval", "to": "dec-permitted-modification", "role": "no", "label": "いいえ" },
+      { "id": "e17", "from": "proc-approval-granted", "to": "term-pass", "role": "flow" },
+      { "id": "e18", "from": "dec-permitted-modification", "to": "proc-modification-applicable", "role": "yes", "label": "はい" },
+      { "id": "e19", "from": "dec-permitted-modification", "to": "term-fail", "role": "no", "label": "いいえ" },
+      { "id": "e20", "from": "proc-modification-applicable", "to": "term-pass", "role": "flow" }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "defines_detail",
+      "articles": ["A56_2:P2", "A56_2:P3", "A56_2:P4", "A56_2:P5"],
+      "description": "本項に関連する他の項の規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

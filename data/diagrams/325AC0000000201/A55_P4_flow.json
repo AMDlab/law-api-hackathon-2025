@@ -1,0 +1,153 @@
+{
+  "id": "A55_P4_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "低層住居専用地域等における高さ制限の適用除外判定",
+    "target_subject": "建築物",
+    "description": "法55条1項及び2項の高さ制限が適用除外となる建築物か否かを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "55",
+    "paragraph": "4",
+    "item": null
+  },
+  "labels": ["集団規定", "高さ制限", "適用除外", "低層住居専用地域"],
+  "text_raw": "第一項及び第二項の規定は、次の各号のいずれかに該当する建築物については、適用しない。\n一 その敷地の周囲に広い公園、広場、道路その他の空地を有する建築物であつて、低層住宅に係る良好な住居の環境を害するおそれがないと認めて特定行政庁が許可したもの\n二 学校その他の建築物であつて、その用途によつてやむを得ないと認めて特定行政庁が許可したもの",
+  "kijo_diagram_ref": "CHK-BSL-A55-P4",
+  "flow_diagram": {
+    "title": "法55条4項 高さ制限適用除外判定フロー",
+    "description": "法55条1項及び2項の高さ制限が適用除外となる各号への該当性を判定",
+    "nodes": [
+      {
+        "id": "term-start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start"
+      },
+      {
+        "id": "dec-zone",
+        "type": "decision",
+        "title": "低層住居専用地域等か？",
+        "decision_type": "binary",
+        "description": "第一種低層住居専用地域、第二種低層住居専用地域又は田園住居地域内か"
+      },
+      {
+        "id": "dec-surrounding-space",
+        "type": "decision",
+        "title": "敷地周囲に広い空地を有するか？",
+        "decision_type": "binary",
+        "description": "敷地の周囲に広い公園、広場、道路その他の空地を有するか"
+      },
+      {
+        "id": "dec-permit-1",
+        "type": "decision",
+        "title": "第1号の特定行政庁許可を受けているか？",
+        "decision_type": "binary",
+        "description": "低層住宅に係る良好な住居の環境を害するおそれがないと認めて特定行政庁が許可したか"
+      },
+      {
+        "id": "proc-item1-applicable",
+        "type": "process",
+        "title": "第1号該当",
+        "description": "敷地周囲に広い空地を有し、特定行政庁の許可を得ている"
+      },
+      {
+        "id": "dec-use-type",
+        "type": "decision",
+        "title": "建築物の用途は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "学校" },
+          { "value": "その他（用途上やむを得ないもの）" },
+          { "value": "一般建築物" }
+        ],
+        "description": "学校その他の建築物であって、その用途によってやむを得ないものか"
+      },
+      {
+        "id": "proc-use-applicable",
+        "type": "process",
+        "title": "第2号対象用途",
+        "description": "学校その他の用途上高さがやむを得ない建築物"
+      },
+      {
+        "id": "dec-permit-2",
+        "type": "decision",
+        "title": "第2号の特定行政庁許可を受けているか？",
+        "decision_type": "binary",
+        "description": "その用途によってやむを得ないと認めて特定行政庁が許可したか"
+      },
+      {
+        "id": "proc-item2-applicable",
+        "type": "process",
+        "title": "第2号該当",
+        "description": "学校その他の建築物で用途上やむを得ず、特定行政庁の許可を得ている"
+      },
+      {
+        "id": "proc-no-exemption",
+        "type": "process",
+        "title": "適用除外非該当",
+        "description": "第1号・第2号のいずれにも該当しない"
+      },
+      {
+        "id": "term-exemption",
+        "type": "terminal",
+        "title": "適用除外",
+        "result": "pass",
+        "description": "法55条1項及び2項の高さ制限は適用しない"
+      },
+      {
+        "id": "term-apply-height-limit",
+        "type": "terminal",
+        "title": "高さ制限適用",
+        "result": "end",
+        "description": "法55条1項及び2項の高さ制限が適用される（本項による除外なし）"
+      },
+      {
+        "id": "term-not-applicable",
+        "type": "terminal",
+        "title": "本条適用対象外",
+        "result": "end",
+        "description": "法55条の適用対象外（他の用途地域）"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "term-start", "to": "dec-zone", "role": "flow" },
+      { "id": "e02", "from": "dec-zone", "to": "dec-surrounding-space", "role": "yes", "label": "はい" },
+      { "id": "e03", "from": "dec-zone", "to": "term-not-applicable", "role": "no", "label": "いいえ" },
+      { "id": "e04", "from": "dec-surrounding-space", "to": "dec-permit-1", "role": "yes", "label": "はい" },
+      { "id": "e05", "from": "dec-surrounding-space", "to": "dec-use-type", "role": "no", "label": "いいえ" },
+      { "id": "e06", "from": "dec-permit-1", "to": "proc-item1-applicable", "role": "yes", "label": "はい" },
+      { "id": "e07", "from": "dec-permit-1", "to": "dec-use-type", "role": "no", "label": "いいえ" },
+      { "id": "e08", "from": "proc-item1-applicable", "to": "term-exemption", "role": "flow" },
+      { "id": "e09", "from": "dec-use-type", "to": "proc-use-applicable", "role": "option", "label": "学校" },
+      { "id": "e10", "from": "dec-use-type", "to": "proc-use-applicable", "role": "option", "label": "その他（用途上やむを得ないもの）" },
+      { "id": "e11", "from": "dec-use-type", "to": "proc-no-exemption", "role": "option", "label": "一般建築物" },
+      { "id": "e12", "from": "proc-use-applicable", "to": "dec-permit-2", "role": "flow" },
+      { "id": "e13", "from": "dec-permit-2", "to": "proc-item2-applicable", "role": "yes", "label": "はい" },
+      { "id": "e14", "from": "dec-permit-2", "to": "proc-no-exemption", "role": "no", "label": "いいえ" },
+      { "id": "e15", "from": "proc-item2-applicable", "to": "term-exemption", "role": "flow" },
+      { "id": "e16", "from": "proc-no-exemption", "to": "term-apply-height-limit", "role": "flow" }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A55:P1", "A55:P2", "A44:P2"],
+      "description": "第1項及び第2項の高さ制限規定、第44条第2項の準用規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

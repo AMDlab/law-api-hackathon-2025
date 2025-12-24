@@ -1,0 +1,115 @@
+{
+  "id": "A84_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "被災市街地における建築制限の判定",
+    "target_subject": "建築物",
+    "description": "災害発生時の被災市街地における建築制限・禁止の適用判定"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "84",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": ["単体規定", "総則"],
+  "text_raw": "特定行政庁は、市街地に災害のあつた場合において都市計画又は土地区画整理法による土地区画整理事業のため必要があると認めるときは、区域を指定し、災害が発生した日から一月以内の期間を限り、その区域内における建築物の建築を制限し、又は禁止することができる。",
+  "kijo_diagram_ref": "CHK-BSL-A84-P1",
+  "flow_diagram": {
+    "title": "被災市街地における建築制限判定フロー",
+    "description": "法84条1項に基づき、災害発生後の市街地で建築制限が適用されるかを判定するフロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start"
+      },
+      {
+        "id": "dec-disaster-occurred",
+        "type": "decision",
+        "title": "市街地で災害が発生したか？",
+        "decision_type": "binary",
+        "description": "当該敷地が属する市街地で災害が発生したか否か"
+      },
+      {
+        "id": "dec-restriction-purpose",
+        "type": "decision",
+        "title": "都市計画又は土地区画整理事業のための必要性が認められるか？",
+        "decision_type": "binary",
+        "description": "特定行政庁が都市計画又は土地区画整理事業のため必要があると認めるか"
+      },
+      {
+        "id": "dec-designated-area",
+        "type": "decision",
+        "title": "制限区域として指定されているか？",
+        "decision_type": "binary",
+        "description": "当該敷地が特定行政庁により建築制限区域として指定されているか"
+      },
+      {
+        "id": "dec-period-valid",
+        "type": "decision",
+        "title": "災害発生日から1月以内か？",
+        "decision_type": "binary",
+        "description": "建築計画時点が災害発生日から1月以内の期間内であるか"
+      },
+      {
+        "id": "pass-restricted",
+        "type": "terminal",
+        "title": "建築制限適用",
+        "result": "pass",
+        "description": "建築物の建築が制限又は禁止される"
+      },
+      {
+        "id": "fail-no-disaster",
+        "type": "terminal",
+        "title": "制限なし",
+        "result": "fail",
+        "description": "市街地での災害がないため建築制限の対象外"
+      },
+      {
+        "id": "fail-no-necessity",
+        "type": "terminal",
+        "title": "制限なし",
+        "result": "fail",
+        "description": "都市計画又は土地区画整理事業のための必要性が認められないため制限対象外"
+      },
+      {
+        "id": "fail-not-designated",
+        "type": "terminal",
+        "title": "制限なし",
+        "result": "fail",
+        "description": "制限区域として指定されていないため制限対象外"
+      },
+      {
+        "id": "fail-period-expired",
+        "type": "terminal",
+        "title": "制限なし",
+        "result": "fail",
+        "description": "災害発生日から1月を超えているため制限期間終了"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "dec-disaster-occurred", "role": "flow" },
+      { "id": "e02", "from": "dec-disaster-occurred", "to": "dec-restriction-purpose", "role": "yes", "label": "はい" },
+      { "id": "e03", "from": "dec-disaster-occurred", "to": "fail-no-disaster", "role": "no", "label": "いいえ" },
+      { "id": "e04", "from": "dec-restriction-purpose", "to": "dec-designated-area", "role": "yes", "label": "はい" },
+      { "id": "e05", "from": "dec-restriction-purpose", "to": "fail-no-necessity", "role": "no", "label": "いいえ" },
+      { "id": "e06", "from": "dec-designated-area", "to": "dec-period-valid", "role": "yes", "label": "はい" },
+      { "id": "e07", "from": "dec-designated-area", "to": "fail-not-designated", "role": "no", "label": "いいえ" },
+      { "id": "e08", "from": "dec-period-valid", "to": "pass-restricted", "role": "yes", "label": "はい" },
+      { "id": "e09", "from": "dec-period-valid", "to": "fail-period-expired", "role": "no", "label": "いいえ" }
+    ]
+  },
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00+09:00",
+    "updated_at": "2025-12-25T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

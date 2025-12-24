@@ -1,0 +1,264 @@
+{
+  "id": "A86_9_P2_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "公共事業による敷地面積減少時の敷地面積最低限度規定の準用",
+    "target_subject": "敷地",
+    "description": "公共事業の施行による敷地面積の減少により、敷地面積の最低限度規定に適合しなくなった土地について、全部を一の敷地として使用する場合に限り、当該規定を適用しない"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "86の9",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": [
+    "敷地面積",
+    "最低限度",
+    "公共事業",
+    "既得権"
+  ],
+  "kijo_diagram_ref": "CHK-BSL-A86-9-P2",
+  "flow_diagram": {
+    "title": "公共事業による敷地面積減少時の適用除外判定フロー",
+    "description": "公共事業の施行による敷地面積の減少により敷地面積最低限度規定に適合しなくなった土地について、適用除外の要件を判定する",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "公共事業による敷地面積減少時の適用除外判定開始"
+      },
+      {
+        "id": "dec-public-project",
+        "type": "decision",
+        "title": "公共事業の施行による敷地面積の減少があるか？",
+        "decision_type": "binary",
+        "description": "第86条の9第1項各号に掲げる事業の施行による敷地面積の減少が生じたか確認"
+      },
+      {
+        "id": "dec-applicable-regulation",
+        "type": "decision",
+        "title": "敷地面積最低限度規定の適用対象か？",
+        "decision_type": "binary",
+        "description": "第53条の2第1項、第57条の5第3項、第67条第3項、第68条第3項のいずれかの規定の対象であるか確認"
+      },
+      {
+        "id": "dec-existing-site",
+        "type": "decision",
+        "title": "事業施行時の土地の状態は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "現に敷地として使用", "description": "事業施行の際現に建築物の敷地として使用されている土地" },
+          { "value": "権利に基づき使用予定", "description": "所有権等に基づいて敷地として使用するならば適合しないこととなる土地" },
+          { "value": "該当なし", "description": "いずれにも該当しない" }
+        ],
+        "description": "事業施行時における土地の利用状態を確認"
+      },
+      {
+        "id": "proc-existing-site-matched",
+        "type": "process",
+        "title": "事業施行時の敷地使用状況該当",
+        "process_type": "mechanical",
+        "description": "現に敷地として使用されている土地、または権利に基づき使用予定の土地に該当"
+      },
+      {
+        "id": "dec-non-compliance",
+        "type": "decision",
+        "title": "公共事業により敷地面積最低限度規定に適合しなくなるか？",
+        "decision_type": "binary",
+        "description": "公共事業の施行による面積減少により、敷地面積最低限度規定に適合しなくなったか判定"
+      },
+      {
+        "id": "dec-single-site-use",
+        "type": "decision",
+        "title": "全部を一の敷地として使用するか？",
+        "decision_type": "binary",
+        "description": "減少後の敷地の全部を一の敷地として使用する場合に限定"
+      },
+      {
+        "id": "dec-exception1",
+        "type": "decision",
+        "title": "変更前制限に違反していた敷地か？",
+        "decision_type": "binary",
+        "description": "敷地面積の最低限度が変更された際、変更前の制限に違反していた建築物の敷地に該当するか"
+      },
+      {
+        "id": "dec-exception2",
+        "type": "decision",
+        "title": "既に規定に適合するに至ったか？",
+        "decision_type": "binary",
+        "description": "敷地面積の最低限度規定に既に適合するに至った建築物の敷地に該当するか"
+      },
+      {
+        "id": "pass-exempt",
+        "type": "terminal",
+        "title": "適用除外",
+        "result": "pass",
+        "description": "敷地面積の最低限度規定を適用しない（法53条の2第3項の準用）"
+      },
+      {
+        "id": "fail-not-applicable",
+        "type": "terminal",
+        "title": "適用除外対象外",
+        "result": "fail",
+        "description": "本規定の適用除外の対象外（通常の敷地面積最低限度規定が適用される）"
+      },
+      {
+        "id": "fail-exception",
+        "type": "terminal",
+        "title": "例外該当（適用除外不可）",
+        "result": "fail",
+        "description": "例外条件に該当するため、適用除外の対象外"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-public-project",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-public-project",
+        "to": "dec-applicable-regulation",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "dec-public-project",
+        "to": "fail-not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e04",
+        "from": "dec-applicable-regulation",
+        "to": "dec-existing-site",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e05",
+        "from": "dec-applicable-regulation",
+        "to": "fail-not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e06",
+        "from": "dec-existing-site",
+        "to": "proc-existing-site-matched",
+        "role": "option",
+        "label": "現に敷地として使用"
+      },
+      {
+        "id": "e07",
+        "from": "dec-existing-site",
+        "to": "proc-existing-site-matched",
+        "role": "option",
+        "label": "権利に基づき使用予定"
+      },
+      {
+        "id": "e08",
+        "from": "dec-existing-site",
+        "to": "fail-not-applicable",
+        "role": "option",
+        "label": "該当なし"
+      },
+      {
+        "id": "e09",
+        "from": "proc-existing-site-matched",
+        "to": "dec-non-compliance",
+        "role": "flow"
+      },
+      {
+        "id": "e10",
+        "from": "dec-non-compliance",
+        "to": "dec-single-site-use",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e11",
+        "from": "dec-non-compliance",
+        "to": "fail-not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e12",
+        "from": "dec-single-site-use",
+        "to": "dec-exception1",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e13",
+        "from": "dec-single-site-use",
+        "to": "fail-not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e14",
+        "from": "dec-exception1",
+        "to": "fail-exception",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e15",
+        "from": "dec-exception1",
+        "to": "dec-exception2",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e16",
+        "from": "dec-exception2",
+        "to": "fail-exception",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e17",
+        "from": "dec-exception2",
+        "to": "pass-exempt",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": [
+        "A53の2:P1",
+        "A53の2:P3",
+        "A57の5:P3",
+        "A67:P3",
+        "A68:P3",
+        "A86の9:P1"
+      ],
+      "description": "第53条の2第3項の準用規定及び他の関連する敷地面積最低限度規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00+09:00",
+    "updated_at": "2025-12-25T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

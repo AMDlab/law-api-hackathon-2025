@@ -287,22 +287,24 @@ function HomeContent() {
                   <span className="text-muted-foreground">審査機序図ありのみ表示</span>
                 </label>
               </div>
-              {loading ? (
-                <div className="space-y-2 px-2">
-                  <Skeleton className="h-4 w-3/4" />
-                  <Skeleton className="h-4 w-full" />
-                  <Skeleton className="h-4 w-5/6" />
-                </div>
-              ) : (
-                <LawTree
-                  nodes={treeData}
-                  onSelect={handleSelect}
-                  selectedDiagramId={selectedNode?.diagramId}
-                  availableDiagramIds={availableDiagramIds}
-                  showOnlyWithDiagram={showOnlyWithDiagram}
-                  searchQuery={searchQuery}
-                />
-              )}
+              <div className="flex-1 min-h-0 overflow-hidden">
+                {loading ? (
+                  <div className="space-y-2 px-2">
+                    <Skeleton className="h-4 w-3/4" />
+                    <Skeleton className="h-4 w-full" />
+                    <Skeleton className="h-4 w-5/6" />
+                  </div>
+                ) : (
+                  <LawTree
+                    nodes={treeData}
+                    onSelect={handleSelect}
+                    selectedDiagramId={selectedNode?.diagramId}
+                    availableDiagramIds={availableDiagramIds}
+                    showOnlyWithDiagram={showOnlyWithDiagram}
+                    searchQuery={searchQuery}
+                  />
+                )}
+              </div>
             </div>
           </ResizablePanel>
 

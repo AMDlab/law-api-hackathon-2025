@@ -1,0 +1,211 @@
+{
+  "id": "A56_P7_I3_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "北側斜線制限の採光・通風確保による適用除外判定フロー",
+    "target_subject": "建築物",
+    "description": "第56条1項3号の高さ制限に関し、北側境界線からの距離に基づく採光・通風確保による適用除外の適合判定"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "56",
+    "paragraph": "7",
+    "item": "3"
+  },
+  "labels": ["集団規定", "高さ制限"],
+  "text_raw": "第一項第三号、第五項及び前項（同号の規定の適用の緩和に係る部分に限る。）隣地境界線から真北方向への水平距離が、第一種低層住居専用地域、第二種低層住居専用地域又は田園住居地域内の建築物にあつては四メートル、第一種中高層住居専用地域又は第二種中高層住居専用地域内の建築物にあつては八メートルだけ外側の線上の政令で定める位置",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "第一種低層住居専用地域、第二種低層住居専用地域、田園住居地域、第一種中高層住居専用地域、又は第二種中高層住居専用地域内"
+        }
+      ],
+      "note": "56条1項3号の高さ制限が適用される地域"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "proposition",
+          "value": "当該位置で確保される採光・通風が政令基準を満たすこと"
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "flow_diagram": {
+    "title": "北側斜線制限の適用除外判定フロー",
+    "description": "北側境界線からの距離に応じた採光・通風確保を判定し、第56条1項3号の適用除外を決定する",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "北側斜線制限の適用除外判定を開始"
+      },
+      {
+        "id": "dec-use-district",
+        "type": "decision",
+        "title": "用途地域は？",
+        "decision_type": "multi",
+        "description": "建築物が所在する用途地域を確認",
+        "options": [
+          { "value": "低層住居専用・田園住居", "description": "第一種低層住居専用地域、第二種低層住居専用地域、田園住居地域" },
+          { "value": "中高層住居専用", "description": "第一種中高層住居専用地域、第二種中高層住居専用地域" },
+          { "value": "その他", "description": "上記以外の用途地域" }
+        ]
+      },
+      {
+        "id": "proc-distance-4m",
+        "type": "process",
+        "title": "基準外側距離4mを適用",
+        "process_type": "mechanical",
+        "description": "低層住居専用地域・田園住居地域の場合、隣地境界線から真北方向に4m外側の線上を基準位置とする"
+      },
+      {
+        "id": "proc-distance-8m",
+        "type": "process",
+        "title": "基準外側距離8mを適用",
+        "process_type": "mechanical",
+        "description": "中高層住居専用地域の場合、隣地境界線から真北方向に8m外側の線上を基準位置とする"
+      },
+      {
+        "id": "dec-lighting-comparison",
+        "type": "decision",
+        "title": "当該位置の採光・通風は基準位置と同程度以上か？",
+        "decision_type": "binary",
+        "description": "第56条1項3号の位置で確保される採光・通風等と、設計による当該位置の採光・通風等を比較"
+      },
+      {
+        "id": "dec-ordinance-compliance",
+        "type": "decision",
+        "title": "政令で定める基準に適合するか？",
+        "decision_type": "binary",
+        "description": "政令で定める採光・通風等の基準への適合を確認"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合（適用除外）",
+        "result": "pass",
+        "description": "第56条1項3号の規定は適用しない"
+      },
+      {
+        "id": "fail-not-applicable",
+        "type": "terminal",
+        "title": "対象外",
+        "result": "end",
+        "description": "北側斜線制限の対象地域ではないため、本号の適用除外判定対象外"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "採光・通風等の基準を満たさず、第56条1項3号が適用される"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-use-district",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-use-district",
+        "to": "proc-distance-4m",
+        "role": "option",
+        "label": "低層住居専用・田園住居"
+      },
+      {
+        "id": "e03",
+        "from": "dec-use-district",
+        "to": "proc-distance-8m",
+        "role": "option",
+        "label": "中高層住居専用"
+      },
+      {
+        "id": "e04",
+        "from": "dec-use-district",
+        "to": "fail-not-applicable",
+        "role": "option",
+        "label": "その他"
+      },
+      {
+        "id": "e05",
+        "from": "proc-distance-4m",
+        "to": "dec-lighting-comparison",
+        "role": "flow"
+      },
+      {
+        "id": "e06",
+        "from": "proc-distance-8m",
+        "to": "dec-lighting-comparison",
+        "role": "flow"
+      },
+      {
+        "id": "e07",
+        "from": "dec-lighting-comparison",
+        "to": "dec-ordinance-compliance",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e08",
+        "from": "dec-lighting-comparison",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e09",
+        "from": "dec-ordinance-compliance",
+        "to": "pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e10",
+        "from": "dec-ordinance-compliance",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-A56-P7-I3",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "defines_detail",
+      "articles": ["A56:P1:I3"],
+      "description": "本条7項3号の適用除外を規定する本文の高さ制限基準"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "defines_detail",
+      "articles": [],
+      "description": "採光・通風基準に関する具体的な政令基準"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00Z",
+    "author": "Claude Code (flow-generator)",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

@@ -1,0 +1,212 @@
+{
+  "id": "A48_P17_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "特例許可の意見聴取に係る公告義務",
+    "target_subject": "公告",
+    "description": "第15項の規定による意見聴取を実施する際の公告要件（建築計画・期日・場所の公告、期日の3日前までの公告）の適合判定フロー"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "48",
+    "paragraph": "17",
+    "item": null
+  },
+  "labels": ["集団規定", "手続規定", "公告義務"],
+  "text_raw": "特定行政庁は、第十五項の規定により意見を聴取する場合においては、その許可しようとする建築物の建築の計画並びに意見の聴取の期日及び場所を期日の三日前までに公告しなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "procedure",
+          "value": "第15項の規定により意見を聴取する場合"
+        }
+      ],
+      "note": "用途地域における特例許可（第1項～第14項ただし書）を行う際の意見聴取手続"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-announcement-content-complete",
+          "operator": "==",
+          "value": true,
+          "note": "公告内容の充足（建築計画・期日・場所）"
+        },
+        {
+          "ref": "info-announcement-timing-compliant",
+          "operator": "==",
+          "value": true,
+          "note": "公告時期の適合（期日の3日前まで）"
+        }
+      ]
+    }
+  },
+  "flow_diagram": {
+    "title": "意見聴取公告義務の適合判定フロー",
+    "description": "特例許可に係る意見聴取の公告が法定要件（内容・時期）を満たしているかを判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "公告義務適合の判定を開始"
+      },
+      {
+        "id": "dec-building-plan-included",
+        "type": "decision",
+        "title": "建築計画を公告に含めているか？",
+        "decision_type": "binary",
+        "description": "許可しようとする建築物の建築の計画が公告に含まれているか"
+      },
+      {
+        "id": "dec-hearing-date-included",
+        "type": "decision",
+        "title": "意見聴取の期日を公告に含めているか？",
+        "decision_type": "binary",
+        "description": "意見聴取を実施する期日が公告に含まれているか"
+      },
+      {
+        "id": "dec-hearing-location-included",
+        "type": "decision",
+        "title": "意見聴取の場所を公告に含めているか？",
+        "decision_type": "binary",
+        "description": "意見聴取を実施する場所が公告に含まれているか"
+      },
+      {
+        "id": "proc-content-complete",
+        "type": "process",
+        "title": "公告内容充足",
+        "process_type": "mechanical",
+        "description": "公告に必要な3要素（建築計画・期日・場所）が全て含まれている"
+      },
+      {
+        "id": "dec-timing-compliant",
+        "type": "decision",
+        "title": "期日の3日前までに公告したか？",
+        "decision_type": "binary",
+        "description": "公告が意見聴取期日の3日前までに実施されているか（初日不算入）"
+      },
+      {
+        "id": "proc-timing-compliant",
+        "type": "process",
+        "title": "公告時期適合",
+        "process_type": "mechanical",
+        "description": "公告が期日の3日前までに実施されている"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "法48条17項適合",
+        "result": "pass",
+        "description": "公告義務を満たしている"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "法48条17項不適合",
+        "result": "fail",
+        "description": "公告義務を満たしていない"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-building-plan-included",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-building-plan-included",
+        "to": "dec-hearing-date-included",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "dec-building-plan-included",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e04",
+        "from": "dec-hearing-date-included",
+        "to": "dec-hearing-location-included",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e05",
+        "from": "dec-hearing-date-included",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e06",
+        "from": "dec-hearing-location-included",
+        "to": "proc-content-complete",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e07",
+        "from": "dec-hearing-location-included",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e08",
+        "from": "proc-content-complete",
+        "to": "dec-timing-compliant",
+        "role": "flow"
+      },
+      {
+        "id": "e09",
+        "from": "dec-timing-compliant",
+        "to": "proc-timing-compliant",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e10",
+        "from": "dec-timing-compliant",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e11",
+        "from": "proc-timing-compliant",
+        "to": "pass",
+        "role": "flow"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-A48-P17",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A48:P15"],
+      "description": "第15項の意見聴取手続に関連"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

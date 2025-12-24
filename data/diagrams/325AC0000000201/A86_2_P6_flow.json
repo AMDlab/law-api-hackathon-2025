@@ -1,0 +1,202 @@
+{
+  "id": "A86_2_P6_flow",
+  "version": "3.2.0",
+  "page_title": {
+    "title": "認定又は許可の公告及び図書変更手続フロー",
+    "target_subject": "特定行政庁",
+    "description": "第86条の2第1項から第3項までの認定又は許可後の公告及び図書変更義務の履行フロー"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "86の2",
+    "paragraph": "6"
+  },
+  "labels": ["単体規定", "行政手続", "申請手続"],
+  "text_raw": "特定行政庁は、第一項から第三項までの規定による認定又は許可をしたときは、遅滞なく、国土交通省令で定めるところにより、その旨を公告するとともに、前条第八項の図書の表示する事項について所要の変更をしなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "procedural",
+          "value": "第86条の2第1項から第3項の認定又は許可が行われた場合"
+        }
+      ]
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "procedural",
+          "description": "遅滞なく認定又は許可の旨を公告すること"
+        },
+        {
+          "type": "procedural",
+          "description": "前条第八項の図書の表示する事項について所要の変更をすること"
+        }
+      ]
+    }
+  },
+  "flow_diagram": {
+    "title": "認定又は許可の公告及び図書変更手続フロー",
+    "description": "第86条の2第6項に基づく公告及び図書変更義務の履行判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "審査開始"
+      },
+      {
+        "id": "dec-certification-approval",
+        "type": "decision",
+        "title": "第86条の2第1項から第3項の認定又は許可を行ったか？",
+        "decision_type": "binary",
+        "description": "一敷地内認定建築物・一敷地内許可建築物の位置及び構造の認定・許可を行ったか判定"
+      },
+      {
+        "id": "proc-not-applicable",
+        "type": "process",
+        "title": "本規定の適用対象外",
+        "description": "認定又は許可を行っていない場合は本規定の適用対象外"
+      },
+      {
+        "id": "dec-notification-completed",
+        "type": "decision",
+        "title": "認定又は許可の旨を遅滞なく公告したか？",
+        "decision_type": "binary",
+        "description": "国土交通省令で定める方法により認定又は許可の旨を公告したか判定"
+      },
+      {
+        "id": "proc-notification-done",
+        "type": "process",
+        "title": "公告完了",
+        "description": "認定又は許可の旨の公告が完了した状態"
+      },
+      {
+        "id": "dec-documents-updated",
+        "type": "decision",
+        "title": "第86条第8項の図書を変更したか？",
+        "decision_type": "binary",
+        "description": "公告対象区域の平面図・立面図等について所要の変更を行ったか判定"
+      },
+      {
+        "id": "proc-documents-done",
+        "type": "process",
+        "title": "図書変更完了",
+        "description": "図書の表示する事項の変更が完了した状態"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "公告及び図書変更義務を履行"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "公告及び図書変更義務の不履行"
+      },
+      {
+        "id": "end-not-applicable",
+        "type": "terminal",
+        "title": "適用対象外",
+        "result": "end",
+        "description": "本規定の適用対象外"
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge-start-to-certification",
+        "from": "start",
+        "to": "dec-certification-approval",
+        "role": "flow"
+      },
+      {
+        "id": "edge-certification-yes",
+        "from": "dec-certification-approval",
+        "to": "dec-notification-completed",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "edge-certification-no",
+        "from": "dec-certification-approval",
+        "to": "proc-not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "edge-not-applicable-to-end",
+        "from": "proc-not-applicable",
+        "to": "end-not-applicable",
+        "role": "flow"
+      },
+      {
+        "id": "edge-notification-yes",
+        "from": "dec-notification-completed",
+        "to": "proc-notification-done",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "edge-notification-no",
+        "from": "dec-notification-completed",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "edge-notification-done-to-documents",
+        "from": "proc-notification-done",
+        "to": "dec-documents-updated",
+        "role": "flow"
+      },
+      {
+        "id": "edge-documents-yes",
+        "from": "dec-documents-updated",
+        "to": "proc-documents-done",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "edge-documents-no",
+        "from": "dec-documents-updated",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "edge-documents-done-to-pass",
+        "from": "proc-documents-done",
+        "to": "pass",
+        "role": "flow"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-A86-2-P6",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A86:P8", "A86_2:P1", "A86_2:P2", "A86_2:P3"],
+      "description": "第86条の2第1項から第3項の認定又は許可、第86条第八項の図書"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

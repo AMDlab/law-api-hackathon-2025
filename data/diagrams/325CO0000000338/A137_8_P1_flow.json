@@ -1,0 +1,175 @@
+{
+  "id": "A137_8_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "容積率に係る既存不適格建築物の増築・改築の緩和範囲判定",
+    "target_subject": "増築及び改築に係る部分",
+    "description": "法第3条第2項の規定により法第52条又は法第60条第1項の規定の適用を受けない建築物の増築・改築が、法第86条の7第1項の緩和適用を受ける範囲であるかの判定フロー"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "137_8",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "既存不適格建築物",
+    "増改築",
+    "容積率"
+  ],
+  "kijo_diagram_ref": "CHK-EXT-A137-8-P1",
+  "flow_diagram": {
+    "title": "容積率に係る既存不適格建築物の増築・改築の緩和範囲判定フロー",
+    "description": "容積率に関する既存不適格建築物の増築・改築が令第137条の8第1項の緩和適用範囲に該当するかを判定するフローチャート",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "容積率に係る既存不適格建築物の増築・改築の緩和範囲判定を開始"
+      },
+      {
+        "id": "dec-existing",
+        "type": "decision",
+        "title": "容積率の既存不適格建築物か？",
+        "decision_type": "binary",
+        "description": "法第3条第2項により法第52条第1項・第2項・第7項又は法第60条第1項（高さ以外）の規定の適用を受けない建築物か確認"
+      },
+      {
+        "id": "dec-work-type",
+        "type": "decision",
+        "title": "工事種別は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "増築" },
+          { "value": "改築" },
+          { "value": "その他" }
+        ],
+        "description": "工事が増築か改築かその他かを判定"
+      },
+      {
+        "id": "dec-part-type",
+        "type": "decision",
+        "title": "増改築部分が特定部分か？",
+        "decision_type": "binary",
+        "description": "増築又は改築に係る部分が特定部分（EV昇降路、共用廊下階段、法52条6項3号の部分、車庫、備蓄倉庫、蓄電池、自家発電、貯水槽、宅配ボックス）となるか確認（第1号）"
+      },
+      {
+        "id": "proc-item1-pass",
+        "type": "process",
+        "title": "第1号適合",
+        "description": "増改築部分が容積率不算入の特定部分に該当"
+      },
+      {
+        "id": "dec-non-exempt-area",
+        "type": "decision",
+        "title": "非特定部分床面積が基準時以下か？",
+        "decision_type": "binary",
+        "description": "増築前における特定部分以外の部分の床面積の合計が基準時を超えないか判定（第2号）",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "Anp", "desc": "増築後非特定部分床面積" },
+          "rhs": { "var": "Anb", "desc": "基準時非特定部分床面積" }
+        }
+      },
+      {
+        "id": "proc-item2-pass",
+        "type": "process",
+        "title": "第2号適合",
+        "description": "非特定部分の床面積が基準時を超えない"
+      },
+      {
+        "id": "dec-target-ratio",
+        "type": "decision",
+        "title": "対象部分床面積が令2条3項の割合以下か？",
+        "decision_type": "binary",
+        "description": "対象部分（車庫、備蓄倉庫、蓄電池等）の床面積が令2条3項各号の割合による上限以下であるか判定（第3号）",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "Ap", "desc": "対象部分床面積" },
+          "rhs": { "var": "Alim", "desc": "令2条3項の割合上限" }
+        }
+      },
+      {
+        "id": "proc-item3-pass",
+        "type": "process",
+        "title": "第3号適合",
+        "description": "対象部分床面積が令2条3項の割合以下"
+      },
+      {
+        "id": "proc-all-pass",
+        "type": "process",
+        "title": "全号適合",
+        "description": "第1号から第3号の全てに適合"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合（緩和適用範囲内）",
+        "result": "pass",
+        "description": "令第137条の8第1項の緩和適用範囲に該当する"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "不適合（緩和適用範囲外）",
+        "result": "fail",
+        "description": "令第137条の8第1項の緩和適用範囲に該当しない"
+      },
+      {
+        "id": "fail-scope",
+        "type": "terminal",
+        "title": "対象外",
+        "result": "fail",
+        "description": "本条の適用対象外（容積率の既存不適格建築物でない、又は増築・改築以外の工事）"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "dec-existing", "role": "flow" },
+      { "id": "e02", "from": "dec-existing", "to": "dec-work-type", "role": "yes", "label": "はい" },
+      { "id": "e03", "from": "dec-existing", "to": "fail-scope", "role": "no", "label": "いいえ" },
+      { "id": "e04", "from": "dec-work-type", "to": "dec-part-type", "role": "option", "label": "増築" },
+      { "id": "e05", "from": "dec-work-type", "to": "dec-part-type", "role": "option", "label": "改築" },
+      { "id": "e06", "from": "dec-work-type", "to": "fail-scope", "role": "option", "label": "その他" },
+      { "id": "e07", "from": "dec-part-type", "to": "proc-item1-pass", "role": "yes", "label": "はい" },
+      { "id": "e08", "from": "dec-part-type", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e09", "from": "proc-item1-pass", "to": "dec-non-exempt-area", "role": "flow" },
+      { "id": "e10", "from": "dec-non-exempt-area", "to": "proc-item2-pass", "role": "yes", "label": "はい" },
+      { "id": "e11", "from": "dec-non-exempt-area", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e12", "from": "proc-item2-pass", "to": "dec-target-ratio", "role": "flow" },
+      { "id": "e13", "from": "dec-target-ratio", "to": "proc-item3-pass", "role": "yes", "label": "はい" },
+      { "id": "e14", "from": "dec-target-ratio", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e15", "from": "proc-item3-pass", "to": "proc-all-pass", "role": "flow" },
+      { "id": "e16", "from": "proc-all-pass", "to": "pass", "role": "flow" }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": ["A3:P2", "A52:P1", "A52:P2", "A52:P7", "A60:P1", "A86_7:P1"],
+      "description": "法第3条第2項の既存不適格建築物の取扱、容積率に関する規定、法第86条の7第1項の緩和規定"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": ["A2:P3"],
+      "description": "床面積不算入部分の割合"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T17:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

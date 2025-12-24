@@ -1,0 +1,276 @@
+{
+  "id": "A53_P3_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "建蔽率の緩和判定",
+    "target_subject": "建築物",
+    "description": "防火性能と敷地条件による建蔽率の緩和値(+1/10又は+2/10)の判定"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "53",
+    "paragraph": "3",
+    "item": null
+  },
+  "labels": ["集団規定", "建蔽率", "形態規制"],
+  "kijo_diagram_ref": "CHK-BSL-A53-P3",
+  "flow_diagram": {
+    "title": "建蔽率の緩和判定フロー",
+    "description": "第3項第1号（防火性能）および第2号（角地等）の該当性から緩和値を判定する",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start"
+      },
+      {
+        "id": "dec-fire-zone",
+        "type": "decision",
+        "title": "防火地域区分は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "防火地域" },
+          { "value": "準防火地域" },
+          { "value": "無指定" }
+        ],
+        "description": "敷地が防火地域、準防火地域、無指定のいずれに該当するか"
+      },
+      {
+        "id": "dec-bcr-80",
+        "type": "decision",
+        "title": "建蔽率の限度が8/10の区域か？",
+        "decision_type": "binary",
+        "description": "第1項第2号から第4号までの規定により建蔽率の限度が十分の八とされている地域に該当するか"
+      },
+      {
+        "id": "dec-structure-fire-only",
+        "type": "decision",
+        "title": "耐火建築物等か？",
+        "decision_type": "binary",
+        "description": "耐火建築物または同等以上の延焼防止性能を有する建築物に該当するか（防火地域用）"
+      },
+      {
+        "id": "dec-structure-semi-zone",
+        "type": "decision",
+        "title": "構造種別は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "耐火建築物等" },
+          { "value": "準耐火建築物等" },
+          { "value": "その他" }
+        ],
+        "description": "耐火建築物等、準耐火建築物等、その他のいずれに該当するか（準防火地域用）"
+      },
+      {
+        "id": "proc-item1-match",
+        "type": "process",
+        "title": "第1号該当",
+        "description": "防火地域内の耐火建築物等、又は準防火地域内の耐火建築物等若しくは準耐火建築物等に該当"
+      },
+      {
+        "id": "proc-item1-no-match",
+        "type": "process",
+        "title": "第1号非該当",
+        "description": "第3項第1号の要件を満たさない"
+      },
+      {
+        "id": "dec-corner-lot",
+        "type": "decision",
+        "title": "角地等に該当するか？",
+        "decision_type": "binary",
+        "description": "街区の角にある敷地又はこれに準ずる敷地で特定行政庁が指定するものに該当するか"
+      },
+      {
+        "id": "proc-item2-match",
+        "type": "process",
+        "title": "第2号該当",
+        "description": "街区の角にある敷地等の内にある建築物として第3項第2号に該当"
+      },
+      {
+        "id": "proc-item2-no-match",
+        "type": "process",
+        "title": "第2号非該当",
+        "description": "第3項第2号の要件を満たさない"
+      },
+      {
+        "id": "dec-both-match",
+        "type": "decision",
+        "title": "第1号と第2号の両方に該当するか？",
+        "decision_type": "binary",
+        "description": "第1号および第2号の両方に該当する場合は+2/10、いずれか一方なら+1/10"
+      },
+      {
+        "id": "pass-plus-2",
+        "type": "terminal",
+        "title": "緩和適用（+2/10）",
+        "result": "pass",
+        "description": "第1号及び第2号に該当：建蔽率の限度に十分の二を加算"
+      },
+      {
+        "id": "pass-plus-1",
+        "type": "terminal",
+        "title": "緩和適用（+1/10）",
+        "result": "pass",
+        "description": "第1号又は第2号のいずれかに該当：建蔽率の限度に十分の一を加算"
+      },
+      {
+        "id": "fail-no-relaxation",
+        "type": "terminal",
+        "title": "緩和なし",
+        "result": "fail",
+        "description": "第3項による緩和は適用されない"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e1",
+        "from": "start",
+        "to": "dec-fire-zone",
+        "role": "flow"
+      },
+      {
+        "id": "e2",
+        "from": "dec-fire-zone",
+        "to": "dec-bcr-80",
+        "role": "option",
+        "label": "防火地域"
+      },
+      {
+        "id": "e3",
+        "from": "dec-fire-zone",
+        "to": "dec-structure-semi-zone",
+        "role": "option",
+        "label": "準防火地域"
+      },
+      {
+        "id": "e4",
+        "from": "dec-fire-zone",
+        "to": "proc-item1-no-match",
+        "role": "option",
+        "label": "無指定"
+      },
+      {
+        "id": "e5",
+        "from": "dec-bcr-80",
+        "to": "proc-item1-no-match",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e6",
+        "from": "dec-bcr-80",
+        "to": "dec-structure-fire-only",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e7",
+        "from": "dec-structure-fire-only",
+        "to": "proc-item1-match",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e8",
+        "from": "dec-structure-fire-only",
+        "to": "proc-item1-no-match",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e9",
+        "from": "dec-structure-semi-zone",
+        "to": "proc-item1-match",
+        "role": "option",
+        "label": "耐火建築物等"
+      },
+      {
+        "id": "e10",
+        "from": "dec-structure-semi-zone",
+        "to": "proc-item1-match",
+        "role": "option",
+        "label": "準耐火建築物等"
+      },
+      {
+        "id": "e11",
+        "from": "dec-structure-semi-zone",
+        "to": "proc-item1-no-match",
+        "role": "option",
+        "label": "その他"
+      },
+      {
+        "id": "e12",
+        "from": "proc-item1-match",
+        "to": "dec-corner-lot",
+        "role": "flow"
+      },
+      {
+        "id": "e13",
+        "from": "proc-item1-no-match",
+        "to": "dec-corner-lot",
+        "role": "flow"
+      },
+      {
+        "id": "e14",
+        "from": "dec-corner-lot",
+        "to": "proc-item2-match",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e15",
+        "from": "dec-corner-lot",
+        "to": "proc-item2-no-match",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e16",
+        "from": "proc-item2-match",
+        "to": "dec-both-match",
+        "role": "flow"
+      },
+      {
+        "id": "e17",
+        "from": "proc-item2-no-match",
+        "to": "dec-both-match",
+        "role": "flow"
+      },
+      {
+        "id": "e18",
+        "from": "dec-both-match",
+        "to": "pass-plus-2",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e19",
+        "from": "dec-both-match",
+        "to": "pass-plus-1",
+        "role": "no",
+        "label": "いいえ（いずれか一方のみ）"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A53:P1", "A53:P2", "A67:P1"],
+      "description": "第1項・第2項の基準建蔽率を参照、第67条で耐火建築物等の定義を参照"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

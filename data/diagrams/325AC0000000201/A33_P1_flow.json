@@ -1,0 +1,193 @@
+{
+  "id": "A33_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "避雷設備",
+    "target_subject": "建築物",
+    "description": "高さ20mを超える建築物に有効な避雷設備が設けられていることを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "33",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "避雷設備",
+    "安全"
+  ],
+  "text_raw": "高さ二十メートルをこえる建築物には、有効に避雷設備を設けなければならない。ただし、周囲の状況によつて安全上支障がない場合においては、この限りでない。",
+  "compliance_logic": {
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "note": "高さ20m以下",
+          "ref": "info-height-threshold-ok",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "note": "有効な避雷設備あり",
+          "ref": "info-effective-lightning-protection",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    },
+    "exceptions": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "note": "周囲の状況により安全上支障がない",
+          "ref": "info-no-safety-issue",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "effect": "EXEMPT"
+    }
+  },
+  "flow_diagram": {
+    "title": "第33条第1項 避雷設備判定フロー",
+    "description": "高さ20mを超える建築物に有効な避雷設備が設けられているか、又はただし書きの適用除外に該当するかを判定する",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start"
+      },
+      {
+        "id": "dec-height",
+        "type": "decision",
+        "title": "建築物の高さは20mを超えるか？",
+        "decision_type": "binary",
+        "description": "建築物の高さが20mを超えるか判定する"
+      },
+      {
+        "id": "dec-lightning-equipment",
+        "type": "decision",
+        "title": "有効な避雷設備が設けられているか？",
+        "decision_type": "binary",
+        "description": "建築物に有効な避雷設備が設けられているか（JIS A 4201等の基準適合）"
+      },
+      {
+        "id": "dec-safety-exception",
+        "type": "decision",
+        "title": "周囲の状況により安全上支障がないか？",
+        "decision_type": "binary",
+        "description": "ただし書きの適用除外：周囲の状況（周辺建築物の高さ、地形等）により安全上支障がないか"
+      },
+      {
+        "id": "proc-compliant",
+        "type": "process",
+        "title": "避雷設備適合確認",
+        "description": "有効な避雷設備が設けられていることを確認"
+      },
+      {
+        "id": "proc-exempt",
+        "type": "process",
+        "title": "ただし書き適用除外該当",
+        "description": "周囲の状況により安全上支障がないため適用除外"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "法33条1項に適合"
+      },
+      {
+        "id": "end-not-applicable",
+        "type": "terminal",
+        "title": "対象外（高さ20m以下）",
+        "result": "end",
+        "description": "高さ20m以下のため本条の適用対象外"
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "法33条1項に不適合"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e1",
+        "from": "start",
+        "to": "dec-height",
+        "role": "flow"
+      },
+      {
+        "id": "e2",
+        "from": "dec-height",
+        "to": "dec-lightning-equipment",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e3",
+        "from": "dec-height",
+        "to": "end-not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e4",
+        "from": "dec-lightning-equipment",
+        "to": "proc-compliant",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e5",
+        "from": "dec-lightning-equipment",
+        "to": "dec-safety-exception",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e6",
+        "from": "dec-safety-exception",
+        "to": "proc-exempt",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e7",
+        "from": "dec-safety-exception",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e8",
+        "from": "proc-compliant",
+        "to": "end-pass",
+        "role": "flow"
+      },
+      {
+        "id": "e9",
+        "from": "proc-exempt",
+        "to": "end-pass",
+        "role": "flow"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-A33-P1",
+  "related_laws": [],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00Z",
+    "updated_at": "2025-12-25T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-skill",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

@@ -1,0 +1,174 @@
+{
+  "id": "A43_P2_I2_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "建築審査会の同意を得た許可による接道義務の適用除外（適合判定フロー）",
+    "target_subject": "建築物",
+    "description": "敷地周囲の広い空地等を有し、建築審査会の同意を得た許可により接道義務の適用除外を受ける建築物の判定フロー"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "43",
+    "paragraph": "2",
+    "item": "2"
+  },
+  "labels": ["集団規定", "接道義務", "適用除外"],
+  "text_raw": "その敷地の周囲に広い空地を有する建築物その他の国土交通省令で定める基準に適合する建築物で、特定行政庁が交通上、安全上、防火上及び衛生上支障がないと認めて建築審査会の同意を得て許可したもの",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        { "type": "reference", "value": "法43条1項が適用される建築物" }
+      ],
+      "note": "法43条1項の接道義務が適用される建築物について、本号の要件を満たす場合は適用除外となる"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "operator": "OR",
+          "conditions": [
+            { "ref": "info-wide-open-space", "operator": "==", "value": true, "note": "敷地の周囲に広い空地を有する" },
+            { "ref": "info-regulation-compliance", "operator": "==", "value": true, "note": "国土交通省令で定める基準に適合" }
+          ]
+        },
+        { "ref": "info-authority-approval", "operator": "==", "value": true, "note": "特定行政庁が交通上・安全上・防火上・衛生上支障がないと認める" },
+        { "ref": "info-board-consent", "operator": "==", "value": true, "note": "建築審査会の同意を得た許可" }
+      ]
+    },
+    "exceptions": null
+  },
+  "flow_diagram": {
+    "title": "法43条2項2号 建築審査会許可による接道義務適用除外 適合判定フロー",
+    "description": "敷地周囲の広い空地等を有し、建築審査会の同意を得た許可により接道義務の適用除外を受けられるかを判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "法43条2項2号の適合判定を開始"
+      },
+      {
+        "id": "dec-basic-condition",
+        "type": "decision",
+        "title": "基本条件に該当するか？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "広い空地あり", "description": "敷地の周囲に広い空地を有する" },
+          { "value": "省令基準適合", "description": "国土交通省令で定める基準に適合する" },
+          { "value": "両方該当", "description": "広い空地を有し、かつ省令基準にも適合する" },
+          { "value": "該当なし", "description": "いずれにも該当しない" }
+        ],
+        "description": "敷地周囲に広い空地があるか、または省令基準に適合するかを判定",
+        "related_articles": ["規則::A10_3:P3"]
+      },
+      {
+        "id": "proc-wide-space",
+        "type": "process",
+        "title": "広い空地該当",
+        "process_type": "mechanical",
+        "description": "敷地の周囲に広い空地を有する"
+      },
+      {
+        "id": "proc-regulation",
+        "type": "process",
+        "title": "省令基準適合",
+        "process_type": "mechanical",
+        "description": "国土交通省令で定める基準に適合する"
+      },
+      {
+        "id": "proc-both",
+        "type": "process",
+        "title": "広い空地・省令基準の両方該当",
+        "process_type": "mechanical",
+        "description": "広い空地を有し、かつ省令基準にも適合する"
+      },
+      {
+        "id": "dec-authority-approval",
+        "type": "decision",
+        "title": "特定行政庁が支障なしと認めたか？",
+        "decision_type": "binary",
+        "description": "特定行政庁が交通上、安全上、防火上及び衛生上支障がないと認めたか判定"
+      },
+      {
+        "id": "dec-board-consent",
+        "type": "decision",
+        "title": "建築審査会の同意を得た許可があるか？",
+        "decision_type": "binary",
+        "description": "建築審査会の同意を得て許可を受けているか判定"
+      },
+      {
+        "id": "proc-exemption",
+        "type": "process",
+        "title": "法43条2項2号該当",
+        "process_type": "mechanical",
+        "description": "全要件を満たし接道義務の適用除外に該当"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合（接道義務適用除外）",
+        "result": "pass",
+        "description": "法43条2項2号により接道義務の適用除外を受けられる"
+      },
+      {
+        "id": "fail-basic",
+        "type": "terminal",
+        "title": "不適合（基本条件不適合）",
+        "result": "fail",
+        "description": "広い空地も省令基準適合もないため本号の適用なし"
+      },
+      {
+        "id": "fail-approval",
+        "type": "terminal",
+        "title": "不適合（特定行政庁の認定なし）",
+        "result": "fail",
+        "description": "特定行政庁が支障なしと認めていないため本号の適用なし"
+      },
+      {
+        "id": "fail-consent",
+        "type": "terminal",
+        "title": "不適合（建築審査会の同意なし）",
+        "result": "fail",
+        "description": "建築審査会の同意を得た許可がないため本号の適用なし"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "dec-basic-condition", "role": "flow" },
+      { "id": "e02", "from": "dec-basic-condition", "to": "proc-wide-space", "role": "option", "label": "広い空地あり" },
+      { "id": "e03", "from": "dec-basic-condition", "to": "proc-regulation", "role": "option", "label": "省令基準適合" },
+      { "id": "e04", "from": "dec-basic-condition", "to": "proc-both", "role": "option", "label": "両方該当" },
+      { "id": "e05", "from": "dec-basic-condition", "to": "fail-basic", "role": "option", "label": "該当なし" },
+      { "id": "e06", "from": "proc-wide-space", "to": "dec-authority-approval", "role": "flow" },
+      { "id": "e07", "from": "proc-regulation", "to": "dec-authority-approval", "role": "flow" },
+      { "id": "e08", "from": "proc-both", "to": "dec-authority-approval", "role": "flow" },
+      { "id": "e09", "from": "dec-authority-approval", "to": "dec-board-consent", "role": "yes", "label": "はい" },
+      { "id": "e10", "from": "dec-authority-approval", "to": "fail-approval", "role": "no", "label": "いいえ" },
+      { "id": "e11", "from": "dec-board-consent", "to": "proc-exemption", "role": "yes", "label": "はい" },
+      { "id": "e12", "from": "dec-board-consent", "to": "fail-consent", "role": "no", "label": "いいえ" },
+      { "id": "e13", "from": "proc-exemption", "to": "pass", "role": "flow" }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-A43-P2-I2",
+  "related_laws": [
+    {
+      "law_id": "325M50004000040",
+      "law_name": "建築基準法施行規則",
+      "law_type": "regulation",
+      "relationship": "delegates_to",
+      "articles": ["A10_3:P3"],
+      "description": "法43条2項2号の国土交通省令で定める基準"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

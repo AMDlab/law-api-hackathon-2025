@@ -1,0 +1,228 @@
+{
+  "id": "A52_P6_I1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "昇降機昇降路の床面積不算入",
+    "target_subject": "建築物の部分",
+    "description": "政令で定める昇降機の昇降路の部分は容積率算定の基礎となる延べ面積に算入しないことを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "52",
+    "paragraph": "6",
+    "item": "1"
+  },
+  "labels": [
+    "集団規定",
+    "容積率",
+    "床面積不算入"
+  ],
+  "text_raw": "政令で定める昇降機の昇降路の部分",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "value": true,
+      "conditions": [
+        {
+          "type": "applicability",
+          "value": "容積率規定が適用される建築物"
+        }
+      ],
+      "note": "法第52条第1項等の容積率規定の適用を受ける建築物が対象"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-elevator-match",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "flow_diagram": {
+    "title": "昇降機昇降路床面積不算入判定フロー",
+    "description": "政令で定める昇降機の昇降路部分が容積率算定の延べ面積に算入されないかを判定するフロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "審査開始",
+        "result": "start",
+        "description": "昇降機昇降路の床面積不算入判定を開始"
+      },
+      {
+        "id": "dec-elevator-type",
+        "type": "decision",
+        "title": "昇降機の種別は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "エレベーター" },
+          { "value": "エスカレーター" },
+          { "value": "その他" }
+        ],
+        "description": "当該部分の昇降機種別を判定"
+      },
+      {
+        "id": "proc-elevator-shaft",
+        "type": "process",
+        "title": "エレベーター昇降路該当",
+        "description": "エレベーターの昇降路として床面積不算入の対象"
+      },
+      {
+        "id": "proc-escalator-type",
+        "type": "process",
+        "title": "エスカレーター該当",
+        "description": "エスカレーターの昇降路について追加確認が必要"
+      },
+      {
+        "id": "dec-escalator-projection",
+        "type": "decision",
+        "title": "水平投影面積が床面積に算入されるか？",
+        "decision_type": "binary",
+        "description": "エスカレーターの水平投影面積が床面積に算入される場合は当該面積を除く"
+      },
+      {
+        "id": "proc-projection-included",
+        "type": "process",
+        "title": "水平投影面積算入あり",
+        "description": "水平投影面積が床面積に算入される場合は当該面積を不算入対象から除外"
+      },
+      {
+        "id": "proc-escalator-shaft",
+        "type": "process",
+        "title": "エスカレーター昇降路該当",
+        "description": "エスカレーターの昇降路として床面積不算入の対象"
+      },
+      {
+        "id": "proc-not-elevator",
+        "type": "process",
+        "title": "政令定め昇降機以外",
+        "description": "エレベーター・エスカレーター以外のため不算入対象外"
+      },
+      {
+        "id": "proc-floor-exclusion",
+        "type": "process",
+        "title": "床面積不算入適用",
+        "process_type": "mechanical",
+        "description": "政令定め昇降機昇降路に該当する部分の床面積は延べ面積に算入しない"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合（床面積不算入）",
+        "result": "pass",
+        "description": "当該昇降機昇降路の床面積は容積率算定の延べ面積に算入しない"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "不適合（不算入対象外）",
+        "result": "fail",
+        "description": "当該部分は床面積不算入の対象外のため通常の容積率算定を適用"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-elevator-type",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-elevator-type",
+        "to": "proc-elevator-shaft",
+        "role": "option",
+        "label": "エレベーター"
+      },
+      {
+        "id": "e03",
+        "from": "dec-elevator-type",
+        "to": "proc-escalator-type",
+        "role": "option",
+        "label": "エスカレーター"
+      },
+      {
+        "id": "e04",
+        "from": "dec-elevator-type",
+        "to": "proc-not-elevator",
+        "role": "option",
+        "label": "その他"
+      },
+      {
+        "id": "e05",
+        "from": "proc-elevator-shaft",
+        "to": "proc-floor-exclusion",
+        "role": "flow"
+      },
+      {
+        "id": "e06",
+        "from": "proc-escalator-type",
+        "to": "dec-escalator-projection",
+        "role": "flow"
+      },
+      {
+        "id": "e07",
+        "from": "dec-escalator-projection",
+        "to": "proc-projection-included",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e08",
+        "from": "dec-escalator-projection",
+        "to": "proc-escalator-shaft",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e09",
+        "from": "proc-projection-included",
+        "to": "fail",
+        "role": "flow"
+      },
+      {
+        "id": "e10",
+        "from": "proc-escalator-shaft",
+        "to": "proc-floor-exclusion",
+        "role": "flow"
+      },
+      {
+        "id": "e11",
+        "from": "proc-not-elevator",
+        "to": "fail",
+        "role": "flow"
+      },
+      {
+        "id": "e12",
+        "from": "proc-floor-exclusion",
+        "to": "pass",
+        "role": "flow"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-A52-P6-I1",
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "delegates_to",
+      "articles": ["A135_17"],
+      "description": "政令で定める昇降機の昇降路：エレベーターの昇降路又はエスカレーターの昇降路（エスカレーターの水平投影面積が床面積に算入される場合は当該面積を除く）"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00.000Z",
+    "author": "Claude Opus 4.5",
+    "generator": "flow-generator-skill",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

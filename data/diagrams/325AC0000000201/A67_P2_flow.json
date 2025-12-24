@@ -1,0 +1,236 @@
+{
+  "id": "A67_P2_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "特定防災街区にわたる建築物の全体適用要件",
+    "target_subject": "建築物",
+    "description": "敷地が特定防災街区整備地区と指定区域外にわたる建築物に対する第1項適用規定の判定と例外要件を判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "67",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": ["単体規定", "防火", "敷地", "区域判定"],
+  "text_raw": "建築物が特定防災街区整備地区と特定防災街区整備地区として指定されていない区域にわたる場合においては、その全部について、前項の規定を適用する。ただし、その建築物が特定防災街区整備地区外において防火壁で区画されている場合においては、その防火壁外の部分については、この限りでない。",
+  "kijo_diagram_ref": "CHK-BSL-A67-P2",
+  "flow_diagram": {
+    "title": "法67条2項適合判定フロー",
+    "description": "特定防災街区整備地区にわたる建築物について第1項適用範囲を判定する",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start"
+      },
+      {
+        "id": "dec-zone-location",
+        "type": "decision",
+        "title": "敷地の区域区分は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "特定防災街区整備地区のみ" },
+          { "value": "指定区域外のみ" },
+          { "value": "両区域にわたる" }
+        ],
+        "description": "敷地が特定防災街区整備地区にわたるか判定"
+      },
+      {
+        "id": "proc-spans-zones",
+        "type": "process",
+        "title": "複数区域わたり該当",
+        "description": "建築物が特定防災街区整備地区と指定区域外にわたる"
+      },
+      {
+        "id": "proc-not-applicable",
+        "type": "process",
+        "title": "本条適用対象外",
+        "description": "敷地が複数区域にわたらないため、本条の適用対象外"
+      },
+      {
+        "id": "dec-firewall-partition",
+        "type": "decision",
+        "title": "地域外で防火壁により区画されているか？",
+        "decision_type": "binary",
+        "description": "建築物が特定防災街区整備地区外において防火壁で区画されているか確認"
+      },
+      {
+        "id": "proc-full-application",
+        "type": "process",
+        "title": "建築物全体に第1項適用",
+        "description": "防火壁による区画がないため、建築物全部に第1項の規定を適用"
+      },
+      {
+        "id": "proc-exception-applicable",
+        "type": "process",
+        "title": "ただし書き例外該当",
+        "description": "防火壁で区画されているため例外適用"
+      },
+      {
+        "id": "dec-exempt-area-identified",
+        "type": "decision",
+        "title": "防火壁外部分が特定されたか？",
+        "decision_type": "binary",
+        "description": "防火壁外の適用除外部分が特定されたか確認"
+      },
+      {
+        "id": "proc-partial-application",
+        "type": "process",
+        "title": "防火壁内部分のみ第1項適用",
+        "description": "防火壁内の部分のみに第1項の規定を適用、防火壁外は適用除外"
+      },
+      {
+        "id": "dec-compliance-check",
+        "type": "decision",
+        "title": "適用部分は第1項に適合か？",
+        "decision_type": "binary",
+        "description": "第1項適用対象部分が界壁の準耐火構造・小屋裏到達要件を満たすか確認"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "法67条2項に適合"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "法67条2項に不適合"
+      },
+      {
+        "id": "end-not-applicable",
+        "type": "terminal",
+        "title": "適用対象外",
+        "result": "end",
+        "description": "本条の適用対象外のため判定終了"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-zone-location",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-zone-location",
+        "to": "proc-spans-zones",
+        "role": "option",
+        "label": "両区域にわたる"
+      },
+      {
+        "id": "e03",
+        "from": "dec-zone-location",
+        "to": "proc-not-applicable",
+        "role": "option",
+        "label": "特定防災街区整備地区のみ"
+      },
+      {
+        "id": "e04",
+        "from": "dec-zone-location",
+        "to": "proc-not-applicable",
+        "role": "option",
+        "label": "指定区域外のみ"
+      },
+      {
+        "id": "e05",
+        "from": "proc-not-applicable",
+        "to": "end-not-applicable",
+        "role": "flow"
+      },
+      {
+        "id": "e06",
+        "from": "proc-spans-zones",
+        "to": "dec-firewall-partition",
+        "role": "flow"
+      },
+      {
+        "id": "e07",
+        "from": "dec-firewall-partition",
+        "to": "proc-exception-applicable",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e08",
+        "from": "dec-firewall-partition",
+        "to": "proc-full-application",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e09",
+        "from": "proc-exception-applicable",
+        "to": "dec-exempt-area-identified",
+        "role": "flow"
+      },
+      {
+        "id": "e10",
+        "from": "dec-exempt-area-identified",
+        "to": "proc-partial-application",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e11",
+        "from": "dec-exempt-area-identified",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e12",
+        "from": "proc-partial-application",
+        "to": "dec-compliance-check",
+        "role": "flow"
+      },
+      {
+        "id": "e13",
+        "from": "proc-full-application",
+        "to": "dec-compliance-check",
+        "role": "flow"
+      },
+      {
+        "id": "e14",
+        "from": "dec-compliance-check",
+        "to": "pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e15",
+        "from": "dec-compliance-check",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A67:P1"],
+      "description": "第2項で参照される第1項の適用要件（耐火建築物等、準耐火建築物等の要件）"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00+09:00",
+    "updated_at": "2025-12-25T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

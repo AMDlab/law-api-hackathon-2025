@@ -1,0 +1,221 @@
+{
+  "id": "A108_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "防火性能に関する技術的基準",
+    "target_subject": "外壁",
+    "description": "法第2条第8号の政令で定める防火性能に関する技術的基準を判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "108",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "定義",
+    "防火性能",
+    "技術的基準"
+  ],
+  "text_raw": "法第二条第八号の政令で定める技術的基準は、次に掲げるものとする。一 耐力壁である外壁にあつては、これに建築物の周囲において発生する通常の火災による火熱が加えられた場合に、加熱開始後三十分間構造耐力上支障のある変形、溶融、破壊その他の損傷を生じないものであること。二 外壁及び軒裏にあつては、これらに建築物の周囲において発生する通常の火災による火熱が加えられた場合に、加熱開始後三十分間当該加熱面以外の面（屋内に面するものに限る。）の温度が可燃物燃焼温度以上に上昇しないものであること。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "reference",
+          "value": "法第2条第8号の防火性能"
+        }
+      ]
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-item1-compliance",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "ref": "info-item2-compliance",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "flow_diagram": {
+    "title": "防火性能基準適合判定フロー",
+    "description": "外壁及び軒裏の防火性能基準への適合を判定するフロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "防火性能基準の適合判定開始"
+      },
+      {
+        "id": "dec-wall-type",
+        "type": "decision",
+        "title": "外壁の種別は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "耐力壁である外壁", "description": "構造耐力上主要な外壁" },
+          { "value": "耐力壁でない外壁", "description": "構造耐力上主要でない外壁" },
+          { "value": "軒裏のみ", "description": "外壁ではなく軒裏のみ" }
+        ],
+        "description": "判定対象が耐力壁である外壁か、その他かを判定"
+      },
+      {
+        "id": "proc-item1-applicable",
+        "type": "process",
+        "title": "第1号基準の適用",
+        "process_type": "mechanical",
+        "description": "耐力壁である外壁には第1号基準が適用される"
+      },
+      {
+        "id": "dec-item1",
+        "type": "decision",
+        "title": "加熱30分間、構造耐力上支障のある損傷がないか？",
+        "decision_type": "binary",
+        "description": "通常の火災による火熱が加えられた場合に、加熱開始後30分間、構造耐力上支障のある変形、溶融、破壊その他の損傷を生じないか",
+        "related_articles": ["令::A108:P1:I1"]
+      },
+      {
+        "id": "proc-item1-pass",
+        "type": "process",
+        "title": "第1号基準適合",
+        "process_type": "mechanical",
+        "description": "第1号の構造耐力基準に適合"
+      },
+      {
+        "id": "dec-item2",
+        "type": "decision",
+        "title": "加熱30分間、屋内面の温度が可燃物燃焼温度未満か？",
+        "decision_type": "binary",
+        "description": "通常の火災による火熱が加えられた場合に、加熱開始後30分間、加熱面以外の面（屋内に面するもの）の温度が可燃物燃焼温度以上に上昇しないか",
+        "related_articles": ["令::A108:P1:I2"]
+      },
+      {
+        "id": "proc-item2-pass",
+        "type": "process",
+        "title": "第2号基準適合",
+        "process_type": "mechanical",
+        "description": "第2号の遮熱基準に適合"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "防火性能基準に適合"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "防火性能基準に不適合"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-wall-type",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-wall-type",
+        "to": "proc-item1-applicable",
+        "role": "option",
+        "label": "耐力壁である外壁"
+      },
+      {
+        "id": "e03",
+        "from": "dec-wall-type",
+        "to": "dec-item2",
+        "role": "option",
+        "label": "耐力壁でない外壁"
+      },
+      {
+        "id": "e04",
+        "from": "dec-wall-type",
+        "to": "dec-item2",
+        "role": "option",
+        "label": "軒裏のみ"
+      },
+      {
+        "id": "e05",
+        "from": "proc-item1-applicable",
+        "to": "dec-item1",
+        "role": "flow"
+      },
+      {
+        "id": "e06",
+        "from": "dec-item1",
+        "to": "proc-item1-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e07",
+        "from": "dec-item1",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e08",
+        "from": "proc-item1-pass",
+        "to": "dec-item2",
+        "role": "flow"
+      },
+      {
+        "id": "e09",
+        "from": "dec-item2",
+        "to": "proc-item2-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e10",
+        "from": "dec-item2",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e11",
+        "from": "proc-item2-pass",
+        "to": "pass",
+        "role": "flow"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-ORDER-A108-P1",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": ["A2_I8"],
+      "description": "法第2条第8号の防火性能の定義"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00.000Z",
+    "updated_at": "2025-12-25T00:00:00.000Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

@@ -1,0 +1,265 @@
+{
+  "id": "A52_P12_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "容積率算定における壁面後退時の道路境界線のみなし規定",
+    "target_subject": "建築物",
+    "description": "前面道路幅員係数4/10の建築物が壁面線等から後退する場合、道路境界線を壁面線等の位置とみなして容積率を算定する規定"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "52",
+    "paragraph": "12",
+    "item": null
+  },
+  "labels": ["集団規定", "容積率", "前面道路幅員", "壁面後退"],
+  "text_raw": "第二項各号の規定により前面道路の幅員のメートルの数値に乗ずる数値が十分の四とされている建築物で、前面道路の境界線から後退して壁面線の指定がある場合又は第六十八条の二第一項の規定に基づく条例で定める壁面の位置の制限（道路に面する建築物の壁又はこれに代わる柱の位置及び道路に面する高さ二メートルを超える門又は塀の位置を制限するものに限る。）がある場合において当該壁面線又は当該壁面の位置の制限として定められた限度の線（以下この項及び次項において「壁面線等」という。）を越えないもの（ひさしその他の建築物の部分で政令で定めるものを除く。）については、当該前面道路の境界線は、当該壁面線等にあるものとみなして、第二項から第七項まで及び第九項の規定を適用することができる。ただし、建築物の容積率は、当該前面道路の幅員のメートルの数値に十分の六を乗じたもの以下でなければならない。",
+  "kijo_diagram_ref": "CHK-BSL-A52-P12",
+  "flow_diagram": {
+    "title": "壁面後退時の道路境界線みなし規定の適合判定フロー",
+    "description": "前面道路幅員係数4/10の建築物が壁面線等から後退する場合の容積率緩和の適用可否を判定する",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "壁面後退時のみなし規定の適用判定を開始"
+      },
+      {
+        "id": "dec-coefficient",
+        "type": "decision",
+        "title": "前面道路幅員係数は4/10か？",
+        "decision_type": "binary",
+        "description": "法52条2項各号により前面道路幅員に乗ずる係数が4/10とされている建築物か",
+        "related_articles": ["法::A52:P2"]
+      },
+      {
+        "id": "dec-setback-line-type",
+        "type": "decision",
+        "title": "壁面線等の種別は？",
+        "decision_type": "multi",
+        "description": "壁面線の指定又は壁面位置制限のいずれがあるか",
+        "options": [
+          { "value": "壁面線の指定", "description": "前面道路の境界線から後退して壁面線の指定がある" },
+          { "value": "条例による壁面位置制限", "description": "法68条の2第1項に基づく条例で壁面位置制限がある" },
+          { "value": "指定なし", "description": "壁面線等の指定がない" }
+        ],
+        "related_articles": ["法::A68_2:P1"]
+      },
+      {
+        "id": "proc-setback-line-exists",
+        "type": "process",
+        "title": "壁面線等あり",
+        "process_type": "mechanical",
+        "description": "壁面線の指定又は壁面位置制限が存在する"
+      },
+      {
+        "id": "dec-building-setback",
+        "type": "decision",
+        "title": "建築物は壁面線等を越えないか？",
+        "decision_type": "binary",
+        "description": "建築物の壁・柱、高さ2m超の門・塀が壁面線等を越えないか（ひさし等政令で定めるものを除く）"
+      },
+      {
+        "id": "proc-setback-confirmed",
+        "type": "process",
+        "title": "後退要件適合",
+        "process_type": "mechanical",
+        "description": "建築物が壁面線等から後退している"
+      },
+      {
+        "id": "proc-deemed-boundary",
+        "type": "process",
+        "title": "道路境界線を壁面線等とみなす",
+        "process_type": "mechanical",
+        "description": "前面道路の境界線を壁面線等にあるものとみなす"
+      },
+      {
+        "id": "proc-calc-deemed-volume",
+        "type": "process",
+        "title": "みなし容積率上限の算定",
+        "process_type": "mechanical",
+        "description": "壁面線等を道路境界線とみなして法52条2項等により容積率を算定",
+        "related_articles": ["法::A52:P2", "法::A52:P7", "法::A52:P9"]
+      },
+      {
+        "id": "proc-calc-limit-volume",
+        "type": "process",
+        "title": "ただし書容積率上限の算定",
+        "process_type": "mechanical",
+        "description": "前面道路幅員×0.6による容積率上限を算定"
+      },
+      {
+        "id": "dec-volume-check",
+        "type": "decision",
+        "title": "計画容積率は上限以下か？",
+        "decision_type": "binary",
+        "description": "計画容積率がみなし容積率とただし書上限の小さい方以下か"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "法52条12項のみなし規定を適用して容積率規定に適合"
+      },
+      {
+        "id": "fail-not-applicable",
+        "type": "terminal",
+        "title": "本項適用対象外",
+        "result": "fail",
+        "description": "前面道路幅員係数が4/10でないため本項適用対象外"
+      },
+      {
+        "id": "fail-no-setback-line",
+        "type": "terminal",
+        "title": "本項適用対象外",
+        "result": "fail",
+        "description": "壁面線等の指定がないため本項適用対象外"
+      },
+      {
+        "id": "fail-not-setback",
+        "type": "terminal",
+        "title": "本項適用対象外",
+        "result": "fail",
+        "description": "建築物が壁面線等を越えているため本項適用対象外"
+      },
+      {
+        "id": "fail-volume",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "計画容積率が上限を超えているため不適合"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-coefficient",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-coefficient",
+        "to": "dec-setback-line-type",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "dec-coefficient",
+        "to": "fail-not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e04",
+        "from": "dec-setback-line-type",
+        "to": "proc-setback-line-exists",
+        "role": "option",
+        "label": "壁面線の指定"
+      },
+      {
+        "id": "e05",
+        "from": "dec-setback-line-type",
+        "to": "proc-setback-line-exists",
+        "role": "option",
+        "label": "条例による壁面位置制限"
+      },
+      {
+        "id": "e06",
+        "from": "dec-setback-line-type",
+        "to": "fail-no-setback-line",
+        "role": "option",
+        "label": "指定なし"
+      },
+      {
+        "id": "e07",
+        "from": "proc-setback-line-exists",
+        "to": "dec-building-setback",
+        "role": "flow"
+      },
+      {
+        "id": "e08",
+        "from": "dec-building-setback",
+        "to": "proc-setback-confirmed",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e09",
+        "from": "dec-building-setback",
+        "to": "fail-not-setback",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e10",
+        "from": "proc-setback-confirmed",
+        "to": "proc-deemed-boundary",
+        "role": "flow"
+      },
+      {
+        "id": "e11",
+        "from": "proc-deemed-boundary",
+        "to": "proc-calc-deemed-volume",
+        "role": "flow"
+      },
+      {
+        "id": "e12",
+        "from": "proc-calc-deemed-volume",
+        "to": "proc-calc-limit-volume",
+        "role": "flow"
+      },
+      {
+        "id": "e13",
+        "from": "proc-calc-limit-volume",
+        "to": "dec-volume-check",
+        "role": "flow"
+      },
+      {
+        "id": "e14",
+        "from": "dec-volume-check",
+        "to": "pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e15",
+        "from": "dec-volume-check",
+        "to": "fail-volume",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A52:P2", "A52:P7", "A52:P9", "A68_2:P1"],
+      "description": "容積率算定の基本規定と壁面位置制限"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "delegates_to",
+      "description": "ひさし等の除外対象を政令で定める"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

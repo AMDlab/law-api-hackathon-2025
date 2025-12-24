@@ -1,0 +1,274 @@
+{
+  "id": "A108_4_P5_I2_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "開口部設備の保有遮炎時間の算定",
+    "target_subject": "開口部設備",
+    "description": "防火区画検証法に基づき、開口部設備が火災時の火熱に対して遮炎性能を保有する加熱時間を算定するフロー"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "108_4",
+    "paragraph": "5",
+    "item": "2"
+  },
+  "labels": [
+    "耐火性能",
+    "防火設備",
+    "検証方法"
+  ],
+  "text_raw": "開口部設備ごとに、当該開口部設備が、当該建築物の屋内において発生が予測される火災による火熱が加えられた場合に、当該加熱面以外の面に火炎を出すことなく耐えることができる加熱時間（以下この項において「保有遮炎時間」という。）を、当該開口部設備の構造方法及び当該火熱による開口部設備の表面の温度の推移に応じて国土交通大臣が定める方法により求めること。",
+  "kijo_diagram_ref": "CHK-CO-A108_4-P5-I2",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "legal_status",
+          "value": "耐火建築物の特定主要構造部が第一項第一号に該当する建築物"
+        },
+        {
+          "type": "building_component",
+          "value": "特定主要構造部である床又は壁（外壁を除く。）の開口部に設けられた防火設備"
+        }
+      ]
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "condition_type": "performance_verification",
+          "description": "開口部設備の保有遮炎時間 >= 当該室の火災継続時間"
+        }
+      ]
+    }
+  },
+  "flow_diagram": {
+    "title": "開口部設備の保有遮炎時間算定・検証フロー",
+    "description": "開口部設備の保有遮炎時間を算定し、火災継続時間と比較検証するフロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "算定開始",
+        "result": "start",
+        "description": "開口部設備の保有遮炎時間の算定開始"
+      },
+      {
+        "id": "proc-identify-openings",
+        "type": "process",
+        "title": "開口部設備の特定",
+        "process_type": "undefined_input",
+        "description": "特定主要構造部である床又は壁の開口部に設けられた防火設備を特定"
+      },
+      {
+        "id": "proc-get-structure-method",
+        "type": "process",
+        "title": "開口部設備の構造方法の確認",
+        "process_type": "undefined_input",
+        "description": "防火設備としての構造形式（框構造、パネル構造等）を確認"
+      },
+      {
+        "id": "proc-calc-temp-profile",
+        "type": "process",
+        "title": "火熱による表面温度推移の算出",
+        "process_type": "mechanical",
+        "description": "火災時の火熱に対する開口部設備表面の温度変化（時間経過に伴う温度推移）を算出"
+      },
+      {
+        "id": "dec-temp-valid",
+        "type": "decision",
+        "title": "表面温度推移は適切に算出されたか？",
+        "decision_type": "binary",
+        "description": "温度推移の計算が適切に行われたか確認"
+      },
+      {
+        "id": "proc-calc-holding-time",
+        "type": "process",
+        "title": "保有遮炎時間（t_hold）の算定",
+        "process_type": "human_judgment",
+        "description": "開口部設備の構造方法及び火熱による表面温度推移に応じて、国土交通大臣が定める方法により保有遮炎時間を算定"
+      },
+      {
+        "id": "dec-holding-time-valid",
+        "type": "decision",
+        "title": "保有遮炎時間は適切に算出されたか？",
+        "decision_type": "binary",
+        "description": "算定方法が適切であり、値が有効であることを確認"
+      },
+      {
+        "id": "info-fire-duration",
+        "type": "information",
+        "title": "当該室の火災継続時間（tf）",
+        "symbol": "tf",
+        "subject": "室",
+        "property": "火災継続時間",
+        "property_type": "numeric",
+        "description": "開口部設備が設けられる開口部が面する室の火災継続時間（第5項第1号で算定）"
+      },
+      {
+        "id": "dec-holding-ge-fire",
+        "type": "decision",
+        "title": "保有遮炎時間 >= 火災継続時間 か？",
+        "decision_type": "binary",
+        "description": "開口部設備の保有遮炎時間が当該室の火災継続時間以上であるか確認"
+      },
+      {
+        "id": "proc-compliance-met",
+        "type": "process",
+        "title": "遮炎性能適合",
+        "process_type": "mechanical",
+        "description": "当該開口部設備は遮炎性能要件を満たす"
+      },
+      {
+        "id": "dec-all-openings-done",
+        "type": "decision",
+        "title": "全ての開口部設備について検証完了したか？",
+        "decision_type": "binary",
+        "description": "全ての対象開口部設備について検証が完了したか確認"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "検証完了・適合",
+        "result": "pass",
+        "description": "全開口部設備の保有遮炎時間が火災継続時間以上であることが確認された"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "検証不適合",
+        "result": "fail",
+        "description": "保有遮炎時間が火災継続時間を満たさない、または算定ができない"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "proc-identify-openings",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "proc-identify-openings",
+        "to": "proc-get-structure-method",
+        "role": "flow"
+      },
+      {
+        "id": "e03",
+        "from": "proc-get-structure-method",
+        "to": "proc-calc-temp-profile",
+        "role": "flow"
+      },
+      {
+        "id": "e04",
+        "from": "proc-calc-temp-profile",
+        "to": "dec-temp-valid",
+        "role": "flow"
+      },
+      {
+        "id": "e05",
+        "from": "dec-temp-valid",
+        "to": "proc-calc-holding-time",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e06",
+        "from": "dec-temp-valid",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e07",
+        "from": "proc-calc-holding-time",
+        "to": "dec-holding-time-valid",
+        "role": "flow"
+      },
+      {
+        "id": "e08",
+        "from": "dec-holding-time-valid",
+        "to": "dec-holding-ge-fire",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e09",
+        "from": "dec-holding-time-valid",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e10",
+        "from": "info-fire-duration",
+        "to": "dec-holding-ge-fire",
+        "role": "input"
+      },
+      {
+        "id": "e11",
+        "from": "dec-holding-ge-fire",
+        "to": "proc-compliance-met",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e12",
+        "from": "dec-holding-ge-fire",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e13",
+        "from": "proc-compliance-met",
+        "to": "dec-all-openings-done",
+        "role": "flow"
+      },
+      {
+        "id": "e14",
+        "from": "dec-all-openings-done",
+        "to": "pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e15",
+        "from": "dec-all-openings-done",
+        "to": "proc-get-structure-method",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": ["A2:P9:I2-B"],
+      "description": "耐火建築物の定義と要件"
+    },
+    {
+      "law_id": "325M50004000040",
+      "law_name": "建築基準法施行規則",
+      "law_type": "regulation",
+      "relationship": "references",
+      "description": "防火設備の構造方法・性能の詳細"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00Z",
+    "updated_at": "2025-12-25T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

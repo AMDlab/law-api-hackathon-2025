@@ -1,0 +1,294 @@
+{
+  "id": "A108_4_P2_I3_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "外壁の屋外火災保有耐火時間検証",
+    "target_subject": "外壁",
+    "description": "耐火建築物の外壁が、周囲火災時の火熱に耐えられる時間を検証するフロー"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "108の4",
+    "paragraph": "2",
+    "item": "3"
+  },
+  "labels": ["単体規定", "耐火関連", "技術基準"],
+  "text_raw": "特定主要構造部ごとに、当該外壁が、当該建築物の周囲において発生する通常の火災時の火熱が加えられた場合に、前項第一号ロに掲げる要件に該当して耐えることができる加熱時間（以下この項において「屋外火災保有耐火時間」という。）を、当該外壁の構造方法並びに当該建築物の自重及び積載荷重に応じて国土交通大臣が定める方法により求めること。",
+  "kijo_diagram_ref": "CHK-REG-A108-4-P2-I3",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "building_type",
+          "value": "耐火建築物の特定主要構造部"
+        },
+        {
+          "type": "structural_part",
+          "value": "外壁"
+        }
+      ]
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "property": "屋外火災保有耐火時間",
+          "operator": "GE",
+          "value": {
+            "type": "conditional",
+            "base": "1時間",
+            "exception": "延焼のおそれのある部分以外は30分"
+          }
+        }
+      ]
+    }
+  },
+  "flow_diagram": {
+    "title": "屋外火災保有耐火時間算出・検証フロー",
+    "description": "外壁の屋外火災保有耐火時間を算出し、基準時間との比較を行うフロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "検証開始",
+        "result": "start",
+        "description": "外壁の屋外火災保有耐火時間の検証開始"
+      },
+      {
+        "id": "proc-identify-walls",
+        "type": "process",
+        "title": "特定主要構造部である外壁の特定",
+        "process_type": "undefined_input",
+        "description": "検証対象となる外壁を特定する"
+      },
+      {
+        "id": "proc-get-wall-structure",
+        "type": "process",
+        "title": "外壁の構造方法の特定",
+        "process_type": "undefined_input",
+        "description": "外壁の構造的特性（鋼構造、RC造等）を確認"
+      },
+      {
+        "id": "proc-get-loads",
+        "type": "process",
+        "title": "自重・積載荷重の特定",
+        "process_type": "undefined_input",
+        "description": "建築物の自重及び積載荷重を確認"
+      },
+      {
+        "id": "proc-calc-tfo",
+        "type": "process",
+        "title": "屋外火災保有耐火時間の算出",
+        "process_type": "mechanical",
+        "description": "外壁の構造方法、自重、積載荷重に基づき国土交通大臣が定める方法により算出"
+      },
+      {
+        "id": "dec-tfo-valid",
+        "type": "decision",
+        "title": "屋外火災保有耐火時間は適切に算出されたか？",
+        "decision_type": "binary",
+        "description": "算出方法が適切であり、値が有効であることを確認"
+      },
+      {
+        "id": "dec-extension-risk",
+        "type": "decision",
+        "title": "当該外壁は延焼のおそれのある部分か？",
+        "decision_type": "binary",
+        "description": "外壁の位置が延焼のおそれのある部分に該当するか判定"
+      },
+      {
+        "id": "proc-extension-risk-yes",
+        "type": "process",
+        "title": "延焼のおそれのある部分：必要耐火時間60分",
+        "process_type": "mechanical",
+        "description": "延焼のおそれのある部分は1時間（60分）の耐火時間が必要"
+      },
+      {
+        "id": "proc-extension-risk-no",
+        "type": "process",
+        "title": "延焼のおそれのある部分以外：必要耐火時間30分",
+        "process_type": "mechanical",
+        "description": "延焼のおそれのある部分以外は30分の耐火時間が必要"
+      },
+      {
+        "id": "dec-tfo-ge-60",
+        "type": "decision",
+        "title": "屋外火災保有耐火時間 >= 60分 か？",
+        "decision_type": "binary",
+        "description": "算出した屋外火災保有耐火時間が60分以上か確認"
+      },
+      {
+        "id": "dec-tfo-ge-30",
+        "type": "decision",
+        "title": "屋外火災保有耐火時間 >= 30分 か？",
+        "decision_type": "binary",
+        "description": "算出した屋外火災保有耐火時間が30分以上か確認"
+      },
+      {
+        "id": "dec-all-walls-done",
+        "type": "decision",
+        "title": "全ての外壁について検証完了したか？",
+        "decision_type": "binary",
+        "description": "建築物の全ての外壁について検証が完了したか確認"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "検証完了・適合",
+        "result": "pass",
+        "description": "全外壁の屋外火災保有耐火時間が基準を満たす"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "検証不適合",
+        "result": "fail",
+        "description": "屋外火災保有耐火時間が基準を満たさない"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "proc-identify-walls",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "proc-identify-walls",
+        "to": "proc-get-wall-structure",
+        "role": "flow"
+      },
+      {
+        "id": "e03",
+        "from": "proc-get-wall-structure",
+        "to": "proc-get-loads",
+        "role": "flow"
+      },
+      {
+        "id": "e04",
+        "from": "proc-get-loads",
+        "to": "proc-calc-tfo",
+        "role": "flow"
+      },
+      {
+        "id": "e05",
+        "from": "proc-calc-tfo",
+        "to": "dec-tfo-valid",
+        "role": "flow"
+      },
+      {
+        "id": "e06",
+        "from": "dec-tfo-valid",
+        "to": "dec-extension-risk",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e07",
+        "from": "dec-tfo-valid",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e08",
+        "from": "dec-extension-risk",
+        "to": "proc-extension-risk-yes",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e09",
+        "from": "dec-extension-risk",
+        "to": "proc-extension-risk-no",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e10",
+        "from": "proc-extension-risk-yes",
+        "to": "dec-tfo-ge-60",
+        "role": "flow"
+      },
+      {
+        "id": "e11",
+        "from": "proc-extension-risk-no",
+        "to": "dec-tfo-ge-30",
+        "role": "flow"
+      },
+      {
+        "id": "e12",
+        "from": "dec-tfo-ge-60",
+        "to": "dec-all-walls-done",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e13",
+        "from": "dec-tfo-ge-60",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e14",
+        "from": "dec-tfo-ge-30",
+        "to": "dec-all-walls-done",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e15",
+        "from": "dec-tfo-ge-30",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e16",
+        "from": "dec-all-walls-done",
+        "to": "pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e17",
+        "from": "dec-all-walls-done",
+        "to": "proc-get-wall-structure",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegates_to",
+      "articles": ["A2:P9"],
+      "description": "法第2条第9号の二イ(2)で定める技術的基準"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": ["A108_4:P1:I1", "A108_4:P2:I1", "A108_4:P2:I2"],
+      "description": "本号が参照する関連条項"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00Z",
+    "updated_at": "2025-12-25T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

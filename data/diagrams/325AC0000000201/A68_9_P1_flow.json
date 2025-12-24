@@ -1,0 +1,167 @@
+{
+  "id": "A68_9_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "都市計画による建築物制限規定の制定権",
+    "target_subject": "地方公共団体",
+    "description": "都市計画における特定区域内で、地方公共団体が建築物に関する制限条例を定める権限を有するかを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "68の9",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": ["集団規定", "地域制限", "都市計画"],
+  "text_raw": "第六条第一項第三号の規定に基づき、都道府県知事が関係市町村の意見を聴いて指定する区域内においては、地方公共団体は、当該区域内における土地利用の状況等を考慮し、適正かつ合理的な土地利用を図るため必要と認めるときは、政令で定める基準に従い、条例で、建築物又はその敷地と道路との関係、建築物の容積率、建築物の高さその他の建築物の敷地又は構造に関して必要な制限を定めることができる。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        { "type": "location", "value": "第6条第1項第3号に基づき都道府県知事が指定する区域内" },
+        { "type": "regulation_requirement", "value": "地方公共団体が土地利用の状況等を考慮し、適正かつ合理的な土地利用の必要性を認識" }
+      ],
+      "note": "都市計画における特定区域内で、条例制定による建築物制限の権限が発生する条件"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        { "ref": "info-designated-area", "operator": "==", "value": true },
+        { "ref": "info-necessity-judgment", "operator": "==", "value": true }
+      ]
+    },
+    "exceptions": null
+  },
+  "flow_diagram": {
+    "title": "建築物制限条例制定権の判定フロー",
+    "description": "地方公共団体が建築物制限条例を定める権限を有するか判定するフロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start"
+      },
+      {
+        "id": "dec-designated-area",
+        "type": "decision",
+        "title": "都道府県知事が指定した区域内か？",
+        "decision_type": "binary",
+        "description": "敷地が第6条第1項第3号に基づき都道府県知事が指定した区域内に位置するか確認"
+      },
+      {
+        "id": "dec-necessity-judgment",
+        "type": "decision",
+        "title": "土地利用上、制限条例が必要か？",
+        "decision_type": "binary",
+        "description": "当該区域内における土地利用の状況等を考慮し、適正かつ合理的な土地利用を図るため必要と認められるか"
+      },
+      {
+        "id": "proc-necessity-confirmed",
+        "type": "process",
+        "title": "制限条例制定の必要性確認",
+        "process_type": "human_judgment",
+        "description": "土地利用の状況等を考慮し、制限条例制定の必要性を確認"
+      },
+      {
+        "id": "dec-criteria-compliance",
+        "type": "decision",
+        "title": "政令で定める基準に適合するか？",
+        "decision_type": "binary",
+        "description": "定める制限内容が政令で定める基準に従っているか確認"
+      },
+      {
+        "id": "dec-restriction-scope",
+        "type": "decision",
+        "title": "制限対象は適切か？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "敷地と道路との関係" },
+          { "value": "容積率" },
+          { "value": "高さ" },
+          { "value": "敷地又は構造に関する制限" }
+        ],
+        "description": "条例で定める制限の対象範囲を確認"
+      },
+      {
+        "id": "proc-scope-valid",
+        "type": "process",
+        "title": "制限対象の妥当性確認",
+        "process_type": "mechanical",
+        "description": "制限対象が法令で認められた範囲内であることを確認"
+      },
+      {
+        "id": "proc-authority-established",
+        "type": "process",
+        "title": "条例制定権の確保",
+        "process_type": "mechanical",
+        "description": "すべての要件を満たし、条例制定権が確保された"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "条例制定権あり",
+        "result": "pass",
+        "description": "地方公共団体は建築物制限条例を制定することができる"
+      },
+      {
+        "id": "fail-not-designated",
+        "type": "terminal",
+        "title": "条例制定権なし（区域外）",
+        "result": "fail",
+        "description": "都道府県知事が指定した区域外のため条例制定権なし"
+      },
+      {
+        "id": "fail-no-necessity",
+        "type": "terminal",
+        "title": "条例制定権なし（必要性なし）",
+        "result": "fail",
+        "description": "土地利用上の必要性が認められないため条例制定権なし"
+      },
+      {
+        "id": "fail-criteria-violation",
+        "type": "terminal",
+        "title": "条例制定権なし（基準不適合）",
+        "result": "fail",
+        "description": "政令で定める基準に適合しないため条例制定権なし"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "dec-designated-area", "role": "flow" },
+      { "id": "e02", "from": "dec-designated-area", "to": "dec-necessity-judgment", "role": "yes", "label": "はい" },
+      { "id": "e03", "from": "dec-designated-area", "to": "fail-not-designated", "role": "no", "label": "いいえ" },
+      { "id": "e04", "from": "dec-necessity-judgment", "to": "proc-necessity-confirmed", "role": "yes", "label": "はい" },
+      { "id": "e05", "from": "dec-necessity-judgment", "to": "fail-no-necessity", "role": "no", "label": "いいえ" },
+      { "id": "e06", "from": "proc-necessity-confirmed", "to": "dec-criteria-compliance", "role": "flow" },
+      { "id": "e07", "from": "dec-criteria-compliance", "to": "dec-restriction-scope", "role": "yes", "label": "はい" },
+      { "id": "e08", "from": "dec-criteria-compliance", "to": "fail-criteria-violation", "role": "no", "label": "いいえ" },
+      { "id": "e09", "from": "dec-restriction-scope", "to": "proc-scope-valid", "role": "option", "label": "敷地と道路との関係" },
+      { "id": "e10", "from": "dec-restriction-scope", "to": "proc-scope-valid", "role": "option", "label": "容積率" },
+      { "id": "e11", "from": "dec-restriction-scope", "to": "proc-scope-valid", "role": "option", "label": "高さ" },
+      { "id": "e12", "from": "dec-restriction-scope", "to": "proc-scope-valid", "role": "option", "label": "敷地又は構造に関する制限" },
+      { "id": "e13", "from": "proc-scope-valid", "to": "proc-authority-established", "role": "flow" },
+      { "id": "e14", "from": "proc-authority-established", "to": "pass", "role": "flow" }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-A68-9-P1",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A6:P1:I3"],
+      "description": "第6条第1項第3号により都市計画の要件が定められている"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

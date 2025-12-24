@@ -1,0 +1,160 @@
+{
+  "id": "A25_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "大規模木造建築物等の外壁・軒裏・屋根の構造",
+    "target_subject": "木造建築物等",
+    "description": "延べ面積が1000平方メートルを超える木造建築物等の外壁・軒裏・屋根が所定の防火性能を満たすことを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "25",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": ["単体規定", "防火", "大規模木造"],
+  "kijo_diagram_ref": "CHK-BSL-A25-P1",
+  "flow_diagram": {
+    "title": "法25条1項適合判定フロー",
+    "description": "大規模木造建築物等の外壁・軒裏・屋根の防火性能適合判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start"
+      },
+      {
+        "id": "dec-wood-building",
+        "type": "decision",
+        "title": "木造建築物等に該当するか?",
+        "decision_type": "binary",
+        "description": "主要構造部の政令定め部分が可燃材料で造られた建築物か"
+      },
+      {
+        "id": "proc-wood-building",
+        "type": "process",
+        "title": "木造建築物等該当",
+        "description": "木造建築物等に該当"
+      },
+      {
+        "id": "dec-floor-area",
+        "type": "decision",
+        "title": "延べ面積（同一敷地内合計）は1000平方メートルを超えるか?",
+        "decision_type": "binary",
+        "description": "同一敷地内に二以上ある場合は合計で判定"
+      },
+      {
+        "id": "proc-scope-applicable",
+        "type": "process",
+        "title": "法25条1項適用対象",
+        "description": "延べ面積1000平方メートル超の大規模木造建築物等として法25条1項の適用対象に該当"
+      },
+      {
+        "id": "dec-ensho-exists",
+        "type": "decision",
+        "title": "外壁・軒裏に延焼のおそれのある部分があるか?",
+        "decision_type": "binary",
+        "description": "隣地境界線等からの距離に基づき延焼のおそれのある部分の有無を判定"
+      },
+      {
+        "id": "dec-fireproof-structure",
+        "type": "decision",
+        "title": "延焼のおそれのある部分が防火構造に適合するか?",
+        "decision_type": "binary",
+        "description": "外壁・軒裏の延焼のおそれのある部分が防火構造であるか"
+      },
+      {
+        "id": "proc-fireproof-ok",
+        "type": "process",
+        "title": "外壁・軒裏防火構造適合",
+        "description": "外壁・軒裏の延焼のおそれのある部分が防火構造に適合"
+      },
+      {
+        "id": "dec-roof-compliance",
+        "type": "decision",
+        "title": "屋根が法22条1項の構造に適合するか?",
+        "decision_type": "binary",
+        "description": "屋根が法22条1項に規定する構造（火の粉による発炎防止性能等）に適合するか"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "法25条1項に適合（外壁・軒裏の防火構造適合＋屋根の法22条1項適合）"
+      },
+      {
+        "id": "pass-not-applicable",
+        "type": "terminal",
+        "title": "適用外（適合）",
+        "result": "pass",
+        "description": "木造建築物等に非該当又は延べ面積1000平方メートル以下のため法25条1項の適用外"
+      },
+      {
+        "id": "pass-no-ensho",
+        "type": "process",
+        "title": "延焼のおそれのある部分なし",
+        "description": "外壁・軒裏に延焼のおそれのある部分がないため防火構造要件を満たす"
+      },
+      {
+        "id": "fail-fireproof",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "外壁・軒裏が防火構造に不適合"
+      },
+      {
+        "id": "fail-roof",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "屋根が法22条1項の構造に不適合"
+      }
+    ],
+    "edges": [
+      {"id": "e01", "from": "start", "to": "dec-wood-building", "role": "flow"},
+      {"id": "e02", "from": "dec-wood-building", "to": "proc-wood-building", "role": "yes"},
+      {"id": "e03", "from": "dec-wood-building", "to": "pass-not-applicable", "role": "no"},
+      {"id": "e04", "from": "proc-wood-building", "to": "dec-floor-area", "role": "flow"},
+      {"id": "e05", "from": "dec-floor-area", "to": "proc-scope-applicable", "role": "yes"},
+      {"id": "e06", "from": "dec-floor-area", "to": "pass-not-applicable", "role": "no"},
+      {"id": "e07", "from": "proc-scope-applicable", "to": "dec-ensho-exists", "role": "flow"},
+      {"id": "e08", "from": "dec-ensho-exists", "to": "dec-fireproof-structure", "role": "yes"},
+      {"id": "e09", "from": "dec-ensho-exists", "to": "pass-no-ensho", "role": "no"},
+      {"id": "e10", "from": "dec-fireproof-structure", "to": "proc-fireproof-ok", "role": "yes"},
+      {"id": "e11", "from": "dec-fireproof-structure", "to": "fail-fireproof", "role": "no"},
+      {"id": "e12", "from": "proc-fireproof-ok", "to": "dec-roof-compliance", "role": "flow"},
+      {"id": "e13", "from": "pass-no-ensho", "to": "dec-roof-compliance", "role": "flow"},
+      {"id": "e14", "from": "dec-roof-compliance", "to": "pass", "role": "yes"},
+      {"id": "e15", "from": "dec-roof-compliance", "to": "fail-roof", "role": "no"}
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A2:I6", "A2:I8", "A22:P1"],
+      "description": "延焼のおそれのある部分、防火構造、屋根の構造を定義・規定"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "delegates_to",
+      "articles": ["A107"],
+      "description": "防火構造の技術的基準を定める"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00Z",
+    "generator": "claude-code-flow-generator",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

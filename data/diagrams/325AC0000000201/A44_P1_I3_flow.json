@@ -1,0 +1,156 @@
+{
+  "id": "A44_P1_I3_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "道路内の建築制限（第3号例外）（適合判定フロー）",
+    "target_subject": "建築物",
+    "description": "第43条1項2号の道路の上空・路面下に設ける建築物について、地区計画適合性、政令基準適合性、特定行政庁認定を判定するフロー"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "44",
+    "paragraph": "1",
+    "item": "3"
+  },
+  "labels": ["集団規定", "道路", "地区計画"],
+  "text_raw": "第四十三条第一項第二号の道路の上空又は路面下に設ける建築物のうち、当該道路に係る地区計画の内容に適合し、かつ、政令で定める基準に適合するものであつて特定行政庁が安全上、防火上及び衛生上支障がないと認めるもの",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        { "type": "prerequisite", "ref": "info-road-type-match", "note": "第43条1項2号の道路である" },
+        { "type": "prerequisite", "ref": "info-position-match", "note": "当該道路の上空又は路面下に設ける建築物である" }
+      ]
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        { "ref": "info-district-plan-compliance", "note": "地区計画の内容に適合する" },
+        { "ref": "info-order-standard-compliance", "note": "政令で定める基準に適合する" },
+        { "ref": "info-admin-approval", "note": "特定行政庁が安全上、防火上及び衛生上支障がないと認める" }
+      ]
+    }
+  },
+  "flow_diagram": {
+    "title": "法44条1項3号 地区計画区域内道路上空・路面下建築物 適合判定フロー",
+    "description": "地区計画区域内の道路上空又は路面下に設ける建築物の適用除外要件を判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "法44条1項3号の適合判定を開始"
+      },
+      {
+        "id": "dec-road-type",
+        "type": "decision",
+        "title": "法43条1項2号の道路（地区計画区域内）か？",
+        "decision_type": "binary",
+        "description": "建築物が接する道路が第43条1項2号の道路（地区計画区域内の道路）であるか判定",
+        "related_articles": ["法::A43:P1:I2"]
+      },
+      {
+        "id": "dec-position",
+        "type": "decision",
+        "title": "道路の上空又は路面下に設けるか？",
+        "decision_type": "binary",
+        "description": "建築物が当該道路の上空又は路面下に設けられているか判定"
+      },
+      {
+        "id": "proc-scope-match",
+        "type": "process",
+        "title": "適用対象確認",
+        "process_type": "mechanical",
+        "description": "法44条1項3号の適用対象（地区計画区域内道路の上空・路面下建築物）であることを確認"
+      },
+      {
+        "id": "dec-district-plan",
+        "type": "decision",
+        "title": "地区計画の内容に適合するか？",
+        "decision_type": "binary",
+        "description": "建築物が当該道路に係る地区計画の内容に適合しているか判定"
+      },
+      {
+        "id": "dec-order-standard",
+        "type": "decision",
+        "title": "政令で定める基準に適合するか？",
+        "decision_type": "binary",
+        "description": "建築物が政令（令第144条の4）で定める基準に適合しているか判定",
+        "related_articles": ["令::A144_4"]
+      },
+      {
+        "id": "dec-admin-approval",
+        "type": "decision",
+        "title": "特定行政庁の認定を受けているか？",
+        "decision_type": "binary",
+        "description": "特定行政庁が安全上、防火上及び衛生上支障がないと認めているか判定"
+      },
+      {
+        "id": "proc-item3-match",
+        "type": "process",
+        "title": "第3号該当",
+        "process_type": "mechanical",
+        "description": "法44条1項3号の全要件を満たす"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合（適用除外）",
+        "result": "pass",
+        "description": "法44条1項3号に該当し、道路内建築制限の適用除外となる"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "法44条1項3号に該当せず、道路内建築制限が適用される"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "dec-road-type", "role": "flow" },
+      { "id": "e02", "from": "dec-road-type", "to": "dec-position", "role": "yes", "label": "はい" },
+      { "id": "e03", "from": "dec-road-type", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e04", "from": "dec-position", "to": "proc-scope-match", "role": "yes", "label": "はい" },
+      { "id": "e05", "from": "dec-position", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e06", "from": "proc-scope-match", "to": "dec-district-plan", "role": "flow" },
+      { "id": "e07", "from": "dec-district-plan", "to": "dec-order-standard", "role": "yes", "label": "はい" },
+      { "id": "e08", "from": "dec-district-plan", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e09", "from": "dec-order-standard", "to": "dec-admin-approval", "role": "yes", "label": "はい" },
+      { "id": "e10", "from": "dec-order-standard", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e11", "from": "dec-admin-approval", "to": "proc-item3-match", "role": "yes", "label": "はい" },
+      { "id": "e12", "from": "dec-admin-approval", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e13", "from": "proc-item3-match", "to": "pass", "role": "flow" }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-A44-P1-I3",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A43:P1:I2"],
+      "description": "第43条1項2号の道路（地区計画区域内の道路）を参照"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "delegates_to",
+      "articles": ["A144_4"],
+      "description": "政令で定める基準を規定（第144条の4）"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

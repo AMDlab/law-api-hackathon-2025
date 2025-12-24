@@ -1,0 +1,248 @@
+{
+  "id": "A57_2_P2_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "特例容積率申請に係る利害関係人の同意確認フロー",
+    "target_subject": "申請",
+    "description": "特例容積率の指定申請に際して、申請者及び第1項の同意者以外の利害関係人の同意要件を判定"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "57の2",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "申請手続"
+  ],
+  "text_raw": "前項の規定による申請をしようとする者は、申請者及び同項の規定による同意をした者以外に当該申請に係る特例敷地について政令で定める利害関係を有する者があるときは、あらかじめ、これらの者の同意を得なければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "procedure",
+          "value": "特例容積率の指定申請手続中"
+        },
+        {
+          "type": "location_characteristic",
+          "value": "特例容積率適用地区内の特例敷地"
+        }
+      ],
+      "note": "第1項の規定による申請をしようとする場合に適用"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "condition_name": "利害関係人の確定",
+          "description": "申請者及び第1項の同意者以外の利害関係人が存在するか"
+        },
+        {
+          "condition_name": "同意の取得",
+          "description": "当該利害関係人から申請に係る特例敷地について事前に同意を得たか"
+        }
+      ]
+    }
+  },
+  "flow_diagram": {
+    "title": "第57条の2第2項 利害関係人の同意確認フロー",
+    "description": "特例容積率の指定申請に際して、利害関係人からの事前同意取得要件を判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "利害関係人の同意確認判定を開始"
+      },
+      {
+        "id": "dec-applicant-identified",
+        "type": "decision",
+        "title": "第1項に基づく申請者が特定されているか？",
+        "decision_type": "binary",
+        "description": "第57条の2第1項の規定により申請する者を確認"
+      },
+      {
+        "id": "dec-p1-consent-identified",
+        "type": "decision",
+        "title": "第1項の同意者が特定されているか？",
+        "decision_type": "binary",
+        "description": "第1項の規定により同意をした者（敷地所有権者等）を確認"
+      },
+      {
+        "id": "proc-identify-stakeholders",
+        "type": "process",
+        "title": "利害関係人の確定",
+        "process_type": "human_judgment",
+        "description": "特例敷地について政令で定める利害関係を有する者を特定"
+      },
+      {
+        "id": "dec-stakeholder-exists",
+        "type": "decision",
+        "title": "申請者及び第1項同意者以外に利害関係人が存在するか？",
+        "decision_type": "binary",
+        "description": "政令で定める利害関係を有する者（申請者及び第1項同意者以外）の存在を確認"
+      },
+      {
+        "id": "proc-no-stakeholder",
+        "type": "process",
+        "title": "利害関係人なし",
+        "process_type": "mechanical",
+        "description": "申請者及び第1項同意者以外に利害関係人が存在しない"
+      },
+      {
+        "id": "proc-stakeholder-identified",
+        "type": "process",
+        "title": "利害関係人を特定",
+        "process_type": "mechanical",
+        "description": "申請者及び第1項同意者以外の利害関係人を特定"
+      },
+      {
+        "id": "dec-consent-obtained",
+        "type": "decision",
+        "title": "利害関係人から事前に同意を得たか？",
+        "decision_type": "binary",
+        "description": "利害関係人から、申請に係る特例敷地について事前（申請前）に同意を取得したことを確認"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合（申請可能）",
+        "result": "pass",
+        "description": "利害関係人の同意要件に適合し、申請可能"
+      },
+      {
+        "id": "pass-no-stakeholder",
+        "type": "terminal",
+        "title": "適合（利害関係人なし）",
+        "result": "pass",
+        "description": "利害関係人が存在しないため、同意要件は自動的に充足"
+      },
+      {
+        "id": "fail-applicant",
+        "type": "terminal",
+        "title": "不適合（申請者未特定）",
+        "result": "fail",
+        "description": "第1項に基づく申請者が特定されていない"
+      },
+      {
+        "id": "fail-p1-consent",
+        "type": "terminal",
+        "title": "不適合（第1項同意者未特定）",
+        "result": "fail",
+        "description": "第1項の同意者が特定されていない"
+      },
+      {
+        "id": "fail-consent",
+        "type": "terminal",
+        "title": "不適合（同意未取得）",
+        "result": "fail",
+        "description": "利害関係人から事前に同意を得ていないため、申請不可"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-applicant-identified",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-applicant-identified",
+        "to": "dec-p1-consent-identified",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "dec-applicant-identified",
+        "to": "fail-applicant",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e04",
+        "from": "dec-p1-consent-identified",
+        "to": "proc-identify-stakeholders",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e05",
+        "from": "dec-p1-consent-identified",
+        "to": "fail-p1-consent",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e06",
+        "from": "proc-identify-stakeholders",
+        "to": "dec-stakeholder-exists",
+        "role": "flow"
+      },
+      {
+        "id": "e07",
+        "from": "dec-stakeholder-exists",
+        "to": "proc-stakeholder-identified",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e08",
+        "from": "dec-stakeholder-exists",
+        "to": "proc-no-stakeholder",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e09",
+        "from": "proc-no-stakeholder",
+        "to": "pass-no-stakeholder",
+        "role": "flow"
+      },
+      {
+        "id": "e10",
+        "from": "proc-stakeholder-identified",
+        "to": "dec-consent-obtained",
+        "role": "flow"
+      },
+      {
+        "id": "e11",
+        "from": "dec-consent-obtained",
+        "to": "pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e12",
+        "from": "dec-consent-obtained",
+        "to": "fail-consent",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-A57-2-P2",
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "delegates_to",
+      "description": "利害関係を有する者の定義"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00Z",
+    "author": "Claude Code (flow-generator)",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

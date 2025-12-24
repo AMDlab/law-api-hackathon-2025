@@ -1,0 +1,225 @@
+{
+  "id": "A60_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "特定街区内の容積率・高さ制限",
+    "target_subject": "建築物",
+    "description": "特定街区内の建築物の容積率及び高さが都市計画で定められた限度以下であることを判定するフロー"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "60",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": ["集団規定", "高さ制限", "容積率"],
+  "text_raw": "特定街区内においては、建築物の容積率及び高さは、特定街区に関する都市計画において定められた限度以下でなければならない。",
+  "kijo_diagram_ref": "CHK-BSL-A60-P1",
+  "flow_diagram": {
+    "title": "特定街区内の容積率・高さ制限適合判定フロー",
+    "description": "特定街区内の建築物について、容積率及び高さが都市計画で定められた限度以下であるかを判定するフロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "法60条1項の適合判定を開始"
+      },
+      {
+        "id": "dec-location",
+        "type": "decision",
+        "title": "敷地は特定街区内か？",
+        "decision_type": "binary",
+        "description": "建築物の敷地が特定街区内に位置するか判定"
+      },
+      {
+        "id": "proc-get-limits",
+        "type": "process",
+        "title": "都市計画の制限値を取得",
+        "process_type": "mechanical",
+        "description": "当該特定街区に関する都市計画で定められた容積率の限度（FARmax）及び高さの限度（Hmax）を取得する"
+      },
+      {
+        "id": "proc-calc-far",
+        "type": "process",
+        "title": "建築物の容積率を算定",
+        "process_type": "mechanical",
+        "description": "建築物の延べ面積と敷地面積から容積率（FAR）を算定: FAR = (延べ面積 / 敷地面積) × 100"
+      },
+      {
+        "id": "dec-far-check",
+        "type": "decision",
+        "title": "容積率は制限値以下か？",
+        "decision_type": "binary",
+        "description": "建築物の容積率（FAR）が都市計画で定められた限度（FARmax）以下であるか判定: FAR ≤ FARmax",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "FAR", "desc": "建築物の容積率" },
+          "rhs": { "var": "FARmax", "desc": "容積率の限度", "unit": "%" }
+        }
+      },
+      {
+        "id": "proc-far-ok",
+        "type": "process",
+        "title": "容積率制限適合",
+        "process_type": "mechanical",
+        "description": "容積率制限への適合を確認"
+      },
+      {
+        "id": "proc-get-height",
+        "type": "process",
+        "title": "建築物の高さを特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の高さ（H）を読み取る"
+      },
+      {
+        "id": "dec-height-check",
+        "type": "decision",
+        "title": "高さは制限値以下か？",
+        "decision_type": "binary",
+        "description": "建築物の高さ（H）が都市計画で定められた限度（Hmax）以下であるか判定: H ≤ Hmax",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "H", "desc": "建築物の高さ" },
+          "rhs": { "var": "Hmax", "desc": "高さの限度", "unit": "m" }
+        }
+      },
+      {
+        "id": "proc-height-ok",
+        "type": "process",
+        "title": "高さ制限適合",
+        "process_type": "mechanical",
+        "description": "高さ制限への適合を確認"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "法60条1項に適合（容積率及び高さが限度以下）"
+      },
+      {
+        "id": "fail-far",
+        "type": "terminal",
+        "title": "不適合（容積率超過）",
+        "result": "fail",
+        "description": "容積率が都市計画で定められた限度を超過しているため不適合"
+      },
+      {
+        "id": "fail-height",
+        "type": "terminal",
+        "title": "不適合（高さ超過）",
+        "result": "fail",
+        "description": "高さが都市計画で定められた限度を超過しているため不適合"
+      },
+      {
+        "id": "end-not-applicable",
+        "type": "terminal",
+        "title": "本項適用外",
+        "result": "end",
+        "description": "特定街区外のため本項は適用されない"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-location",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-location",
+        "to": "proc-get-limits",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "dec-location",
+        "to": "end-not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e04",
+        "from": "proc-get-limits",
+        "to": "proc-calc-far",
+        "role": "flow"
+      },
+      {
+        "id": "e05",
+        "from": "proc-calc-far",
+        "to": "dec-far-check",
+        "role": "flow"
+      },
+      {
+        "id": "e06",
+        "from": "dec-far-check",
+        "to": "proc-far-ok",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e07",
+        "from": "dec-far-check",
+        "to": "fail-far",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e08",
+        "from": "proc-far-ok",
+        "to": "proc-get-height",
+        "role": "flow"
+      },
+      {
+        "id": "e09",
+        "from": "proc-get-height",
+        "to": "dec-height-check",
+        "role": "flow"
+      },
+      {
+        "id": "e10",
+        "from": "dec-height-check",
+        "to": "proc-height-ok",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e11",
+        "from": "dec-height-check",
+        "to": "fail-height",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e12",
+        "from": "proc-height-ok",
+        "to": "pass",
+        "role": "flow"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "都市計画法",
+      "law_name": "都市計画法",
+      "law_type": "act",
+      "relationship": "references",
+      "description": "特定街区の指定及び容積率・高さの限度を定める"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00Z",
+    "updated_at": "2025-12-25T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

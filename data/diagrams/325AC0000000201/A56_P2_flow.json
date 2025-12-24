@@ -1,0 +1,203 @@
+{
+  "id": "A56_P2_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "後退建築物の道路斜線制限適用の修正",
+    "target_subject": "建築物",
+    "description": "前面道路の境界線から後退した建築物に対する道路斜線制限の計算方法を修正適用する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "56",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": [
+    "集団規定",
+    "高さ制限",
+    "道路斜線制限",
+    "後退建築物"
+  ],
+  "text_raw": "前面道路の境界線から後退した建築物に対する前項第一号の規定の適用については、同号中「前面道路の反対側の境界線」とあるのは、「前面道路の反対側の境界線から当該建築物の後退距離（当該建築物（地盤面下の部分その他政令で定める部分を除く。）から前面道路の境界線までの水平距離のうち最小のものをいう。）に相当する距離だけ外側の線」とする。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "property",
+          "value": "前面道路から後退"
+        }
+      ],
+      "note": "56条1項第1号の道路斜線制限が適用される場合で、建築物が前面道路から後退している"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "note": "修正された仮想道路境界線で計算した場合の制限高さを使用",
+          "ref": "info-adjusted-road-limit",
+          "operator": "==",
+          "value": "modified"
+        }
+      ]
+    }
+  },
+  "flow_diagram": {
+    "title": "法56条2項 後退建築物の道路斜線制限修正適用フロー",
+    "description": "前面道路から後退した建築物について、仮想道路境界線を用いた道路斜線制限の適合を判定する",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "法56条2項の後退建築物の道路斜線制限修正適用判定を開始"
+      },
+      {
+        "id": "dec-setback-status",
+        "type": "decision",
+        "title": "建築物は前面道路から後退しているか？",
+        "decision_type": "binary",
+        "description": "建築物が前面道路の境界線から後退しているかを確認"
+      },
+      {
+        "id": "proc-not-applicable",
+        "type": "process",
+        "title": "本項適用対象外",
+        "description": "後退していない場合は56条2項の適用対象外（56条1項第1号をそのまま適用）"
+      },
+      {
+        "id": "proc-setback-distance",
+        "type": "process",
+        "title": "後退距離の計算",
+        "process_type": "mechanical",
+        "description": "建築物（地盤面下の部分を除く）から前面道路境界線までの最小水平距離を計算"
+      },
+      {
+        "id": "dec-setback-positive",
+        "type": "decision",
+        "title": "後退距離は0より大きいか？",
+        "decision_type": "binary",
+        "description": "有効な後退距離があるか確認"
+      },
+      {
+        "id": "proc-adjust-boundary",
+        "type": "process",
+        "title": "仮想道路反対側境界線の決定",
+        "process_type": "mechanical",
+        "description": "元の境界線を後退距離分外側に移動させた仮想境界線を決定"
+      },
+      {
+        "id": "proc-building-parts",
+        "type": "process",
+        "title": "建築物各部分の特定",
+        "process_type": "undefined_input",
+        "description": "判定対象となる建築物の各部分を特定"
+      },
+      {
+        "id": "proc-adjusted-distance",
+        "type": "process",
+        "title": "修正後境界線までの水平距離算出",
+        "process_type": "mechanical",
+        "description": "各部分から修正後の仮想境界線までの水平距離を計算"
+      },
+      {
+        "id": "proc-slope-ratio",
+        "type": "process",
+        "title": "道路斜線勾配係数の取得",
+        "process_type": "mechanical",
+        "description": "別表第三により勾配係数を取得"
+      },
+      {
+        "id": "proc-adjusted-limit",
+        "type": "process",
+        "title": "修正後の道路斜線制限高さ算出",
+        "process_type": "mechanical",
+        "description": "H_road_limit_adj = D_adj_road × K_road"
+      },
+      {
+        "id": "dec-height-check",
+        "type": "decision",
+        "title": "各部分の高さが修正後の制限高さ以下か？",
+        "decision_type": "binary",
+        "description": "H ≤ H_road_limit_adj を判定"
+      },
+      {
+        "id": "proc-part-pass",
+        "type": "process",
+        "title": "当該部分適合",
+        "description": "当該部分は修正後の道路斜線制限に適合"
+      },
+      {
+        "id": "dec-all-parts-check",
+        "type": "decision",
+        "title": "全ての部分で適合か？",
+        "decision_type": "binary",
+        "description": "建築物の全ての部分が修正後の道路斜線制限に適合しているか"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "法56条2項の修正後の道路斜線制限に適合"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "法56条2項の修正後の道路斜線制限に不適合"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "dec-setback-status", "role": "flow" },
+      { "id": "e02", "from": "dec-setback-status", "to": "proc-setback-distance", "role": "yes", "label": "はい" },
+      { "id": "e03", "from": "dec-setback-status", "to": "proc-not-applicable", "role": "no", "label": "いいえ" },
+      { "id": "e04", "from": "proc-not-applicable", "to": "pass", "role": "flow" },
+      { "id": "e05", "from": "proc-setback-distance", "to": "dec-setback-positive", "role": "flow" },
+      { "id": "e06", "from": "dec-setback-positive", "to": "proc-adjust-boundary", "role": "yes", "label": "はい" },
+      { "id": "e07", "from": "dec-setback-positive", "to": "proc-not-applicable", "role": "no", "label": "いいえ" },
+      { "id": "e08", "from": "proc-adjust-boundary", "to": "proc-building-parts", "role": "flow" },
+      { "id": "e09", "from": "proc-building-parts", "to": "proc-adjusted-distance", "role": "flow" },
+      { "id": "e10", "from": "proc-adjusted-distance", "to": "proc-slope-ratio", "role": "flow" },
+      { "id": "e11", "from": "proc-slope-ratio", "to": "proc-adjusted-limit", "role": "flow" },
+      { "id": "e12", "from": "proc-adjusted-limit", "to": "dec-height-check", "role": "flow" },
+      { "id": "e13", "from": "dec-height-check", "to": "proc-part-pass", "role": "yes", "label": "はい" },
+      { "id": "e14", "from": "dec-height-check", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e15", "from": "proc-part-pass", "to": "dec-all-parts-check", "role": "flow" },
+      { "id": "e16", "from": "dec-all-parts-check", "to": "pass", "role": "yes", "label": "はい" },
+      { "id": "e17", "from": "dec-all-parts-check", "to": "fail", "role": "no", "label": "いいえ" }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-A56-P2",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A56:P1:I1"],
+      "description": "56条2項は56条1項第1号の規定を修正適用する"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "defines_detail",
+      "articles": ["A130"],
+      "description": "後退距離に関する政令規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00+09:00",
+    "updated_at": "2025-12-25T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

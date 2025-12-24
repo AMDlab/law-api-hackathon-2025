@@ -1,0 +1,137 @@
+{
+  "id": "A53_P7_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "防火地域内外にわたる敷地の建蔽率緩和判定フロー",
+    "target_subject": "敷地",
+    "description": "敷地が防火地域の内外にわたる場合で、敷地内の全建築物が耐火建築物等である場合における、敷地全体を防火地域内とみなす規定の適用判定フロー"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "53",
+    "paragraph": "7"
+  },
+  "labels": ["集団規定", "建蔽率", "防火地域", "敷地みなし規定"],
+  "text_raw": "建築物の敷地が防火地域の内外にわたる場合において、その敷地内の建築物の全部が耐火建築物等であるときは、その敷地は、全て防火地域内にあるものとみなして、第三項第一号又は前項第一号の規定を適用する。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "敷地が防火地域の内外にわたる"
+        }
+      ],
+      "note": "敷地が防火地域の境界をまたいでいる場合に適用"
+    },
+    "judgment_rule": {
+      "operator": "IMPLICATION",
+      "conditions": [
+        {
+          "type": "proposition",
+          "description": "敷地内の建築物の全部が耐火建築物等である",
+          "symbol": "A"
+        }
+      ],
+      "effect": {
+        "type": "legal_fiction",
+        "description": "敷地全体を防火地域内にあるものとみなす",
+        "applied_articles": ["法::A53:P3:I1", "法::A53:P6:I1"]
+      },
+      "note": "敷地内の全建築物が耐火建築物等であれば、敷地全体を防火地域内とみなして第53条第3項第1号又は第6項第1号を適用（建蔽率の緩和）"
+    }
+  },
+  "kijo_diagram_ref": "CHK-BSL-A53-P7",
+  "flow_diagram": {
+    "title": "防火地域内外にわたる敷地の建蔽率緩和判定フロー",
+    "description": "敷地が防火地域の内外にわたる場合のみなし規定適用を判定する",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "防火地域みなし規定の適用判定を開始"
+      },
+      {
+        "id": "dec-site-straddle",
+        "type": "decision",
+        "title": "敷地が防火地域の内外にわたるか？",
+        "decision_type": "binary",
+        "description": "敷地が防火地域の境界をまたいでいるか確認"
+      },
+      {
+        "id": "dec-all-fireproof",
+        "type": "decision",
+        "title": "敷地内の全建築物が耐火建築物等か？",
+        "decision_type": "binary",
+        "description": "敷地内に存在する建築物の全部が耐火建築物等（耐火建築物又はこれと同等以上の延焼防止性能を有する建築物）に該当するか判定"
+      },
+      {
+        "id": "proc-deemed-fire-district",
+        "type": "process",
+        "title": "防火地域内みなし適用",
+        "process_type": "mechanical",
+        "description": "敷地の全部が防火地域内にあるものとみなす"
+      },
+      {
+        "id": "dec-coverage-rate",
+        "type": "decision",
+        "title": "建蔽率の限度は8/10か？",
+        "decision_type": "binary",
+        "description": "第1項第2号から第4号により建蔽率限度が8/10とされている地域か判定"
+      },
+      {
+        "id": "pass-exempt",
+        "type": "terminal",
+        "title": "適合（第6項第1号適用）",
+        "result": "pass",
+        "description": "第53条第6項第1号により建蔽率規制の適用除外となる"
+      },
+      {
+        "id": "pass-relaxation",
+        "type": "terminal",
+        "title": "適合（第3項第1号適用）",
+        "result": "pass",
+        "description": "第53条第3項第1号により建蔽率+1/10の緩和が適用される"
+      },
+      {
+        "id": "fail-not-applicable",
+        "type": "terminal",
+        "title": "本項非適用",
+        "result": "fail",
+        "description": "本項の要件を満たさないため、みなし規定は適用されない"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "dec-site-straddle", "role": "flow" },
+      { "id": "e02", "from": "dec-site-straddle", "to": "dec-all-fireproof", "role": "yes", "label": "はい" },
+      { "id": "e03", "from": "dec-site-straddle", "to": "fail-not-applicable", "role": "no", "label": "いいえ" },
+      { "id": "e04", "from": "dec-all-fireproof", "to": "proc-deemed-fire-district", "role": "yes", "label": "はい" },
+      { "id": "e05", "from": "dec-all-fireproof", "to": "fail-not-applicable", "role": "no", "label": "いいえ" },
+      { "id": "e06", "from": "proc-deemed-fire-district", "to": "dec-coverage-rate", "role": "flow" },
+      { "id": "e07", "from": "dec-coverage-rate", "to": "pass-exempt", "role": "yes", "label": "はい" },
+      { "id": "e08", "from": "dec-coverage-rate", "to": "pass-relaxation", "role": "no", "label": "いいえ" }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A53:P3:I1", "A53:P6:I1"],
+      "description": "第3項第1号（耐火建築物等による建蔽率+1/10緩和）及び第6項第1号（建蔽率8/10地域での適用除外）を参照"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

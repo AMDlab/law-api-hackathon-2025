@@ -1,0 +1,130 @@
+{
+  "id": "A53_P8_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "準防火地域みなし規定適用判定フロー",
+    "target_subject": "敷地",
+    "description": "敷地が準防火地域と非防火・非準防火区域とにわたる場合に、全建築物が耐火・準耐火建築物であれば全て準防火地域とみなす規定の適用判定フロー"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "53",
+    "paragraph": "8"
+  },
+  "labels": ["集団規定", "建蔽率", "防火地域", "みなし規定"],
+  "text_raw": "建築物の敷地が準防火地域と防火地域及び準防火地域以外の区域とにわたる場合において、その敷地内の建築物の全部が耐火建築物等又は準耐火建築物等であるときは、その敷地は、全て準防火地域内にあるものとみなして、第三項第一号の規定を適用する。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "敷地が準防火地域と非防火・非準防火区域とにわたる"
+        }
+      ],
+      "note": "敷地が準防火地域と、防火地域及び準防火地域以外の区域の両方にわたる場合に適用"
+    },
+    "judgment_rule": {
+      "operator": "IF_THEN",
+      "conditions": [
+        {
+          "type": "proposition",
+          "symbol": "C1",
+          "description": "敷地が準防火地域と非防火・非準防火区域にわたる"
+        },
+        {
+          "type": "proposition",
+          "symbol": "C2",
+          "description": "敷地内の建築物の全部が耐火建築物等又は準耐火建築物等である"
+        }
+      ],
+      "conclusion": {
+        "type": "proposition",
+        "description": "敷地は全て準防火地域内にあるものとみなす（第53条第3項第1号適用）"
+      }
+    }
+  },
+  "kijo_diagram_ref": "CHK-BSL-A53-P8",
+  "flow_diagram": {
+    "title": "準防火地域みなし規定適用判定フロー",
+    "description": "敷地が準防火地域と非防火・非準防火区域にわたる場合のみなし規定適用を判定する",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "準防火地域みなし規定の適用判定を開始"
+      },
+      {
+        "id": "dec-site-straddle",
+        "type": "decision",
+        "title": "敷地が準防火地域と非指定区域にわたるか？",
+        "decision_type": "binary",
+        "description": "敷地が準防火地域と、防火地域及び準防火地域以外の区域とにわたるか確認"
+      },
+      {
+        "id": "dec-building-fireproof-type",
+        "type": "decision",
+        "title": "建築物の耐火性能区分は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "全棟が耐火建築物等" },
+          { "value": "全棟が準耐火建築物等以上" },
+          { "value": "それ以外" }
+        ],
+        "description": "敷地内の全建築物が耐火建築物等又は準耐火建築物等に該当するか判定"
+      },
+      {
+        "id": "proc-deemed-quasi-fire-district",
+        "type": "process",
+        "title": "準防火地域内みなし適用",
+        "process_type": "mechanical",
+        "description": "敷地の全部が準防火地域内にあるものとみなす"
+      },
+      {
+        "id": "pass-relaxation",
+        "type": "terminal",
+        "title": "適合（第3項第1号適用）",
+        "result": "pass",
+        "description": "第53条第3項第1号により建蔽率+1/10の緩和が適用される"
+      },
+      {
+        "id": "fail-not-applicable",
+        "type": "terminal",
+        "title": "本項非適用",
+        "result": "fail",
+        "description": "本項の要件を満たさないため、みなし規定は適用されない"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "dec-site-straddle", "role": "flow" },
+      { "id": "e02", "from": "dec-site-straddle", "to": "dec-building-fireproof-type", "role": "yes", "label": "はい" },
+      { "id": "e03", "from": "dec-site-straddle", "to": "fail-not-applicable", "role": "no", "label": "いいえ" },
+      { "id": "e04", "from": "dec-building-fireproof-type", "to": "proc-deemed-quasi-fire-district", "role": "option", "label": "全棟が耐火建築物等" },
+      { "id": "e05", "from": "dec-building-fireproof-type", "to": "proc-deemed-quasi-fire-district", "role": "option", "label": "全棟が準耐火建築物等以上" },
+      { "id": "e06", "from": "dec-building-fireproof-type", "to": "fail-not-applicable", "role": "option", "label": "それ以外" },
+      { "id": "e07", "from": "proc-deemed-quasi-fire-district", "to": "pass-relaxation", "role": "flow" }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A53:P3:I1"],
+      "description": "みなし適用される第53条第3項第1号（建蔽率の緩和規定）"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

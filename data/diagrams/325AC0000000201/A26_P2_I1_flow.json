@@ -1,0 +1,99 @@
+{
+  "id": "A26_P2_I1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "防火壁適用除外（耐火構造等）",
+    "target_subject": "建築物",
+    "description": "特定部分の特定主要構造部が耐火構造等の場合の防火壁適用除外判定"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "26",
+    "paragraph": "2",
+    "item": "1"
+  },
+  "labels": ["単体規定", "防火", "適用除外"],
+  "kijo_diagram_ref": "CHK-BSL-A26-P2-I1",
+  "flow_diagram": {
+    "title": "法26条2項1号適合判定フロー",
+    "description": "特定主要構造部が耐火構造等の場合の防火壁適用除外判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start"
+      },
+      {
+        "id": "dec-structure-type",
+        "type": "decision",
+        "title": "特定主要構造部の構造種別は?",
+        "decision_type": "multi",
+        "options": [
+          {"value": "耐火構造"},
+          {"value": "第2条9号の二イ(2)同等性能の大臣定め構造方法"},
+          {"value": "大臣認定"},
+          {"value": "その他"}
+        ],
+        "description": "特定部分の特定主要構造部の構造種別を判定"
+      },
+      {
+        "id": "dec-fireproof",
+        "type": "decision",
+        "title": "耐火構造に該当するか?",
+        "decision_type": "binary",
+        "description": "特定主要構造部が耐火構造であるか"
+      },
+      {
+        "id": "dec-minister-method",
+        "type": "decision",
+        "title": "大臣定め構造方法に該当するか?",
+        "decision_type": "binary",
+        "description": "第2条9号の二イ(2)と同等の性能を有する大臣定め構造方法か"
+      },
+      {
+        "id": "dec-minister-cert",
+        "type": "decision",
+        "title": "大臣認定を受けているか?",
+        "decision_type": "binary",
+        "description": "国土交通大臣の認定を受けた構造方法か"
+      },
+      {
+        "id": "pass-exempt",
+        "type": "terminal",
+        "title": "適用除外（適合）",
+        "result": "pass",
+        "description": "法26条2項1号に該当し防火壁設置義務の適用除外"
+      },
+      {
+        "id": "fail-not-exempt",
+        "type": "terminal",
+        "title": "適用除外に非該当",
+        "result": "fail",
+        "description": "法26条2項1号の適用除外要件を満たさない（防火壁設置義務あり）"
+      }
+    ],
+    "edges": [
+      {"id": "e01", "from": "start", "to": "dec-structure-type", "role": "flow"},
+      {"id": "e02", "from": "dec-structure-type", "to": "dec-fireproof", "role": "option", "label": "耐火構造"},
+      {"id": "e03", "from": "dec-structure-type", "to": "dec-minister-method", "role": "option", "label": "第2条9号の二イ(2)同等性能の大臣定め構造方法"},
+      {"id": "e04", "from": "dec-structure-type", "to": "dec-minister-cert", "role": "option", "label": "大臣認定"},
+      {"id": "e05", "from": "dec-structure-type", "to": "fail-not-exempt", "role": "option", "label": "その他"},
+      {"id": "e06", "from": "dec-fireproof", "to": "pass-exempt", "role": "yes"},
+      {"id": "e07", "from": "dec-fireproof", "to": "fail-not-exempt", "role": "no"},
+      {"id": "e08", "from": "dec-minister-method", "to": "pass-exempt", "role": "yes"},
+      {"id": "e09", "from": "dec-minister-method", "to": "fail-not-exempt", "role": "no"},
+      {"id": "e10", "from": "dec-minister-cert", "to": "pass-exempt", "role": "yes"},
+      {"id": "e11", "from": "dec-minister-cert", "to": "fail-not-exempt", "role": "no"}
+    ]
+  },
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00Z",
+    "generator": "claude-code-flow-generator",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

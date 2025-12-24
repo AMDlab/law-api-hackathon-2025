@@ -1,0 +1,164 @@
+{
+  "id": "A35_3_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "無窓居室の主要構造部（適合判定フロー）",
+    "target_subject": "居室",
+    "description": "政令で定める窓その他の開口部を有しない居室の主要構造部が所定の構造基準を満たすことを判定するフロー"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "35_3",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": ["単体規定", "防火"],
+  "text_raw": "政令で定める窓その他の開口部を有しない居室は、その居室を区画する主要構造部を耐火構造とし、又は不燃材料で造らなければならない。ただし、別表第一（い）欄（一）項に掲げる用途に供するものについては、この限りでない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        { "type": "room_characteristic", "value": "政令で定める窓その他の開口部を有しない居室" }
+      ],
+      "note": "政令で定める無窓居室に適用"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        { "ref": "info-exempt" },
+        { "ref": "info-fireproof-structure" },
+        { "ref": "info-noncombustible-material" }
+      ]
+    },
+    "exceptions": {
+      "operator": "AND",
+      "conditions": [
+        { "note": "別表第一（い）欄（一）項の用途（劇場等）に供する建築物" }
+      ],
+      "effect": "EXEMPT"
+    }
+  },
+  "flow_diagram": {
+    "title": "法35条の3第1項 無窓居室の主要構造部 適合判定フロー",
+    "description": "無窓居室の主要構造部が耐火構造又は不燃材料で造られているか、適用除外に該当するか判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "法35条の3第1項の適合判定を開始"
+      },
+      {
+        "id": "dec-windowless",
+        "type": "decision",
+        "title": "政令で定める無窓居室があるか？",
+        "decision_type": "binary",
+        "description": "建築物に政令で定める窓その他の開口部を有しない居室があるか判定",
+        "related_articles": ["令::A111"]
+      },
+      {
+        "id": "proc-no-windowless",
+        "type": "process",
+        "title": "適用対象外（無窓居室なし）",
+        "process_type": "mechanical",
+        "description": "政令で定める無窓居室がないため本条適用対象外"
+      },
+      {
+        "id": "dec-use",
+        "type": "decision",
+        "title": "建築物の用途は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "劇場等", "description": "別表第一（い）欄（一）項の用途（劇場、映画館、演芸場等）" },
+          { "value": "その他", "description": "上記以外の用途" }
+        ],
+        "description": "建築物が別表第一（い）欄（一）項の用途（劇場等）に供するか判定",
+        "related_articles": ["法::別表第一(い)(一)"]
+      },
+      {
+        "id": "proc-exempt",
+        "type": "process",
+        "title": "適用除外（劇場等用途）",
+        "process_type": "mechanical",
+        "description": "別表第一（い）欄（一）項の用途に供するためただし書き適用除外"
+      },
+      {
+        "id": "dec-structure",
+        "type": "decision",
+        "title": "主要構造部の構造は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "耐火構造", "description": "耐火構造" },
+          { "value": "不燃材料造", "description": "不燃材料で造られている" },
+          { "value": "その他", "description": "上記以外" }
+        ],
+        "description": "居室を区画する主要構造部が耐火構造又は不燃材料で造られているか判定",
+        "related_articles": ["法::A2:I7", "法::A2:I9"]
+      },
+      {
+        "id": "proc-fireproof",
+        "type": "process",
+        "title": "耐火構造該当",
+        "process_type": "mechanical",
+        "description": "主要構造部が耐火構造であるため基準適合"
+      },
+      {
+        "id": "proc-noncombustible",
+        "type": "process",
+        "title": "不燃材料造該当",
+        "process_type": "mechanical",
+        "description": "主要構造部が不燃材料で造られているため基準適合"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "法35条の3第1項の規定に適合"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "法35条の3第1項の規定に不適合"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "dec-windowless", "role": "flow" },
+      { "id": "e02", "from": "dec-windowless", "to": "dec-use", "role": "yes", "label": "はい" },
+      { "id": "e03", "from": "dec-windowless", "to": "proc-no-windowless", "role": "no", "label": "いいえ" },
+      { "id": "e04", "from": "proc-no-windowless", "to": "pass", "role": "flow" },
+      { "id": "e05", "from": "dec-use", "to": "proc-exempt", "role": "option", "label": "劇場等" },
+      { "id": "e06", "from": "dec-use", "to": "dec-structure", "role": "option", "label": "その他" },
+      { "id": "e07", "from": "proc-exempt", "to": "pass", "role": "flow" },
+      { "id": "e08", "from": "dec-structure", "to": "proc-fireproof", "role": "option", "label": "耐火構造" },
+      { "id": "e09", "from": "dec-structure", "to": "proc-noncombustible", "role": "option", "label": "不燃材料造" },
+      { "id": "e10", "from": "dec-structure", "to": "fail", "role": "option", "label": "その他" },
+      { "id": "e11", "from": "proc-fireproof", "to": "pass", "role": "flow" },
+      { "id": "e12", "from": "proc-noncombustible", "to": "pass", "role": "flow" }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-A35_3-P1",
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "delegates_to",
+      "articles": ["A111"],
+      "description": "法35条の3第1項の政令で定める窓その他の開口部を定める"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

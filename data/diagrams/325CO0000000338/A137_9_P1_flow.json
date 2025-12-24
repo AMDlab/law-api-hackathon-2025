@@ -1,0 +1,264 @@
+{
+  "id": "A137_9_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "高度利用地区等における既存不適格建築物の増築・改築の緩和範囲判定",
+    "target_subject": "既存不適格建築物",
+    "description": "法第3条第2項により法第59条第1項等の規定の適用を受けない建築物について、法第86条の7第1項の緩和適用範囲を判定するフロー"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "137_9",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "既存不適格建築物",
+    "増改築",
+    "高度利用地区",
+    "都市再生特別地区",
+    "特定用途誘導地区"
+  ],
+  "kijo_diagram_ref": "CHK-ORD-A137-9-P1",
+  "flow_diagram": {
+    "title": "高度利用地区等における既存不適格建築物の増築・改築の緩和範囲判定フロー",
+    "description": "高度利用地区、都市再生特別地区又は特定用途誘導地区における既存不適格建築物の増築・改築が令第137条の9第1項の緩和適用範囲に該当するかを判定するフローチャート",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "高度利用地区等における既存不適格建築物の増築・改築の緩和範囲判定を開始"
+      },
+      {
+        "id": "dec-existing",
+        "type": "decision",
+        "title": "高度利用地区等の既存不適格建築物か？",
+        "decision_type": "binary",
+        "description": "法第3条第2項により法第59条第1項、法第60条の2第1項又は法第60条の3第1項の規定の適用を受けない建築物か確認"
+      },
+      {
+        "id": "dec-non-compliance-type",
+        "type": "decision",
+        "title": "不適合部分の区分は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "容積率最低限度又は建築面積", "description": "本条各号のみ適用" },
+          { "value": "容積率最高限度及び建築面積", "description": "本条各号及び前条各号適用" },
+          { "value": "容積率最高限度のみ", "description": "前条各号のみ適用" }
+        ],
+        "description": "適合しない部分が容積率最低限度、建築面積、容積率最高限度のいずれに係るかを判定"
+      },
+      {
+        "id": "dec-work-type",
+        "type": "decision",
+        "title": "工事種別は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "増築" },
+          { "value": "改築" },
+          { "value": "その他" }
+        ],
+        "description": "工事が増築か改築かその他かを判定"
+      },
+      {
+        "id": "proc-min-route",
+        "type": "process",
+        "title": "容積率最低限度・建築面積ルート",
+        "description": "本条各号による判定"
+      },
+      {
+        "id": "proc-both-route",
+        "type": "process",
+        "title": "容積率最高限度及び建築面積ルート",
+        "description": "本条各号及び前条（令137条の8）各号による判定"
+      },
+      {
+        "id": "proc-max-route",
+        "type": "process",
+        "title": "容積率最高限度ルート",
+        "description": "前条（令137条の8）各号のみによる判定"
+      },
+      {
+        "id": "dec-item1",
+        "type": "decision",
+        "title": "増築後面積が基準時の1.5倍以下か？",
+        "decision_type": "binary",
+        "description": "増築後の建築面積及び延べ面積が基準時の1.5倍を超えないか判定（第1号）",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "Aa,Fa", "desc": "増築後建築面積・延べ面積" },
+          "rhs": { "var": "Ab*1.5,Fb*1.5", "desc": "基準時の1.5倍" }
+        }
+      },
+      {
+        "id": "proc-item1-pass",
+        "type": "process",
+        "title": "第1号適合",
+        "description": "増築後の建築面積及び延べ面積が基準時の1.5倍以内"
+      },
+      {
+        "id": "dec-item2",
+        "type": "decision",
+        "title": "増築後建築面積が都市計画最低限度の2/3以下か？",
+        "decision_type": "binary",
+        "description": "増築後の建築面積が高度利用地区等の都市計画で定められた建築面積の最低限度の2/3を超えないか判定（第2号）",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "Aa", "desc": "増築後建築面積" },
+          "rhs": { "var": "Amin*2/3", "desc": "都市計画最低限度の2/3" }
+        }
+      },
+      {
+        "id": "proc-item2-pass",
+        "type": "process",
+        "title": "第2号適合",
+        "description": "増築後の建築面積が都市計画最低限度の2/3以内"
+      },
+      {
+        "id": "dec-item3",
+        "type": "decision",
+        "title": "増築後容積率が都市計画最低限度の2/3以下か？",
+        "decision_type": "binary",
+        "description": "増築後の容積率が高度利用地区等の都市計画で定められた容積率の最低限度の2/3を超えないか判定（第3号）",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "FARa", "desc": "増築後容積率" },
+          "rhs": { "var": "FARmin*2/3", "desc": "都市計画最低限度の2/3" }
+        }
+      },
+      {
+        "id": "proc-item3-pass",
+        "type": "process",
+        "title": "第3号適合",
+        "description": "増築後の容積率が都市計画最低限度の2/3以内"
+      },
+      {
+        "id": "dec-is-rebuild",
+        "type": "decision",
+        "title": "改築か？",
+        "decision_type": "binary",
+        "description": "工事が改築であるか確認（改築の場合は第4号の判定が必要）"
+      },
+      {
+        "id": "dec-item4",
+        "type": "decision",
+        "title": "改築部分床面積が基準時の1/2以下か？",
+        "decision_type": "binary",
+        "description": "改築に係る部分の床面積が基準時における延べ面積の1/2を超えないか判定（第4号）",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "Fr", "desc": "改築部分床面積" },
+          "rhs": { "var": "Fb*0.5", "desc": "基準時延べ面積の1/2" }
+        }
+      },
+      {
+        "id": "proc-item4-pass",
+        "type": "process",
+        "title": "第4号適合",
+        "description": "改築部分の床面積が基準時延べ面積の1/2以内"
+      },
+      {
+        "id": "proc-this-article-pass",
+        "type": "process",
+        "title": "本条各号全て適合",
+        "description": "令第137条の9第1項各号に全て適合"
+      },
+      {
+        "id": "dec-prev-article",
+        "type": "decision",
+        "title": "前条（令137条の8）各号に適合か？",
+        "decision_type": "binary",
+        "description": "令第137条の8各号（容積率に係る緩和要件）に適合するか判定"
+      },
+      {
+        "id": "proc-prev-article-pass",
+        "type": "process",
+        "title": "前条各号適合",
+        "description": "令第137条の8各号に適合"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合（緩和適用範囲内）",
+        "result": "pass",
+        "description": "令第137条の9第1項の緩和適用範囲に該当する"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "不適合（緩和適用範囲外）",
+        "result": "fail",
+        "description": "令第137条の9第1項の緩和適用範囲に該当しない"
+      },
+      {
+        "id": "fail-scope",
+        "type": "terminal",
+        "title": "対象外",
+        "result": "fail",
+        "description": "本条の適用対象外（高度利用地区等の既存不適格建築物でない、又は増築・改築以外の工事）"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "dec-existing", "role": "flow" },
+      { "id": "e02", "from": "dec-existing", "to": "dec-non-compliance-type", "role": "yes", "label": "はい" },
+      { "id": "e03", "from": "dec-existing", "to": "fail-scope", "role": "no", "label": "いいえ" },
+      { "id": "e04", "from": "dec-non-compliance-type", "to": "proc-min-route", "role": "option", "label": "容積率最低限度又は建築面積" },
+      { "id": "e05", "from": "dec-non-compliance-type", "to": "proc-both-route", "role": "option", "label": "容積率最高限度及び建築面積" },
+      { "id": "e06", "from": "dec-non-compliance-type", "to": "proc-max-route", "role": "option", "label": "容積率最高限度のみ" },
+      { "id": "e07", "from": "proc-min-route", "to": "dec-work-type", "role": "flow" },
+      { "id": "e08", "from": "proc-both-route", "to": "dec-work-type", "role": "flow" },
+      { "id": "e09", "from": "proc-max-route", "to": "dec-prev-article", "role": "flow" },
+      { "id": "e10", "from": "dec-work-type", "to": "dec-item1", "role": "option", "label": "増築" },
+      { "id": "e11", "from": "dec-work-type", "to": "dec-item1", "role": "option", "label": "改築" },
+      { "id": "e12", "from": "dec-work-type", "to": "fail-scope", "role": "option", "label": "その他" },
+      { "id": "e13", "from": "dec-item1", "to": "proc-item1-pass", "role": "yes", "label": "はい" },
+      { "id": "e14", "from": "dec-item1", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e15", "from": "proc-item1-pass", "to": "dec-item2", "role": "flow" },
+      { "id": "e16", "from": "dec-item2", "to": "proc-item2-pass", "role": "yes", "label": "はい" },
+      { "id": "e17", "from": "dec-item2", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e18", "from": "proc-item2-pass", "to": "dec-item3", "role": "flow" },
+      { "id": "e19", "from": "dec-item3", "to": "proc-item3-pass", "role": "yes", "label": "はい" },
+      { "id": "e20", "from": "dec-item3", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e21", "from": "proc-item3-pass", "to": "dec-is-rebuild", "role": "flow" },
+      { "id": "e22", "from": "dec-is-rebuild", "to": "dec-item4", "role": "yes", "label": "はい" },
+      { "id": "e23", "from": "dec-is-rebuild", "to": "proc-this-article-pass", "role": "no", "label": "いいえ" },
+      { "id": "e24", "from": "dec-item4", "to": "proc-item4-pass", "role": "yes", "label": "はい" },
+      { "id": "e25", "from": "dec-item4", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e26", "from": "proc-item4-pass", "to": "proc-this-article-pass", "role": "flow" },
+      { "id": "e27", "from": "proc-this-article-pass", "to": "dec-prev-article", "role": "flow" },
+      { "id": "e28", "from": "dec-prev-article", "to": "proc-prev-article-pass", "role": "yes", "label": "はい" },
+      { "id": "e29", "from": "dec-prev-article", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e30", "from": "proc-prev-article-pass", "to": "pass", "role": "flow" }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": ["A3:P2", "A59:P1", "A60_2:P1", "A60_3:P1", "A86_7:P1"],
+      "description": "法第3条第2項の既存不適格建築物の取扱、高度利用地区・都市再生特別地区・特定用途誘導地区に関する規定、法第86条の7第1項の緩和規定"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": ["A137_8"],
+      "description": "前条（容積率の最高限度に係る場合の要件）を参照"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T17:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

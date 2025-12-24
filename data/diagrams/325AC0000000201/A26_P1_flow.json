@@ -1,0 +1,210 @@
+{
+  "id": "A26_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "防火壁等による区画（適合判定フロー）",
+    "target_subject": "建築物",
+    "description": "延べ面積1000㎡超の建築物における防火壁又は防火床による区画要件の適合判定"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "26",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": ["単体規定", "防火"],
+  "text_raw": "延べ面積が千平方メートルを超える建築物は、防火上有効な構造の防火壁又は防火床によつて有効に区画し、かつ、各区画における床面積の合計をそれぞれ千平方メートル以内としなければならない。ただし、次の各号のいずれかに該当する建築物については、この限りでない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        { "type": "floor_area", "operator": ">", "value": 1000, "unit": "m2" }
+      ]
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        { "ref": "info-exempt" },
+        {
+          "operator": "AND",
+          "conditions": [
+            { "ref": "info-effective-partition", "operator": "==", "value": true },
+            { "ref": "info-compartment-area-compliance", "operator": "==", "value": true }
+          ]
+        }
+      ]
+    },
+    "exceptions": {
+      "operator": "OR",
+      "conditions": [
+        { "note": "第一号：耐火建築物又は準耐火建築物" },
+        { "note": "第二号：火災発生おそれ少ない用途で構造要件適合" },
+        { "note": "第三号：畜舎等で大臣基準適合" }
+      ],
+      "effect": "EXEMPT"
+    }
+  },
+  "flow_diagram": {
+    "title": "法26条1項 防火壁等による区画 適合判定フロー",
+    "description": "延べ面積1000㎡超の建築物について、適用除外または防火区画要件を判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "法26条1項の適合判定を開始"
+      },
+      {
+        "id": "dec-floor-area",
+        "type": "decision",
+        "title": "延べ面積 > 1000㎡か？",
+        "decision_type": "binary",
+        "description": "建築物の延べ面積が1000平方メートルを超えるか判定",
+        "condition": {
+          "operator": "GT",
+          "lhs": { "var": "A", "desc": "延べ面積" },
+          "rhs": { "value": 1000, "unit": "m2" }
+        }
+      },
+      {
+        "id": "proc-not-applicable",
+        "type": "process",
+        "title": "適用対象外",
+        "process_type": "mechanical",
+        "description": "延べ面積1000㎡以下のため法26条1項の適用対象外"
+      },
+      {
+        "id": "dec-fire-resistant",
+        "type": "decision",
+        "title": "耐火建築物又は準耐火建築物か？",
+        "decision_type": "binary",
+        "description": "第一号：耐火建築物又は準耐火建築物に該当するか判定",
+        "related_articles": ["法::A2:I9の2"]
+      },
+      {
+        "id": "proc-exempt-1",
+        "type": "process",
+        "title": "第一号該当（適用除外）",
+        "process_type": "mechanical",
+        "description": "耐火建築物又は準耐火建築物のためただし書き適用除外"
+      },
+      {
+        "id": "dec-low-fire-risk",
+        "type": "decision",
+        "title": "火災発生おそれ少ない用途か？",
+        "decision_type": "binary",
+        "description": "第二号：卸売市場上家、機械製作工場等の火災発生おそれが少ない用途か判定"
+      },
+      {
+        "id": "proc-low-fire-yes",
+        "type": "process",
+        "title": "低火災リスク用途該当",
+        "process_type": "mechanical",
+        "description": "火災の発生のおそれが少ない用途に該当"
+      },
+      {
+        "id": "dec-structure-2",
+        "type": "decision",
+        "title": "主要構造部不燃材料又は政令基準適合か？",
+        "decision_type": "binary",
+        "description": "第二号イ・ロ：主要構造部が不燃材料造り又は政令技術基準に適合するか判定"
+      },
+      {
+        "id": "proc-exempt-2",
+        "type": "process",
+        "title": "第二号該当（適用除外）",
+        "process_type": "mechanical",
+        "description": "火災発生おそれ少ない用途で構造要件適合のためただし書き適用除外"
+      },
+      {
+        "id": "dec-livestock",
+        "type": "decision",
+        "title": "畜舎等で大臣基準適合か？",
+        "decision_type": "binary",
+        "description": "第三号：畜舎等で周辺農業地域かつ国土交通大臣基準に適合するか判定"
+      },
+      {
+        "id": "proc-exempt-3",
+        "type": "process",
+        "title": "第三号該当（適用除外）",
+        "process_type": "mechanical",
+        "description": "畜舎等で大臣基準適合のためただし書き適用除外"
+      },
+      {
+        "id": "dec-partition",
+        "type": "decision",
+        "title": "防火壁・防火床で有効に区画されているか？",
+        "decision_type": "binary",
+        "description": "防火上有効な構造の防火壁又は防火床によって有効に区画されているか判定"
+      },
+      {
+        "id": "dec-compartment-area",
+        "type": "decision",
+        "title": "各区画の床面積 ≤ 1000㎡か？",
+        "decision_type": "binary",
+        "description": "各区画における床面積の合計がそれぞれ1000㎡以内か判定",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "Ac", "desc": "区画の床面積" },
+          "rhs": { "value": 1000, "unit": "m2" }
+        }
+      },
+      {
+        "id": "proc-main-comply",
+        "type": "process",
+        "title": "本則適合",
+        "process_type": "mechanical",
+        "description": "防火壁・防火床による区画と床面積基準を満たす"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "法26条1項の規定に適合"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "法26条1項の規定に不適合"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "dec-floor-area", "role": "flow" },
+      { "id": "e02", "from": "dec-floor-area", "to": "dec-fire-resistant", "role": "yes", "label": "はい" },
+      { "id": "e03", "from": "dec-floor-area", "to": "proc-not-applicable", "role": "no", "label": "いいえ" },
+      { "id": "e04", "from": "proc-not-applicable", "to": "pass", "role": "flow" },
+      { "id": "e05", "from": "dec-fire-resistant", "to": "proc-exempt-1", "role": "yes", "label": "はい" },
+      { "id": "e06", "from": "dec-fire-resistant", "to": "dec-low-fire-risk", "role": "no", "label": "いいえ" },
+      { "id": "e07", "from": "proc-exempt-1", "to": "pass", "role": "flow" },
+      { "id": "e08", "from": "dec-low-fire-risk", "to": "proc-low-fire-yes", "role": "yes", "label": "はい" },
+      { "id": "e09", "from": "dec-low-fire-risk", "to": "dec-livestock", "role": "no", "label": "いいえ" },
+      { "id": "e10", "from": "proc-low-fire-yes", "to": "dec-structure-2", "role": "flow" },
+      { "id": "e11", "from": "dec-structure-2", "to": "proc-exempt-2", "role": "yes", "label": "はい" },
+      { "id": "e12", "from": "dec-structure-2", "to": "dec-livestock", "role": "no", "label": "いいえ" },
+      { "id": "e13", "from": "proc-exempt-2", "to": "pass", "role": "flow" },
+      { "id": "e14", "from": "dec-livestock", "to": "proc-exempt-3", "role": "yes", "label": "はい" },
+      { "id": "e15", "from": "dec-livestock", "to": "dec-partition", "role": "no", "label": "いいえ" },
+      { "id": "e16", "from": "proc-exempt-3", "to": "pass", "role": "flow" },
+      { "id": "e17", "from": "dec-partition", "to": "dec-compartment-area", "role": "yes", "label": "はい" },
+      { "id": "e18", "from": "dec-partition", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e19", "from": "dec-compartment-area", "to": "proc-main-comply", "role": "yes", "label": "はい" },
+      { "id": "e20", "from": "dec-compartment-area", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e21", "from": "proc-main-comply", "to": "pass", "role": "flow" }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-A26-P1",
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

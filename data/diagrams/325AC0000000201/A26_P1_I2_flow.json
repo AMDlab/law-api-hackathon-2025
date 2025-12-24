@@ -1,0 +1,105 @@
+{
+  "id": "A26_P1_I2_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "防火壁適用除外（火災発生おそれ少ない用途）",
+    "target_subject": "建築物",
+    "description": "卸売市場の上家、機械製作工場等の火災発生おそれの少ない用途の建築物の防火壁適用除外判定"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "26",
+    "paragraph": "1",
+    "item": "2"
+  },
+  "labels": ["単体規定", "防火", "適用除外"],
+  "kijo_diagram_ref": "CHK-BSL-A26-P1-I2",
+  "flow_diagram": {
+    "title": "法26条1項2号適合判定フロー",
+    "description": "火災発生おそれ少ない用途の建築物の防火壁適用除外判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start"
+      },
+      {
+        "id": "dec-use-type",
+        "type": "decision",
+        "title": "建築物の用途は?",
+        "decision_type": "multi",
+        "options": [
+          {"value": "卸売市場の上家"},
+          {"value": "機械製作工場"},
+          {"value": "これらと同等以上に火災発生おそれ少ない用途"},
+          {"value": "その他の用途"}
+        ],
+        "description": "建築物の用途種別を判定"
+      },
+      {
+        "id": "proc-low-risk-use",
+        "type": "process",
+        "title": "火災発生おそれ少ない用途該当",
+        "description": "卸売市場の上家、機械製作工場等の火災発生おそれ少ない用途に該当"
+      },
+      {
+        "id": "dec-structure-safety",
+        "type": "decision",
+        "title": "構造・用途の特殊性により周囲に火災危険を及ぼすおそれがないか?",
+        "decision_type": "binary",
+        "description": "政令で定める要件（周囲への火災危険なし）を満たすか"
+      },
+      {
+        "id": "pass-exempt",
+        "type": "terminal",
+        "title": "適用除外（適合）",
+        "result": "pass",
+        "description": "法26条1項2号に該当し防火壁設置義務の適用除外"
+      },
+      {
+        "id": "fail-not-exempt",
+        "type": "terminal",
+        "title": "適用除外に非該当",
+        "result": "fail",
+        "description": "法26条1項2号の適用除外要件を満たさない（防火壁設置義務あり）"
+      },
+      {
+        "id": "fail-other-use",
+        "type": "terminal",
+        "title": "適用除外に非該当",
+        "result": "fail",
+        "description": "火災発生おそれ少ない用途に該当しない（防火壁設置義務あり）"
+      }
+    ],
+    "edges": [
+      {"id": "e01", "from": "start", "to": "dec-use-type", "role": "flow"},
+      {"id": "e02", "from": "dec-use-type", "to": "proc-low-risk-use", "role": "option", "label": "卸売市場の上家"},
+      {"id": "e03", "from": "dec-use-type", "to": "proc-low-risk-use", "role": "option", "label": "機械製作工場"},
+      {"id": "e04", "from": "dec-use-type", "to": "proc-low-risk-use", "role": "option", "label": "これらと同等以上に火災発生おそれ少ない用途"},
+      {"id": "e05", "from": "dec-use-type", "to": "fail-other-use", "role": "option", "label": "その他の用途"},
+      {"id": "e06", "from": "proc-low-risk-use", "to": "dec-structure-safety", "role": "flow"},
+      {"id": "e07", "from": "dec-structure-safety", "to": "pass-exempt", "role": "yes"},
+      {"id": "e08", "from": "dec-structure-safety", "to": "fail-not-exempt", "role": "no"}
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "delegates_to",
+      "articles": ["A115_2_2:P1:I2"],
+      "description": "令115条の2の2第1項2号"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00Z",
+    "generator": "claude-code-flow-generator",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

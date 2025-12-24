@@ -1,0 +1,138 @@
+{
+  "id": "A48_P8_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "田園住居地域における建築物の用途制限",
+    "target_subject": "建築物",
+    "description": "田園住居地域内において建築可能な建築物の用途が別表第二(ち)項に適合することを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "48",
+    "paragraph": "8",
+    "item": null
+  },
+  "labels": ["集団規定", "用途制限", "田園住居地域"],
+  "text_raw": "田園住居地域内においては、別表第二（ち）項に掲げる建築物以外の建築物は、建築してはならない。ただし、特定行政庁が農業の利便及び田園住居地域における良好な住居の環境を害するおそれがないと認め、又は公益上やむを得ないと認めて許可した場合においては、この限りでない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        { "type": "location", "value": "田園住居地域内" }
+      ],
+      "note": "都市計画で定められた田園住居地域"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        { "ref": "info-table2-compliance", "operator": "==", "value": true },
+        { "ref": "info-special-approval", "operator": "==", "value": true }
+      ]
+    },
+    "exceptions": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "note": "特定行政庁の許可を受けた場合（農業の利便及び環境を害するおそれがない、又は公益上やむを得ない）",
+          "ref": "info-special-approval",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "effect": "EXEMPT"
+    }
+  },
+  "flow_diagram": {
+    "title": "法48条8項 適合判定フロー",
+    "description": "田園住居地域における建築物の用途制限の適合判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start"
+      },
+      {
+        "id": "dec-table2-chi",
+        "type": "decision",
+        "title": "別表第二(ち)項の建築可能用途に該当するか？",
+        "decision_type": "binary",
+        "description": "建築物の用途が住宅、兼用住宅、共同住宅、学校、図書館等公益施設、神社・寺院、福祉施設、診療所、農業用建築物、農産物関連施設等に該当するか",
+        "related_articles": ["法::別表第二(ち)"]
+      },
+      {
+        "id": "proc-allowed",
+        "type": "process",
+        "title": "建築可能用途該当",
+        "process_type": "mechanical",
+        "description": "別表第二(ち)項に掲げる建築可能用途に該当"
+      },
+      {
+        "id": "proc-not-allowed",
+        "type": "process",
+        "title": "建築可能用途非該当",
+        "process_type": "mechanical",
+        "description": "別表第二(ち)項に掲げる建築可能用途に該当しない"
+      },
+      {
+        "id": "dec-special-approval",
+        "type": "decision",
+        "title": "特定行政庁の許可を受けているか？",
+        "decision_type": "binary",
+        "description": "農業の利便及び良好な住居の環境を害するおそれがない、又は公益上やむを得ないとして許可を受けているか"
+      },
+      {
+        "id": "proc-approved",
+        "type": "process",
+        "title": "許可取得済み",
+        "process_type": "mechanical",
+        "description": "特定行政庁の許可を受けている"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "法48条8項に適合"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "法48条8項に不適合（建築禁止）"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "dec-table2-chi", "role": "flow" },
+      { "id": "e02", "from": "dec-table2-chi", "to": "proc-allowed", "role": "yes", "label": "はい" },
+      { "id": "e03", "from": "proc-allowed", "to": "pass", "role": "flow" },
+      { "id": "e04", "from": "dec-table2-chi", "to": "proc-not-allowed", "role": "no", "label": "いいえ" },
+      { "id": "e05", "from": "proc-not-allowed", "to": "dec-special-approval", "role": "flow" },
+      { "id": "e06", "from": "dec-special-approval", "to": "proc-approved", "role": "yes", "label": "はい" },
+      { "id": "e07", "from": "proc-approved", "to": "pass", "role": "flow" },
+      { "id": "e08", "from": "dec-special-approval", "to": "fail", "role": "no", "label": "いいえ" }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-A48-P8",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["別表第二(ち)"],
+      "description": "田園住居地域において建築可能な建築物を定める"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

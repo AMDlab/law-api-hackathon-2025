@@ -1,0 +1,187 @@
+{
+  "id": "A137_6_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "非常用昇降機に係る既存不適格建築物の増築・改築の緩和範囲判定",
+    "target_subject": "増築及び改築",
+    "description": "法第3条第2項の規定により法第34条第2項の規定の適用を受けない高さ31mを超える建築物の増築・改築が、法第86条の7第1項の緩和適用を受ける範囲であるかの判定フロー"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "137_6",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "既存不適格建築物",
+    "増改築",
+    "非常用昇降機",
+    "高さ31m超"
+  ],
+  "kijo_diagram_ref": "CHK-EXT-A137-6-P1",
+  "flow_diagram": {
+    "title": "非常用昇降機に係る既存不適格建築物の増築・改築の緩和範囲判定フロー",
+    "description": "高さ31mを超える既存不適格建築物の増築・改築が令第137条の6第1項の緩和適用範囲に該当するかを判定するフローチャート",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "非常用昇降機に係る既存不適格建築物の増築・改築の緩和範囲判定を開始"
+      },
+      {
+        "id": "dec-existing",
+        "type": "decision",
+        "title": "高さ31m超の既存不適格建築物か？",
+        "decision_type": "binary",
+        "description": "法第3条第2項により法第34条第2項（非常用昇降機）の適用を受けない高さ31m超の建築物か確認"
+      },
+      {
+        "id": "dec-work-type",
+        "type": "decision",
+        "title": "工事種別は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "増築" },
+          { "value": "改築" },
+          { "value": "その他" }
+        ],
+        "description": "工事が増築か改築かその他かを判定"
+      },
+      {
+        "id": "proc-extension-route",
+        "type": "process",
+        "title": "増築ルート（第1号判定）",
+        "description": "増築に係る緩和要件を判定するルートへ進む"
+      },
+      {
+        "id": "dec-ext-height",
+        "type": "decision",
+        "title": "増築部分の高さ31m以下か？",
+        "decision_type": "binary",
+        "description": "増築に係る部分の建築物の高さが31mを超えないか判定",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "He", "desc": "増築部分高さ" },
+          "rhs": { "value": 31, "unit": "m" }
+        }
+      },
+      {
+        "id": "dec-ext-area",
+        "type": "decision",
+        "title": "増築部分床面積が基準時の1/2以下か？",
+        "decision_type": "binary",
+        "description": "増築に係る部分の床面積の合計が基準時における延べ面積の1/2を超えないか判定",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "Ae", "desc": "増築部分床面積" },
+          "rhs": { "var": "Ab/2", "desc": "基準時延べ面積の1/2" }
+        }
+      },
+      {
+        "id": "proc-item1-pass",
+        "type": "process",
+        "title": "第1号適合",
+        "description": "増築が第1号の基準に適合"
+      },
+      {
+        "id": "proc-rebuild-route",
+        "type": "process",
+        "title": "改築ルート（第2号判定）",
+        "description": "改築に係る緩和要件を判定するルートへ進む"
+      },
+      {
+        "id": "dec-rebuild-area",
+        "type": "decision",
+        "title": "改築部分床面積が基準時の1/5以下か？",
+        "decision_type": "binary",
+        "description": "改築に係る部分の床面積の合計が基準時における延べ面積の1/5を超えないか判定",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "Ar", "desc": "改築部分床面積" },
+          "rhs": { "var": "Ab/5", "desc": "基準時延べ面積の1/5" }
+        }
+      },
+      {
+        "id": "dec-rebuild-height",
+        "type": "decision",
+        "title": "改築部分高さが基準時以下か？",
+        "decision_type": "binary",
+        "description": "改築に係る部分の建築物の高さが基準時における当該部分の高さを超えないか判定",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "Hr", "desc": "改築部分高さ" },
+          "rhs": { "var": "Hb", "desc": "基準時高さ" }
+        }
+      },
+      {
+        "id": "proc-item2-pass",
+        "type": "process",
+        "title": "第2号適合",
+        "description": "改築が第2号の基準に適合"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合（緩和適用範囲内）",
+        "result": "pass",
+        "description": "令第137条の6第1項の緩和適用範囲に該当する"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "不適合（緩和適用範囲外）",
+        "result": "fail",
+        "description": "令第137条の6第1項の緩和適用範囲に該当しない"
+      },
+      {
+        "id": "fail-scope",
+        "type": "terminal",
+        "title": "対象外",
+        "result": "fail",
+        "description": "本条の適用対象外（高さ31m超の既存不適格建築物でない、又は増築・改築以外の工事）"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "dec-existing", "role": "flow" },
+      { "id": "e02", "from": "dec-existing", "to": "dec-work-type", "role": "yes", "label": "はい" },
+      { "id": "e03", "from": "dec-existing", "to": "fail-scope", "role": "no", "label": "いいえ" },
+      { "id": "e04", "from": "dec-work-type", "to": "proc-extension-route", "role": "option", "label": "増築" },
+      { "id": "e05", "from": "dec-work-type", "to": "proc-rebuild-route", "role": "option", "label": "改築" },
+      { "id": "e06", "from": "dec-work-type", "to": "fail-scope", "role": "option", "label": "その他" },
+      { "id": "e07", "from": "proc-extension-route", "to": "dec-ext-height", "role": "flow" },
+      { "id": "e08", "from": "dec-ext-height", "to": "dec-ext-area", "role": "yes", "label": "はい" },
+      { "id": "e09", "from": "dec-ext-height", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e10", "from": "dec-ext-area", "to": "proc-item1-pass", "role": "yes", "label": "はい" },
+      { "id": "e11", "from": "dec-ext-area", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e12", "from": "proc-item1-pass", "to": "pass", "role": "flow" },
+      { "id": "e13", "from": "proc-rebuild-route", "to": "dec-rebuild-area", "role": "flow" },
+      { "id": "e14", "from": "dec-rebuild-area", "to": "dec-rebuild-height", "role": "yes", "label": "はい" },
+      { "id": "e15", "from": "dec-rebuild-area", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e16", "from": "dec-rebuild-height", "to": "proc-item2-pass", "role": "yes", "label": "はい" },
+      { "id": "e17", "from": "dec-rebuild-height", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e18", "from": "proc-item2-pass", "to": "pass", "role": "flow" }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": ["A3:P2", "A34:P2", "A86_7:P1"],
+      "description": "法第3条第2項の既存不適格建築物の取扱、法第34条第2項の非常用昇降機に関する規定、法第86条の7第1項の緩和規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T17:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

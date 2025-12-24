@@ -1,0 +1,175 @@
+{
+  "id": "A67_P9_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "第３項〜第５項適用除外判定（適合判定フロー）",
+    "target_subject": "建築物",
+    "description": "特定防災街区整備地区内における敷地面積最低限度と壁面位置制限の適用除外判定フロー"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "67",
+    "paragraph": "9",
+    "item": null
+  },
+  "labels": [
+    "集団規定",
+    "特定防災街区整備地区"
+  ],
+  "text_raw": "前三項の規定は、次の各号のいずれかに該当する建築物については、適用しない。一第三項第一号に掲げる建築物二学校、駅舎、卸売市場その他これらに類する公益上必要な建築物で、特定行政庁が用途上又は構造上やむを得ないと認めて許可したもの",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "特定防災街区整備地区内"
+        }
+      ],
+      "note": "特定防災街区整備地区に関する都市計画が定められている区域"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "type": "building_category",
+          "description": "第３項第１号に掲げる建築物"
+        },
+        {
+          "type": "approval",
+          "description": "公益上必要な建築物で特定行政庁の許可を得たもの"
+        }
+      ]
+    }
+  },
+  "flow_diagram": {
+    "title": "法67条9項 適用除外判定フロー",
+    "description": "特定防災街区整備地区内の建築物について、敷地面積最低限度及び壁面位置制限（第3項〜第5項）の適用除外に該当するかを判定する",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "特定防災街区整備地区内の建築物について適用除外判定を開始"
+      },
+      {
+        "id": "dec-item1-area",
+        "type": "decision",
+        "title": "延べ面積 ≤ 50㎡か？",
+        "decision_type": "binary",
+        "description": "建築物の延べ面積が50平方メートル以内かを判定",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "A", "desc": "延べ面積" },
+          "rhs": { "value": 50, "unit": "m2" }
+        }
+      },
+      {
+        "id": "dec-item1-story",
+        "type": "decision",
+        "title": "平家建てか？",
+        "decision_type": "binary",
+        "description": "建築物が平家建て（1階建て）であるかを判定"
+      },
+      {
+        "id": "dec-item1-accessory",
+        "type": "decision",
+        "title": "附属建築物か？",
+        "decision_type": "binary",
+        "description": "主たる建築物に付随する附属建築物であるかを判定"
+      },
+      {
+        "id": "dec-item1-fireproof",
+        "type": "decision",
+        "title": "外壁・軒裏が防火構造か？",
+        "decision_type": "binary",
+        "description": "外壁及び軒裏が防火構造であるかを判定"
+      },
+      {
+        "id": "proc-item1-match",
+        "type": "process",
+        "title": "第1号該当",
+        "process_type": "mechanical",
+        "description": "第3項第1号の要件（延べ面積50㎡以内の平家建て附属建築物で外壁・軒裏が防火構造）に該当"
+      },
+      {
+        "id": "dec-public-use",
+        "type": "decision",
+        "title": "公益上必要な建築物か？",
+        "decision_type": "binary",
+        "description": "学校、駅舎、卸売市場その他これらに類する公益上必要な建築物であるかを判定"
+      },
+      {
+        "id": "dec-approval",
+        "type": "decision",
+        "title": "特定行政庁の許可を受けているか？",
+        "decision_type": "binary",
+        "description": "用途上又は構造上やむを得ないと認めて特定行政庁が許可しているかを判定"
+      },
+      {
+        "id": "proc-item2-match",
+        "type": "process",
+        "title": "第2号該当",
+        "process_type": "mechanical",
+        "description": "公益上必要な建築物で特定行政庁の許可を受けたものとして第2号に該当"
+      },
+      {
+        "id": "pass-exempt",
+        "type": "terminal",
+        "title": "適合（適用除外）",
+        "result": "pass",
+        "description": "第9項各号のいずれかに該当し、第3項〜第5項の規定が適用されない"
+      },
+      {
+        "id": "fail-not-exempt",
+        "type": "terminal",
+        "title": "適用除外に非該当",
+        "result": "fail",
+        "description": "第9項の適用除外要件を満たさず、第3項〜第5項の規定が適用される"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "dec-item1-area", "role": "flow" },
+      { "id": "e02", "from": "dec-item1-area", "to": "dec-item1-story", "role": "yes", "label": "はい" },
+      { "id": "e03", "from": "dec-item1-area", "to": "dec-public-use", "role": "no", "label": "いいえ" },
+      { "id": "e04", "from": "dec-item1-story", "to": "dec-item1-accessory", "role": "yes", "label": "はい" },
+      { "id": "e05", "from": "dec-item1-story", "to": "dec-public-use", "role": "no", "label": "いいえ" },
+      { "id": "e06", "from": "dec-item1-accessory", "to": "dec-item1-fireproof", "role": "yes", "label": "はい" },
+      { "id": "e07", "from": "dec-item1-accessory", "to": "dec-public-use", "role": "no", "label": "いいえ" },
+      { "id": "e08", "from": "dec-item1-fireproof", "to": "proc-item1-match", "role": "yes", "label": "はい" },
+      { "id": "e09", "from": "dec-item1-fireproof", "to": "dec-public-use", "role": "no", "label": "いいえ" },
+      { "id": "e10", "from": "proc-item1-match", "to": "pass-exempt", "role": "flow" },
+      { "id": "e11", "from": "dec-public-use", "to": "dec-approval", "role": "yes", "label": "はい" },
+      { "id": "e12", "from": "dec-public-use", "to": "fail-not-exempt", "role": "no", "label": "いいえ" },
+      { "id": "e13", "from": "dec-approval", "to": "proc-item2-match", "role": "yes", "label": "はい" },
+      { "id": "e14", "from": "dec-approval", "to": "fail-not-exempt", "role": "no", "label": "いいえ" },
+      { "id": "e15", "from": "proc-item2-match", "to": "pass-exempt", "role": "flow" }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-A67-P9",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": [
+        "A67:P3:I1",
+        "A67:P5"
+      ],
+      "description": "第３項第１号及び第５項の適用除外規定の内容を参照"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00Z",
+    "updated_at": "2025-12-25T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

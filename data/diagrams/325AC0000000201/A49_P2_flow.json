@@ -1,0 +1,302 @@
+{
+  "id": "A49_P2_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "特別用途地区における制限緩和適合判定フロー",
+    "target_subject": "建築計画",
+    "description": "特別用途地区内において地方公共団体の条例による制限緩和が適用される場合の適合判定フロー"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "49",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": [
+    "集団規定",
+    "用途制限",
+    "特別用途地区"
+  ],
+  "text_raw": "特別用途地区内においては、地方公共団体は、その地区の指定の目的のために必要と認める場合においては、国土交通大臣の承認を得て、条例で、前条第一項から第十三項までの規定による制限を緩和することができる。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "特別用途地区内"
+        }
+      ],
+      "note": "都市計画法に基づき指定された特別用途地区"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "note": "条例による緩和規定がない場合は法48条の制限が適用される",
+          "ref": "info-ordinance-relaxation",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "note": "条例による緩和規定がある場合は緩和後の基準で判定",
+          "operator": "AND",
+          "conditions": [
+            {
+              "ref": "info-ordinance-relaxation",
+              "operator": "==",
+              "value": true
+            },
+            {
+              "ref": "info-minister-approval",
+              "operator": "==",
+              "value": true
+            },
+            {
+              "ref": "info-relaxed-compliance",
+              "operator": "==",
+              "value": true
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "flow_diagram": {
+    "title": "法49条2項 特別用途地区制限緩和適合判定フロー",
+    "description": "特別用途地区内での緩和条例の適用による適合判定を行う",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "特別用途地区における制限緩和適合判定を開始"
+      },
+      {
+        "id": "dec-location",
+        "type": "decision",
+        "title": "特別用途地区内か？",
+        "decision_type": "binary",
+        "description": "敷地が特別用途地区内に所在するかを確認"
+      },
+      {
+        "id": "proc-building-use",
+        "type": "process",
+        "title": "建築物用途の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の用途を特定"
+      },
+      {
+        "id": "dec-relaxation-ordinance",
+        "type": "decision",
+        "title": "緩和条例があるか？",
+        "decision_type": "binary",
+        "description": "当該特別用途地区において法49条2項に基づく地方公共団体の緩和条例が制定されているかを確認"
+      },
+      {
+        "id": "proc-no-relaxation",
+        "type": "process",
+        "title": "緩和なしルート",
+        "process_type": "mechanical",
+        "description": "緩和条例がないため、法48条の制限がそのまま適用される"
+      },
+      {
+        "id": "dec-article48-compliance",
+        "type": "decision",
+        "title": "法48条の用途制限に適合するか？",
+        "decision_type": "binary",
+        "description": "法48条1項〜13項の用途地域による制限に適合するかを判定",
+        "related_articles": [
+          "法::A48:P1",
+          "法::A48:P2",
+          "法::A48:P3",
+          "法::A48:P4",
+          "法::A48:P5",
+          "法::A48:P6",
+          "法::A48:P7",
+          "法::A48:P8",
+          "法::A48:P9",
+          "法::A48:P10",
+          "法::A48:P11",
+          "法::A48:P12",
+          "法::A48:P13"
+        ]
+      },
+      {
+        "id": "proc-relaxation-exists",
+        "type": "process",
+        "title": "緩和条例ありルート",
+        "process_type": "mechanical",
+        "description": "緩和条例が存在するため、大臣承認と緩和後基準を確認"
+      },
+      {
+        "id": "dec-minister-approval",
+        "type": "decision",
+        "title": "国土交通大臣の承認を得ているか？",
+        "decision_type": "binary",
+        "description": "緩和条例が国土交通大臣の承認を得たものであるかを確認"
+      },
+      {
+        "id": "dec-relaxed-compliance",
+        "type": "decision",
+        "title": "緩和後の基準に適合するか？",
+        "decision_type": "binary",
+        "description": "条例で定められた緩和後の用途制限基準に適合するかを判定"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "法49条2項関連規定に適合"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "法49条2項関連規定に不適合"
+      },
+      {
+        "id": "pass-outside",
+        "type": "terminal",
+        "title": "適用対象外（適合）",
+        "result": "pass",
+        "description": "特別用途地区外のため、本規定の適用対象外"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-location",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-location",
+        "to": "proc-building-use",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "dec-location",
+        "to": "pass-outside",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e04",
+        "from": "proc-building-use",
+        "to": "dec-relaxation-ordinance",
+        "role": "flow"
+      },
+      {
+        "id": "e05",
+        "from": "dec-relaxation-ordinance",
+        "to": "proc-no-relaxation",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e06",
+        "from": "proc-no-relaxation",
+        "to": "dec-article48-compliance",
+        "role": "flow"
+      },
+      {
+        "id": "e07",
+        "from": "dec-article48-compliance",
+        "to": "pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e08",
+        "from": "dec-article48-compliance",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e09",
+        "from": "dec-relaxation-ordinance",
+        "to": "proc-relaxation-exists",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e10",
+        "from": "proc-relaxation-exists",
+        "to": "dec-minister-approval",
+        "role": "flow"
+      },
+      {
+        "id": "e11",
+        "from": "dec-minister-approval",
+        "to": "dec-relaxed-compliance",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e12",
+        "from": "dec-minister-approval",
+        "to": "dec-article48-compliance",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e13",
+        "from": "dec-relaxed-compliance",
+        "to": "pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e14",
+        "from": "dec-relaxed-compliance",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-A49-P2",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": [
+        "A48:P1",
+        "A48:P2",
+        "A48:P3",
+        "A48:P4",
+        "A48:P5",
+        "A48:P6",
+        "A48:P7",
+        "A48:P8",
+        "A48:P9",
+        "A48:P10",
+        "A48:P11",
+        "A48:P12",
+        "A48:P13"
+      ],
+      "description": "特別用途地区内における緩和の対象となる用途制限規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00.000Z",
+    "generator": "flow-generator-skill-v3",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法",
+    "author": "Claude Code",
+    "checklist_ref": "確認審査報告書チェックリスト.csv:91"
+  }
+}

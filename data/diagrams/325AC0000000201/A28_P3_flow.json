@@ -1,0 +1,270 @@
+{
+  "id": "A28_P3_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "換気設備の設置義務（火気使用室等）適合判定フロー",
+    "target_subject": "居室・室",
+    "description": "特殊建築物の居室または火を使用する設備を設けた室に換気設備が技術的基準に従って設置されていることを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "28",
+    "paragraph": "3",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "衛生",
+    "換気"
+  ],
+  "text_raw": "別表第一（い）欄（一）項に掲げる用途に供する特殊建築物の居室又は建築物の調理室、浴室その他の室でかまど、こんろその他火を使用する設備若しくは器具を設けたもの（政令で定めるものを除く。）には、政令で定める技術的基準に従つて、換気設備を設けなければならない。",
+  "kijo_diagram_ref": "CHK-BSL-A28-P3",
+  "flow_diagram": {
+    "title": "法28条3項 換気設備の設置義務 適合判定フロー",
+    "description": "各室について、規定適用対象かどうかを判定し、対象の場合は換気設備の設置および技術的基準適合を確認する",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start"
+      },
+      {
+        "id": "dec-building-use",
+        "type": "decision",
+        "title": "建築物の用途は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "別表第一(い)(一)項の用途" },
+          { "value": "その他の用途" }
+        ],
+        "description": "別表第一(い)欄(一)項: 劇場、映画館、演芸場、観覧場、公会堂、集会場等"
+      },
+      {
+        "id": "proc-special-building",
+        "type": "process",
+        "title": "特殊建築物該当",
+        "process_type": "mechanical",
+        "description": "別表第一(い)欄(一)項の用途に供する特殊建築物に該当"
+      },
+      {
+        "id": "dec-room-type",
+        "type": "decision",
+        "title": "室の種別は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "居室" },
+          { "value": "調理室・浴室等" },
+          { "value": "その他" }
+        ],
+        "description": "居室、調理室、浴室、その他の室の区分を判定"
+      },
+      {
+        "id": "dec-fire-equipment",
+        "type": "decision",
+        "title": "火気使用設備があるか？",
+        "decision_type": "binary",
+        "description": "かまど、こんろその他火を使用する設備・器具が設けられているか"
+      },
+      {
+        "id": "dec-ordinance-exempt",
+        "type": "decision",
+        "title": "政令適用除外に該当するか？",
+        "decision_type": "binary",
+        "description": "令20条の3: 開放型燃焼器具、電気を熱源とする器具等",
+        "related_articles": ["令第20条の3"]
+      },
+      {
+        "id": "proc-exempt",
+        "type": "process",
+        "title": "適用除外",
+        "process_type": "mechanical",
+        "description": "政令で定める適用除外に該当するため規定の適用なし"
+      },
+      {
+        "id": "proc-target-room",
+        "type": "process",
+        "title": "規定適用対象室",
+        "process_type": "mechanical",
+        "description": "法28条3項の規定適用対象として換気設備の設置が必要"
+      },
+      {
+        "id": "dec-equipment-installed",
+        "type": "decision",
+        "title": "換気設備が設置されているか？",
+        "decision_type": "binary",
+        "description": "当該室に換気設備が設置されているか確認"
+      },
+      {
+        "id": "dec-standard-compliance",
+        "type": "decision",
+        "title": "技術的基準に適合するか？",
+        "decision_type": "binary",
+        "description": "令20条の2の技術的基準に適合するか",
+        "related_articles": ["令第20条の2"]
+      },
+      {
+        "id": "dec-more-rooms",
+        "type": "decision",
+        "title": "未判定の室があるか？",
+        "decision_type": "binary",
+        "description": "建築物内の全ての室について判定が完了したか確認"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "法28条3項の規定に適合"
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "法28条3項の規定に不適合"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-building-use",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-building-use",
+        "to": "proc-special-building",
+        "role": "option",
+        "label": "別表第一(い)(一)項の用途"
+      },
+      {
+        "id": "e03",
+        "from": "dec-building-use",
+        "to": "dec-room-type",
+        "role": "option",
+        "label": "その他の用途"
+      },
+      {
+        "id": "e04",
+        "from": "proc-special-building",
+        "to": "dec-room-type",
+        "role": "flow"
+      },
+      {
+        "id": "e05",
+        "from": "dec-room-type",
+        "to": "proc-target-room",
+        "role": "option",
+        "label": "居室"
+      },
+      {
+        "id": "e06",
+        "from": "dec-room-type",
+        "to": "dec-fire-equipment",
+        "role": "option",
+        "label": "調理室・浴室等"
+      },
+      {
+        "id": "e07",
+        "from": "dec-room-type",
+        "to": "dec-more-rooms",
+        "role": "option",
+        "label": "その他"
+      },
+      {
+        "id": "e08",
+        "from": "dec-fire-equipment",
+        "to": "dec-ordinance-exempt",
+        "role": "yes"
+      },
+      {
+        "id": "e09",
+        "from": "dec-fire-equipment",
+        "to": "dec-more-rooms",
+        "role": "no"
+      },
+      {
+        "id": "e10",
+        "from": "dec-ordinance-exempt",
+        "to": "proc-exempt",
+        "role": "yes"
+      },
+      {
+        "id": "e11",
+        "from": "dec-ordinance-exempt",
+        "to": "proc-target-room",
+        "role": "no"
+      },
+      {
+        "id": "e12",
+        "from": "proc-exempt",
+        "to": "dec-more-rooms",
+        "role": "flow"
+      },
+      {
+        "id": "e13",
+        "from": "proc-target-room",
+        "to": "dec-equipment-installed",
+        "role": "flow"
+      },
+      {
+        "id": "e14",
+        "from": "dec-equipment-installed",
+        "to": "dec-standard-compliance",
+        "role": "yes"
+      },
+      {
+        "id": "e15",
+        "from": "dec-equipment-installed",
+        "to": "end-fail",
+        "role": "no"
+      },
+      {
+        "id": "e16",
+        "from": "dec-standard-compliance",
+        "to": "dec-more-rooms",
+        "role": "yes"
+      },
+      {
+        "id": "e17",
+        "from": "dec-standard-compliance",
+        "to": "end-fail",
+        "role": "no"
+      },
+      {
+        "id": "e18",
+        "from": "dec-more-rooms",
+        "to": "dec-room-type",
+        "role": "yes"
+      },
+      {
+        "id": "e19",
+        "from": "dec-more-rooms",
+        "to": "end-pass",
+        "role": "no"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "delegates_to",
+      "articles": ["A20_2", "A20_3"],
+      "description": "法28条3項の技術的基準（令20条の2）及び適用除外（令20条の3）を定める"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

@@ -1,0 +1,130 @@
+{
+  "id": "A55_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "低層住居専用地域等における建築物の高さ制限",
+    "target_subject": "建築物",
+    "description": "第一種低層住居専用地域等内の建築物が都市計画で定められた高さ限度を超えないことを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "55",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": ["集団規定", "高さ制限"],
+  "text_raw": "第一種低層住居専用地域、第二種低層住居専用地域又は田園住居地域内においては、建築物の高さは、十メートル又は十二メートルのうち当該地域に関する都市計画において定められた建築物の高さの限度を超えてはならない。",
+  "kijo_diagram_ref": "CHK-BSL-A55-P1",
+  "flow_diagram": {
+    "title": "法55条1項 高さ制限適合判定フロー",
+    "description": "低層住居専用地域等における建築物の高さが都市計画で定められた限度以下であることを確認する",
+    "nodes": [
+      {
+        "id": "term-start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start"
+      },
+      {
+        "id": "dec-zone",
+        "type": "decision",
+        "title": "用途地域は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "第一種低層住居専用地域" },
+          { "value": "第二種低層住居専用地域" },
+          { "value": "田園住居地域" },
+          { "value": "その他" }
+        ],
+        "description": "建築物の敷地が属する用途地域を判定"
+      },
+      {
+        "id": "proc-applicable",
+        "type": "process",
+        "title": "本条適用対象",
+        "description": "法55条1項の適用対象となる"
+      },
+      {
+        "id": "dec-height-limit",
+        "type": "decision",
+        "title": "都市計画で定められた高さ限度は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "10m" },
+          { "value": "12m" }
+        ],
+        "description": "当該地域に関する都市計画で定められた建築物の高さの限度"
+      },
+      {
+        "id": "dec-height-10m",
+        "type": "decision",
+        "title": "建築物の高さは10m以下か？",
+        "decision_type": "binary",
+        "description": "建築物の高さが10mの限度を超えないか判定",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "H", "desc": "建築物の高さ" },
+          "rhs": { "value": 10, "unit": "m" }
+        }
+      },
+      {
+        "id": "dec-height-12m",
+        "type": "decision",
+        "title": "建築物の高さは12m以下か？",
+        "decision_type": "binary",
+        "description": "建築物の高さが12mの限度を超えないか判定",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "H", "desc": "建築物の高さ" },
+          "rhs": { "value": 12, "unit": "m" }
+        }
+      },
+      {
+        "id": "term-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "法55条1項に適合"
+      },
+      {
+        "id": "term-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "法55条1項に不適合（高さ限度超過）"
+      },
+      {
+        "id": "term-not-applicable",
+        "type": "terminal",
+        "title": "適用対象外",
+        "result": "end",
+        "description": "本条の適用対象外（他の用途地域）"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "term-start", "to": "dec-zone", "role": "flow" },
+      { "id": "e02", "from": "dec-zone", "to": "proc-applicable", "role": "option", "label": "第一種低層住居専用地域" },
+      { "id": "e03", "from": "dec-zone", "to": "proc-applicable", "role": "option", "label": "第二種低層住居専用地域" },
+      { "id": "e04", "from": "dec-zone", "to": "proc-applicable", "role": "option", "label": "田園住居地域" },
+      { "id": "e05", "from": "dec-zone", "to": "term-not-applicable", "role": "option", "label": "その他" },
+      { "id": "e06", "from": "proc-applicable", "to": "dec-height-limit", "role": "flow" },
+      { "id": "e07", "from": "dec-height-limit", "to": "dec-height-10m", "role": "option", "label": "10m" },
+      { "id": "e08", "from": "dec-height-limit", "to": "dec-height-12m", "role": "option", "label": "12m" },
+      { "id": "e09", "from": "dec-height-10m", "to": "term-pass", "role": "yes", "label": "はい" },
+      { "id": "e10", "from": "dec-height-10m", "to": "term-fail", "role": "no", "label": "いいえ" },
+      { "id": "e11", "from": "dec-height-12m", "to": "term-pass", "role": "yes", "label": "はい" },
+      { "id": "e12", "from": "dec-height-12m", "to": "term-fail", "role": "no", "label": "いいえ" }
+    ]
+  },
+  "related_laws": [],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

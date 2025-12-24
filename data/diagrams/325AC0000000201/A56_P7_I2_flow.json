@@ -1,0 +1,234 @@
+{
+  "id": "A56_P7_I2_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "隣地斜線制限の採光・通風確保による適用除外判定フロー",
+    "target_subject": "建築物",
+    "description": "第56条1項2号の高さ制限に関し、隣地境界線からの距離に基づく採光・通風確保による適用除外の適合判定"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "56",
+    "paragraph": "7",
+    "item": "2"
+  },
+  "labels": [
+    "単体規定",
+    "高さ制限",
+    "適用除外"
+  ],
+  "text_raw": "第一項第二号、第五項及び前項（同号の規定の適用の緩和に係る部分に限る。）隣地境界線からの水平距離が、第一項第二号イ又はニに定める数値が一・二五とされている建築物にあつては十六メートル、第一項第二号イからニまでに定める数値が二・五とされている建築物にあつては十二・四メートルだけ外側の線上の政令で定める位置",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "applicable_provision",
+          "value": "法56条1項2号の高さ制限が適用される建築物"
+        }
+      ],
+      "note": "第1項2号により高さが制限された場合"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "lighting_condition",
+          "description": "当該位置において確保される採光、通風等と同程度以上の採光、通風等が確保される"
+        },
+        {
+          "type": "compliance_condition",
+          "description": "政令で定める基準に適合する"
+        }
+      ]
+    },
+    "exceptions": {
+      "operator": "EXEMPT",
+      "effect": "第1項2号の規定は適用しない"
+    }
+  },
+  "flow_diagram": {
+    "title": "隣地斜線制限の適用除外判定フロー",
+    "description": "隣地境界線からの距離に応じた採光・通風確保を判定し、第56条1項2号の適用除外を決定する",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "隣地斜線制限の適用除外判定を開始"
+      },
+      {
+        "id": "dec-height-limit-applicable",
+        "type": "decision",
+        "title": "隣地斜線制限の対象建築物か？",
+        "decision_type": "binary",
+        "description": "第56条1項2号の高さ制限が適用される建築物であることを確認"
+      },
+      {
+        "id": "dec-coefficient",
+        "type": "decision",
+        "title": "用途地域に基づく高さ制限係数は？",
+        "decision_type": "multi",
+        "description": "用途地域に応じて適用される係数（1.25または2.5）を判定",
+        "options": [
+          { "value": "1.25", "description": "住居系用途地域（低層・中高層）" },
+          { "value": "2.5", "description": "近隣商業・商業・工業系用途地域" }
+        ]
+      },
+      {
+        "id": "proc-distance-16m",
+        "type": "process",
+        "title": "基準外側距離16mを適用",
+        "process_type": "mechanical",
+        "description": "係数1.25の場合、隣地境界線から16m外側の線上を基準位置とする"
+      },
+      {
+        "id": "proc-distance-12-4m",
+        "type": "process",
+        "title": "基準外側距離12.4mを適用",
+        "process_type": "mechanical",
+        "description": "係数2.5の場合、隣地境界線から12.4m外側の線上を基準位置とする"
+      },
+      {
+        "id": "dec-lighting-comparison",
+        "type": "decision",
+        "title": "当該位置の採光・通風は基準位置と同程度以上か？",
+        "decision_type": "binary",
+        "description": "基準位置で確保される採光・通風等と、設計による当該位置の採光・通風等を比較"
+      },
+      {
+        "id": "dec-ordinance-compliance",
+        "type": "decision",
+        "title": "政令で定める基準に適合するか？",
+        "decision_type": "binary",
+        "description": "政令で定める採光・通風等の基準（天空率等）への適合を確認"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合（適用除外）",
+        "result": "pass",
+        "description": "第56条1項2号の規定は適用しない"
+      },
+      {
+        "id": "fail-not-applicable",
+        "type": "terminal",
+        "title": "対象外",
+        "result": "end",
+        "description": "隣地斜線制限の対象建築物ではないため、本号の適用除外判定対象外"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "採光・通風等の基準を満たさず、第56条1項2号が適用される"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-height-limit-applicable",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-height-limit-applicable",
+        "to": "dec-coefficient",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "dec-height-limit-applicable",
+        "to": "fail-not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e04",
+        "from": "dec-coefficient",
+        "to": "proc-distance-16m",
+        "role": "option",
+        "label": "1.25"
+      },
+      {
+        "id": "e05",
+        "from": "dec-coefficient",
+        "to": "proc-distance-12-4m",
+        "role": "option",
+        "label": "2.5"
+      },
+      {
+        "id": "e06",
+        "from": "proc-distance-16m",
+        "to": "dec-lighting-comparison",
+        "role": "flow"
+      },
+      {
+        "id": "e07",
+        "from": "proc-distance-12-4m",
+        "to": "dec-lighting-comparison",
+        "role": "flow"
+      },
+      {
+        "id": "e08",
+        "from": "dec-lighting-comparison",
+        "to": "dec-ordinance-compliance",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e09",
+        "from": "dec-lighting-comparison",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e10",
+        "from": "dec-ordinance-compliance",
+        "to": "pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e11",
+        "from": "dec-ordinance-compliance",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-A56-P7-I2",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A56:P1:I2", "A56:P5", "A56:P6"],
+      "description": "同条第1項2号、第5項、第6項を参照する例外規定"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "delegated_from",
+      "description": "採光・通風等の基準に関する詳細は政令で定める"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00.000Z",
+    "author": "Claude Code (flow-generator)",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

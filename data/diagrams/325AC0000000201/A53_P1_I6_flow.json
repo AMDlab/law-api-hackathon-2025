@@ -1,0 +1,288 @@
+{
+  "id": "A53_P1_I6_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "建蔽率の限度判定（用途地域未指定区域）",
+    "target_subject": "建築物",
+    "description": "用途地域の指定のない区域内の建築物について、特定行政庁が定める建蔽率の限度への適合を判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "53",
+    "paragraph": "1",
+    "item": "6"
+  },
+  "labels": [
+    "集団規定",
+    "建蔽率",
+    "容積・建蔽率"
+  ],
+  "text_raw": "用途地域の指定のない区域内の建築物\n十分の三、十分の四、十分の五、十分の六又は十分の七のうち、特定行政庁が土地利用の状況等を考慮し当該区域を区分して都道府県都市計画審議会の議を経て定めるもの",
+  "kijo_diagram_ref": "CHK-BSL-A53-P1-I6",
+  "flow_diagram": {
+    "title": "建蔽率適合判定フロー（用途地域未指定区域）",
+    "description": "用途地域の指定のない区域内の建築物の建蔽率が特定行政庁の定める限度以下であるかを判定する",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "建蔽率適合判定を開始"
+      },
+      {
+        "id": "dec-use-district",
+        "type": "decision",
+        "title": "敷地は用途地域の指定のない区域内か？",
+        "decision_type": "binary",
+        "description": "敷地が用途地域の指定のない区域（白地地域等）に所在するか確認"
+      },
+      {
+        "id": "proc-get-site-area",
+        "type": "process",
+        "title": "敷地面積の算定",
+        "process_type": "mechanical",
+        "description": "設計図書等から敷地面積を算定する"
+      },
+      {
+        "id": "proc-get-building-area",
+        "type": "process",
+        "title": "建築面積の算定",
+        "process_type": "mechanical",
+        "description": "敷地内の全建築物の建築面積の合計を算定する"
+      },
+      {
+        "id": "proc-calc-bcr",
+        "type": "process",
+        "title": "建蔽率の算定",
+        "process_type": "mechanical",
+        "description": "建築面積を敷地面積で除して建蔽率を算定（BCR = Ab / As）"
+      },
+      {
+        "id": "dec-bcr-limit",
+        "type": "decision",
+        "title": "特定行政庁が定める建蔽率限度は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "3/10", "description": "30%" },
+          { "value": "4/10", "description": "40%" },
+          { "value": "5/10", "description": "50%" },
+          { "value": "6/10", "description": "60%" },
+          { "value": "7/10", "description": "70%" }
+        ],
+        "description": "特定行政庁が土地利用の状況等を考慮し都道府県都市計画審議会の議を経て定めた建蔽率の限度"
+      },
+      {
+        "id": "dec-bcr-30",
+        "type": "decision",
+        "title": "建蔽率は30%以下か？",
+        "decision_type": "binary",
+        "description": "建蔽率が3/10以下であるか判定"
+      },
+      {
+        "id": "dec-bcr-40",
+        "type": "decision",
+        "title": "建蔽率は40%以下か？",
+        "decision_type": "binary",
+        "description": "建蔽率が4/10以下であるか判定"
+      },
+      {
+        "id": "dec-bcr-50",
+        "type": "decision",
+        "title": "建蔽率は50%以下か？",
+        "decision_type": "binary",
+        "description": "建蔽率が5/10以下であるか判定"
+      },
+      {
+        "id": "dec-bcr-60",
+        "type": "decision",
+        "title": "建蔽率は60%以下か？",
+        "decision_type": "binary",
+        "description": "建蔽率が6/10以下であるか判定"
+      },
+      {
+        "id": "dec-bcr-70",
+        "type": "decision",
+        "title": "建蔽率は70%以下か？",
+        "decision_type": "binary",
+        "description": "建蔽率が7/10以下であるか判定"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "建蔽率が限度以下であり、法53条1項6号に適合"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "建蔽率が限度を超えており、法53条1項6号に不適合"
+      },
+      {
+        "id": "end-not-applicable",
+        "type": "terminal",
+        "title": "適用対象外",
+        "result": "end",
+        "description": "用途地域の指定のない区域外のため本号の適用対象外（他号を確認）"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-use-district",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-use-district",
+        "to": "proc-get-site-area",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "dec-use-district",
+        "to": "end-not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e04",
+        "from": "proc-get-site-area",
+        "to": "proc-get-building-area",
+        "role": "flow"
+      },
+      {
+        "id": "e05",
+        "from": "proc-get-building-area",
+        "to": "proc-calc-bcr",
+        "role": "flow"
+      },
+      {
+        "id": "e06",
+        "from": "proc-calc-bcr",
+        "to": "dec-bcr-limit",
+        "role": "flow"
+      },
+      {
+        "id": "e07",
+        "from": "dec-bcr-limit",
+        "to": "dec-bcr-30",
+        "role": "option",
+        "label": "3/10"
+      },
+      {
+        "id": "e08",
+        "from": "dec-bcr-limit",
+        "to": "dec-bcr-40",
+        "role": "option",
+        "label": "4/10"
+      },
+      {
+        "id": "e09",
+        "from": "dec-bcr-limit",
+        "to": "dec-bcr-50",
+        "role": "option",
+        "label": "5/10"
+      },
+      {
+        "id": "e10",
+        "from": "dec-bcr-limit",
+        "to": "dec-bcr-60",
+        "role": "option",
+        "label": "6/10"
+      },
+      {
+        "id": "e11",
+        "from": "dec-bcr-limit",
+        "to": "dec-bcr-70",
+        "role": "option",
+        "label": "7/10"
+      },
+      {
+        "id": "e12",
+        "from": "dec-bcr-30",
+        "to": "pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e13",
+        "from": "dec-bcr-30",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e14",
+        "from": "dec-bcr-40",
+        "to": "pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e15",
+        "from": "dec-bcr-40",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e16",
+        "from": "dec-bcr-50",
+        "to": "pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e17",
+        "from": "dec-bcr-50",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e18",
+        "from": "dec-bcr-60",
+        "to": "pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e19",
+        "from": "dec-bcr-60",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e20",
+        "from": "dec-bcr-70",
+        "to": "pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e21",
+        "from": "dec-bcr-70",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

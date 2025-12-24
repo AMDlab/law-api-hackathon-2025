@@ -1,0 +1,251 @@
+{
+  "id": "A108_4_P2_I1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "火災の継続時間の計算",
+    "target_subject": "建築物の室",
+    "description": "耐火性能検証法における、建築物の屋内において発生が予測される火災の継続時間を計算するフロー"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "108の4",
+    "paragraph": "2",
+    "item": "1"
+  },
+  "labels": ["単体規定", "火災安全"],
+  "text_raw": "当該建築物の屋内において発生が予測される火災の継続時間を当該建築物の室ごとに次の式により計算すること。tf＝Qr／60qb",
+  "kijo_diagram_ref": "CHK-BO-A108_4-P2-I1",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "fire_safety_method",
+          "value": "耐火性能検証法を採用する建築物"
+        }
+      ]
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "calculation",
+          "description": "火災継続時間がtf＝Qr／60qbの式により算出されている"
+        }
+      ]
+    }
+  },
+  "flow_diagram": {
+    "title": "火災継続時間計算フロー",
+    "description": "室ごとの火災継続時間（tf）を算出するための計算フロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "計算開始",
+        "result": "start",
+        "description": "火災継続時間の計算開始"
+      },
+      {
+        "id": "proc-identify-rooms",
+        "type": "process",
+        "title": "計算対象室の特定",
+        "process_type": "undefined_input",
+        "description": "建築物内の計算対象となる室を特定する"
+      },
+      {
+        "id": "proc-get-room-data",
+        "type": "process",
+        "title": "室の諸元データ取得",
+        "process_type": "undefined_input",
+        "description": "室の用途、床面積、内装面表面積、建築材料種別、開口部情報を取得"
+      },
+      {
+        "id": "proc-calc-qr",
+        "type": "process",
+        "title": "可燃物発熱量（Qr）の算出",
+        "process_type": "mechanical",
+        "description": "国土交通大臣が定める方法により室内の可燃物の発熱量を算出（単位：MJ）"
+      },
+      {
+        "id": "dec-qr-valid",
+        "type": "decision",
+        "title": "Qrの算出は正しく行われたか？",
+        "decision_type": "binary",
+        "description": "可燃物発熱量Qrが適切に算出されたか確認"
+      },
+      {
+        "id": "proc-calc-qb",
+        "type": "process",
+        "title": "可燃物発熱速度（qb）の算出",
+        "process_type": "mechanical",
+        "description": "国土交通大臣が定める方法により室内の可燃物の一秒間当たり発熱量を算出（単位：MW）"
+      },
+      {
+        "id": "dec-qb-valid",
+        "type": "decision",
+        "title": "qbの算出は正しく行われたか？",
+        "decision_type": "binary",
+        "description": "可燃物発熱速度qbが適切に算出されたか確認"
+      },
+      {
+        "id": "dec-qb-zero",
+        "type": "decision",
+        "title": "qb > 0 か？",
+        "decision_type": "binary",
+        "description": "計算式の分母となるqbが0でないことを確認"
+      },
+      {
+        "id": "proc-calc-tf",
+        "type": "process",
+        "title": "火災継続時間（tf）の計算",
+        "process_type": "mechanical",
+        "description": "tf = Qr / (60 x qb) の式により火災継続時間を計算（単位：分）"
+      },
+      {
+        "id": "dec-all-rooms-done",
+        "type": "decision",
+        "title": "全ての室について計算完了したか？",
+        "decision_type": "binary",
+        "description": "建築物内の全ての対象室について計算が完了したか確認"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "計算完了",
+        "result": "pass",
+        "description": "全室の火災継続時間の計算が完了"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "計算不可",
+        "result": "fail",
+        "description": "火災継続時間の計算ができない"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "proc-identify-rooms",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "proc-identify-rooms",
+        "to": "proc-get-room-data",
+        "role": "flow"
+      },
+      {
+        "id": "e03",
+        "from": "proc-get-room-data",
+        "to": "proc-calc-qr",
+        "role": "flow"
+      },
+      {
+        "id": "e04",
+        "from": "proc-calc-qr",
+        "to": "dec-qr-valid",
+        "role": "flow"
+      },
+      {
+        "id": "e05",
+        "from": "dec-qr-valid",
+        "to": "proc-calc-qb",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e06",
+        "from": "dec-qr-valid",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e07",
+        "from": "proc-calc-qb",
+        "to": "dec-qb-valid",
+        "role": "flow"
+      },
+      {
+        "id": "e08",
+        "from": "dec-qb-valid",
+        "to": "dec-qb-zero",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e09",
+        "from": "dec-qb-valid",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e10",
+        "from": "dec-qb-zero",
+        "to": "proc-calc-tf",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e11",
+        "from": "dec-qb-zero",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e12",
+        "from": "proc-calc-tf",
+        "to": "dec-all-rooms-done",
+        "role": "flow"
+      },
+      {
+        "id": "e13",
+        "from": "dec-all-rooms-done",
+        "to": "pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e14",
+        "from": "dec-all-rooms-done",
+        "to": "proc-get-room-data",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "defines_detail",
+      "articles": ["A108_4:P1"],
+      "description": "特定主要構造部の技術的基準（耐火性能検証法の適用条件）"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "defines_detail",
+      "articles": ["A108_4:P2:I2", "A108_4:P2:I3", "A108_4:P2:I4"],
+      "description": "耐火性能検証法の他の計算方法"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00Z",
+    "updated_at": "2025-12-25T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

@@ -1,0 +1,189 @@
+{
+  "id": "A68_2_P4_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "建築物構造の防火規制における区域内外の適用措置（適合判定フロー）",
+    "target_subject": "建築物",
+    "description": "地区計画等に基づく市町村条例で定める建築物の構造に関する防火上必要な制限が、当該制限を受ける区域の内外にわたる建築物に適用される際の措置を判定するフロー"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "68_2",
+    "paragraph": "4",
+    "item": null
+  },
+  "labels": [
+    "集団規定",
+    "防火",
+    "地区計画"
+  ],
+  "text_raw": "第一項の規定に基づく条例で建築物の構造に関する防火上必要な制限を定める場合においては、当該条例に、第六十五条の規定の例により、当該制限を受ける区域の内外にわたる建築物についての当該制限に係る規定の適用に関する措置を定めるものとする。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "地区計画等の区域内"
+        },
+        {
+          "type": "regulation_type",
+          "value": "建築物構造に関する防火上必要な制限を定める市町村条例"
+        }
+      ],
+      "note": "第1項の規定に基づく条例で建築物の構造に関する防火上必要な制限を定める場合"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-ordinance-measures",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "ref": "info-boundary-treatment",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "flow_diagram": {
+    "title": "法68条の2第4項 建築物構造の防火規制における区域内外の適用措置 適合判定フロー",
+    "description": "市町村条例で建築物の構造に関する防火上必要な制限を定める場合に、第65条の規定の例により区域内外にわたる建築物への適用措置が定められているかを判定する",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "建築物構造の防火規制における区域内外適用措置の判定を開始"
+      },
+      {
+        "id": "dec-fireproof-restriction",
+        "type": "decision",
+        "title": "構造に関する防火上必要な制限を定めるか？",
+        "decision_type": "binary",
+        "description": "市町村条例で建築物の構造に関する防火上必要な制限を定めているか否かを確認"
+      },
+      {
+        "id": "dec-boundary-building",
+        "type": "decision",
+        "title": "建築物の位置は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "区域内のみ", "description": "建築物全体が規制区域内に所在" },
+          { "value": "区域外のみ", "description": "建築物全体が規制区域外に所在" },
+          { "value": "区域内外にわたる", "description": "建築物が規制区域の内外にわたって所在" }
+        ],
+        "description": "建築物が規制を受ける区域の内外のいずれに位置するか、または内外にわたるかを判定"
+      },
+      {
+        "id": "dec-measures-defined",
+        "type": "decision",
+        "title": "区域内外にわたる建築物への適用措置が定められているか？",
+        "decision_type": "binary",
+        "description": "条例に第65条の規定の例により、当該制限を受ける区域の内外にわたる建築物についての適用措置が定められているかを確認",
+        "related_articles": ["法::A65"]
+      },
+      {
+        "id": "dec-article65-compliance",
+        "type": "decision",
+        "title": "第65条の規定の例に従った措置か？",
+        "decision_type": "binary",
+        "description": "定められた適用措置が第65条の規定の例に従った内容であるかを判定",
+        "related_articles": ["法::A65"]
+      },
+      {
+        "id": "proc-measures-complete",
+        "type": "process",
+        "title": "適用措置規定完備確認",
+        "process_type": "mechanical",
+        "description": "第65条の規定の例による区域内外にわたる建築物への適用措置が条例に適切に定められていることを確認"
+      },
+      {
+        "id": "proc-apply-measures",
+        "type": "process",
+        "title": "適用措置に従った制限の適用",
+        "process_type": "mechanical",
+        "description": "区域内外にわたる建築物について、条例で定められた適用措置に従って防火規制を適用"
+      },
+      {
+        "id": "pass-no-restriction",
+        "type": "terminal",
+        "title": "適合（防火規制なし）",
+        "result": "pass",
+        "description": "構造に関する防火上必要な制限を定めないため、本項の適用措置規定は不要"
+      },
+      {
+        "id": "pass-inside-only",
+        "type": "terminal",
+        "title": "適合（区域内のみ）",
+        "result": "pass",
+        "description": "建築物全体が規制区域内に所在するため、通常の規制を適用"
+      },
+      {
+        "id": "pass-outside-only",
+        "type": "terminal",
+        "title": "適合（区域外）",
+        "result": "pass",
+        "description": "建築物全体が規制区域外に所在するため、本条例の制限は適用されない"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "法68条の2第4項に従い、区域内外にわたる建築物への適用措置が適切に定められている"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "法68条の2第4項に定める適用措置規定が条例に不足している、または第65条の例に従っていない"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "dec-fireproof-restriction", "role": "flow" },
+      { "id": "e02", "from": "dec-fireproof-restriction", "to": "dec-boundary-building", "role": "yes", "label": "はい" },
+      { "id": "e03", "from": "dec-fireproof-restriction", "to": "pass-no-restriction", "role": "no", "label": "いいえ" },
+      { "id": "e04", "from": "dec-boundary-building", "to": "pass-inside-only", "role": "option", "label": "区域内のみ" },
+      { "id": "e05", "from": "dec-boundary-building", "to": "pass-outside-only", "role": "option", "label": "区域外のみ" },
+      { "id": "e06", "from": "dec-boundary-building", "to": "dec-measures-defined", "role": "option", "label": "区域内外にわたる" },
+      { "id": "e07", "from": "dec-measures-defined", "to": "dec-article65-compliance", "role": "yes", "label": "はい" },
+      { "id": "e08", "from": "dec-measures-defined", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e09", "from": "dec-article65-compliance", "to": "proc-measures-complete", "role": "yes", "label": "はい" },
+      { "id": "e10", "from": "dec-article65-compliance", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e11", "from": "proc-measures-complete", "to": "proc-apply-measures", "role": "flow" },
+      { "id": "e12", "from": "proc-apply-measures", "to": "pass", "role": "flow" }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-A68-2-P4",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": [
+        "A65",
+        "A68_2:P1"
+      ],
+      "description": "第65条は、防火地域内における建築物の構造に関する規制の区域内外の取扱いについて定める前例。第68条の2第1項は、当条例の根拠条項"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00Z",
+    "updated_at": "2025-12-25T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

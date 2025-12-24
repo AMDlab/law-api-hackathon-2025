@@ -1,0 +1,191 @@
+{
+  "id": "A129_2_6_P1_I2_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "冷却塔設備の距離要件",
+    "target_subject": "冷却塔設備",
+    "description": "冷却塔の構造に応じ、建築物の他の部分までの距離が国土交通大臣が定める距離以上であることの判定フロー"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "129の2の6",
+    "paragraph": "1",
+    "item": "2"
+  },
+  "labels": [
+    "単体規定",
+    "建築設備",
+    "防火"
+  ],
+  "kijo_diagram_ref": "CHK-BSL-KIJO-A129_2_6-P1-I2",
+  "flow_diagram": {
+    "title": "第2号適合判定フロー（離隔距離）",
+    "description": "冷却塔設備と建築物の他の部分との離隔距離が必要距離以上かを判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "冷却塔設備の離隔距離要件判定を開始"
+      },
+      {
+        "id": "dec-tower-exists",
+        "type": "decision",
+        "title": "屋上に冷却塔設備があるか？",
+        "decision_type": "binary",
+        "description": "屋上に設ける冷房のための冷却塔設備が存在するか確認"
+      },
+      {
+        "id": "dec-structure-type",
+        "type": "decision",
+        "title": "冷却塔の構造種別は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "開放型" },
+          { "value": "密閉型" },
+          { "value": "その他" }
+        ],
+        "description": "冷却塔の構造種別を特定"
+      },
+      {
+        "id": "proc-get-required-distance",
+        "type": "process",
+        "title": "必要離隔距離の照合",
+        "process_type": "mechanical",
+        "description": "冷却塔の構造に応じて国土交通大臣が定める必要離隔距離を照合（昭和45年建設省告示第1833号）",
+        "related_articles": ["告示::昭和45年建設省告示第1833号"]
+      },
+      {
+        "id": "dec-distance-check",
+        "type": "decision",
+        "title": "実際の離隔距離 >= 必要離隔距離か？",
+        "decision_type": "binary",
+        "description": "冷却塔設備と建築物の他の部分との実際の離隔距離が必要離隔距離以上か",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "Da", "desc": "実際の離隔距離" },
+          "rhs": { "var": "Dr", "desc": "必要離隔距離", "unit": "m" }
+        }
+      },
+      {
+        "id": "proc-distance-ok",
+        "type": "process",
+        "title": "離隔距離要件適合",
+        "process_type": "mechanical",
+        "description": "実際の離隔距離が必要離隔距離以上"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "第2号適合",
+        "result": "pass",
+        "description": "令第129条の2の6第1項第2号に適合"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "第2号不適合",
+        "result": "fail",
+        "description": "令第129条の2の6第1項第2号に不適合"
+      },
+      {
+        "id": "end-not-applicable",
+        "type": "terminal",
+        "title": "対象外",
+        "result": "end",
+        "description": "屋上に冷却塔設備がないため対象外"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-tower-exists",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-tower-exists",
+        "to": "dec-structure-type",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "dec-tower-exists",
+        "to": "end-not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e04",
+        "from": "dec-structure-type",
+        "to": "proc-get-required-distance",
+        "role": "option",
+        "label": "開放型"
+      },
+      {
+        "id": "e05",
+        "from": "dec-structure-type",
+        "to": "proc-get-required-distance",
+        "role": "option",
+        "label": "密閉型"
+      },
+      {
+        "id": "e06",
+        "from": "dec-structure-type",
+        "to": "proc-get-required-distance",
+        "role": "option",
+        "label": "その他"
+      },
+      {
+        "id": "e07",
+        "from": "proc-get-required-distance",
+        "to": "dec-distance-check",
+        "role": "flow"
+      },
+      {
+        "id": "e08",
+        "from": "dec-distance-check",
+        "to": "proc-distance-ok",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e09",
+        "from": "dec-distance-check",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e10",
+        "from": "proc-distance-ok",
+        "to": "pass",
+        "role": "flow"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": ["A36:P1"],
+      "description": "法第36条から委任される建築設備の構造基準"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00Z",
+    "updated_at": "2025-12-25T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

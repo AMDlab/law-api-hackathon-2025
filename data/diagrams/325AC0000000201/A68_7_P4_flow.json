@@ -1,0 +1,185 @@
+{
+  "id": "A68_7_P4_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "予定道路に対する道路みなし規定の適用",
+    "target_subject": "予定道路",
+    "description": "第1項の規定により指定された予定道路を建築基準法42条1項の道路とみなし、第44条の規定を適用する処理"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "68の7",
+    "paragraph": "4",
+    "item": null
+  },
+  "labels": [
+    "集団規定",
+    "みなし規定",
+    "適用規定"
+  ],
+  "text_raw": "第一項の規定により予定道路が指定された場合においては、当該予定道路を第四十二条第一項に規定する道路とみなして、第四十四条の規定を適用する。",
+  "kijo_diagram_ref": "CHK-BSL-A68-7-P4",
+  "flow_diagram": {
+    "title": "予定道路の道路みなし・法44条適用判定フロー",
+    "description": "法68条の7第4項に基づき予定道路が法42条1項の道路とみなされ法44条が適用されるかを判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "審査開始",
+        "result": "start",
+        "description": "法68条の7第4項の適合判定開始"
+      },
+      {
+        "id": "dec-designation",
+        "type": "decision",
+        "title": "法68条の7第1項により予定道路が指定されているか？",
+        "decision_type": "binary",
+        "description": "第1項の規定に基づいて予定道路が指定されているか確認"
+      },
+      {
+        "id": "proc-deeming",
+        "type": "process",
+        "title": "法42条1項の道路とみなす",
+        "process_type": "mechanical",
+        "description": "予定道路を法42条1項に規定する道路とみなす処理"
+      },
+      {
+        "id": "dec-building-on-road",
+        "type": "decision",
+        "title": "予定道路内に建築物又は工作物を建築等するか？",
+        "decision_type": "binary",
+        "description": "予定道路の敷地内に建築物又は敷地を造成する擁壁等を建築、築造するか（法44条の規制対象行為）"
+      },
+      {
+        "id": "dec-article44-exception",
+        "type": "decision",
+        "title": "法44条各号の例外に該当するか？",
+        "decision_type": "binary",
+        "description": "法44条第1項各号（公衆便所、巡査派出所等）の例外に該当するか"
+      },
+      {
+        "id": "proc-article44-exception",
+        "type": "process",
+        "title": "法44条各号該当",
+        "process_type": "mechanical",
+        "description": "法44条第1項各号の例外規定に該当"
+      },
+      {
+        "id": "pass-no-designation",
+        "type": "terminal",
+        "title": "適用対象外",
+        "result": "pass",
+        "description": "予定道路が指定されていないため第4項は適用されない"
+      },
+      {
+        "id": "pass-no-building",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "予定道路内に建築等を行わないため法44条違反なし"
+      },
+      {
+        "id": "pass-exception",
+        "type": "terminal",
+        "title": "適合（例外）",
+        "result": "pass",
+        "description": "法44条各号の例外に該当するため建築等が可能"
+      },
+      {
+        "id": "fail-violation",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "予定道路内への建築等は法44条に違反（道路内建築制限）"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-designation",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-designation",
+        "to": "proc-deeming",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "dec-designation",
+        "to": "pass-no-designation",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e04",
+        "from": "proc-deeming",
+        "to": "dec-building-on-road",
+        "role": "flow"
+      },
+      {
+        "id": "e05",
+        "from": "dec-building-on-road",
+        "to": "dec-article44-exception",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e06",
+        "from": "dec-building-on-road",
+        "to": "pass-no-building",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e07",
+        "from": "dec-article44-exception",
+        "to": "proc-article44-exception",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e08",
+        "from": "dec-article44-exception",
+        "to": "fail-violation",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e09",
+        "from": "proc-article44-exception",
+        "to": "pass-exception",
+        "role": "flow"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": [
+        "A68_7:P1",
+        "A42:P1",
+        "A44"
+      ],
+      "description": "予定道路が法42条1項の道路とみなされ、法44条が適用される"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00+09:00",
+    "updated_at": "2025-12-25T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

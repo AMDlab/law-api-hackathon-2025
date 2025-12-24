@@ -1,0 +1,410 @@
+{
+  "id": "A68_3_P3_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "再開発等促進区内の高さ制限緩和判定フロー",
+    "target_subject": "建築物",
+    "description": "再開発等促進区等内で高さの最高限度が20m以下に定められている区域において、第55条の高さ制限が適用されないかを判定するフロー"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "68の3",
+    "paragraph": "3",
+    "item": null
+  },
+  "labels": [
+    "集団規定",
+    "日影制限"
+  ],
+  "text_raw": "地区計画又は沿道地区計画の区域のうち再開発等促進区又は沿道再開発等促進区（地区整備計画又は沿道地区整備計画が定められている区域のうち二十メートル以下の高さで建築物の高さの最高限度が定められている区域に限る。）内においては、当該地区計画又は沿道地区計画の内容に適合し、かつ、その敷地面積が政令で定める規模以上の建築物であつて特定行政庁が交通上、安全上、防火上及び衛生上支障がないと認めるものについては、第五十五条第一項及び第二項の規定は、適用しない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "地区計画又は沿道地区計画の区域内"
+        },
+        {
+          "type": "location",
+          "value": "再開発等促進区又は沿道再開発等促進区内"
+        },
+        {
+          "type": "location",
+          "value": "建築物の高さの最高限度が20m以下で定められている区域"
+        }
+      ]
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "compliance",
+          "description": "地区計画又は沿道地区計画の内容に適合すること"
+        },
+        {
+          "type": "property",
+          "description": "敷地面積が政令で定める規模以上であること"
+        },
+        {
+          "type": "judgment",
+          "description": "特定行政庁が交通上、安全上、防火上及び衛生上支障がないと認めること"
+        }
+      ],
+      "effect": "第55条1項及び2項の日影制限規定は適用しない"
+    }
+  },
+  "flow_diagram": {
+    "title": "第55条高さ制限適用除外判定フロー",
+    "description": "再開発等促進区等内における第55条適用除外の判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "第55条高さ制限の適用除外判定を開始"
+      },
+      {
+        "id": "dec-redevelopment-area",
+        "type": "decision",
+        "title": "再開発等促進区又は沿道再開発等促進区内か？",
+        "decision_type": "binary",
+        "description": "敷地が地区計画又は沿道地区計画の再開発等促進区・沿道再開発等促進区内に位置するか"
+      },
+      {
+        "id": "dec-district-plan-defined",
+        "type": "decision",
+        "title": "地区整備計画等が定められているか？",
+        "decision_type": "binary",
+        "description": "当該区域に地区整備計画又は沿道地区整備計画が定められているか"
+      },
+      {
+        "id": "dec-height-limit",
+        "type": "decision",
+        "title": "高さの最高限度が20m以下か？",
+        "decision_type": "binary",
+        "description": "地区整備計画等において建築物の高さの最高限度が20m以下で定められているか",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "H_max", "desc": "高さの最高限度" },
+          "rhs": { "value": 20, "unit": "m", "desc": "20メートル" }
+        }
+      },
+      {
+        "id": "proc-scope-confirmed",
+        "type": "process",
+        "title": "適用範囲該当確認",
+        "process_type": "mechanical",
+        "description": "本規定の適用範囲に該当することを確認"
+      },
+      {
+        "id": "dec-plan-conformance",
+        "type": "decision",
+        "title": "地区計画の内容に適合しているか？",
+        "decision_type": "binary",
+        "description": "当該建築物が地区計画又は沿道地区計画の内容に適合しているか"
+      },
+      {
+        "id": "proc-plan-conformance-confirmed",
+        "type": "process",
+        "title": "地区計画適合確認済み",
+        "process_type": "human_judgment",
+        "description": "建築物が地区計画の内容に適合していることを確認した状態"
+      },
+      {
+        "id": "dec-site-area",
+        "type": "decision",
+        "title": "敷地面積が政令規模以上か？",
+        "decision_type": "binary",
+        "description": "敷地面積が政令（令第129条）で定める規模以上であるか",
+        "related_articles": ["令::A129:P1"]
+      },
+      {
+        "id": "proc-site-area-confirmed",
+        "type": "process",
+        "title": "敷地面積要件適合確認",
+        "process_type": "mechanical",
+        "description": "敷地面積が政令で定める規模以上であることを確認した状態"
+      },
+      {
+        "id": "dec-traffic-safety",
+        "type": "decision",
+        "title": "交通上支障がないか？",
+        "decision_type": "binary",
+        "description": "特定行政庁が交通上支障がないと認めるか"
+      },
+      {
+        "id": "dec-general-safety",
+        "type": "decision",
+        "title": "安全上支障がないか？",
+        "decision_type": "binary",
+        "description": "特定行政庁が安全上支障がないと認めるか"
+      },
+      {
+        "id": "dec-fire-safety",
+        "type": "decision",
+        "title": "防火上支障がないか？",
+        "decision_type": "binary",
+        "description": "特定行政庁が防火上支障がないと認めるか"
+      },
+      {
+        "id": "dec-hygiene-safety",
+        "type": "decision",
+        "title": "衛生上支障がないか？",
+        "decision_type": "binary",
+        "description": "特定行政庁が衛生上支障がないと認めるか"
+      },
+      {
+        "id": "proc-authority-approved",
+        "type": "process",
+        "title": "特定行政庁の承認",
+        "process_type": "human_judgment",
+        "description": "特定行政庁が交通上、安全上、防火上及び衛生上支障がないと認めた状態"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "第55条適用除外",
+        "result": "pass",
+        "description": "第55条第1項及び第2項の高さ制限は適用されない",
+        "related_articles": ["法::A55:P1", "法::A55:P2"]
+      },
+      {
+        "id": "fail-not-in-area",
+        "type": "terminal",
+        "title": "本規定の対象外",
+        "result": "fail",
+        "description": "再開発等促進区等に該当しないため本規定は適用されない"
+      },
+      {
+        "id": "fail-no-district-plan",
+        "type": "terminal",
+        "title": "本規定の対象外（整備計画なし）",
+        "result": "fail",
+        "description": "地区整備計画等が定められていないため本規定は適用されない"
+      },
+      {
+        "id": "fail-height-over-20m",
+        "type": "terminal",
+        "title": "本規定の対象外（高さ限度超過）",
+        "result": "fail",
+        "description": "高さの最高限度が20mを超えているため本規定は適用されない"
+      },
+      {
+        "id": "fail-not-conforming",
+        "type": "terminal",
+        "title": "適用除外不可（計画不適合）",
+        "result": "fail",
+        "description": "地区計画の内容に適合しないため第55条が適用される"
+      },
+      {
+        "id": "fail-site-area-insufficient",
+        "type": "terminal",
+        "title": "適用除外不可（敷地面積不足）",
+        "result": "fail",
+        "description": "敷地面積が政令で定める規模未満のため第55条が適用される"
+      },
+      {
+        "id": "fail-authority-rejected",
+        "type": "terminal",
+        "title": "適用除外不可（支障あり）",
+        "result": "fail",
+        "description": "特定行政庁が支障ありと認めるため第55条が適用される"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-redevelopment-area",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-redevelopment-area",
+        "to": "dec-district-plan-defined",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "dec-redevelopment-area",
+        "to": "fail-not-in-area",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e04",
+        "from": "dec-district-plan-defined",
+        "to": "dec-height-limit",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e05",
+        "from": "dec-district-plan-defined",
+        "to": "fail-no-district-plan",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e06",
+        "from": "dec-height-limit",
+        "to": "proc-scope-confirmed",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e07",
+        "from": "dec-height-limit",
+        "to": "fail-height-over-20m",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e08",
+        "from": "proc-scope-confirmed",
+        "to": "dec-plan-conformance",
+        "role": "flow"
+      },
+      {
+        "id": "e09",
+        "from": "dec-plan-conformance",
+        "to": "proc-plan-conformance-confirmed",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e10",
+        "from": "dec-plan-conformance",
+        "to": "fail-not-conforming",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e11",
+        "from": "proc-plan-conformance-confirmed",
+        "to": "dec-site-area",
+        "role": "flow"
+      },
+      {
+        "id": "e12",
+        "from": "dec-site-area",
+        "to": "proc-site-area-confirmed",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e13",
+        "from": "dec-site-area",
+        "to": "fail-site-area-insufficient",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e14",
+        "from": "proc-site-area-confirmed",
+        "to": "dec-traffic-safety",
+        "role": "flow"
+      },
+      {
+        "id": "e15",
+        "from": "dec-traffic-safety",
+        "to": "dec-general-safety",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e16",
+        "from": "dec-traffic-safety",
+        "to": "fail-authority-rejected",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e17",
+        "from": "dec-general-safety",
+        "to": "dec-fire-safety",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e18",
+        "from": "dec-general-safety",
+        "to": "fail-authority-rejected",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e19",
+        "from": "dec-fire-safety",
+        "to": "dec-hygiene-safety",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e20",
+        "from": "dec-fire-safety",
+        "to": "fail-authority-rejected",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e21",
+        "from": "dec-hygiene-safety",
+        "to": "proc-authority-approved",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e22",
+        "from": "dec-hygiene-safety",
+        "to": "fail-authority-rejected",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e23",
+        "from": "proc-authority-approved",
+        "to": "pass",
+        "role": "flow"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-A68-3-P3",
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "defines_detail",
+      "articles": [
+        "A129:P1"
+      ],
+      "description": "敷地面積の最小値を定める"
+    },
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": [
+        "A55:P1",
+        "A55:P2"
+      ],
+      "description": "高さ制限に関する規定（適用除外の対象規定）"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00Z",
+    "updated_at": "2025-12-25T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

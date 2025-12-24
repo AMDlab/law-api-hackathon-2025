@@ -1,0 +1,247 @@
+{
+  "id": "A68_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "景観地区内の建築物の高さ制限",
+    "target_subject": "建築物",
+    "description": "景観地区内の建築物の高さが都市計画で定められた最高限度以下又は最低限度以上であることを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "68",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": ["集団規定", "景観"],
+  "text_raw": "景観地区内においては、建築物の高さは、景観地区に関する都市計画において建築物の高さの最高限度又は最低限度が定められたときは、当該最高限度以下又は当該最低限度以上でなければならない。ただし、次の各号のいずれかに該当する建築物については、この限りでない。一 公衆便所、巡査派出所その他これらに類する建築物で、公益上必要なもの 二 特定行政庁が用途上又は構造上やむを得ないと認めて許可したもの",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        { "type": "location", "value": "景観地区内" },
+        { "type": "regulation_exists", "value": "景観地区の都市計画で建築物の高さの最高限度又は最低限度が定められている" }
+      ],
+      "note": "景観地区に関する都市計画において建築物の高さの制限が定められた区域"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "operator": "AND",
+          "conditions": [
+            { "ref": "info-max-limit-exists", "operator": "==", "value": true },
+            { "ref": "info-height", "operator": "<=", "ref": "info-max-limit" }
+          ]
+        },
+        {
+          "operator": "AND",
+          "conditions": [
+            { "ref": "info-min-limit-exists", "operator": "==", "value": true },
+            { "ref": "info-height", "operator": ">=", "ref": "info-min-limit" }
+          ]
+        }
+      ]
+    },
+    "exceptions": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "note": "公衆便所、巡査派出所その他これらに類する建築物で、公益上必要なもの",
+          "ref": "info-public-building"
+        },
+        {
+          "note": "特定行政庁が用途上又は構造上やむを得ないと認めて許可したもの",
+          "ref": "info-permission"
+        }
+      ],
+      "effect": "EXEMPT"
+    }
+  },
+  "flow_diagram": {
+    "title": "景観地区内建築物高さ制限の判定フロー",
+    "description": "景観地区内の建築物の高さが都市計画で定められた制限に適合するか判定するフロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start"
+      },
+      {
+        "id": "dec-in-landscape-area",
+        "type": "decision",
+        "title": "景観地区内か？",
+        "decision_type": "binary",
+        "description": "敷地が景観地区内に位置するか確認"
+      },
+      {
+        "id": "dec-height-limit-type",
+        "type": "decision",
+        "title": "都市計画で定められた高さ制限は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "最高限度のみ" },
+          { "value": "最低限度のみ" },
+          { "value": "両方" },
+          { "value": "定めなし" }
+        ],
+        "description": "景観地区に関する都市計画において定められた高さ制限の種類を確認"
+      },
+      {
+        "id": "dec-building-use",
+        "type": "decision",
+        "title": "建築物の用途は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "公衆便所・巡査派出所等" },
+          { "value": "一般建築物" }
+        ],
+        "description": "建築物の用途を確認"
+      },
+      {
+        "id": "proc-public-building",
+        "type": "process",
+        "title": "第1号該当（公益上必要な建築物）",
+        "process_type": "mechanical",
+        "description": "公衆便所、巡査派出所その他これらに類する建築物で、公益上必要なもの"
+      },
+      {
+        "id": "dec-public-necessity",
+        "type": "decision",
+        "title": "公益上必要か？",
+        "decision_type": "binary",
+        "description": "公益上必要な建築物であるか確認"
+      },
+      {
+        "id": "dec-authority-permission",
+        "type": "decision",
+        "title": "特定行政庁の許可を受けているか？",
+        "decision_type": "binary",
+        "description": "特定行政庁が用途上又は構造上やむを得ないと認めて許可したか確認"
+      },
+      {
+        "id": "proc-item2-match",
+        "type": "process",
+        "title": "第2号該当（特定行政庁の許可）",
+        "process_type": "mechanical",
+        "description": "特定行政庁が用途上又は構造上やむを得ないと認めて許可したもの"
+      },
+      {
+        "id": "dec-max-limit-check",
+        "type": "decision",
+        "title": "高さが最高限度以下か？",
+        "decision_type": "binary",
+        "description": "建築物の高さが最高限度以下であるか確認"
+      },
+      {
+        "id": "dec-min-limit-check",
+        "type": "decision",
+        "title": "高さが最低限度以上か？",
+        "decision_type": "binary",
+        "description": "建築物の高さが最低限度以上であるか確認"
+      },
+      {
+        "id": "dec-both-limits-max",
+        "type": "decision",
+        "title": "高さが最高限度以下か？",
+        "decision_type": "binary",
+        "description": "建築物の高さが最高限度以下であるか確認（両方制限の場合）"
+      },
+      {
+        "id": "dec-both-limits-min",
+        "type": "decision",
+        "title": "高さが最低限度以上か？",
+        "decision_type": "binary",
+        "description": "建築物の高さが最低限度以上であるか確認（両方制限の場合）"
+      },
+      {
+        "id": "pass-exempt",
+        "type": "terminal",
+        "title": "適合（適用除外）",
+        "result": "pass",
+        "description": "ただし書きの適用除外に該当するため適合"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "建築物の高さが制限に適合"
+      },
+      {
+        "id": "pass-no-limit",
+        "type": "terminal",
+        "title": "規定対象外（制限なし）",
+        "result": "pass",
+        "description": "高さ制限が定められていないため規制対象外"
+      },
+      {
+        "id": "fail-outside-area",
+        "type": "terminal",
+        "title": "規定対象外（区域外）",
+        "result": "pass",
+        "description": "景観地区外のため本規定の対象外"
+      },
+      {
+        "id": "fail-max-limit",
+        "type": "terminal",
+        "title": "不適合（最高限度超過）",
+        "result": "fail",
+        "description": "建築物の高さが最高限度を超過"
+      },
+      {
+        "id": "fail-min-limit",
+        "type": "terminal",
+        "title": "不適合（最低限度未満）",
+        "result": "fail",
+        "description": "建築物の高さが最低限度未満"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "dec-in-landscape-area", "role": "flow" },
+      { "id": "e02", "from": "dec-in-landscape-area", "to": "dec-height-limit-type", "role": "yes", "label": "はい" },
+      { "id": "e03", "from": "dec-in-landscape-area", "to": "fail-outside-area", "role": "no", "label": "いいえ" },
+      { "id": "e04", "from": "dec-height-limit-type", "to": "dec-building-use", "role": "option", "label": "最高限度のみ" },
+      { "id": "e05", "from": "dec-height-limit-type", "to": "dec-building-use", "role": "option", "label": "最低限度のみ" },
+      { "id": "e06", "from": "dec-height-limit-type", "to": "dec-building-use", "role": "option", "label": "両方" },
+      { "id": "e07", "from": "dec-height-limit-type", "to": "pass-no-limit", "role": "option", "label": "定めなし" },
+      { "id": "e08", "from": "dec-building-use", "to": "proc-public-building", "role": "option", "label": "公衆便所・巡査派出所等" },
+      { "id": "e09", "from": "dec-building-use", "to": "dec-authority-permission", "role": "option", "label": "一般建築物" },
+      { "id": "e10", "from": "proc-public-building", "to": "dec-public-necessity", "role": "flow" },
+      { "id": "e11", "from": "dec-public-necessity", "to": "pass-exempt", "role": "yes", "label": "はい" },
+      { "id": "e12", "from": "dec-public-necessity", "to": "dec-authority-permission", "role": "no", "label": "いいえ" },
+      { "id": "e13", "from": "dec-authority-permission", "to": "proc-item2-match", "role": "yes", "label": "はい" },
+      { "id": "e14", "from": "proc-item2-match", "to": "pass-exempt", "role": "flow" },
+      { "id": "e15", "from": "dec-authority-permission", "to": "dec-max-limit-check", "role": "no", "label": "いいえ" },
+      { "id": "e16", "from": "dec-max-limit-check", "to": "pass", "role": "yes", "label": "はい" },
+      { "id": "e17", "from": "dec-max-limit-check", "to": "fail-max-limit", "role": "no", "label": "いいえ" },
+      { "id": "e18", "from": "dec-min-limit-check", "to": "pass", "role": "yes", "label": "はい" },
+      { "id": "e19", "from": "dec-min-limit-check", "to": "fail-min-limit", "role": "no", "label": "いいえ" },
+      { "id": "e20", "from": "dec-both-limits-max", "to": "dec-both-limits-min", "role": "yes", "label": "はい" },
+      { "id": "e21", "from": "dec-both-limits-max", "to": "fail-max-limit", "role": "no", "label": "いいえ" },
+      { "id": "e22", "from": "dec-both-limits-min", "to": "pass", "role": "yes", "label": "はい" },
+      { "id": "e23", "from": "dec-both-limits-min", "to": "fail-min-limit", "role": "no", "label": "いいえ" }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-A68-P1",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A44:P2"],
+      "description": "第44条第2項は許可の手続きについて定める（第6項で準用）"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

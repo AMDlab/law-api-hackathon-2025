@@ -1,0 +1,190 @@
+{
+  "id": "A137_12_P12_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "法44条1項適用除外建築物の大規模修繕・模様替の適用除外判定",
+    "target_subject": "建築物",
+    "description": "法44条1項（道路内の建築制限）の適用を受けない建築物について、大規模修繕または大規模模様替が法86条の7の適用除外対象となる条件を判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "137_12",
+    "paragraph": "12",
+    "item": null
+  },
+  "labels": [
+    "既存不適格",
+    "大規模修繕",
+    "大規模模様替",
+    "道路内建築制限"
+  ],
+  "text_raw": "法第三条第二項の規定により法第四十四条第一項の規定の適用を受けない建築物についての法第八十六条の七第一項の政令で定める範囲は、大規模の修繕又は大規模の模様替については、当該建築物における当該建築物の形態の変更（他の建築物の利便その他周囲の環境の維持又は向上のため必要なものを除く。）を伴わない大規模の修繕又は大規模の模様替であつて、特定行政庁が通行上、安全上、防火上及び衛生上支障がないと認めるものとする。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "applicability_condition",
+          "value": "法3条2項により法44条1項（道路内の建築制限）の適用を受けない建築物"
+        }
+      ],
+      "note": "既存建築物等で法44条1項（道路内の建築制限）の適用除外対象建築物"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-work-type",
+          "operator": "IN",
+          "value": ["大規模修繕", "大規模模様替"]
+        },
+        {
+          "ref": "info-form-change",
+          "operator": "OR",
+          "conditions": [
+            { "operator": "==", "value": "形態変更なし" },
+            { "operator": "==", "value": "環境維持向上のため必要" }
+          ]
+        },
+        {
+          "ref": "info-admin-approval",
+          "operator": "==",
+          "value": "特定行政庁が支障なしと認定"
+        }
+      ]
+    },
+    "exceptions": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "type": "exemption",
+          "value": "他の建築物の利便その他周囲の環境の維持又は向上のため必要な形態変更"
+        }
+      ],
+      "effect": "EXEMPT"
+    }
+  },
+  "flow_diagram": {
+    "title": "令137条の12第12項 適合判定フロー",
+    "description": "法44条1項適用除外建築物の大規模修繕・模様替が法86条の7の適用除外対象となるか判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start"
+      },
+      {
+        "id": "dec-exemption-status",
+        "type": "decision",
+        "title": "法44条1項（道路内建築制限）の適用除外建築物か？",
+        "decision_type": "binary",
+        "description": "当該建築物が法3条2項により法44条1項（道路内の建築制限）の適用を受けない対象であるか"
+      },
+      {
+        "id": "dec-work-type",
+        "type": "decision",
+        "title": "工事種別は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "大規模修繕" },
+          { "value": "大規模模様替" },
+          { "value": "その他" }
+        ],
+        "description": "当該工事が大規模修繕又は大規模模様替のいずれであるか"
+      },
+      {
+        "id": "dec-form-change",
+        "type": "decision",
+        "title": "形態変更を伴うか？",
+        "decision_type": "binary",
+        "description": "当該工事に伴い建築物の形態変更があるか"
+      },
+      {
+        "id": "dec-env-improvement",
+        "type": "decision",
+        "title": "環境維持向上のため必要な変更か？",
+        "decision_type": "binary",
+        "description": "形態変更が他の建築物の利便その他周囲の環境の維持又は向上のため必要なものか"
+      },
+      {
+        "id": "proc-exempt-form-change",
+        "type": "process",
+        "title": "形態変更条件クリア",
+        "process_type": "mechanical",
+        "description": "形態変更なし、又は環境維持向上のため必要な変更により条件クリア"
+      },
+      {
+        "id": "dec-admin-approval",
+        "type": "decision",
+        "title": "特定行政庁が支障なしと認めるか？",
+        "decision_type": "binary",
+        "description": "特定行政庁が通行上、安全上、防火上及び衛生上支障がないと認めるか"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合（適用除外対象）",
+        "result": "pass",
+        "description": "法86条の7第1項の政令で定める範囲に該当し、法44条1項（道路内の建築制限）の適用が不要"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "不適合（適用除外対象外）",
+        "result": "fail",
+        "description": "法86条の7第1項の政令で定める範囲に該当せず、法44条1項（道路内の建築制限）の適用が必要"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "dec-exemption-status", "role": "flow" },
+      { "id": "e02", "from": "dec-exemption-status", "to": "dec-work-type", "role": "yes", "label": "はい" },
+      { "id": "e03", "from": "dec-exemption-status", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e04", "from": "dec-work-type", "to": "dec-form-change", "role": "option", "label": "大規模修繕" },
+      { "id": "e05", "from": "dec-work-type", "to": "dec-form-change", "role": "option", "label": "大規模模様替" },
+      { "id": "e06", "from": "dec-work-type", "to": "fail", "role": "option", "label": "その他" },
+      { "id": "e07", "from": "dec-form-change", "to": "dec-env-improvement", "role": "yes", "label": "はい" },
+      { "id": "e08", "from": "dec-form-change", "to": "proc-exempt-form-change", "role": "no", "label": "いいえ" },
+      { "id": "e09", "from": "dec-env-improvement", "to": "proc-exempt-form-change", "role": "yes", "label": "はい" },
+      { "id": "e10", "from": "dec-env-improvement", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e11", "from": "proc-exempt-form-change", "to": "dec-admin-approval", "role": "flow" },
+      { "id": "e12", "from": "dec-admin-approval", "to": "pass", "role": "yes", "label": "はい" },
+      { "id": "e13", "from": "dec-admin-approval", "to": "fail", "role": "no", "label": "いいえ" }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-ORD-A137_12-P12",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": [
+        "A3:P2",
+        "A44:P1",
+        "A86_7"
+      ],
+      "description": "法3条2項で既存建築物等の適用除外を規定。法44条1項は道路内の建築制限を規定。法86条の7は大規模修繕・模様替の適用除外を規定"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "defines_detail",
+      "articles": [
+        "A137_12:P12"
+      ],
+      "description": "大規模修繕・模様替の定義及び適用除外の詳細基準"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T12:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

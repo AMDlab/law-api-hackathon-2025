@@ -1,0 +1,137 @@
+{
+  "id": "A48_P11_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "準工業地域における建築物の用途制限",
+    "target_subject": "建築物",
+    "description": "準工業地域内において建築禁止とされる別表第二(る)項に掲げる建築物に該当しないこと、又は特定行政庁の許可を受けていることを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "48",
+    "paragraph": "11",
+    "item": null
+  },
+  "labels": ["集団規定", "用途制限"],
+  "text_raw": "準工業地域内においては、別表第二（る）項に掲げる建築物は、建築してはならない。ただし、特定行政庁が安全上若しくは防火上の危険の度若しくは衛生上の有害の度が低いと認め、又は公益上やむを得ないと認めて許可した場合においては、この限りでない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        { "type": "location", "value": "準工業地域内" }
+      ],
+      "note": "都市計画で定められた準工業地域"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        { "ref": "info-prohibition-not-applicable", "operator": "==", "value": true },
+        { "ref": "info-special-approval", "operator": "==", "value": true }
+      ]
+    },
+    "exceptions": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "note": "特定行政庁の許可を受けた場合（安全上若しくは防火上の危険の度若しくは衛生上の有害の度が低い、又は公益上やむを得ない）",
+          "ref": "info-special-approval",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "effect": "EXEMPT"
+    }
+  },
+  "flow_diagram": {
+    "title": "法48条11項適合判定フロー",
+    "description": "準工業地域内での用途制限に適合するかを判定するフロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start"
+      },
+      {
+        "id": "dec-table2-prohibited",
+        "type": "decision",
+        "title": "別表第二(る)項に該当する用途か？",
+        "decision_type": "binary",
+        "description": "建築物の用途が別表第二(る)項（火薬類・石油類等の危険物の貯蔵・処理施設等）に該当するか"
+      },
+      {
+        "id": "proc-prohibited-match",
+        "type": "process",
+        "title": "建築禁止対象該当",
+        "process_type": "mechanical",
+        "description": "別表第二(る)項に該当するため原則建築禁止"
+      },
+      {
+        "id": "dec-special-approval",
+        "type": "decision",
+        "title": "特定行政庁の許可を受けたか？",
+        "decision_type": "binary",
+        "description": "特定行政庁が安全上若しくは防火上の危険の度若しくは衛生上の有害の度が低いと認め、又は公益上やむを得ないと認めて許可したか"
+      },
+      {
+        "id": "proc-exception-match",
+        "type": "process",
+        "title": "ただし書き該当",
+        "process_type": "mechanical",
+        "description": "特定行政庁の許可を受けたため例外適用"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "法48条11項の規定に適合"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "法48条11項の規定に不適合（準工業地域内で建築禁止用途）"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "dec-table2-prohibited", "role": "flow" },
+      { "id": "e02", "from": "dec-table2-prohibited", "to": "pass", "role": "no", "label": "いいえ" },
+      { "id": "e03", "from": "dec-table2-prohibited", "to": "proc-prohibited-match", "role": "yes", "label": "はい" },
+      { "id": "e04", "from": "proc-prohibited-match", "to": "dec-special-approval", "role": "flow" },
+      { "id": "e05", "from": "dec-special-approval", "to": "proc-exception-match", "role": "yes", "label": "はい" },
+      { "id": "e06", "from": "proc-exception-match", "to": "pass", "role": "flow" },
+      { "id": "e07", "from": "dec-special-approval", "to": "fail", "role": "no", "label": "いいえ" }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-A48-P11",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["別表第二(る)"],
+      "description": "準工業地域において建築が禁止される建築物を定める"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "defines_detail",
+      "articles": ["A130_9_2"],
+      "description": "別表第二(る)項の政令で定める危険物の貯蔵・処理施設の詳細を規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

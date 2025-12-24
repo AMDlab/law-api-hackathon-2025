@@ -1,0 +1,265 @@
+{
+  "id": "A53_2_P3_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "既存不適格敷地の適用除外",
+    "target_subject": "敷地",
+    "description": "敷地面積最低限度の制定・変更時に既存の敷地が第1項の規定の適用除外となる条件を判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "53_2",
+    "paragraph": "3",
+    "item": null
+  },
+  "labels": [
+    "集団規定",
+    "敷地",
+    "既存不適格"
+  ],
+  "text_raw": "第一項の都市計画において建築物の敷地面積の最低限度が定められ、又は変更された際、現に建築物の敷地として使用されている土地で同項の規定に適合しないもの又は現に存する所有権その他の権利に基づいて建築物の敷地として使用するならば同項の規定に適合しないこととなる土地について、その全部を一の敷地として使用する場合においては、同項の規定は、適用しない。ただし、次の各号のいずれかに該当する土地については、この限りでない。",
+  "kijo_diagram_ref": "CHK-BSL-A53_2-P3",
+  "flow_diagram": {
+    "title": "既存不適格敷地の適用除外判定フロー",
+    "description": "敷地面積最低限度の制定・変更時に既存の敷地が第1項の適用除外となるかを判定する",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "既存不適格敷地の適用除外判定を開始"
+      },
+      {
+        "id": "dec-site-status",
+        "type": "decision",
+        "title": "規制制定・変更時の敷地状況は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "現に建築物の敷地", "description": "現に建築物の敷地として使用されている土地" },
+          { "value": "権利に基づく土地", "description": "所有権等に基づき敷地として使用すれば不適格となる土地" },
+          { "value": "該当なし", "description": "いずれにも該当しない" }
+        ],
+        "description": "規制制定・変更時における敷地の使用状況を判定"
+      },
+      {
+        "id": "dec-nonconforming",
+        "type": "decision",
+        "title": "敷地面積が最低限度未満か？",
+        "decision_type": "binary",
+        "description": "規制時の敷地面積が最低限度に適合しないか判定"
+      },
+      {
+        "id": "proc-nonconforming-site",
+        "type": "process",
+        "title": "既存不適格敷地に該当",
+        "process_type": "mechanical",
+        "description": "規制制定・変更時に不適格だった敷地として認定"
+      },
+      {
+        "id": "dec-single-site",
+        "type": "decision",
+        "title": "土地の全部を一の敷地として使用するか？",
+        "decision_type": "binary",
+        "description": "当該土地の全部を一の敷地として使用するかを確認"
+      },
+      {
+        "id": "dec-regulation-type",
+        "type": "decision",
+        "title": "規制の種別は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "新規制定", "description": "新たに敷地面積最低限度が定められた場合" },
+          { "value": "変更", "description": "既存の最低限度が変更された場合" }
+        ],
+        "description": "規制が新規制定か変更かを確認"
+      },
+      {
+        "id": "dec-previous-violation",
+        "type": "decision",
+        "title": "変更前の制限に既に違反していたか？",
+        "decision_type": "binary",
+        "description": "規制変更時に従前の敷地面積最低限度制限に既に違反していたか判定（第3項第1号）"
+      },
+      {
+        "id": "proc-item1-applies",
+        "type": "process",
+        "title": "第1号該当",
+        "process_type": "mechanical",
+        "description": "従前の制限に既に違反していたため適用除外の対象外"
+      },
+      {
+        "id": "dec-became-conforming",
+        "type": "decision",
+        "title": "その後適合するに至ったか？",
+        "decision_type": "binary",
+        "description": "第1項の規定に適合するに至ったか判定（第3項第2号）"
+      },
+      {
+        "id": "proc-item2-applies",
+        "type": "process",
+        "title": "第2号該当",
+        "process_type": "mechanical",
+        "description": "適合するに至ったため適用除外の対象外"
+      },
+      {
+        "id": "pass-exemption",
+        "type": "terminal",
+        "title": "適用除外",
+        "result": "pass",
+        "description": "第1項の規定が適用されない（適用除外）"
+      },
+      {
+        "id": "fail-no-exemption",
+        "type": "terminal",
+        "title": "適用除外なし",
+        "result": "fail",
+        "description": "第1項の規定が適用される（適用除外とならない）"
+      },
+      {
+        "id": "end-not-applicable",
+        "type": "terminal",
+        "title": "適用対象外",
+        "result": "end",
+        "description": "既存不適格敷地に該当しないため本項の適用対象外"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-site-status",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-site-status",
+        "to": "dec-nonconforming",
+        "role": "option",
+        "label": "現に建築物の敷地"
+      },
+      {
+        "id": "e03",
+        "from": "dec-site-status",
+        "to": "dec-nonconforming",
+        "role": "option",
+        "label": "権利に基づく土地"
+      },
+      {
+        "id": "e04",
+        "from": "dec-site-status",
+        "to": "end-not-applicable",
+        "role": "option",
+        "label": "該当なし"
+      },
+      {
+        "id": "e05",
+        "from": "dec-nonconforming",
+        "to": "proc-nonconforming-site",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e06",
+        "from": "dec-nonconforming",
+        "to": "end-not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e07",
+        "from": "proc-nonconforming-site",
+        "to": "dec-single-site",
+        "role": "flow"
+      },
+      {
+        "id": "e08",
+        "from": "dec-single-site",
+        "to": "dec-regulation-type",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e09",
+        "from": "dec-single-site",
+        "to": "fail-no-exemption",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e10",
+        "from": "dec-regulation-type",
+        "to": "dec-became-conforming",
+        "role": "option",
+        "label": "新規制定"
+      },
+      {
+        "id": "e11",
+        "from": "dec-regulation-type",
+        "to": "dec-previous-violation",
+        "role": "option",
+        "label": "変更"
+      },
+      {
+        "id": "e12",
+        "from": "dec-previous-violation",
+        "to": "proc-item1-applies",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e13",
+        "from": "dec-previous-violation",
+        "to": "dec-became-conforming",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e14",
+        "from": "proc-item1-applies",
+        "to": "fail-no-exemption",
+        "role": "flow"
+      },
+      {
+        "id": "e15",
+        "from": "dec-became-conforming",
+        "to": "proc-item2-applies",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e16",
+        "from": "dec-became-conforming",
+        "to": "pass-exemption",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e17",
+        "from": "proc-item2-applies",
+        "to": "fail-no-exemption",
+        "role": "flow"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A53_2:P1"],
+      "description": "第1項の敷地面積最低限度規制を参照"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

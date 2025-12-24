@@ -1,0 +1,357 @@
+{
+  "id": "A85_P6_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "仮設興行場等の建築許可",
+    "target_subject": "仮設建築物",
+    "description": "仮設興行場、博覧会建築物、仮設店舗その他これらに類する仮設建築物の建築を許可する基準を判定するフロー"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "85",
+    "paragraph": "6"
+  },
+  "labels": [
+    "雑則",
+    "仮設建築物",
+    "許可"
+  ],
+  "text_raw": "特定行政庁は、仮設興行場、博覧会建築物、仮設店舗その他これらに類する仮設建築物について安全上、防火上及び衛生上支障がないと認める場合においては、一年以内の期間を定めてその建築を許可することができる。この場合においては、第十二条第一項から第四項まで、第二十一条から第二十七条まで、第三十一条、第三十四条第二項、第三十五条の二、第三十五条の三及び第三十七条の規定並びに第三章の規定は、適用しない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "OR",
+      "conditions": [
+        { "type": "use", "value": "仮設興行場" },
+        { "type": "use", "value": "博覧会建築物" },
+        { "type": "use", "value": "仮設店舗" },
+        { "type": "use", "value": "これらに類する仮設建築物" }
+      ]
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        { "ref": "info-safety-check", "operator": "==", "value": true },
+        { "ref": "info-period-limit", "operator": "==", "value": true }
+      ]
+    },
+    "exceptions": null
+  },
+  "flow_diagram": {
+    "title": "仮設興行場等建築許可判定フロー",
+    "description": "特定行政庁による仮設興行場等の建築許可の可否判定（1年以内）",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start"
+      },
+      {
+        "id": "dec-building-type",
+        "type": "decision",
+        "title": "仮設建築物の種別は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "仮設興行場" },
+          { "value": "博覧会建築物" },
+          { "value": "仮設店舗" },
+          { "value": "これらに類する仮設建築物" },
+          { "value": "該当なし" }
+        ],
+        "description": "建築物が仮設興行場等に該当するか"
+      },
+      {
+        "id": "proc-building-type-confirmed",
+        "type": "process",
+        "title": "仮設建築物該当",
+        "process_type": "mechanical",
+        "description": "仮設興行場等に該当することを確認"
+      },
+      {
+        "id": "dec-safety-check",
+        "type": "decision",
+        "title": "安全上支障がないか？",
+        "decision_type": "binary",
+        "description": "構造安全性等に問題がないか"
+      },
+      {
+        "id": "proc-safety-ok",
+        "type": "process",
+        "title": "安全性確認済み",
+        "process_type": "human_judgment",
+        "description": "安全上支障がないことを確認"
+      },
+      {
+        "id": "dec-fire-check",
+        "type": "decision",
+        "title": "防火上支障がないか？",
+        "decision_type": "binary",
+        "description": "防火性能に問題がないか"
+      },
+      {
+        "id": "proc-fire-ok",
+        "type": "process",
+        "title": "防火性確認済み",
+        "process_type": "human_judgment",
+        "description": "防火上支障がないことを確認"
+      },
+      {
+        "id": "dec-sanitation-check",
+        "type": "decision",
+        "title": "衛生上支障がないか？",
+        "decision_type": "binary",
+        "description": "衛生条件に問題がないか"
+      },
+      {
+        "id": "proc-sanitation-ok",
+        "type": "process",
+        "title": "衛生性確認済み",
+        "process_type": "human_judgment",
+        "description": "衛生上支障がないことを確認"
+      },
+      {
+        "id": "proc-all-conditions-met",
+        "type": "process",
+        "title": "安全・防火・衛生条件適合",
+        "process_type": "mechanical",
+        "description": "安全上・防火上・衛生上の全条件を満たす"
+      },
+      {
+        "id": "dec-period-type",
+        "type": "decision",
+        "title": "許可期間の種類は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "1年以内の期間" },
+          { "value": "工事期間中（特例）" }
+        ],
+        "description": "一年以内の期間か、工事施工上必要な期間か"
+      },
+      {
+        "id": "dec-period-within-1year",
+        "type": "decision",
+        "title": "許可期間は1年以内か？",
+        "decision_type": "binary",
+        "description": "定められた許可期間が1年以内であるか"
+      },
+      {
+        "id": "proc-work-period-special",
+        "type": "process",
+        "title": "工事期間特例適用",
+        "process_type": "human_judgment",
+        "description": "建築物の工事を施工するための仮設店舗等の場合、工事期間中の特例を適用"
+      },
+      {
+        "id": "pass-permitted",
+        "type": "terminal",
+        "title": "適合（許可可能）",
+        "result": "pass",
+        "description": "1年以内の期間を定めて建築を許可することができる"
+      },
+      {
+        "id": "pass-work-period",
+        "type": "terminal",
+        "title": "適合（工事期間特例）",
+        "result": "pass",
+        "description": "工事施工上必要と認める期間、建築を許可することができる"
+      },
+      {
+        "id": "fail-not-target",
+        "type": "terminal",
+        "title": "対象外",
+        "result": "end",
+        "description": "仮設興行場等に該当しないため本項の適用なし"
+      },
+      {
+        "id": "fail-safety",
+        "type": "terminal",
+        "title": "不適合（安全性）",
+        "result": "fail",
+        "description": "安全上支障があるため許可できない"
+      },
+      {
+        "id": "fail-fire",
+        "type": "terminal",
+        "title": "不適合（防火性）",
+        "result": "fail",
+        "description": "防火上支障があるため許可できない"
+      },
+      {
+        "id": "fail-sanitation",
+        "type": "terminal",
+        "title": "不適合（衛生性）",
+        "result": "fail",
+        "description": "衛生上支障があるため許可できない"
+      },
+      {
+        "id": "fail-period",
+        "type": "terminal",
+        "title": "不適合（期間超過）",
+        "result": "fail",
+        "description": "許可期間が1年を超えるため許可できない"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-building-type",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-building-type",
+        "to": "proc-building-type-confirmed",
+        "role": "option",
+        "label": "仮設興行場"
+      },
+      {
+        "id": "e03",
+        "from": "dec-building-type",
+        "to": "proc-building-type-confirmed",
+        "role": "option",
+        "label": "博覧会建築物"
+      },
+      {
+        "id": "e04",
+        "from": "dec-building-type",
+        "to": "proc-building-type-confirmed",
+        "role": "option",
+        "label": "仮設店舗"
+      },
+      {
+        "id": "e05",
+        "from": "dec-building-type",
+        "to": "proc-building-type-confirmed",
+        "role": "option",
+        "label": "これらに類する仮設建築物"
+      },
+      {
+        "id": "e06",
+        "from": "dec-building-type",
+        "to": "fail-not-target",
+        "role": "option",
+        "label": "該当なし"
+      },
+      {
+        "id": "e07",
+        "from": "proc-building-type-confirmed",
+        "to": "dec-safety-check",
+        "role": "flow"
+      },
+      {
+        "id": "e08",
+        "from": "dec-safety-check",
+        "to": "proc-safety-ok",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e09",
+        "from": "dec-safety-check",
+        "to": "fail-safety",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e10",
+        "from": "proc-safety-ok",
+        "to": "dec-fire-check",
+        "role": "flow"
+      },
+      {
+        "id": "e11",
+        "from": "dec-fire-check",
+        "to": "proc-fire-ok",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e12",
+        "from": "dec-fire-check",
+        "to": "fail-fire",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e13",
+        "from": "proc-fire-ok",
+        "to": "dec-sanitation-check",
+        "role": "flow"
+      },
+      {
+        "id": "e14",
+        "from": "dec-sanitation-check",
+        "to": "proc-sanitation-ok",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e15",
+        "from": "dec-sanitation-check",
+        "to": "fail-sanitation",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e16",
+        "from": "proc-sanitation-ok",
+        "to": "proc-all-conditions-met",
+        "role": "flow"
+      },
+      {
+        "id": "e17",
+        "from": "proc-all-conditions-met",
+        "to": "dec-period-type",
+        "role": "flow"
+      },
+      {
+        "id": "e18",
+        "from": "dec-period-type",
+        "to": "dec-period-within-1year",
+        "role": "option",
+        "label": "1年以内の期間"
+      },
+      {
+        "id": "e19",
+        "from": "dec-period-type",
+        "to": "proc-work-period-special",
+        "role": "option",
+        "label": "工事期間中（特例）"
+      },
+      {
+        "id": "e20",
+        "from": "dec-period-within-1year",
+        "to": "pass-permitted",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e21",
+        "from": "dec-period-within-1year",
+        "to": "fail-period",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e22",
+        "from": "proc-work-period-special",
+        "to": "pass-work-period",
+        "role": "flow"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-A85-P6",
+  "related_laws": [],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00Z",
+    "updated_at": "2025-12-25T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-skill",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

@@ -1,0 +1,255 @@
+{
+  "id": "A50_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "建ぺい率制限適合判定フロー",
+    "target_subject": "建築物",
+    "description": "建築物の建築面積の敷地面積に対する割合（建ぺい率）が都市計画で定められた建ぺい率を超えないことを判定するフロー"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "50",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "集団規定",
+    "建ぺい率"
+  ],
+  "text_raw": "建築物の建築面積（同一敷地内に二以上の建築物がある場合においては、その建築面積の合計）の敷地面積に対する割合（以下「建ぺい率」という。）は、次の各号に掲げる区分に従い、当該各号に定める数値を超えてはならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "建ぺい率制限が適用される区域"
+        }
+      ],
+      "note": "都市計画で定められた用途地域等"
+    },
+    "judgment_rule": {
+      "operator": "<=",
+      "lhs": {
+        "ref": "info-building-coverage-ratio",
+        "description": "建築物の建ぺい率"
+      },
+      "rhs": {
+        "ref": "info-designated-ratio",
+        "description": "指定建ぺい率"
+      }
+    }
+  },
+  "flow_diagram": {
+    "title": "法50条1項 建ぺい率制限適合判定フロー",
+    "description": "建築物の建ぺい率が指定建ぺい率以下であることを判定する",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "建ぺい率制限適合判定を開始"
+      },
+      {
+        "id": "proc-site-def",
+        "type": "process",
+        "title": "敷地の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から対象となる敷地を特定"
+      },
+      {
+        "id": "proc-site-area",
+        "type": "process",
+        "title": "敷地面積の算定",
+        "process_type": "mechanical",
+        "description": "敷地の幾何学的形状から面積を計算"
+      },
+      {
+        "id": "proc-buildings-set",
+        "type": "process",
+        "title": "敷地内建築物の特定",
+        "process_type": "human_judgment",
+        "description": "同一敷地内の全ての建築物（既存建築物を含む）を特定"
+      },
+      {
+        "id": "proc-building-area",
+        "type": "process",
+        "title": "建築面積の算定",
+        "process_type": "mechanical",
+        "description": "各建築物の水平投影面積から建築面積を算定",
+        "related_articles": [
+          "令::A2:P1:I2"
+        ]
+      },
+      {
+        "id": "dec-multiple-buildings",
+        "type": "decision",
+        "title": "同一敷地内に複数の建築物があるか？",
+        "decision_type": "binary",
+        "description": "同一敷地内に2以上の建築物があるかを確認"
+      },
+      {
+        "id": "proc-total-area",
+        "type": "process",
+        "title": "建築面積の合計算定",
+        "process_type": "mechanical",
+        "description": "同一敷地内の全ての建築物の建築面積を合計"
+      },
+      {
+        "id": "proc-coverage-ratio",
+        "type": "process",
+        "title": "建ぺい率の計算",
+        "process_type": "mechanical",
+        "description": "建築面積（の合計）を敷地面積で除して建ぺい率を算定"
+      },
+      {
+        "id": "proc-designated-ratio",
+        "type": "process",
+        "title": "指定建ぺい率の特定",
+        "process_type": "mechanical",
+        "description": "都市計画情報から当該敷地に適用される建ぺい率の限度を特定"
+      },
+      {
+        "id": "dec-compliance",
+        "type": "decision",
+        "title": "建ぺい率 <= 指定建ぺい率か？",
+        "decision_type": "binary",
+        "description": "計算した建ぺい率が指定建ぺい率以下であることを確認",
+        "condition": {
+          "operator": "LTE",
+          "lhs": {
+            "var": "BCR",
+            "desc": "建ぺい率"
+          },
+          "rhs": {
+            "var": "BCR_max",
+            "desc": "指定建ぺい率",
+            "unit": "%"
+          }
+        }
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "法50条1項の建ぺい率制限に適合"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "法50条1項の建ぺい率制限に不適合（建ぺい率超過）"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "proc-site-def",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "proc-site-def",
+        "to": "proc-site-area",
+        "role": "flow"
+      },
+      {
+        "id": "e03",
+        "from": "proc-site-area",
+        "to": "proc-buildings-set",
+        "role": "flow"
+      },
+      {
+        "id": "e04",
+        "from": "proc-buildings-set",
+        "to": "proc-building-area",
+        "role": "flow"
+      },
+      {
+        "id": "e05",
+        "from": "proc-building-area",
+        "to": "dec-multiple-buildings",
+        "role": "flow"
+      },
+      {
+        "id": "e06",
+        "from": "dec-multiple-buildings",
+        "to": "proc-total-area",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e07",
+        "from": "dec-multiple-buildings",
+        "to": "proc-coverage-ratio",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e08",
+        "from": "proc-total-area",
+        "to": "proc-coverage-ratio",
+        "role": "flow"
+      },
+      {
+        "id": "e09",
+        "from": "proc-site-def",
+        "to": "proc-designated-ratio",
+        "role": "flow"
+      },
+      {
+        "id": "e10",
+        "from": "proc-coverage-ratio",
+        "to": "dec-compliance",
+        "role": "flow"
+      },
+      {
+        "id": "e11",
+        "from": "proc-designated-ratio",
+        "to": "dec-compliance",
+        "role": "flow"
+      },
+      {
+        "id": "e12",
+        "from": "dec-compliance",
+        "to": "pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e13",
+        "from": "dec-compliance",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-A50-P1",
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "defines_detail",
+      "articles": [
+        "A2:P1:I2"
+      ],
+      "description": "建築面積の定義"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00.000Z",
+    "generator": "flow-generator-skill-v3",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法",
+    "author": "Claude Code"
+  }
+}

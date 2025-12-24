@@ -1,0 +1,205 @@
+{
+  "id": "A129_2_P4_I1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "全館避難安全検証法（避難時間に基づく検証）",
+    "target_subject": "建築物",
+    "description": "火災発生時において建築物からの避難の安全性を避難に要する時間に基づき検証する方法のフロー"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "129の2",
+    "paragraph": "4",
+    "item": "1"
+  },
+  "labels": [
+    "単体規定",
+    "避難安全検証"
+  ],
+  "kijo_diagram_ref": "CHK-BSL-KIJO-A129_2-P4-I1",
+  "flow_diagram": {
+    "title": "全館避難安全検証法判定フロー",
+    "description": "各階の階避難安全性能確認と、全館避難時間が煙流入時間を超えないことの検証",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "全館避難安全検証法による検証を開始"
+      },
+      {
+        "id": "dec-all-floors-safety",
+        "type": "decision",
+        "title": "全ての階が階避難安全性能を有するか？（イ）",
+        "decision_type": "binary",
+        "description": "各階が令第129条第3項第1号に定める方法により階避難安全性能を有することが確認されたか",
+        "related_articles": ["令::A129:P3:I1"]
+      },
+      {
+        "id": "proc-floor-safety-ok",
+        "type": "process",
+        "title": "階避難安全性能確認済",
+        "process_type": "sub_diagram_reference",
+        "description": "全ての階について階避難安全性能を確認"
+      },
+      {
+        "id": "proc-identify-fire-rooms",
+        "type": "process",
+        "title": "各階火災室の特定",
+        "process_type": "undefined_input",
+        "description": "各階における火災室を特定"
+      },
+      {
+        "id": "proc-calc-evac-time",
+        "type": "process",
+        "title": "全館避難時間の計算（ロ）",
+        "process_type": "mechanical",
+        "description": "在館者全てが火災室で火災が発生してから建築物からの避難を終了するまでに要する時間を計算"
+      },
+      {
+        "id": "proc-calc-smoke-time",
+        "type": "process",
+        "title": "煙流入時間の計算（ハ）",
+        "process_type": "mechanical",
+        "description": "煙が階段の部分または直上階以上の階に流入するために要する時間を計算"
+      },
+      {
+        "id": "dec-time-comparison",
+        "type": "decision",
+        "title": "全館避難時間 <= 煙流入時間か？（ニ）",
+        "decision_type": "binary",
+        "description": "全館避難時間が煙流入時間を超えないか（Tb <= Ti）",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "Tb", "desc": "全館避難時間" },
+          "rhs": { "var": "Ti", "desc": "煙流入時間", "unit": "min" }
+        }
+      },
+      {
+        "id": "proc-building-check-ok",
+        "type": "process",
+        "title": "全館避難安全確認",
+        "process_type": "mechanical",
+        "description": "全ての火災室について全館避難時間が煙流入時間を超えないことを確認"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "全館避難安全性能あり",
+        "result": "pass",
+        "description": "全館避難安全検証法により全館避難安全性能を有することが確認された"
+      },
+      {
+        "id": "fail-floor",
+        "type": "terminal",
+        "title": "検証不適合（階避難安全）",
+        "result": "fail",
+        "description": "いずれかの階が階避難安全性能を有していない"
+      },
+      {
+        "id": "fail-time",
+        "type": "terminal",
+        "title": "検証不適合（避難時間）",
+        "result": "fail",
+        "description": "全館避難時間が煙流入時間を超えている"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-all-floors-safety",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-all-floors-safety",
+        "to": "proc-floor-safety-ok",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "dec-all-floors-safety",
+        "to": "fail-floor",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e04",
+        "from": "proc-floor-safety-ok",
+        "to": "proc-identify-fire-rooms",
+        "role": "flow"
+      },
+      {
+        "id": "e05",
+        "from": "proc-identify-fire-rooms",
+        "to": "proc-calc-evac-time",
+        "role": "flow"
+      },
+      {
+        "id": "e06",
+        "from": "proc-identify-fire-rooms",
+        "to": "proc-calc-smoke-time",
+        "role": "flow"
+      },
+      {
+        "id": "e07",
+        "from": "proc-calc-evac-time",
+        "to": "dec-time-comparison",
+        "role": "flow"
+      },
+      {
+        "id": "e08",
+        "from": "proc-calc-smoke-time",
+        "to": "dec-time-comparison",
+        "role": "flow"
+      },
+      {
+        "id": "e09",
+        "from": "dec-time-comparison",
+        "to": "proc-building-check-ok",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e10",
+        "from": "dec-time-comparison",
+        "to": "fail-time",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e11",
+        "from": "proc-building-check-ok",
+        "to": "pass",
+        "role": "flow"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": [
+        "A129:P2",
+        "A129:P3:I1"
+      ],
+      "description": "階避難安全性能の定義および検証法"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00Z",
+    "updated_at": "2025-12-25T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

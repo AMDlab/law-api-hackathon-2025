@@ -1,0 +1,182 @@
+{
+  "id": "A86_2_P4_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "公告認定対象区域内における建築計画同意取得確認",
+    "target_subject": "建築計画申請者",
+    "description": "第2項の規定による許可申請時に、他の土地所有者または借地権者からの同意取得の確認"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "86の2",
+    "paragraph": "4",
+    "item": null
+  },
+  "labels": [
+    "集団規定",
+    "手続要件"
+  ],
+  "text_raw": "第二項の規定による許可を申請する者は、その者以外に公告認定対象区域内にある土地について所有権又は借地権を有する者があるときは、建築物に関する計画について、あらかじめ、これらの者の同意を得なければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "公告認定対象区域内"
+        },
+        {
+          "type": "procedure",
+          "value": "第86条の2第2項の規定による許可申請"
+        }
+      ],
+      "note": "建築基準法第86条の2第2項の許可申請時に限定"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "condition": "他の土地所有者・借地権者がいる場合",
+          "requirement": "建築物に関する計画について同意を得ている"
+        },
+        {
+          "condition": "同意取得は申請前に行われている",
+          "description": "あらかじめ同意を得ること"
+        }
+      ]
+    }
+  },
+  "kijo_diagram_ref": "CHK-BSL-A86-2-P4",
+  "flow_diagram": {
+    "title": "土地権利者からの同意取得確認フロー",
+    "description": "法86条の2第4項に基づく他の土地所有者・借地権者からの同意取得を判定するフローチャート",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "法86条の2第4項の適合判定を開始"
+      },
+      {
+        "id": "dec-other-rights-holders",
+        "type": "decision",
+        "title": "他の土地権利者がいるか？",
+        "decision_type": "binary",
+        "description": "申請者以外に公告認定対象区域内にある土地について所有権又は借地権を有する者がいるか"
+      },
+      {
+        "id": "proc-identify-rights-holders",
+        "type": "process",
+        "title": "権利者特定",
+        "process_type": "human_judgment",
+        "description": "他の土地所有者・借地権者を特定"
+      },
+      {
+        "id": "dec-all-consents-obtained",
+        "type": "decision",
+        "title": "全ての権利者から同意を得たか？",
+        "decision_type": "binary",
+        "description": "建築物に関する計画について、すべての他の土地権利者からあらかじめ同意を得ているか"
+      },
+      {
+        "id": "proc-consents-confirmed",
+        "type": "process",
+        "title": "同意取得完了",
+        "process_type": "mechanical",
+        "description": "必要な同意がすべて取得済み"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "法86条の2第4項の要件を満たす（許可申請可能）"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "法86条の2第4項の要件を満たさない（同意が不足）"
+      },
+      {
+        "id": "pass-no-consent-needed",
+        "type": "terminal",
+        "title": "同意不要",
+        "result": "pass",
+        "description": "他の土地権利者がいないため同意取得不要"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-other-rights-holders",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-other-rights-holders",
+        "to": "proc-identify-rights-holders",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "dec-other-rights-holders",
+        "to": "pass-no-consent-needed",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e04",
+        "from": "proc-identify-rights-holders",
+        "to": "dec-all-consents-obtained",
+        "role": "flow"
+      },
+      {
+        "id": "e05",
+        "from": "dec-all-consents-obtained",
+        "to": "proc-consents-confirmed",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e06",
+        "from": "dec-all-consents-obtained",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e07",
+        "from": "proc-consents-confirmed",
+        "to": "pass",
+        "role": "flow"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": [
+        "A86_2:P2"
+      ],
+      "description": "第86条の2第2項の規定による許可申請時に本要件が適用される"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

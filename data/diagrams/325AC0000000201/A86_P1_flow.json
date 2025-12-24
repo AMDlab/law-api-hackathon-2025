@@ -1,0 +1,277 @@
+{
+  "id": "A86_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "一団地の一の敷地認定",
+    "target_subject": "一団地",
+    "description": "一団地を形成する複数の敷地について、建築物の位置・構造が安全上等支障ないと認定された場合、特例対象規定の適用において一の敷地とみなす"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "86",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "集団規定",
+    "総合設計",
+    "制限緩和"
+  ],
+  "kijo_diagram_ref": "CHK-BSL-A86-P1",
+  "flow_diagram": {
+    "title": "一団地の一の敷地認定適合判定フロー",
+    "description": "二以上の敷地等が一団地を形成している場合に、特例対象規定の適用において一の敷地とみなす認定の要件を判定する",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "一団地の一の敷地認定判定開始"
+      },
+      {
+        "id": "dec-unified-site",
+        "type": "decision",
+        "title": "二以上の敷地等が一団地を形成しているか？",
+        "decision_type": "binary",
+        "description": "建築物の敷地または敷地以外の土地で二以上のものが一団地を形成しているか判定"
+      },
+      {
+        "id": "dec-building-count",
+        "type": "decision",
+        "title": "建築物の数は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "一棟", "description": "一の構えを成す建築物" },
+          { "value": "二棟以上", "description": "二以上の構えを成す建築物" }
+        ],
+        "description": "一団地内で建築等をする建築物が一棟か二棟以上かを確認"
+      },
+      {
+        "id": "proc-single-building",
+        "type": "process",
+        "title": "一棟の建築物",
+        "process_type": "mechanical",
+        "description": "一棟の場合は総合的設計要件は無条件で適合"
+      },
+      {
+        "id": "dec-comprehensive-design",
+        "type": "decision",
+        "title": "総合的設計によるか？",
+        "decision_type": "binary",
+        "description": "二棟以上の場合、総合的設計によって建築等をするものであるか確認"
+      },
+      {
+        "id": "proc-comprehensive-design-matched",
+        "type": "process",
+        "title": "総合的設計要件適合",
+        "process_type": "mechanical",
+        "description": "総合的設計要件を満たす"
+      },
+      {
+        "id": "dec-safety",
+        "type": "decision",
+        "title": "位置及び構造が安全上支障がないか？",
+        "decision_type": "binary",
+        "description": "建築物の位置及び構造が安全上支障がないか判定"
+      },
+      {
+        "id": "dec-fire-safety",
+        "type": "decision",
+        "title": "位置及び構造が防火上支障がないか？",
+        "decision_type": "binary",
+        "description": "建築物の位置及び構造が防火上支障がないか判定"
+      },
+      {
+        "id": "dec-hygiene",
+        "type": "decision",
+        "title": "位置及び構造が衛生上支障がないか？",
+        "decision_type": "binary",
+        "description": "建築物の位置及び構造が衛生上支障がないか判定"
+      },
+      {
+        "id": "dec-admin-approval",
+        "type": "decision",
+        "title": "特定行政庁の認定を受けたか？",
+        "decision_type": "binary",
+        "description": "特定行政庁が安全上、防火上及び衛生上支障がないと認めて認定したか確認"
+      },
+      {
+        "id": "pass-approval",
+        "type": "terminal",
+        "title": "適合（一の敷地とみなす）",
+        "result": "pass",
+        "description": "一団地を一の敷地とみなす認定要件に適合。特例対象規定の適用において一の敷地として扱う"
+      },
+      {
+        "id": "fail-not-unified",
+        "type": "terminal",
+        "title": "不適合（一団地形成せず）",
+        "result": "fail",
+        "description": "一団地を形成していないため認定対象外"
+      },
+      {
+        "id": "fail-no-comprehensive-design",
+        "type": "terminal",
+        "title": "不適合（総合的設計でない）",
+        "result": "fail",
+        "description": "二棟以上の場合に総合的設計でないため認定要件を満たさない"
+      },
+      {
+        "id": "fail-safety-issue",
+        "type": "terminal",
+        "title": "不適合（安全・防火・衛生上の支障あり）",
+        "result": "fail",
+        "description": "位置及び構造に安全上、防火上又は衛生上の支障があるため認定不可"
+      },
+      {
+        "id": "fail-no-approval",
+        "type": "terminal",
+        "title": "不適合（認定なし）",
+        "result": "fail",
+        "description": "特定行政庁の認定を受けていないため適合しない"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-unified-site",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-unified-site",
+        "to": "dec-building-count",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "dec-unified-site",
+        "to": "fail-not-unified",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e04",
+        "from": "dec-building-count",
+        "to": "proc-single-building",
+        "role": "option",
+        "label": "一棟"
+      },
+      {
+        "id": "e05",
+        "from": "dec-building-count",
+        "to": "dec-comprehensive-design",
+        "role": "option",
+        "label": "二棟以上"
+      },
+      {
+        "id": "e06",
+        "from": "proc-single-building",
+        "to": "dec-safety",
+        "role": "flow"
+      },
+      {
+        "id": "e07",
+        "from": "dec-comprehensive-design",
+        "to": "proc-comprehensive-design-matched",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e08",
+        "from": "dec-comprehensive-design",
+        "to": "fail-no-comprehensive-design",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e09",
+        "from": "proc-comprehensive-design-matched",
+        "to": "dec-safety",
+        "role": "flow"
+      },
+      {
+        "id": "e10",
+        "from": "dec-safety",
+        "to": "dec-fire-safety",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e11",
+        "from": "dec-safety",
+        "to": "fail-safety-issue",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e12",
+        "from": "dec-fire-safety",
+        "to": "dec-hygiene",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e13",
+        "from": "dec-fire-safety",
+        "to": "fail-safety-issue",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e14",
+        "from": "dec-hygiene",
+        "to": "dec-admin-approval",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e15",
+        "from": "dec-hygiene",
+        "to": "fail-safety-issue",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e16",
+        "from": "dec-admin-approval",
+        "to": "pass-approval",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e17",
+        "from": "dec-admin-approval",
+        "to": "fail-no-approval",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325M50004000040",
+      "law_name": "建築基準法施行規則",
+      "law_type": "regulation",
+      "relationship": "delegates_to",
+      "articles": [
+        "A10_4_2"
+      ],
+      "description": "法86条1項の認定の申請手続等を定める"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00+09:00",
+    "updated_at": "2025-12-25T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

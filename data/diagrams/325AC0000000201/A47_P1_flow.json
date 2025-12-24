@@ -1,0 +1,147 @@
+{
+  "id": "A47_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "柱の構造（地階・1階・2階）",
+    "target_subject": "柱",
+    "description": "地階、1階又は2階の柱が国土交通大臣が定めた構造方法を用いることを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "47",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": ["単体規定", "構造"],
+  "text_raw": "建築物の柱で地階、一階又は二階にあるものは、国土交通大臣が定めた構造方法を用いるものとしなければならない。ただし、次の各号のいずれかに該当するものについては、この限りでない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "floor_level",
+          "value": "地階、1階又は2階に存在する柱"
+        }
+      ],
+      "note": "地階、1階又は2階にある柱が対象"
+    },
+    "judgment_rule": {
+      "operator": "==",
+      "conditions": [
+        {
+          "ref": "info-minister-method",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    },
+    "exceptions": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "note": "各号のいずれかに該当する柱は適用除外",
+          "ref": "info-exempt",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "effect": "EXEMPT"
+    }
+  },
+  "flow_diagram": {
+    "title": "法47条1項適合判定フロー",
+    "description": "地階・1階・2階の柱が大臣定め構造方法に適合するかを判定するフロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start"
+      },
+      {
+        "id": "dec-floor",
+        "type": "decision",
+        "title": "柱の所属階は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "地階・1階・2階" },
+          { "value": "3階以上" }
+        ],
+        "description": "柱が存在する階を判定"
+      },
+      {
+        "id": "dec-exempt",
+        "type": "decision",
+        "title": "ただし書き各号に該当するか？",
+        "decision_type": "binary",
+        "description": "ただし書き各号のいずれかに該当し適用除外となるか"
+      },
+      {
+        "id": "proc-exempt-match",
+        "type": "process",
+        "title": "適用除外該当",
+        "process_type": "mechanical",
+        "description": "ただし書き各号に該当するため適用除外"
+      },
+      {
+        "id": "dec-minister-method",
+        "type": "decision",
+        "title": "大臣定め構造方法に該当するか？",
+        "decision_type": "binary",
+        "description": "国土交通大臣が定めた構造方法（告示）に該当するか"
+      },
+      {
+        "id": "pass-not-applicable",
+        "type": "terminal",
+        "title": "適合（対象外）",
+        "result": "pass",
+        "description": "3階以上の柱のため規制対象外"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "法47条1項の規定に適合"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "法47条1項の規定に不適合"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "dec-floor", "role": "flow" },
+      { "id": "e02", "from": "dec-floor", "to": "pass-not-applicable", "role": "option", "label": "3階以上" },
+      { "id": "e03", "from": "dec-floor", "to": "dec-exempt", "role": "option", "label": "地階・1階・2階" },
+      { "id": "e04", "from": "dec-exempt", "to": "proc-exempt-match", "role": "yes", "label": "はい" },
+      { "id": "e05", "from": "proc-exempt-match", "to": "pass", "role": "flow" },
+      { "id": "e06", "from": "dec-exempt", "to": "dec-minister-method", "role": "no", "label": "いいえ" },
+      { "id": "e07", "from": "dec-minister-method", "to": "pass", "role": "yes", "label": "はい" },
+      { "id": "e08", "from": "dec-minister-method", "to": "fail", "role": "no", "label": "いいえ" }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-A47-P1",
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": [],
+      "description": "柱の構造に関する関連規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

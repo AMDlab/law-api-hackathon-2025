@@ -1,0 +1,189 @@
+{
+  "id": "A48_P16_I2_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "特例許可における建築審査会の同意取得不要判定（日常生活必要建築物）",
+    "target_subject": "建築物",
+    "description": "日常生活に必要な建築物で環境悪化防止措置が講じられている場合の特例許可手続き簡素化の適合判定フロー"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "48",
+    "paragraph": "16",
+    "item": "2"
+  },
+  "labels": [
+    "集団規定",
+    "用途制限",
+    "特例許可手続"
+  ],
+  "text_raw": "日常生活に必要な政令で定める建築物で、騒音又は振動の発生その他の事象による住居の環境の悪化を防止するために必要な国土交通省令で定める措置が講じられているものの建築について特例許可（第一項から第七項までの規定のただし書の規定によるものに限る。）をする場合",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "第一種低層住居専用地域、第二種低層住居専用地域、第一種中高層住居専用地域、第二種中高層住居専用地域、第一種住居地域、第二種住居地域、準住居地域のいずれか"
+        },
+        {
+          "type": "procedure",
+          "value": "特例許可申請中"
+        }
+      ],
+      "note": "法第48条第1項から第7項までの住居系地域における特例許可に適用"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "classification",
+          "subject": "建築物",
+          "property": "用途",
+          "value": "日常生活に必要な政令で定める用途"
+        },
+        {
+          "type": "proposition",
+          "subject": "建築物",
+          "property": "環境悪化防止措置適合",
+          "value": true
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "flow_diagram": {
+    "title": "建築審査会同意取得不要の判定フロー（日常生活必要建築物）",
+    "description": "日常生活に必要な政令で定める建築物かつ省令で定める環境悪化防止措置が講じられている場合に建築審査会の同意取得が不要となるかを判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "建築審査会同意取得不要該当の判定を開始"
+      },
+      {
+        "id": "dec-daily-life-building",
+        "type": "decision",
+        "title": "日常生活に必要な建築物か？",
+        "decision_type": "binary",
+        "description": "政令（令第130条の9の3）で定める日常生活に必要な建築物に該当するか",
+        "related_articles": ["令::A130_9_3"]
+      },
+      {
+        "id": "proc-daily-life-applicable",
+        "type": "process",
+        "title": "日常生活必要建築物に該当",
+        "process_type": "mechanical",
+        "description": "政令で定める日常生活に必要な建築物に該当する"
+      },
+      {
+        "id": "dec-measures-compliant",
+        "type": "decision",
+        "title": "環境悪化防止措置に適合するか？",
+        "decision_type": "binary",
+        "description": "騒音・振動等による住居環境悪化防止のための国土交通省令（規則第10条の4の15）で定める措置に適合するか",
+        "related_articles": ["規則::A10_4_15"]
+      },
+      {
+        "id": "proc-measures-applicable",
+        "type": "process",
+        "title": "省令措置に適合",
+        "process_type": "mechanical",
+        "description": "国土交通省令で定める環境悪化防止措置に適合している"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "建築審査会の同意取得不要",
+        "result": "pass",
+        "description": "第48条第16項第2号の要件を満たし、建築審査会の同意を得ることを要しない"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "建築審査会の同意が必要",
+        "result": "fail",
+        "description": "第48条第16項第2号の要件を満たさず、建築審査会の同意が必要"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-daily-life-building",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-daily-life-building",
+        "to": "proc-daily-life-applicable",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "dec-daily-life-building",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e04",
+        "from": "proc-daily-life-applicable",
+        "to": "dec-measures-compliant",
+        "role": "flow"
+      },
+      {
+        "id": "e05",
+        "from": "dec-measures-compliant",
+        "to": "proc-measures-applicable",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e06",
+        "from": "dec-measures-compliant",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e07",
+        "from": "proc-measures-applicable",
+        "to": "pass",
+        "role": "flow"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-A48-P16-I2",
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "delegates_to",
+      "articles": ["A130_9_3"],
+      "description": "日常生活に必要な建築物の定義"
+    },
+    {
+      "law_id": "325M50004000040",
+      "law_name": "建築基準法施行規則",
+      "law_type": "regulation",
+      "relationship": "delegates_to",
+      "articles": ["A10_4_15"],
+      "description": "騒音・振動等による環境悪化防止措置の定義"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00.000Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

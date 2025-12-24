@@ -1,0 +1,237 @@
+{
+  "id": "A35_2_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "特殊建築物等の内装制限（適合判定フロー）",
+    "target_subject": "建築物",
+    "description": "別表第一用途等の建築物における壁・天井の室内仕上げの防火性能要件の判定フロー"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "35の2",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": ["単体規定", "防火", "内装制限"],
+  "text_raw": "別表第一（い）欄に掲げる用途に供する特殊建築物、階数が三以上である建築物、政令で定める窓その他の開口部を有しない居室を有する建築物、延べ面積が千平方メートルをこえる建築物又は建築物の調理室、浴室その他の室でかまど、こんろその他火を使用する設備若しくは器具を設けたものは、政令で定めるものを除き、政令で定める技術的基準に従つて、その壁及び天井（天井のない場合においては、屋根）の室内に面する部分の仕上げを防火上支障がないようにしなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "OR",
+      "conditions": [
+        { "type": "building_type", "value": "別表第一（い）欄用途の特殊建築物" },
+        { "type": "building_feature", "value": "階数が3以上" },
+        { "type": "building_feature", "value": "政令で定める無窓居室を有する" },
+        { "type": "building_feature", "value": "延べ面積>1000㎡" },
+        { "type": "room_feature", "value": "火気使用室を有する" }
+      ],
+      "note": "いずれか1つでも該当すれば内装制限が適用される"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        { "ref": "not-applicable" },
+        { "ref": "exempt" },
+        { "ref": "tech-compliance" }
+      ]
+    },
+    "exceptions": {
+      "operator": "OR",
+      "conditions": [
+        { "type": "regulatory", "description": "政令で定める適用除外要件に該当する場合" }
+      ],
+      "effect": "EXEMPT"
+    }
+  },
+  "flow_diagram": {
+    "title": "法35条の2第1項 内装制限 適合判定フロー",
+    "description": "内装制限の適用対象該当性、適用除外該当性、技術基準適合を判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "法35条の2第1項の適合判定を開始"
+      },
+      {
+        "id": "dec-special-use",
+        "type": "decision",
+        "title": "別表第一（い）欄用途の特殊建築物か？",
+        "decision_type": "binary",
+        "description": "建築物が別表第一（い）欄に掲げる用途に供する特殊建築物か判定",
+        "related_articles": ["法::別表第一"]
+      },
+      {
+        "id": "proc-trigger-use",
+        "type": "process",
+        "title": "内装制限適用対象（特殊建築物）",
+        "process_type": "mechanical",
+        "description": "別表第一（い）欄用途の特殊建築物のため内装制限適用対象"
+      },
+      {
+        "id": "dec-floors",
+        "type": "decision",
+        "title": "階数 >= 3か？",
+        "decision_type": "binary",
+        "description": "建築物の階数が3以上か判定",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "F", "desc": "階数" },
+          "rhs": { "value": 3 }
+        }
+      },
+      {
+        "id": "proc-trigger-floors",
+        "type": "process",
+        "title": "内装制限適用対象（階数3以上）",
+        "process_type": "mechanical",
+        "description": "階数が3以上のため内装制限適用対象"
+      },
+      {
+        "id": "dec-windowless",
+        "type": "decision",
+        "title": "政令で定める無窓居室を有するか？",
+        "decision_type": "binary",
+        "description": "政令で定める窓その他の開口部を有しない居室を有するか判定",
+        "related_articles": ["令::A111"]
+      },
+      {
+        "id": "proc-trigger-windowless",
+        "type": "process",
+        "title": "内装制限適用対象（無窓居室）",
+        "process_type": "mechanical",
+        "description": "政令で定める無窓居室を有するため内装制限適用対象"
+      },
+      {
+        "id": "dec-area",
+        "type": "decision",
+        "title": "延べ面積 > 1000㎡か？",
+        "decision_type": "binary",
+        "description": "建築物の延べ面積が1000平方メートルを超えるか判定",
+        "condition": {
+          "operator": "GT",
+          "lhs": { "var": "A", "desc": "延べ面積" },
+          "rhs": { "value": 1000, "unit": "m2" }
+        }
+      },
+      {
+        "id": "proc-trigger-area",
+        "type": "process",
+        "title": "内装制限適用対象（延べ面積1000㎡超）",
+        "process_type": "mechanical",
+        "description": "延べ面積が1000㎡を超えるため内装制限適用対象"
+      },
+      {
+        "id": "dec-fire-room",
+        "type": "decision",
+        "title": "火気使用室を有するか？",
+        "decision_type": "binary",
+        "description": "調理室、浴室等の火気使用設備・器具を設けた室を有するか判定"
+      },
+      {
+        "id": "proc-trigger-fire-room",
+        "type": "process",
+        "title": "内装制限適用対象（火気使用室）",
+        "process_type": "mechanical",
+        "description": "火気使用室を有するため内装制限適用対象"
+      },
+      {
+        "id": "proc-not-applicable",
+        "type": "process",
+        "title": "適用対象外",
+        "process_type": "mechanical",
+        "description": "いずれの適用条件にも該当しないため内装制限適用対象外"
+      },
+      {
+        "id": "dec-exempt",
+        "type": "decision",
+        "title": "政令で定める適用除外に該当するか？",
+        "decision_type": "binary",
+        "description": "政令で定める適用除外要件（耐火建築物等）に該当するか判定",
+        "related_articles": ["令::A128_5"]
+      },
+      {
+        "id": "proc-exempt",
+        "type": "process",
+        "title": "適用除外（政令で定める建築物）",
+        "process_type": "mechanical",
+        "description": "政令で定める適用除外要件に該当するため適用除外"
+      },
+      {
+        "id": "dec-tech-standard",
+        "type": "decision",
+        "title": "内装制限技術基準に適合するか？",
+        "decision_type": "binary",
+        "description": "壁及び天井の室内仕上げが政令で定める技術的基準に適合するか判定",
+        "related_articles": ["令::A128_4", "令::A128_5"]
+      },
+      {
+        "id": "proc-comply",
+        "type": "process",
+        "title": "技術基準適合",
+        "process_type": "mechanical",
+        "description": "内装制限の技術的基準に適合"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "法35条の2第1項の規定に適合"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "法35条の2第1項の規定に不適合"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "dec-special-use", "role": "flow" },
+      { "id": "e02", "from": "dec-special-use", "to": "proc-trigger-use", "role": "yes", "label": "はい" },
+      { "id": "e03", "from": "dec-special-use", "to": "dec-floors", "role": "no", "label": "いいえ" },
+      { "id": "e04", "from": "proc-trigger-use", "to": "dec-exempt", "role": "flow" },
+      { "id": "e05", "from": "dec-floors", "to": "proc-trigger-floors", "role": "yes", "label": "はい" },
+      { "id": "e06", "from": "dec-floors", "to": "dec-windowless", "role": "no", "label": "いいえ" },
+      { "id": "e07", "from": "proc-trigger-floors", "to": "dec-exempt", "role": "flow" },
+      { "id": "e08", "from": "dec-windowless", "to": "proc-trigger-windowless", "role": "yes", "label": "はい" },
+      { "id": "e09", "from": "dec-windowless", "to": "dec-area", "role": "no", "label": "いいえ" },
+      { "id": "e10", "from": "proc-trigger-windowless", "to": "dec-exempt", "role": "flow" },
+      { "id": "e11", "from": "dec-area", "to": "proc-trigger-area", "role": "yes", "label": "はい" },
+      { "id": "e12", "from": "dec-area", "to": "dec-fire-room", "role": "no", "label": "いいえ" },
+      { "id": "e13", "from": "proc-trigger-area", "to": "dec-exempt", "role": "flow" },
+      { "id": "e14", "from": "dec-fire-room", "to": "proc-trigger-fire-room", "role": "yes", "label": "はい" },
+      { "id": "e15", "from": "dec-fire-room", "to": "proc-not-applicable", "role": "no", "label": "いいえ" },
+      { "id": "e16", "from": "proc-trigger-fire-room", "to": "dec-exempt", "role": "flow" },
+      { "id": "e17", "from": "proc-not-applicable", "to": "pass", "role": "flow" },
+      { "id": "e18", "from": "dec-exempt", "to": "proc-exempt", "role": "yes", "label": "はい" },
+      { "id": "e19", "from": "dec-exempt", "to": "dec-tech-standard", "role": "no", "label": "いいえ" },
+      { "id": "e20", "from": "proc-exempt", "to": "pass", "role": "flow" },
+      { "id": "e21", "from": "dec-tech-standard", "to": "proc-comply", "role": "yes", "label": "はい" },
+      { "id": "e22", "from": "dec-tech-standard", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e23", "from": "proc-comply", "to": "pass", "role": "flow" }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-A35_2-P1",
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "delegates_to",
+      "articles": ["A111", "A128_4", "A128_5"],
+      "description": "無窓居室の定義、内装制限の技術的基準、適用除外を政令で規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

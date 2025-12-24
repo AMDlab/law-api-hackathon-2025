@@ -1,0 +1,125 @@
+{
+  "id": "A48_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "第一種低層住居専用地域における建築物の用途制限（適合判定フロー）",
+    "target_subject": "建築物",
+    "description": "第一種低層住居専用地域内において建築可能な建築物の用途が別表第二(い)項に適合するかを判定するフロー"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "48",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": ["集団規定", "用途制限"],
+  "text_raw": "第一種低層住居専用地域内においては、別表第二（い）項に掲げる建築物以外の建築物は、建築してはならない。ただし、特定行政庁が第一種低層住居専用地域における良好な住居の環境を害するおそれがないと認め、又は公益上やむを得ないと認めて許可した場合においては、この限りでない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        { "type": "location", "value": "第一種低層住居専用地域内" }
+      ]
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        { "ref": "info-table2-compliance" },
+        { "ref": "info-special-approval" }
+      ]
+    },
+    "exceptions": {
+      "operator": "OR",
+      "conditions": [
+        { "note": "特定行政庁の許可を受けた場合", "ref": "info-special-approval" }
+      ],
+      "effect": "EXEMPT"
+    }
+  },
+  "flow_diagram": {
+    "title": "法48条1項 第一種低層住居専用地域の用途制限 適合判定フロー",
+    "description": "建築物の用途が別表第二(い)項に該当するか、特定行政庁の許可を受けているかを判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "法48条1項の適合判定を開始"
+      },
+      {
+        "id": "dec-table2",
+        "type": "decision",
+        "title": "別表第二(い)項に掲げる建築物か？",
+        "decision_type": "binary",
+        "description": "建築物の用途が別表第二(い)項（住宅、兼用住宅、共同住宅、学校、図書館、神社、老人ホーム、診療所等）に該当するか判定",
+        "related_articles": ["法::別表第二(い)"]
+      },
+      {
+        "id": "proc-table2-yes",
+        "type": "process",
+        "title": "別表第二(い)項該当",
+        "process_type": "mechanical",
+        "description": "別表第二(い)項に掲げる用途に該当するため建築可能"
+      },
+      {
+        "id": "dec-permit",
+        "type": "decision",
+        "title": "特定行政庁の許可を受けているか？",
+        "decision_type": "binary",
+        "description": "特定行政庁が良好な住居環境を害するおそれがないと認め、又は公益上やむを得ないと認めて許可しているか判定"
+      },
+      {
+        "id": "proc-permit-yes",
+        "type": "process",
+        "title": "特定行政庁許可あり（適用除外）",
+        "process_type": "mechanical",
+        "description": "ただし書きにより特定行政庁の許可を受けているため建築可能"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "法48条1項の規定に適合"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "法48条1項の規定に不適合（建築不可）"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "dec-table2", "role": "flow" },
+      { "id": "e02", "from": "dec-table2", "to": "proc-table2-yes", "role": "yes", "label": "はい" },
+      { "id": "e03", "from": "dec-table2", "to": "dec-permit", "role": "no", "label": "いいえ" },
+      { "id": "e04", "from": "proc-table2-yes", "to": "pass", "role": "flow" },
+      { "id": "e05", "from": "dec-permit", "to": "proc-permit-yes", "role": "yes", "label": "はい" },
+      { "id": "e06", "from": "dec-permit", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e07", "from": "proc-permit-yes", "to": "pass", "role": "flow" }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-A48-P1",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["別表第二(い)"],
+      "description": "第一種低層住居専用地域において建築可能な建築物を定める"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

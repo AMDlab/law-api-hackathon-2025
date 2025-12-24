@@ -1,0 +1,181 @@
+{
+  "id": "A137_18_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "用途変更における類似用途の判定（法第87条第1項関係）",
+    "target_subject": "建築物",
+    "description": "法第87条第1項の規定により用途変更の際に建築基準法の一部規定が準用されない類似の用途に該当するかの判定フロー"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "137_18",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "用途変更",
+    "類似用途",
+    "既存建築物"
+  ],
+  "kijo_diagram_ref": "CHK-ORD-A137-18-P1",
+  "flow_diagram": {
+    "title": "類似用途判定フロー（令第137条の18第1項）",
+    "description": "用途変更前後の用途が同一号内の類似用途に該当するか、およびただし書きの除外に該当するかを判定するフロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "用途変更における類似用途判定の開始"
+      },
+      {
+        "id": "dec-current-use-group",
+        "type": "decision",
+        "title": "現在の用途はどの号に該当するか？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "1号（劇場等）" },
+          { "value": "2号（公会堂等）" },
+          { "value": "3号（診療所等）" },
+          { "value": "4号（ホテル等）" },
+          { "value": "5号（下宿等）" },
+          { "value": "6号（博物館等）" },
+          { "value": "7号（体育館等）" },
+          { "value": "8号（百貨店等）" },
+          { "value": "9号（キャバレー等）" },
+          { "value": "10号（待合等）" },
+          { "value": "11号（スタジオ）" },
+          { "value": "該当なし" }
+        ],
+        "description": "現在の用途が第1号〜第11号のいずれに該当するか判定"
+      },
+      {
+        "id": "proc-no-match",
+        "type": "process",
+        "title": "号非該当",
+        "process_type": "mechanical",
+        "description": "現在の用途がいずれの号にも該当しない"
+      },
+      {
+        "id": "dec-new-use-same-item",
+        "type": "decision",
+        "title": "変更後の用途は同一号内の他の用途か？",
+        "decision_type": "binary",
+        "description": "変更後の用途が現在の用途と同一号に属する他の用途であるか判定"
+      },
+      {
+        "id": "proc-item-match",
+        "type": "process",
+        "title": "号該当確認",
+        "process_type": "mechanical",
+        "description": "現在の用途と変更後の用途が同一号内の類似用途に該当"
+      },
+      {
+        "id": "dec-exception-item",
+        "type": "decision",
+        "title": "該当する号は第3号・第6号・第7号・第9号のいずれか？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "第3号・第6号" },
+          { "value": "第7号" },
+          { "value": "第9号" },
+          { "value": "その他の号" }
+        ],
+        "description": "ただし書きの適用対象となる号であるかを判定"
+      },
+      {
+        "id": "dec-zone-3-6",
+        "type": "decision",
+        "title": "建築物は1低専・2低専・田園住居地域内か？",
+        "decision_type": "binary",
+        "description": "第3号・第6号用途の建築物が1種低層住居専用・2種低層住居専用・田園住居地域内にあるか判定"
+      },
+      {
+        "id": "dec-zone-7",
+        "type": "decision",
+        "title": "建築物は1中高専・2中高専・工専地域内か？",
+        "decision_type": "binary",
+        "description": "第7号用途の建築物が1種中高層住居専用・2種中高層住居専用・工業専用地域内にあるか判定"
+      },
+      {
+        "id": "dec-zone-9",
+        "type": "decision",
+        "title": "建築物は準住居・近商地域内か？",
+        "decision_type": "binary",
+        "description": "第9号用途の建築物が準住居・近隣商業地域内にあるか判定"
+      },
+      {
+        "id": "proc-exception-applies",
+        "type": "process",
+        "title": "ただし書き該当",
+        "process_type": "mechanical",
+        "description": "ただし書きの除外規定に該当するため、類似用途として扱わない"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "類似用途に該当",
+        "result": "pass",
+        "description": "令第137条の18第1項に規定する類似の用途に該当する（法第87条第1項の一部規定の準用除外）"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "類似用途に該当しない",
+        "result": "fail",
+        "description": "類似の用途に該当しないため、法第87条第1項の規定が準用される"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "dec-current-use-group", "role": "flow" },
+      { "id": "e02", "from": "dec-current-use-group", "to": "proc-no-match", "role": "option", "label": "該当なし" },
+      { "id": "e03", "from": "dec-current-use-group", "to": "dec-new-use-same-item", "role": "option", "label": "1号（劇場等）" },
+      { "id": "e04", "from": "dec-current-use-group", "to": "dec-new-use-same-item", "role": "option", "label": "2号（公会堂等）" },
+      { "id": "e05", "from": "dec-current-use-group", "to": "dec-new-use-same-item", "role": "option", "label": "3号（診療所等）" },
+      { "id": "e06", "from": "dec-current-use-group", "to": "dec-new-use-same-item", "role": "option", "label": "4号（ホテル等）" },
+      { "id": "e07", "from": "dec-current-use-group", "to": "dec-new-use-same-item", "role": "option", "label": "5号（下宿等）" },
+      { "id": "e08", "from": "dec-current-use-group", "to": "dec-new-use-same-item", "role": "option", "label": "6号（博物館等）" },
+      { "id": "e09", "from": "dec-current-use-group", "to": "dec-new-use-same-item", "role": "option", "label": "7号（体育館等）" },
+      { "id": "e10", "from": "dec-current-use-group", "to": "dec-new-use-same-item", "role": "option", "label": "8号（百貨店等）" },
+      { "id": "e11", "from": "dec-current-use-group", "to": "dec-new-use-same-item", "role": "option", "label": "9号（キャバレー等）" },
+      { "id": "e12", "from": "dec-current-use-group", "to": "dec-new-use-same-item", "role": "option", "label": "10号（待合等）" },
+      { "id": "e13", "from": "dec-current-use-group", "to": "dec-new-use-same-item", "role": "option", "label": "11号（スタジオ）" },
+      { "id": "e14", "from": "proc-no-match", "to": "fail", "role": "flow" },
+      { "id": "e15", "from": "dec-new-use-same-item", "to": "proc-item-match", "role": "yes", "label": "はい" },
+      { "id": "e16", "from": "dec-new-use-same-item", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e17", "from": "proc-item-match", "to": "dec-exception-item", "role": "flow" },
+      { "id": "e18", "from": "dec-exception-item", "to": "dec-zone-3-6", "role": "option", "label": "第3号・第6号" },
+      { "id": "e19", "from": "dec-exception-item", "to": "dec-zone-7", "role": "option", "label": "第7号" },
+      { "id": "e20", "from": "dec-exception-item", "to": "dec-zone-9", "role": "option", "label": "第9号" },
+      { "id": "e21", "from": "dec-exception-item", "to": "pass", "role": "option", "label": "その他の号" },
+      { "id": "e22", "from": "dec-zone-3-6", "to": "proc-exception-applies", "role": "yes", "label": "はい" },
+      { "id": "e23", "from": "dec-zone-3-6", "to": "pass", "role": "no", "label": "いいえ" },
+      { "id": "e24", "from": "dec-zone-7", "to": "proc-exception-applies", "role": "yes", "label": "はい" },
+      { "id": "e25", "from": "dec-zone-7", "to": "pass", "role": "no", "label": "いいえ" },
+      { "id": "e26", "from": "dec-zone-9", "to": "proc-exception-applies", "role": "yes", "label": "はい" },
+      { "id": "e27", "from": "dec-zone-9", "to": "pass", "role": "no", "label": "いいえ" },
+      { "id": "e28", "from": "proc-exception-applies", "to": "fail", "role": "flow" }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": ["A87:P1"],
+      "description": "法第87条第1項により政令で指定する類似の用途"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T12:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

@@ -1,0 +1,170 @@
+{
+  "id": "A68_7_P5_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "予定道路の前面道路みなし適用",
+    "target_subject": "建築物",
+    "description": "予定道路の指定された敷地の建築物が、予定道路を前面道路とみなされるための要件を判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "68の7",
+    "paragraph": "5",
+    "item": null
+  },
+  "labels": ["集団規定", "道路"],
+  "text_raw": "第一項の規定により予定道路が指定された場合において、建築物の敷地が予定道路に接するとき又は当該敷地内に予定道路があるときは、特定行政庁が交通上、安全上、防火上及び衛生上支障がないと認めて許可した建築物については、当該予定道路を第五十二条第二項の前面道路とみなして、同項から同条第七項まで及び第九項の規定を適用するものとする。この場合においては、当該敷地のうち予定道路に係る部分の面積は、敷地面積又は敷地の部分の面積に算入しないものとする。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "reference",
+          "value": "法68条の7第1項により予定道路が指定された"
+        },
+        {
+          "type": "condition",
+          "value": "敷地が予定道路に接するか、または敷地内に予定道路がある"
+        }
+      ],
+      "note": "予定道路の指定と敷地の位置関係が要件"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-site-road-condition",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "ref": "info-authority-approval",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "flow_diagram": {
+    "title": "予定道路の前面道路みなし適用判定フロー",
+    "description": "予定道路が指定された敷地において、前面道路みなし適用の要件を判定するフロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start"
+      },
+      {
+        "id": "dec-planned-road-designated",
+        "type": "decision",
+        "title": "予定道路が指定されているか？",
+        "decision_type": "binary",
+        "description": "法68条の7第1項により予定道路が指定されているか確認"
+      },
+      {
+        "id": "dec-site-road-relation",
+        "type": "decision",
+        "title": "敷地と予定道路の位置関係は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "敷地が予定道路に接する" },
+          { "value": "敷地内に予定道路がある" },
+          { "value": "該当しない" }
+        ],
+        "description": "敷地が予定道路に接するか、または敷地内に予定道路があるか判定"
+      },
+      {
+        "id": "proc-site-road-applicable",
+        "type": "process",
+        "title": "位置関係要件充足",
+        "process_type": "mechanical",
+        "description": "敷地と予定道路の位置関係の要件を満たしている"
+      },
+      {
+        "id": "dec-authority-approval",
+        "type": "decision",
+        "title": "特定行政庁の許可を受けているか？",
+        "decision_type": "binary",
+        "description": "特定行政庁が交通上、安全上、防火上及び衛生上支障がないと認めて許可したか確認"
+      },
+      {
+        "id": "proc-deemed-front-road",
+        "type": "process",
+        "title": "前面道路みなし適用",
+        "process_type": "mechanical",
+        "description": "予定道路を法52条第2項の前面道路とみなして適用"
+      },
+      {
+        "id": "proc-site-area-exclusion",
+        "type": "process",
+        "title": "敷地面積から予定道路部分を除外",
+        "process_type": "mechanical",
+        "description": "敷地のうち予定道路に係る部分の面積を敷地面積から算入しない"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "みなし適用対象",
+        "result": "pass",
+        "description": "予定道路を前面道路とみなして容積率等の規定を適用"
+      },
+      {
+        "id": "fail-not-designated",
+        "type": "terminal",
+        "title": "対象外（予定道路指定なし）",
+        "result": "fail",
+        "description": "予定道路が指定されていないため本規定の対象外"
+      },
+      {
+        "id": "fail-no-relation",
+        "type": "terminal",
+        "title": "対象外（位置関係不該当）",
+        "result": "fail",
+        "description": "敷地が予定道路に接しておらず、敷地内にも予定道路がないため対象外"
+      },
+      {
+        "id": "fail-no-approval",
+        "type": "terminal",
+        "title": "みなし適用不可",
+        "result": "fail",
+        "description": "特定行政庁の許可がないため前面道路みなし適用不可"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "dec-planned-road-designated", "role": "flow" },
+      { "id": "e02", "from": "dec-planned-road-designated", "to": "dec-site-road-relation", "role": "yes", "label": "はい" },
+      { "id": "e03", "from": "dec-planned-road-designated", "to": "fail-not-designated", "role": "no", "label": "いいえ" },
+      { "id": "e04", "from": "dec-site-road-relation", "to": "proc-site-road-applicable", "role": "option", "label": "敷地が予定道路に接する" },
+      { "id": "e05", "from": "dec-site-road-relation", "to": "proc-site-road-applicable", "role": "option", "label": "敷地内に予定道路がある" },
+      { "id": "e06", "from": "dec-site-road-relation", "to": "fail-no-relation", "role": "option", "label": "該当しない" },
+      { "id": "e07", "from": "proc-site-road-applicable", "to": "dec-authority-approval", "role": "flow" },
+      { "id": "e08", "from": "dec-authority-approval", "to": "proc-deemed-front-road", "role": "yes", "label": "はい" },
+      { "id": "e09", "from": "dec-authority-approval", "to": "fail-no-approval", "role": "no", "label": "いいえ" },
+      { "id": "e10", "from": "proc-deemed-front-road", "to": "proc-site-area-exclusion", "role": "flow" },
+      { "id": "e11", "from": "proc-site-area-exclusion", "to": "pass", "role": "flow" }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-A68-7-P5",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A52:P2", "A68:P7:P1"],
+      "description": "法52条第2項の前面道路の定義、法68条の7第1項の予定道路指定の要件"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

@@ -1,0 +1,374 @@
+{
+  "id": "A57_2_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "特例容積率の指定申請要件判定フロー",
+    "target_subject": "敷地（複数）",
+    "description": "特例容積率適用地区内の複数敷地について、特例容積率の限度の指定申請資格を判定"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "57の2",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "集団規定",
+    "容積率"
+  ],
+  "text_raw": "特例容積率適用地区内の二以上の敷地（建築物の敷地となるべき土地及び当該特例容積率適用地区の内外にわたる敷地であつてその過半が当該特例容積率適用地区に属するものを含む。以下この項において同じ。）に係る土地について所有権若しくは建築物の所有を目的とする地上権若しくは賃借権（臨時設備その他一時使用のため設定されたことが明らかなものを除く。以下「借地権」という。）を有する者又はこれらの者の同意を得た者は、一人で、又は数人が共同して、特定行政庁に対し、国土交通省令で定めるところにより、当該二以上の敷地（以下この条及び次条において「特例敷地」という。）のそれぞれに適用される特別の容積率（以下この条及び第六十条の二第四項において「特例容積率」という。）の限度の指定を申請することができる。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "特例容積率適用地区内"
+        }
+      ],
+      "note": "特定行政庁が指定する特例容積率適用地区"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-applicant-qualification",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "ref": "info-multi-sites",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "ref": "info-property-rights",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    }
+  },
+  "flow_diagram": {
+    "title": "第57条の2第1項 特例容積率の指定申請要件判定フロー",
+    "description": "特例容積率適用地区内における複数敷地の特例容積率指定申請の資格要件を判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "特例容積率の指定申請要件の判定を開始"
+      },
+      {
+        "id": "dec-site-count",
+        "type": "decision",
+        "title": "敷地は2以上あるか？",
+        "decision_type": "binary",
+        "description": "対象となる敷地が2以上であることを確認"
+      },
+      {
+        "id": "dec-site-location",
+        "type": "decision",
+        "title": "各敷地は特例容積率適用地区内に位置するか？",
+        "decision_type": "binary",
+        "description": "各敷地が特例容積率適用地区内、または区域内外にわたる場合は過半が区域内に属するかを確認"
+      },
+      {
+        "id": "dec-right-type",
+        "type": "decision",
+        "title": "敷地に係る権利の種類は？",
+        "decision_type": "multi",
+        "description": "当該敷地に係る権利が所有権、地上権、賃借権のいずれであるかを確認",
+        "options": [
+          { "value": "所有権", "description": "土地の所有権" },
+          { "value": "地上権", "description": "建築物の所有を目的とする地上権" },
+          { "value": "賃借権", "description": "建築物の所有を目的とする賃借権（借地権）" },
+          { "value": "その他", "description": "上記以外の権利" }
+        ]
+      },
+      {
+        "id": "proc-ownership-confirmed",
+        "type": "process",
+        "title": "所有権を確認",
+        "process_type": "mechanical",
+        "description": "土地について所有権を有することを確認"
+      },
+      {
+        "id": "proc-superficies-confirmed",
+        "type": "process",
+        "title": "地上権を確認",
+        "process_type": "mechanical",
+        "description": "建築物の所有を目的とする地上権を有することを確認"
+      },
+      {
+        "id": "proc-lease-confirmed",
+        "type": "process",
+        "title": "賃借権を確認",
+        "process_type": "mechanical",
+        "description": "建築物の所有を目的とする賃借権（借地権）を有することを確認"
+      },
+      {
+        "id": "dec-temporary-exclusion",
+        "type": "decision",
+        "title": "臨時設備その他一時使用のための権利ではないか？",
+        "decision_type": "binary",
+        "description": "当該権利が臨時設備その他一時使用のため設定されたものでないことを確認"
+      },
+      {
+        "id": "dec-applicant-status",
+        "type": "decision",
+        "title": "申請者の資格は？",
+        "decision_type": "multi",
+        "description": "申請者が権利者本人か、権利者の同意を得た者かを確認",
+        "options": [
+          { "value": "権利者本人", "description": "所有権、地上権、または賃借権を有する者" },
+          { "value": "同意を得た者", "description": "権利者の同意を得た者" },
+          { "value": "その他", "description": "いずれにも該当しない" }
+        ]
+      },
+      {
+        "id": "proc-rights-holder",
+        "type": "process",
+        "title": "権利者本人として資格確認",
+        "process_type": "mechanical",
+        "description": "申請者が所有権等の権利を有する者であることを確認"
+      },
+      {
+        "id": "proc-consent-holder",
+        "type": "process",
+        "title": "権利者の同意取得を確認",
+        "process_type": "mechanical",
+        "description": "申請者が権利者からの同意を得ていることを確認"
+      },
+      {
+        "id": "dec-application-type",
+        "type": "decision",
+        "title": "申請形式は？",
+        "decision_type": "multi",
+        "description": "申請が個人で行われるか、複数人による共同申請かを決定",
+        "options": [
+          { "value": "単独申請", "description": "一人で申請" },
+          { "value": "共同申請", "description": "数人が共同して申請" }
+        ]
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合（申請可能）",
+        "result": "pass",
+        "description": "特例容積率の限度の指定を申請することができる"
+      },
+      {
+        "id": "fail-site-count",
+        "type": "terminal",
+        "title": "不適合（敷地数不足）",
+        "result": "fail",
+        "description": "2以上の敷地が対象となっていないため、申請不可"
+      },
+      {
+        "id": "fail-location",
+        "type": "terminal",
+        "title": "不適合（位置要件）",
+        "result": "fail",
+        "description": "敷地が特例容積率適用地区内の位置要件を満たさない"
+      },
+      {
+        "id": "fail-rights",
+        "type": "terminal",
+        "title": "不適合（権利要件）",
+        "result": "fail",
+        "description": "所有権、地上権、賃借権のいずれも有していない"
+      },
+      {
+        "id": "fail-temporary",
+        "type": "terminal",
+        "title": "不適合（一時使用除外）",
+        "result": "fail",
+        "description": "権利が臨時設備その他一時使用のため設定されたものである"
+      },
+      {
+        "id": "fail-applicant",
+        "type": "terminal",
+        "title": "不適合（申請者資格）",
+        "result": "fail",
+        "description": "申請者が権利者本人でも、権利者の同意を得た者でもない"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-site-count",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-site-count",
+        "to": "dec-site-location",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "dec-site-count",
+        "to": "fail-site-count",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e04",
+        "from": "dec-site-location",
+        "to": "dec-right-type",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e05",
+        "from": "dec-site-location",
+        "to": "fail-location",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e06",
+        "from": "dec-right-type",
+        "to": "proc-ownership-confirmed",
+        "role": "option",
+        "label": "所有権"
+      },
+      {
+        "id": "e07",
+        "from": "dec-right-type",
+        "to": "proc-superficies-confirmed",
+        "role": "option",
+        "label": "地上権"
+      },
+      {
+        "id": "e08",
+        "from": "dec-right-type",
+        "to": "proc-lease-confirmed",
+        "role": "option",
+        "label": "賃借権"
+      },
+      {
+        "id": "e09",
+        "from": "dec-right-type",
+        "to": "fail-rights",
+        "role": "option",
+        "label": "その他"
+      },
+      {
+        "id": "e10",
+        "from": "proc-ownership-confirmed",
+        "to": "dec-temporary-exclusion",
+        "role": "flow"
+      },
+      {
+        "id": "e11",
+        "from": "proc-superficies-confirmed",
+        "to": "dec-temporary-exclusion",
+        "role": "flow"
+      },
+      {
+        "id": "e12",
+        "from": "proc-lease-confirmed",
+        "to": "dec-temporary-exclusion",
+        "role": "flow"
+      },
+      {
+        "id": "e13",
+        "from": "dec-temporary-exclusion",
+        "to": "dec-applicant-status",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e14",
+        "from": "dec-temporary-exclusion",
+        "to": "fail-temporary",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e15",
+        "from": "dec-applicant-status",
+        "to": "proc-rights-holder",
+        "role": "option",
+        "label": "権利者本人"
+      },
+      {
+        "id": "e16",
+        "from": "dec-applicant-status",
+        "to": "proc-consent-holder",
+        "role": "option",
+        "label": "同意を得た者"
+      },
+      {
+        "id": "e17",
+        "from": "dec-applicant-status",
+        "to": "fail-applicant",
+        "role": "option",
+        "label": "その他"
+      },
+      {
+        "id": "e18",
+        "from": "proc-rights-holder",
+        "to": "dec-application-type",
+        "role": "flow"
+      },
+      {
+        "id": "e19",
+        "from": "proc-consent-holder",
+        "to": "dec-application-type",
+        "role": "flow"
+      },
+      {
+        "id": "e20",
+        "from": "dec-application-type",
+        "to": "pass",
+        "role": "option",
+        "label": "単独申請"
+      },
+      {
+        "id": "e21",
+        "from": "dec-application-type",
+        "to": "pass",
+        "role": "option",
+        "label": "共同申請"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-A57-2-P1",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": [
+        "A52",
+        "A60_2"
+      ],
+      "description": "第57条の2第1項で参照される容積率関連規定"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "defines_detail",
+      "articles": [],
+      "description": "特例容積率適用地区の指定と申請手続きを定める"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00+09:00",
+    "author": "Claude Code (flow-generator)",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

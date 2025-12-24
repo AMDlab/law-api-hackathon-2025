@@ -1,0 +1,152 @@
+{
+  "id": "A52_P1_I5_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "高層住居誘導地区内建築物の容積率基準適用判定",
+    "target_subject": "建築物",
+    "description": "高層住居誘導地区内の建築物について、第52条第1項第5号に基づく容積率基準が適用されるかを判定するフロー"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "52",
+    "paragraph": "1",
+    "item": "5"
+  },
+  "labels": [
+    "集団規定",
+    "容積率",
+    "高層住居誘導地区"
+  ],
+  "text_raw": "高層住居誘導地区内の建築物（第七号に掲げる建築物を除く。）であつて、その住宅の用途に供する部分の床面積の合計がその延べ面積の三分の二以上であるもの（当該高層住居誘導地区に関する都市計画において建築物の敷地面積の最低限度が定められたときは、その敷地面積が当該最低限度以上のものに限る。）",
+  "kijo_diagram_ref": "CHK-BSL-A52-P1-I5",
+  "flow_diagram": {
+    "title": "高層住居誘導地区容積率基準適用判定フロー",
+    "description": "法第52条第1項第5号の適用要件を判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "第52条第1項第5号該当性の判定を開始"
+      },
+      {
+        "id": "dec-housing-ratio",
+        "type": "decision",
+        "title": "住宅用途床面積比率は2/3以上か？",
+        "decision_type": "binary",
+        "description": "住宅の用途に供する部分の床面積合計が延べ面積の2/3以上であるか判定",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "R_h", "desc": "住宅用途床面積比率" },
+          "rhs": { "value": 0.667, "desc": "2/3" }
+        },
+        "related_articles": ["法::A52:P1:I5"]
+      },
+      {
+        "id": "dec-min-site-defined",
+        "type": "decision",
+        "title": "敷地面積最低限度が都市計画で定められているか？",
+        "decision_type": "binary",
+        "description": "当該高層住居誘導地区に関する都市計画において敷地面積最低限度が定められているか確認",
+        "related_articles": ["法::A52:P1:I5"]
+      },
+      {
+        "id": "dec-site-area",
+        "type": "decision",
+        "title": "敷地面積は最低限度以上か？",
+        "decision_type": "binary",
+        "description": "建築物の敷地面積が都市計画で定められた最低限度以上であるか判定",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "A_site", "desc": "敷地面積" },
+          "rhs": { "var": "A_min", "desc": "敷地面積最低限度" }
+        },
+        "related_articles": ["法::A52:P1:I5"]
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "第5号該当",
+        "result": "pass",
+        "description": "法第52条第1項第5号に定める建築物に該当し、同号の容積率基準が適用される"
+      },
+      {
+        "id": "fail-housing-ratio",
+        "type": "terminal",
+        "title": "住宅比率不足で非該当",
+        "result": "fail",
+        "description": "住宅用途床面積比率が2/3未満のため第5号に該当しない"
+      },
+      {
+        "id": "fail-site-area",
+        "type": "terminal",
+        "title": "敷地面積不足で非該当",
+        "result": "fail",
+        "description": "敷地面積が都市計画で定められた最低限度未満のため第5号に該当しない"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-housing-ratio",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-housing-ratio",
+        "to": "dec-min-site-defined",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "dec-housing-ratio",
+        "to": "fail-housing-ratio",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e04",
+        "from": "dec-min-site-defined",
+        "to": "dec-site-area",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e05",
+        "from": "dec-min-site-defined",
+        "to": "pass",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e06",
+        "from": "dec-site-area",
+        "to": "pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e07",
+        "from": "dec-site-area",
+        "to": "fail-site-area",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "related_laws": [],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00Z",
+    "updated_at": "2025-12-25T00:00:00Z",
+    "author": "Claude Opus 4.5",
+    "generator": "flow-generator-skill-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

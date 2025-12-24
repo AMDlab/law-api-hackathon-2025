@@ -1,0 +1,193 @@
+{
+  "id": "A43_P2_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "接道義務の適用除外（適合判定フロー）",
+    "target_subject": "建築物",
+    "description": "第43条第1項の接道義務規定の適用除外要件（1号または2号）を判定するフロー"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "43",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": ["集団規定", "道路", "接道", "適用除外"],
+  "text_raw": "前項の規定は、次の各号のいずれかに該当する建築物については、適用しない。\n一 その敷地が幅員四メートル以上の道（道路に該当するものを除き、避難及び通行の安全上必要な国土交通省令で定める基準に適合するものに限る。）に二メートル以上接する建築物のうち、利用者が少数であるものとしてその用途及び規模に関し国土交通省令で定める基準に適合するもので、特定行政庁が交通上、安全上、防火上及び衛生上支障がないと認めるもの\n二 その敷地の周囲に広い空地を有する建築物その他の国土交通省令で定める基準に適合する建築物で、特定行政庁が交通上、安全上、防火上及び衛生上支障がないと認めて建築審査会の同意を得て許可したもの",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        { "type": "general", "value": "すべての建築物" }
+      ],
+      "note": "法43条1項が原則として適用される建築物のうち、本項各号に該当するものは適用除外となる"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        { "ref": "info-item1-applicable", "note": "1号該当" },
+        { "ref": "info-item2-applicable", "note": "2号該当" }
+      ]
+    }
+  },
+  "flow_diagram": {
+    "title": "法43条2項 接道義務の適用除外 適合判定フロー",
+    "description": "1号（道路以外の道に接し認定）または2号（広い空地等で許可）に該当するかを判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "法43条2項の適用除外判定を開始"
+      },
+      {
+        "id": "dec-road-width-4m",
+        "type": "decision",
+        "title": "幅員4m以上の道（道路以外）に接するか？",
+        "decision_type": "binary",
+        "description": "敷地が道路に該当しない幅員4m以上の道に接しているか判定",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "W1", "desc": "道の幅員" },
+          "rhs": { "value": 4, "unit": "m" }
+        }
+      },
+      {
+        "id": "dec-contact-2m",
+        "type": "decision",
+        "title": "道に2m以上接するか？",
+        "decision_type": "binary",
+        "description": "敷地が当該道に2メートル以上接しているか判定",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "L", "desc": "接道長さ" },
+          "rhs": { "value": 2, "unit": "m" }
+        }
+      },
+      {
+        "id": "dec-evacuation-standard",
+        "type": "decision",
+        "title": "避難・通行安全基準に適合するか？",
+        "decision_type": "binary",
+        "description": "道が避難及び通行の安全上必要な国土交通省令で定める基準に適合するか判定",
+        "related_articles": ["規則::A10_3:P1:I1"]
+      },
+      {
+        "id": "dec-use-scale-standard",
+        "type": "decision",
+        "title": "用途・規模基準（少数利用者）に適合するか？",
+        "decision_type": "binary",
+        "description": "利用者が少数であるものとして用途及び規模に関し国土交通省令で定める基準に適合するか判定（延べ面積200㎡以内等）",
+        "related_articles": ["規則::A10_3:P1:I2"]
+      },
+      {
+        "id": "dec-authority-approval-1",
+        "type": "decision",
+        "title": "特定行政庁の認定を受けているか？",
+        "decision_type": "binary",
+        "description": "特定行政庁が交通上、安全上、防火上及び衛生上支障がないと認めているか判定"
+      },
+      {
+        "id": "proc-item1-match",
+        "type": "process",
+        "title": "1号該当",
+        "process_type": "mechanical",
+        "description": "法43条2項1号の要件を全て満たす"
+      },
+      {
+        "id": "dec-wide-open-space",
+        "type": "decision",
+        "title": "広い空地を有するか？",
+        "decision_type": "binary",
+        "description": "敷地の周囲に広い空地を有するか判定"
+      },
+      {
+        "id": "dec-other-standard",
+        "type": "decision",
+        "title": "その他の省令基準に適合するか？",
+        "decision_type": "binary",
+        "description": "その他の国土交通省令で定める基準（幅員4m以上の通路・農道等に2m以上接する等）に適合するか判定",
+        "related_articles": ["規則::A10_3:P2"]
+      },
+      {
+        "id": "dec-authority-permit-2",
+        "type": "decision",
+        "title": "特定行政庁の許可（建築審査会同意付）を受けているか？",
+        "decision_type": "binary",
+        "description": "特定行政庁が交通上、安全上、防火上及び衛生上支障がないと認めて建築審査会の同意を得て許可しているか判定"
+      },
+      {
+        "id": "proc-item2-match",
+        "type": "process",
+        "title": "2号該当",
+        "process_type": "mechanical",
+        "description": "法43条2項2号の要件を全て満たす"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適用除外（適合）",
+        "result": "pass",
+        "description": "法43条2項に該当し、第1項の接道義務の適用除外となる"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "適用除外非該当",
+        "result": "fail",
+        "description": "法43条2項に該当せず、第1項の接道義務が適用される"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "dec-road-width-4m", "role": "flow" },
+      { "id": "e02", "from": "dec-road-width-4m", "to": "dec-contact-2m", "role": "yes", "label": "はい" },
+      { "id": "e03", "from": "dec-road-width-4m", "to": "dec-wide-open-space", "role": "no", "label": "いいえ" },
+      { "id": "e04", "from": "dec-contact-2m", "to": "dec-evacuation-standard", "role": "yes", "label": "はい" },
+      { "id": "e05", "from": "dec-contact-2m", "to": "dec-wide-open-space", "role": "no", "label": "いいえ" },
+      { "id": "e06", "from": "dec-evacuation-standard", "to": "dec-use-scale-standard", "role": "yes", "label": "はい" },
+      { "id": "e07", "from": "dec-evacuation-standard", "to": "dec-wide-open-space", "role": "no", "label": "いいえ" },
+      { "id": "e08", "from": "dec-use-scale-standard", "to": "dec-authority-approval-1", "role": "yes", "label": "はい" },
+      { "id": "e09", "from": "dec-use-scale-standard", "to": "dec-wide-open-space", "role": "no", "label": "いいえ" },
+      { "id": "e10", "from": "dec-authority-approval-1", "to": "proc-item1-match", "role": "yes", "label": "はい" },
+      { "id": "e11", "from": "dec-authority-approval-1", "to": "dec-wide-open-space", "role": "no", "label": "いいえ" },
+      { "id": "e12", "from": "proc-item1-match", "to": "pass", "role": "flow" },
+      { "id": "e13", "from": "dec-wide-open-space", "to": "dec-authority-permit-2", "role": "yes", "label": "はい" },
+      { "id": "e14", "from": "dec-wide-open-space", "to": "dec-other-standard", "role": "no", "label": "いいえ" },
+      { "id": "e15", "from": "dec-other-standard", "to": "dec-authority-permit-2", "role": "yes", "label": "はい" },
+      { "id": "e16", "from": "dec-other-standard", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e17", "from": "dec-authority-permit-2", "to": "proc-item2-match", "role": "yes", "label": "はい" },
+      { "id": "e18", "from": "dec-authority-permit-2", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e19", "from": "proc-item2-match", "to": "pass", "role": "flow" }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-A43-P2",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A43:P1"],
+      "description": "第1項の接道義務規定の適用除外を定める"
+    },
+    {
+      "law_id": "325M50004000040",
+      "law_name": "建築基準法施行規則",
+      "law_type": "regulation",
+      "relationship": "delegates_to",
+      "articles": ["A10_3"],
+      "description": "法43条2項各号の詳細基準を定める"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

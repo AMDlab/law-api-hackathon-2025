@@ -1,0 +1,181 @@
+{
+  "id": "A61_P2_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "防火地域等の別建築物みなし規定判定フロー",
+    "target_subject": "建築物",
+    "description": "法61条1項の基準適用上、政令で定める部分が2以上ある建築物は、それぞれ別の建築物とみなすことを判定するフロー"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "61",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": [
+    "集団規定",
+    "防火",
+    "みなし規定"
+  ],
+  "text_raw": "前項に規定する基準の適用上一の建築物であつても別の建築物とみなすことができる部分として政令で定める部分が二以上ある建築物の当該建築物の部分は、同項の規定の適用については、それぞれ別の建築物とみなす。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "防火地域又は準防火地域内"
+        },
+        {
+          "type": "structure",
+          "value": "政令で定める部分が2以上ある建築物"
+        }
+      ],
+      "note": "法61条1項の基準適用を受ける建築物であって、政令で定める部分が2以上あるものが対象"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-has-two-or-more-parts",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "kijo_diagram_ref": "CHK-BSL-A61-P2",
+  "flow_diagram": {
+    "title": "防火地域等の別建築物みなし規定判定",
+    "description": "建築物に政令で定める部分が2以上あるかを判定し、該当する場合は各部分を別の建築物とみなすフロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "法61条2項の別建築物みなし規定の判定を開始"
+      },
+      {
+        "id": "proc-identify-parts",
+        "type": "process",
+        "title": "政令定め部分の特定",
+        "process_type": "human_judgment",
+        "description": "令第136条の2で定める別の建築物とみなすことができる部分を特定する",
+        "related_articles": [
+          "令::A136_2"
+        ]
+      },
+      {
+        "id": "dec-parts-count",
+        "type": "decision",
+        "title": "政令定め部分は2以上あるか？",
+        "decision_type": "binary",
+        "description": "政令で定める部分の数が2以上であるかを判定",
+        "condition": {
+          "operator": "GTE",
+          "lhs": {
+            "var": "N",
+            "desc": "政令定め部分の数"
+          },
+          "rhs": {
+            "value": 2,
+            "unit": "個"
+          }
+        }
+      },
+      {
+        "id": "proc-two-or-more",
+        "type": "process",
+        "title": "2以上該当",
+        "process_type": "mechanical",
+        "description": "政令定め部分が2以上あることが確認された"
+      },
+      {
+        "id": "proc-separate-apply",
+        "type": "process",
+        "title": "別建築物みなし適用",
+        "process_type": "mechanical",
+        "description": "各部分を別の建築物とみなして法61条1項を適用する"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合（別建築物みなし）",
+        "result": "pass",
+        "description": "法61条2項により各部分を別の建築物としてみなす"
+      },
+      {
+        "id": "end-not-applicable",
+        "type": "terminal",
+        "title": "本条項対象外",
+        "result": "end",
+        "description": "政令定め部分が2以上ないため、本条項は適用されない（一の建築物として法61条1項を適用）"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "proc-identify-parts",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "proc-identify-parts",
+        "to": "dec-parts-count",
+        "role": "flow"
+      },
+      {
+        "id": "e03",
+        "from": "dec-parts-count",
+        "to": "proc-two-or-more",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e04",
+        "from": "dec-parts-count",
+        "to": "end-not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e05",
+        "from": "proc-two-or-more",
+        "to": "proc-separate-apply",
+        "role": "flow"
+      },
+      {
+        "id": "e06",
+        "from": "proc-separate-apply",
+        "to": "pass",
+        "role": "flow"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "delegates_to",
+      "articles": [
+        "A136_2"
+      ],
+      "description": "法61条2項の政令で定める別の建築物とみなすことができる部分を規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00+09:00",
+    "updated_at": "2025-12-25T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

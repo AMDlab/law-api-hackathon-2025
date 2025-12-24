@@ -1,0 +1,202 @@
+{
+  "id": "A52_P14_I3_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "省エネ改修建築物の容積率緩和適用判定",
+    "target_subject": "建築物",
+    "description": "エネルギー消費性能向上工事を行う建築物について、容積率制限緩和の適用要件を判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "52",
+    "paragraph": "14",
+    "item": "3"
+  },
+  "labels": ["集団規定", "容積率", "省エネ改修", "緩和規定"],
+  "text_raw": "建築物のエネルギー消費性能（建築物のエネルギー消費性能の向上等に関する法律（平成二十七年法律第五十三号）第二条第一項第二号に規定するエネルギー消費性能をいう。次条第五項第四号において同じ。）の向上のため必要な外壁に関する工事その他の屋外に面する建築物の部分に関する工事を行う建築物で構造上やむを得ないものとして国土交通省令で定めるもの",
+  "kijo_diagram_ref": "CHK-BSL-A52-P14-I3",
+  "flow_diagram": {
+    "title": "省エネ改修建築物の容積率緩和適用判定フロー",
+    "description": "エネルギー消費性能向上工事を行う建築物が法52条14項3号に該当するかを判定する",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "省エネ改修による容積率緩和の適用判定を開始"
+      },
+      {
+        "id": "dec-work-type",
+        "type": "decision",
+        "title": "工事種別は？",
+        "decision_type": "multi",
+        "description": "実施する工事の種別を判定",
+        "options": [
+          { "value": "省エネ外壁工事", "description": "エネルギー消費性能向上のための外壁に関する工事" },
+          { "value": "省エネ屋外部分工事", "description": "エネルギー消費性能向上のための屋外に面する建築物の部分に関する工事" },
+          { "value": "その他の工事", "description": "上記以外の工事" }
+        ],
+        "related_articles": ["建築物のエネルギー消費性能の向上等に関する法律::A2:P1:I2"]
+      },
+      {
+        "id": "proc-energy-work-confirmed",
+        "type": "process",
+        "title": "省エネ改修工事該当",
+        "process_type": "mechanical",
+        "description": "エネルギー消費性能向上のための外壁工事又は屋外に面する建築物部分の工事に該当"
+      },
+      {
+        "id": "dec-ministerial-ordinance",
+        "type": "decision",
+        "title": "国土交通省令の要件に適合するか？",
+        "decision_type": "binary",
+        "description": "構造上やむを得ないものとして国土交通省令で定める要件に適合するか"
+      },
+      {
+        "id": "proc-ordinance-ok",
+        "type": "process",
+        "title": "国交省令適合",
+        "process_type": "mechanical",
+        "description": "国土交通省令で定める要件に適合"
+      },
+      {
+        "id": "proc-item3-applicable",
+        "type": "process",
+        "title": "第3号該当",
+        "process_type": "mechanical",
+        "description": "法52条14項3号に規定する建築物に該当"
+      },
+      {
+        "id": "dec-p14-main-req",
+        "type": "decision",
+        "title": "法52条14項本文の許可要件を満たすか？",
+        "decision_type": "binary",
+        "description": "交通上、安全上、防火上及び衛生上支障がないことについて特定行政庁の許可を得られるか"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "緩和対象該当",
+        "result": "pass",
+        "description": "法52条14項3号に該当し、容積率緩和許可の対象となる"
+      },
+      {
+        "id": "fail-not-energy-work",
+        "type": "terminal",
+        "title": "第3号適用対象外",
+        "result": "fail",
+        "description": "省エネ改修工事に該当しないため第3号適用対象外"
+      },
+      {
+        "id": "fail-ordinance",
+        "type": "terminal",
+        "title": "第3号適用対象外",
+        "result": "fail",
+        "description": "国土交通省令の要件に適合しないため第3号適用対象外"
+      },
+      {
+        "id": "fail-main-req",
+        "type": "terminal",
+        "title": "許可要件不適合",
+        "result": "fail",
+        "description": "法52条14項本文の許可要件を満たさないため緩和許可を受けられない"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-work-type",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-work-type",
+        "to": "proc-energy-work-confirmed",
+        "role": "option",
+        "label": "省エネ外壁工事"
+      },
+      {
+        "id": "e03",
+        "from": "dec-work-type",
+        "to": "proc-energy-work-confirmed",
+        "role": "option",
+        "label": "省エネ屋外部分工事"
+      },
+      {
+        "id": "e04",
+        "from": "dec-work-type",
+        "to": "fail-not-energy-work",
+        "role": "option",
+        "label": "その他の工事"
+      },
+      {
+        "id": "e05",
+        "from": "proc-energy-work-confirmed",
+        "to": "dec-ministerial-ordinance",
+        "role": "flow"
+      },
+      {
+        "id": "e06",
+        "from": "dec-ministerial-ordinance",
+        "to": "proc-ordinance-ok",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e07",
+        "from": "dec-ministerial-ordinance",
+        "to": "fail-ordinance",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e08",
+        "from": "proc-ordinance-ok",
+        "to": "proc-item3-applicable",
+        "role": "flow"
+      },
+      {
+        "id": "e09",
+        "from": "proc-item3-applicable",
+        "to": "dec-p14-main-req",
+        "role": "flow"
+      },
+      {
+        "id": "e10",
+        "from": "dec-p14-main-req",
+        "to": "pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e11",
+        "from": "dec-p14-main-req",
+        "to": "fail-main-req",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "427AC0000000053",
+      "law_name": "建築物のエネルギー消費性能の向上等に関する法律",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A2:P1:I2"],
+      "description": "エネルギー消費性能の定義を参照"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

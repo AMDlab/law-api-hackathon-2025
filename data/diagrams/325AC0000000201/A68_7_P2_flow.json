@@ -1,0 +1,182 @@
+{
+  "id": "A68_7_P2_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "建築審査会の同意",
+    "target_subject": "予定道路指定",
+    "description": "予定道路の指定に際して、特定行政庁が建築審査会の同意を得る必要性を判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "68の7",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "手続き"
+  ],
+  "text_raw": "特定行政庁は、前項の規定により予定道路の指定を行う場合（同項第一号に該当する場合を除く。）においては、あらかじめ、建築審査会の同意を得なければならない。",
+  "kijo_diagram_ref": "CHK-BSL-A68-7-P2",
+  "flow_diagram": {
+    "title": "建築審査会の同意要否判定フロー",
+    "description": "法68条の7第2項に基づき建築審査会の同意が必要かを判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "審査開始",
+        "result": "start",
+        "description": "法68条の7第2項の適合判定開始"
+      },
+      {
+        "id": "dec-designation",
+        "type": "decision",
+        "title": "予定道路の指定を行うか？",
+        "decision_type": "binary",
+        "description": "法68条の7第1項の規定により予定道路の指定が行われるか"
+      },
+      {
+        "id": "dec-designation-reason",
+        "type": "decision",
+        "title": "予定道路指定の根拠条項は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "第1号", "description": "土地所有者等の同意あり" },
+          { "value": "第2号", "description": "区画道路接続・細街路網形成" },
+          { "value": "第3号", "description": "既整備部分の機能維持" }
+        ],
+        "description": "68条の7第1項の第1号、第2号、第3号のいずれに該当するか"
+      },
+      {
+        "id": "proc-item1-exempt",
+        "type": "process",
+        "title": "第1号該当",
+        "process_type": "mechanical",
+        "description": "土地所有者等の同意があるため建築審査会の同意は不要"
+      },
+      {
+        "id": "dec-council-consent",
+        "type": "decision",
+        "title": "建築審査会の同意を得たか？",
+        "decision_type": "binary",
+        "description": "予定道路の指定について事前に建築審査会の同意を得たか"
+      },
+      {
+        "id": "proc-consent-obtained",
+        "type": "process",
+        "title": "同意取得完了",
+        "process_type": "human_judgment",
+        "description": "建築審査会から予定道路指定の同意を取得"
+      },
+      {
+        "id": "pass-exempt",
+        "type": "terminal",
+        "title": "適合（同意不要）",
+        "result": "pass",
+        "description": "第1号該当のため建築審査会の同意は不要"
+      },
+      {
+        "id": "pass-consent",
+        "type": "terminal",
+        "title": "適合（同意あり）",
+        "result": "pass",
+        "description": "建築審査会の同意を得ており第2項に適合"
+      },
+      {
+        "id": "fail-no-consent",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "建築審査会の同意を得ておらず第2項に不適合"
+      },
+      {
+        "id": "pass-no-designation",
+        "type": "terminal",
+        "title": "適用対象外",
+        "result": "pass",
+        "description": "予定道路の指定を行わないため第2項は適用されない"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-designation",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-designation",
+        "to": "dec-designation-reason",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "dec-designation",
+        "to": "pass-no-designation",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e04",
+        "from": "dec-designation-reason",
+        "to": "proc-item1-exempt",
+        "role": "option",
+        "label": "第1号"
+      },
+      {
+        "id": "e05",
+        "from": "dec-designation-reason",
+        "to": "dec-council-consent",
+        "role": "option",
+        "label": "第2号"
+      },
+      {
+        "id": "e06",
+        "from": "dec-designation-reason",
+        "to": "dec-council-consent",
+        "role": "option",
+        "label": "第3号"
+      },
+      {
+        "id": "e07",
+        "from": "proc-item1-exempt",
+        "to": "pass-exempt",
+        "role": "flow"
+      },
+      {
+        "id": "e08",
+        "from": "dec-council-consent",
+        "to": "proc-consent-obtained",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e09",
+        "from": "dec-council-consent",
+        "to": "fail-no-consent",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e10",
+        "from": "proc-consent-obtained",
+        "to": "pass-consent",
+        "role": "flow"
+      }
+    ]
+  },
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00+09:00",
+    "updated_at": "2025-12-25T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

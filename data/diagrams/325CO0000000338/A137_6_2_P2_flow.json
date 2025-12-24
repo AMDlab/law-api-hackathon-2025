@@ -1,0 +1,177 @@
+{
+  "id": "A137_6_2_P2_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "避難施設及び排煙設備に係る既存不適格建築物の増築・改築の範囲",
+    "target_subject": "増築及び改築に係る部分",
+    "description": "法第3条第2項の規定により法第35条（前項に規定する技術的基準に係る部分）の規定の適用を受けない建築物の増築・改築が、法第86条の7第1項の緩和適用を受ける範囲であるかの判定フロー"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "137_6_2",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": [
+    "既存不適格建築物",
+    "増改築",
+    "避難施設",
+    "排煙設備"
+  ],
+  "text_raw": "法第三条第二項の規定により法第三十五条（前項に規定する技術的基準に係る部分に限る。）の規定の適用を受けない建築物についての法第八十六条の七第一項の政令で定める範囲は、増築及び改築については、次の各号のいずれかに該当する増築又は改築に係る部分とする。\n一 次のイ及びロに該当するものであること。\n  イ 増築又は改築に係る部分及びその他の部分が、増築又は改築後においても法第三十五条（第一項に規定する技術的基準に係る部分に限る。）の規定に適合するものであること。\n  ロ 増築又は改築に係る部分の当該建築物の居室の床面積の合計が基準時における当該建築物の居室の床面積の合計を超えないものであること。\n二 工事の着手が基準時以後である増築又は改築に係る部分の対象床面積の合計が五十平方メートルを超えないものであること。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "building_type",
+          "value": "法第3条第2項の規定により法第35条（第1項の技術的基準に係る部分）の規定の適用を受けない建築物"
+        },
+        {
+          "type": "work_type",
+          "value": "増築又は改築"
+        }
+      ],
+      "note": "避難施設及び排煙設備に関する既存不適格建築物における増築・改築が対象"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "description": "第1号: イ（技術的基準適合）及びロ（居室床面積非増加）の両方を満たす"
+        },
+        {
+          "description": "第2号: 対象床面積が50m2以下"
+        }
+      ]
+    }
+  },
+  "flow_diagram": {
+    "title": "令第137条の6の2第2項適合判定フロー",
+    "description": "第1号（技術的基準適合＋居室床面積非増加）又は第2号（50m2以下）のいずれかに該当するかを判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "令第137条の6の2第2項の適合判定を開始"
+      },
+      {
+        "id": "dec-tech-standard",
+        "type": "decision",
+        "title": "増改築後も技術的基準に適合するか？",
+        "decision_type": "binary",
+        "description": "増改築部分及びその他の部分が、増改築後においても法第35条（第1項技術的基準）に適合するか（第1号イ）"
+      },
+      {
+        "id": "proc-tech-standard-ok",
+        "type": "process",
+        "title": "イ要件適合",
+        "process_type": "mechanical",
+        "description": "技術的基準適合の要件（イ）に適合"
+      },
+      {
+        "id": "dec-room-area",
+        "type": "decision",
+        "title": "居室床面積が基準時以下か？",
+        "decision_type": "binary",
+        "description": "増改築部分の居室床面積が基準時における居室床面積を超えないか（第1号ロ）",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "Rt", "desc": "増改築部分居室床面積" },
+          "rhs": { "var": "Rb", "desc": "基準時居室床面積" }
+        }
+      },
+      {
+        "id": "proc-room-area-ok",
+        "type": "process",
+        "title": "ロ要件適合",
+        "process_type": "mechanical",
+        "description": "居室床面積非増加の要件（ロ）に適合"
+      },
+      {
+        "id": "proc-item1-ok",
+        "type": "process",
+        "title": "第1号該当",
+        "process_type": "mechanical",
+        "description": "第1号（イ及びロ）の要件に適合"
+      },
+      {
+        "id": "dec-floor-area",
+        "type": "decision",
+        "title": "対象床面積が50m2以下か？",
+        "decision_type": "binary",
+        "description": "基準時以後に着手した増改築部分の対象床面積の合計が50m2以下か（第2号）",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "At", "desc": "対象床面積" },
+          "rhs": { "value": 50, "unit": "m2" }
+        }
+      },
+      {
+        "id": "proc-item2-ok",
+        "type": "process",
+        "title": "第2号該当",
+        "process_type": "mechanical",
+        "description": "第2号（対象床面積50m2以下）の要件に適合"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "緩和適用範囲該当",
+        "result": "pass",
+        "description": "令第137条の6の2第2項の緩和適用範囲に該当（第1号又は第2号に適合）"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "緩和適用範囲外",
+        "result": "fail",
+        "description": "令第137条の6の2第2項の緩和適用範囲に該当しない"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "dec-tech-standard", "role": "flow" },
+      { "id": "e02", "from": "dec-tech-standard", "to": "proc-tech-standard-ok", "role": "yes", "label": "はい" },
+      { "id": "e03", "from": "dec-tech-standard", "to": "dec-floor-area", "role": "no", "label": "いいえ" },
+      { "id": "e04", "from": "proc-tech-standard-ok", "to": "dec-room-area", "role": "flow" },
+      { "id": "e05", "from": "dec-room-area", "to": "proc-room-area-ok", "role": "yes", "label": "はい" },
+      { "id": "e06", "from": "dec-room-area", "to": "dec-floor-area", "role": "no", "label": "いいえ" },
+      { "id": "e07", "from": "proc-room-area-ok", "to": "proc-item1-ok", "role": "flow" },
+      { "id": "e08", "from": "proc-item1-ok", "to": "pass", "role": "flow" },
+      { "id": "e09", "from": "dec-floor-area", "to": "proc-item2-ok", "role": "yes", "label": "はい" },
+      { "id": "e10", "from": "dec-floor-area", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e11", "from": "proc-item2-ok", "to": "pass", "role": "flow" }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-EXT-A137-6-2-P2",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": ["A3:P2", "A35", "A86_7:P1"],
+      "description": "法第3条第2項の既存不適格建築物の取扱、法第35条の避難施設・排煙設備に関する規定、法第86条の7第1項の緩和規定"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": ["A137_6_2:P1"],
+      "description": "前項に規定する技術的基準"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T17:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

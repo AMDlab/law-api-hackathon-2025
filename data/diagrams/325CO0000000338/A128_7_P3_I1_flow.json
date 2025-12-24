@@ -1,0 +1,226 @@
+{
+  "id": "A128_7_P3_I1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "区画避難安全検証法（時間ベース検証）",
+    "target_subject": "区画部分",
+    "description": "火災発生時において当該区画部分からの避難が安全に行われることを避難に要する時間に基づき検証するフロー"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "128の7",
+    "paragraph": "3",
+    "item": "1"
+  },
+  "labels": [
+    "単体規定",
+    "避難安全検証",
+    "時間ベース検証"
+  ],
+  "text_raw": "次に定めるところにより、火災発生時において当該区画部分からの避難が安全に行われることを当該区画部分からの避難に要する時間に基づき検証する方法",
+  "kijo_diagram_ref": "CHK-BSL-ORD-A128_7-P3-I1",
+  "flow_diagram": {
+    "title": "区画避難安全検証法（時間ベース）判定フロー",
+    "description": "居室避難時間と煙降下時間の比較、区画部分避難時間と煙降下時間の比較による二段階検証",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start"
+      },
+      {
+        "id": "proc-compartment-identify",
+        "type": "process",
+        "title": "区画部分の特定",
+        "description": "設計図書等から区画部分を特定"
+      },
+      {
+        "id": "proc-rooms-identify",
+        "type": "process",
+        "title": "居室の特定",
+        "description": "区画部分に含まれる居室を特定"
+      },
+      {
+        "id": "proc-fire-rooms-identify",
+        "type": "process",
+        "title": "火災室の特定",
+        "description": "火災の発生のおそれの少ない室を除く各室を火災室として特定"
+      },
+      {
+        "id": "proc-room-evac-time",
+        "type": "process",
+        "title": "居室避難時間の計算（イ）",
+        "description": "各居室について火災発生から当該居室からの避難終了までに要する時間を計算"
+      },
+      {
+        "id": "proc-room-smoke-time",
+        "type": "process",
+        "title": "居室煙降下時間の計算（ロ）",
+        "description": "各居室について火災発生から煙又はガスが避難上支障のある高さまで降下するまでの時間を計算"
+      },
+      {
+        "id": "dec-room-safety",
+        "type": "decision",
+        "title": "全居室で居室避難時間 <= 煙降下時間か？（ハ）",
+        "decision_type": "binary",
+        "description": "各居室についてイの時間がロの時間を超えないことを確認"
+      },
+      {
+        "id": "proc-room-safety-ok",
+        "type": "process",
+        "title": "居室避難安全確認完了",
+        "description": "全居室について居室避難安全が確認された"
+      },
+      {
+        "id": "proc-compartment-evac-time",
+        "type": "process",
+        "title": "区画部分避難時間の計算（ニ）",
+        "description": "各火災室について火災発生から区画部分からの避難終了までに要する時間を計算"
+      },
+      {
+        "id": "proc-compartment-smoke-time",
+        "type": "process",
+        "title": "区画部分煙降下時間の計算（ホ）",
+        "description": "各火災室について各居室及び主たる廊下等における煙降下時間を計算"
+      },
+      {
+        "id": "dec-compartment-safety",
+        "type": "decision",
+        "title": "全火災室で区画部分避難時間 <= 煙降下時間か？（ヘ）",
+        "decision_type": "binary",
+        "description": "各火災室についてニの時間がホの時間を超えないことを確認"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "区画避難安全性能あり",
+        "result": "pass",
+        "description": "時間ベース検証により区画避難安全性能を有することが確認された"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "区画避難安全性能なし",
+        "result": "fail",
+        "description": "時間ベース検証により区画避難安全性能を有しない"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "proc-compartment-identify",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "proc-compartment-identify",
+        "to": "proc-rooms-identify",
+        "role": "flow"
+      },
+      {
+        "id": "e03",
+        "from": "proc-rooms-identify",
+        "to": "proc-fire-rooms-identify",
+        "role": "flow"
+      },
+      {
+        "id": "e04",
+        "from": "proc-fire-rooms-identify",
+        "to": "proc-room-evac-time",
+        "role": "flow"
+      },
+      {
+        "id": "e05",
+        "from": "proc-room-evac-time",
+        "to": "proc-room-smoke-time",
+        "role": "flow"
+      },
+      {
+        "id": "e06",
+        "from": "proc-room-smoke-time",
+        "to": "dec-room-safety",
+        "role": "flow"
+      },
+      {
+        "id": "e07",
+        "from": "dec-room-safety",
+        "to": "proc-room-safety-ok",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e08",
+        "from": "dec-room-safety",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e09",
+        "from": "proc-room-safety-ok",
+        "to": "proc-compartment-evac-time",
+        "role": "flow"
+      },
+      {
+        "id": "e10",
+        "from": "proc-compartment-evac-time",
+        "to": "proc-compartment-smoke-time",
+        "role": "flow"
+      },
+      {
+        "id": "e11",
+        "from": "proc-compartment-smoke-time",
+        "to": "dec-compartment-safety",
+        "role": "flow"
+      },
+      {
+        "id": "e12",
+        "from": "dec-compartment-safety",
+        "to": "pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e13",
+        "from": "dec-compartment-safety",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": [
+        "A128_7:P2"
+      ],
+      "description": "区画避難安全性能の定義を参照"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": [
+        "A128_7:P3:I2"
+      ],
+      "description": "煙の高さに基づく検証方法（第2号）と選択適用"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00+09:00",
+    "author": "Claude",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

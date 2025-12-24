@@ -1,0 +1,130 @@
+{
+  "id": "A48_P6_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "第二種住居地域における建築物の用途制限",
+    "target_subject": "建築物",
+    "description": "第二種住居地域内において建築できない建築物の用途が別表第二(へ)項に該当しないことを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "48",
+    "paragraph": "6",
+    "item": null
+  },
+  "labels": ["集団規定", "用途制限"],
+  "text_raw": "第二種住居地域内においては、別表第二（へ）項に掲げる建築物は、建築してはならない。ただし、特定行政庁が第二種住居地域における住居の環境を害するおそれがないと認め、又は公益上やむを得ないと認めて許可した場合においては、この限りでない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        { "type": "location", "value": "第二種住居地域内" }
+      ],
+      "note": "都市計画で定められた第二種住居地域"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        { "ref": "info-table2-compliance", "operator": "==", "value": false },
+        { "ref": "info-special-approval", "operator": "==", "value": true }
+      ]
+    },
+    "exceptions": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "note": "特定行政庁の許可を受けた場合（環境を害するおそれがない、又は公益上やむを得ない）",
+          "ref": "info-special-approval",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "effect": "EXEMPT"
+    }
+  },
+  "flow_diagram": {
+    "title": "法48条6項 適合判定フロー",
+    "description": "第二種住居地域における建築物の用途制限の適合判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start"
+      },
+      {
+        "id": "dec-table2-he",
+        "type": "decision",
+        "title": "別表第二(へ)項の禁止用途に該当するか？",
+        "decision_type": "binary",
+        "description": "建築物の用途が10,000㎡超のマージャン屋・ぱちんこ屋等、10,000㎡超のカラオケボックス等、10,000㎡超の料理店、キャバレー・ダンスホール等風俗施設、個室付浴場業に係る公衆浴場等に該当するか",
+        "related_articles": ["法::別表第二(へ)"]
+      },
+      {
+        "id": "proc-prohibited",
+        "type": "process",
+        "title": "禁止用途該当",
+        "process_type": "mechanical",
+        "description": "別表第二(へ)項に掲げる建築禁止用途に該当"
+      },
+      {
+        "id": "dec-special-approval",
+        "type": "decision",
+        "title": "特定行政庁の許可を受けているか？",
+        "decision_type": "binary",
+        "description": "住居の環境を害するおそれがない、又は公益上やむを得ないとして許可を受けているか"
+      },
+      {
+        "id": "proc-approved",
+        "type": "process",
+        "title": "許可取得済み",
+        "process_type": "mechanical",
+        "description": "特定行政庁の許可を受けている"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "法48条6項に適合"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "法48条6項に不適合（建築禁止）"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "dec-table2-he", "role": "flow" },
+      { "id": "e02", "from": "dec-table2-he", "to": "pass", "role": "no", "label": "いいえ" },
+      { "id": "e03", "from": "dec-table2-he", "to": "proc-prohibited", "role": "yes", "label": "はい" },
+      { "id": "e04", "from": "proc-prohibited", "to": "dec-special-approval", "role": "flow" },
+      { "id": "e05", "from": "dec-special-approval", "to": "proc-approved", "role": "yes", "label": "はい" },
+      { "id": "e06", "from": "proc-approved", "to": "pass", "role": "flow" },
+      { "id": "e07", "from": "dec-special-approval", "to": "fail", "role": "no", "label": "いいえ" }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-A48-P6",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["別表第二(へ)"],
+      "description": "第二種住居地域において建築できない建築物を定める"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

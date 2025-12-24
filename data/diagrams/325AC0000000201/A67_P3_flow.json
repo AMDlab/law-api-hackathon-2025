@@ -1,0 +1,223 @@
+{
+  "id": "A67_P3_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "敷地面積の最低限度",
+    "target_subject": "敷地",
+    "description": "特定防災街区整備地区内の建築物の敷地が都市計画で定められた最低限度以上であることを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "67",
+    "paragraph": "3",
+    "item": null
+  },
+  "labels": ["集団規定", "防火", "特定防災街区整備地区"],
+  "text_raw": "特定防災街区整備地区内においては、建築物の敷地面積は、特定防災街区整備地区に関する都市計画において定められた建築物の敷地面積の最低限度以上でなければならない。ただし、次の各号のいずれかに該当する建築物の敷地については、この限りでない。一公衆便所、巡査派出所その他これらに類する建築物で公益上必要なもの二特定行政庁が用途上又は構造上やむを得ないと認めて許可したもの",
+  "kijo_diagram_ref": "CHK-BSL-A67-P3",
+  "flow_diagram": {
+    "title": "法67条3項適合判定フロー",
+    "description": "特定防災街区整備地区内の敷地面積最低限度要件を判定する",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start"
+      },
+      {
+        "id": "dec-in-zone",
+        "type": "decision",
+        "title": "特定防災街区整備地区内か？",
+        "decision_type": "binary",
+        "description": "建築物の敷地が特定防災街区整備地区内に位置するか確認"
+      },
+      {
+        "id": "proc-not-applicable",
+        "type": "process",
+        "title": "本条適用対象外",
+        "description": "特定防災街区整備地区外のため、本条の適用対象外"
+      },
+      {
+        "id": "dec-building-type",
+        "type": "decision",
+        "title": "建築物の用途は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "公衆便所等の公益施設" },
+          { "value": "一般建築物" }
+        ],
+        "description": "建築物が公衆便所、巡査派出所等の公益上必要な建築物に該当するか判定"
+      },
+      {
+        "id": "proc-item1-applicable",
+        "type": "process",
+        "title": "1号該当（公益施設）",
+        "description": "公衆便所、巡査派出所その他公益上必要な建築物に該当"
+      },
+      {
+        "id": "dec-admin-approval",
+        "type": "decision",
+        "title": "特定行政庁の許可を得ているか？",
+        "decision_type": "binary",
+        "description": "用途上又は構造上やむを得ないと認めて特定行政庁が許可したか確認"
+      },
+      {
+        "id": "proc-item2-applicable",
+        "type": "process",
+        "title": "2号該当（特定行政庁許可）",
+        "description": "特定行政庁が用途上又は構造上やむを得ないと認めて許可した建築物"
+      },
+      {
+        "id": "proc-check-area",
+        "type": "process",
+        "title": "敷地面積の確認",
+        "description": "敷地面積と都市計画で定められた最低限度を確認"
+      },
+      {
+        "id": "dec-area-compliant",
+        "type": "decision",
+        "title": "敷地面積が最低限度以上か？",
+        "decision_type": "binary",
+        "description": "敷地面積が都市計画で定められた最低限度以上であるか判定"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "法67条3項に適合"
+      },
+      {
+        "id": "pass-exempt",
+        "type": "terminal",
+        "title": "適合（適用除外）",
+        "result": "pass",
+        "description": "ただし書きにより適用除外"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "法67条3項に不適合"
+      },
+      {
+        "id": "end-not-applicable",
+        "type": "terminal",
+        "title": "適用対象外",
+        "result": "end",
+        "description": "本条の適用対象外のため判定終了"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-in-zone",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-in-zone",
+        "to": "dec-building-type",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "dec-in-zone",
+        "to": "proc-not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e04",
+        "from": "proc-not-applicable",
+        "to": "end-not-applicable",
+        "role": "flow"
+      },
+      {
+        "id": "e05",
+        "from": "dec-building-type",
+        "to": "proc-item1-applicable",
+        "role": "option",
+        "label": "公衆便所等の公益施設"
+      },
+      {
+        "id": "e06",
+        "from": "dec-building-type",
+        "to": "dec-admin-approval",
+        "role": "option",
+        "label": "一般建築物"
+      },
+      {
+        "id": "e07",
+        "from": "proc-item1-applicable",
+        "to": "pass-exempt",
+        "role": "flow"
+      },
+      {
+        "id": "e08",
+        "from": "dec-admin-approval",
+        "to": "proc-item2-applicable",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e09",
+        "from": "dec-admin-approval",
+        "to": "proc-check-area",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e10",
+        "from": "proc-item2-applicable",
+        "to": "pass-exempt",
+        "role": "flow"
+      },
+      {
+        "id": "e11",
+        "from": "proc-check-area",
+        "to": "dec-area-compliant",
+        "role": "flow"
+      },
+      {
+        "id": "e12",
+        "from": "dec-area-compliant",
+        "to": "pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e13",
+        "from": "dec-area-compliant",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A67:P1", "A67:P4"],
+      "description": "第67条の他の項に基づく規定との関連"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00+09:00",
+    "updated_at": "2025-12-25T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

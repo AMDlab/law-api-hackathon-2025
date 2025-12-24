@@ -1,0 +1,215 @@
+{
+  "id": "A52_P8_I2_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "容積率緩和要件（敷地内空地・敷地面積）の判定",
+    "target_subject": "建築物",
+    "description": "住宅用途を含む建築物について、容積率緩和を受けるための敷地内空地及び敷地面積の要件適合を判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "52",
+    "paragraph": "8",
+    "item": "2"
+  },
+  "labels": [
+    "集団規定",
+    "容積率",
+    "許可"
+  ],
+  "text_raw": "二その敷地内に政令で定める規模以上の空地（道路に接して有効な部分が政令で定める規模以上であるものに限る。）を有し、かつ、その敷地面積が政令で定める規模以上であること。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "第一種住居地域、第二種住居地域、準住居地域、近隣商業地域、準工業地域又は商業地域内（高層住居誘導地区及び特定行政庁指定区域を除く）"
+        },
+        {
+          "type": "use",
+          "value": "全部又は一部を住宅の用途に供する建築物"
+        },
+        {
+          "type": "exclusion",
+          "value": "居住環境向上用途誘導地区内の誘導用途建築物及び特定用途誘導地区内の誘導用途建築物を除く"
+        }
+      ],
+      "note": "法52条8項柱書による適用範囲"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "proposition",
+          "ref": "M1",
+          "description": "敷地内空地の規模が政令基準以上"
+        },
+        {
+          "type": "proposition",
+          "ref": "M2",
+          "description": "道路接続有効空地の規模が政令基準以上"
+        },
+        {
+          "type": "proposition",
+          "ref": "M3",
+          "description": "敷地面積が政令基準以上"
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "flow_diagram": {
+    "title": "容積率緩和の空地・敷地規模要件判定フロー",
+    "description": "法52条8項2号の敷地内空地・道路接続空地・敷地面積要件の適合判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start"
+      },
+      {
+        "id": "dec-zone-type",
+        "type": "decision",
+        "title": "用途地域は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "第一種住居地域" },
+          { "value": "第二種住居地域" },
+          { "value": "準住居地域" },
+          { "value": "準工業地域" },
+          { "value": "近隣商業地域" },
+          { "value": "商業地域" }
+        ],
+        "description": "敷地が所在する用途地域を判定"
+      },
+      {
+        "id": "proc-required-site-area-2000",
+        "type": "process",
+        "title": "必要敷地面積2000㎡",
+        "process_type": "mechanical",
+        "description": "第一種・第二種住居地域、準住居地域、準工業地域の場合、必要敷地面積は2000㎡",
+        "related_articles": ["令::A135_16:P3"]
+      },
+      {
+        "id": "proc-required-site-area-1000",
+        "type": "process",
+        "title": "必要敷地面積1000㎡",
+        "process_type": "mechanical",
+        "description": "近隣商業地域、商業地域の場合、必要敷地面積は1000㎡",
+        "related_articles": ["令::A135_16:P3"]
+      },
+      {
+        "id": "dec-site-area",
+        "type": "decision",
+        "title": "敷地面積が基準以上か？",
+        "decision_type": "binary",
+        "description": "敷地面積が必要敷地面積（As_req）以上であるか判定",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "As", "desc": "敷地面積" },
+          "rhs": { "var": "As_req", "desc": "必要敷地面積" }
+        }
+      },
+      {
+        "id": "proc-calc-required-open-space",
+        "type": "process",
+        "title": "必要空地面積の算定",
+        "process_type": "mechanical",
+        "description": "必要空地面積を算定（Ao_req = As × (100% - 建蔽率限度 + 20%)）",
+        "related_articles": ["令::A135_16:P1"]
+      },
+      {
+        "id": "dec-open-space",
+        "type": "decision",
+        "title": "空地面積が基準以上か？",
+        "decision_type": "binary",
+        "description": "敷地内空地面積が必要空地面積（Ao_req）以上であるか判定",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "Ao", "desc": "敷地内空地面積" },
+          "rhs": { "var": "Ao_req", "desc": "必要空地面積" }
+        }
+      },
+      {
+        "id": "proc-calc-required-road-space",
+        "type": "process",
+        "title": "必要道路接続空地面積の算定",
+        "process_type": "mechanical",
+        "description": "必要道路接続空地面積を算定（Ar_req = Ao_req × 1/2）",
+        "related_articles": ["令::A135_16:P2"]
+      },
+      {
+        "id": "dec-road-space",
+        "type": "decision",
+        "title": "道路接続空地が基準以上か？",
+        "decision_type": "binary",
+        "description": "道路に接して有効な空地面積が必要道路接続空地面積（Ar_req）以上であるか判定",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "Ar", "desc": "道路接続有効空地面積" },
+          "rhs": { "var": "Ar_req", "desc": "必要道路接続空地面積" }
+        }
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "2号要件適合",
+        "result": "pass",
+        "description": "法52条8項2号の空地・敷地規模要件に適合"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "2号要件不適合",
+        "result": "fail",
+        "description": "法52条8項2号の空地・敷地規模要件に不適合"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "dec-zone-type", "role": "flow" },
+      { "id": "e02", "from": "dec-zone-type", "to": "proc-required-site-area-2000", "role": "option", "label": "第一種住居地域" },
+      { "id": "e03", "from": "dec-zone-type", "to": "proc-required-site-area-2000", "role": "option", "label": "第二種住居地域" },
+      { "id": "e04", "from": "dec-zone-type", "to": "proc-required-site-area-2000", "role": "option", "label": "準住居地域" },
+      { "id": "e05", "from": "dec-zone-type", "to": "proc-required-site-area-2000", "role": "option", "label": "準工業地域" },
+      { "id": "e06", "from": "dec-zone-type", "to": "proc-required-site-area-1000", "role": "option", "label": "近隣商業地域" },
+      { "id": "e07", "from": "dec-zone-type", "to": "proc-required-site-area-1000", "role": "option", "label": "商業地域" },
+      { "id": "e08", "from": "proc-required-site-area-2000", "to": "dec-site-area", "role": "flow" },
+      { "id": "e09", "from": "proc-required-site-area-1000", "to": "dec-site-area", "role": "flow" },
+      { "id": "e10", "from": "dec-site-area", "to": "proc-calc-required-open-space", "role": "yes", "label": "はい" },
+      { "id": "e11", "from": "dec-site-area", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e12", "from": "proc-calc-required-open-space", "to": "dec-open-space", "role": "flow" },
+      { "id": "e13", "from": "dec-open-space", "to": "proc-calc-required-road-space", "role": "yes", "label": "はい" },
+      { "id": "e14", "from": "dec-open-space", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e15", "from": "proc-calc-required-road-space", "to": "dec-road-space", "role": "flow" },
+      { "id": "e16", "from": "dec-road-space", "to": "pass", "role": "yes", "label": "はい" },
+      { "id": "e17", "from": "dec-road-space", "to": "fail", "role": "no", "label": "いいえ" }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-A52-P8-I2",
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "delegates_to",
+      "articles": [
+        "A135_16:P1",
+        "A135_16:P2",
+        "A135_16:P3"
+      ],
+      "description": "空地の規模、道路接続有効空地の規模、敷地面積の規模を定める"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}
