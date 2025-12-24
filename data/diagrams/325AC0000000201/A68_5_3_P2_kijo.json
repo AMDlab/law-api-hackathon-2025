@@ -1,0 +1,190 @@
+{
+  "id": "CHK-BSL-A68-5-3-P2",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "建ぺい率等の特例許可",
+    "target_subject": "建築物",
+    "description": "高度利用と都市機能の更新を図る地区計画等の区域内で、敷地内に有効な空地が確保される場合に、特定行政庁が許可した建築物の建ぺい率等の制限が適用されない判定"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "68の5の3",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "容積率・建ぺい率"
+  ],
+  "text_raw": "前項各号に掲げる条件に該当する地区計画又は沿道地区計画の区域内においては、敷地内に道路に接して有効な空地が確保されていること等により、特定行政庁が、交通上、安全上、防火上及び衛生上支障がないと認めて許可した建築物については、第五十六条第一項第一号及び第二項から第四項までの規定は、適用しない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "法68条の5の3第1項各号に掲げる条件に該当する地区計画又は沿道地区計画の区域内"
+        }
+      ],
+      "note": "高度利用と都市機能の更新を図る地区計画等の区域"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-open-space-secured",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "ref": "info-authority-approval",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-open-space",
+        "type": "process",
+        "title": "有効な空地確保の確認",
+        "process_type": "human_judgment",
+        "description": "敷地内に道路に接して有効な空地が確保されているかを設計図書等から確認する。『等により』の記載から、有効性は定性的判断を含む"
+      },
+      {
+        "id": "info-open-space-secured",
+        "type": "information",
+        "title": "有効な空地確保",
+        "symbol": "S1",
+        "subject": "敷地",
+        "property": "有効な空地確保の有無",
+        "property_type": "proposition",
+        "description": "敷地内に道路に接して有効な空地が確保されているか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-authority-approval",
+        "type": "process",
+        "title": "特定行政庁による許可判定",
+        "process_type": "human_judgment",
+        "description": "特定行政庁が交通上、安全上、防火上及び衛生上支障がないと認めて許可を与えるかを判定する。この判定には有効な空地確保のほか、複合的な条件を含む"
+      },
+      {
+        "id": "info-authority-approval",
+        "type": "information",
+        "title": "特定行政庁による許可",
+        "symbol": "A1",
+        "subject": "建築物",
+        "property": "特定行政庁の許可",
+        "property_type": "proposition",
+        "description": "特定行政庁が交通上、安全上、防火上及び衛生上支障がないと認めて許可したか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-article56-exemption",
+        "type": "process",
+        "title": "法56条の適用除外判定",
+        "process_type": "mechanical",
+        "logic_expression": "(S1 = true) AND (A1 = true) → 法56条第1項第1号及び第2項～第4項は適用しない",
+        "description": "有効な空地確保と特定行政庁の許可の両条件を満たす場合、法56条（容積率、建ぺい率等）の制限規定は適用されない"
+      },
+      {
+        "id": "info-article56-exemption",
+        "type": "information",
+        "title": "法56条の適用除外",
+        "symbol": "C1",
+        "subject": "建築物",
+        "property": "法56条適用除外",
+        "property_type": "proposition",
+        "description": "当該建築物に対して法56条の規定が適用されないかどうか。適用除外の場合、建ぺい率、容積率等の制限が緩和される",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge-001",
+        "from": "proc-open-space",
+        "to": "info-open-space-secured",
+        "role": "output"
+      },
+      {
+        "id": "edge-002",
+        "from": "info-open-space-secured",
+        "to": "proc-article56-exemption",
+        "role": "input"
+      },
+      {
+        "id": "edge-003",
+        "from": "proc-authority-approval",
+        "to": "info-authority-approval",
+        "role": "output"
+      },
+      {
+        "id": "edge-004",
+        "from": "info-authority-approval",
+        "to": "proc-article56-exemption",
+        "role": "input"
+      },
+      {
+        "id": "edge-005",
+        "from": "proc-article56-exemption",
+        "to": "info-article56-exemption",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A56:P1:I1"],
+      "description": "建ぺい率の制限（建築物が建つことができる敷地面積の最高限度）。本条による許可により適用が除外される"
+    },
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A56:P2"],
+      "description": "建ぺい率の制限の例外（特定用途地域内）。本条による許可により適用が除外される"
+    },
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A56:P3"],
+      "description": "建ぺい率の制限の例外（駅前広場等の利用の支障がない場合）。本条による許可により適用が除外される"
+    },
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A56:P4"],
+      "description": "建ぺい率の制限の例外（敷地が共有される場合等）。本条による許可により適用が除外される"
+    },
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "defines_detail",
+      "articles": ["A68_5_3:P1"],
+      "description": "適用される地区計画等の条件を定める先行条件（第1項）"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-24T08:00:00Z",
+    "author": "Claude Code",
+    "status": "draft",
+    "notes": "第2項は特定行政庁の許可に基づく建ぺい率等の適用除外を規定する。有効な空地確保と複合的な判定（交通上・安全上・防火上・衛生上支障がないと認める）が要件となる"
+  }
+}

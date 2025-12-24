@@ -1,0 +1,359 @@
+{
+  "id": "CHK-BSL-A68-P2",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "壁面の位置の制限への適合",
+    "target_subject": "建築物",
+    "description": "景観地区内の建築物の壁又はこれに代わる柱が壁面の位置の制限に適合することを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "68",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "景観"
+  ],
+  "text_raw": "景観地区内においては、建築物の壁又はこれに代わる柱は、景観地区に関する都市計画において壁面の位置の制限が定められたときは、建築物の地盤面下の部分を除き、当該壁面の位置の制限に反して建築してはならない。ただし、次の各号のいずれかに該当する建築物については、この限りでない。一前項第一号に掲げる建築物二学校、駅舎、卸売市場その他これらに類する公益上必要な建築物で、特定行政庁が用途上又は構造上やむを得ないと認めて許可したもの",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "景観地区内"
+        },
+        {
+          "type": "urban_plan",
+          "value": "壁面の位置の制限が定められている"
+        }
+      ],
+      "note": "景観地区に関する都市計画において壁面の位置の制限が定められた場合のみ適用"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "note": "地盤面上の部分",
+          "ref": "info-wall-location",
+          "operator": "!=",
+          "value": "below-grade"
+        },
+        {
+          "ref": "info-wall-compliance",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    },
+    "exceptions": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "note": "法68条1項1号の建築物（公益上必要な建築物）",
+          "ref": "info-building-type",
+          "value": "public-interest-building-1"
+        },
+        {
+          "note": "学校、駅舎、卸売市場等で特定行政庁が許可したもの",
+          "operator": "AND",
+          "conditions": [
+            {
+              "ref": "info-building-type",
+              "value": "public-interest-building-2"
+            },
+            {
+              "ref": "info-authority-approval",
+              "operator": "==",
+              "value": true
+            }
+          ]
+        }
+      ],
+      "effect": "EXEMPT"
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-building-type",
+        "type": "process",
+        "title": "建築物種類の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の用途（公益上必要な建築物、学校・駅舎・卸売市場等、その他）を特定する"
+      },
+      {
+        "id": "info-building-type",
+        "type": "information",
+        "title": "建築物の種類",
+        "symbol": "B",
+        "subject": "建築物",
+        "property": "用途種別",
+        "property_type": "classification",
+        "description": "法68条1項1号の公益上必要な建築物、学校・駅舎・卸売市場等の公益上必要な建築物、その他一般建築物のいずれか",
+        "remarks": "前項（第1項）との関連で「前項第一号に掲げる建築物」に該当するか確認必要",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-authority-approval",
+        "type": "process",
+        "title": "特定行政庁の許可確認",
+        "process_type": "undefined_input",
+        "description": "特定行政庁が用途上又は構造上やむを得ないと認めて許可したか確認する"
+      },
+      {
+        "id": "info-authority-approval",
+        "type": "information",
+        "title": "特定行政庁の許可の有無",
+        "symbol": "P",
+        "subject": "建築物",
+        "property": "特定行政庁の許可状況",
+        "property_type": "proposition",
+        "description": "特定行政庁が用途上又は構造上やむを得ないと認めて許可しているか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-walls-set",
+        "type": "process",
+        "title": "壁・柱の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から判定対象となる壁又はこれに代わる柱を特定する"
+      },
+      {
+        "id": "info-walls-set",
+        "type": "information",
+        "title": "建築物の壁・柱",
+        "subject": "建築物",
+        "property": "壁・柱の集合",
+        "property_type": "set_definition",
+        "description": "判定対象となる建築物に属する壁又はこれに代わる柱を特定",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-belowgrade-check",
+        "type": "process",
+        "title": "地盤面下部分の判定",
+        "process_type": "mechanical",
+        "target_subject": "壁・柱",
+        "iteration": "iterative",
+        "description": "壁又は柱が建築物の地盤面下の部分に該当するかを判定"
+      },
+      {
+        "id": "info-belowgrade",
+        "type": "information",
+        "title": "地盤面下部分の有無",
+        "symbol": "G",
+        "subject": "壁・柱",
+        "property": "地盤面下部分への該当",
+        "property_type": "proposition",
+        "description": "当該壁・柱が建築物の地盤面下の部分に該当するか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-wall-position",
+        "type": "process",
+        "title": "壁面の位置の特定",
+        "process_type": "mechanical",
+        "target_subject": "壁・柱",
+        "iteration": "iterative",
+        "description": "設計図書等から壁又は柱の位置を特定し、都市計画に定められた制限値と比較する"
+      },
+      {
+        "id": "info-wall-location",
+        "type": "information",
+        "title": "壁面の位置",
+        "symbol": "W",
+        "subject": "壁・柱",
+        "property": "位置座標",
+        "property_type": "geometric_surface",
+        "description": "壁又は柱の位置（地盤面からの距離等）",
+        "unit": "m",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-restriction-check",
+        "type": "process",
+        "title": "壁面制限への適合判定",
+        "process_type": "mechanical",
+        "target_subject": "壁・柱",
+        "iteration": "iterative",
+        "description": "壁又は柱の位置が都市計画に定められた壁面の位置の制限に適合するか判定（地盤面下を除く）",
+        "logic_expression": "(G = false) AND (W conforming_to restriction_limit)"
+      },
+      {
+        "id": "info-wall-compliance",
+        "type": "information",
+        "title": "壁面位置制限への適合",
+        "symbol": "C",
+        "subject": "壁・柱",
+        "property": "壁面の位置の制限への適合",
+        "property_type": "proposition",
+        "description": "壁又は柱が壁面の位置の制限に適合するか（地盤面下を除く）",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-exempt-check",
+        "type": "process",
+        "title": "適用除外判定",
+        "process_type": "mechanical",
+        "target_subject": "建築物",
+        "description": "ただし書きの適用除外に該当するか判定",
+        "logic_expression": "(B = 'public-interest-building-1') OR ((B = 'public-interest-building-2') AND (P = true))"
+      },
+      {
+        "id": "info-exempt",
+        "type": "information",
+        "title": "適用除外該当",
+        "symbol": "X",
+        "subject": "建築物",
+        "property": "適用除外への該当",
+        "property_type": "proposition",
+        "description": "ただし書きによる適用除外に該当するか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-final-judgment",
+        "type": "process",
+        "title": "法68条2項適合判定",
+        "process_type": "mechanical",
+        "target_subject": "建築物",
+        "description": "建築物が法68条2項に適合するか判定",
+        "logic_expression": "X OR (∀wall ∈ Walls: C(wall) = true)"
+      },
+      {
+        "id": "info-compliance",
+        "type": "information",
+        "title": "法68条2項適合",
+        "subject": "建築物",
+        "property": "法68条2項適合",
+        "property_type": "proposition",
+        "description": "建築物が法68条2項の規定に適合するか",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-building-type",
+        "to": "info-building-type",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "info-building-type",
+        "to": "proc-exempt-check",
+        "role": "input"
+      },
+      {
+        "id": "e03",
+        "from": "proc-authority-approval",
+        "to": "info-authority-approval",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "info-authority-approval",
+        "to": "proc-exempt-check",
+        "role": "input"
+      },
+      {
+        "id": "e05",
+        "from": "proc-exempt-check",
+        "to": "info-exempt",
+        "role": "output"
+      },
+      {
+        "id": "e06",
+        "from": "proc-walls-set",
+        "to": "info-walls-set",
+        "role": "output"
+      },
+      {
+        "id": "e07",
+        "from": "info-walls-set",
+        "to": "proc-belowgrade-check",
+        "role": "input"
+      },
+      {
+        "id": "e08",
+        "from": "proc-belowgrade-check",
+        "to": "info-belowgrade",
+        "role": "output"
+      },
+      {
+        "id": "e09",
+        "from": "info-walls-set",
+        "to": "proc-wall-position",
+        "role": "input"
+      },
+      {
+        "id": "e10",
+        "from": "proc-wall-position",
+        "to": "info-wall-location",
+        "role": "output"
+      },
+      {
+        "id": "e11",
+        "from": "info-belowgrade",
+        "to": "proc-restriction-check",
+        "role": "input"
+      },
+      {
+        "id": "e12",
+        "from": "info-wall-location",
+        "to": "proc-restriction-check",
+        "role": "input"
+      },
+      {
+        "id": "e13",
+        "from": "proc-restriction-check",
+        "to": "info-wall-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e14",
+        "from": "info-exempt",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e15",
+        "from": "info-wall-compliance",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e16",
+        "from": "proc-final-judgment",
+        "to": "info-compliance",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": [
+        "A68:P1:I1",
+        "A68:P1:I2"
+      ],
+      "description": "第68条第1項の例外要件を参照"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-24T10:00:00+09:00",
+    "updated_at": "2025-12-24T10:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

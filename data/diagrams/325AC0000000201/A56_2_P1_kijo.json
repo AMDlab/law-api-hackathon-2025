@@ -1,0 +1,548 @@
+{
+  "id": "CHK-BSL-A56-2-P1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "日影制限",
+    "target_subject": "建築物",
+    "description": "対象区域内の建築物が冬至日の日中における日影制限を満たすことを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "56の2",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "集団規定",
+    "日影制限"
+  ],
+  "text_raw": "別表第四（い）欄の各項に掲げる地域又は区域の全部又は一部で地方公共団体の条例で指定する区域（以下この条において「対象区域」という。）内にある同表（ろ）欄の当該各項（四の項にあつては、同項イ又はロのうちから地方公共団体がその地方の気候及び風土、当該区域の土地利用の状況等を勘案して条例で指定するもの）に掲げる建築物は、冬至日の真太陽時による午前八時から午後四時まで（道の区域内にあつては、午前九時から午後三時まで）の間において、それぞれ、同表（は）欄の各項（四の項にあつては、同項イ又はロ）に掲げる平均地盤面からの高さ（二の項及び三の項にあつては、当該各項に掲げる平均地盤面からの高さのうちから地方公共団体が当該区域の土地利用の状況等を勘案して条例で指定するもの）の水平面（対象区域外の部分、高層住居誘導地区内の部分、都市再生特別地区内の部分及び当該建築物の敷地内の部分を除く。）に、敷地境界線からの水平距離が五メートルを超える範囲において、同表（に）欄の（一）、（二）又は（三）の号（同表の三の項にあつては、（一）又は（二）の号）のうちから地方公共団体がその地方の気候及び風土、土地利用の状況等を勘案して条例で指定する号に掲げる時間以上日影となる部分を生じさせることのないものとしなければならない。ただし、特定行政庁が土地の状況等により周囲の居住環境を害するおそれがないと認めて建築審査会の同意を得て許可した場合又は当該許可を受けた建築物を周囲の居住環境を害するおそれがないものとして政令で定める位置及び規模の範囲内において増築し、改築し、若しくは移転する場合においては、この限りでない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "別表第四に掲げる対象区域内"
+        }
+      ],
+      "note": "地方公共団体の条例で指定する区域"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-building-type-compliance",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "ref": "info-height-check",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "ref": "info-shadow-compliance",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    },
+    "exceptions": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "note": "特定行政庁が認可した場合",
+          "ref": "info-approval"
+        },
+        {
+          "note": "認可建築物の政令で定める位置・規模での増築・改築・移転",
+          "ref": "info-permitted-modification"
+        }
+      ],
+      "effect": "EXEMPT"
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-target-area",
+        "type": "process",
+        "title": "対象区域該当確認",
+        "process_type": "mechanical",
+        "description": "敷地が別表第四に掲げる対象区域（地方公共団体の条例で指定）に属するか確認"
+      },
+      {
+        "id": "info-target-area",
+        "type": "information",
+        "title": "対象区域への属性",
+        "symbol": "ZA",
+        "subject": "敷地",
+        "property": "対象区域への属性",
+        "property_type": "proposition",
+        "description": "当該敷地が対象区域内に属するか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-building-type-check",
+        "type": "process",
+        "title": "建築物用途の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の用途が別表第四（ろ）欄に掲げるいずれに該当するか特定する"
+      },
+      {
+        "id": "info-building-type",
+        "type": "information",
+        "title": "建築物の用途区分",
+        "symbol": "BT",
+        "subject": "建築物",
+        "property": "用途区分",
+        "property_type": "classification",
+        "description": "別表第四（ろ）欄に掲げる各項（1～4項）のいずれに該当するか",
+        "remarks": "4の項の場合はイ又はロから地方公共団体の条例で指定されるもの",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-height-standard",
+        "type": "process",
+        "title": "日影規制高さの決定",
+        "process_type": "mechanical",
+        "description": "別表第四（は）欄の建築物用途に対応する平均地盤面からの高さを決定",
+        "remarks": "2の項及び3の項の場合は地方公共団体の条例で指定される高さを適用"
+      },
+      {
+        "id": "info-height-standard",
+        "type": "information",
+        "title": "適用される日影規制高さ",
+        "symbol": "HS",
+        "subject": "建築物",
+        "property": "日影規制高さ",
+        "property_type": "numeric",
+        "unit": "m",
+        "description": "別表第四（は）欄に掲げる平均地盤面からの高さ",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-height-measurement",
+        "type": "process",
+        "title": "建築物の高さ測定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の平均地盤面からの高さを測定"
+      },
+      {
+        "id": "info-building-height",
+        "type": "information",
+        "title": "建築物の高さ",
+        "symbol": "BH",
+        "subject": "建築物",
+        "property": "平均地盤面からの高さ",
+        "property_type": "numeric",
+        "unit": "m",
+        "description": "対象建築物の平均地盤面から最高点までの高さ",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-height-check",
+        "type": "process",
+        "title": "建築物高さの判定",
+        "process_type": "mechanical",
+        "description": "建築物の高さが日影規制高さを超えるか否かを判定",
+        "logic_expression": "BH > HS"
+      },
+      {
+        "id": "info-height-check",
+        "type": "information",
+        "title": "日影規制高さ超過判定",
+        "symbol": "HC",
+        "subject": "建築物",
+        "property": "規制高さ超過",
+        "property_type": "proposition",
+        "description": "建築物の高さが規制高さを超えるか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-shadow-plane-check",
+        "type": "process",
+        "title": "日影水平面の特定",
+        "process_type": "mechanical",
+        "description": "別表第四（は）欄に掲げる高さの水平面を特定（除外部分を除く）",
+        "remarks": "対象区域外、高層住居誘導地区内、都市再生特別地区内、敷地内の部分は除外"
+      },
+      {
+        "id": "info-shadow-plane",
+        "type": "information",
+        "title": "日影規制水平面",
+        "symbol": "SP",
+        "subject": "敷地",
+        "property": "日影規制対象となる水平面",
+        "property_type": "geometric_surface",
+        "description": "敷地境界線から5mを超える範囲における規制高さの水平面",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-shadow-time-check",
+        "type": "process",
+        "title": "規制時間帯の決定",
+        "process_type": "mechanical",
+        "description": "別表第四（に）欄の日影時間（一）（二）（三）号のうち、地方公共団体の条例で指定されるものを決定"
+      },
+      {
+        "id": "info-shadow-time-limit",
+        "type": "information",
+        "title": "規制される日影時間",
+        "symbol": "ST",
+        "subject": "敷地",
+        "property": "規制日影時間",
+        "property_type": "numeric",
+        "unit": "時間",
+        "description": "冬至日の午前8時～午後4時（道区域内は午前9時～午後3時）における規制日影時間",
+        "remarks": "別表第四（に）欄の号で指定される時間数（例：2時間、3時間）",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-winter-solstice-analysis",
+        "type": "process",
+        "title": "冬至日の日影シミュレーション",
+        "process_type": "human_judgment",
+        "description": "建築物が冬至日（12月21日頃）の真太陽時による指定時間帯に、日影規制水平面に対して生じさせる日影時間を分析",
+        "remarks": "道区域内の場合は午前9時～午後3時、その他は午前8時～午後4時を対象"
+      },
+      {
+        "id": "info-shadow-duration",
+        "type": "information",
+        "title": "日影水平面での日影継続時間",
+        "symbol": "SD",
+        "subject": "敷地",
+        "property": "日影継続時間",
+        "property_type": "numeric",
+        "unit": "時間",
+        "description": "冬至日の指定時間帯における日影規制水平面での最大日影継続時間",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-shadow-compliance",
+        "type": "process",
+        "title": "日影基準適合判定",
+        "process_type": "mechanical",
+        "description": "日影継続時間が規制時間以下であることを確認",
+        "logic_expression": "SD ≤ ST"
+      },
+      {
+        "id": "info-shadow-compliance",
+        "type": "information",
+        "title": "日影基準適合",
+        "symbol": "SC",
+        "subject": "建築物",
+        "property": "日影基準適合",
+        "property_type": "proposition",
+        "description": "建築物が日影規制基準に適合するか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-approval-check",
+        "type": "process",
+        "title": "特定行政庁許可確認",
+        "process_type": "undefined_input",
+        "description": "特定行政庁が建築審査会の同意を得て許可したか否かを確認"
+      },
+      {
+        "id": "info-approval",
+        "type": "information",
+        "title": "特定行政庁による許可",
+        "symbol": "AP",
+        "subject": "建築物",
+        "property": "許可の有無",
+        "property_type": "proposition",
+        "description": "土地の状況等により周囲の居住環境を害するおそれがないと認めて建築審査会の同意を得た許可の有無",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-modification-check",
+        "type": "process",
+        "title": "許可建築物の増改築規模確認",
+        "process_type": "human_judgment",
+        "description": "許可を受けた建築物の増築・改築・移転が政令で定める位置及び規模の範囲内であるか確認"
+      },
+      {
+        "id": "info-permitted-modification",
+        "type": "information",
+        "title": "許可建築物の増改築該当",
+        "symbol": "PM",
+        "subject": "建築物",
+        "property": "許可条件内の増改築該当",
+        "property_type": "proposition",
+        "description": "政令で定める位置及び規模の範囲内における増築・改築・移転であるか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-exemption-check",
+        "type": "process",
+        "title": "適用除外判定",
+        "process_type": "mechanical",
+        "description": "ただし書きの適用除外（許可又は許可条件内増改築）に該当するか判定",
+        "logic_expression": "AP OR PM"
+      },
+      {
+        "id": "info-exemption",
+        "type": "information",
+        "title": "適用除外該当",
+        "symbol": "EX",
+        "subject": "建築物",
+        "property": "適用除外該当",
+        "property_type": "proposition",
+        "description": "日影規制のただし書きによる適用除外に該当するか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-building-type-compliance",
+        "type": "process",
+        "title": "建築物用途の適用判定",
+        "process_type": "mechanical",
+        "description": "建築物の用途が別表第四（ろ）欄に掲げるいずれかに該当し、規制対象であるか確認",
+        "logic_expression": "BT ∈ {別表第四(ろ)欄の各項}"
+      },
+      {
+        "id": "info-building-type-compliance",
+        "type": "information",
+        "title": "規制対象用途該当",
+        "symbol": "TC",
+        "subject": "建築物",
+        "property": "規制対象用途該当",
+        "property_type": "proposition",
+        "description": "建築物の用途が日影規制の対象用途に該当するか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-final-judgment",
+        "type": "process",
+        "title": "法56条の2第1項適合判定",
+        "process_type": "mechanical",
+        "description": "対象区域内で対象用途の建築物が日影基準に適合するか、又は適用除外に該当するか最終判定",
+        "logic_expression": "(ZA AND TC AND (HC → SC)) OR EX"
+      },
+      {
+        "id": "info-final-compliance",
+        "type": "information",
+        "title": "法56条の2第1項適合",
+        "subject": "建築物",
+        "property": "法56条の2第1項適合",
+        "property_type": "proposition",
+        "description": "建築物が法56条の2第1項の規定に適合するか",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-target-area",
+        "to": "info-target-area",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "proc-building-type-check",
+        "to": "info-building-type",
+        "role": "output"
+      },
+      {
+        "id": "e03",
+        "from": "info-building-type",
+        "to": "proc-height-standard",
+        "role": "input"
+      },
+      {
+        "id": "e04",
+        "from": "proc-height-standard",
+        "to": "info-height-standard",
+        "role": "output"
+      },
+      {
+        "id": "e05",
+        "from": "proc-height-measurement",
+        "to": "info-building-height",
+        "role": "output"
+      },
+      {
+        "id": "e06",
+        "from": "info-height-standard",
+        "to": "proc-height-check",
+        "role": "input"
+      },
+      {
+        "id": "e07",
+        "from": "info-building-height",
+        "to": "proc-height-check",
+        "role": "input"
+      },
+      {
+        "id": "e08",
+        "from": "proc-height-check",
+        "to": "info-height-check",
+        "role": "output"
+      },
+      {
+        "id": "e09",
+        "from": "info-height-standard",
+        "to": "proc-shadow-plane-check",
+        "role": "input"
+      },
+      {
+        "id": "e10",
+        "from": "proc-shadow-plane-check",
+        "to": "info-shadow-plane",
+        "role": "output"
+      },
+      {
+        "id": "e11",
+        "from": "info-building-type",
+        "to": "proc-shadow-time-check",
+        "role": "input"
+      },
+      {
+        "id": "e12",
+        "from": "proc-shadow-time-check",
+        "to": "info-shadow-time-limit",
+        "role": "output"
+      },
+      {
+        "id": "e13",
+        "from": "info-shadow-plane",
+        "to": "proc-winter-solstice-analysis",
+        "role": "input"
+      },
+      {
+        "id": "e14",
+        "from": "info-building-height",
+        "to": "proc-winter-solstice-analysis",
+        "role": "input"
+      },
+      {
+        "id": "e15",
+        "from": "proc-winter-solstice-analysis",
+        "to": "info-shadow-duration",
+        "role": "output"
+      },
+      {
+        "id": "e16",
+        "from": "info-shadow-duration",
+        "to": "proc-shadow-compliance",
+        "role": "input"
+      },
+      {
+        "id": "e17",
+        "from": "info-shadow-time-limit",
+        "to": "proc-shadow-compliance",
+        "role": "input"
+      },
+      {
+        "id": "e18",
+        "from": "proc-shadow-compliance",
+        "to": "info-shadow-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e19",
+        "from": "proc-approval-check",
+        "to": "info-approval",
+        "role": "output"
+      },
+      {
+        "id": "e20",
+        "from": "proc-modification-check",
+        "to": "info-permitted-modification",
+        "role": "output"
+      },
+      {
+        "id": "e21",
+        "from": "info-approval",
+        "to": "proc-exemption-check",
+        "role": "input"
+      },
+      {
+        "id": "e22",
+        "from": "info-permitted-modification",
+        "to": "proc-exemption-check",
+        "role": "input"
+      },
+      {
+        "id": "e23",
+        "from": "proc-exemption-check",
+        "to": "info-exemption",
+        "role": "output"
+      },
+      {
+        "id": "e24",
+        "from": "info-building-type",
+        "to": "proc-building-type-compliance",
+        "role": "input"
+      },
+      {
+        "id": "e25",
+        "from": "proc-building-type-compliance",
+        "to": "info-building-type-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e26",
+        "from": "info-target-area",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e27",
+        "from": "info-building-type-compliance",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e28",
+        "from": "info-height-check",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e29",
+        "from": "info-shadow-compliance",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e30",
+        "from": "info-exemption",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e31",
+        "from": "proc-final-judgment",
+        "to": "info-final-compliance",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "defines_detail",
+      "articles": [
+        "A56_2:P2",
+        "A56_2:P3",
+        "A56_2:P4",
+        "A56_2:P5"
+      ],
+      "description": "本項に関連する他の項の規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-24T06:47:00+09:00",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

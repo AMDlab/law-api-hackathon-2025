@@ -1,0 +1,272 @@
+{
+  "id": "CHK-BSL-A41-P1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "市町村の条例による制限緩和の適用可否判定",
+    "target_subject": "建築計画",
+    "description": "市町村が条例により第19条、第21条、第28条、第29条及び第36条の規定の制限を緩和できる場合の判定"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "41",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "条例による緩和"
+  ],
+  "text_raw": "第六条第一項第三号の区域外においては、市町村は、土地の状況により必要と認める場合においては、国土交通大臣の承認を得て、条例で、区域を限り、第十九条、第二十一条、第二十八条、第二十九条及び第三十六条の規定の全部若しくは一部を適用せず、又はこれらの規定による制限を緩和することができる。ただし、第六条第一項第一号に掲げる建築物及び同項第二号に掲げる建築物（木造以外の建築物に限る。）については、この限りでない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "第6条第1項第3号の区域外"
+        },
+        {
+          "type": "administrative",
+          "value": "市町村が条例を制定している区域内"
+        }
+      ],
+      "note": "条例緩和が適用される区域に限定"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "description": "条例による緩和が適用される",
+          "value": "特例措置を受ける"
+        },
+        {
+          "description": "条例による緩和の例外に該当する",
+          "value": "緩和対象外"
+        }
+      ]
+    },
+    "exceptions": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "type": "building_type",
+          "ref": "法::A6:P1:I1",
+          "description": "第6条第1項第1号に掲げる建築物（特殊建築物）"
+        },
+        {
+          "type": "building_type_and_structure",
+          "ref": "法::A6:P1:I2",
+          "description": "第6条第1項第2号に掲げる建築物で木造以外の建築物"
+        }
+      ],
+      "effect": "EXEMPT_FROM_RELAXATION",
+      "note": "これらの建築物には条例による緩和が適用されない"
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "info-building",
+        "type": "information",
+        "title": "建築物の用途・規模",
+        "subject": "建築物",
+        "property": "用途・規模の区分",
+        "property_type": "classification",
+        "plurality": "single",
+        "description": "法第6条第1項各号に基づく建築物の区分",
+        "related_articles": ["法::A6:P1"]
+      },
+      {
+        "id": "proc-building-identify",
+        "type": "process",
+        "title": "建築物区分の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の用途・規模を読み取り、第6条第1項各号のいずれに該当するか特定する"
+      },
+      {
+        "id": "info-structure-type",
+        "type": "information",
+        "title": "建築物の構造種別",
+        "subject": "建築物",
+        "property": "構造種別",
+        "property_type": "classification",
+        "plurality": "single",
+        "description": "木造、鉄骨造、鉄筋コンクリート造等の構造種別",
+        "remarks": "木造/木造以外の判定に使用"
+      },
+      {
+        "id": "proc-structure-identify",
+        "type": "process",
+        "title": "構造種別の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の構造種別を読み取る"
+      },
+      {
+        "id": "info-location",
+        "type": "information",
+        "title": "敷地の所在地",
+        "subject": "敷地",
+        "property": "所在地（区域区分）",
+        "property_type": "classification",
+        "plurality": "single",
+        "description": "第6条第1項第3号の区域外であるかの判定"
+      },
+      {
+        "id": "proc-location-identify",
+        "type": "process",
+        "title": "所在地の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から敷地の所在地を読み取る"
+      },
+      {
+        "id": "proc-exempt-check",
+        "type": "process",
+        "title": "例外該当判定",
+        "process_type": "mechanical",
+        "description": "条例による緩和の例外に該当するかを判定する",
+        "logic_expression": "(B1 ∈ {第6条1項1号建築物}) OR (B1 ∈ {第6条1項2号建築物} AND S1 ∈ {木造以外})",
+        "remarks": "第6条第1項第1号建築物、又は同項第2号建築物で木造以外の建築物は緩和対象外"
+      },
+      {
+        "id": "info-exempt-result",
+        "type": "information",
+        "title": "緩和適用除外該当",
+        "symbol": "E1",
+        "subject": "建築物",
+        "property": "条例緩和の適用除外該当の有無",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "条例による緩和が適用されない建築物に該当するか"
+      },
+      {
+        "id": "proc-ordinance-check",
+        "type": "process",
+        "title": "条例制定状況の確認",
+        "process_type": "mechanical",
+        "description": "当該市町村において第41条に基づく緩和条例が制定されているか、敷地が条例で指定された区域内にあるかを確認する",
+        "remarks": "市町村条例データベースとの照合"
+      },
+      {
+        "id": "info-ordinance-exists",
+        "type": "information",
+        "title": "条例適用区域該当",
+        "symbol": "C1",
+        "subject": "敷地",
+        "property": "緩和条例適用区域内該当の有無",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "市町村が第41条に基づき制定した条例の適用区域内に該当するか"
+      },
+      {
+        "id": "proc-relaxation-applicability",
+        "type": "process",
+        "title": "条例緩和適用可否判定",
+        "process_type": "mechanical",
+        "description": "条例による緩和が適用される建築計画であるかを総合判定する",
+        "logic_expression": "(C1 = TRUE) AND (E1 = FALSE)",
+        "remarks": "条例適用区域内であり、かつ例外に該当しない場合に緩和適用可"
+      },
+      {
+        "id": "info-relaxation-applicable",
+        "type": "information",
+        "title": "条例緩和適用可",
+        "symbol": "R1",
+        "subject": "建築計画",
+        "property": "第41条による条例緩和の適用可否",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "市町村の条例により第19条、第21条、第28条、第29条及び第36条の規定の制限が緩和される"
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge-001",
+        "from": "proc-building-identify",
+        "to": "info-building",
+        "role": "output"
+      },
+      {
+        "id": "edge-002",
+        "from": "proc-structure-identify",
+        "to": "info-structure-type",
+        "role": "output"
+      },
+      {
+        "id": "edge-003",
+        "from": "proc-location-identify",
+        "to": "info-location",
+        "role": "output"
+      },
+      {
+        "id": "edge-004",
+        "from": "info-building",
+        "to": "proc-exempt-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-005",
+        "from": "info-structure-type",
+        "to": "proc-exempt-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-006",
+        "from": "proc-exempt-check",
+        "to": "info-exempt-result",
+        "role": "output"
+      },
+      {
+        "id": "edge-007",
+        "from": "info-location",
+        "to": "proc-ordinance-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-008",
+        "from": "proc-ordinance-check",
+        "to": "info-ordinance-exists",
+        "role": "output"
+      },
+      {
+        "id": "edge-009",
+        "from": "info-ordinance-exists",
+        "to": "proc-relaxation-applicability",
+        "role": "input"
+      },
+      {
+        "id": "edge-010",
+        "from": "info-exempt-result",
+        "to": "proc-relaxation-applicability",
+        "role": "input"
+      },
+      {
+        "id": "edge-011",
+        "from": "proc-relaxation-applicability",
+        "to": "info-relaxation-applicable",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A6:P1:I1", "A6:P1:I2", "A6:P1:I3", "A19", "A21", "A28", "A29", "A36"],
+      "description": "第6条第1項各号による建築物区分、緩和対象となる規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-24T06:30:00.000Z",
+    "updated_at": "2025-12-24T06:30:00.000Z",
+    "author": "Claude Code (Sonnet 4.5)",
+    "generator": "kijo-generator-skill-v3",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法",
+    "source": "e-Gov法令API"
+  }
+}

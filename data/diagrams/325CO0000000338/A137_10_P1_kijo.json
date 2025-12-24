@@ -1,0 +1,445 @@
+{
+  "id": "CHK-ORD-A137-10-P1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "防火地域における既存不適格建築物の増築・改築範囲",
+    "target_subject": "既存不適格建築物",
+    "description": "法第3条第2項により法第61条（防火地域内）の規定の適用を受けない建築物について、法第86条の7第1項の緩和適用範囲を判定"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "137_10",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "既存不適格建築物",
+    "増改築",
+    "防火地域",
+    "防火規制"
+  ],
+  "text_raw": "法第三条第二項の規定により法第六十一条（防火地域内にある建築物に係る部分に限る。）の規定の適用を受けない建築物についての法第八十六条の七第一項の政令で定める範囲は、増築及び改築については、次の各号に掲げる建築物の区分に応じ、当該各号に定める要件に該当する増築又は改築に係る部分とする。\n一 次号に掲げる建築物以外の建築物 次のイ又はロのいずれかに該当するものであること。\n二 木造の建築物のうち、外壁及び軒裏が防火構造のもの以外のもの 前号イに該当するものであること。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "building_type",
+          "value": "法第3条第2項の規定により法第61条（防火地域内）の規定の適用を受けない建築物"
+        },
+        {
+          "type": "work_type",
+          "value": "増築又は改築"
+        }
+      ],
+      "note": "防火地域内における既存不適格建築物の増築・改築"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "description": "第1号（第2号以外の建築物）: イ又はロのいずれかに該当",
+          "operator": "OR",
+          "conditions": [
+            {
+              "description": "イ: 火熱遮断壁等区画 AND 大臣定め基準適合"
+            },
+            {
+              "description": "ロ: 対象床面積50m2以下等5要件全て適合"
+            }
+          ]
+        },
+        {
+          "description": "第2号（木造で外壁・軒裏が防火構造でないもの）: 第1号イのみ",
+          "operator": "AND",
+          "conditions": [
+            {
+              "description": "第1号イに該当すること"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-existing-status",
+        "type": "process",
+        "title": "既存建築物の法適用状況確認",
+        "process_type": "undefined_input",
+        "description": "当該既存建築物が法第3条第2項の規定により法第61条（防火地域内）の規定の適用を受けない建築物であるか確認"
+      },
+      {
+        "id": "info-existing-status",
+        "type": "information",
+        "title": "既存建築物の法適用状況",
+        "symbol": "E",
+        "subject": "建築物",
+        "property": "法第61条（防火地域内）の規定適用状況",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "当該既存建築物が法第3条第2項の規定により法第61条（防火地域内）の規定の適用を受けないか否か"
+      },
+      {
+        "id": "proc-structure-type",
+        "type": "process",
+        "title": "構造種別の特定",
+        "process_type": "undefined_input",
+        "description": "当該建築物が木造か否かを特定"
+      },
+      {
+        "id": "info-structure-type",
+        "type": "information",
+        "title": "構造種別",
+        "symbol": "S",
+        "subject": "建築物",
+        "property": "構造種別",
+        "property_type": "classification",
+        "plurality": "single",
+        "description": "当該建築物が木造か否か"
+      },
+      {
+        "id": "proc-exterior-type",
+        "type": "process",
+        "title": "外壁・軒裏の構造確認",
+        "process_type": "undefined_input",
+        "description": "木造建築物の場合、外壁及び軒裏が防火構造であるか確認"
+      },
+      {
+        "id": "info-exterior-type",
+        "type": "information",
+        "title": "外壁・軒裏の防火構造",
+        "symbol": "EX",
+        "subject": "建築物",
+        "property": "外壁・軒裏の防火構造該当",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "木造建築物の外壁及び軒裏が防火構造であるか"
+      },
+      {
+        "id": "proc-building-category",
+        "type": "process",
+        "title": "建築物区分判定",
+        "process_type": "mechanical",
+        "description": "第1号（第2号以外）又は第2号（木造で外壁・軒裏が防火構造でないもの）のいずれに該当するか判定",
+        "logic_expression": "(S ≠ 木造) OR (S = 木造 AND EX = true) → 第1号, (S = 木造 AND EX = false) → 第2号"
+      },
+      {
+        "id": "info-building-category",
+        "type": "information",
+        "title": "建築物区分",
+        "symbol": "BC",
+        "subject": "建築物",
+        "property": "本条における建築物区分",
+        "property_type": "classification",
+        "plurality": "single",
+        "description": "第1号（第2号以外の建築物）又は第2号（木造で外壁・軒裏が防火構造でないもの）の区分"
+      },
+      {
+        "id": "proc-work-type",
+        "type": "process",
+        "title": "工事種別の特定",
+        "process_type": "undefined_input",
+        "description": "当該工事が増築又は改築であるかを確認"
+      },
+      {
+        "id": "info-work-type",
+        "type": "information",
+        "title": "工事種別",
+        "symbol": "W",
+        "subject": "建築物",
+        "property": "工事の種別",
+        "property_type": "classification",
+        "plurality": "single",
+        "description": "当該工事が増築か改築か"
+      },
+      {
+        "id": "proc-target-part",
+        "type": "process",
+        "title": "増築・改築部分の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書から増築又は改築に係る部分の範囲を特定"
+      },
+      {
+        "id": "info-target-part",
+        "type": "information",
+        "title": "増築・改築に係る部分",
+        "subject": "建築物",
+        "property": "増改築部分の特定",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "当該建築物における増築又は改築に係る部分を特定"
+      },
+      {
+        "id": "proc-item1-i-check",
+        "type": "process",
+        "title": "第1号イ要件判定",
+        "process_type": "sub_diagram_reference",
+        "sub_diagram_ref": "CHK-ORD-A137-10-P1-I1",
+        "description": "第1号イの要件（火熱遮断壁等区画及び大臣定め基準適合）を判定"
+      },
+      {
+        "id": "info-item1-i",
+        "type": "information",
+        "title": "第1号イ適合",
+        "symbol": "I1a",
+        "subject": "増築・改築部分",
+        "property": "第1号イ適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "増築・改築部分が第1号イに適合するか"
+      },
+      {
+        "id": "proc-item1-ro-check",
+        "type": "process",
+        "title": "第1号ロ要件判定",
+        "process_type": "sub_diagram_reference",
+        "description": "第1号ロの要件（対象床面積50m2以下等5要件）を判定"
+      },
+      {
+        "id": "info-item1-ro",
+        "type": "information",
+        "title": "第1号ロ適合",
+        "symbol": "I1b",
+        "subject": "増築・改築部分",
+        "property": "第1号ロ適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "増築・改築部分が第1号ロに適合するか"
+      },
+      {
+        "id": "proc-item1-judgment",
+        "type": "process",
+        "title": "第1号適合判定",
+        "process_type": "mechanical",
+        "description": "第1号イ又はロのいずれかに適合するか判定",
+        "logic_expression": "I1a OR I1b"
+      },
+      {
+        "id": "info-item1-compliance",
+        "type": "information",
+        "title": "第1号適合",
+        "symbol": "I1",
+        "subject": "増築・改築部分",
+        "property": "第1号適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "増築・改築部分が第1号に適合するか"
+      },
+      {
+        "id": "proc-item2-judgment",
+        "type": "process",
+        "title": "第2号適合判定",
+        "process_type": "mechanical",
+        "description": "第2号（木造で外壁・軒裏が防火構造でないもの）は第1号イのみ適合",
+        "logic_expression": "I1a"
+      },
+      {
+        "id": "info-item2-compliance",
+        "type": "information",
+        "title": "第2号適合",
+        "symbol": "I2",
+        "subject": "増築・改築部分",
+        "property": "第2号適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "増築・改築部分が第2号要件に適合するか"
+      },
+      {
+        "id": "proc-final-judgment",
+        "type": "process",
+        "title": "緩和適用範囲該当判定",
+        "process_type": "mechanical",
+        "description": "建築物区分に応じた各号適合を総合判定",
+        "logic_expression": "(BC = 第1号) → I1, (BC = 第2号) → I2"
+      },
+      {
+        "id": "info-final-compliance",
+        "type": "information",
+        "title": "令137条の10第1項適合",
+        "subject": "増築・改築部分",
+        "property": "令137条の10第1項適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "増築・改築部分が令第137条の10第1項の緩和適用範囲に該当するか"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-existing-status",
+        "to": "info-existing-status",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "proc-structure-type",
+        "to": "info-structure-type",
+        "role": "output"
+      },
+      {
+        "id": "e03",
+        "from": "proc-exterior-type",
+        "to": "info-exterior-type",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "info-structure-type",
+        "to": "proc-building-category",
+        "role": "input"
+      },
+      {
+        "id": "e05",
+        "from": "info-exterior-type",
+        "to": "proc-building-category",
+        "role": "input"
+      },
+      {
+        "id": "e06",
+        "from": "proc-building-category",
+        "to": "info-building-category",
+        "role": "output"
+      },
+      {
+        "id": "e07",
+        "from": "proc-work-type",
+        "to": "info-work-type",
+        "role": "output"
+      },
+      {
+        "id": "e08",
+        "from": "proc-target-part",
+        "to": "info-target-part",
+        "role": "output"
+      },
+      {
+        "id": "e09",
+        "from": "info-target-part",
+        "to": "proc-item1-i-check",
+        "role": "input"
+      },
+      {
+        "id": "e10",
+        "from": "proc-item1-i-check",
+        "to": "info-item1-i",
+        "role": "output"
+      },
+      {
+        "id": "e11",
+        "from": "info-target-part",
+        "to": "proc-item1-ro-check",
+        "role": "input"
+      },
+      {
+        "id": "e12",
+        "from": "proc-item1-ro-check",
+        "to": "info-item1-ro",
+        "role": "output"
+      },
+      {
+        "id": "e13",
+        "from": "info-item1-i",
+        "to": "proc-item1-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e14",
+        "from": "info-item1-ro",
+        "to": "proc-item1-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e15",
+        "from": "proc-item1-judgment",
+        "to": "info-item1-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e16",
+        "from": "info-item1-i",
+        "to": "proc-item2-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e17",
+        "from": "proc-item2-judgment",
+        "to": "info-item2-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e18",
+        "from": "info-building-category",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e19",
+        "from": "info-item1-compliance",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e20",
+        "from": "info-item2-compliance",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e21",
+        "from": "proc-final-judgment",
+        "to": "info-final-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e22",
+        "from": "info-existing-status",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e23",
+        "from": "info-work-type",
+        "to": "proc-final-judgment",
+        "role": "input"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": [
+        "A3:P2",
+        "A61",
+        "A86_7:P1"
+      ],
+      "description": "法第3条第2項の既存不適格建築物の取扱、法第61条の防火地域規制、法第86条の7第1項の緩和規定"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": [
+        "A136_2",
+        "A109"
+      ],
+      "description": "令136条の2各号の基準（防火地域内建築物）、令109条の防火設備"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T12:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令",
+    "source": "e-Gov法令API"
+  }
+}

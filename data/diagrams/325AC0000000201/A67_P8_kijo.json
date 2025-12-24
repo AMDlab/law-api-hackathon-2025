@@ -1,0 +1,252 @@
+{
+  "id": "CHK-BSL-A67-P8",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "防災都市計画施設に面する建築物の間口率・高さ算定",
+    "target_subject": "建築物",
+    "description": "防災都市計画施設に面する建築物の間口率及び高さの算定方法を確認する処理"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "67",
+    "paragraph": "8"
+  },
+  "labels": [
+    "単体規定",
+    "特定防災街区整備地区",
+    "計算基準"
+  ],
+  "text_raw": "前二項の建築物の防災都市計画施設に係る間口率及び高さの算定に関し必要な事項は、政令で定める。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "特定防災街区整備地区内"
+        },
+        {
+          "type": "building_attribute",
+          "value": "防災都市計画施設に接する敷地に立地"
+        }
+      ],
+      "note": "第6項および第7項の規定が適用される建築物の間口率・高さ算定"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "calculation_method",
+          "value": "間口率および高さの算定は政令により定義される基準に従う"
+        }
+      ]
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "info-building",
+        "type": "information",
+        "title": "防災都市計画施設に接する建築物",
+        "subject": "建築物",
+        "property": "防災都市計画施設との関係",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "当該敷地が防災都市計画施設に接する建築物",
+        "related_articles": [
+          "法::A67:P6",
+          "法::A67:P7"
+        ]
+      },
+      {
+        "id": "info-frontage-rate",
+        "type": "information",
+        "title": "防災都市計画施設に係る間口率",
+        "subject": "建築物",
+        "property": "防災都市計画施設に面する部分の長さの割合",
+        "property_type": "numeric",
+        "plurality": "single",
+        "unit": "%",
+        "description": "防災都市計画施設に面する部分の長さの、敷地の当該防災都市計画施設に接する部分の長さに対する割合",
+        "related_articles": [
+          "法::A67:P6"
+        ]
+      },
+      {
+        "id": "info-building-height",
+        "type": "information",
+        "title": "建築物の高さ",
+        "subject": "建築物",
+        "property": "地盤面からの高さ",
+        "property_type": "numeric",
+        "plurality": "single",
+        "unit": "m",
+        "description": "防災都市計画施設に面する部分における建築物の高さ",
+        "related_articles": [
+          "法::A67:P6",
+          "法::A67:P7"
+        ]
+      },
+      {
+        "id": "proc-obtain-calculation-standard",
+        "type": "process",
+        "title": "間口率・高さ算定基準の取得",
+        "process_type": "undefined_input",
+        "description": "政令で定められた間口率・高さの算定基準を確認",
+        "target_subject": "建築物",
+        "related_articles": [
+          "令::A129_6"
+        ],
+        "remarks": "政令（建築基準法施行令）により定められた具体的な算定方法を参照"
+      },
+      {
+        "id": "info-calculation-standard",
+        "type": "information",
+        "title": "間口率・高さ算定基準",
+        "subject": "建築物",
+        "property": "算定基準の詳細",
+        "property_type": "classification",
+        "plurality": "single",
+        "description": "政令で定められた間口率及び高さの算定方法",
+        "related_articles": [
+          "令::A129_6"
+        ],
+        "remarks": "建築基準法施行令第129条の6で詳細が規定"
+      },
+      {
+        "id": "proc-calculate-frontage-rate",
+        "type": "process",
+        "title": "間口率の計算",
+        "process_type": "mechanical",
+        "description": "防災都市計画施設に面する部分の長さをもとに間口率を計算",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "logic_expression": "間口率 = (防災都市計画施設に面する部分の長さ) / (敷地の防災都市計画施設に接する部分の長さ)",
+        "software_functions": [
+          {
+            "category": "program_processing",
+            "description": "敷地の境界線と建築物配置から間口率を自動計算"
+          }
+        ]
+      },
+      {
+        "id": "proc-calculate-height",
+        "type": "process",
+        "title": "高さの計算",
+        "process_type": "mechanical",
+        "description": "政令の基準に従って高さを計測",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "logic_expression": "高さ = 地盤面から建築物最頂部までの距離（政令基準に従う）",
+        "software_functions": [
+          {
+            "category": "program_processing",
+            "description": "3Dモデルから政令基準に基づいて高さを自動計測"
+          }
+        ]
+      },
+      {
+        "id": "info-calculated-frontage-rate",
+        "type": "information",
+        "title": "算定された間口率",
+        "subject": "建築物",
+        "property": "実際の間口率値",
+        "property_type": "numeric",
+        "plurality": "single",
+        "unit": "%",
+        "description": "計算方法に従い算定された間口率の値",
+        "related_articles": [
+          "法::A67:P6"
+        ]
+      },
+      {
+        "id": "info-calculated-height",
+        "type": "information",
+        "title": "算定された高さ",
+        "subject": "建築物",
+        "property": "実際の高さ値",
+        "property_type": "numeric",
+        "plurality": "single",
+        "unit": "m",
+        "description": "計算方法に従い算定された高さの値",
+        "related_articles": [
+          "法::A67:P6",
+          "法::A67:P7"
+        ]
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge-01",
+        "from": "info-building",
+        "to": "proc-obtain-calculation-standard",
+        "role": "input"
+      },
+      {
+        "id": "edge-02",
+        "from": "proc-obtain-calculation-standard",
+        "to": "info-calculation-standard",
+        "role": "output"
+      },
+      {
+        "id": "edge-03",
+        "from": "info-calculation-standard",
+        "to": "proc-calculate-frontage-rate",
+        "role": "input"
+      },
+      {
+        "id": "edge-04",
+        "from": "info-frontage-rate",
+        "to": "proc-calculate-frontage-rate",
+        "role": "input"
+      },
+      {
+        "id": "edge-05",
+        "from": "proc-calculate-frontage-rate",
+        "to": "info-calculated-frontage-rate",
+        "role": "output"
+      },
+      {
+        "id": "edge-06",
+        "from": "info-calculation-standard",
+        "to": "proc-calculate-height",
+        "role": "input"
+      },
+      {
+        "id": "edge-07",
+        "from": "info-building-height",
+        "to": "proc-calculate-height",
+        "role": "input"
+      },
+      {
+        "id": "edge-08",
+        "from": "proc-calculate-height",
+        "to": "info-calculated-height",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "defines_detail",
+      "articles": [
+        "A129_6"
+      ],
+      "description": "間口率及び高さの算定に関する具体的な基準を規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-24T00:00:00Z",
+    "updated_at": "2025-12-24T00:00:00Z",
+    "generator": "kijo-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法",
+    "source": "e-Gov法令API v2"
+  }
+}

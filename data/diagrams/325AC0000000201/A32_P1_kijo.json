@@ -1,0 +1,187 @@
+{
+  "id": "CHK-BSL-A32-P1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "建築物の電気設備",
+    "target_subject": "電気設備",
+    "description": "建築物の電気設備が法律等で定める工法に適合することを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "32",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "建築設備",
+    "電気設備"
+  ],
+  "text_raw": "建築物の電気設備は、法律又はこれに基く命令の規定で電気工作物に係る建築物の安全及び防火に関するものの定める工法によつて設けなければならない。",
+  "compliance_logic": {
+    "judgment_rule": {
+      "operator": "==",
+      "conditions": [
+        {
+          "ref": "info-compliance",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-equipment-set",
+        "type": "process",
+        "title": "電気設備の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から判定対象となる建築物の電気設備を特定する"
+      },
+      {
+        "id": "info-equipment-set",
+        "type": "information",
+        "title": "建築物の電気設備",
+        "subject": "建築物",
+        "property": "電気設備の集合",
+        "property_type": "set_definition",
+        "description": "判定対象となる建築物に属する電気設備を特定",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-equipment-spec",
+        "type": "process",
+        "title": "電気設備の工法・仕様の特定",
+        "process_type": "human_judgment",
+        "target_subject": "電気設備",
+        "iteration": "iterative",
+        "description": "設計図書等から各電気設備の設置工法・仕様を読み取る"
+      },
+      {
+        "id": "info-equipment-spec",
+        "type": "information",
+        "title": "電気設備の工法",
+        "symbol": "M",
+        "subject": "電気設備",
+        "property": "設置工法・仕様",
+        "property_type": "classification",
+        "description": "電気設備の設置工法・仕様（配線方法、接地方法、過電流保護装置等）",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-legal-compliance",
+        "type": "process",
+        "title": "法令工法適合判定",
+        "process_type": "mechanical",
+        "target_subject": "電気設備",
+        "iteration": "iterative",
+        "description": "電気事業法等の法令で定める工法（電気設備に関する技術基準、内線規程等）への適合を判定",
+        "related_articles": [
+          "電気事業法",
+          "電気設備に関する技術基準を定める省令"
+        ],
+        "remarks": "電気工作物に係る建築物の安全及び防火に関する法令（電気事業法、電気設備に関する技術基準を定める省令等）で定める工法"
+      },
+      {
+        "id": "info-legal-compliance",
+        "type": "information",
+        "title": "法令工法適合",
+        "symbol": "L",
+        "subject": "電気設備",
+        "property": "法令工法適合",
+        "property_type": "proposition",
+        "description": "法律又はこれに基づく命令で定める工法に適合するか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-all-check",
+        "type": "process",
+        "title": "全電気設備適合確認",
+        "process_type": "mechanical",
+        "description": "全ての電気設備が法令工法に適合することを確認",
+        "logic_expression": "∀equipment ∈ ElectricalEquipments: L(equipment) = true"
+      },
+      {
+        "id": "info-compliance",
+        "type": "information",
+        "title": "建築物の法32条1項適合",
+        "subject": "建築物",
+        "property": "法32条1項適合",
+        "property_type": "proposition",
+        "description": "建築物全体として法32条1項の規定に適合するか",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-equipment-set",
+        "to": "info-equipment-set",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "info-equipment-set",
+        "to": "proc-equipment-spec",
+        "role": "input"
+      },
+      {
+        "id": "e03",
+        "from": "proc-equipment-spec",
+        "to": "info-equipment-spec",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "info-equipment-spec",
+        "to": "proc-legal-compliance",
+        "role": "input"
+      },
+      {
+        "id": "e05",
+        "from": "proc-legal-compliance",
+        "to": "info-legal-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e06",
+        "from": "info-legal-compliance",
+        "to": "proc-all-check",
+        "role": "input"
+      },
+      {
+        "id": "e07",
+        "from": "proc-all-check",
+        "to": "info-compliance",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "昭和39年法律第170号",
+      "law_name": "電気事業法",
+      "law_type": "act",
+      "relationship": "references",
+      "description": "電気工作物に係る建築物の安全及び防火に関する工法を定める"
+    },
+    {
+      "law_id": "平成9年通商産業省令第52号",
+      "law_name": "電気設備に関する技術基準を定める省令",
+      "law_type": "regulation",
+      "relationship": "defines_detail",
+      "description": "電気設備の技術基準（配線、接地、過電流保護等）を具体的に規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-23T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

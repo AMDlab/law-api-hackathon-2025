@@ -1,0 +1,231 @@
+{
+  "id": "CHK-BSL-A84-P1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "被災市街地における建築制限の判定",
+    "target_subject": "建築物",
+    "description": "災害発生時の被災市街地における建築制限・禁止の適用判定"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "84",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "総則"
+  ],
+  "text_raw": "特定行政庁は、市街地に災害のあつた場合において都市計画又は土地区画整理法による土地区画整理事業のため必要があると認めるときは、区域を指定し、災害が発生した日から一月以内の期間を限り、その区域内における建築物の建築を制限し、又は禁止することができる。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "event",
+          "value": "市街地における災害の発生"
+        },
+        {
+          "type": "purpose",
+          "value": "都市計画又は土地区画整理事業"
+        }
+      ],
+      "note": "災害発生日から1月以内の期間"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-designated-area",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "ref": "info-period-valid",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-disaster-check",
+        "type": "process",
+        "title": "災害発生状況の確認",
+        "process_type": "undefined_input",
+        "description": "市街地における災害の発生及びその日時を確認",
+        "target_subject": "敷地"
+      },
+      {
+        "id": "info-disaster-occurred",
+        "type": "information",
+        "title": "災害の発生",
+        "symbol": "D",
+        "subject": "市街地",
+        "property": "災害発生の有無",
+        "property_type": "proposition",
+        "description": "当該敷地が属する市街地で災害が発生したか否か",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-purpose-check",
+        "type": "process",
+        "title": "制限の目的確認",
+        "process_type": "human_judgment",
+        "description": "都市計画又は土地区画整理事業の必要性を判断",
+        "target_subject": "市街地",
+        "logic_expression": "都市計画目的 OR 土地区画整理事業目的"
+      },
+      {
+        "id": "info-restriction-purpose",
+        "type": "information",
+        "title": "制限の目的",
+        "symbol": "P",
+        "subject": "市街地",
+        "property": "制限目的の適切性",
+        "property_type": "proposition",
+        "description": "都市計画又は土地区画整理事業のための必要性が認められるか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-area-designate",
+        "type": "process",
+        "title": "制限区域の指定",
+        "process_type": "human_judgment",
+        "description": "特定行政庁が制限対象区域を指定する処理",
+        "target_subject": "敷地"
+      },
+      {
+        "id": "info-designated-area",
+        "type": "information",
+        "title": "制限区域の指定",
+        "symbol": "A",
+        "subject": "敷地",
+        "property": "制限区域への指定",
+        "property_type": "proposition",
+        "description": "当該敷地が特定行政庁により制限区域として指定されているか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-period-check",
+        "type": "process",
+        "title": "制限期間の確認",
+        "process_type": "mechanical",
+        "description": "災害発生日から1月以内の期間内か判定",
+        "target_subject": "敷地",
+        "logic_expression": "現在日 ≤ 災害発生日 + 1月"
+      },
+      {
+        "id": "info-period-valid",
+        "type": "information",
+        "title": "制限期間の適用",
+        "symbol": "T",
+        "subject": "建築物",
+        "property": "制限期間内の判定",
+        "property_type": "proposition",
+        "description": "当該建築物の計画が災害発生日から1月以内の期間内であるか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-restriction-judgment",
+        "type": "process",
+        "title": "建築制限の適用判定",
+        "process_type": "mechanical",
+        "description": "建築物の建築制限又は禁止の適用を判定",
+        "target_subject": "建築物",
+        "logic_expression": "D AND P AND A AND T"
+      },
+      {
+        "id": "info-restriction-applicable",
+        "type": "information",
+        "title": "適否判定",
+        "symbol": "R",
+        "subject": "建築物",
+        "property": "法適合性",
+        "property_type": "proposition",
+        "description": "法第84条第1項に定める建築制限が適用される",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge-001",
+        "from": "proc-disaster-check",
+        "to": "info-disaster-occurred",
+        "role": "output"
+      },
+      {
+        "id": "edge-002",
+        "from": "info-disaster-occurred",
+        "to": "proc-purpose-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-003",
+        "from": "proc-purpose-check",
+        "to": "info-restriction-purpose",
+        "role": "output"
+      },
+      {
+        "id": "edge-004",
+        "from": "info-restriction-purpose",
+        "to": "proc-area-designate",
+        "role": "input"
+      },
+      {
+        "id": "edge-005",
+        "from": "proc-area-designate",
+        "to": "info-designated-area",
+        "role": "output"
+      },
+      {
+        "id": "edge-006",
+        "from": "info-disaster-occurred",
+        "to": "proc-period-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-007",
+        "from": "proc-period-check",
+        "to": "info-period-valid",
+        "role": "output"
+      },
+      {
+        "id": "edge-008",
+        "from": "info-designated-area",
+        "to": "proc-restriction-judgment",
+        "role": "input"
+      },
+      {
+        "id": "edge-009",
+        "from": "info-restriction-purpose",
+        "to": "proc-restriction-judgment",
+        "role": "input"
+      },
+      {
+        "id": "edge-010",
+        "from": "info-period-valid",
+        "to": "proc-restriction-judgment",
+        "role": "input"
+      },
+      {
+        "id": "edge-011",
+        "from": "proc-restriction-judgment",
+        "to": "info-restriction-applicable",
+        "role": "output"
+      }
+    ]
+  },
+  "metadata": {
+    "created_at": "2025-12-24T00:00:00Z",
+    "generator": "kijo-generator",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法",
+    "source": "法令API"
+  }
+}

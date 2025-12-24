@@ -1,0 +1,48 @@
+{
+  "id": "CHK-BSL-A26-P2-I1",
+  "version": "3.0.0",
+  "page_title": {"title": "防火壁適用除外（耐火構造等）", "target_subject": "建築物", "description": "特定部分の特定主要構造部が耐火構造等の場合の防火壁適用除外判定"},
+  "legal_ref": {"law_id": "325AC0000000201", "law_type": "act", "law_name": "建築基準法", "law_abbrev": "法", "article": "26", "paragraph": "2", "item": "1"},
+  "labels": ["単体規定", "防火", "適用除外"],
+  "text_raw": "一当該特定部分の特定主要構造部が耐火構造であるもの又は第二条第九号の二イ（２）に規定する性能と同等の性能を有するものとして国土交通大臣が定めた構造方法を用いるもの若しくは国土交通大臣の認定を受けたもの",
+  "compliance_logic": {
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {"ref": "info-fireproof", "value": true},
+        {"ref": "info-minister-method", "value": true},
+        {"ref": "info-minister-cert", "value": true}
+      ]
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {"id": "proc-part", "type": "process", "title": "特定部分の特定", "process_type": "undefined_input"},
+      {"id": "info-part", "type": "information", "title": "特定部分", "subject": "建築物", "property": "特定部分の集合", "property_type": "set_definition", "plurality": "single"},
+      {"id": "proc-structure", "type": "process", "title": "特定主要構造部の特定", "process_type": "undefined_input"},
+      {"id": "info-structure", "type": "information", "title": "特定主要構造部の構造", "subject": "特定主要構造部", "property": "構造種別", "property_type": "classification", "plurality": "single"},
+      {"id": "proc-fireproof", "type": "process", "title": "耐火構造判定", "process_type": "mechanical"},
+      {"id": "info-fireproof", "type": "information", "title": "耐火構造", "subject": "特定主要構造部", "property": "耐火構造該当", "property_type": "proposition", "plurality": "single"},
+      {"id": "proc-method", "type": "process", "title": "大臣定め構造方法確認", "process_type": "undefined_input"},
+      {"id": "info-minister-method", "type": "information", "title": "大臣定め構造方法", "subject": "特定主要構造部", "property": "大臣定め構造方法使用", "property_type": "proposition", "plurality": "single"},
+      {"id": "proc-cert", "type": "process", "title": "大臣認定確認", "process_type": "undefined_input"},
+      {"id": "info-minister-cert", "type": "information", "title": "大臣認定", "subject": "特定主要構造部", "property": "大臣認定取得", "property_type": "proposition", "plurality": "single"},
+      {"id": "proc-exemption", "type": "process", "title": "適用除外判定", "process_type": "mechanical", "logic_expression": "fireproof OR method OR cert"},
+      {"id": "info-exemption", "type": "information", "title": "法26条2項1号該当", "symbol": "EXEMPT", "subject": "建築物", "property": "防火壁適用除外", "property_type": "proposition", "plurality": "single"}
+    ],
+    "edges": [
+      {"id": "e001", "from": "proc-part", "to": "info-part", "role": "output"},
+      {"id": "e002", "from": "info-part", "to": "proc-structure", "role": "input"},
+      {"id": "e003", "from": "proc-structure", "to": "info-structure", "role": "output"},
+      {"id": "e004", "from": "info-structure", "to": "proc-fireproof", "role": "input"},
+      {"id": "e005", "from": "proc-fireproof", "to": "info-fireproof", "role": "output"},
+      {"id": "e006", "from": "proc-method", "to": "info-minister-method", "role": "output"},
+      {"id": "e007", "from": "proc-cert", "to": "info-minister-cert", "role": "output"},
+      {"id": "e008", "from": "info-fireproof", "to": "proc-exemption", "role": "input"},
+      {"id": "e009", "from": "info-minister-method", "to": "proc-exemption", "role": "input"},
+      {"id": "e010", "from": "info-minister-cert", "to": "proc-exemption", "role": "input"},
+      {"id": "e011", "from": "proc-exemption", "to": "info-exemption", "role": "output"}
+    ]
+  },
+  "metadata": {"created_at": "2025-12-24T00:00:00Z", "generator": "claude-code-kijo-generator", "law_id": "325AC0000000201", "law_name": "建築基準法"}
+}

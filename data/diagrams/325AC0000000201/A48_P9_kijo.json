@@ -1,0 +1,177 @@
+{
+  "id": "CHK-BSL-A48-P9",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "近隣商業地域における建築物の用途制限",
+    "target_subject": "建築物",
+    "description": "近隣商業地域内において建築禁止となる建築物の用途が別表第二(り)項に該当しないことを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "48",
+    "paragraph": "9",
+    "item": null
+  },
+  "labels": ["集団規定", "用途制限"],
+  "text_raw": "近隣商業地域内においては、別表第二（り）項に掲げる建築物は、建築してはならない。ただし、特定行政庁が近隣の住宅地の住民に対する日用品の供給を行うことを主たる内容とする商業その他の業務の利便及び当該住宅地の環境を害するおそれがないと認め、又は公益上やむを得ないと認めて許可した場合においては、この限りでない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        { "type": "location", "value": "近隣商業地域内" }
+      ],
+      "note": "都市計画で定められた近隣商業地域"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        { "ref": "info-table2-non-prohibited", "operator": "==", "value": true },
+        { "ref": "info-special-approval", "operator": "==", "value": true }
+      ]
+    },
+    "exceptions": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "note": "特定行政庁の許可を受けた場合（商業・業務の利便及び住宅地の環境を害するおそれがない、又は公益上やむを得ない）",
+          "ref": "info-special-approval",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "effect": "EXEMPT"
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-building-use",
+        "type": "process",
+        "title": "建築物の用途の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の用途を特定する"
+      },
+      {
+        "id": "info-building-use",
+        "type": "information",
+        "title": "建築物の用途",
+        "symbol": "U",
+        "subject": "建築物",
+        "property": "用途",
+        "property_type": "classification",
+        "description": "建築物の用途種別（住宅、店舗、事務所、工場等）",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-table2-check",
+        "type": "process",
+        "title": "別表第二(り)項該当判定",
+        "process_type": "mechanical",
+        "description": "建築物の用途が別表第二(り)項に掲げられているかを判定",
+        "related_articles": ["法::別表第二(り)"],
+        "remarks": "別表第二(り)項に掲げる建築禁止用途: 客席部分の床面積が200㎡以上のカラオケボックス等、営業用倉庫、危険物貯蔵・処理量が非常に多い建築物",
+        "logic_expression": "U ∈ {別表第二(り)項に掲げる用途}"
+      },
+      {
+        "id": "info-table2-prohibited",
+        "type": "information",
+        "title": "別表第二(り)項該当",
+        "symbol": "P",
+        "subject": "建築物",
+        "property": "別表第二(り)項該当",
+        "property_type": "proposition",
+        "description": "建築物の用途が別表第二(り)項の建築禁止用途に該当するか",
+        "related_articles": ["法::別表第二(り)"],
+        "plurality": "single"
+      },
+      {
+        "id": "proc-non-prohibited-judgment",
+        "type": "process",
+        "title": "建築禁止非該当判定",
+        "process_type": "mechanical",
+        "description": "別表第二(り)項に該当しない（建築可能）ことを判定",
+        "logic_expression": "NOT P"
+      },
+      {
+        "id": "info-table2-non-prohibited",
+        "type": "information",
+        "title": "別表第二(り)項非該当",
+        "symbol": "N",
+        "subject": "建築物",
+        "property": "別表第二(り)項非該当",
+        "property_type": "proposition",
+        "description": "建築物の用途が別表第二(り)項の建築禁止用途に該当しない",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-special-approval-check",
+        "type": "process",
+        "title": "特定行政庁の許可の確認",
+        "process_type": "undefined_input",
+        "description": "特定行政庁の許可（商業・業務の利便及び住宅地の環境を害するおそれがない、又は公益上やむを得ない）を受けているかを確認",
+        "remarks": "許可要件: 1)近隣の住宅地の住民に対する日用品の供給を行うことを主たる内容とする商業その他の業務の利便及び当該住宅地の環境を害するおそれがない、又は 2)公益上やむを得ない"
+      },
+      {
+        "id": "info-special-approval",
+        "type": "information",
+        "title": "特定行政庁の許可",
+        "symbol": "A",
+        "subject": "建築物",
+        "property": "特定行政庁の許可の有無",
+        "property_type": "proposition",
+        "description": "特定行政庁の許可を受けているか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-final-judgment",
+        "type": "process",
+        "title": "適合判定",
+        "process_type": "mechanical",
+        "description": "別表第二(り)項に該当しない、又は特定行政庁の許可を受けているかを判定",
+        "logic_expression": "N OR A"
+      },
+      {
+        "id": "info-compliance",
+        "type": "information",
+        "title": "法48条9項適合",
+        "symbol": "C",
+        "subject": "建築物",
+        "property": "法48条9項適合",
+        "property_type": "proposition",
+        "description": "法48条9項の規定に適合するか",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "proc-building-use", "to": "info-building-use", "role": "output" },
+      { "id": "e02", "from": "info-building-use", "to": "proc-table2-check", "role": "input" },
+      { "id": "e03", "from": "proc-table2-check", "to": "info-table2-prohibited", "role": "output" },
+      { "id": "e04", "from": "info-table2-prohibited", "to": "proc-non-prohibited-judgment", "role": "input" },
+      { "id": "e05", "from": "proc-non-prohibited-judgment", "to": "info-table2-non-prohibited", "role": "output" },
+      { "id": "e06", "from": "proc-special-approval-check", "to": "info-special-approval", "role": "output" },
+      { "id": "e07", "from": "info-table2-non-prohibited", "to": "proc-final-judgment", "role": "input" },
+      { "id": "e08", "from": "info-special-approval", "to": "proc-final-judgment", "role": "input" },
+      { "id": "e09", "from": "proc-final-judgment", "to": "info-compliance", "role": "output" }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["別表第二(り)"],
+      "description": "近隣商業地域において建築禁止となる建築物を定める"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-24T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

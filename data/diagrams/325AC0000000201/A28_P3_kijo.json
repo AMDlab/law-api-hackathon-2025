@@ -1,0 +1,472 @@
+{
+  "id": "CHK-BSL-A28-P3",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "換気設備の設置義務（火気使用室等）",
+    "target_subject": "居室・室",
+    "description": "特殊建築物の居室または火を使用する設備を設けた室に換気設備が技術的基準に従って設置されていることを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "28",
+    "paragraph": "3",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "衛生",
+    "換気"
+  ],
+  "text_raw": "別表第一（い）欄（一）項に掲げる用途に供する特殊建築物の居室又は建築物の調理室、浴室その他の室でかまど、こんろその他火を使用する設備若しくは器具を設けたもの（政令で定めるものを除く。）には、政令で定める技術的基準に従つて、換気設備を設けなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "type": "room_type",
+          "value": "別表第一（い）欄（一）項の用途に供する特殊建築物の居室"
+        },
+        {
+          "type": "room_type",
+          "value": "火を使用する設備・器具を設けた調理室、浴室その他の室（政令で定めるものを除く）"
+        }
+      ],
+      "note": "2つのカテゴリのいずれかに該当する室に適用"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-equipment-installed",
+          "description": "換気設備が設置されている",
+          "value": true
+        },
+        {
+          "ref": "info-standard-compliance",
+          "description": "技術的基準に従っている",
+          "value": true
+        }
+      ]
+    },
+    "exceptions": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "note": "火を使用する設備・器具を設けた室のうち政令で定めるもの",
+          "ref": "info-exempt-by-ordinance",
+          "value": true
+        }
+      ],
+      "effect": "EXEMPT"
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-building-use",
+        "type": "process",
+        "title": "建築物用途の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の用途を読み取る"
+      },
+      {
+        "id": "info-building-use",
+        "type": "information",
+        "title": "建築物の用途",
+        "symbol": "B",
+        "subject": "建築物",
+        "property": "用途",
+        "property_type": "classification",
+        "description": "別表第一（い）欄（一）項に掲げる用途（劇場、映画館、演芸場、観覧場、公会堂、集会場）",
+        "remarks": "別表第一（い）欄（一）項: 劇場、映画館、演芸場、観覧場、公会堂、集会場その他これらに類するもの",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-special-building-check",
+        "type": "process",
+        "title": "特殊建築物該当判定",
+        "process_type": "mechanical",
+        "description": "建築物用途が別表第一（い）欄（一）項の用途に該当し、特殊建築物に該当するか判定",
+        "logic_expression": "B ∈ {劇場, 映画館, 演芸場, 観覧場, 公会堂, 集会場, ...}"
+      },
+      {
+        "id": "info-special-building",
+        "type": "information",
+        "title": "特殊建築物該当",
+        "symbol": "S",
+        "subject": "建築物",
+        "property": "別表第一（い）欄（一）項該当",
+        "property_type": "proposition",
+        "description": "建築物が別表第一（い）欄（一）項の用途に供する特殊建築物に該当するか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-rooms-set",
+        "type": "process",
+        "title": "室の特定",
+        "process_type": "undefined_input",
+        "description": "建築物に属する全ての室（居室、調理室、浴室等）を特定する"
+      },
+      {
+        "id": "info-rooms-set",
+        "type": "information",
+        "title": "建築物の室",
+        "subject": "建築物",
+        "property": "室の集合",
+        "property_type": "set_definition",
+        "description": "判定対象となる建築物に属する居室・調理室・浴室その他の室を特定",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-room-type",
+        "type": "process",
+        "title": "室種別の特定",
+        "process_type": "human_judgment",
+        "target_subject": "室",
+        "iteration": "iterative",
+        "description": "各室の種別（居室、調理室、浴室、その他）を特定する"
+      },
+      {
+        "id": "info-room-type",
+        "type": "information",
+        "title": "室の種別",
+        "symbol": "R",
+        "subject": "室",
+        "property": "室種別",
+        "property_type": "classification",
+        "description": "居室、調理室、浴室、その他の室の区分",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-fire-equipment",
+        "type": "process",
+        "title": "火気使用設備の有無確認",
+        "process_type": "human_judgment",
+        "target_subject": "室",
+        "iteration": "iterative",
+        "description": "設計図書等から各室に火を使用する設備・器具（かまど、こんろ等）が設置されているか確認"
+      },
+      {
+        "id": "info-fire-equipment",
+        "type": "information",
+        "title": "火気使用設備の有無",
+        "symbol": "F",
+        "subject": "室",
+        "property": "火気使用設備設置",
+        "property_type": "proposition",
+        "description": "かまど、こんろその他火を使用する設備若しくは器具を設けているか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-ordinance-exempt-check",
+        "type": "process",
+        "title": "政令適用除外判定",
+        "process_type": "mechanical",
+        "target_subject": "室",
+        "iteration": "iterative",
+        "description": "火気使用設備を設けた室が政令で定める適用除外に該当するか判定",
+        "related_articles": [
+          "令::A20_3"
+        ],
+        "logic_expression": "火を使用する設備が令20条の3で除外されるものか"
+      },
+      {
+        "id": "info-ordinance-exempt",
+        "type": "information",
+        "title": "政令適用除外該当",
+        "symbol": "E",
+        "subject": "室",
+        "property": "政令適用除外該当",
+        "property_type": "proposition",
+        "description": "政令で定める適用除外に該当するか",
+        "related_articles": [
+          "令::A20_3"
+        ],
+        "remarks": "令20条の3: 開放型燃焼器具、電気を熱源とする器具等",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-target-room-check",
+        "type": "process",
+        "title": "規定適用対象判定",
+        "process_type": "mechanical",
+        "target_subject": "室",
+        "iteration": "iterative",
+        "description": "室が法28条3項の規定適用対象（特殊建築物の居室、または火気使用室で除外対象外）に該当するか判定",
+        "logic_expression": "(S = true AND R = 居室) OR (R ∈ {調理室, 浴室, その他} AND F = true AND E = false)"
+      },
+      {
+        "id": "info-target-room",
+        "type": "information",
+        "title": "規定適用対象",
+        "symbol": "T",
+        "subject": "室",
+        "property": "法28条3項適用対象",
+        "property_type": "proposition",
+        "description": "当該室が法28条3項の規定適用対象であるか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-equipment-check",
+        "type": "process",
+        "title": "換気設備設置確認",
+        "process_type": "human_judgment",
+        "target_subject": "室",
+        "iteration": "iterative",
+        "description": "設計図書等から各室に換気設備が設置されているか確認"
+      },
+      {
+        "id": "info-equipment-installed",
+        "type": "information",
+        "title": "換気設備の設置",
+        "symbol": "V",
+        "subject": "室",
+        "property": "換気設備設置",
+        "property_type": "proposition",
+        "description": "換気設備が設置されているか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-standard-check",
+        "type": "process",
+        "title": "技術的基準適合確認",
+        "process_type": "mechanical",
+        "target_subject": "室",
+        "iteration": "iterative",
+        "description": "換気設備が政令で定める技術的基準に従っているか確認",
+        "related_articles": [
+          "令::A20_2"
+        ],
+        "logic_expression": "換気設備が令20条の2の基準を満たす"
+      },
+      {
+        "id": "info-standard-compliance",
+        "type": "information",
+        "title": "技術的基準適合",
+        "symbol": "Ts",
+        "subject": "室",
+        "property": "技術的基準適合",
+        "property_type": "proposition",
+        "description": "換気設備が政令で定める技術的基準に従っているか",
+        "related_articles": [
+          "令::A20_2"
+        ],
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-room-compliance",
+        "type": "process",
+        "title": "室の適合判定",
+        "process_type": "mechanical",
+        "target_subject": "室",
+        "iteration": "iterative",
+        "description": "各室について、規定非対象または（換気設備設置かつ技術的基準適合）のいずれかを満たすことを確認",
+        "logic_expression": "(NOT T) OR (V = true AND Ts = true)"
+      },
+      {
+        "id": "info-room-compliance",
+        "type": "information",
+        "title": "室の法28条3項適合",
+        "symbol": "C",
+        "subject": "室",
+        "property": "法28条3項適合",
+        "property_type": "proposition",
+        "description": "室が法28条3項の規定に適合するか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-all-rooms-check",
+        "type": "process",
+        "title": "全室適合確認",
+        "process_type": "mechanical",
+        "description": "全ての室が法28条3項に適合することを確認",
+        "logic_expression": "∀room ∈ Rooms: C(room) = true"
+      },
+      {
+        "id": "info-final-compliance",
+        "type": "information",
+        "title": "建築物の法28条3項適合",
+        "subject": "建築物",
+        "property": "法28条3項適合",
+        "property_type": "proposition",
+        "description": "建築物全体として法28条3項の規定に適合するか",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-building-use",
+        "to": "info-building-use",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "info-building-use",
+        "to": "proc-special-building-check",
+        "role": "input"
+      },
+      {
+        "id": "e03",
+        "from": "proc-special-building-check",
+        "to": "info-special-building",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "proc-rooms-set",
+        "to": "info-rooms-set",
+        "role": "output"
+      },
+      {
+        "id": "e05",
+        "from": "info-rooms-set",
+        "to": "proc-room-type",
+        "role": "input"
+      },
+      {
+        "id": "e06",
+        "from": "proc-room-type",
+        "to": "info-room-type",
+        "role": "output"
+      },
+      {
+        "id": "e07",
+        "from": "info-rooms-set",
+        "to": "proc-fire-equipment",
+        "role": "input"
+      },
+      {
+        "id": "e08",
+        "from": "proc-fire-equipment",
+        "to": "info-fire-equipment",
+        "role": "output"
+      },
+      {
+        "id": "e09",
+        "from": "info-fire-equipment",
+        "to": "proc-ordinance-exempt-check",
+        "role": "input"
+      },
+      {
+        "id": "e10",
+        "from": "proc-ordinance-exempt-check",
+        "to": "info-ordinance-exempt",
+        "role": "output"
+      },
+      {
+        "id": "e11",
+        "from": "info-special-building",
+        "to": "proc-target-room-check",
+        "role": "input"
+      },
+      {
+        "id": "e12",
+        "from": "info-room-type",
+        "to": "proc-target-room-check",
+        "role": "input"
+      },
+      {
+        "id": "e13",
+        "from": "info-fire-equipment",
+        "to": "proc-target-room-check",
+        "role": "input"
+      },
+      {
+        "id": "e14",
+        "from": "info-ordinance-exempt",
+        "to": "proc-target-room-check",
+        "role": "input"
+      },
+      {
+        "id": "e15",
+        "from": "proc-target-room-check",
+        "to": "info-target-room",
+        "role": "output"
+      },
+      {
+        "id": "e16",
+        "from": "info-rooms-set",
+        "to": "proc-equipment-check",
+        "role": "input"
+      },
+      {
+        "id": "e17",
+        "from": "proc-equipment-check",
+        "to": "info-equipment-installed",
+        "role": "output"
+      },
+      {
+        "id": "e18",
+        "from": "info-equipment-installed",
+        "to": "proc-standard-check",
+        "role": "input"
+      },
+      {
+        "id": "e19",
+        "from": "proc-standard-check",
+        "to": "info-standard-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e20",
+        "from": "info-target-room",
+        "to": "proc-room-compliance",
+        "role": "input"
+      },
+      {
+        "id": "e21",
+        "from": "info-equipment-installed",
+        "to": "proc-room-compliance",
+        "role": "input"
+      },
+      {
+        "id": "e22",
+        "from": "info-standard-compliance",
+        "to": "proc-room-compliance",
+        "role": "input"
+      },
+      {
+        "id": "e23",
+        "from": "proc-room-compliance",
+        "to": "info-room-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e24",
+        "from": "info-room-compliance",
+        "to": "proc-all-rooms-check",
+        "role": "input"
+      },
+      {
+        "id": "e25",
+        "from": "proc-all-rooms-check",
+        "to": "info-final-compliance",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "delegates_to",
+      "articles": [
+        "A20_2",
+        "A20_3"
+      ],
+      "description": "法28条3項の技術的基準（令20条の2）及び適用除外（令20条の3）を定める"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-24T15:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

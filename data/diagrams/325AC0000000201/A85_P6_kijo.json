@@ -1,0 +1,236 @@
+{
+  "id": "CHK-BSL-A85-P6",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "仮設興行場等の建築許可",
+    "target_subject": "仮設建築物",
+    "description": "仮設興行場、博覧会建築物、仮設店舗その他これらに類する仮設建築物の建築を許可する基準を判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "85",
+    "paragraph": "6",
+    "item": null
+  },
+  "labels": [
+    "雑則",
+    "仮設建築物",
+    "許可"
+  ],
+  "text_raw": "特定行政庁は、仮設興行場、博覧会建築物、仮設店舗その他これらに類する仮設建築物について安全上、防火上及び衛生上支障がないと認める場合においては、一年以内の期間を定めてその建築を許可することができる。この場合においては、第十二条第一項から第四項まで、第二十一条から第二十七条まで、第三十一条、第三十四条第二項、第三十五条の二、第三十五条の三及び第三十七条の規定並びに第三章の規定は、適用しない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "type": "use",
+          "value": "仮設興行場"
+        },
+        {
+          "type": "use",
+          "value": "博覧会建築物"
+        },
+        {
+          "type": "use",
+          "value": "仮設店舗"
+        },
+        {
+          "type": "use",
+          "value": "これらに類する仮設建築物"
+        }
+      ]
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-safety-check",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "ref": "info-period-limit",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-building-type-identify",
+        "type": "process",
+        "title": "仮設建築物種別の特定",
+        "process_type": "undefined_input",
+        "description": "建築物が仮設興行場等に該当するか確認"
+      },
+      {
+        "id": "info-building-type",
+        "type": "information",
+        "title": "仮設建築物の種別",
+        "symbol": "T",
+        "subject": "建築物",
+        "property": "仮設建築物種別",
+        "property_type": "classification",
+        "plurality": "single",
+        "description": "仮設興行場、博覧会建築物、仮設店舗等"
+      },
+      {
+        "id": "proc-safety-check",
+        "type": "process",
+        "title": "安全性等の確認",
+        "process_type": "human_judgment",
+        "description": "安全上、防火上及び衛生上支障がないか確認"
+      },
+      {
+        "id": "info-safety-check",
+        "type": "information",
+        "title": "安全性等の確認",
+        "symbol": "S",
+        "subject": "建築物",
+        "property": "安全性等適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "安全上、防火上及び衛生上支障がないか"
+      },
+      {
+        "id": "proc-period-check",
+        "type": "process",
+        "title": "許可期間の確認",
+        "process_type": "mechanical",
+        "description": "一年以内の期間が定められているか確認",
+        "logic_expression": "期間 ≤ 1年"
+      },
+      {
+        "id": "info-period-limit",
+        "type": "information",
+        "title": "許可期間",
+        "symbol": "P",
+        "subject": "許可",
+        "property": "期間",
+        "property_type": "numeric",
+        "unit": "年",
+        "plurality": "single",
+        "description": "許可期間が1年以内か"
+      },
+      {
+        "id": "proc-work-period-check",
+        "type": "process",
+        "title": "工事期間の特例確認",
+        "process_type": "human_judgment",
+        "description": "建築物の工事を施工するための仮設店舗等の場合、工事期間中の期間を確認"
+      },
+      {
+        "id": "info-work-period",
+        "type": "information",
+        "title": "工事期間特例",
+        "symbol": "W",
+        "subject": "許可",
+        "property": "工事期間特例適用",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "工事施工上必要と認める期間の特例適用か"
+      },
+      {
+        "id": "proc-final-judgment",
+        "type": "process",
+        "title": "許可可否判定",
+        "process_type": "mechanical",
+        "description": "仮設建築物の建築許可の可否を判定",
+        "logic_expression": "T適合 AND S AND (P OR W)"
+      },
+      {
+        "id": "info-final",
+        "type": "information",
+        "title": "建築許可の可否",
+        "symbol": "R",
+        "subject": "建築物",
+        "property": "建築許可可否",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "法85条6項に基づく建築許可の可否"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-building-type-identify",
+        "to": "info-building-type",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "info-building-type",
+        "to": "proc-safety-check",
+        "role": "input"
+      },
+      {
+        "id": "e03",
+        "from": "proc-safety-check",
+        "to": "info-safety-check",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "info-building-type",
+        "to": "proc-period-check",
+        "role": "input"
+      },
+      {
+        "id": "e05",
+        "from": "proc-period-check",
+        "to": "info-period-limit",
+        "role": "output"
+      },
+      {
+        "id": "e06",
+        "from": "info-building-type",
+        "to": "proc-work-period-check",
+        "role": "input"
+      },
+      {
+        "id": "e07",
+        "from": "proc-work-period-check",
+        "to": "info-work-period",
+        "role": "output"
+      },
+      {
+        "id": "e08",
+        "from": "info-safety-check",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e09",
+        "from": "info-period-limit",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e10",
+        "from": "info-work-period",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e11",
+        "from": "proc-final-judgment",
+        "to": "info-final",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [],
+  "metadata": {
+    "created_at": "2025-12-24T12:00:00Z",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

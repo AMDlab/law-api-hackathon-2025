@@ -1,0 +1,425 @@
+{
+  "id": "CHK-BSL-A43-P3",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "条例による接道規制の付加対象建築物",
+    "target_subject": "建築物",
+    "description": "地方公共団体が条例で接道に関する制限を付加できる建築物の範囲を判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "43",
+    "paragraph": "3",
+    "item": null
+  },
+  "labels": ["集団規定", "道路", "接道", "条例委任"],
+  "text_raw": "地方公共団体は、次の各号のいずれかに該当する建築物について、その用途、規模又は位置の特殊性により、第一項の規定によつては避難又は通行の安全の目的を十分に達成することが困難であると認めるときは、条例で、その敷地が接しなければならない道路の幅員、その敷地が道路に接する部分の長さその他その敷地又は建築物と道路との関係に関して必要な制限を付加することができる。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "OR",
+      "conditions": [
+        { "type": "building_type", "value": "特殊建築物" },
+        { "type": "building_floors", "value": "階数が3以上" },
+        { "type": "building_room", "value": "政令で定める窓その他の開口部を有しない居室を有する" },
+        { "type": "building_area", "value": "延べ面積が1000㎡超" },
+        { "type": "site_location", "value": "袋路状道路のみに接し延べ面積150㎡超(一戸建て住宅除く)" }
+      ],
+      "note": "各号のいずれかに該当する建築物が条例による付加制限の対象となり得る"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "ref": "info-special-building",
+          "description": "特殊建築物に該当する"
+        },
+        {
+          "ref": "info-floors-three-or-more",
+          "description": "階数が3以上である"
+        },
+        {
+          "ref": "info-no-window-room",
+          "description": "政令で定める窓その他の開口部を有しない居室を有する"
+        },
+        {
+          "ref": "info-large-area",
+          "description": "延べ面積が1000㎡を超える"
+        },
+        {
+          "ref": "info-cul-de-sac",
+          "description": "袋路状道路にのみ接し延べ面積が150㎡を超える(一戸建て住宅を除く)"
+        }
+      ]
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-building-identify",
+        "type": "process",
+        "title": "建築物の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物を特定する"
+      },
+      {
+        "id": "info-building",
+        "type": "information",
+        "title": "建築物",
+        "symbol": "B",
+        "subject": "建築物",
+        "property": "建築物の存在",
+        "property_type": "set_definition",
+        "description": "判定対象となる建築物",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-use-identify",
+        "type": "process",
+        "title": "用途の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の用途を読み取る"
+      },
+      {
+        "id": "info-building-use",
+        "type": "information",
+        "title": "建築物の用途",
+        "symbol": "U",
+        "subject": "建築物",
+        "property": "用途",
+        "property_type": "classification",
+        "description": "建築物の用途区分",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-special-building-check",
+        "type": "process",
+        "title": "特殊建築物該当判定",
+        "process_type": "mechanical",
+        "description": "法別表第一に定める特殊建築物に該当するか判定",
+        "related_articles": ["法::A2:P1"],
+        "logic_expression": "U ∈ {別表第一の用途}"
+      },
+      {
+        "id": "info-special-building",
+        "type": "information",
+        "title": "特殊建築物該当",
+        "symbol": "S1",
+        "subject": "建築物",
+        "property": "特殊建築物への該当",
+        "property_type": "proposition",
+        "description": "法第2条第2号の特殊建築物に該当するか",
+        "plurality": "single",
+        "related_articles": ["法::A2:P1"]
+      },
+      {
+        "id": "proc-floors-identify",
+        "type": "process",
+        "title": "階数の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の階数を読み取る"
+      },
+      {
+        "id": "info-building-floors",
+        "type": "information",
+        "title": "建築物の階数",
+        "symbol": "F",
+        "subject": "建築物",
+        "property": "階数",
+        "property_type": "numeric",
+        "unit": "階",
+        "description": "建築物の階数",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-floors-check",
+        "type": "process",
+        "title": "階数3以上判定",
+        "process_type": "mechanical",
+        "description": "建築物の階数が3以上であるか判定",
+        "logic_expression": "F >= 3"
+      },
+      {
+        "id": "info-floors-three-or-more",
+        "type": "information",
+        "title": "階数3以上該当",
+        "symbol": "S2",
+        "subject": "建築物",
+        "property": "階数3以上への該当",
+        "property_type": "proposition",
+        "description": "階数が3以上であるか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-rooms-identify",
+        "type": "process",
+        "title": "居室の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物に属する居室を特定する"
+      },
+      {
+        "id": "info-rooms-set",
+        "type": "information",
+        "title": "建築物の居室",
+        "subject": "建築物",
+        "property": "居室の集合",
+        "property_type": "set_definition",
+        "description": "判定対象となる建築物に属する居室を特定",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-window-identify",
+        "type": "process",
+        "title": "開口部の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から各居室の窓その他の開口部を読み取る"
+      },
+      {
+        "id": "info-room-windows",
+        "type": "information",
+        "title": "居室の開口部",
+        "subject": "居室",
+        "property": "窓その他の開口部の有無",
+        "property_type": "proposition",
+        "description": "政令で定める窓その他の開口部を有するか",
+        "plurality": "multiple",
+        "related_articles": ["令::A116:P2"]
+      },
+      {
+        "id": "proc-no-window-room-check",
+        "type": "process",
+        "title": "無窓居室有無判定",
+        "process_type": "mechanical",
+        "description": "政令で定める窓その他の開口部を有しない居室が存在するか判定",
+        "iteration": "iterative",
+        "target_subject": "居室",
+        "related_articles": ["令::A116:P2"],
+        "logic_expression": "∃r ∈ Rooms : ¬HasWindows(r)"
+      },
+      {
+        "id": "info-no-window-room",
+        "type": "information",
+        "title": "無窓居室有無",
+        "symbol": "S3",
+        "subject": "建築物",
+        "property": "無窓居室の有無",
+        "property_type": "proposition",
+        "description": "政令で定める窓その他の開口部を有しない居室を有するか",
+        "plurality": "single",
+        "related_articles": ["令::A116:P2"]
+      },
+      {
+        "id": "proc-area-identify",
+        "type": "process",
+        "title": "延べ面積の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の延べ面積を読み取る(同一敷地内に2以上の建築物がある場合は合計)"
+      },
+      {
+        "id": "info-building-area",
+        "type": "information",
+        "title": "建築物の延べ面積",
+        "symbol": "A",
+        "subject": "建築物",
+        "property": "延べ面積",
+        "property_type": "numeric",
+        "unit": "㎡",
+        "description": "建築物の延べ面積(同一敷地内に2以上ある場合は合計)",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-large-area-check",
+        "type": "process",
+        "title": "延べ面積1000㎡超判定",
+        "process_type": "mechanical",
+        "description": "建築物の延べ面積が1000㎡を超えるか判定",
+        "logic_expression": "A > 1000"
+      },
+      {
+        "id": "info-large-area",
+        "type": "information",
+        "title": "延べ面積1000㎡超該当",
+        "symbol": "S4",
+        "subject": "建築物",
+        "property": "延べ面積1000㎡超への該当",
+        "property_type": "proposition",
+        "description": "延べ面積が1000㎡を超えるか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-site-identify",
+        "type": "process",
+        "title": "敷地の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の敷地を特定する"
+      },
+      {
+        "id": "info-site",
+        "type": "information",
+        "title": "敷地",
+        "subject": "敷地",
+        "property": "敷地の範囲",
+        "property_type": "geometric_surface",
+        "description": "判定対象となる建築物の敷地",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-road-type-check",
+        "type": "process",
+        "title": "接道状況の判定",
+        "process_type": "mechanical",
+        "description": "敷地が袋路状道路(その一端のみが他の道路に接続したもの)にのみ接するか判定",
+        "related_articles": ["法::A43:P3:I5"]
+      },
+      {
+        "id": "info-cul-de-sac-only",
+        "type": "information",
+        "title": "袋路状道路のみ接道",
+        "symbol": "R",
+        "subject": "敷地",
+        "property": "袋路状道路のみに接する",
+        "property_type": "proposition",
+        "description": "敷地が袋路状道路にのみ接するか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-area-150-check",
+        "type": "process",
+        "title": "延べ面積150㎡超判定",
+        "process_type": "mechanical",
+        "description": "建築物の延べ面積が150㎡を超えるか判定",
+        "logic_expression": "A > 150"
+      },
+      {
+        "id": "info-area-over-150",
+        "type": "information",
+        "title": "延べ面積150㎡超",
+        "symbol": "A150",
+        "subject": "建築物",
+        "property": "延べ面積150㎡超",
+        "property_type": "proposition",
+        "description": "延べ面積が150㎡を超えるか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-house-type-check",
+        "type": "process",
+        "title": "一戸建て住宅判定",
+        "process_type": "mechanical",
+        "description": "建築物が一戸建ての住宅に該当するか判定",
+        "logic_expression": "U == '一戸建ての住宅'"
+      },
+      {
+        "id": "info-not-single-house",
+        "type": "information",
+        "title": "一戸建て住宅非該当",
+        "symbol": "NH",
+        "subject": "建築物",
+        "property": "一戸建て住宅でない",
+        "property_type": "proposition",
+        "description": "一戸建ての住宅に該当しないか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-cul-de-sac-final",
+        "type": "process",
+        "title": "第5号該当判定",
+        "process_type": "mechanical",
+        "description": "袋路状道路のみに接し、延べ面積150㎡超で、一戸建て住宅でないことを確認",
+        "logic_expression": "R AND A150 AND NH"
+      },
+      {
+        "id": "info-cul-de-sac",
+        "type": "information",
+        "title": "第5号該当",
+        "symbol": "S5",
+        "subject": "建築物",
+        "property": "第5号への該当",
+        "property_type": "proposition",
+        "description": "袋路状道路にのみ接し延べ面積が150㎡を超える建築物(一戸建て住宅を除く)に該当するか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-scope-judgment",
+        "type": "process",
+        "title": "条例付加対象判定",
+        "process_type": "mechanical",
+        "description": "第1号から第5号のいずれかに該当するか判定",
+        "logic_expression": "S1 OR S2 OR S3 OR S4 OR S5"
+      },
+      {
+        "id": "info-ordinance-scope",
+        "type": "information",
+        "title": "法43条3項該当",
+        "symbol": "C",
+        "subject": "建築物",
+        "property": "法43条3項該当",
+        "property_type": "proposition",
+        "description": "地方公共団体が条例で接道制限を付加できる建築物に該当するか",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "proc-building-identify", "to": "info-building", "role": "output" },
+      { "id": "e02", "from": "proc-use-identify", "to": "info-building-use", "role": "output" },
+      { "id": "e03", "from": "info-building-use", "to": "proc-special-building-check", "role": "input" },
+      { "id": "e04", "from": "proc-special-building-check", "to": "info-special-building", "role": "output" },
+      { "id": "e05", "from": "proc-floors-identify", "to": "info-building-floors", "role": "output" },
+      { "id": "e06", "from": "info-building-floors", "to": "proc-floors-check", "role": "input" },
+      { "id": "e07", "from": "proc-floors-check", "to": "info-floors-three-or-more", "role": "output" },
+      { "id": "e08", "from": "proc-rooms-identify", "to": "info-rooms-set", "role": "output" },
+      { "id": "e09", "from": "proc-window-identify", "to": "info-room-windows", "role": "output" },
+      { "id": "e10", "from": "info-rooms-set", "to": "proc-no-window-room-check", "role": "input" },
+      { "id": "e11", "from": "info-room-windows", "to": "proc-no-window-room-check", "role": "input" },
+      { "id": "e12", "from": "proc-no-window-room-check", "to": "info-no-window-room", "role": "output" },
+      { "id": "e13", "from": "proc-area-identify", "to": "info-building-area", "role": "output" },
+      { "id": "e14", "from": "info-building-area", "to": "proc-large-area-check", "role": "input" },
+      { "id": "e15", "from": "proc-large-area-check", "to": "info-large-area", "role": "output" },
+      { "id": "e16", "from": "proc-site-identify", "to": "info-site", "role": "output" },
+      { "id": "e17", "from": "info-site", "to": "proc-road-type-check", "role": "input" },
+      { "id": "e18", "from": "proc-road-type-check", "to": "info-cul-de-sac-only", "role": "output" },
+      { "id": "e19", "from": "info-building-area", "to": "proc-area-150-check", "role": "input" },
+      { "id": "e20", "from": "proc-area-150-check", "to": "info-area-over-150", "role": "output" },
+      { "id": "e21", "from": "info-building-use", "to": "proc-house-type-check", "role": "input" },
+      { "id": "e22", "from": "proc-house-type-check", "to": "info-not-single-house", "role": "output" },
+      { "id": "e23", "from": "info-cul-de-sac-only", "to": "proc-cul-de-sac-final", "role": "input" },
+      { "id": "e24", "from": "info-area-over-150", "to": "proc-cul-de-sac-final", "role": "input" },
+      { "id": "e25", "from": "info-not-single-house", "to": "proc-cul-de-sac-final", "role": "input" },
+      { "id": "e26", "from": "proc-cul-de-sac-final", "to": "info-cul-de-sac", "role": "output" },
+      { "id": "e27", "from": "info-special-building", "to": "proc-scope-judgment", "role": "input" },
+      { "id": "e28", "from": "info-floors-three-or-more", "to": "proc-scope-judgment", "role": "input" },
+      { "id": "e29", "from": "info-no-window-room", "to": "proc-scope-judgment", "role": "input" },
+      { "id": "e30", "from": "info-large-area", "to": "proc-scope-judgment", "role": "input" },
+      { "id": "e31", "from": "info-cul-de-sac", "to": "proc-scope-judgment", "role": "input" },
+      { "id": "e32", "from": "proc-scope-judgment", "to": "info-ordinance-scope", "role": "output" }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A2:P1", "A43:P1"],
+      "description": "特殊建築物の定義(法2条2号)および接道義務の原則(法43条1項)を参照"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "delegates_to",
+      "articles": ["A116:P2"],
+      "description": "政令で定める窓その他の開口部の基準(令116条2項)を参照"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-24T00:00:00+09:00",
+    "updated_at": "2025-12-24T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

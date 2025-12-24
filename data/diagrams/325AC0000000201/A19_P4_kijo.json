@@ -1,0 +1,259 @@
+{
+  "id": "CHK-BSL-A19-P4",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "がけ崩れ等に対する措置",
+    "target_subject": "建築物",
+    "description": "建築物ががけ崩れ等による被害を受けるおそれのある場合の安全上必要な措置を判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "19",
+    "paragraph": "4",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "敷地・地盤"
+  ],
+  "text_raw": "建築物ががけ崩れ等による被害を受けるおそれのある場合においては、擁壁の設置その他安全上適当な措置を講じなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "==",
+      "value": true,
+      "conditions": [
+        {
+          "type": "risk_condition",
+          "value": "がけ崩れ等による被害を受けるおそれ"
+        }
+      ],
+      "note": "がけ崩れ、土砂災害等による被害を受けるおそれのある場合に適用"
+    },
+    "judgment_rule": {
+      "operator": "==",
+      "conditions": [
+        {
+          "ref": "info-measures-compliance",
+          "operator": "==",
+          "value": true,
+          "note": "擁壁の設置その他安全上適当な措置を講じている"
+        }
+      ]
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "info-building-set",
+        "type": "information",
+        "title": "判定対象建築物",
+        "subject": "建築計画",
+        "property": "建築物の特定",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "建築確認申請の対象となる建築物を特定"
+      },
+      {
+        "id": "proc-building-input",
+        "type": "process",
+        "title": "建築物の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物を特定する"
+      },
+      {
+        "id": "info-site-location",
+        "type": "information",
+        "title": "敷地の立地条件",
+        "subject": "敷地",
+        "property": "地形・周辺状況",
+        "property_type": "visual",
+        "plurality": "single",
+        "description": "敷地の地形、がけの有無、急傾斜地の状況等"
+      },
+      {
+        "id": "proc-site-condition-input",
+        "type": "process",
+        "title": "敷地状況の把握",
+        "process_type": "human_judgment",
+        "description": "敷地図、現況測量図、地盤調査報告書等から敷地の立地条件を把握する"
+      },
+      {
+        "id": "info-risk-assessment",
+        "type": "information",
+        "title": "被害のおそれ",
+        "symbol": "R1",
+        "subject": "建築物",
+        "property": "がけ崩れ等の被害リスク",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "がけ崩れ、土砂災害等による被害を受けるおそれがあるか"
+      },
+      {
+        "id": "proc-risk-check",
+        "type": "process",
+        "title": "被害リスクの判定",
+        "process_type": "human_judgment",
+        "description": "敷地の立地条件、地盤状況、土砂災害警戒区域指定状況等から被害リスクを判定する"
+      },
+      {
+        "id": "info-measures-plan",
+        "type": "information",
+        "title": "講じる措置の内容",
+        "subject": "建築計画",
+        "property": "安全対策措置",
+        "property_type": "classification",
+        "plurality": "single",
+        "description": "擁壁の設置、杭基礎、地盤改良等の安全対策措置内容"
+      },
+      {
+        "id": "proc-measures-input",
+        "type": "process",
+        "title": "措置内容の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から講じる措置の内容を読み取る"
+      },
+      {
+        "id": "info-measures-adequacy",
+        "type": "information",
+        "title": "措置の適切性",
+        "subject": "安全対策措置",
+        "property": "安全上の妥当性",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "措置が安全上適切か"
+      },
+      {
+        "id": "proc-measures-check",
+        "type": "process",
+        "title": "措置の妥当性判定",
+        "process_type": "human_judgment",
+        "description": "講じる措置が敷地の状況・被害リスクに応じて安全上適切かを判定する。擁壁の設置基準（令142条）適合性等を含む"
+      },
+      {
+        "id": "info-measures-compliance",
+        "type": "information",
+        "title": "法19条4項適合",
+        "symbol": "PASS",
+        "subject": "建築物",
+        "property": "必要措置の実施",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "被害のおそれがない、又は適切な措置を講じている"
+      },
+      {
+        "id": "proc-final-judgment",
+        "type": "process",
+        "title": "適合判定",
+        "process_type": "mechanical",
+        "logic_expression": "NOT R1 OR (R1 AND 措置適切)",
+        "description": "被害のおそれがない場合は適用外、おそれがある場合は措置の妥当性で判定"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e001",
+        "from": "proc-building-input",
+        "to": "info-building-set",
+        "role": "output"
+      },
+      {
+        "id": "e002",
+        "from": "info-building-set",
+        "to": "proc-site-condition-input",
+        "role": "input"
+      },
+      {
+        "id": "e003",
+        "from": "proc-site-condition-input",
+        "to": "info-site-location",
+        "role": "output"
+      },
+      {
+        "id": "e004",
+        "from": "info-site-location",
+        "to": "proc-risk-check",
+        "role": "input"
+      },
+      {
+        "id": "e005",
+        "from": "proc-risk-check",
+        "to": "info-risk-assessment",
+        "role": "output"
+      },
+      {
+        "id": "e006",
+        "from": "proc-measures-input",
+        "to": "info-measures-plan",
+        "role": "output"
+      },
+      {
+        "id": "e007",
+        "from": "info-building-set",
+        "to": "proc-measures-check",
+        "role": "input"
+      },
+      {
+        "id": "e008",
+        "from": "info-site-location",
+        "to": "proc-measures-check",
+        "role": "input"
+      },
+      {
+        "id": "e009",
+        "from": "info-risk-assessment",
+        "to": "proc-measures-check",
+        "role": "input"
+      },
+      {
+        "id": "e010",
+        "from": "info-measures-plan",
+        "to": "proc-measures-check",
+        "role": "input"
+      },
+      {
+        "id": "e011",
+        "from": "proc-measures-check",
+        "to": "info-measures-adequacy",
+        "role": "output"
+      },
+      {
+        "id": "e012",
+        "from": "info-risk-assessment",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e013",
+        "from": "info-measures-adequacy",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e014",
+        "from": "proc-final-judgment",
+        "to": "info-measures-compliance",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "defines_detail",
+      "articles": ["A142"],
+      "description": "擁壁の設置基準"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-24T00:00:00Z",
+    "generator": "claude-code-kijo-generator",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法",
+    "checklist_ref": "確認審査報告書チェックリスト"
+  }
+}

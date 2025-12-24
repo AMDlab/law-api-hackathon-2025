@@ -1,0 +1,64 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://example.com/schemas/law-article.schema.json",
+  "title": "Law Article Cache",
+  "description": "e-Gov法令APIから取得した条文のキャッシュファイル形式",
+  "type": "object",
+  "required": ["law_id", "law_name", "article", "text", "raw_node", "fetched_at"],
+  "properties": {
+    "law_id": {
+      "type": "string",
+      "description": "法令ID（e-Gov法令番号）",
+      "pattern": "^[0-9A-Z]+$",
+      "examples": ["325AC0000000201", "325CO0000000338"]
+    },
+    "law_name": {
+      "type": "string",
+      "description": "法令名称",
+      "examples": ["建築基準法", "建築基準法施行令"]
+    },
+    "article": {
+      "type": "string",
+      "description": "条番号（枝番は「の」を使用）",
+      "pattern": "^\\d+(?:の\\d+)?$",
+      "examples": ["19", "28の2", "137の10"]
+    },
+    "text": {
+      "type": "string",
+      "description": "条文の全文テキスト（見出し・条文タイトル・各項を含む）"
+    },
+    "raw_node": {
+      "type": "object",
+      "description": "e-Gov法令APIから取得した条文の生XMLノード構造",
+      "required": ["tag", "attr"],
+      "properties": {
+        "tag": {
+          "type": "string",
+          "const": "Article"
+        },
+        "attr": {
+          "type": "object",
+          "required": ["Num"],
+          "properties": {
+            "Num": {
+              "type": "string",
+              "description": "条番号（API内部形式、枝番は「_」を使用）",
+              "pattern": "^\\d+(?:_\\d+)?$",
+              "examples": ["19", "28_2", "137_10"]
+            }
+          }
+        },
+        "children": {
+          "type": "array",
+          "description": "条文の子要素（ArticleCaption, ArticleTitle, Paragraph等）"
+        }
+      }
+    },
+    "fetched_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "取得日時（ISO 8601形式）"
+    }
+  },
+  "additionalProperties": false
+}

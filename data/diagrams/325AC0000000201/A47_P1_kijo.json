@@ -1,0 +1,341 @@
+{
+  "id": "CHK-BSL-A47-P1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "柱の構造（地階・1階・2階）",
+    "target_subject": "柱",
+    "description": "地階、1階又は2階の柱が国土交通大臣が定めた構造方法を用いることを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "47",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造"
+  ],
+  "text_raw": "建築物の柱で地階、一階又は二階にあるものは、国土交通大臣が定めた構造方法を用いるものとしなければならない。ただし、次の各号のいずれかに該当するものについては、この限りでない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "floor_level",
+          "value": "地階、1階又は2階に存在する柱"
+        }
+      ],
+      "note": "地階、1階又は2階にある柱が対象"
+    },
+    "judgment_rule": {
+      "operator": "==",
+      "conditions": [
+        {
+          "ref": "info-minister-method",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    },
+    "exceptions": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "note": "各号のいずれかに該当する柱は適用除外",
+          "ref": "info-exempt",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "effect": "EXEMPT"
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-columns-set",
+        "type": "process",
+        "title": "柱の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から判定対象となる建築物の柱を特定する"
+      },
+      {
+        "id": "info-columns-set",
+        "type": "information",
+        "title": "建築物の柱",
+        "subject": "建築物",
+        "property": "柱の集合",
+        "property_type": "set_definition",
+        "description": "判定対象となる建築物に属する柱を特定",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-column-floor",
+        "type": "process",
+        "title": "柱の階の特定",
+        "process_type": "human_judgment",
+        "target_subject": "柱",
+        "iteration": "iterative",
+        "description": "設計図書等から各柱が存在する階（地階、1階、2階等）を特定する"
+      },
+      {
+        "id": "info-column-floor",
+        "type": "information",
+        "title": "柱の所属階",
+        "symbol": "F",
+        "subject": "柱",
+        "property": "所属階",
+        "property_type": "classification",
+        "description": "柱が存在する階（地階、1階、2階、3階以上）",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-target-check",
+        "type": "process",
+        "title": "規制対象判定",
+        "process_type": "mechanical",
+        "target_subject": "柱",
+        "iteration": "iterative",
+        "description": "地階、1階又は2階に存在する柱かを判定",
+        "logic_expression": "F ∈ {地階, 1階, 2階}"
+      },
+      {
+        "id": "info-target",
+        "type": "information",
+        "title": "規制対象該当",
+        "symbol": "T",
+        "subject": "柱",
+        "property": "法47条1項規制対象該当",
+        "property_type": "proposition",
+        "description": "地階、1階又は2階に存在する柱として規制対象に該当するか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-column-structure",
+        "type": "process",
+        "title": "柱構造の特定",
+        "process_type": "human_judgment",
+        "target_subject": "柱",
+        "iteration": "iterative",
+        "description": "設計図書等から柱の構造方法を特定する"
+      },
+      {
+        "id": "info-column-structure",
+        "type": "information",
+        "title": "柱の構造方法",
+        "symbol": "S",
+        "subject": "柱",
+        "property": "構造方法",
+        "property_type": "classification",
+        "description": "柱の構造方法（木造、鉄筋コンクリート造、鉄骨造等）",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-minister-method",
+        "type": "process",
+        "title": "大臣定め構造方法該当判定",
+        "process_type": "mechanical",
+        "target_subject": "柱",
+        "iteration": "iterative",
+        "description": "国土交通大臣が定めた構造方法（告示）に該当するかを判定",
+        "remarks": "平成13年国土交通省告示第1540号等"
+      },
+      {
+        "id": "info-minister-method",
+        "type": "information",
+        "title": "大臣定め構造方法への該当",
+        "symbol": "M",
+        "subject": "柱",
+        "property": "大臣定め構造方法該当",
+        "property_type": "proposition",
+        "description": "国土交通大臣が定めた構造方法（告示）に該当するか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-exempt-items-check",
+        "type": "process",
+        "title": "各号該当判定",
+        "process_type": "mechanical",
+        "target_subject": "柱",
+        "iteration": "iterative",
+        "description": "ただし書き各号のいずれかに該当するか判定",
+        "remarks": "具体的な各号の内容は法文参照"
+      },
+      {
+        "id": "info-exempt",
+        "type": "information",
+        "title": "適用除外該当",
+        "symbol": "X",
+        "subject": "柱",
+        "property": "適用除外への該当",
+        "property_type": "proposition",
+        "description": "ただし書き各号のいずれかに該当し適用除外となるか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-final-judgment",
+        "type": "process",
+        "title": "適合判定",
+        "process_type": "mechanical",
+        "target_subject": "柱",
+        "iteration": "iterative",
+        "description": "各柱について、規制対象外、適用除外、または大臣定め構造方法該当のいずれかを満たすことを確認",
+        "logic_expression": "(NOT T) OR X OR M"
+      },
+      {
+        "id": "info-compliance",
+        "type": "information",
+        "title": "法47条1項適合",
+        "symbol": "C",
+        "subject": "柱",
+        "property": "法47条1項適合",
+        "property_type": "proposition",
+        "description": "法47条1項の規定に適合するか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-all-check",
+        "type": "process",
+        "title": "全柱適合確認",
+        "process_type": "mechanical",
+        "description": "全ての柱が法47条1項に適合することを確認",
+        "logic_expression": "∀column ∈ Columns: C(column) = true"
+      },
+      {
+        "id": "info-final",
+        "type": "information",
+        "title": "建築物の法47条1項適合",
+        "subject": "建築物",
+        "property": "法47条1項適合",
+        "property_type": "proposition",
+        "description": "建築物全体として法47条1項の規定に適合するか",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-columns-set",
+        "to": "info-columns-set",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "info-columns-set",
+        "to": "proc-column-floor",
+        "role": "input"
+      },
+      {
+        "id": "e03",
+        "from": "proc-column-floor",
+        "to": "info-column-floor",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "info-column-floor",
+        "to": "proc-target-check",
+        "role": "input"
+      },
+      {
+        "id": "e05",
+        "from": "proc-target-check",
+        "to": "info-target",
+        "role": "output"
+      },
+      {
+        "id": "e06",
+        "from": "info-columns-set",
+        "to": "proc-column-structure",
+        "role": "input"
+      },
+      {
+        "id": "e07",
+        "from": "proc-column-structure",
+        "to": "info-column-structure",
+        "role": "output"
+      },
+      {
+        "id": "e08",
+        "from": "info-column-structure",
+        "to": "proc-minister-method",
+        "role": "input"
+      },
+      {
+        "id": "e09",
+        "from": "proc-minister-method",
+        "to": "info-minister-method",
+        "role": "output"
+      },
+      {
+        "id": "e10",
+        "from": "info-column-structure",
+        "to": "proc-exempt-items-check",
+        "role": "input"
+      },
+      {
+        "id": "e11",
+        "from": "proc-exempt-items-check",
+        "to": "info-exempt",
+        "role": "output"
+      },
+      {
+        "id": "e12",
+        "from": "info-target",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e13",
+        "from": "info-exempt",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e14",
+        "from": "info-minister-method",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e15",
+        "from": "proc-final-judgment",
+        "to": "info-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e16",
+        "from": "info-compliance",
+        "to": "proc-all-check",
+        "role": "input"
+      },
+      {
+        "id": "e17",
+        "from": "proc-all-check",
+        "to": "info-final",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": [],
+      "description": "柱の構造に関する関連規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-23T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

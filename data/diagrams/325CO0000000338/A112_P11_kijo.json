@@ -1,0 +1,281 @@
+{
+  "id": "CHK-BSL-KIJO-A112-P11",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "竪穴区画",
+    "target_subject": "建築物",
+    "description": "地階または3階以上に居室を有する建築物の竪穴部分の区画"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "112",
+    "paragraph": "11",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "防火区画",
+    "竪穴区画"
+  ],
+  "text_raw": "主要構造部を準耐火構造とした建築物（特定主要構造部を耐火構造とした建築物を含む。）又は第百三十六条の二第一号ロ若しくは第二号ロに掲げる基準に適合する建築物であつて、地階又は三階以上の階に居室を有するものの竪穴部分については、当該竪穴部分以外の部分と準耐火構造の床若しくは壁又は法第二条第九号の二ロに規定する防火設備で区画しなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "building_standard",
+          "value": "主要構造部が準耐火構造または令第136条の2適合"
+        },
+        {
+          "type": "floor",
+          "value": "地階または3階以上に居室を有する"
+        }
+      ]
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "requirement",
+          "value": "竪穴部分を竪穴部分以外と準耐火構造の床・壁または防火設備で区画"
+        }
+      ]
+    },
+    "exceptions": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "type": "building_part",
+          "value": "避難階から直上・直下階のみに通ずる吹抜き等で内装不燃のもの"
+        },
+        {
+          "type": "building_part",
+          "value": "小規模住宅（階数3以下・200平方メートル以内）の竪穴部分"
+        }
+      ],
+      "effect": "EXEMPT"
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-structure-type",
+        "type": "process",
+        "title": "構造種別の特定",
+        "process_type": "undefined_input",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "主要構造部の構造種別を特定"
+      },
+      {
+        "id": "info-structure-type",
+        "type": "information",
+        "title": "主要構造部の構造",
+        "symbol": "S",
+        "subject": "建築物",
+        "property": "主要構造部構造種別",
+        "property_type": "classification",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-floor-check",
+        "type": "process",
+        "title": "居室階の確認",
+        "process_type": "undefined_input",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "地階または3階以上に居室があるか確認"
+      },
+      {
+        "id": "info-basement-room",
+        "type": "information",
+        "title": "地階の居室",
+        "symbol": "BR",
+        "subject": "建築物",
+        "property": "地階居室の有無",
+        "property_type": "proposition",
+        "plurality": "single"
+      },
+      {
+        "id": "info-upper-room",
+        "type": "information",
+        "title": "3階以上の居室",
+        "symbol": "UR",
+        "subject": "建築物",
+        "property": "3階以上居室の有無",
+        "property_type": "proposition",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-applicability",
+        "type": "process",
+        "title": "適用判定",
+        "process_type": "mechanical",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "本項の適用対象か判定",
+        "logic_expression": "(S = 準耐火構造等) AND (BR OR UR)"
+      },
+      {
+        "id": "info-applicability",
+        "type": "information",
+        "title": "本項適用の有無",
+        "symbol": "AP",
+        "subject": "建築物",
+        "property": "適用判定結果",
+        "property_type": "proposition",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-shaft-set",
+        "type": "process",
+        "title": "竪穴部分の特定",
+        "process_type": "undefined_input",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "竪穴部分を特定"
+      },
+      {
+        "id": "info-shaft-set",
+        "type": "information",
+        "title": "竪穴部分",
+        "symbol": "SH",
+        "subject": "建築物",
+        "property": "竪穴部分の集合",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "吹抜き、階段、昇降機昇降路、ダクトスペース等"
+      },
+      {
+        "id": "proc-compartment-check",
+        "type": "process",
+        "title": "区画の確認",
+        "process_type": "undefined_input",
+        "target_subject": "竪穴部分",
+        "iteration": "iterative",
+        "description": "竪穴部分の区画状況を確認"
+      },
+      {
+        "id": "info-compartment",
+        "type": "information",
+        "title": "区画の設置状況",
+        "symbol": "FC",
+        "subject": "竪穴部分",
+        "property": "区画設置状況",
+        "property_type": "classification",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-final-judge",
+        "type": "process",
+        "title": "適合判定",
+        "process_type": "mechanical",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "竪穴区画要件の適合判定"
+      },
+      {
+        "id": "info-compliance",
+        "type": "information",
+        "title": "第11項適合判定結果",
+        "symbol": "R",
+        "subject": "建築物",
+        "property": "適合判定結果",
+        "property_type": "proposition",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge-001",
+        "from": "proc-structure-type",
+        "to": "info-structure-type",
+        "role": "output"
+      },
+      {
+        "id": "edge-002",
+        "from": "proc-floor-check",
+        "to": "info-basement-room",
+        "role": "output"
+      },
+      {
+        "id": "edge-003",
+        "from": "proc-floor-check",
+        "to": "info-upper-room",
+        "role": "output"
+      },
+      {
+        "id": "edge-004",
+        "from": "info-structure-type",
+        "to": "proc-applicability",
+        "role": "input"
+      },
+      {
+        "id": "edge-005",
+        "from": "info-basement-room",
+        "to": "proc-applicability",
+        "role": "input"
+      },
+      {
+        "id": "edge-006",
+        "from": "info-upper-room",
+        "to": "proc-applicability",
+        "role": "input"
+      },
+      {
+        "id": "edge-007",
+        "from": "proc-applicability",
+        "to": "info-applicability",
+        "role": "output"
+      },
+      {
+        "id": "edge-008",
+        "from": "proc-shaft-set",
+        "to": "info-shaft-set",
+        "role": "output"
+      },
+      {
+        "id": "edge-009",
+        "from": "info-shaft-set",
+        "to": "proc-compartment-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-010",
+        "from": "proc-compartment-check",
+        "to": "info-compartment",
+        "role": "output"
+      },
+      {
+        "id": "edge-011",
+        "from": "info-applicability",
+        "to": "proc-final-judge",
+        "role": "input"
+      },
+      {
+        "id": "edge-012",
+        "from": "info-compartment",
+        "to": "proc-final-judge",
+        "role": "input"
+      },
+      {
+        "id": "edge-013",
+        "from": "proc-final-judge",
+        "to": "info-compliance",
+        "role": "output"
+      }
+    ]
+  },
+  "metadata": {
+    "created_at": "2025-12-24T00:00:00Z",
+    "updated_at": "2025-12-24T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "kijo-generator",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令",
+    "source": "e-Gov法令API"
+  }
+}

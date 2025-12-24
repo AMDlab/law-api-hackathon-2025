@@ -1,0 +1,593 @@
+{
+  "id": "CHK-BSL-A28-P1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "居室の採光",
+    "target_subject": "居室",
+    "description": "特定用途建築物の居室における採光有効面積が所定の基準を満たすことを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "28",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "衛生"
+  ],
+  "text_raw": "住宅、学校、病院、診療所、寄宿舎、下宿その他これらに類する建築物で政令で定めるものの居室（居住のための居室、学校の教室、病院の病室その他これらに類するものとして政令で定めるものに限る。）には、採光のための窓その他の開口部を設け、その採光に有効な部分の面積は、その居室の床面積に対して、五分の一から十分の一までの間において居室の種類に応じ政令で定める割合以上としなければならない。ただし、地階若しくは地下工作物内に設ける居室その他これらに類する居室又は温湿度調整を必要とする作業を行う作業室その他用途上やむを得ない居室については、この限りでない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "building_use",
+          "value": "住宅、学校、病院、診療所、寄宿舎、下宿その他政令で定めるもの"
+        },
+        {
+          "type": "room_type",
+          "value": "居住のための居室、教室、病室その他政令で定めるもの"
+        }
+      ],
+      "note": "特定用途建築物の特定居室に限定"
+    },
+    "judgment_rule": {
+      "operator": ">=",
+      "lhs": {
+        "ref": "info-effective-area",
+        "description": "採光有効面積"
+      },
+      "rhs": {
+        "operator": "*",
+        "lhs": {
+          "ref": "info-floor-area",
+          "description": "居室床面積"
+        },
+        "rhs": {
+          "ref": "info-required-ratio",
+          "description": "所定の割合"
+        }
+      }
+    },
+    "exceptions": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "note": "地階・地下工作物内の居室等",
+          "operator": "OR",
+          "conditions": [
+            {
+              "ref": "info-location",
+              "value": "地階"
+            },
+            {
+              "ref": "info-location",
+              "value": "地下工作物内"
+            }
+          ]
+        },
+        {
+          "note": "温湿度調整を必要とする作業室その他用途上やむを得ない居室",
+          "ref": "info-unavoidable",
+          "value": true
+        }
+      ],
+      "effect": "EXEMPT"
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-building-use",
+        "type": "process",
+        "title": "建築物用途の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の用途を読み取る"
+      },
+      {
+        "id": "info-building-use",
+        "type": "information",
+        "title": "建築物の用途",
+        "symbol": "B",
+        "subject": "建築物",
+        "property": "用途",
+        "property_type": "classification",
+        "description": "住宅、学校、病院、診療所、寄宿舎、下宿その他これらに類する建築物で政令で定めるもの",
+        "related_articles": [
+          "令::A19"
+        ],
+        "plurality": "single"
+      },
+      {
+        "id": "proc-rooms-set",
+        "type": "process",
+        "title": "判定対象居室の特定",
+        "process_type": "undefined_input",
+        "description": "建築物に属する居室のうち、採光規定の対象となる居室を特定する"
+      },
+      {
+        "id": "info-rooms-set",
+        "type": "information",
+        "title": "建築物の居室",
+        "subject": "建築物",
+        "property": "居室の集合",
+        "property_type": "set_definition",
+        "description": "判定対象となる建築物に属する居室を特定",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-room-type",
+        "type": "process",
+        "title": "居室種別の特定",
+        "process_type": "human_judgment",
+        "target_subject": "居室",
+        "iteration": "iterative",
+        "description": "各居室の種別（居住室、教室、病室等）を特定する"
+      },
+      {
+        "id": "info-room-type",
+        "type": "information",
+        "title": "居室の種別",
+        "symbol": "R",
+        "subject": "居室",
+        "property": "居室種別",
+        "property_type": "classification",
+        "description": "居住のための居室、学校の教室、病院の病室その他これらに類するものとして政令で定めるもの",
+        "related_articles": [
+          "令::A19"
+        ],
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-target-check",
+        "type": "process",
+        "title": "規定適用判定",
+        "process_type": "mechanical",
+        "target_subject": "居室",
+        "iteration": "iterative",
+        "description": "建築物用途と居室種別から、当該居室が法28条1項の規定適用対象かを判定",
+        "logic_expression": "(B ∈ {住宅, 学校, 病院, ...}) AND (R ∈ {居住室, 教室, 病室, ...})"
+      },
+      {
+        "id": "info-target",
+        "type": "information",
+        "title": "規定適用対象",
+        "symbol": "T",
+        "subject": "居室",
+        "property": "法28条1項適用対象",
+        "property_type": "proposition",
+        "description": "当該居室が法28条1項の規定適用対象であるか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-room-location",
+        "type": "process",
+        "title": "居室の位置の特定",
+        "process_type": "human_judgment",
+        "target_subject": "居室",
+        "iteration": "iterative",
+        "description": "設計図書等から居室の位置（地上階、地階、地下工作物内）を特定する"
+      },
+      {
+        "id": "info-room-location",
+        "type": "information",
+        "title": "居室の位置",
+        "symbol": "L",
+        "subject": "居室",
+        "property": "位置",
+        "property_type": "classification",
+        "description": "地上階、地階、地下工作物内等の区分",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-room-unavoidable",
+        "type": "process",
+        "title": "用途上やむを得ない居室の判定",
+        "process_type": "human_judgment",
+        "target_subject": "居室",
+        "iteration": "iterative",
+        "description": "温湿度調整を必要とする作業室その他用途上やむを得ない居室に該当するか判定"
+      },
+      {
+        "id": "info-room-unavoidable",
+        "type": "information",
+        "title": "用途上やむを得ない居室",
+        "symbol": "U",
+        "subject": "居室",
+        "property": "用途上やむを得ない居室該当",
+        "property_type": "proposition",
+        "description": "温湿度調整を必要とする作業室その他用途上やむを得ない居室に該当するか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-exempt-check",
+        "type": "process",
+        "title": "適用除外判定",
+        "process_type": "mechanical",
+        "target_subject": "居室",
+        "iteration": "iterative",
+        "description": "ただし書きの適用除外に該当するか判定",
+        "logic_expression": "(L ∈ {地階, 地下工作物内}) OR (U = true)"
+      },
+      {
+        "id": "info-exempt",
+        "type": "information",
+        "title": "適用除外該当",
+        "symbol": "X",
+        "subject": "居室",
+        "property": "適用除外への該当",
+        "property_type": "proposition",
+        "description": "ただし書きによる適用除外に該当するか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-floor-area",
+        "type": "process",
+        "title": "居室床面積の特定",
+        "process_type": "human_judgment",
+        "target_subject": "居室",
+        "iteration": "iterative",
+        "description": "設計図書等から各居室の床面積を読み取る"
+      },
+      {
+        "id": "info-floor-area",
+        "type": "information",
+        "title": "居室の床面積",
+        "symbol": "A",
+        "subject": "居室",
+        "property": "床面積",
+        "property_type": "numeric",
+        "unit": "m2",
+        "description": "各居室の床面積",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-required-ratio",
+        "type": "process",
+        "title": "所定の割合の特定",
+        "process_type": "mechanical",
+        "target_subject": "居室",
+        "iteration": "iterative",
+        "description": "居室の種類に応じて政令で定める採光に必要な割合（1/5〜1/10）を特定",
+        "related_articles": [
+          "令::A19"
+        ],
+        "logic_expression": "R → 割合 (令19条の表による)"
+      },
+      {
+        "id": "info-required-ratio",
+        "type": "information",
+        "title": "所定の割合",
+        "symbol": "Rr",
+        "subject": "居室",
+        "property": "採光に必要な割合",
+        "property_type": "numeric",
+        "unit": "",
+        "description": "居室の種類に応じて政令で定める割合（例: 1/5, 1/7, 1/10）",
+        "related_articles": [
+          "令::A19"
+        ],
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-openings-set",
+        "type": "process",
+        "title": "開口部の特定",
+        "process_type": "human_judgment",
+        "target_subject": "居室",
+        "iteration": "iterative",
+        "description": "各居室に設けられた採光のための窓その他の開口部を特定する"
+      },
+      {
+        "id": "info-openings-set",
+        "type": "information",
+        "title": "居室の開口部",
+        "subject": "居室",
+        "property": "開口部の集合",
+        "property_type": "set_definition",
+        "description": "各居室に属する採光のための窓その他の開口部を特定",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-effective-area",
+        "type": "process",
+        "title": "採光有効面積の算定",
+        "process_type": "mechanical",
+        "target_subject": "居室",
+        "iteration": "iterative",
+        "description": "各開口部の面積、位置、隣地との関係等から、採光有効面積を算定",
+        "related_articles": [
+          "令::A20"
+        ],
+        "logic_expression": "Σ(開口部面積 × 採光補正係数)"
+      },
+      {
+        "id": "info-effective-area",
+        "type": "information",
+        "title": "採光有効面積",
+        "symbol": "Ae",
+        "subject": "居室",
+        "property": "採光有効面積",
+        "property_type": "numeric",
+        "unit": "m2",
+        "description": "採光のための窓その他の開口部の採光に有効な部分の面積",
+        "related_articles": [
+          "令::A20"
+        ],
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-area-ratio-check",
+        "type": "process",
+        "title": "採光面積比判定",
+        "process_type": "mechanical",
+        "target_subject": "居室",
+        "iteration": "iterative",
+        "description": "採光有効面積が居室床面積×所定の割合以上であることを確認",
+        "logic_expression": "Ae ≥ A × Rr"
+      },
+      {
+        "id": "info-area-ratio-ok",
+        "type": "information",
+        "title": "採光面積基準適合",
+        "symbol": "Ok",
+        "subject": "居室",
+        "property": "採光面積基準適合",
+        "property_type": "proposition",
+        "description": "採光有効面積が所定の基準を満たすか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-final-judgment",
+        "type": "process",
+        "title": "適合判定",
+        "process_type": "mechanical",
+        "target_subject": "居室",
+        "iteration": "iterative",
+        "description": "各居室について、規定非対象、適用除外、または基準適合のいずれかを満たすことを確認",
+        "logic_expression": "(NOT T) OR X OR Ok"
+      },
+      {
+        "id": "info-compliance",
+        "type": "information",
+        "title": "法28条1項適合",
+        "symbol": "C",
+        "subject": "居室",
+        "property": "法28条1項適合",
+        "property_type": "proposition",
+        "description": "居室が法28条1項の規定に適合するか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-all-check",
+        "type": "process",
+        "title": "全居室適合確認",
+        "process_type": "mechanical",
+        "description": "全ての居室が法28条1項に適合することを確認",
+        "logic_expression": "∀room ∈ Rooms: C(room) = true"
+      },
+      {
+        "id": "info-final",
+        "type": "information",
+        "title": "建築物の法28条1項適合",
+        "subject": "建築物",
+        "property": "法28条1項適合",
+        "property_type": "proposition",
+        "description": "建築物全体として法28条1項の規定に適合するか",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-building-use",
+        "to": "info-building-use",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "proc-rooms-set",
+        "to": "info-rooms-set",
+        "role": "output"
+      },
+      {
+        "id": "e03",
+        "from": "info-rooms-set",
+        "to": "proc-room-type",
+        "role": "input"
+      },
+      {
+        "id": "e04",
+        "from": "proc-room-type",
+        "to": "info-room-type",
+        "role": "output"
+      },
+      {
+        "id": "e05",
+        "from": "info-building-use",
+        "to": "proc-target-check",
+        "role": "input"
+      },
+      {
+        "id": "e06",
+        "from": "info-room-type",
+        "to": "proc-target-check",
+        "role": "input"
+      },
+      {
+        "id": "e07",
+        "from": "proc-target-check",
+        "to": "info-target",
+        "role": "output"
+      },
+      {
+        "id": "e08",
+        "from": "info-rooms-set",
+        "to": "proc-room-location",
+        "role": "input"
+      },
+      {
+        "id": "e09",
+        "from": "proc-room-location",
+        "to": "info-room-location",
+        "role": "output"
+      },
+      {
+        "id": "e10",
+        "from": "proc-room-unavoidable",
+        "to": "info-room-unavoidable",
+        "role": "output"
+      },
+      {
+        "id": "e11",
+        "from": "info-room-location",
+        "to": "proc-exempt-check",
+        "role": "input"
+      },
+      {
+        "id": "e12",
+        "from": "info-room-unavoidable",
+        "to": "proc-exempt-check",
+        "role": "input"
+      },
+      {
+        "id": "e13",
+        "from": "proc-exempt-check",
+        "to": "info-exempt",
+        "role": "output"
+      },
+      {
+        "id": "e14",
+        "from": "info-rooms-set",
+        "to": "proc-floor-area",
+        "role": "input"
+      },
+      {
+        "id": "e15",
+        "from": "proc-floor-area",
+        "to": "info-floor-area",
+        "role": "output"
+      },
+      {
+        "id": "e16",
+        "from": "info-room-type",
+        "to": "proc-required-ratio",
+        "role": "input"
+      },
+      {
+        "id": "e17",
+        "from": "proc-required-ratio",
+        "to": "info-required-ratio",
+        "role": "output"
+      },
+      {
+        "id": "e18",
+        "from": "info-rooms-set",
+        "to": "proc-openings-set",
+        "role": "input"
+      },
+      {
+        "id": "e19",
+        "from": "proc-openings-set",
+        "to": "info-openings-set",
+        "role": "output"
+      },
+      {
+        "id": "e20",
+        "from": "info-openings-set",
+        "to": "proc-effective-area",
+        "role": "input"
+      },
+      {
+        "id": "e21",
+        "from": "proc-effective-area",
+        "to": "info-effective-area",
+        "role": "output"
+      },
+      {
+        "id": "e22",
+        "from": "info-effective-area",
+        "to": "proc-area-ratio-check",
+        "role": "input"
+      },
+      {
+        "id": "e23",
+        "from": "info-floor-area",
+        "to": "proc-area-ratio-check",
+        "role": "input"
+      },
+      {
+        "id": "e24",
+        "from": "info-required-ratio",
+        "to": "proc-area-ratio-check",
+        "role": "input"
+      },
+      {
+        "id": "e25",
+        "from": "proc-area-ratio-check",
+        "to": "info-area-ratio-ok",
+        "role": "output"
+      },
+      {
+        "id": "e26",
+        "from": "info-target",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e27",
+        "from": "info-exempt",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e28",
+        "from": "info-area-ratio-ok",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e29",
+        "from": "proc-final-judgment",
+        "to": "info-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e30",
+        "from": "info-compliance",
+        "to": "proc-all-check",
+        "role": "input"
+      },
+      {
+        "id": "e31",
+        "from": "proc-all-check",
+        "to": "info-final",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "delegates_to",
+      "articles": [
+        "A19",
+        "A20"
+      ],
+      "description": "法28条1項の対象建築物・居室の範囲及び所定の割合、採光有効面積の算定方法を定める"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-23T18:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

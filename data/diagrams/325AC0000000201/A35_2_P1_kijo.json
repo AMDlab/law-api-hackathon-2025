@@ -1,0 +1,536 @@
+{
+  "id": "CHK-BSL-A35_2-P1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "特殊建築物等の内装制限",
+    "target_subject": "建築物",
+    "description": "別表第一用途等の建築物における壁・天井の室内仕上げの防火性能要件の判定"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "35の2",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "防火",
+    "内装制限"
+  ],
+  "text_raw": "別表第一（い）欄に掲げる用途に供する特殊建築物、階数が三以上である建築物、政令で定める窓その他の開口部を有しない居室を有する建築物、延べ面積が千平方メートルをこえる建築物又は建築物の調理室、浴室その他の室でかまど、こんろその他火を使用する設備若しくは器具を設けたものは、政令で定めるものを除き、政令で定める技術的基準に従つて、その壁及び天井（天井のない場合においては、屋根）の室内に面する部分の仕上げを防火上支障がないようにしなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "type": "building_type",
+          "value": "別表第一（い）欄用途の特殊建築物"
+        },
+        {
+          "type": "building_feature",
+          "value": "階数が3以上"
+        },
+        {
+          "type": "building_feature",
+          "value": "政令で定める無窓居室を有する"
+        },
+        {
+          "type": "building_feature",
+          "value": "延べ面積>1000㎡"
+        },
+        {
+          "type": "room_feature",
+          "value": "火気使用室を有する"
+        }
+      ],
+      "note": "いずれか1つでも該当すれば内装制限が適用される"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "proposition",
+          "ref": "M1",
+          "description": "適用除外に該当しない（政令で定めるものを除く）"
+        },
+        {
+          "type": "proposition",
+          "ref": "M2",
+          "description": "内装制限技術基準に適合する"
+        }
+      ]
+    },
+    "exceptions": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "type": "regulatory",
+          "description": "政令で定める適用除外要件に該当する場合"
+        }
+      ],
+      "effect": "EXEMPT"
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "info-use",
+        "type": "information",
+        "title": "建築物の用途",
+        "subject": "建築物",
+        "property": "用途",
+        "property_type": "classification",
+        "property_type_description": "区分情報 - 既定のいくつかの区分の中のいずれかを示すもの（例: 用途地域、建物用途コード）",
+        "plurality": "single",
+        "description": "建築物がどの用途に供されるか（別表第一（い）欄該当性判定のため）"
+      },
+      {
+        "id": "proc-use-check",
+        "type": "process",
+        "title": "用途の特定",
+        "process_type": "undefined_input",
+        "process_type_description": "入力情報不定処理 - 導出されるアウトプット情報を得るための情報源の所在や手続きのメカニズムも含めて人が判断する処理。インプット情報を繋がない。左側の辺を消した状態で表示。",
+        "description": "設計図書等から建築物の用途を読み取る"
+      },
+      {
+        "id": "info-floors",
+        "type": "information",
+        "title": "建築物の階数",
+        "subject": "建築物",
+        "property": "階数",
+        "property_type": "numeric",
+        "property_type_description": "数値 - 大小関係に位置づけられる整数値または実数値（例: 延べ面積、高さ）",
+        "unit": "階",
+        "plurality": "single",
+        "description": "建築物の地上階数"
+      },
+      {
+        "id": "proc-floors-check",
+        "type": "process",
+        "title": "階数の特定",
+        "process_type": "undefined_input",
+        "process_type_description": "入力情報不定処理 - 導出されるアウトプット情報を得るための情報源の所在や手続きのメカニズムも含めて人が判断する処理。インプット情報を繋がない。左側の辺を消した状態で表示。",
+        "description": "設計図書等から建築物の階数を読み取る"
+      },
+      {
+        "id": "info-windowless",
+        "type": "information",
+        "title": "建築物の無窓居室",
+        "subject": "建築物",
+        "property": "政令で定める無窓居室の有無",
+        "property_type": "proposition",
+        "property_type_description": "命題真偽 - 真か偽かが判定可能な事実（例: 技術基準を満たすか否か）",
+        "plurality": "single",
+        "description": "政令で定める窓その他の開口部を有しない居室を有するか",
+        "related_articles": ["令::A111"]
+      },
+      {
+        "id": "proc-windowless-check",
+        "type": "process",
+        "title": "無窓居室の判定",
+        "process_type": "sub_diagram_reference",
+        "process_type_description": "部分審査機序図への参照 - 別途作成された部分審査機序図の情報処理全体をひとつの[処理]として表現。+記号を付加。",
+        "description": "政令で定める無窓居室の該当性を判定",
+        "related_articles": ["令::A111"],
+        "remarks": "令第111条に基づく無窓居室の判定"
+      },
+      {
+        "id": "info-area",
+        "type": "information",
+        "title": "建築物の延べ面積",
+        "subject": "建築物",
+        "property": "延べ面積",
+        "property_type": "numeric",
+        "property_type_description": "数値 - 大小関係に位置づけられる整数値または実数値（例: 延べ面積、高さ）",
+        "unit": "m2",
+        "plurality": "single",
+        "description": "建築物の延べ面積"
+      },
+      {
+        "id": "proc-area-check",
+        "type": "process",
+        "title": "延べ面積の特定",
+        "process_type": "undefined_input",
+        "process_type_description": "入力情報不定処理 - 導出されるアウトプット情報を得るための情報源の所在や手続きのメカニズムも含めて人が判断する処理。インプット情報を繋がない。左側の辺を消した状態で表示。",
+        "description": "設計図書等から建築物の延べ面積を読み取る"
+      },
+      {
+        "id": "info-fire-rooms-set",
+        "type": "information",
+        "title": "建築物の火気使用室",
+        "subject": "建築物",
+        "property": "火気使用室の集合",
+        "property_type": "set_definition",
+        "property_type_description": "集合定義 - 主体と特定の関係にある他の主体がどれであるかを示す情報（例: 階に属する外壁の集合）【必須ケース: 建築物⇔屋根、建築物⇔外壁、敷地⇔建築物など親子関係がある場合】",
+        "plurality": "single",
+        "description": "建築物に属する調理室・浴室等の火気使用室を特定"
+      },
+      {
+        "id": "proc-fire-rooms-check",
+        "type": "process",
+        "title": "火気使用室の特定",
+        "process_type": "undefined_input",
+        "process_type_description": "入力情報不定処理 - 導出されるアウトプット情報を得るための情報源の所在や手続きのメカニズムも含めて人が判断する処理。インプット情報を繋がない。左側の辺を消した状態で表示。",
+        "description": "設計図書等から調理室、浴室等のかまど・こんろ等の火気使用設備・器具を設けた室を特定"
+      },
+      {
+        "id": "info-fire-rooms-exist",
+        "type": "information",
+        "title": "火気使用室の存在",
+        "subject": "建築物",
+        "property": "火気使用室を有するか",
+        "property_type": "proposition",
+        "property_type_description": "命題真偽 - 真か偽かが判定可能な事実（例: 技術基準を満たすか否か）",
+        "plurality": "single",
+        "description": "調理室、浴室等の火気使用室が存在するか"
+      },
+      {
+        "id": "proc-fire-rooms-exist",
+        "type": "process",
+        "title": "火気使用室の存在判定",
+        "process_type": "mechanical",
+        "process_type_description": "機械的処理 - 自動化可能な論理演算や計算。視認情報をこれに繋ぐことはできない。水色で表示。",
+        "description": "火気使用室の集合が空でないかを判定",
+        "logic_expression": "集合A ≠ ∅"
+      },
+      {
+        "id": "info-trigger",
+        "type": "information",
+        "title": "内装制限適用対象該当",
+        "symbol": "T1",
+        "subject": "建築物",
+        "property": "内装制限の適用対象性",
+        "property_type": "proposition",
+        "property_type_description": "命題真偽 - 真か偽かが判定可能な事実（例: 技術基準を満たすか否か）",
+        "plurality": "single",
+        "description": "5つの適用条件のいずれかに該当するか"
+      },
+      {
+        "id": "proc-trigger",
+        "type": "process",
+        "title": "適用対象判定",
+        "process_type": "mechanical",
+        "process_type_description": "機械的処理 - 自動化可能な論理演算や計算。視認情報をこれに繋ぐことはできない。水色で表示。",
+        "description": "別表第一用途、階数3以上、無窓居室、延べ面積1000㎡超、火気使用室のいずれかに該当するかを判定",
+        "logic_expression": "(B1 ∈ {別表第一(い)欄用途}) OR (B2 ≥ 3) OR (B3 = true) OR (B4 > 1000) OR (B5 = true)",
+        "remarks": "いずれか1つでも該当すれば内装制限の適用対象となる"
+      },
+      {
+        "id": "info-exempt",
+        "type": "information",
+        "title": "適用除外該当性",
+        "symbol": "M1",
+        "subject": "建築物",
+        "property": "政令で定める適用除外への該当性",
+        "property_type": "proposition",
+        "property_type_description": "命題真偽 - 真か偽かが判定可能な事実（例: 技術基準を満たすか否か）",
+        "plurality": "single",
+        "description": "政令で定める適用除外要件に該当するか",
+        "related_articles": ["令::A128_5"]
+      },
+      {
+        "id": "proc-exempt",
+        "type": "process",
+        "title": "適用除外判定",
+        "process_type": "sub_diagram_reference",
+        "process_type_description": "部分審査機序図への参照 - 別途作成された部分審査機序図の情報処理全体をひとつの[処理]として表現。+記号を付加。",
+        "description": "令第128条の5等に基づく適用除外要件の判定",
+        "related_articles": ["令::A128_5"],
+        "remarks": "政令で定める適用除外の判定"
+      },
+      {
+        "id": "info-interior-parts-set",
+        "type": "information",
+        "title": "建築物の内装部位",
+        "subject": "建築物",
+        "property": "内装部位（壁・天井・屋根）の集合",
+        "property_type": "set_definition",
+        "property_type_description": "集合定義 - 主体と特定の関係にある他の主体がどれであるかを示す情報（例: 階に属する外壁の集合）【必須ケース: 建築物⇔屋根、建築物⇔外壁、敷地⇔建築物など親子関係がある場合】",
+        "plurality": "single",
+        "description": "建築物に属する壁及び天井（天井のない場合は屋根）の室内に面する部分を特定"
+      },
+      {
+        "id": "proc-interior-parts-check",
+        "type": "process",
+        "title": "内装部位の特定",
+        "process_type": "undefined_input",
+        "process_type_description": "入力情報不定処理 - 導出されるアウトプット情報を得るための情報源の所在や手続きのメカニズムも含めて人が判断する処理。インプット情報を繋がない。左側の辺を消した状態で表示。",
+        "description": "設計図書等から壁・天井・屋根の室内に面する部分を特定",
+        "remarks": "天井のない場合は屋根を対象とする"
+      },
+      {
+        "id": "info-finish",
+        "type": "information",
+        "title": "内装部位の仕上げ",
+        "subject": "内装部位",
+        "property": "仕上げ材料・構造",
+        "property_type": "classification",
+        "property_type_description": "区分情報 - 既定のいくつかの区分の中のいずれかを示すもの（例: 用途地域、建物用途コード）",
+        "plurality": "multiple",
+        "description": "各内装部位の仕上げ材料・構造"
+      },
+      {
+        "id": "proc-finish-check",
+        "type": "process",
+        "title": "仕上げの特定",
+        "process_type": "undefined_input",
+        "process_type_description": "入力情報不定処理 - 導出されるアウトプット情報を得るための情報源の所在や手続きのメカニズムも含めて人が判断する処理。インプット情報を繋がない。左側の辺を消した状態で表示。",
+        "description": "設計図書等から各内装部位の仕上げ材料・構造を読み取る",
+        "iteration": "iterative"
+      },
+      {
+        "id": "info-standard",
+        "type": "information",
+        "title": "内装制限技術基準",
+        "subject": "建築物",
+        "property": "政令で定める技術的基準",
+        "property_type": "classification",
+        "property_type_description": "区分情報 - 既定のいくつかの区分の中のいずれかを示すもの（例: 用途地域、建物用途コード）",
+        "plurality": "single",
+        "description": "政令で定める内装制限の技術的基準",
+        "related_articles": ["令::A128_4", "令::A128_5"],
+        "remarks": "令第128条の4及び令第128条の5に規定される技術的基準"
+      },
+      {
+        "id": "proc-standard-check",
+        "type": "process",
+        "title": "技術基準の特定",
+        "process_type": "mechanical",
+        "process_type_description": "機械的処理 - 自動化可能な論理演算や計算。視認情報をこれに繋ぐことはできない。水色で表示。",
+        "description": "建築物の用途・規模等に応じた内装制限技術基準を特定",
+        "related_articles": ["令::A128_4", "令::A128_5"],
+        "remarks": "政令の規定に基づき適用される技術基準を決定"
+      },
+      {
+        "id": "info-compliance",
+        "type": "information",
+        "title": "内装制限基準適合",
+        "symbol": "M2",
+        "subject": "建築物",
+        "property": "内装制限技術基準への適合性",
+        "property_type": "proposition",
+        "property_type_description": "命題真偽 - 真か偽かが判定可能な事実（例: 技術基準を満たすか否か）",
+        "plurality": "single",
+        "description": "政令で定める技術的基準に従って内装仕上げが防火上支障がないか"
+      },
+      {
+        "id": "proc-compliance",
+        "type": "process",
+        "title": "技術基準適合判定",
+        "process_type": "mechanical",
+        "process_type_description": "機械的処理 - 自動化可能な論理演算や計算。視認情報をこれに繋ぐことはできない。水色で表示。",
+        "description": "内装部位の仕上げが技術基準に適合するかを判定",
+        "related_articles": ["令::A128_4", "令::A128_5"],
+        "logic_expression": "∀x ∈ 内装部位: 仕上げ(x) が 技術基準(S) に適合",
+        "iteration": "iterative",
+        "remarks": "全ての内装部位について技術基準への適合を確認"
+      },
+      {
+        "id": "info-result",
+        "type": "information",
+        "title": "法第35条の2第1項適合",
+        "subject": "建築物",
+        "property": "法第35条の2第1項への適合性",
+        "property_type": "proposition",
+        "property_type_description": "命題真偽 - 真か偽かが判定可能な事実（例: 技術基準を満たすか否か）",
+        "plurality": "single",
+        "description": "内装制限規定への適合性"
+      },
+      {
+        "id": "proc-result",
+        "type": "process",
+        "title": "最終適合判定",
+        "process_type": "mechanical",
+        "process_type_description": "機械的処理 - 自動化可能な論理演算や計算。視認情報をこれに繋ぐことはできない。水色で表示。",
+        "description": "適用対象外または（適用除外でない かつ 技術基準適合）の場合に適合",
+        "logic_expression": "(NOT T1) OR ((NOT M1) AND M2)",
+        "remarks": "適用対象でない場合は適合、適用対象の場合は適用除外でなく技術基準に適合すれば適合"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-use-check",
+        "to": "info-use",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "proc-floors-check",
+        "to": "info-floors",
+        "role": "output"
+      },
+      {
+        "id": "e03",
+        "from": "proc-windowless-check",
+        "to": "info-windowless",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "proc-area-check",
+        "to": "info-area",
+        "role": "output"
+      },
+      {
+        "id": "e05",
+        "from": "proc-fire-rooms-check",
+        "to": "info-fire-rooms-set",
+        "role": "output"
+      },
+      {
+        "id": "e06",
+        "from": "info-fire-rooms-set",
+        "to": "proc-fire-rooms-exist",
+        "role": "input"
+      },
+      {
+        "id": "e07",
+        "from": "proc-fire-rooms-exist",
+        "to": "info-fire-rooms-exist",
+        "role": "output"
+      },
+      {
+        "id": "e08",
+        "from": "info-use",
+        "to": "proc-trigger",
+        "role": "input"
+      },
+      {
+        "id": "e09",
+        "from": "info-floors",
+        "to": "proc-trigger",
+        "role": "input"
+      },
+      {
+        "id": "e10",
+        "from": "info-windowless",
+        "to": "proc-trigger",
+        "role": "input"
+      },
+      {
+        "id": "e11",
+        "from": "info-area",
+        "to": "proc-trigger",
+        "role": "input"
+      },
+      {
+        "id": "e12",
+        "from": "info-fire-rooms-exist",
+        "to": "proc-trigger",
+        "role": "input"
+      },
+      {
+        "id": "e13",
+        "from": "proc-trigger",
+        "to": "info-trigger",
+        "role": "output"
+      },
+      {
+        "id": "e14",
+        "from": "proc-exempt",
+        "to": "info-exempt",
+        "role": "output"
+      },
+      {
+        "id": "e15",
+        "from": "proc-interior-parts-check",
+        "to": "info-interior-parts-set",
+        "role": "output"
+      },
+      {
+        "id": "e16",
+        "from": "info-interior-parts-set",
+        "to": "proc-finish-check",
+        "role": "input"
+      },
+      {
+        "id": "e17",
+        "from": "proc-finish-check",
+        "to": "info-finish",
+        "role": "output"
+      },
+      {
+        "id": "e18",
+        "from": "info-use",
+        "to": "proc-standard-check",
+        "role": "input"
+      },
+      {
+        "id": "e19",
+        "from": "proc-standard-check",
+        "to": "info-standard",
+        "role": "output"
+      },
+      {
+        "id": "e20",
+        "from": "info-interior-parts-set",
+        "to": "proc-compliance",
+        "role": "input"
+      },
+      {
+        "id": "e21",
+        "from": "info-finish",
+        "to": "proc-compliance",
+        "role": "input"
+      },
+      {
+        "id": "e22",
+        "from": "info-standard",
+        "to": "proc-compliance",
+        "role": "input"
+      },
+      {
+        "id": "e23",
+        "from": "proc-compliance",
+        "to": "info-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e24",
+        "from": "info-trigger",
+        "to": "proc-result",
+        "role": "input"
+      },
+      {
+        "id": "e25",
+        "from": "info-exempt",
+        "to": "proc-result",
+        "role": "input"
+      },
+      {
+        "id": "e26",
+        "from": "info-compliance",
+        "to": "proc-result",
+        "role": "input"
+      },
+      {
+        "id": "e27",
+        "from": "proc-result",
+        "to": "info-result",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "delegates_to",
+      "articles": ["A111", "A128_4", "A128_5"],
+      "description": "無窓居室の定義、内装制限の技術的基準、適用除外を政令で規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-24T00:00:00Z",
+    "author": "Claude Code (Sonnet 4.5)",
+    "generator": "kijo-generator-skill-v3",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法",
+    "source": "e-Gov法令API v2"
+  }
+}

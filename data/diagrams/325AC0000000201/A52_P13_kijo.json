@@ -1,0 +1,230 @@
+{
+  "id": "CHK-BSL-A52-P13",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "壁面線等による敷地面積の補正",
+    "target_subject": "敷地",
+    "description": "第12項の壁面線等による容積率緩和を適用する場合、前面道路と壁面線等との間の部分を敷地面積から除外する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "52",
+    "paragraph": "13",
+    "item": null
+  },
+  "labels": ["集団規定", "容積率", "敷地面積算定"],
+  "text_raw": "前項の場合においては、当該建築物の敷地のうち前面道路と壁面線等との間の部分の面積は、敷地面積又は敷地の部分の面積に算入しないものとする。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "prerequisite",
+          "value": "法52条12項の適用を受ける建築物"
+        }
+      ],
+      "note": "第2項各号の規定により前面道路幅員に乗ずる数値が4/10とされている建築物で、壁面線等の指定があり、壁面線等を越えないもの"
+    },
+    "judgment_rule": {
+      "operator": "=",
+      "lhs": {
+        "ref": "info-effective-site-area",
+        "symbol": "As_eff"
+      },
+      "rhs": {
+        "expression": "As - Asetback",
+        "description": "敷地面積から前面道路と壁面線等との間の部分の面積を除く"
+      }
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-site-area",
+        "type": "process",
+        "title": "敷地面積の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から敷地全体の面積を読み取る"
+      },
+      {
+        "id": "info-site-area",
+        "type": "information",
+        "title": "敷地面積",
+        "symbol": "As",
+        "subject": "敷地",
+        "property": "面積",
+        "property_type": "numeric",
+        "unit": "m2",
+        "description": "建築物の敷地全体の面積",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-road-boundary",
+        "type": "process",
+        "title": "前面道路境界線の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から前面道路の境界線の位置を読み取る"
+      },
+      {
+        "id": "info-road-boundary",
+        "type": "information",
+        "title": "前面道路境界線",
+        "symbol": "Lr",
+        "subject": "前面道路",
+        "property": "境界線の位置",
+        "property_type": "geometric_line",
+        "description": "前面道路と敷地の境界となる線",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-setback-line",
+        "type": "process",
+        "title": "壁面線等の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から壁面線又は壁面の位置の制限として定められた限度の線（壁面線等）の位置を読み取る",
+        "related_articles": ["法::A52:P12"],
+        "remarks": "壁面線の指定または法68条の2第1項に基づく条例による壁面位置制限"
+      },
+      {
+        "id": "info-setback-line",
+        "type": "information",
+        "title": "壁面線等",
+        "symbol": "Ls",
+        "subject": "敷地",
+        "property": "壁面線等の位置",
+        "property_type": "geometric_line",
+        "description": "壁面線の指定または壁面の位置の制限として定められた限度の線",
+        "plurality": "single",
+        "related_articles": ["法::A52:P12"]
+      },
+      {
+        "id": "proc-setback-area",
+        "type": "process",
+        "title": "セットバック部分面積の算出",
+        "process_type": "mechanical",
+        "description": "前面道路境界線と壁面線等との間の敷地部分の面積を幾何学的に計算する",
+        "logic_expression": "Asetback = Area(Region between Lr and Ls)"
+      },
+      {
+        "id": "info-setback-area",
+        "type": "information",
+        "title": "前面道路と壁面線等との間の部分の面積",
+        "symbol": "Asetback",
+        "subject": "敷地",
+        "property": "セットバック部分の面積",
+        "property_type": "numeric",
+        "unit": "m2",
+        "description": "前面道路境界線と壁面線等との間の敷地部分の面積",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-effective-area",
+        "type": "process",
+        "title": "容積率算定用敷地面積の計算",
+        "process_type": "mechanical",
+        "description": "敷地面積からセットバック部分の面積を除いて、容積率算定に用いる有効敷地面積を算出する",
+        "logic_expression": "As_eff = As - Asetback",
+        "remarks": "この有効敷地面積を用いて容積率を算定する"
+      },
+      {
+        "id": "info-effective-site-area",
+        "type": "information",
+        "title": "容積率算定用敷地面積",
+        "symbol": "As_eff",
+        "subject": "敷地",
+        "property": "容積率算定用敷地面積",
+        "property_type": "numeric",
+        "unit": "m2",
+        "description": "容積率算定の基礎となる敷地面積（セットバック部分を除外したもの）",
+        "plurality": "single",
+        "remarks": "この面積を用いて容積率（延べ面積÷敷地面積）を算定する"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-site-area",
+        "to": "info-site-area",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "proc-road-boundary",
+        "to": "info-road-boundary",
+        "role": "output"
+      },
+      {
+        "id": "e03",
+        "from": "proc-setback-line",
+        "to": "info-setback-line",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "info-road-boundary",
+        "to": "proc-setback-area",
+        "role": "input"
+      },
+      {
+        "id": "e05",
+        "from": "info-setback-line",
+        "to": "proc-setback-area",
+        "role": "input"
+      },
+      {
+        "id": "e06",
+        "from": "proc-setback-area",
+        "to": "info-setback-area",
+        "role": "output"
+      },
+      {
+        "id": "e07",
+        "from": "info-site-area",
+        "to": "proc-effective-area",
+        "role": "input"
+      },
+      {
+        "id": "e08",
+        "from": "info-setback-area",
+        "to": "proc-effective-area",
+        "role": "input"
+      },
+      {
+        "id": "e09",
+        "from": "proc-effective-area",
+        "to": "info-effective-site-area",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A52:P12"],
+      "description": "第12項の壁面線等による容積率緩和規定を前提とする敷地面積算定ルール"
+    },
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A68_2:P1"],
+      "description": "壁面の位置の制限に関する条例規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-24T00:00:00Z",
+    "updated_at": "2025-12-24T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "kijo-generator-skill",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法",
+    "source": "e-Gov法令API v2"
+  }
+}

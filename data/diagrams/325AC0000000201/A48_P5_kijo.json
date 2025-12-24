@@ -1,0 +1,156 @@
+{
+  "id": "CHK-BSL-A48-P5",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "第一種住居地域における建築物の用途制限",
+    "target_subject": "建築物",
+    "description": "第一種住居地域内において建築禁止の建築物の用途が別表第二(ほ)項に該当しないことを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "48",
+    "paragraph": "5",
+    "item": null
+  },
+  "labels": ["集団規定", "用途制限"],
+  "text_raw": "第一種住居地域内においては、別表第二（ほ）項に掲げる建築物は、建築してはならない。ただし、特定行政庁が第一種住居地域における住居の環境を害するおそれがないと認め、又は公益上やむを得ないと認めて許可した場合においては、この限りでない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        { "type": "location", "value": "第一種住居地域内" }
+      ],
+      "note": "都市計画で定められた第一種住居地域"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        { "ref": "info-table2-non-prohibited", "operator": "==", "value": true },
+        { "ref": "info-special-approval", "operator": "==", "value": true }
+      ]
+    },
+    "exceptions": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "note": "特定行政庁の許可を受けた場合（環境を害するおそれがない、又は公益上やむを得ない）",
+          "ref": "info-special-approval",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "effect": "EXEMPT"
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-building-use",
+        "type": "process",
+        "title": "建築物の用途の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の用途を特定する"
+      },
+      {
+        "id": "info-building-use",
+        "type": "information",
+        "title": "建築物の用途",
+        "symbol": "U",
+        "subject": "建築物",
+        "property": "用途",
+        "property_type": "classification",
+        "description": "建築物の用途種別（住宅、店舗、事務所等）",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-table2-check",
+        "type": "process",
+        "title": "別表第二(ほ)項非該当判定",
+        "process_type": "mechanical",
+        "description": "建築物の用途が別表第二(ほ)項に掲げる禁止用途に該当しないかを判定",
+        "related_articles": ["法::別表第二(ほ)"],
+        "remarks": "別表第二(ほ)項（建築禁止）: 一 カラオケボックス等、二 3,000㎡超の店舗・飲食店・展示場等、三 4階以上又は3,000㎡超の事務所、四 ホテル・旅館、五 ボーリング場・スケート場・水泳場・ゴルフ練習場等の遊戯施設、六 自動車教習所、七 倉庫業を営む倉庫、八 3階以上又は300㎡超の自動車車庫（附属用途を除く）、九 15㎡超の危険物貯蔵・処理施設（石油類等の制限あり）、十 営業用倉庫",
+        "logic_expression": "U ∉ {別表第二(ほ)項に掲げる用途}"
+      },
+      {
+        "id": "info-table2-non-prohibited",
+        "type": "information",
+        "title": "別表第二(ほ)項非該当",
+        "symbol": "T",
+        "subject": "建築物",
+        "property": "別表第二(ほ)項非該当",
+        "property_type": "proposition",
+        "description": "建築物の用途が別表第二(ほ)項の禁止用途に該当しないか",
+        "related_articles": ["法::別表第二(ほ)"],
+        "plurality": "single"
+      },
+      {
+        "id": "proc-special-approval-check",
+        "type": "process",
+        "title": "特定行政庁の許可の確認",
+        "process_type": "undefined_input",
+        "description": "特定行政庁の許可（環境を害するおそれがない、又は公益上やむを得ない）を受けているかを確認",
+        "remarks": "許可要件: 1)住居の環境を害するおそれがない、又は 2)公益上やむを得ない"
+      },
+      {
+        "id": "info-special-approval",
+        "type": "information",
+        "title": "特定行政庁の許可",
+        "symbol": "A",
+        "subject": "建築物",
+        "property": "特定行政庁の許可の有無",
+        "property_type": "proposition",
+        "description": "特定行政庁の許可を受けているか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-final-judgment",
+        "type": "process",
+        "title": "適合判定",
+        "process_type": "mechanical",
+        "description": "別表第二(ほ)項の禁止用途に該当しないか、又は特定行政庁の許可を受けているかを判定",
+        "logic_expression": "T OR A"
+      },
+      {
+        "id": "info-compliance",
+        "type": "information",
+        "title": "法48条5項適合",
+        "symbol": "C",
+        "subject": "建築物",
+        "property": "法48条5項適合",
+        "property_type": "proposition",
+        "description": "法48条5項の規定に適合するか",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "proc-building-use", "to": "info-building-use", "role": "output" },
+      { "id": "e02", "from": "info-building-use", "to": "proc-table2-check", "role": "input" },
+      { "id": "e03", "from": "proc-table2-check", "to": "info-table2-non-prohibited", "role": "output" },
+      { "id": "e04", "from": "proc-special-approval-check", "to": "info-special-approval", "role": "output" },
+      { "id": "e05", "from": "info-table2-non-prohibited", "to": "proc-final-judgment", "role": "input" },
+      { "id": "e06", "from": "info-special-approval", "to": "proc-final-judgment", "role": "input" },
+      { "id": "e07", "from": "proc-final-judgment", "to": "info-compliance", "role": "output" }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["別表第二(ほ)"],
+      "description": "第一種住居地域において建築禁止の建築物を定める"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-24T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

@@ -1,0 +1,331 @@
+{
+  "id": "CHK-BSL-A50-P1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "建ぺい率の制限",
+    "target_subject": "建築物",
+    "description": "建築物の建築面積の敷地面積に対する割合（建ぺい率）が都市計画で定められた建ぺい率を超えないことを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "50",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "集団規定",
+    "建ぺい率"
+  ],
+  "text_raw": "建築物の建築面積（同一敷地内に二以上の建築物がある場合においては、その建築面積の合計）の敷地面積に対する割合（以下「建ぺい率」という。）は、次の各号に掲げる区分に従い、当該各号に定める数値を超えてはならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "建ぺい率制限が適用される区域"
+        }
+      ],
+      "note": "都市計画で定められた用途地域等"
+    },
+    "judgment_rule": {
+      "operator": "<=",
+      "lhs": {
+        "ref": "info-building-coverage-ratio",
+        "description": "建築物の建ぺい率"
+      },
+      "rhs": {
+        "ref": "info-designated-ratio",
+        "description": "指定建ぺい率"
+      }
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-site-def",
+        "type": "process",
+        "title": "敷地の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から対象となる敷地を特定する"
+      },
+      {
+        "id": "info-site",
+        "type": "information",
+        "title": "敷地",
+        "subject": "敷地",
+        "property": "敷地の特定",
+        "property_type": "geometric_surface",
+        "description": "判定対象となる敷地",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-site-area",
+        "type": "process",
+        "title": "敷地面積の算定",
+        "process_type": "mechanical",
+        "description": "敷地の幾何学的形状から面積を計算する"
+      },
+      {
+        "id": "info-site-area",
+        "type": "information",
+        "title": "敷地面積",
+        "symbol": "As",
+        "subject": "敷地",
+        "property": "面積",
+        "property_type": "numeric",
+        "unit": "m2",
+        "description": "敷地の面積",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-buildings-set",
+        "type": "process",
+        "title": "敷地内建築物の特定",
+        "process_type": "human_judgment",
+        "description": "設計図書等から同一敷地内の全ての建築物を特定する"
+      },
+      {
+        "id": "info-buildings-set",
+        "type": "information",
+        "title": "敷地内の建築物",
+        "subject": "敷地",
+        "property": "建築物の集合",
+        "property_type": "set_definition",
+        "description": "当該敷地に属する建築物（既存建築物を含む）を特定",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-building-area",
+        "type": "process",
+        "title": "建築面積の算定",
+        "process_type": "mechanical",
+        "target_subject": "建築物",
+        "iteration": "iterative",
+        "description": "各建築物の水平投影面積から建築面積を算定する",
+        "related_articles": [
+          "令::A2:P1:I2"
+        ]
+      },
+      {
+        "id": "info-building-area",
+        "type": "information",
+        "title": "建築物の建築面積",
+        "symbol": "Ab",
+        "subject": "建築物",
+        "property": "建築面積",
+        "property_type": "numeric",
+        "unit": "m2",
+        "description": "各建築物の建築面積（建築物の外壁又はこれに代わる柱の中心線で囲まれた部分の水平投影面積）",
+        "related_articles": [
+          "令::A2:P1:I2"
+        ],
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-total-area",
+        "type": "process",
+        "title": "建築面積の合計算定",
+        "process_type": "mechanical",
+        "description": "同一敷地内の全ての建築物の建築面積を合計する",
+        "logic_expression": "Ab_total = Σ Ab(i)"
+      },
+      {
+        "id": "info-total-building-area",
+        "type": "information",
+        "title": "建築面積の合計",
+        "symbol": "Ab_total",
+        "subject": "敷地",
+        "property": "建築面積の合計",
+        "property_type": "numeric",
+        "unit": "m2",
+        "description": "同一敷地内の全ての建築物の建築面積の合計",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-coverage-ratio",
+        "type": "process",
+        "title": "建ぺい率の計算",
+        "process_type": "mechanical",
+        "description": "建築面積の合計を敷地面積で除して建ぺい率を算定する",
+        "logic_expression": "BCR = (Ab_total / As) × 100"
+      },
+      {
+        "id": "info-building-coverage-ratio",
+        "type": "information",
+        "title": "建ぺい率",
+        "symbol": "BCR",
+        "subject": "敷地",
+        "property": "建ぺい率",
+        "property_type": "numeric",
+        "unit": "%",
+        "description": "建築面積の敷地面積に対する割合",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-designated-ratio",
+        "type": "process",
+        "title": "指定建ぺい率の特定",
+        "process_type": "mechanical",
+        "description": "都市計画情報（用途地域等）から当該敷地に適用される建ぺい率の限度を特定する",
+        "remarks": "都市計画データベースとの照合により自動判定可能"
+      },
+      {
+        "id": "info-designated-ratio",
+        "type": "information",
+        "title": "指定建ぺい率",
+        "symbol": "BCR_max",
+        "subject": "敷地",
+        "property": "指定建ぺい率",
+        "property_type": "numeric",
+        "unit": "%",
+        "description": "都市計画で定められた建ぺい率の限度（30%、40%、50%、60%、70%、80%のいずれか）",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-compliance-check",
+        "type": "process",
+        "title": "建ぺい率制限適合判定",
+        "process_type": "mechanical",
+        "description": "建ぺい率が指定建ぺい率以下であることを確認する",
+        "logic_expression": "BCR ≤ BCR_max"
+      },
+      {
+        "id": "info-compliance",
+        "type": "information",
+        "title": "法50条1項適合",
+        "subject": "敷地",
+        "property": "法50条1項適合",
+        "property_type": "proposition",
+        "description": "建ぺい率が都市計画で定められた限度を超えていないか",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-site-def",
+        "to": "info-site",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "info-site",
+        "to": "proc-site-area",
+        "role": "input"
+      },
+      {
+        "id": "e03",
+        "from": "proc-site-area",
+        "to": "info-site-area",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "info-site",
+        "to": "proc-buildings-set",
+        "role": "input"
+      },
+      {
+        "id": "e05",
+        "from": "proc-buildings-set",
+        "to": "info-buildings-set",
+        "role": "output"
+      },
+      {
+        "id": "e06",
+        "from": "info-buildings-set",
+        "to": "proc-building-area",
+        "role": "input"
+      },
+      {
+        "id": "e07",
+        "from": "proc-building-area",
+        "to": "info-building-area",
+        "role": "output"
+      },
+      {
+        "id": "e08",
+        "from": "info-building-area",
+        "to": "proc-total-area",
+        "role": "input"
+      },
+      {
+        "id": "e09",
+        "from": "proc-total-area",
+        "to": "info-total-building-area",
+        "role": "output"
+      },
+      {
+        "id": "e10",
+        "from": "info-total-building-area",
+        "to": "proc-coverage-ratio",
+        "role": "input"
+      },
+      {
+        "id": "e11",
+        "from": "info-site-area",
+        "to": "proc-coverage-ratio",
+        "role": "input"
+      },
+      {
+        "id": "e12",
+        "from": "proc-coverage-ratio",
+        "to": "info-building-coverage-ratio",
+        "role": "output"
+      },
+      {
+        "id": "e13",
+        "from": "info-site",
+        "to": "proc-designated-ratio",
+        "role": "input"
+      },
+      {
+        "id": "e14",
+        "from": "proc-designated-ratio",
+        "to": "info-designated-ratio",
+        "role": "output"
+      },
+      {
+        "id": "e15",
+        "from": "info-building-coverage-ratio",
+        "to": "proc-compliance-check",
+        "role": "input"
+      },
+      {
+        "id": "e16",
+        "from": "info-designated-ratio",
+        "to": "proc-compliance-check",
+        "role": "input"
+      },
+      {
+        "id": "e17",
+        "from": "proc-compliance-check",
+        "to": "info-compliance",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "defines_detail",
+      "articles": [
+        "A2:P1:I2"
+      ],
+      "description": "建築面積の定義"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-23T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

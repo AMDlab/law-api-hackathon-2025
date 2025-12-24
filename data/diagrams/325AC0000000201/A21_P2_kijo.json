@@ -1,0 +1,329 @@
+{
+  "id": "CHK-BSL-A21-P2",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "大規模建築物の耐火建築物等要件",
+    "target_subject": "建築物",
+    "description": "延べ面積3000㎡超で主要構造部に可燃材料を用いた建築物が耐火建築物等の基準を満たすことを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "21",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "防火",
+    "耐火建築物"
+  ],
+  "text_raw": "延べ面積が三千平方メートルを超える建築物（その主要構造部（床、屋根及び階段を除く。）の前項の政令で定める部分の全部又は一部に木材、プラスチックその他の可燃材料を用いたものに限る。）は、第二条第九号の二イに掲げる基準に適合するものとしなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "floor_area",
+          "operator": ">",
+          "value": 3000,
+          "note": "延べ面積が3000㎡を超える"
+        },
+        {
+          "type": "material",
+          "value": "主要構造部（床、屋根、階段を除く）の前項の政令で定める部分に可燃材料を使用"
+        }
+      ]
+    },
+    "judgment_rule": {
+      "operator": "==",
+      "conditions": [
+        {
+          "ref": "info-fireproof-compliance",
+          "operator": "==",
+          "value": true,
+          "note": "第2条9号の二イの基準（耐火建築物等）に適合"
+        }
+      ]
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-floor-area",
+        "type": "process",
+        "title": "延べ面積の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の延べ面積を特定する"
+      },
+      {
+        "id": "info-floor-area",
+        "type": "information",
+        "title": "建築物の延べ面積",
+        "symbol": "A",
+        "subject": "建築物",
+        "property": "延べ面積",
+        "property_type": "numeric",
+        "unit": "㎡",
+        "plurality": "single",
+        "description": "建築物の延べ面積"
+      },
+      {
+        "id": "proc-area-check",
+        "type": "process",
+        "title": "延べ面積判定",
+        "process_type": "mechanical",
+        "logic_expression": "A > 3000",
+        "description": "延べ面積が3000㎡を超えるか判定"
+      },
+      {
+        "id": "info-area-over",
+        "type": "information",
+        "title": "延べ面積3000㎡超",
+        "symbol": "A1",
+        "subject": "建築物",
+        "property": "延べ面積3000㎡超該当",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "延べ面積が3000㎡を超える"
+      },
+      {
+        "id": "proc-main-structure-parts",
+        "type": "process",
+        "title": "主要構造部対象部分の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から主要構造部（床、屋根、階段を除く）の前項の政令で定める部分を特定する"
+      },
+      {
+        "id": "info-main-structure-parts",
+        "type": "information",
+        "title": "主要構造部の対象部分",
+        "subject": "建築物",
+        "property": "主要構造部対象部分の集合",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "主要構造部（床、屋根、階段を除く）の政令で定める部分",
+        "related_articles": [
+          "令::A109_3_2"
+        ]
+      },
+      {
+        "id": "proc-material-check",
+        "type": "process",
+        "title": "可燃材料使用確認",
+        "process_type": "human_judgment",
+        "description": "主要構造部の対象部分に木材、プラスチックその他の可燃材料が使用されているか確認"
+      },
+      {
+        "id": "info-combustible-material",
+        "type": "information",
+        "title": "可燃材料の使用",
+        "symbol": "CM",
+        "subject": "建築物",
+        "property": "主要構造部への可燃材料使用",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "主要構造部の政令で定める部分の全部又は一部に可燃材料を用いているか"
+      },
+      {
+        "id": "proc-scope-check",
+        "type": "process",
+        "title": "適用範囲判定",
+        "process_type": "mechanical",
+        "logic_expression": "A1 AND CM",
+        "description": "延べ面積3000㎡超かつ可燃材料使用の条件を満たすか判定"
+      },
+      {
+        "id": "info-scope",
+        "type": "information",
+        "title": "適用範囲該当",
+        "symbol": "S",
+        "subject": "建築物",
+        "property": "法21条2項適用範囲該当",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "延べ面積3000㎡超で主要構造部に可燃材料を用いた建築物であるか"
+      },
+      {
+        "id": "proc-building-type",
+        "type": "process",
+        "title": "建築物種別の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物が耐火建築物等に該当するかを特定する"
+      },
+      {
+        "id": "info-building-type",
+        "type": "information",
+        "title": "建築物の種別",
+        "subject": "建築物",
+        "property": "耐火建築物等の区分",
+        "property_type": "classification",
+        "plurality": "single",
+        "description": "耐火建築物、準耐火建築物等の区分"
+      },
+      {
+        "id": "proc-fireproof-check",
+        "type": "process",
+        "title": "第2条9号の二イ適合判定",
+        "process_type": "mechanical",
+        "description": "第2条9号の二イに掲げる基準（耐火建築物等）への適合を判定",
+        "related_articles": [
+          "法::A2:P9_2:I1"
+        ]
+      },
+      {
+        "id": "info-fireproof-compliance",
+        "type": "information",
+        "title": "耐火建築物等基準適合",
+        "symbol": "F",
+        "subject": "建築物",
+        "property": "第2条9号の二イ基準適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "第2条9号の二イに掲げる基準に適合するか"
+      },
+      {
+        "id": "proc-final-judgment",
+        "type": "process",
+        "title": "法21条2項適合判定",
+        "process_type": "mechanical",
+        "logic_expression": "NOT S OR F",
+        "description": "適用範囲外、または耐火建築物等基準に適合するか判定"
+      },
+      {
+        "id": "info-compliance",
+        "type": "information",
+        "title": "法21条2項適合",
+        "symbol": "PASS",
+        "subject": "建築物",
+        "property": "法21条2項適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "法21条2項に適合する"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e001",
+        "from": "proc-floor-area",
+        "to": "info-floor-area",
+        "role": "output"
+      },
+      {
+        "id": "e002",
+        "from": "info-floor-area",
+        "to": "proc-area-check",
+        "role": "input"
+      },
+      {
+        "id": "e003",
+        "from": "proc-area-check",
+        "to": "info-area-over",
+        "role": "output"
+      },
+      {
+        "id": "e004",
+        "from": "proc-main-structure-parts",
+        "to": "info-main-structure-parts",
+        "role": "output"
+      },
+      {
+        "id": "e005",
+        "from": "info-main-structure-parts",
+        "to": "proc-material-check",
+        "role": "input"
+      },
+      {
+        "id": "e006",
+        "from": "proc-material-check",
+        "to": "info-combustible-material",
+        "role": "output"
+      },
+      {
+        "id": "e007",
+        "from": "info-area-over",
+        "to": "proc-scope-check",
+        "role": "input"
+      },
+      {
+        "id": "e008",
+        "from": "info-combustible-material",
+        "to": "proc-scope-check",
+        "role": "input"
+      },
+      {
+        "id": "e009",
+        "from": "proc-scope-check",
+        "to": "info-scope",
+        "role": "output"
+      },
+      {
+        "id": "e010",
+        "from": "proc-building-type",
+        "to": "info-building-type",
+        "role": "output"
+      },
+      {
+        "id": "e011",
+        "from": "info-building-type",
+        "to": "proc-fireproof-check",
+        "role": "input"
+      },
+      {
+        "id": "e012",
+        "from": "proc-fireproof-check",
+        "to": "info-fireproof-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e013",
+        "from": "info-scope",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e014",
+        "from": "info-fireproof-compliance",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e015",
+        "from": "proc-final-judgment",
+        "to": "info-compliance",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": [
+        "A2:P9_2:I1"
+      ],
+      "description": "第2条9号の二イ（耐火建築物等の定義）"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "delegates_to",
+      "articles": [
+        "A109_3_2"
+      ],
+      "description": "第109条の3第2号（主要構造部の政令で定める部分）"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-24T00:00:00Z",
+    "generator": "claude-code-kijo-generator",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法",
+    "checklist_ref": "確認審査報告書チェックリスト"
+  }
+}

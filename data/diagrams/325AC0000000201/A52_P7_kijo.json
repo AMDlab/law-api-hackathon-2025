@@ -1,0 +1,449 @@
+{
+  "id": "CHK-BSL-A52-P7",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "複数地域にまたがる敷地の容積率制限",
+    "target_subject": "建築物",
+    "description": "敷地が複数の用途地域等にまたがる場合における容積率の加重平均による算定"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "52",
+    "paragraph": "7",
+    "item": null
+  },
+  "labels": [
+    "集団規定",
+    "容積率",
+    "敷地分割"
+  ],
+  "text_raw": "建築物の敷地が第一項及び第二項の規定による建築物の容積率に関する制限を受ける地域、地区又は区域の二以上にわたる場合においては、当該建築物の容積率は、第一項及び第二項の規定による当該各地域、地区又は区域内の建築物の容積率の限度にその敷地の当該地域、地区又は区域内にある各部分の面積の敷地面積に対する割合を乗じて得たものの合計以下でなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "description": "敷地が容積率制限を受ける地域・地区・区域の2以上にまたがる",
+          "value": "敷地が第52条第1項及び第2項の容積率制限を受ける地域・地区・区域の2以上にまたがる場合"
+        }
+      ],
+      "note": "用途地域等の境界を跨ぐ敷地に適用"
+    },
+    "judgment_rule": {
+      "operator": "<=",
+      "lhs": {
+        "type": "numeric",
+        "symbol": "FAR_actual",
+        "description": "建築物の容積率"
+      },
+      "rhs": {
+        "type": "formula",
+        "symbol": "FAR_weighted",
+        "description": "各地域の容積率限度と敷地面積割合の加重平均の合計",
+        "formula": "Σ(FAR_i × A_i / A_total)"
+      }
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "info-site",
+        "type": "information",
+        "title": "建築物の敷地",
+        "subject": "建築物",
+        "property": "敷地",
+        "property_type": "geometric_surface",
+        "property_type_description": "幾何学概念（面形状） - 例: 隣地境界",
+        "plurality": "single",
+        "description": "判定対象となる建築物の敷地"
+      },
+      {
+        "id": "proc-site-read",
+        "type": "process",
+        "title": "敷地の特定",
+        "process_type": "undefined_input",
+        "process_type_description": "入力情報不定処理 - 導出されるアウトプット情報を得るための情報源の所在や手続きのメカニズムも含めて人が判断する処理。インプット情報を繋がない。左側の辺を消した状態で表示。",
+        "description": "設計図書等から建築物の敷地を読み取る"
+      },
+      {
+        "id": "info-site-parts",
+        "type": "information",
+        "title": "各地域・地区・区域内の敷地部分",
+        "subject": "敷地",
+        "property": "地域・地区・区域ごとの面積区分",
+        "property_type": "set_definition",
+        "property_type_description": "集合定義 - 主体と特定の関係にある他の主体がどれであるかを示す情報（例: 階に属する外壁の集合）【必須ケース: 建築物⇔屋根、建築物⇔外壁、敷地⇔建築物など親子関係がある場合】",
+        "plurality": "single",
+        "description": "敷地の各地域・地区・区域内にある各部分の特定",
+        "remarks": "52条1項・2項の容積率制限を受ける地域・地区・区域ごとに敷地を分割"
+      },
+      {
+        "id": "proc-divide-site",
+        "type": "process",
+        "title": "敷地の地域別区分",
+        "process_type": "mechanical",
+        "process_type_description": "機械的処理 - 自動化可能な論理演算や計算。視認情報をこれに繋ぐことはできない。水色で表示。",
+        "description": "敷地を用途地域・地区・区域の境界線で区分し各部分を特定",
+        "remarks": "都市計画情報（用途地域等の境界）との照合により自動化可能",
+        "related_articles": ["法::A52:P1", "法::A52:P2"]
+      },
+      {
+        "id": "info-area-parts",
+        "type": "information",
+        "title": "各部分の面積",
+        "symbol": "A_i",
+        "subject": "敷地部分",
+        "property": "面積",
+        "property_type": "numeric",
+        "property_type_description": "数値 - 大小関係に位置づけられる整数値または実数値（例: 延べ面積、高さ）",
+        "unit": "m²",
+        "plurality": "multiple",
+        "description": "各地域・地区・区域内にある敷地の各部分の面積"
+      },
+      {
+        "id": "proc-measure-parts",
+        "type": "process",
+        "title": "各部分の面積測定",
+        "process_type": "mechanical",
+        "process_type_description": "機械的処理 - 自動化可能な論理演算や計算。視認情報をこれに繋ぐことはできない。水色で表示。",
+        "target_subject": "敷地部分",
+        "iteration": "iterative",
+        "description": "地域別に区分された敷地の各部分の面積を測定"
+      },
+      {
+        "id": "info-total-area",
+        "type": "information",
+        "title": "敷地面積",
+        "symbol": "A_total",
+        "subject": "敷地",
+        "property": "面積",
+        "property_type": "numeric",
+        "property_type_description": "数値 - 大小関係に位置づけられる整数値または実数値（例: 延べ面積、高さ）",
+        "unit": "m²",
+        "plurality": "single",
+        "description": "建築物の敷地全体の面積"
+      },
+      {
+        "id": "proc-calc-total",
+        "type": "process",
+        "title": "敷地面積算定",
+        "process_type": "mechanical",
+        "process_type_description": "機械的処理 - 自動化可能な論理演算や計算。視認情報をこれに繋ぐことはできない。水色で表示。",
+        "description": "敷地全体の面積を算定",
+        "logic_expression": "A_total = Σ A_i"
+      },
+      {
+        "id": "info-far-limits",
+        "type": "information",
+        "title": "各地域の容積率限度",
+        "symbol": "FAR_i",
+        "subject": "敷地部分",
+        "property": "適用される容積率限度",
+        "property_type": "numeric",
+        "property_type_description": "数値 - 大小関係に位置づけられる整数値または実数値（例: 延べ面積、高さ）",
+        "plurality": "multiple",
+        "description": "各地域・地区・区域に対して52条1項・2項が定める容積率の限度",
+        "related_articles": ["法::A52:P1", "法::A52:P2"]
+      },
+      {
+        "id": "proc-get-far-limits",
+        "type": "process",
+        "title": "容積率限度の取得",
+        "process_type": "mechanical",
+        "process_type_description": "機械的処理 - 自動化可能な論理演算や計算。視認情報をこれに繋ぐことはできない。水色で表示。",
+        "target_subject": "敷地部分",
+        "iteration": "iterative",
+        "description": "各地域・地区・区域の容積率限度（52条1項・2項による）を取得",
+        "remarks": "都市計画情報から容積率を取得"
+      },
+      {
+        "id": "info-area-ratios",
+        "type": "information",
+        "title": "各部分の面積割合",
+        "symbol": "r_i",
+        "subject": "敷地部分",
+        "property": "敷地面積に対する面積割合",
+        "property_type": "numeric",
+        "property_type_description": "数値 - 大小関係に位置づけられる整数値または実数値（例: 延べ面積、高さ）",
+        "plurality": "multiple",
+        "description": "各部分の面積の敷地面積に対する割合（A_i / A_total）"
+      },
+      {
+        "id": "proc-calc-ratios",
+        "type": "process",
+        "title": "面積割合算定",
+        "process_type": "mechanical",
+        "process_type_description": "機械的処理 - 自動化可能な論理演算や計算。視認情報をこれに繋ぐことはできない。水色で表示。",
+        "target_subject": "敷地部分",
+        "iteration": "iterative",
+        "description": "各部分の面積の敷地面積に対する割合を計算",
+        "logic_expression": "r_i = A_i / A_total"
+      },
+      {
+        "id": "info-weighted-products",
+        "type": "information",
+        "title": "加重積",
+        "symbol": "w_i",
+        "subject": "敷地部分",
+        "property": "容積率限度と面積割合の積",
+        "property_type": "numeric",
+        "property_type_description": "数値 - 大小関係に位置づけられる整数値または実数値（例: 延べ面積、高さ）",
+        "plurality": "multiple",
+        "description": "各地域の容積率限度にその敷地部分の面積割合を乗じた値（w_i = FAR_i × r_i）"
+      },
+      {
+        "id": "proc-calc-products",
+        "type": "process",
+        "title": "加重積算定",
+        "process_type": "mechanical",
+        "process_type_description": "機械的処理 - 自動化可能な論理演算や計算。視認情報をこれに繋ぐことはできない。水色で表示。",
+        "target_subject": "敷地部分",
+        "iteration": "iterative",
+        "description": "容積率限度と面積割合を乗算",
+        "logic_expression": "w_i = FAR_i × r_i"
+      },
+      {
+        "id": "info-far-limit-weighted",
+        "type": "information",
+        "title": "適合すべき容積率限度",
+        "symbol": "FAR_limit",
+        "subject": "建築物",
+        "property": "加重平均による容積率限度",
+        "property_type": "numeric",
+        "property_type_description": "数値 - 大小関係に位置づけられる整数値または実数値（例: 延べ面積、高さ）",
+        "plurality": "single",
+        "description": "各地域の加重積の合計値（Σ(FAR_i × r_i)）"
+      },
+      {
+        "id": "proc-sum-weighted",
+        "type": "process",
+        "title": "加重平均算定",
+        "process_type": "mechanical",
+        "process_type_description": "機械的処理 - 自動化可能な論理演算や計算。視認情報をこれに繋ぐことはできない。水色で表示。",
+        "description": "加重積の合計を算出",
+        "logic_expression": "FAR_limit = Σ(FAR_i × r_i)"
+      },
+      {
+        "id": "info-gross-area",
+        "type": "information",
+        "title": "建築物の延べ面積",
+        "symbol": "GFA",
+        "subject": "建築物",
+        "property": "延べ面積",
+        "property_type": "numeric",
+        "property_type_description": "数値 - 大小関係に位置づけられる整数値または実数値（例: 延べ面積、高さ）",
+        "unit": "m²",
+        "plurality": "single",
+        "description": "建築物の延べ面積"
+      },
+      {
+        "id": "proc-read-gross-area",
+        "type": "process",
+        "title": "延べ面積の特定",
+        "process_type": "undefined_input",
+        "process_type_description": "入力情報不定処理 - 導出されるアウトプット情報を得るための情報源の所在や手続きのメカニズムも含めて人が判断する処理。インプット情報を繋がない。左側の辺を消した状態で表示。",
+        "description": "設計図書等から建築物の延べ面積を読み取る"
+      },
+      {
+        "id": "info-far-actual",
+        "type": "information",
+        "title": "建築物の容積率",
+        "symbol": "FAR_actual",
+        "subject": "建築物",
+        "property": "容積率（延べ面積/敷地面積）",
+        "property_type": "numeric",
+        "property_type_description": "数値 - 大小関係に位置づけられる整数値または実数値（例: 延べ面積、高さ）",
+        "plurality": "single",
+        "description": "建築物の延べ面積の敷地面積に対する割合"
+      },
+      {
+        "id": "proc-calc-far",
+        "type": "process",
+        "title": "容積率算定",
+        "process_type": "mechanical",
+        "process_type_description": "機械的処理 - 自動化可能な論理演算や計算。視認情報をこれに繋ぐことはできない。水色で表示。",
+        "description": "建築物の容積率を算定",
+        "logic_expression": "FAR_actual = GFA / A_total"
+      },
+      {
+        "id": "info-compliance",
+        "type": "information",
+        "title": "法52条7項適合",
+        "symbol": "C",
+        "subject": "建築物",
+        "property": "容積率が加重平均限度以下であること",
+        "property_type": "proposition",
+        "property_type_description": "命題真偽 - 真か偽かが判定可能な事実（例: 技術基準を満たすか否か）",
+        "plurality": "single",
+        "description": "建築物の容積率が加重平均による限度以下であること"
+      },
+      {
+        "id": "proc-judge-compliance",
+        "type": "process",
+        "title": "容積率制限適合判定",
+        "process_type": "mechanical",
+        "process_type_description": "機械的処理 - 自動化可能な論理演算や計算。視認情報をこれに繋ぐことはできない。水色で表示。",
+        "description": "容積率が加重平均限度以下であるかを判定",
+        "logic_expression": "C = (FAR_actual ≤ FAR_limit)"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-site-read",
+        "to": "info-site",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "info-site",
+        "to": "proc-divide-site",
+        "role": "input"
+      },
+      {
+        "id": "e03",
+        "from": "proc-divide-site",
+        "to": "info-site-parts",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "info-site-parts",
+        "to": "proc-measure-parts",
+        "role": "input"
+      },
+      {
+        "id": "e05",
+        "from": "proc-measure-parts",
+        "to": "info-area-parts",
+        "role": "output"
+      },
+      {
+        "id": "e06",
+        "from": "info-area-parts",
+        "to": "proc-calc-total",
+        "role": "input"
+      },
+      {
+        "id": "e07",
+        "from": "proc-calc-total",
+        "to": "info-total-area",
+        "role": "output"
+      },
+      {
+        "id": "e08",
+        "from": "info-site-parts",
+        "to": "proc-get-far-limits",
+        "role": "input"
+      },
+      {
+        "id": "e09",
+        "from": "proc-get-far-limits",
+        "to": "info-far-limits",
+        "role": "output"
+      },
+      {
+        "id": "e10",
+        "from": "info-area-parts",
+        "to": "proc-calc-ratios",
+        "role": "input"
+      },
+      {
+        "id": "e11",
+        "from": "info-total-area",
+        "to": "proc-calc-ratios",
+        "role": "input"
+      },
+      {
+        "id": "e12",
+        "from": "proc-calc-ratios",
+        "to": "info-area-ratios",
+        "role": "output"
+      },
+      {
+        "id": "e13",
+        "from": "info-far-limits",
+        "to": "proc-calc-products",
+        "role": "input"
+      },
+      {
+        "id": "e14",
+        "from": "info-area-ratios",
+        "to": "proc-calc-products",
+        "role": "input"
+      },
+      {
+        "id": "e15",
+        "from": "proc-calc-products",
+        "to": "info-weighted-products",
+        "role": "output"
+      },
+      {
+        "id": "e16",
+        "from": "info-weighted-products",
+        "to": "proc-sum-weighted",
+        "role": "input"
+      },
+      {
+        "id": "e17",
+        "from": "proc-sum-weighted",
+        "to": "info-far-limit-weighted",
+        "role": "output"
+      },
+      {
+        "id": "e18",
+        "from": "proc-read-gross-area",
+        "to": "info-gross-area",
+        "role": "output"
+      },
+      {
+        "id": "e19",
+        "from": "info-gross-area",
+        "to": "proc-calc-far",
+        "role": "input"
+      },
+      {
+        "id": "e20",
+        "from": "info-total-area",
+        "to": "proc-calc-far",
+        "role": "input"
+      },
+      {
+        "id": "e21",
+        "from": "proc-calc-far",
+        "to": "info-far-actual",
+        "role": "output"
+      },
+      {
+        "id": "e22",
+        "from": "info-far-actual",
+        "to": "proc-judge-compliance",
+        "role": "input"
+      },
+      {
+        "id": "e23",
+        "from": "info-far-limit-weighted",
+        "to": "proc-judge-compliance",
+        "role": "input"
+      },
+      {
+        "id": "e24",
+        "from": "proc-judge-compliance",
+        "to": "info-compliance",
+        "role": "output"
+      }
+    ]
+  },
+  "metadata": {
+    "created_at": "2025-12-24T00:00:00Z",
+    "author": "Claude Sonnet 4.5",
+    "generator": "kijo-generator-manual",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法",
+    "source": "e-Gov法令API"
+  }
+}

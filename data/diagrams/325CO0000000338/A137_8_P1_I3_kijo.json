@@ -1,0 +1,319 @@
+{
+  "id": "CHK-EXT-A137-8-P1-I3",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "容積率に係る対象部分床面積の割合判定（第3号）",
+    "target_subject": "対象部分",
+    "description": "増築又は改築後における対象部分（自動車車庫等、備蓄倉庫、蓄電池、自家発電、貯水槽、宅配ボックス）の床面積が令2条3項各号の割合を超えないかの判定"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "137_8",
+    "paragraph": "1",
+    "item": "3"
+  },
+  "labels": [
+    "既存不適格建築物",
+    "増改築",
+    "容積率",
+    "床面積不算入"
+  ],
+  "text_raw": "三 増築又は改築後における自動車車庫等部分の床面積の合計、備蓄倉庫部分の床面積の合計、蓄電池設置部分の床面積の合計、自家発電設備設置部分の床面積の合計、貯水槽設置部分の床面積の合計又は宅配ボックス設置部分の床面積の合計（以下この号において「対象部分の床面積の合計」という。）が、第二条第三項各号に掲げる建築物の部分の区分に応じ、増築又は改築後における当該建築物の床面積の合計に当該各号に定める割合を乗じて得た面積（改築の場合において、基準時における対象部分の床面積の合計が同項各号に掲げる建築物の部分の区分に応じ基準時における当該建築物の床面積の合計に当該各号に定める割合を乗じて得た面積を超えているときは、基準時における対象部分の床面積の合計）を超えないものであること。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "building_type",
+          "value": "法第3条第2項の規定により容積率規定の適用を受けない建築物"
+        },
+        {
+          "type": "work_type",
+          "value": "増築又は改築"
+        }
+      ],
+      "note": "対象部分（車庫、備蓄倉庫、蓄電池、自家発電、貯水槽、宅配ボックス）の床面積割合判定"
+    },
+    "judgment_rule": {
+      "operator": "CASE",
+      "description": "改築の場合で基準時に割合超過していた場合は特例あり",
+      "cases": [
+        {
+          "condition": "増築の場合、又は改築で基準時に割合超過していない場合",
+          "rule": "対象部分床面積 <= 増改築後床面積 × 令2条3項の割合"
+        },
+        {
+          "condition": "改築で基準時に割合超過していた場合",
+          "rule": "対象部分床面積 <= 基準時の対象部分床面積"
+        }
+      ]
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-work-type",
+        "type": "process",
+        "title": "工事内容の特定",
+        "process_type": "undefined_input",
+        "description": "当該工事が増築又は改築であるかを確認"
+      },
+      {
+        "id": "info-work-type",
+        "type": "information",
+        "title": "工事内容",
+        "symbol": "W",
+        "subject": "建築物",
+        "property": "工事の種別",
+        "property_type": "classification",
+        "plurality": "single",
+        "description": "当該工事が増築か改築かを判定"
+      },
+      {
+        "id": "proc-target-part",
+        "type": "process",
+        "title": "対象部分の特定",
+        "process_type": "undefined_input",
+        "description": "増改築後における対象部分（自動車車庫等、備蓄倉庫、蓄電池、自家発電、貯水槽、宅配ボックス）を特定"
+      },
+      {
+        "id": "info-target-part",
+        "type": "information",
+        "title": "対象部分",
+        "subject": "建築物",
+        "property": "対象部分の特定",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "増改築後における対象部分（床面積不算入対象となる部分）を特定"
+      },
+      {
+        "id": "proc-target-part-area",
+        "type": "process",
+        "title": "対象部分床面積の算定",
+        "process_type": "mechanical",
+        "target_subject": "対象部分",
+        "description": "増改築後における各対象部分の床面積の合計を算定"
+      },
+      {
+        "id": "info-target-part-area",
+        "type": "information",
+        "title": "対象部分床面積",
+        "symbol": "Ap",
+        "subject": "建築物",
+        "property": "対象部分床面積",
+        "property_type": "numeric",
+        "unit": "m2",
+        "plurality": "single",
+        "description": "増改築後における対象部分の床面積の合計"
+      },
+      {
+        "id": "proc-post-total-area",
+        "type": "process",
+        "title": "増改築後総床面積の算定",
+        "process_type": "mechanical",
+        "description": "増築又は改築後における建築物の床面積の合計を算定"
+      },
+      {
+        "id": "info-post-total-area",
+        "type": "information",
+        "title": "増改築後総床面積",
+        "symbol": "At",
+        "subject": "建築物",
+        "property": "増改築後総床面積",
+        "property_type": "numeric",
+        "unit": "m2",
+        "plurality": "single",
+        "description": "増築又は改築後における建築物の床面積の合計"
+      },
+      {
+        "id": "proc-ratio-limit",
+        "type": "process",
+        "title": "割合上限の算定",
+        "process_type": "mechanical",
+        "description": "増改築後床面積に令2条3項各号の割合を乗じて上限を算出",
+        "logic_expression": "Alim1 = At × r（令2条3項の割合）",
+        "related_articles": ["令::A2:P3"]
+      },
+      {
+        "id": "info-ratio-limit",
+        "type": "information",
+        "title": "割合上限",
+        "symbol": "Alim1",
+        "subject": "建築物",
+        "property": "割合上限",
+        "property_type": "numeric",
+        "unit": "m2",
+        "plurality": "single",
+        "description": "増改築後床面積に令2条3項各号の割合を乗じた面積"
+      },
+      {
+        "id": "proc-base-total-area",
+        "type": "process",
+        "title": "基準時総床面積の特定",
+        "process_type": "undefined_input",
+        "description": "基準時における建築物の床面積の合計を確認"
+      },
+      {
+        "id": "info-base-total-area",
+        "type": "information",
+        "title": "基準時総床面積",
+        "symbol": "Atb",
+        "subject": "建築物",
+        "property": "基準時総床面積",
+        "property_type": "numeric",
+        "unit": "m2",
+        "plurality": "single",
+        "description": "基準時における建築物の床面積の合計"
+      },
+      {
+        "id": "proc-base-target-area",
+        "type": "process",
+        "title": "基準時対象部分床面積の特定",
+        "process_type": "undefined_input",
+        "description": "基準時における対象部分の床面積の合計を確認"
+      },
+      {
+        "id": "info-base-target-area",
+        "type": "information",
+        "title": "基準時対象部分床面積",
+        "symbol": "Apb",
+        "subject": "建築物",
+        "property": "基準時対象部分床面積",
+        "property_type": "numeric",
+        "unit": "m2",
+        "plurality": "single",
+        "description": "基準時における対象部分の床面積の合計"
+      },
+      {
+        "id": "proc-base-ratio-limit",
+        "type": "process",
+        "title": "基準時割合上限の算定",
+        "process_type": "mechanical",
+        "description": "基準時床面積に令2条3項各号の割合を乗じて基準時の上限を算出",
+        "logic_expression": "Alim2 = Atb × r（令2条3項の割合）"
+      },
+      {
+        "id": "info-base-ratio-limit",
+        "type": "information",
+        "title": "基準時割合上限",
+        "symbol": "Alim2",
+        "subject": "建築物",
+        "property": "基準時割合上限",
+        "property_type": "numeric",
+        "unit": "m2",
+        "plurality": "single",
+        "description": "基準時床面積に令2条3項各号の割合を乗じた面積"
+      },
+      {
+        "id": "proc-base-exceeded-check",
+        "type": "process",
+        "title": "基準時超過判定",
+        "process_type": "mechanical",
+        "description": "改築の場合において、基準時の対象部分床面積が基準時の割合上限を超えていたか判定",
+        "logic_expression": "W = 改築 AND Apb > Alim2"
+      },
+      {
+        "id": "info-base-exceeded",
+        "type": "information",
+        "title": "基準時超過該当",
+        "symbol": "BE",
+        "subject": "建築物",
+        "property": "基準時超過該当",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "改築の場合で基準時に割合超過していたか"
+      },
+      {
+        "id": "proc-effective-limit",
+        "type": "process",
+        "title": "適用上限の決定",
+        "process_type": "mechanical",
+        "description": "基準時超過該当の場合は基準時対象部分床面積、それ以外は割合上限を適用上限とする",
+        "logic_expression": "Aeff = IF(BE, Apb, Alim1)"
+      },
+      {
+        "id": "info-effective-limit",
+        "type": "information",
+        "title": "適用上限",
+        "symbol": "Aeff",
+        "subject": "建築物",
+        "property": "適用上限",
+        "property_type": "numeric",
+        "unit": "m2",
+        "plurality": "single",
+        "description": "実際に適用される対象部分床面積の上限"
+      },
+      {
+        "id": "proc-final-judgment",
+        "type": "process",
+        "title": "第3号適合判定",
+        "process_type": "mechanical",
+        "description": "対象部分床面積が適用上限以下であるか判定",
+        "logic_expression": "Ap <= Aeff"
+      },
+      {
+        "id": "info-final-compliance",
+        "type": "information",
+        "title": "第3号適合",
+        "subject": "建築物",
+        "property": "令137条の8第1項第3号適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "対象部分床面積が令第137条の8第1項第3号に適合するか"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "proc-work-type", "to": "info-work-type", "role": "output" },
+      { "id": "e02", "from": "proc-target-part", "to": "info-target-part", "role": "output" },
+      { "id": "e03", "from": "info-target-part", "to": "proc-target-part-area", "role": "input" },
+      { "id": "e04", "from": "proc-target-part-area", "to": "info-target-part-area", "role": "output" },
+      { "id": "e05", "from": "proc-post-total-area", "to": "info-post-total-area", "role": "output" },
+      { "id": "e06", "from": "info-post-total-area", "to": "proc-ratio-limit", "role": "input" },
+      { "id": "e07", "from": "proc-ratio-limit", "to": "info-ratio-limit", "role": "output" },
+      { "id": "e08", "from": "proc-base-total-area", "to": "info-base-total-area", "role": "output" },
+      { "id": "e09", "from": "proc-base-target-area", "to": "info-base-target-area", "role": "output" },
+      { "id": "e10", "from": "info-base-total-area", "to": "proc-base-ratio-limit", "role": "input" },
+      { "id": "e11", "from": "proc-base-ratio-limit", "to": "info-base-ratio-limit", "role": "output" },
+      { "id": "e12", "from": "info-work-type", "to": "proc-base-exceeded-check", "role": "input" },
+      { "id": "e13", "from": "info-base-target-area", "to": "proc-base-exceeded-check", "role": "input" },
+      { "id": "e14", "from": "info-base-ratio-limit", "to": "proc-base-exceeded-check", "role": "input" },
+      { "id": "e15", "from": "proc-base-exceeded-check", "to": "info-base-exceeded", "role": "output" },
+      { "id": "e16", "from": "info-base-exceeded", "to": "proc-effective-limit", "role": "input" },
+      { "id": "e17", "from": "info-base-target-area", "to": "proc-effective-limit", "role": "input" },
+      { "id": "e18", "from": "info-ratio-limit", "to": "proc-effective-limit", "role": "input" },
+      { "id": "e19", "from": "proc-effective-limit", "to": "info-effective-limit", "role": "output" },
+      { "id": "e20", "from": "info-target-part-area", "to": "proc-final-judgment", "role": "input" },
+      { "id": "e21", "from": "info-effective-limit", "to": "proc-final-judgment", "role": "input" },
+      { "id": "e22", "from": "proc-final-judgment", "to": "info-final-compliance", "role": "output" }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": ["A3:P2", "A52", "A86_7:P1"],
+      "description": "法第3条第2項の既存不適格建築物の取扱、容積率に関する規定、法第86条の7第1項の緩和規定"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": ["A2:P3"],
+      "description": "床面積不算入部分の割合（自動車車庫等1/5、備蓄倉庫1/50、蓄電池1/50、自家発電1/100、貯水槽1/100、宅配ボックス1/100）"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T16:30:00+09:00",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令",
+    "source": "e-Gov法令API"
+  }
+}

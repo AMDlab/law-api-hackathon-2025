@@ -1,0 +1,300 @@
+{
+  "id": "CHK-BSL-A52-P5",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "地盤面の条例による別定の確認",
+    "target_subject": "建築物",
+    "description": "容積率算定に用いる地盤面について、地方公共団体の条例による別定が適用されるか確認する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "52",
+    "paragraph": "5"
+  },
+  "labels": [
+    "集団規定",
+    "容積率"
+  ],
+  "text_raw": "地方公共団体は、土地の状況等により必要と認める場合においては、前項の規定にかかわらず、政令で定める基準に従い、条例で、区域を限り、第三項の地盤面を別に定めることができる。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "地方公共団体が条例で地盤面を別に定めた区域内"
+        }
+      ],
+      "note": "第52条第5項に基づき地方公共団体が条例で定める区域に限定"
+    },
+    "judgment_rule": {
+      "operator": "EXISTS",
+      "conditions": [
+        {
+          "type": "ordinance_existence",
+          "description": "当該地方公共団体において第52条第5項に基づく条例が制定されているか"
+        },
+        {
+          "type": "area_applicability",
+          "description": "当該敷地が条例で定める区域内にあるか"
+        }
+      ]
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "info-site-location",
+        "type": "information",
+        "title": "敷地の所在地",
+        "subject": "敷地",
+        "property": "所在地（地方公共団体名・地番）",
+        "property_type": "classification",
+        "property_type_description": "区分情報 - 既定のいくつかの区分の中のいずれかを示すもの（例: 用途地域、建物用途コード）",
+        "plurality": "single",
+        "description": "建築物の敷地がどの地方公共団体に属するかを特定"
+      },
+      {
+        "id": "proc-site-location-check",
+        "type": "process",
+        "title": "敷地所在地の特定",
+        "process_type": "undefined_input",
+        "process_type_description": "入力情報不定処理 - 導出されるアウトプット情報を得るための情報源の所在や手続きのメカニズムも含めて人が判断する処理。インプット情報を繋がない。左側の辺を消した状態で表示。",
+        "description": "設計図書等から建築物の敷地の所在地を読み取る"
+      },
+      {
+        "id": "info-ordinance-existence",
+        "type": "information",
+        "title": "条例の制定有無",
+        "subject": "当該地方公共団体",
+        "property": "法第52条第5項に基づく地盤面別定条例の制定有無",
+        "property_type": "proposition",
+        "property_type_description": "命題真偽 - 真か偽かが判定可能な事実（例: 技術基準を満たすか否か）",
+        "plurality": "single",
+        "description": "当該地方公共団体において法第52条第5項に基づく条例が制定されているか",
+        "symbol": "C1"
+      },
+      {
+        "id": "proc-ordinance-check",
+        "type": "process",
+        "title": "条例制定状況の確認",
+        "process_type": "mechanical",
+        "process_type_description": "機械的処理 - 自動化可能な論理演算や計算。視認情報をこれに繋ぐことはできない。水色で表示。",
+        "description": "当該地方公共団体の条例データベースから法第52条第5項に基づく条例の有無を照合",
+        "related_articles": ["法::A52:P5"]
+      },
+      {
+        "id": "info-designated-area-boundary",
+        "type": "information",
+        "title": "条例指定区域の範囲",
+        "subject": "条例指定区域",
+        "property": "区域境界線",
+        "property_type": "geometric_surface",
+        "property_type_description": "幾何学概念（面形状） - 例: 隣地境界",
+        "plurality": "single",
+        "description": "条例で地盤面の別定が適用される区域の境界",
+        "remarks": "条例が制定されている場合のみ存在"
+      },
+      {
+        "id": "proc-area-boundary-retrieve",
+        "type": "process",
+        "title": "指定区域境界の取得",
+        "process_type": "mechanical",
+        "process_type_description": "機械的処理 - 自動化可能な論理演算や計算。視認情報をこれに繋ぐことはできない。水色で表示。",
+        "description": "条例で定められた区域の境界情報を取得",
+        "remarks": "条例が存在する場合のみ実行"
+      },
+      {
+        "id": "info-site-geometry",
+        "type": "information",
+        "title": "敷地の形状",
+        "subject": "敷地",
+        "property": "敷地境界線",
+        "property_type": "geometric_surface",
+        "property_type_description": "幾何学概念（面形状） - 例: 隣地境界",
+        "plurality": "single",
+        "description": "建築物の敷地の形状・位置"
+      },
+      {
+        "id": "proc-site-geometry-check",
+        "type": "process",
+        "title": "敷地形状の特定",
+        "process_type": "undefined_input",
+        "process_type_description": "入力情報不定処理 - 導出されるアウトプット情報を得るための情報源の所在や手続きのメカニズムも含めて人が判断する処理。インプット情報を繋がない。左側の辺を消した状態で表示。",
+        "description": "設計図書等から敷地の形状・位置を読み取る"
+      },
+      {
+        "id": "info-applicability",
+        "type": "information",
+        "title": "条例指定区域内該当",
+        "subject": "敷地",
+        "property": "条例指定区域内にあるか",
+        "property_type": "proposition",
+        "property_type_description": "命題真偽 - 真か偽かが判定可能な事実（例: 技術基準を満たすか否か）",
+        "plurality": "single",
+        "description": "当該敷地が条例で定める区域内にあるか",
+        "symbol": "C2"
+      },
+      {
+        "id": "proc-applicability-check",
+        "type": "process",
+        "title": "区域内該当判定",
+        "process_type": "mechanical",
+        "process_type_description": "機械的処理 - 自動化可能な論理演算や計算。視認情報をこれに繋ぐことはできない。水色で表示。",
+        "description": "敷地が条例指定区域内に位置するかを幾何学的に判定",
+        "logic_expression": "敷地 ∩ 条例指定区域 ≠ ∅"
+      },
+      {
+        "id": "info-alternative-ground-level-def",
+        "type": "information",
+        "title": "条例で定める地盤面",
+        "subject": "条例指定区域",
+        "property": "地盤面の定義（第三項地盤面の代替定義）",
+        "property_type": "classification",
+        "property_type_description": "区分情報 - 既定のいくつかの区分の中のいずれかを示すもの（例: 用途地域、建物用途コード）",
+        "plurality": "single",
+        "description": "条例で別に定める地盤面の定義内容",
+        "related_articles": ["法::A52:P3", "法::A52:P4"],
+        "remarks": "条例が適用される場合に使用"
+      },
+      {
+        "id": "proc-ground-level-def-retrieve",
+        "type": "process",
+        "title": "地盤面定義の取得",
+        "process_type": "mechanical",
+        "process_type_description": "機械的処理 - 自動化可能な論理演算や計算。視認情報をこれに繋ぐことはできない。水色で表示。",
+        "description": "条例で定められた地盤面の定義内容を取得",
+        "related_articles": ["法::A52:P5"]
+      },
+      {
+        "id": "info-ordinance-applicable",
+        "type": "information",
+        "title": "条例適用該当",
+        "subject": "敷地",
+        "property": "法第52条第5項に基づく条例が適用されるか",
+        "property_type": "proposition",
+        "property_type_description": "命題真偽 - 真か偽かが判定可能な事実（例: 技術基準を満たすか否か）",
+        "plurality": "single",
+        "description": "当該敷地について条例による地盤面の別定が適用されるか",
+        "symbol": "R"
+      },
+      {
+        "id": "proc-final-judgment",
+        "type": "process",
+        "title": "条例適用判定",
+        "process_type": "mechanical",
+        "process_type_description": "機械的処理 - 自動化可能な論理演算や計算。視認情報をこれに繋ぐことはできない。水色で表示。",
+        "description": "条例が制定されており、かつ敷地が指定区域内にある場合に条例が適用される",
+        "logic_expression": "R = C1 AND C2",
+        "related_articles": ["法::A52:P5"]
+      }
+    ],
+    "edges": [
+      {
+        "id": "e1",
+        "from": "proc-site-location-check",
+        "to": "info-site-location",
+        "role": "output"
+      },
+      {
+        "id": "e2",
+        "from": "info-site-location",
+        "to": "proc-ordinance-check",
+        "role": "input"
+      },
+      {
+        "id": "e3",
+        "from": "proc-ordinance-check",
+        "to": "info-ordinance-existence",
+        "role": "output"
+      },
+      {
+        "id": "e4",
+        "from": "info-ordinance-existence",
+        "to": "proc-area-boundary-retrieve",
+        "role": "input"
+      },
+      {
+        "id": "e5",
+        "from": "proc-area-boundary-retrieve",
+        "to": "info-designated-area-boundary",
+        "role": "output"
+      },
+      {
+        "id": "e6",
+        "from": "proc-site-geometry-check",
+        "to": "info-site-geometry",
+        "role": "output"
+      },
+      {
+        "id": "e7",
+        "from": "info-site-geometry",
+        "to": "proc-applicability-check",
+        "role": "input"
+      },
+      {
+        "id": "e8",
+        "from": "info-designated-area-boundary",
+        "to": "proc-applicability-check",
+        "role": "input"
+      },
+      {
+        "id": "e9",
+        "from": "proc-applicability-check",
+        "to": "info-applicability",
+        "role": "output"
+      },
+      {
+        "id": "e10",
+        "from": "info-ordinance-existence",
+        "to": "proc-ground-level-def-retrieve",
+        "role": "input"
+      },
+      {
+        "id": "e11",
+        "from": "proc-ground-level-def-retrieve",
+        "to": "info-alternative-ground-level-def",
+        "role": "output"
+      },
+      {
+        "id": "e12",
+        "from": "info-ordinance-existence",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e13",
+        "from": "info-applicability",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e14",
+        "from": "proc-final-judgment",
+        "to": "info-ordinance-applicable",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "delegates_to",
+      "description": "政令で定める基準に従い条例を制定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-24T00:00:00Z",
+    "author": "Claude Sonnet 4.5",
+    "generator": "kijo-generator-skill",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法",
+    "checklist_ref": "確認審査報告書チェックリスト行101",
+    "source": "e-Gov法令API"
+  }
+}

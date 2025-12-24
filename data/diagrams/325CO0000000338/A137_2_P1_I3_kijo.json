@@ -1,0 +1,303 @@
+{
+  "id": "CHK-EXT-A137-2-P1-I3",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "構造耐力に係る既存不適格建築物の増改築 第3号基準",
+    "target_subject": "増築及び改築",
+    "description": "床面積が1/20以下の増築・改築について、構造方法がイ又はロのいずれかに適合するかの判定"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "137_2",
+    "paragraph": "1",
+    "item": "3"
+  },
+  "labels": [
+    "既存不適格建築物",
+    "増改築",
+    "構造耐力",
+    "第3号"
+  ],
+  "text_raw": "三 増築又は改築に係る部分の床面積の合計が基準時における延べ面積の二十分の一（五十平方メートルを超える場合にあつては、五十平方メートル）を超えないこと 増築又は改築後の建築物の構造方法が次のいずれかに適合するものであること。\nイ 次に掲げる基準に適合するものであること。\n（１）増築又は改築に係る部分が第三章及び第百二十九条の二の三の規定並びに法第四十条の規定に基づく条例の構造耐力に関する制限を定めた規定に適合すること。\n（２）増築又は改築に係る部分以外の部分の構造耐力上の危険性が増大しないこと。\nロ 前二号に定める基準のいずれかに適合するものであること。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "floor_area_range",
+          "value": "1/20以下"
+        }
+      ],
+      "note": "増改築部分の床面積が基準時延べ面積の1/20（上限50m2）以下"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "description": "イ: 増改築部分が構造規定適合かつ既存部分の危険性非増大",
+          "operator": "AND",
+          "conditions": [
+            { "description": "（１）増改築部分が第3章及び令129条の2の3等に適合" },
+            { "description": "（２）既存部分の構造耐力上の危険性が増大しない" }
+          ]
+        },
+        { "description": "ロ: 第1号又は第2号基準に適合" }
+      ]
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-target-floor-area",
+        "type": "process",
+        "title": "増改築部分床面積の確認",
+        "process_type": "undefined_input",
+        "description": "増築・改築に係る部分の床面積の合計を確認"
+      },
+      {
+        "id": "info-target-floor-area",
+        "type": "information",
+        "title": "増改築部分床面積",
+        "symbol": "At",
+        "subject": "増築・改築部分",
+        "property": "床面積の合計",
+        "property_type": "numeric",
+        "unit": "m2",
+        "plurality": "single",
+        "description": "増築・改築に係る部分の床面積の合計"
+      },
+      {
+        "id": "proc-range-check",
+        "type": "process",
+        "title": "床面積範囲確認",
+        "process_type": "mechanical",
+        "description": "床面積が1/20以下の範囲に該当するか確認",
+        "logic_expression": "At ≤ T20"
+      },
+      {
+        "id": "info-range-ok",
+        "type": "information",
+        "title": "第3号範囲該当",
+        "symbol": "R3",
+        "subject": "増築・改築部分",
+        "property": "第3号範囲該当",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "床面積が第3号の範囲（1/20以下）に該当するか"
+      },
+      {
+        "id": "proc-target-part",
+        "type": "process",
+        "title": "増築・改築部分の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書から増築又は改築に係る部分を特定"
+      },
+      {
+        "id": "info-target-part",
+        "type": "information",
+        "title": "増築・改築に係る部分",
+        "subject": "建築物",
+        "property": "増改築部分の特定",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "当該建築物における増築又は改築に係る部分を特定"
+      },
+      {
+        "id": "proc-existing-part",
+        "type": "process",
+        "title": "既存部分の特定",
+        "process_type": "undefined_input",
+        "description": "増築又は改築に係る部分以外の部分（既存部分）を特定"
+      },
+      {
+        "id": "info-existing-part",
+        "type": "information",
+        "title": "既存部分",
+        "subject": "建築物",
+        "property": "既存部分の特定",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "増築又は改築に係る部分以外の部分を特定"
+      },
+      {
+        "id": "proc-target-struct-check",
+        "type": "process",
+        "title": "増改築部分構造規定適合判定",
+        "process_type": "sub_diagram_reference",
+        "target_subject": "増築・改築部分",
+        "description": "増改築部分が第3章及び令129条の2の3、条例の構造耐力規定に適合するか判定",
+        "related_articles": ["令::A36〜A99", "令::A129_2_3"]
+      },
+      {
+        "id": "info-target-struct-compliance",
+        "type": "information",
+        "title": "増改築部分構造規定適合",
+        "symbol": "Ts",
+        "subject": "増築・改築部分",
+        "property": "構造規定適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "増改築部分が第3章及び条例規定に適合するか（イ（１））"
+      },
+      {
+        "id": "proc-danger-check",
+        "type": "process",
+        "title": "既存部分危険性増大判定",
+        "process_type": "human_judgment",
+        "target_subject": "既存部分",
+        "description": "既存部分の構造耐力上の危険性が増大しないか判定"
+      },
+      {
+        "id": "info-danger-check",
+        "type": "information",
+        "title": "既存部分危険性非増大",
+        "symbol": "D",
+        "subject": "既存部分",
+        "property": "構造耐力上の危険性非増大",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "既存部分の構造耐力上の危険性が増大しないか（イ（２））"
+      },
+      {
+        "id": "proc-route-a-check",
+        "type": "process",
+        "title": "イ適合判定",
+        "process_type": "mechanical",
+        "description": "イの要件（（１）構造規定適合かつ（２）危険性非増大）に適合するか判定",
+        "logic_expression": "Ts AND D"
+      },
+      {
+        "id": "info-route-a-compliance",
+        "type": "information",
+        "title": "イ適合",
+        "symbol": "Ra",
+        "subject": "建築物",
+        "property": "イ適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "第3号イの基準に適合するか"
+      },
+      {
+        "id": "proc-route-b-item1-ref",
+        "type": "process",
+        "title": "第1号基準適合判定",
+        "process_type": "sub_diagram_reference",
+        "sub_diagram_ref": "CHK-EXT-A137-2-P1-I1",
+        "description": "第1号に定める基準に適合するか判定",
+        "related_articles": ["令::A137_2:P1:I1"]
+      },
+      {
+        "id": "info-item1-compliance",
+        "type": "information",
+        "title": "第1号基準適合",
+        "symbol": "I1",
+        "subject": "建築物",
+        "property": "第1号基準適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "第1号に定める基準に適合するか"
+      },
+      {
+        "id": "proc-route-b-item2-ref",
+        "type": "process",
+        "title": "第2号基準適合判定",
+        "process_type": "sub_diagram_reference",
+        "sub_diagram_ref": "CHK-EXT-A137-2-P1-I2",
+        "description": "第2号に定める基準に適合するか判定",
+        "related_articles": ["令::A137_2:P1:I2"]
+      },
+      {
+        "id": "info-item2-compliance",
+        "type": "information",
+        "title": "第2号基準適合",
+        "symbol": "I2",
+        "subject": "建築物",
+        "property": "第2号基準適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "第2号に定める基準に適合するか"
+      },
+      {
+        "id": "proc-route-b-check",
+        "type": "process",
+        "title": "ロ適合判定",
+        "process_type": "mechanical",
+        "description": "ロ（第1号又は第2号基準）に適合するか判定",
+        "logic_expression": "I1 OR I2"
+      },
+      {
+        "id": "info-route-b-compliance",
+        "type": "information",
+        "title": "ロ適合",
+        "symbol": "Rb",
+        "subject": "建築物",
+        "property": "ロ適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "第3号ロの基準に適合するか"
+      },
+      {
+        "id": "proc-final-judgment",
+        "type": "process",
+        "title": "第3号適合判定",
+        "process_type": "mechanical",
+        "description": "イ又はロのいずれかに適合するか判定",
+        "logic_expression": "Ra OR Rb"
+      },
+      {
+        "id": "info-final-compliance",
+        "type": "information",
+        "title": "第3号適合",
+        "subject": "増築・改築部分",
+        "property": "第3号適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "令第137条の2第1項第3号に適合するか"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "proc-target-floor-area", "to": "info-target-floor-area", "role": "output" },
+      { "id": "e02", "from": "info-target-floor-area", "to": "proc-range-check", "role": "input" },
+      { "id": "e03", "from": "proc-range-check", "to": "info-range-ok", "role": "output" },
+      { "id": "e04", "from": "proc-target-part", "to": "info-target-part", "role": "output" },
+      { "id": "e05", "from": "proc-existing-part", "to": "info-existing-part", "role": "output" },
+      { "id": "e06", "from": "info-target-part", "to": "proc-target-struct-check", "role": "input" },
+      { "id": "e07", "from": "proc-target-struct-check", "to": "info-target-struct-compliance", "role": "output" },
+      { "id": "e08", "from": "info-existing-part", "to": "proc-danger-check", "role": "input" },
+      { "id": "e09", "from": "info-target-part", "to": "proc-danger-check", "role": "input" },
+      { "id": "e10", "from": "proc-danger-check", "to": "info-danger-check", "role": "output" },
+      { "id": "e11", "from": "info-target-struct-compliance", "to": "proc-route-a-check", "role": "input" },
+      { "id": "e12", "from": "info-danger-check", "to": "proc-route-a-check", "role": "input" },
+      { "id": "e13", "from": "proc-route-a-check", "to": "info-route-a-compliance", "role": "output" },
+      { "id": "e14", "from": "proc-route-b-item1-ref", "to": "info-item1-compliance", "role": "output" },
+      { "id": "e15", "from": "proc-route-b-item2-ref", "to": "info-item2-compliance", "role": "output" },
+      { "id": "e16", "from": "info-item1-compliance", "to": "proc-route-b-check", "role": "input" },
+      { "id": "e17", "from": "info-item2-compliance", "to": "proc-route-b-check", "role": "input" },
+      { "id": "e18", "from": "proc-route-b-check", "to": "info-route-b-compliance", "role": "output" },
+      { "id": "e19", "from": "info-route-a-compliance", "to": "proc-final-judgment", "role": "input" },
+      { "id": "e20", "from": "info-route-b-compliance", "to": "proc-final-judgment", "role": "input" },
+      { "id": "e21", "from": "proc-final-judgment", "to": "info-final-compliance", "role": "output" }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A40"],
+      "description": "法第40条に基づく条例の構造耐力規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T12:45:00+09:00",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令",
+    "source": "e-Gov法令API"
+  }
+}

@@ -1,0 +1,657 @@
+{
+  "id": "CHK-BSL-A25-P1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "大規模木造建築物等の外壁・軒裏・屋根の構造",
+    "target_subject": "木造建築物等",
+    "description": "延べ面積が1000㎡を超える木造建築物等の外壁・軒裏・屋根が所定の防火性能を満たすことを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "25",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "防火",
+    "大規模木造"
+  ],
+  "text_raw": "延べ面積（同一敷地内に二以上の木造建築物等がある場合においては、その延べ面積の合計）が千平方メートルを超える木造建築物等は、その外壁及び軒裏で延焼のおそれのある部分を防火構造とし、その屋根の構造を第二十二条第一項に規定する構造としなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "structure",
+          "value": "木造建築物等"
+        },
+        {
+          "type": "floor_area",
+          "operator": ">",
+          "value": 1000,
+          "unit": "m2"
+        }
+      ],
+      "note": "延べ面積（同一敷地内に二以上ある場合は合計）が1000㎡を超える木造建築物等"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "note": "外壁・軒裏の防火構造",
+          "operator": "OR",
+          "conditions": [
+            {
+              "ref": "info-no-ensho-parts",
+              "operator": "==",
+              "value": true
+            },
+            {
+              "ref": "info-fireproof-compliance",
+              "operator": "==",
+              "value": true
+            }
+          ]
+        },
+        {
+          "ref": "info-roof-a22-compliance",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-structure-type",
+        "type": "process",
+        "title": "構造種別の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の構造種別（木造、鉄骨造等）を特定する"
+      },
+      {
+        "id": "info-structure-type",
+        "type": "information",
+        "title": "建築物の構造種別",
+        "symbol": "S",
+        "subject": "建築物",
+        "property": "構造種別",
+        "property_type": "classification",
+        "description": "木造建築物等か否か",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-site-buildings",
+        "type": "process",
+        "title": "敷地内建築物の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から同一敷地内に存在する木造建築物等を特定する"
+      },
+      {
+        "id": "info-site-buildings-set",
+        "type": "information",
+        "title": "敷地内の木造建築物等",
+        "subject": "敷地",
+        "property": "木造建築物等の集合",
+        "property_type": "set_definition",
+        "description": "当該敷地内に存在する木造建築物等の集合",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-floor-area",
+        "type": "process",
+        "title": "延べ面積の特定",
+        "process_type": "human_judgment",
+        "target_subject": "建築物",
+        "iteration": "iterative",
+        "description": "設計図書等から各建築物の延べ面積を読み取る"
+      },
+      {
+        "id": "info-floor-area",
+        "type": "information",
+        "title": "建築物の延べ面積",
+        "symbol": "A",
+        "subject": "建築物",
+        "property": "延べ面積",
+        "property_type": "numeric",
+        "unit": "m2",
+        "description": "各建築物の延べ面積",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-total-area",
+        "type": "process",
+        "title": "延べ面積合計算出",
+        "process_type": "mechanical",
+        "description": "同一敷地内の木造建築物等の延べ面積の合計を算出",
+        "logic_expression": "A_total = Σ A_i"
+      },
+      {
+        "id": "info-total-area",
+        "type": "information",
+        "title": "延べ面積の合計",
+        "symbol": "A_total",
+        "subject": "敷地",
+        "property": "木造建築物等の延べ面積合計",
+        "property_type": "numeric",
+        "unit": "m2",
+        "description": "同一敷地内の木造建築物等の延べ面積の合計",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-scope-check",
+        "type": "process",
+        "title": "適用判定",
+        "process_type": "mechanical",
+        "description": "延べ面積合計が1000㎡を超える木造建築物等か判定",
+        "logic_expression": "(S = '木造建築物等') AND (A_total > 1000)"
+      },
+      {
+        "id": "info-scope",
+        "type": "information",
+        "title": "法25条1項適用対象",
+        "symbol": "SCOPE",
+        "subject": "建築物",
+        "property": "法25条1項適用対象該当",
+        "property_type": "proposition",
+        "description": "法25条1項の適用対象となる大規模木造建築物等か",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-walls-eaves-set",
+        "type": "process",
+        "title": "外壁・軒裏の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から判定対象となる外壁及び軒裏を特定する"
+      },
+      {
+        "id": "info-walls-eaves-set",
+        "type": "information",
+        "title": "建築物の外壁・軒裏",
+        "subject": "建築物",
+        "property": "外壁・軒裏の集合",
+        "property_type": "set_definition",
+        "description": "判定対象となる建築物に属する外壁及び軒裏を特定",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-ensho-check",
+        "type": "process",
+        "title": "延焼のおそれのある部分の判定",
+        "process_type": "mechanical",
+        "target_subject": "外壁・軒裏",
+        "iteration": "iterative",
+        "description": "隣地境界線等からの距離に基づき、外壁・軒裏の各部分が延焼のおそれのある部分に該当するかを判定",
+        "related_articles": [
+          "法::A2:I6"
+        ]
+      },
+      {
+        "id": "info-ensho-parts",
+        "type": "information",
+        "title": "延焼のおそれのある部分",
+        "symbol": "E",
+        "subject": "外壁・軒裏",
+        "property": "延焼のおそれのある部分への該当",
+        "property_type": "proposition",
+        "description": "当該外壁・軒裏が延焼のおそれのある部分に該当するか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-ensho-exists",
+        "type": "process",
+        "title": "延焼のおそれのある部分の存在確認",
+        "process_type": "mechanical",
+        "description": "延焼のおそれのある部分が存在するか確認",
+        "logic_expression": "∃part: E(part) = true"
+      },
+      {
+        "id": "info-ensho-exists",
+        "type": "information",
+        "title": "延焼のおそれのある部分の有無",
+        "symbol": "E_exist",
+        "subject": "建築物",
+        "property": "延焼のおそれのある外壁・軒裏の有無",
+        "property_type": "proposition",
+        "description": "外壁・軒裏に延焼のおそれのある部分が存在するか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-fireproof-structure",
+        "type": "process",
+        "title": "防火構造の特定",
+        "process_type": "human_judgment",
+        "target_subject": "外壁・軒裏",
+        "iteration": "iterative",
+        "description": "設計図書等から外壁・軒裏の防火構造仕様を特定する"
+      },
+      {
+        "id": "info-fireproof-structure",
+        "type": "information",
+        "title": "外壁・軒裏の構造",
+        "symbol": "F",
+        "subject": "外壁・軒裏",
+        "property": "防火構造仕様",
+        "property_type": "classification",
+        "description": "外壁・軒裏の防火構造仕様",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-fireproof-compliance",
+        "type": "process",
+        "title": "防火構造適合判定",
+        "process_type": "mechanical",
+        "target_subject": "外壁・軒裏",
+        "iteration": "iterative",
+        "description": "延焼のおそれのある部分について、防火構造に適合するか判定",
+        "related_articles": [
+          "法::A2:I8",
+          "令::A107"
+        ],
+        "logic_expression": "NOT E(part) OR 防火構造適合(F(part))"
+      },
+      {
+        "id": "info-fireproof-compliance-each",
+        "type": "information",
+        "title": "各部防火構造適合",
+        "symbol": "FC",
+        "subject": "外壁・軒裏",
+        "property": "防火構造適合",
+        "property_type": "proposition",
+        "description": "各外壁・軒裏が防火構造の要件を満たすか（延焼のおそれのない部分は適用除外）",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-all-fireproof-check",
+        "type": "process",
+        "title": "全外壁・軒裏適合確認",
+        "process_type": "mechanical",
+        "description": "全ての外壁・軒裏（延焼のおそれのある部分）が防火構造に適合することを確認",
+        "logic_expression": "∀part: FC(part) = true"
+      },
+      {
+        "id": "info-fireproof-compliance",
+        "type": "information",
+        "title": "外壁・軒裏の防火構造適合",
+        "symbol": "WALL_OK",
+        "subject": "建築物",
+        "property": "外壁・軒裏の防火構造適合",
+        "property_type": "proposition",
+        "description": "建築物の外壁・軒裏（延焼のおそれのある部分）が防火構造に適合するか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-no-ensho-parts",
+        "type": "process",
+        "title": "延焼のおそれのある部分不在判定",
+        "process_type": "mechanical",
+        "description": "外壁・軒裏に延焼のおそれのある部分が存在しない場合は要件を満たす",
+        "logic_expression": "NOT E_exist"
+      },
+      {
+        "id": "info-no-ensho-parts",
+        "type": "information",
+        "title": "延焼のおそれのある部分不在",
+        "symbol": "NO_ENSHO",
+        "subject": "建築物",
+        "property": "延焼のおそれのある外壁・軒裏不在",
+        "property_type": "proposition",
+        "description": "外壁・軒裏に延焼のおそれのある部分が存在しない",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-roofs-set",
+        "type": "process",
+        "title": "屋根の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から判定対象となる屋根を特定する"
+      },
+      {
+        "id": "info-roofs-set",
+        "type": "information",
+        "title": "建築物の屋根",
+        "subject": "建築物",
+        "property": "屋根の集合",
+        "property_type": "set_definition",
+        "description": "判定対象となる建築物に属する屋根を特定",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-roof-structure",
+        "type": "process",
+        "title": "屋根構造の特定",
+        "process_type": "human_judgment",
+        "target_subject": "屋根",
+        "iteration": "iterative",
+        "description": "設計図書等から屋根の構造方法を特定する"
+      },
+      {
+        "id": "info-roof-structure",
+        "type": "information",
+        "title": "屋根の構造",
+        "symbol": "R",
+        "subject": "屋根",
+        "property": "構造方法",
+        "property_type": "classification",
+        "description": "屋根の構造方法",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-roof-a22-compliance",
+        "type": "process",
+        "title": "法22条1項適合判定",
+        "process_type": "sub_diagram_reference",
+        "target_subject": "屋根",
+        "iteration": "iterative",
+        "description": "法22条1項に規定する構造（火の粉による発炎防止性能等）に適合するか判定",
+        "related_articles": [
+          "法::A22:P1"
+        ],
+        "sub_diagram_ref": "CHK-BSL-A22-P1"
+      },
+      {
+        "id": "info-roof-a22-compliance-each",
+        "type": "information",
+        "title": "各屋根の法22条1項適合",
+        "symbol": "R22",
+        "subject": "屋根",
+        "property": "法22条1項適合",
+        "property_type": "proposition",
+        "description": "各屋根が法22条1項の規定する構造に適合するか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-all-roof-check",
+        "type": "process",
+        "title": "全屋根適合確認",
+        "process_type": "mechanical",
+        "description": "全ての屋根が法22条1項に適合することを確認",
+        "logic_expression": "∀roof: R22(roof) = true"
+      },
+      {
+        "id": "info-roof-a22-compliance",
+        "type": "information",
+        "title": "屋根の法22条1項適合",
+        "symbol": "ROOF_OK",
+        "subject": "建築物",
+        "property": "屋根の法22条1項適合",
+        "property_type": "proposition",
+        "description": "建築物の屋根が法22条1項に規定する構造に適合するか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-final-judgment",
+        "type": "process",
+        "title": "最終適合判定",
+        "process_type": "mechanical",
+        "description": "外壁・軒裏の防火構造適合と屋根の法22条1項適合の両方を満たすことを確認",
+        "logic_expression": "(NO_ENSHO OR WALL_OK) AND ROOF_OK"
+      },
+      {
+        "id": "info-compliance",
+        "type": "information",
+        "title": "法25条1項適合",
+        "symbol": "COMPLY",
+        "subject": "建築物",
+        "property": "法25条1項適合",
+        "property_type": "proposition",
+        "description": "建築物が法25条1項の規定に適合するか",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-structure-type",
+        "to": "info-structure-type",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "proc-site-buildings",
+        "to": "info-site-buildings-set",
+        "role": "output"
+      },
+      {
+        "id": "e03",
+        "from": "info-site-buildings-set",
+        "to": "proc-floor-area",
+        "role": "input"
+      },
+      {
+        "id": "e04",
+        "from": "proc-floor-area",
+        "to": "info-floor-area",
+        "role": "output"
+      },
+      {
+        "id": "e05",
+        "from": "info-floor-area",
+        "to": "proc-total-area",
+        "role": "input"
+      },
+      {
+        "id": "e06",
+        "from": "proc-total-area",
+        "to": "info-total-area",
+        "role": "output"
+      },
+      {
+        "id": "e07",
+        "from": "info-structure-type",
+        "to": "proc-scope-check",
+        "role": "input"
+      },
+      {
+        "id": "e08",
+        "from": "info-total-area",
+        "to": "proc-scope-check",
+        "role": "input"
+      },
+      {
+        "id": "e09",
+        "from": "proc-scope-check",
+        "to": "info-scope",
+        "role": "output"
+      },
+      {
+        "id": "e09b",
+        "from": "info-scope",
+        "to": "proc-walls-eaves-set",
+        "role": "input"
+      },
+      {
+        "id": "e10",
+        "from": "proc-walls-eaves-set",
+        "to": "info-walls-eaves-set",
+        "role": "output"
+      },
+      {
+        "id": "e11",
+        "from": "info-walls-eaves-set",
+        "to": "proc-ensho-check",
+        "role": "input"
+      },
+      {
+        "id": "e12",
+        "from": "proc-ensho-check",
+        "to": "info-ensho-parts",
+        "role": "output"
+      },
+      {
+        "id": "e13",
+        "from": "info-ensho-parts",
+        "to": "proc-ensho-exists",
+        "role": "input"
+      },
+      {
+        "id": "e14",
+        "from": "proc-ensho-exists",
+        "to": "info-ensho-exists",
+        "role": "output"
+      },
+      {
+        "id": "e15",
+        "from": "info-walls-eaves-set",
+        "to": "proc-fireproof-structure",
+        "role": "input"
+      },
+      {
+        "id": "e16",
+        "from": "proc-fireproof-structure",
+        "to": "info-fireproof-structure",
+        "role": "output"
+      },
+      {
+        "id": "e17",
+        "from": "info-ensho-parts",
+        "to": "proc-fireproof-compliance",
+        "role": "input"
+      },
+      {
+        "id": "e18",
+        "from": "info-fireproof-structure",
+        "to": "proc-fireproof-compliance",
+        "role": "input"
+      },
+      {
+        "id": "e19",
+        "from": "proc-fireproof-compliance",
+        "to": "info-fireproof-compliance-each",
+        "role": "output"
+      },
+      {
+        "id": "e20",
+        "from": "info-fireproof-compliance-each",
+        "to": "proc-all-fireproof-check",
+        "role": "input"
+      },
+      {
+        "id": "e21",
+        "from": "proc-all-fireproof-check",
+        "to": "info-fireproof-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e22",
+        "from": "info-ensho-exists",
+        "to": "proc-no-ensho-parts",
+        "role": "input"
+      },
+      {
+        "id": "e23",
+        "from": "proc-no-ensho-parts",
+        "to": "info-no-ensho-parts",
+        "role": "output"
+      },
+      {
+        "id": "e23b",
+        "from": "info-scope",
+        "to": "proc-roofs-set",
+        "role": "input"
+      },
+      {
+        "id": "e24",
+        "from": "proc-roofs-set",
+        "to": "info-roofs-set",
+        "role": "output"
+      },
+      {
+        "id": "e25",
+        "from": "info-roofs-set",
+        "to": "proc-roof-structure",
+        "role": "input"
+      },
+      {
+        "id": "e26",
+        "from": "proc-roof-structure",
+        "to": "info-roof-structure",
+        "role": "output"
+      },
+      {
+        "id": "e27",
+        "from": "info-roof-structure",
+        "to": "proc-roof-a22-compliance",
+        "role": "input"
+      },
+      {
+        "id": "e28",
+        "from": "proc-roof-a22-compliance",
+        "to": "info-roof-a22-compliance-each",
+        "role": "output"
+      },
+      {
+        "id": "e29",
+        "from": "info-roof-a22-compliance-each",
+        "to": "proc-all-roof-check",
+        "role": "input"
+      },
+      {
+        "id": "e30",
+        "from": "proc-all-roof-check",
+        "to": "info-roof-a22-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e31",
+        "from": "info-no-ensho-parts",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e32",
+        "from": "info-fireproof-compliance",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e33",
+        "from": "info-roof-a22-compliance",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e34",
+        "from": "proc-final-judgment",
+        "to": "info-compliance",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": [
+        "A2:I6",
+        "A2:I8",
+        "A22:P1"
+      ],
+      "description": "延焼のおそれのある部分、防火構造、屋根の構造を定義・規定"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "delegates_to",
+      "articles": [
+        "A107"
+      ],
+      "description": "防火構造の技術的基準を定める"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-23T09:00:00Z",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

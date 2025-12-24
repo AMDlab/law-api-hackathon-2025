@@ -1,0 +1,388 @@
+{
+  "id": "CHK-BSL-A28-P2",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "居室の換気",
+    "target_subject": "居室",
+    "description": "居室における換気有効面積が所定の基準を満たすこと、または換気設備が技術的基準に従っていることを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "28",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "衛生"
+  ],
+  "text_raw": "居室には換気のための窓その他の開口部を設け、その換気に有効な部分の面積は、その居室の床面積に対して、二十分の一以上としなければならない。ただし、政令で定める技術的基準に従つて換気設備を設けた場合においては、この限りでない。",
+  "compliance_logic": {
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "operator": ">=",
+          "lhs": {
+            "ref": "info-effective-vent-area",
+            "description": "換気有効面積"
+          },
+          "rhs": {
+            "operator": "*",
+            "lhs": {
+              "ref": "info-floor-area",
+              "description": "居室床面積"
+            },
+            "rhs": {
+              "value": 0.05,
+              "description": "1/20"
+            }
+          }
+        },
+        {
+          "ref": "info-equipment-compliant",
+          "value": true,
+          "description": "政令で定める技術的基準に従った換気設備を設けている"
+        }
+      ]
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-rooms-set",
+        "type": "process",
+        "title": "判定対象居室の特定",
+        "process_type": "undefined_input",
+        "description": "建築物に属する居室を特定する"
+      },
+      {
+        "id": "info-rooms-set",
+        "type": "information",
+        "title": "建築物の居室",
+        "subject": "建築物",
+        "property": "居室の集合",
+        "property_type": "set_definition",
+        "description": "判定対象となる建築物に属する居室を特定",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-floor-area",
+        "type": "process",
+        "title": "居室床面積の特定",
+        "process_type": "human_judgment",
+        "target_subject": "居室",
+        "iteration": "iterative",
+        "description": "設計図書等から各居室の床面積を読み取る"
+      },
+      {
+        "id": "info-floor-area",
+        "type": "information",
+        "title": "居室の床面積",
+        "symbol": "A",
+        "subject": "居室",
+        "property": "床面積",
+        "property_type": "numeric",
+        "unit": "m2",
+        "description": "各居室の床面積",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-openings-set",
+        "type": "process",
+        "title": "換気用開口部の特定",
+        "process_type": "human_judgment",
+        "target_subject": "居室",
+        "iteration": "iterative",
+        "description": "各居室に設けられた換気のための窓その他の開口部を特定する"
+      },
+      {
+        "id": "info-openings-set",
+        "type": "information",
+        "title": "居室の換気用開口部",
+        "subject": "居室",
+        "property": "換気用開口部の集合",
+        "property_type": "set_definition",
+        "description": "各居室に属する換気のための窓その他の開口部を特定",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-effective-vent-area",
+        "type": "process",
+        "title": "換気有効面積の算定",
+        "process_type": "mechanical",
+        "target_subject": "居室",
+        "iteration": "iterative",
+        "description": "各開口部の換気に有効な部分の面積を算定",
+        "related_articles": [
+          "令::A20_2"
+        ],
+        "logic_expression": "Σ(換気用開口部面積)"
+      },
+      {
+        "id": "info-effective-vent-area",
+        "type": "information",
+        "title": "換気有効面積",
+        "symbol": "Av",
+        "subject": "居室",
+        "property": "換気有効面積",
+        "property_type": "numeric",
+        "unit": "m2",
+        "description": "換気のための窓その他の開口部の換気に有効な部分の面積",
+        "related_articles": [
+          "令::A20_2"
+        ],
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-area-ratio-check",
+        "type": "process",
+        "title": "換気面積比判定",
+        "process_type": "mechanical",
+        "target_subject": "居室",
+        "iteration": "iterative",
+        "description": "換気有効面積が居室床面積の1/20以上であることを確認",
+        "logic_expression": "Av ≥ A × (1/20)"
+      },
+      {
+        "id": "info-area-ratio-ok",
+        "type": "information",
+        "title": "換気面積基準適合",
+        "symbol": "Ok1",
+        "subject": "居室",
+        "property": "換気面積基準適合",
+        "property_type": "proposition",
+        "description": "換気有効面積が所定の基準（床面積の1/20以上）を満たすか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-equipment-check",
+        "type": "process",
+        "title": "換気設備の確認",
+        "process_type": "human_judgment",
+        "target_subject": "居室",
+        "iteration": "iterative",
+        "description": "換気設備の有無と仕様を設計図書等から確認"
+      },
+      {
+        "id": "info-equipment-exists",
+        "type": "information",
+        "title": "換気設備の有無",
+        "symbol": "E",
+        "subject": "居室",
+        "property": "換気設備の有無",
+        "property_type": "proposition",
+        "description": "換気設備が設けられているか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-equipment-compliance",
+        "type": "process",
+        "title": "換気設備の技術基準適合判定",
+        "process_type": "mechanical",
+        "target_subject": "居室",
+        "iteration": "iterative",
+        "description": "換気設備が政令で定める技術的基準に従っているか判定",
+        "related_articles": [
+          "令::A20_3",
+          "令::A129_2_6"
+        ],
+        "logic_expression": "E AND (技術基準適合)"
+      },
+      {
+        "id": "info-equipment-compliant",
+        "type": "information",
+        "title": "換気設備技術基準適合",
+        "symbol": "Ok2",
+        "subject": "居室",
+        "property": "換気設備技術基準適合",
+        "property_type": "proposition",
+        "description": "政令で定める技術的基準に従った換気設備を設けているか",
+        "related_articles": [
+          "令::A20_3",
+          "令::A129_2_6"
+        ],
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-final-judgment",
+        "type": "process",
+        "title": "適合判定",
+        "process_type": "mechanical",
+        "target_subject": "居室",
+        "iteration": "iterative",
+        "description": "各居室について、換気面積基準適合または換気設備技術基準適合のいずれかを満たすことを確認",
+        "logic_expression": "Ok1 OR Ok2"
+      },
+      {
+        "id": "info-compliance",
+        "type": "information",
+        "title": "法28条2項適合",
+        "symbol": "C",
+        "subject": "居室",
+        "property": "法28条2項適合",
+        "property_type": "proposition",
+        "description": "居室が法28条2項の規定に適合するか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-all-check",
+        "type": "process",
+        "title": "全居室適合確認",
+        "process_type": "mechanical",
+        "description": "全ての居室が法28条2項に適合することを確認",
+        "logic_expression": "∀room ∈ Rooms: C(room) = true"
+      },
+      {
+        "id": "info-final",
+        "type": "information",
+        "title": "建築物の法28条2項適合",
+        "subject": "建築物",
+        "property": "法28条2項適合",
+        "property_type": "proposition",
+        "description": "建築物全体として法28条2項の規定に適合するか",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-rooms-set",
+        "to": "info-rooms-set",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "info-rooms-set",
+        "to": "proc-floor-area",
+        "role": "input"
+      },
+      {
+        "id": "e03",
+        "from": "proc-floor-area",
+        "to": "info-floor-area",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "info-rooms-set",
+        "to": "proc-openings-set",
+        "role": "input"
+      },
+      {
+        "id": "e05",
+        "from": "proc-openings-set",
+        "to": "info-openings-set",
+        "role": "output"
+      },
+      {
+        "id": "e06",
+        "from": "info-openings-set",
+        "to": "proc-effective-vent-area",
+        "role": "input"
+      },
+      {
+        "id": "e07",
+        "from": "proc-effective-vent-area",
+        "to": "info-effective-vent-area",
+        "role": "output"
+      },
+      {
+        "id": "e08",
+        "from": "info-effective-vent-area",
+        "to": "proc-area-ratio-check",
+        "role": "input"
+      },
+      {
+        "id": "e09",
+        "from": "info-floor-area",
+        "to": "proc-area-ratio-check",
+        "role": "input"
+      },
+      {
+        "id": "e10",
+        "from": "proc-area-ratio-check",
+        "to": "info-area-ratio-ok",
+        "role": "output"
+      },
+      {
+        "id": "e11",
+        "from": "info-rooms-set",
+        "to": "proc-equipment-check",
+        "role": "input"
+      },
+      {
+        "id": "e12",
+        "from": "proc-equipment-check",
+        "to": "info-equipment-exists",
+        "role": "output"
+      },
+      {
+        "id": "e13",
+        "from": "info-equipment-exists",
+        "to": "proc-equipment-compliance",
+        "role": "input"
+      },
+      {
+        "id": "e14",
+        "from": "proc-equipment-compliance",
+        "to": "info-equipment-compliant",
+        "role": "output"
+      },
+      {
+        "id": "e15",
+        "from": "info-area-ratio-ok",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e16",
+        "from": "info-equipment-compliant",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e17",
+        "from": "proc-final-judgment",
+        "to": "info-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e18",
+        "from": "info-compliance",
+        "to": "proc-all-check",
+        "role": "input"
+      },
+      {
+        "id": "e19",
+        "from": "proc-all-check",
+        "to": "info-final",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "delegates_to",
+      "articles": [
+        "A20_2",
+        "A20_3",
+        "A129_2_6"
+      ],
+      "description": "法28条2項の換気有効面積の算定方法及び換気設備の技術的基準を定める"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-24T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

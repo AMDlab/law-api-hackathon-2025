@@ -1,0 +1,296 @@
+{
+  "id": "CHK-BSL-A85-P2",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "災害時仮設建築物の適用除外（停車場・官公署等）",
+    "target_subject": "応急仮設建築物",
+    "description": "災害時に建築する停車場、官公署等の公益上必要な応急仮設建築物について、特定の規定の適用を除外する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "85",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": ["手続規定", "適用除外", "仮設建築物"],
+  "text_raw": "災害があつた場合において建築する停車場、官公署その他これらに類する公益上必要な用途に供する応急仮設建築物又は工事を施工するために現場に設ける事務所、下小屋、材料置場その他これらに類する仮設建築物については、第六条から第七条の六まで、第十二条第一項から第四項まで、第十五条、第十八条（第四十一項を除く。）、第十九条、第二十一条から第二十三条まで、第二十六条、第三十一条、第三十三条、第三十四条第二項、第三十五条、第三十六条（第十九条、第二十一条、第二十六条、第三十一条、第三十三条、第三十四条第二項及び第三十五条に係る部分に限る。）、第三十七条、第三十九条及び第四十条の規定並びに第三章の規定は、適用しない。ただし、防火地域又は準防火地域内にある延べ面積が五十平方メートルを超えるものについては、第六十二条の規定の適用があるものとする。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        { "type": "disaster", "value": "災害が発生した場合" },
+        { "type": "building_purpose", "value": "停車場、官公署等の公益上必要な用途又は工事に関連する仮設建築物" }
+      ],
+      "note": "災害時の応急復旧に関連する建築物に限定"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        { "type": "circumstance", "value": "災害があった場合" },
+        { "type": "purpose", "value": "停車場、官公署等の公益上必要な用途又は工事現場の仮設建築物" }
+      ]
+    },
+    "exceptions": {
+      "operator": "AND",
+      "conditions": [
+        { "type": "location", "value": "防火地域又は準防火地域内" },
+        { "type": "area", "value": "延べ面積が50㎡を超えるもの" }
+      ],
+      "effect": "APPLY_FIRE_CODE",
+      "note": "防火地域等での大規模仮設建築物には第62条が適用される"
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-disaster-check",
+        "type": "process",
+        "title": "災害の発生確認",
+        "process_type": "undefined_input",
+        "description": "災害が発生したか確認する"
+      },
+      {
+        "id": "info-disaster-occurred",
+        "type": "information",
+        "title": "災害の発生",
+        "symbol": "D",
+        "subject": "地域",
+        "property": "災害発生の有無",
+        "property_type": "proposition",
+        "description": "対象敷地が所在する地域で災害が発生したか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-building-purpose-check",
+        "type": "process",
+        "title": "建築物用途の特定",
+        "process_type": "undefined_input",
+        "description": "応急仮設建築物の用途が停車場、官公署等の公益上必要な用途に該当するか、または工事関連の仮設建築物かを特定する"
+      },
+      {
+        "id": "info-building-purpose",
+        "type": "information",
+        "title": "応急仮設建築物の用途",
+        "symbol": "P",
+        "subject": "建築物",
+        "property": "用途区分",
+        "property_type": "classification",
+        "description": "停車場、官公署、工事現場の仮設建築物などの用途分類",
+        "remarks": "停車場、官公署その他これらに類する公益上必要な用途、又は事務所、下小屋、材料置場その他これらに類する工事関連仮設建築物",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-purpose-judgment",
+        "type": "process",
+        "title": "適用除外対象用途の判定",
+        "process_type": "mechanical",
+        "description": "建築物の用途が適用除外対象（停車場、官公署等の公益上必要な用途、又は工事関連仮設建築物）に該当するか判定",
+        "logic_expression": "P ∈ {停車場, 官公署, 公益上必要な用途} OR P ∈ {工事現場事務所, 下小屋, 材料置場, 工事関連仮設}"
+      },
+      {
+        "id": "info-purpose-conform",
+        "type": "information",
+        "title": "適用除外対象用途への適合",
+        "symbol": "M1",
+        "subject": "建築物",
+        "property": "適用除外対象用途への適合",
+        "property_type": "proposition",
+        "description": "建築物の用途が適用除外対象に該当するか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-fire-area-check",
+        "type": "process",
+        "title": "防火地域等の位置確認",
+        "process_type": "mechanical",
+        "description": "建築物が防火地域又は準防火地域内に所在するか確認"
+      },
+      {
+        "id": "info-in-fire-area",
+        "type": "information",
+        "title": "防火地域・準防火地域内",
+        "symbol": "Z1",
+        "subject": "建築物",
+        "property": "防火地域等への該当",
+        "property_type": "proposition",
+        "description": "建築物が防火地域又は準防火地域内に所在するか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-area-measurement",
+        "type": "process",
+        "title": "延べ面積の測定",
+        "process_type": "mechanical",
+        "description": "応急仮設建築物の延べ面積を測定する"
+      },
+      {
+        "id": "info-floor-area",
+        "type": "information",
+        "title": "応急仮設建築物の延べ面積",
+        "symbol": "A",
+        "subject": "建築物",
+        "property": "延べ面積",
+        "property_type": "numeric",
+        "unit": "㎡",
+        "description": "応急仮設建築物の延べ面積",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-exception-judgment",
+        "type": "process",
+        "title": "ただし書き条件の判定",
+        "process_type": "mechanical",
+        "description": "防火地域等内で延べ面積が50㎡を超えるか判定（第62条適用の有無）",
+        "logic_expression": "(Z1 = true) AND (A > 50)"
+      },
+      {
+        "id": "info-fire-code-applies",
+        "type": "information",
+        "title": "第62条適用の有無",
+        "symbol": "E",
+        "subject": "建築物",
+        "property": "防火基準の適用",
+        "property_type": "proposition",
+        "description": "防火地域等内で50㎡超の仮設建築物に第62条が適用されるか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-compliance-judgment",
+        "type": "process",
+        "title": "法適合性の判定",
+        "process_type": "mechanical",
+        "description": "前記の各要件を総合し、第6条～第40条及び第3章の規定除外が成立するか判定",
+        "logic_expression": "D = true AND M1 = true AND NOT(E = true)"
+      },
+      {
+        "id": "info-compliance-result",
+        "type": "information",
+        "title": "法適合性の判定結果",
+        "symbol": "R",
+        "subject": "建築物",
+        "property": "規制の適用除外",
+        "property_type": "proposition",
+        "description": "第6条～第40条及び第3章の規定が適用されるか（除外される場合は適合）",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge-001",
+        "from": "proc-disaster-check",
+        "to": "info-disaster-occurred",
+        "role": "output"
+      },
+      {
+        "id": "edge-002",
+        "from": "info-disaster-occurred",
+        "to": "proc-building-purpose-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-003",
+        "from": "proc-building-purpose-check",
+        "to": "info-building-purpose",
+        "role": "output"
+      },
+      {
+        "id": "edge-004",
+        "from": "info-building-purpose",
+        "to": "proc-purpose-judgment",
+        "role": "input"
+      },
+      {
+        "id": "edge-005",
+        "from": "proc-purpose-judgment",
+        "to": "info-purpose-conform",
+        "role": "output"
+      },
+      {
+        "id": "edge-006",
+        "from": "info-purpose-conform",
+        "to": "proc-fire-area-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-007",
+        "from": "proc-fire-area-check",
+        "to": "info-in-fire-area",
+        "role": "output"
+      },
+      {
+        "id": "edge-008",
+        "from": "info-in-fire-area",
+        "to": "proc-area-measurement",
+        "role": "input"
+      },
+      {
+        "id": "edge-009",
+        "from": "proc-area-measurement",
+        "to": "info-floor-area",
+        "role": "output"
+      },
+      {
+        "id": "edge-010",
+        "from": "info-in-fire-area",
+        "to": "proc-exception-judgment",
+        "role": "input"
+      },
+      {
+        "id": "edge-011",
+        "from": "info-floor-area",
+        "to": "proc-exception-judgment",
+        "role": "input"
+      },
+      {
+        "id": "edge-012",
+        "from": "proc-exception-judgment",
+        "to": "info-fire-code-applies",
+        "role": "output"
+      },
+      {
+        "id": "edge-013",
+        "from": "info-disaster-occurred",
+        "to": "proc-compliance-judgment",
+        "role": "input"
+      },
+      {
+        "id": "edge-014",
+        "from": "info-purpose-conform",
+        "to": "proc-compliance-judgment",
+        "role": "input"
+      },
+      {
+        "id": "edge-015",
+        "from": "info-fire-code-applies",
+        "to": "proc-compliance-judgment",
+        "role": "input"
+      },
+      {
+        "id": "edge-016",
+        "from": "proc-compliance-judgment",
+        "to": "info-compliance-result",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A85:P1", "A85:P3"],
+      "description": "第85条の他の項目と相互参照"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-24T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "kijo-generator-manual",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

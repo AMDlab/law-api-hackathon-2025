@@ -1,0 +1,220 @@
+{
+  "id": "CHK-BSL-ORD-A128_7-P1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "区画避難安全検証法による適用除外",
+    "target_subject": "区画部分",
+    "description": "区画避難安全性能を有する区画部分に対する排煙・内装制限規定の適用除外"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "128の7",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "避難",
+    "区画避難安全検証"
+  ],
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-compartment-identify",
+        "type": "process",
+        "title": "区画部分の特定",
+        "process_type": "undefined_input",
+        "description": "準耐火構造の床・壁又は防火設備で区画された部分を特定（二以上の階にわたるものを除く）"
+      },
+      {
+        "id": "info-compartment-set",
+        "type": "information",
+        "title": "区画部分",
+        "subject": "建築物",
+        "property": "区画部分の集合",
+        "property_type": "set_definition",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-structure-check",
+        "type": "process",
+        "title": "主要構造部の確認",
+        "process_type": "undefined_input",
+        "description": "主要構造部が準耐火構造、耐火構造又は不燃材料か確認"
+      },
+      {
+        "id": "info-structure",
+        "type": "information",
+        "title": "主要構造部",
+        "subject": "建築物",
+        "property": "主要構造部の構造",
+        "property_type": "classification",
+        "plurality": "single",
+        "description": "準耐火構造（特定主要構造部が耐火構造を含む）又は不燃材料"
+      },
+      {
+        "id": "proc-structure-judge",
+        "type": "process",
+        "title": "構造要件判定",
+        "process_type": "mechanical",
+        "description": "主要構造部が準耐火構造又は不燃材料であるか判定",
+        "logic_expression": "主要構造部=準耐火構造 OR 主要構造部=不燃材料"
+      },
+      {
+        "id": "info-structure-ok",
+        "type": "information",
+        "title": "構造要件適合",
+        "symbol": "ST",
+        "subject": "建築物",
+        "property": "構造要件適合",
+        "property_type": "proposition",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-verification-check",
+        "type": "process",
+        "title": "安全検証確認",
+        "process_type": "undefined_input",
+        "description": "区画避難安全検証法により確かめられたか、又は大臣認定を受けたか確認",
+        "iteration": "iterative"
+      },
+      {
+        "id": "info-verified",
+        "type": "information",
+        "title": "検証済み",
+        "symbol": "V",
+        "subject": "区画部分",
+        "property": "区画避難安全性能検証済み",
+        "property_type": "proposition",
+        "plurality": "multiple",
+        "description": "区画避難安全検証法又は大臣認定"
+      },
+      {
+        "id": "proc-exemption-judge",
+        "type": "process",
+        "title": "適用除外判定",
+        "process_type": "mechanical",
+        "description": "構造要件適合かつ検証済みの区画部分に対し規定適用除外",
+        "logic_expression": "ST AND V",
+        "iteration": "iterative"
+      },
+      {
+        "id": "info-exemption",
+        "type": "information",
+        "title": "適用除外該当",
+        "symbol": "EX",
+        "subject": "区画部分",
+        "property": "規定適用除外該当",
+        "property_type": "proposition",
+        "plurality": "multiple",
+        "description": "令126条の2、126条の3、128条の5（一部除く）の適用除外"
+      },
+      {
+        "id": "proc-final-judge",
+        "type": "process",
+        "title": "最終適合判定",
+        "process_type": "mechanical",
+        "description": "適用除外該当の区画部分を判定",
+        "logic_expression": "FILTER(EX)"
+      },
+      {
+        "id": "info-final-compliance",
+        "type": "information",
+        "title": "令第128条の7第1項適合",
+        "symbol": "COMPLIANT",
+        "subject": "建築物",
+        "property": "令第128条の7第1項適合性",
+        "property_type": "proposition",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-compartment-identify",
+        "to": "info-compartment-set",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "proc-structure-check",
+        "to": "info-structure",
+        "role": "output"
+      },
+      {
+        "id": "e03",
+        "from": "info-structure",
+        "to": "proc-structure-judge",
+        "role": "input"
+      },
+      {
+        "id": "e04",
+        "from": "proc-structure-judge",
+        "to": "info-structure-ok",
+        "role": "output"
+      },
+      {
+        "id": "e05",
+        "from": "info-compartment-set",
+        "to": "proc-verification-check",
+        "role": "input"
+      },
+      {
+        "id": "e06",
+        "from": "proc-verification-check",
+        "to": "info-verified",
+        "role": "output"
+      },
+      {
+        "id": "e07",
+        "from": "info-structure-ok",
+        "to": "proc-exemption-judge",
+        "role": "input"
+      },
+      {
+        "id": "e08",
+        "from": "info-verified",
+        "to": "proc-exemption-judge",
+        "role": "input"
+      },
+      {
+        "id": "e09",
+        "from": "proc-exemption-judge",
+        "to": "info-exemption",
+        "role": "output"
+      },
+      {
+        "id": "e10",
+        "from": "info-exemption",
+        "to": "proc-final-judge",
+        "role": "input"
+      },
+      {
+        "id": "e11",
+        "from": "proc-final-judge",
+        "to": "info-final-compliance",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": ["A126_2", "A126_3", "A128_5", "A112:P19:I2"],
+      "description": "排煙設備等の規定を適用除外、防火設備の構造を参照"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-24T00:00:00+09:00",
+    "author": "Claude",
+    "generator": "kijo-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

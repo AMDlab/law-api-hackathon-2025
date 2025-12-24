@@ -1,0 +1,456 @@
+{
+  "id": "CHK-BSL-A29-P1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "地階における住宅等の居室",
+    "target_subject": "居室",
+    "description": "地階に設ける居住用居室が防湿及び換気に関する技術的基準を満たすことを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "29",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "衛生"
+  ],
+  "text_raw": "住宅の居住のための居室、学校の教室、病院の病室又は寄宿舎の寝室で地階に設けるものは、壁及び床の防湿の措置その他の事項について衛生上必要な政令で定める技術的基準に適合するものとしなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "building_use",
+          "value": "住宅、学校、病院、又は寄宿舎"
+        },
+        {
+          "type": "room_type",
+          "value": "居住のための居室、教室、病室、又は寝室"
+        },
+        {
+          "type": "location",
+          "value": "地階"
+        }
+      ],
+      "note": "地階に設ける特定用途の居室に限定"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-moisture-compliance",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "ref": "info-other-compliance",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-building-use",
+        "type": "process",
+        "title": "建築物用途の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の用途を読み取る"
+      },
+      {
+        "id": "info-building-use",
+        "type": "information",
+        "title": "建築物の用途",
+        "symbol": "B",
+        "subject": "建築物",
+        "property": "用途",
+        "property_type": "classification",
+        "description": "住宅、学校、病院、寄宿舎のいずれか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-rooms-set",
+        "type": "process",
+        "title": "判定対象居室の特定",
+        "process_type": "undefined_input",
+        "description": "建築物に属する居室を特定する"
+      },
+      {
+        "id": "info-rooms-set",
+        "type": "information",
+        "title": "建築物の居室",
+        "subject": "建築物",
+        "property": "居室の集合",
+        "property_type": "set_definition",
+        "description": "判定対象となる建築物に属する居室を特定",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-room-type",
+        "type": "process",
+        "title": "居室種別の特定",
+        "process_type": "human_judgment",
+        "target_subject": "居室",
+        "iteration": "iterative",
+        "description": "各居室の種別（居住室、教室、病室、寝室等）を特定する"
+      },
+      {
+        "id": "info-room-type",
+        "type": "information",
+        "title": "居室の種別",
+        "symbol": "R",
+        "subject": "居室",
+        "property": "居室種別",
+        "property_type": "classification",
+        "description": "居住のための居室、教室、病室、寝室のいずれか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-room-location",
+        "type": "process",
+        "title": "居室の位置の特定",
+        "process_type": "human_judgment",
+        "target_subject": "居室",
+        "iteration": "iterative",
+        "description": "設計図書等から居室の位置（地階、地上階）を特定する"
+      },
+      {
+        "id": "info-room-location",
+        "type": "information",
+        "title": "居室の位置",
+        "symbol": "L",
+        "subject": "居室",
+        "property": "位置",
+        "property_type": "classification",
+        "description": "地階、地上階等の区分",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-target-check",
+        "type": "process",
+        "title": "規定適用判定",
+        "process_type": "mechanical",
+        "target_subject": "居室",
+        "iteration": "iterative",
+        "description": "建築物用途、居室種別、位置から、当該居室が法29条1項の規定適用対象かを判定",
+        "logic_expression": "(B ∈ {住宅, 学校, 病院, 寄宿舎}) AND (R ∈ {居住室, 教室, 病室, 寝室}) AND (L = 地階)"
+      },
+      {
+        "id": "info-target",
+        "type": "information",
+        "title": "規定適用対象",
+        "symbol": "T",
+        "subject": "居室",
+        "property": "法29条1項適用対象",
+        "property_type": "proposition",
+        "description": "当該居室が法29条1項の規定適用対象であるか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-wall-floor-structure",
+        "type": "process",
+        "title": "壁・床の構造特定",
+        "process_type": "human_judgment",
+        "target_subject": "居室",
+        "iteration": "iterative",
+        "description": "設計図書等から地階居室の壁・床の構造を特定する"
+      },
+      {
+        "id": "info-wall-floor-structure",
+        "type": "information",
+        "title": "壁・床の構造",
+        "symbol": "S",
+        "subject": "居室",
+        "property": "壁・床の構造",
+        "property_type": "classification",
+        "description": "壁及び床の防湿構造、材料等",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-moisture-check",
+        "type": "process",
+        "title": "防湿措置基準適合判定",
+        "process_type": "mechanical",
+        "target_subject": "居室",
+        "iteration": "iterative",
+        "description": "令22条の2第1号の壁及び床の防湿措置に関する技術的基準への適合を判定",
+        "related_articles": [
+          "令::A22_2:I1"
+        ],
+        "logic_expression": "防湿層設置 AND (直接土に接する部分への防湿材使用 OR 空気層確保)"
+      },
+      {
+        "id": "info-moisture-compliance",
+        "type": "information",
+        "title": "防湿措置基準適合",
+        "symbol": "M",
+        "subject": "居室",
+        "property": "防湿措置基準適合",
+        "property_type": "proposition",
+        "description": "令22条の2第1号の壁及び床の防湿措置基準に適合するか",
+        "related_articles": [
+          "令::A22_2:I1"
+        ],
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-other-measures",
+        "type": "process",
+        "title": "その他の措置の特定",
+        "process_type": "human_judgment",
+        "target_subject": "居室",
+        "iteration": "iterative",
+        "description": "換気設備等その他の衛生上必要な措置を特定する"
+      },
+      {
+        "id": "info-other-measures",
+        "type": "information",
+        "title": "その他の措置",
+        "symbol": "O",
+        "subject": "居室",
+        "property": "その他の措置",
+        "property_type": "classification",
+        "description": "換気設備その他の衛生上必要な措置",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-other-check",
+        "type": "process",
+        "title": "その他の措置基準適合判定",
+        "process_type": "mechanical",
+        "target_subject": "居室",
+        "iteration": "iterative",
+        "description": "令22条の2第2号のその他の措置に関する技術的基準への適合を判定",
+        "related_articles": [
+          "令::A22_2:I2"
+        ],
+        "logic_expression": "換気設備設置 OR (外気に有効に開放された開口部)"
+      },
+      {
+        "id": "info-other-compliance",
+        "type": "information",
+        "title": "その他の措置基準適合",
+        "symbol": "Oc",
+        "subject": "居室",
+        "property": "その他の措置基準適合",
+        "property_type": "proposition",
+        "description": "令22条の2第2号のその他の措置基準に適合するか",
+        "related_articles": [
+          "令::A22_2:I2"
+        ],
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-final-judgment",
+        "type": "process",
+        "title": "適合判定",
+        "process_type": "mechanical",
+        "target_subject": "居室",
+        "iteration": "iterative",
+        "description": "各居室について、規定非対象または基準適合のいずれかを満たすことを確認",
+        "logic_expression": "(NOT T) OR (M AND Oc)"
+      },
+      {
+        "id": "info-compliance",
+        "type": "information",
+        "title": "法29条1項適合",
+        "symbol": "C",
+        "subject": "居室",
+        "property": "法29条1項適合",
+        "property_type": "proposition",
+        "description": "居室が法29条1項の規定に適合するか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-all-check",
+        "type": "process",
+        "title": "全居室適合確認",
+        "process_type": "mechanical",
+        "description": "全ての居室が法29条1項に適合することを確認",
+        "logic_expression": "∀room ∈ Rooms: C(room) = true"
+      },
+      {
+        "id": "info-final",
+        "type": "information",
+        "title": "建築物の法29条1項適合",
+        "subject": "建築物",
+        "property": "法29条1項適合",
+        "property_type": "proposition",
+        "description": "建築物全体として法29条1項の規定に適合するか",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-building-use",
+        "to": "info-building-use",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "proc-rooms-set",
+        "to": "info-rooms-set",
+        "role": "output"
+      },
+      {
+        "id": "e03",
+        "from": "info-rooms-set",
+        "to": "proc-room-type",
+        "role": "input"
+      },
+      {
+        "id": "e04",
+        "from": "proc-room-type",
+        "to": "info-room-type",
+        "role": "output"
+      },
+      {
+        "id": "e05",
+        "from": "info-rooms-set",
+        "to": "proc-room-location",
+        "role": "input"
+      },
+      {
+        "id": "e06",
+        "from": "proc-room-location",
+        "to": "info-room-location",
+        "role": "output"
+      },
+      {
+        "id": "e07",
+        "from": "info-building-use",
+        "to": "proc-target-check",
+        "role": "input"
+      },
+      {
+        "id": "e08",
+        "from": "info-room-type",
+        "to": "proc-target-check",
+        "role": "input"
+      },
+      {
+        "id": "e09",
+        "from": "info-room-location",
+        "to": "proc-target-check",
+        "role": "input"
+      },
+      {
+        "id": "e10",
+        "from": "proc-target-check",
+        "to": "info-target",
+        "role": "output"
+      },
+      {
+        "id": "e11",
+        "from": "info-rooms-set",
+        "to": "proc-wall-floor-structure",
+        "role": "input"
+      },
+      {
+        "id": "e12",
+        "from": "proc-wall-floor-structure",
+        "to": "info-wall-floor-structure",
+        "role": "output"
+      },
+      {
+        "id": "e13",
+        "from": "info-wall-floor-structure",
+        "to": "proc-moisture-check",
+        "role": "input"
+      },
+      {
+        "id": "e14",
+        "from": "proc-moisture-check",
+        "to": "info-moisture-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e15",
+        "from": "info-rooms-set",
+        "to": "proc-other-measures",
+        "role": "input"
+      },
+      {
+        "id": "e16",
+        "from": "proc-other-measures",
+        "to": "info-other-measures",
+        "role": "output"
+      },
+      {
+        "id": "e17",
+        "from": "info-other-measures",
+        "to": "proc-other-check",
+        "role": "input"
+      },
+      {
+        "id": "e18",
+        "from": "proc-other-check",
+        "to": "info-other-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e19",
+        "from": "info-target",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e20",
+        "from": "info-moisture-compliance",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e21",
+        "from": "info-other-compliance",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e22",
+        "from": "proc-final-judgment",
+        "to": "info-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e23",
+        "from": "info-compliance",
+        "to": "proc-all-check",
+        "role": "input"
+      },
+      {
+        "id": "e24",
+        "from": "proc-all-check",
+        "to": "info-final",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "delegates_to",
+      "articles": [
+        "A22_2"
+      ],
+      "description": "法29条1項の技術的基準（壁・床の防湿措置、換気等）を定める"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-23T18:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

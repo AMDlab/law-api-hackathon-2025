@@ -1,0 +1,308 @@
+{
+  "id": "CHK-BSL-A53-P4",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "壁面線等による建蔽率制限の緩和（許可）",
+    "target_subject": "建築物",
+    "description": "隣地境界線から後退した壁面線等の指定がある場合において、壁面線等を越えない建築物で特定行政庁が許可したものは、建蔽率の限度を超えることができる"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "53",
+    "paragraph": "4",
+    "item": null
+  },
+  "labels": ["集団規定", "建蔽率", "壁面線", "許可"],
+  "text_raw": "隣地境界線から後退して壁面線の指定がある場合又は第六十八条の二第一項の規定に基づく条例で定める壁面の位置の制限（隣地境界線に面する建築物の壁又はこれに代わる柱の位置及び隣地境界線に面する高さ二メートルを超える門又は塀の位置を制限するものに限る。）がある場合において、当該壁面線又は壁面の位置の制限として定められた限度の線を越えない建築物（ひさしその他の建築物の部分で政令で定めるものを除く。次項において同じ。）で、特定行政庁が安全上、防火上及び衛生上支障がないと認めて許可したものの建蔽率は、前三項の規定にかかわらず、その許可の範囲内において、前三項の規定による限度を超えるものとすることができる。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "隣地境界線から後退した壁面線の指定がある区域、又は法68条の2第1項に基づく条例で隣地境界線に面する壁面の位置の制限がある区域"
+        }
+      ],
+      "note": "隣地境界線に面する建築物の壁・柱の位置及び高さ2mを超える門・塀の位置を制限するもの"
+    },
+    "judgment_rule": {
+      "operator": "CAN_EXCEED",
+      "conditions": [
+        {
+          "type": "prerequisite",
+          "ref": "info-compliance-setback",
+          "description": "壁面線等を越えない建築物であること"
+        },
+        {
+          "type": "prerequisite",
+          "ref": "info-permission-granted",
+          "description": "特定行政庁が安全上、防火上及び衛生上支障がないと認めて許可したこと"
+        }
+      ],
+      "effect": "前三項（第1項〜第3項）の規定による建蔽率の限度を超えることができる",
+      "note": "許可の範囲内での緩和"
+    },
+    "exceptions": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "type": "exclusion",
+          "description": "ひさしその他の建築物の部分で政令で定めるもの（除外）"
+        }
+      ],
+      "effect": "当該部分は壁面線等の遵守判定から除外"
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-building-spec",
+        "type": "process",
+        "title": "建築物の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から判定対象となる建築物を特定する"
+      },
+      {
+        "id": "info-building",
+        "type": "information",
+        "title": "建築物",
+        "symbol": "B",
+        "subject": "建築物",
+        "property": "対象建築物",
+        "property_type": "set_definition",
+        "description": "判定対象となる建築物",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-neighbor-boundary",
+        "type": "process",
+        "title": "隣地境界線の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から隣地境界線の位置を読み取る"
+      },
+      {
+        "id": "info-neighbor-boundary",
+        "type": "information",
+        "title": "隣地境界線",
+        "symbol": "Ln",
+        "subject": "敷地",
+        "property": "隣地境界線の位置",
+        "property_type": "geometric_line",
+        "description": "敷地と隣地との境界となる線",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-setback-line",
+        "type": "process",
+        "title": "壁面線等の特定",
+        "process_type": "undefined_input",
+        "description": "壁面線の指定又は法68条の2第1項に基づく条例による壁面の位置の制限として定められた限度の線（壁面線等）の位置を読み取る",
+        "related_articles": ["法::A68_2:P1"],
+        "remarks": "隣地境界線に面する建築物の壁・柱の位置及び高さ2mを超える門・塀の位置を制限するもの"
+      },
+      {
+        "id": "info-setback-line",
+        "type": "information",
+        "title": "壁面線等",
+        "symbol": "Ls",
+        "subject": "敷地",
+        "property": "壁面線等の位置",
+        "property_type": "geometric_line",
+        "description": "隣地境界線から後退して指定された壁面線又は壁面の位置の制限として定められた限度の線",
+        "plurality": "single",
+        "related_articles": ["法::A68_2:P1"]
+      },
+      {
+        "id": "proc-building-walls",
+        "type": "process",
+        "title": "建築物の壁・柱の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の壁又はこれに代わる柱の位置を読み取る（ひさし等の除外部分を除く）",
+        "remarks": "ひさしその他の建築物の部分で政令で定めるものは除外"
+      },
+      {
+        "id": "info-building-walls",
+        "type": "information",
+        "title": "建築物の壁・柱の位置",
+        "symbol": "Wb",
+        "subject": "建築物",
+        "property": "壁・柱の位置",
+        "property_type": "geometric_surface",
+        "description": "建築物の壁又はこれに代わる柱の位置（ひさし等の除外部分を除く）",
+        "plurality": "single",
+        "remarks": "政令で定める除外部分（ひさし等）は含まない"
+      },
+      {
+        "id": "proc-setback-compliance",
+        "type": "process",
+        "title": "壁面線等の遵守判定",
+        "process_type": "mechanical",
+        "description": "建築物の壁・柱が壁面線等を越えていないかを幾何学的に判定する",
+        "logic_expression": "C1 = (Wb does not exceed Ls)"
+      },
+      {
+        "id": "info-compliance-setback",
+        "type": "information",
+        "title": "壁面線等遵守",
+        "symbol": "C1",
+        "subject": "建築物",
+        "property": "壁面線等を越えない",
+        "property_type": "proposition",
+        "description": "建築物が壁面線等を越えていないこと",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-permission-check",
+        "type": "process",
+        "title": "特定行政庁の許可の確認",
+        "process_type": "undefined_input",
+        "description": "特定行政庁が安全上、防火上及び衛生上支障がないと認めて許可したか確認する",
+        "remarks": "許可の範囲（建蔽率の上限値等）も含む"
+      },
+      {
+        "id": "info-permission-granted",
+        "type": "information",
+        "title": "特定行政庁の許可",
+        "symbol": "P",
+        "subject": "建築物",
+        "property": "特定行政庁の許可の有無",
+        "property_type": "proposition",
+        "description": "特定行政庁が安全上、防火上及び衛生上支障がないと認めて許可したこと",
+        "plurality": "single",
+        "remarks": "許可には建蔽率の許可範囲が含まれる"
+      },
+      {
+        "id": "proc-relaxation-eligibility",
+        "type": "process",
+        "title": "建蔽率緩和適用可否の判定",
+        "process_type": "mechanical",
+        "description": "壁面線等を越えず、かつ特定行政庁の許可がある場合、建蔽率の限度を超えることができる",
+        "logic_expression": "R = (C1 AND P)",
+        "remarks": "前三項（第1項〜第3項）の規定による建蔽率の限度を、許可の範囲内で超えることができる"
+      },
+      {
+        "id": "info-relaxation-applicable",
+        "type": "information",
+        "title": "建蔽率制限の緩和適用",
+        "symbol": "R",
+        "subject": "建築物",
+        "property": "建蔽率の限度を超えることができる",
+        "property_type": "proposition",
+        "description": "前三項の規定にかかわらず、許可の範囲内で建蔽率の限度を超えることができる",
+        "plurality": "single",
+        "related_articles": ["法::A53:P1", "法::A53:P2", "法::A53:P3"]
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-building-spec",
+        "to": "info-building",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "proc-neighbor-boundary",
+        "to": "info-neighbor-boundary",
+        "role": "output"
+      },
+      {
+        "id": "e03",
+        "from": "proc-setback-line",
+        "to": "info-setback-line",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "proc-building-walls",
+        "to": "info-building-walls",
+        "role": "output"
+      },
+      {
+        "id": "e05",
+        "from": "info-building",
+        "to": "proc-building-walls",
+        "role": "input"
+      },
+      {
+        "id": "e06",
+        "from": "info-setback-line",
+        "to": "proc-setback-compliance",
+        "role": "input"
+      },
+      {
+        "id": "e07",
+        "from": "info-building-walls",
+        "to": "proc-setback-compliance",
+        "role": "input"
+      },
+      {
+        "id": "e08",
+        "from": "proc-setback-compliance",
+        "to": "info-compliance-setback",
+        "role": "output"
+      },
+      {
+        "id": "e09",
+        "from": "proc-permission-check",
+        "to": "info-permission-granted",
+        "role": "output"
+      },
+      {
+        "id": "e10",
+        "from": "info-compliance-setback",
+        "to": "proc-relaxation-eligibility",
+        "role": "input"
+      },
+      {
+        "id": "e11",
+        "from": "info-permission-granted",
+        "to": "proc-relaxation-eligibility",
+        "role": "input"
+      },
+      {
+        "id": "e12",
+        "from": "proc-relaxation-eligibility",
+        "to": "info-relaxation-applicable",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A53:P1", "A53:P2", "A53:P3"],
+      "description": "第1項〜第3項の建蔽率制限に対する緩和規定"
+    },
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A68_2:P1"],
+      "description": "壁面の位置の制限に関する条例規定"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "defines_detail",
+      "description": "ひさしその他の建築物の部分で除外されるもの（政令で定める）"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-24T08:00:00Z",
+    "updated_at": "2025-12-24T08:00:00Z",
+    "author": "Claude Code",
+    "generator": "kijo-generator-skill",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法",
+    "source": "e-Gov法令API v2"
+  }
+}

@@ -1,0 +1,562 @@
+{
+  "id": "CHK-BSL-A35-P1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "特殊建築物等の避難及び消火に関する技術的基準",
+    "target_subject": "建築物",
+    "description": "特殊建築物等について、避難施設・消火設備等が技術的基準に適合することを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "35",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "避難",
+    "消防"
+  ],
+  "text_raw": "別表第一（い）欄（一）項から（四）項までに掲げる用途に供する特殊建築物、階数が三以上である建築物、政令で定める窓その他の開口部を有しない居室を有する建築物又は延べ面積（同一敷地内に二以上の建築物がある場合においては、その延べ面積の合計）が千平方メートルをこえる建築物については、廊下、階段、出入口その他の避難施設、消火栓、スプリンクラー、貯水槽その他の消火設備、排煙設備、非常用の照明装置及び進入口並びに敷地内の避難上及び消火上必要な通路は、政令で定める技術的基準に従つて、避難上及び消火上支障がないようにしなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "type": "use",
+          "value": "別表第一（い）欄（一）〜（四）項の用途"
+        },
+        {
+          "type": "scale",
+          "value": "階数≧3"
+        },
+        {
+          "type": "feature",
+          "value": "無窓居室あり"
+        },
+        {
+          "type": "scale",
+          "value": "延べ面積>1000㎡"
+        }
+      ],
+      "note": "4つの条件のいずれかに該当する建築物"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-facility-compliance",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-building-use",
+        "type": "process",
+        "title": "建築物用途の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の用途を読み取る"
+      },
+      {
+        "id": "info-building-use",
+        "type": "information",
+        "title": "建築物の用途",
+        "symbol": "U",
+        "subject": "建築物",
+        "property": "用途",
+        "property_type": "classification",
+        "description": "建築物の用途（劇場、病院、学校、百貨店、その他等）",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-special-use-check",
+        "type": "process",
+        "title": "特殊建築物該当判定",
+        "process_type": "mechanical",
+        "description": "別表第一（い）欄（一）〜（四）項の用途に該当するか判定",
+        "remarks": "（一）劇場・映画館・演芸場・観覧場・公会堂・集会場等、（二）病院・診療所・ホテル・旅館・下宿・共同住宅・寄宿舎等、（三）学校・体育館等、（四）百貨店・マーケット・展示場・キャバレー・カフェー・ナイトクラブ・バー・ダンスホール・遊技場等"
+      },
+      {
+        "id": "info-special-use",
+        "type": "information",
+        "title": "特殊建築物該当",
+        "symbol": "S1",
+        "subject": "建築物",
+        "property": "別表第一（い）欄（一）〜（四）項該当",
+        "property_type": "proposition",
+        "description": "別表第一（い）欄（一）〜（四）項の用途に該当するか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-floors",
+        "type": "process",
+        "title": "階数の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の階数を読み取る"
+      },
+      {
+        "id": "info-floors",
+        "type": "information",
+        "title": "階数",
+        "symbol": "F",
+        "subject": "建築物",
+        "property": "階数",
+        "property_type": "numeric",
+        "unit": "階",
+        "description": "建築物の階数",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-floors-check",
+        "type": "process",
+        "title": "階数3以上判定",
+        "process_type": "mechanical",
+        "description": "階数が3以上であるか判定",
+        "logic_expression": "F ≥ 3"
+      },
+      {
+        "id": "info-floors-check",
+        "type": "information",
+        "title": "階数3以上",
+        "symbol": "S2",
+        "subject": "建築物",
+        "property": "階数3以上該当",
+        "property_type": "proposition",
+        "description": "階数が3以上であるか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-windowless-rooms",
+        "type": "process",
+        "title": "無窓居室の有無確認",
+        "process_type": "human_judgment",
+        "description": "政令で定める窓その他の開口部を有しない居室の有無を確認する",
+        "related_articles": [
+          "令::A111"
+        ]
+      },
+      {
+        "id": "info-windowless-rooms",
+        "type": "information",
+        "title": "無窓居室の有無",
+        "symbol": "S3",
+        "subject": "建築物",
+        "property": "無窓居室の有無",
+        "property_type": "proposition",
+        "description": "政令で定める窓その他の開口部を有しない居室を有するか",
+        "related_articles": [
+          "令::A111"
+        ],
+        "plurality": "single"
+      },
+      {
+        "id": "proc-site-buildings",
+        "type": "process",
+        "title": "敷地内建築物の特定",
+        "process_type": "undefined_input",
+        "description": "同一敷地内の全建築物を特定する"
+      },
+      {
+        "id": "info-site-buildings",
+        "type": "information",
+        "title": "敷地内の建築物",
+        "subject": "敷地",
+        "property": "建築物の集合",
+        "property_type": "set_definition",
+        "description": "同一敷地内の二以上の建築物（既存を含む）を特定",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-total-area",
+        "type": "process",
+        "title": "延べ面積の算定",
+        "process_type": "mechanical",
+        "description": "同一敷地内に二以上の建築物がある場合は延べ面積の合計を算定",
+        "logic_expression": "A_total = Σ A_i (敷地内全建築物)"
+      },
+      {
+        "id": "info-total-area",
+        "type": "information",
+        "title": "延べ面積（合計）",
+        "symbol": "A",
+        "subject": "建築物",
+        "property": "延べ面積（敷地内合計）",
+        "property_type": "numeric",
+        "unit": "m2",
+        "description": "延べ面積（同一敷地内に二以上の建築物がある場合は合計）",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-area-check",
+        "type": "process",
+        "title": "延べ面積1000㎡超判定",
+        "process_type": "mechanical",
+        "description": "延べ面積が1000㎡を超えるか判定",
+        "logic_expression": "A > 1000"
+      },
+      {
+        "id": "info-area-check",
+        "type": "information",
+        "title": "延べ面積1000㎡超",
+        "symbol": "S4",
+        "subject": "建築物",
+        "property": "延べ面積1000㎡超該当",
+        "property_type": "proposition",
+        "description": "延べ面積が1000㎡を超えるか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-scope-check",
+        "type": "process",
+        "title": "適用範囲判定",
+        "process_type": "mechanical",
+        "description": "4つの条件のいずれかに該当するか判定",
+        "logic_expression": "S1 OR S2 OR S3 OR S4"
+      },
+      {
+        "id": "info-scope",
+        "type": "information",
+        "title": "法35条適用対象該当",
+        "symbol": "SC",
+        "subject": "建築物",
+        "property": "法35条適用対象該当",
+        "property_type": "proposition",
+        "description": "法35条の規定が適用される建築物に該当するか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-facility-type",
+        "type": "process",
+        "title": "避難・消火施設の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から廊下、階段、出入口等の避難施設、消火栓等の消火設備、排煙設備、非常用照明装置、進入口、敷地内通路を特定する"
+      },
+      {
+        "id": "info-facilities",
+        "type": "information",
+        "title": "建築物の避難・消火施設",
+        "subject": "建築物",
+        "property": "避難・消火施設の集合",
+        "property_type": "set_definition",
+        "description": "判定対象となる避難施設・消火設備等（廊下、階段、出入口、消火栓、スプリンクラー、貯水槽、排煙設備、非常用照明装置、進入口、敷地内通路）",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-facility-spec",
+        "type": "process",
+        "title": "施設仕様の特定",
+        "process_type": "human_judgment",
+        "target_subject": "避難・消火施設",
+        "iteration": "iterative",
+        "description": "設計図書等から各施設の仕様（寸法、構造、設備内容等）を読み取る"
+      },
+      {
+        "id": "info-facility-spec",
+        "type": "information",
+        "title": "施設の仕様",
+        "symbol": "FS",
+        "subject": "避難・消火施設",
+        "property": "仕様",
+        "property_type": "classification",
+        "description": "各施設の仕様（廊下幅、階段幅、消火栓の種類等）",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-tech-standard",
+        "type": "process",
+        "title": "技術的基準適合判定",
+        "process_type": "mechanical",
+        "target_subject": "避難・消火施設",
+        "iteration": "iterative",
+        "description": "政令で定める技術的基準に適合し、避難上及び消火上支障がないか判定",
+        "related_articles": [
+          "令::A117",
+          "令::A118",
+          "令::A119",
+          "令::A120",
+          "令::A121",
+          "令::A122",
+          "令::A123",
+          "令::A124",
+          "令::A125",
+          "令::A126",
+          "令::A126_2",
+          "令::A126_3",
+          "令::A127",
+          "令::A128"
+        ],
+        "remarks": "廊下（令117条〜119条）、階段（令120条〜127条）、出入口（令118条等）、排煙設備（令126条の2）、非常用照明（令126条の4）、進入口（令126条の6）、敷地内通路（令128条）等"
+      },
+      {
+        "id": "info-facility-compliance",
+        "type": "information",
+        "title": "技術的基準適合",
+        "symbol": "TC",
+        "subject": "避難・消火施設",
+        "property": "技術的基準適合",
+        "property_type": "proposition",
+        "description": "政令で定める技術的基準に適合し、避難上及び消火上支障がないか",
+        "related_articles": [
+          "令::A117",
+          "令::A118",
+          "令::A119",
+          "令::A120",
+          "令::A121",
+          "令::A122",
+          "令::A123",
+          "令::A124",
+          "令::A125",
+          "令::A126",
+          "令::A126_2",
+          "令::A126_3",
+          "令::A127",
+          "令::A128"
+        ],
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-all-check",
+        "type": "process",
+        "title": "全施設適合確認",
+        "process_type": "mechanical",
+        "description": "全ての避難・消火施設が技術的基準に適合することを確認",
+        "logic_expression": "∀facility ∈ Facilities: TC(facility) = true"
+      },
+      {
+        "id": "info-all-compliance",
+        "type": "information",
+        "title": "全施設技術的基準適合",
+        "symbol": "AC",
+        "subject": "建築物",
+        "property": "全施設技術的基準適合",
+        "property_type": "proposition",
+        "description": "全ての避難・消火施設が技術的基準に適合するか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-final-judgment",
+        "type": "process",
+        "title": "最終判定",
+        "process_type": "mechanical",
+        "description": "適用対象外の場合は適用なし、適用対象の場合は全施設適合を確認",
+        "logic_expression": "(NOT SC) OR (SC AND AC)"
+      },
+      {
+        "id": "info-final",
+        "type": "information",
+        "title": "建築物の法35条1項適合",
+        "subject": "建築物",
+        "property": "法35条1項適合",
+        "property_type": "proposition",
+        "description": "建築物全体として法35条1項の規定に適合するか",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-building-use",
+        "to": "info-building-use",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "info-building-use",
+        "to": "proc-special-use-check",
+        "role": "input"
+      },
+      {
+        "id": "e03",
+        "from": "proc-special-use-check",
+        "to": "info-special-use",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "proc-floors",
+        "to": "info-floors",
+        "role": "output"
+      },
+      {
+        "id": "e05",
+        "from": "info-floors",
+        "to": "proc-floors-check",
+        "role": "input"
+      },
+      {
+        "id": "e06",
+        "from": "proc-floors-check",
+        "to": "info-floors-check",
+        "role": "output"
+      },
+      {
+        "id": "e07",
+        "from": "proc-windowless-rooms",
+        "to": "info-windowless-rooms",
+        "role": "output"
+      },
+      {
+        "id": "e08",
+        "from": "proc-site-buildings",
+        "to": "info-site-buildings",
+        "role": "output"
+      },
+      {
+        "id": "e09",
+        "from": "info-site-buildings",
+        "to": "proc-total-area",
+        "role": "input"
+      },
+      {
+        "id": "e10",
+        "from": "proc-total-area",
+        "to": "info-total-area",
+        "role": "output"
+      },
+      {
+        "id": "e11",
+        "from": "info-total-area",
+        "to": "proc-area-check",
+        "role": "input"
+      },
+      {
+        "id": "e12",
+        "from": "proc-area-check",
+        "to": "info-area-check",
+        "role": "output"
+      },
+      {
+        "id": "e13",
+        "from": "info-special-use",
+        "to": "proc-scope-check",
+        "role": "input"
+      },
+      {
+        "id": "e14",
+        "from": "info-floors-check",
+        "to": "proc-scope-check",
+        "role": "input"
+      },
+      {
+        "id": "e15",
+        "from": "info-windowless-rooms",
+        "to": "proc-scope-check",
+        "role": "input"
+      },
+      {
+        "id": "e16",
+        "from": "info-area-check",
+        "to": "proc-scope-check",
+        "role": "input"
+      },
+      {
+        "id": "e17",
+        "from": "proc-scope-check",
+        "to": "info-scope",
+        "role": "output"
+      },
+      {
+        "id": "e18",
+        "from": "proc-facility-type",
+        "to": "info-facilities",
+        "role": "output"
+      },
+      {
+        "id": "e19",
+        "from": "info-facilities",
+        "to": "proc-facility-spec",
+        "role": "input"
+      },
+      {
+        "id": "e20",
+        "from": "proc-facility-spec",
+        "to": "info-facility-spec",
+        "role": "output"
+      },
+      {
+        "id": "e21",
+        "from": "info-facility-spec",
+        "to": "proc-tech-standard",
+        "role": "input"
+      },
+      {
+        "id": "e22",
+        "from": "proc-tech-standard",
+        "to": "info-facility-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e23",
+        "from": "info-facility-compliance",
+        "to": "proc-all-check",
+        "role": "input"
+      },
+      {
+        "id": "e24",
+        "from": "proc-all-check",
+        "to": "info-all-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e25",
+        "from": "info-scope",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e26",
+        "from": "info-all-compliance",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e27",
+        "from": "proc-final-judgment",
+        "to": "info-final",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "delegates_to",
+      "articles": [
+        "A111",
+        "A117",
+        "A118",
+        "A119",
+        "A120",
+        "A121",
+        "A122",
+        "A123",
+        "A124",
+        "A125",
+        "A126",
+        "A126_2",
+        "A126_3",
+        "A126_4",
+        "A126_6",
+        "A127",
+        "A128"
+      ],
+      "description": "法35条の技術的基準を定める（無窓居室、廊下、階段、出入口、排煙設備、非常用照明、進入口、敷地内通路等）"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-23T19:30:00+09:00",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

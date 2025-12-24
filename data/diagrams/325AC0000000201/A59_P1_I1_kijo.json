@@ -1,0 +1,251 @@
+{
+  "id": "CHK-BSL-A59-P1-I1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "高度利用地区内の建築物の判定",
+    "target_subject": "建築物",
+    "description": "高度利用地区内の建築物が容積率、建蔽率、建築面積の規制に適合し、かつ除外要件に該当しないことを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "59",
+    "paragraph": "1",
+    "item": "1"
+  },
+  "labels": [
+    "集団規定",
+    "高度利用地区"
+  ],
+  "text_raw": "主要構造部が木造、鉄骨造、コンクリートブロック造その他これらに類する構造であつて、階数が二以下で、かつ、地階を有しない建築物で、容易に移転し、又は除却することができるもの",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "高度利用地区内"
+        }
+      ],
+      "note": "都市計画で指定された高度利用地区"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-structure-type",
+          "operator": "IN",
+          "value": ["木造", "鉄骨造", "コンクリートブロック造", "その他類する構造"]
+        },
+        {
+          "ref": "info-story-count",
+          "operator": "<=",
+          "value": 2
+        },
+        {
+          "ref": "info-basement",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "ref": "info-transferable",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-structure-type",
+        "type": "process",
+        "title": "主要構造部の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の主要構造部の種類を特定する"
+      },
+      {
+        "id": "info-structure-type",
+        "type": "information",
+        "title": "主要構造部の種類",
+        "symbol": "S",
+        "subject": "建築物",
+        "property": "主要構造部の構造種別",
+        "property_type": "classification",
+        "description": "木造、鉄骨造、コンクリートブロック造その他これらに類する構造のいずれか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-story-count",
+        "type": "process",
+        "title": "階数の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の階数を読み取る"
+      },
+      {
+        "id": "info-story-count",
+        "type": "information",
+        "title": "階数",
+        "symbol": "N",
+        "subject": "建築物",
+        "property": "階数",
+        "property_type": "numeric",
+        "unit": "階",
+        "description": "建築物の階数",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-basement",
+        "type": "process",
+        "title": "地階の有無確認",
+        "process_type": "undefined_input",
+        "description": "設計図書等から地階の有無を確認する"
+      },
+      {
+        "id": "info-basement",
+        "type": "information",
+        "title": "地階の有無",
+        "symbol": "B",
+        "subject": "建築物",
+        "property": "地階の有無",
+        "property_type": "proposition",
+        "description": "建築物が地階を有するか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-transferability",
+        "type": "process",
+        "title": "移転・除却の容易性確認",
+        "process_type": "human_judgment",
+        "description": "建築物が容易に移転し、又は除却することができるか判断する"
+      },
+      {
+        "id": "info-transferable",
+        "type": "information",
+        "title": "移転・除却の容易性",
+        "symbol": "T",
+        "subject": "建築物",
+        "property": "移転・除却の容易性",
+        "property_type": "proposition",
+        "description": "建築物が容易に移転し、又は除却することができるか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-exemption-check",
+        "type": "process",
+        "title": "適用除外判定",
+        "process_type": "mechanical",
+        "description": "第59条1項の除外要件にすべて該当するか判定",
+        "logic_expression": "(S ∈ {木造, 鉄骨造, ＣＢ造他}) AND (N ≤ 2) AND (B = false) AND (T = true)"
+      },
+      {
+        "id": "info-exemption",
+        "type": "information",
+        "title": "第59条1項除外該当",
+        "symbol": "E",
+        "subject": "建築物",
+        "property": "第59条1項1号適用除外への該当",
+        "property_type": "proposition",
+        "description": "第59条1項1号の除外要件にすべて該当するか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-final-judgment",
+        "type": "process",
+        "title": "適合判定",
+        "process_type": "mechanical",
+        "description": "第59条1項1号の要件にすべて該当することを確認",
+        "logic_expression": "E = true"
+      },
+      {
+        "id": "info-final",
+        "type": "information",
+        "title": "第59条1項1号適合判定",
+        "subject": "建築物",
+        "property": "第59条1項1号適合",
+        "property_type": "proposition",
+        "description": "建築物が第59条1項1号の要件に適合するか",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-structure-type",
+        "to": "info-structure-type",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "proc-story-count",
+        "to": "info-story-count",
+        "role": "output"
+      },
+      {
+        "id": "e03",
+        "from": "proc-basement",
+        "to": "info-basement",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "proc-transferability",
+        "to": "info-transferable",
+        "role": "output"
+      },
+      {
+        "id": "e05",
+        "from": "info-structure-type",
+        "to": "proc-exemption-check",
+        "role": "input"
+      },
+      {
+        "id": "e06",
+        "from": "info-story-count",
+        "to": "proc-exemption-check",
+        "role": "input"
+      },
+      {
+        "id": "e07",
+        "from": "info-basement",
+        "to": "proc-exemption-check",
+        "role": "input"
+      },
+      {
+        "id": "e08",
+        "from": "info-transferable",
+        "to": "proc-exemption-check",
+        "role": "input"
+      },
+      {
+        "id": "e09",
+        "from": "proc-exemption-check",
+        "to": "info-exemption",
+        "role": "output"
+      },
+      {
+        "id": "e10",
+        "from": "info-exemption",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e11",
+        "from": "proc-final-judgment",
+        "to": "info-final",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [],
+  "metadata": {
+    "created_at": "2025-12-24T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

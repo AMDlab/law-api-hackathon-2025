@@ -1,0 +1,407 @@
+{
+  "id": "CHK-ORD-A137-10-P1-I1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "防火地域における既存不適格建築物の増築・改築要件（第1号）",
+    "target_subject": "増築・改築部分",
+    "description": "防火地域内の既存不適格建築物（第2号以外）について、増築・改築に係る部分がイ又はロの要件に該当するか判定"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "137_10",
+    "paragraph": "1",
+    "item": "1"
+  },
+  "labels": [
+    "既存不適格建築物",
+    "増改築",
+    "防火地域",
+    "火熱遮断壁等",
+    "防火構造"
+  ],
+  "text_raw": "一 次号に掲げる建築物以外の建築物 次のイ又はロのいずれかに該当するものであること。\nイ 次の（１）及び（２）に該当するものであること。\n（１）増築又は改築に係る部分が火熱遮断壁等で区画されるものであること。\n（２）増築又は改築に係る部分が、第百三十六条の二各号に定める基準（防火地域内にある建築物に係るものに限る。）に相当する建築物の部分に関する基準として国土交通大臣が定めるものに適合するもので、国土交通大臣の定めた構造方法を用いるもの又は国土交通大臣の認定を受けたものであること。\nロ 次の（１）から（５）までに該当するものであること。\n（１）工事の着手が基準時以後である増築及び改築に係る部分の対象床面積の合計は、五十平方メートルを超えず、かつ、基準時における当該建築物の延べ面積の合計を超えないこと。\n（２）増築又は改築後における建築物の階数が二以下で、かつ、延べ面積が五百平方メートルを超えないこと。\n（３）増築又は改築に係る部分の外壁及び軒裏は、防火構造であること。\n（４）増築又は改築に係る部分の外壁の開口部で延焼のおそれのある部分に、二十分間防火設備を設けること。\n（５）増築又は改築に係る部分以外の部分の外壁の開口部で延焼のおそれのある部分に、二十分間防火設備が設けられていること。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "building_type",
+          "value": "第2号以外の建築物（木造以外、又は木造で外壁・軒裏が防火構造のもの）"
+        },
+        {
+          "type": "work_type",
+          "value": "増築又は改築"
+        }
+      ],
+      "note": "防火地域内の既存不適格建築物で第2号以外のもの"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "description": "イ: (1)火熱遮断壁等区画 AND (2)大臣定め基準適合",
+          "operator": "AND",
+          "conditions": [
+            { "ref": "info-fire-barrier", "description": "火熱遮断壁等で区画" },
+            { "ref": "info-minister-standard", "description": "大臣定め基準適合かつ大臣定め構造方法又は大臣認定" }
+          ]
+        },
+        {
+          "description": "ロ: (1)対象床面積50m2以下等 AND (2)階数2以下・延べ面積500m2以下 AND (3)外壁・軒裏防火構造 AND (4)増改築部分開口部に20分間防火設備 AND (5)既存部分開口部に20分間防火設備",
+          "operator": "AND",
+          "conditions": [
+            { "ref": "info-floor-area-check", "description": "対象床面積基準適合" },
+            { "ref": "info-scale-check", "description": "規模基準適合" },
+            { "ref": "info-wall-check", "description": "外壁・軒裏防火構造" },
+            { "ref": "info-new-opening", "description": "増改築部分の開口部に20分間防火設備" },
+            { "ref": "info-existing-opening", "description": "既存部分の開口部に20分間防火設備" }
+          ]
+        }
+      ]
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-target-part",
+        "type": "process",
+        "title": "増築・改築部分の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書から増築又は改築に係る部分の範囲を特定"
+      },
+      {
+        "id": "info-target-part",
+        "type": "information",
+        "title": "増築・改築に係る部分",
+        "subject": "建築物",
+        "property": "増改築部分の特定",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "当該建築物における増築又は改築に係る部分を特定"
+      },
+      {
+        "id": "proc-fire-barrier",
+        "type": "process",
+        "title": "火熱遮断壁等区画確認",
+        "process_type": "human_judgment",
+        "target_subject": "増築・改築部分",
+        "description": "増築又は改築に係る部分が火熱遮断壁等で区画されているか確認"
+      },
+      {
+        "id": "info-fire-barrier",
+        "type": "information",
+        "title": "火熱遮断壁等区画",
+        "symbol": "FB",
+        "subject": "増築・改築部分",
+        "property": "火熱遮断壁等による区画",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "増築又は改築に係る部分が火熱遮断壁等で区画されているか（イ(1)）"
+      },
+      {
+        "id": "proc-minister-standard",
+        "type": "process",
+        "title": "大臣定め基準適合確認",
+        "process_type": "human_judgment",
+        "target_subject": "増築・改築部分",
+        "description": "令136条の2各号相当基準として国土交通大臣が定めるものに適合し、大臣定め構造方法又は大臣認定を受けているか確認",
+        "related_articles": ["令::A136_2"]
+      },
+      {
+        "id": "info-minister-standard",
+        "type": "information",
+        "title": "大臣定め基準適合",
+        "symbol": "MS",
+        "subject": "増築・改築部分",
+        "property": "大臣定め基準適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "令136条の2各号相当の大臣定め基準に適合し、大臣定め構造方法又は大臣認定を受けているか（イ(2)）"
+      },
+      {
+        "id": "proc-item-i-judgment",
+        "type": "process",
+        "title": "イ要件判定",
+        "process_type": "mechanical",
+        "description": "イ(1)及び(2)の両方を満たすか判定",
+        "logic_expression": "FB AND MS"
+      },
+      {
+        "id": "info-item-i",
+        "type": "information",
+        "title": "イ要件適合",
+        "symbol": "Ia",
+        "subject": "増築・改築部分",
+        "property": "イ要件適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "増築・改築部分がイ要件（火熱遮断壁等区画及び大臣定め基準）に適合するか"
+      },
+      {
+        "id": "proc-base-floor-area",
+        "type": "process",
+        "title": "基準時延べ面積の特定",
+        "process_type": "undefined_input",
+        "description": "基準時における当該建築物の延べ面積を確認"
+      },
+      {
+        "id": "info-base-floor-area",
+        "type": "information",
+        "title": "基準時延べ面積",
+        "symbol": "Fb",
+        "subject": "建築物",
+        "property": "基準時延べ面積",
+        "property_type": "numeric",
+        "unit": "m2",
+        "plurality": "single",
+        "description": "基準時における当該建築物の延べ面積"
+      },
+      {
+        "id": "proc-target-floor-area",
+        "type": "process",
+        "title": "対象床面積の算定",
+        "process_type": "mechanical",
+        "target_subject": "増築・改築部分",
+        "description": "工事の着手が基準時以後である増築及び改築に係る部分の対象床面積の合計を算定"
+      },
+      {
+        "id": "info-target-floor-area",
+        "type": "information",
+        "title": "対象床面積",
+        "symbol": "At",
+        "subject": "増築・改築部分",
+        "property": "対象床面積",
+        "property_type": "numeric",
+        "unit": "m2",
+        "plurality": "single",
+        "description": "工事の着手が基準時以後である増築及び改築に係る部分の対象床面積の合計"
+      },
+      {
+        "id": "proc-floor-area-check",
+        "type": "process",
+        "title": "対象床面積基準判定",
+        "process_type": "mechanical",
+        "description": "対象床面積が50m2以下かつ基準時延べ面積以下であるか判定",
+        "logic_expression": "At ≤ 50 AND At ≤ Fb"
+      },
+      {
+        "id": "info-floor-area-check",
+        "type": "information",
+        "title": "対象床面積基準適合",
+        "symbol": "R1",
+        "subject": "増築・改築部分",
+        "property": "対象床面積基準適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "対象床面積が50m2以下かつ基準時延べ面積以下か（ロ(1)）"
+      },
+      {
+        "id": "proc-after-scale",
+        "type": "process",
+        "title": "増改築後規模の確認",
+        "process_type": "undefined_input",
+        "description": "増築又は改築後の建築物の階数及び延べ面積を確認"
+      },
+      {
+        "id": "info-after-stories",
+        "type": "information",
+        "title": "増改築後階数",
+        "symbol": "N",
+        "subject": "建築物",
+        "property": "増改築後階数",
+        "property_type": "numeric",
+        "plurality": "single",
+        "description": "増築又は改築後における建築物の階数"
+      },
+      {
+        "id": "info-after-floor-area",
+        "type": "information",
+        "title": "増改築後延べ面積",
+        "symbol": "Fa",
+        "subject": "建築物",
+        "property": "増改築後延べ面積",
+        "property_type": "numeric",
+        "unit": "m2",
+        "plurality": "single",
+        "description": "増築又は改築後における建築物の延べ面積"
+      },
+      {
+        "id": "proc-scale-check",
+        "type": "process",
+        "title": "規模基準判定",
+        "process_type": "mechanical",
+        "description": "階数が2以下かつ延べ面積が500m2以下であるか判定",
+        "logic_expression": "N ≤ 2 AND Fa ≤ 500"
+      },
+      {
+        "id": "info-scale-check",
+        "type": "information",
+        "title": "規模基準適合",
+        "symbol": "R2",
+        "subject": "建築物",
+        "property": "規模基準適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "階数が2以下かつ延べ面積が500m2以下か（ロ(2)）"
+      },
+      {
+        "id": "proc-wall-check",
+        "type": "process",
+        "title": "外壁・軒裏構造確認",
+        "process_type": "human_judgment",
+        "target_subject": "増築・改築部分",
+        "description": "増築又は改築に係る部分の外壁及び軒裏が防火構造であるか確認"
+      },
+      {
+        "id": "info-wall-check",
+        "type": "information",
+        "title": "外壁・軒裏防火構造",
+        "symbol": "R3",
+        "subject": "増築・改築部分",
+        "property": "外壁・軒裏防火構造",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "増築又は改築に係る部分の外壁及び軒裏が防火構造であるか（ロ(3)）"
+      },
+      {
+        "id": "proc-new-opening",
+        "type": "process",
+        "title": "増改築部分開口部確認",
+        "process_type": "human_judgment",
+        "target_subject": "増築・改築部分",
+        "description": "増築又は改築に係る部分の外壁の開口部で延焼のおそれのある部分に20分間防火設備が設けられているか確認"
+      },
+      {
+        "id": "info-new-opening",
+        "type": "information",
+        "title": "増改築部分開口部防火設備",
+        "symbol": "R4",
+        "subject": "増築・改築部分",
+        "property": "開口部防火設備設置",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "増築又は改築に係る部分の外壁の開口部（延焼のおそれのある部分）に20分間防火設備が設けられているか（ロ(4)）"
+      },
+      {
+        "id": "proc-existing-opening",
+        "type": "process",
+        "title": "既存部分開口部確認",
+        "process_type": "human_judgment",
+        "target_subject": "建築物",
+        "description": "増築又は改築に係る部分以外の部分の外壁の開口部で延焼のおそれのある部分に20分間防火設備が設けられているか確認"
+      },
+      {
+        "id": "info-existing-opening",
+        "type": "information",
+        "title": "既存部分開口部防火設備",
+        "symbol": "R5",
+        "subject": "建築物",
+        "property": "既存部分開口部防火設備設置",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "増築又は改築に係る部分以外の部分の外壁の開口部（延焼のおそれのある部分）に20分間防火設備が設けられているか（ロ(5)）"
+      },
+      {
+        "id": "proc-item-ro-judgment",
+        "type": "process",
+        "title": "ロ要件判定",
+        "process_type": "mechanical",
+        "description": "ロ(1)から(5)までの全てを満たすか判定",
+        "logic_expression": "R1 AND R2 AND R3 AND R4 AND R5"
+      },
+      {
+        "id": "info-item-ro",
+        "type": "information",
+        "title": "ロ要件適合",
+        "symbol": "Ib",
+        "subject": "増築・改築部分",
+        "property": "ロ要件適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "増築・改築部分がロ要件（5要件全て）に適合するか"
+      },
+      {
+        "id": "proc-final-judgment",
+        "type": "process",
+        "title": "第1号適合判定",
+        "process_type": "mechanical",
+        "description": "イ又はロのいずれかに適合するか判定",
+        "logic_expression": "Ia OR Ib"
+      },
+      {
+        "id": "info-final-compliance",
+        "type": "information",
+        "title": "第1号適合",
+        "subject": "増築・改築部分",
+        "property": "令137条の10第1項第1号適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "増築・改築部分が令第137条の10第1項第1号の要件に適合するか"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "proc-target-part", "to": "info-target-part", "role": "output" },
+      { "id": "e02", "from": "info-target-part", "to": "proc-fire-barrier", "role": "input" },
+      { "id": "e03", "from": "proc-fire-barrier", "to": "info-fire-barrier", "role": "output" },
+      { "id": "e04", "from": "info-target-part", "to": "proc-minister-standard", "role": "input" },
+      { "id": "e05", "from": "proc-minister-standard", "to": "info-minister-standard", "role": "output" },
+      { "id": "e06", "from": "info-fire-barrier", "to": "proc-item-i-judgment", "role": "input" },
+      { "id": "e07", "from": "info-minister-standard", "to": "proc-item-i-judgment", "role": "input" },
+      { "id": "e08", "from": "proc-item-i-judgment", "to": "info-item-i", "role": "output" },
+      { "id": "e09", "from": "proc-base-floor-area", "to": "info-base-floor-area", "role": "output" },
+      { "id": "e10", "from": "info-target-part", "to": "proc-target-floor-area", "role": "input" },
+      { "id": "e11", "from": "proc-target-floor-area", "to": "info-target-floor-area", "role": "output" },
+      { "id": "e12", "from": "info-target-floor-area", "to": "proc-floor-area-check", "role": "input" },
+      { "id": "e13", "from": "info-base-floor-area", "to": "proc-floor-area-check", "role": "input" },
+      { "id": "e14", "from": "proc-floor-area-check", "to": "info-floor-area-check", "role": "output" },
+      { "id": "e15", "from": "proc-after-scale", "to": "info-after-stories", "role": "output" },
+      { "id": "e16", "from": "proc-after-scale", "to": "info-after-floor-area", "role": "output" },
+      { "id": "e17", "from": "info-after-stories", "to": "proc-scale-check", "role": "input" },
+      { "id": "e18", "from": "info-after-floor-area", "to": "proc-scale-check", "role": "input" },
+      { "id": "e19", "from": "proc-scale-check", "to": "info-scale-check", "role": "output" },
+      { "id": "e20", "from": "info-target-part", "to": "proc-wall-check", "role": "input" },
+      { "id": "e21", "from": "proc-wall-check", "to": "info-wall-check", "role": "output" },
+      { "id": "e22", "from": "info-target-part", "to": "proc-new-opening", "role": "input" },
+      { "id": "e23", "from": "proc-new-opening", "to": "info-new-opening", "role": "output" },
+      { "id": "e24", "from": "proc-existing-opening", "to": "info-existing-opening", "role": "output" },
+      { "id": "e25", "from": "info-floor-area-check", "to": "proc-item-ro-judgment", "role": "input" },
+      { "id": "e26", "from": "info-scale-check", "to": "proc-item-ro-judgment", "role": "input" },
+      { "id": "e27", "from": "info-wall-check", "to": "proc-item-ro-judgment", "role": "input" },
+      { "id": "e28", "from": "info-new-opening", "to": "proc-item-ro-judgment", "role": "input" },
+      { "id": "e29", "from": "info-existing-opening", "to": "proc-item-ro-judgment", "role": "input" },
+      { "id": "e30", "from": "proc-item-ro-judgment", "to": "info-item-ro", "role": "output" },
+      { "id": "e31", "from": "info-item-i", "to": "proc-final-judgment", "role": "input" },
+      { "id": "e32", "from": "info-item-ro", "to": "proc-final-judgment", "role": "input" },
+      { "id": "e33", "from": "proc-final-judgment", "to": "info-final-compliance", "role": "output" }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": ["A3:P2", "A61", "A86_4", "A86_7:P1"],
+      "description": "法第3条第2項の既存不適格建築物の取扱、法第61条の防火地域規制、法第86条の4の開口部除外、法第86条の7第1項の緩和規定"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": ["A136_2", "A109"],
+      "description": "令136条の2各号の基準（防火地域内建築物）、令109条の防火設備"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T12:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令",
+    "source": "e-Gov法令API"
+  }
+}

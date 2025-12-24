@@ -1,0 +1,70 @@
+{
+  "id": "CHK-BSL-A26-P1-I2",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "防火壁適用除外（火災発生おそれ少ない用途）",
+    "target_subject": "建築物",
+    "description": "卸売市場の上家、機械製作工場等の火災発生おそれの少ない用途の建築物の防火壁適用除外判定"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "26",
+    "paragraph": "1",
+    "item": "2"
+  },
+  "labels": ["単体規定", "防火", "適用除外"],
+  "text_raw": "二卸売市場の上家、機械製作工場その他これらと同等以上に火災の発生のおそれが少ない用途に供する建築物で、構造及び用途の特殊性により周囲に対し著しく火災の危険を及ぼすおそれがないものとして政令で定めるものの部分",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {"type": "use", "note": "火災発生おそれ少ない用途"},
+        {"type": "safety", "note": "周囲に火災危険を及ぼすおそれなし"}
+      ]
+    },
+    "judgment_rule": {
+      "operator": "==",
+      "conditions": [
+        {"ref": "info-exemption", "operator": "==", "value": true}
+      ]
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {"id": "proc-use", "type": "process", "title": "建築物用途の特定", "process_type": "undefined_input", "description": "設計図書から建築物の用途を特定"},
+      {"id": "info-use", "type": "information", "title": "建築物の用途", "subject": "建築物", "property": "用途", "property_type": "classification", "plurality": "single"},
+      {"id": "proc-low-risk-check", "type": "process", "title": "火災発生おそれ判定", "process_type": "mechanical", "description": "用途が卸売市場の上家、機械製作工場等に該当するか", "related_articles": ["令::A115_2_2:P1:I2"]},
+      {"id": "info-low-risk", "type": "information", "title": "火災発生おそれ少ない用途", "subject": "建築物", "property": "火災発生おそれの程度", "property_type": "proposition", "plurality": "single"},
+      {"id": "proc-structure", "type": "process", "title": "構造の特定", "process_type": "undefined_input", "description": "建築物の構造を特定"},
+      {"id": "info-structure", "type": "information", "title": "建築物の構造", "subject": "建築物", "property": "構造", "property_type": "classification", "plurality": "single"},
+      {"id": "proc-safety-check", "type": "process", "title": "火災危険性判定", "process_type": "human_judgment", "description": "構造・用途の特殊性により周囲に火災危険を及ぼすおそれがないか判定"},
+      {"id": "info-no-danger", "type": "information", "title": "周囲への火災危険なし", "subject": "建築物", "property": "周囲への火災危険", "property_type": "proposition", "plurality": "single"},
+      {"id": "proc-exemption", "type": "process", "title": "適用除外判定", "process_type": "mechanical", "logic_expression": "low_risk AND no_danger", "description": "法26条1項2号の適用除外に該当するか"},
+      {"id": "info-exemption", "type": "information", "title": "法26条1項2号該当", "symbol": "EXEMPT", "subject": "建築物", "property": "防火壁適用除外", "property_type": "proposition", "plurality": "single"}
+    ],
+    "edges": [
+      {"id": "e001", "from": "proc-use", "to": "info-use", "role": "output"},
+      {"id": "e002", "from": "info-use", "to": "proc-low-risk-check", "role": "input"},
+      {"id": "e003", "from": "proc-low-risk-check", "to": "info-low-risk", "role": "output"},
+      {"id": "e004", "from": "proc-structure", "to": "info-structure", "role": "output"},
+      {"id": "e005", "from": "info-use", "to": "proc-safety-check", "role": "input"},
+      {"id": "e006", "from": "info-structure", "to": "proc-safety-check", "role": "input"},
+      {"id": "e007", "from": "proc-safety-check", "to": "info-no-danger", "role": "output"},
+      {"id": "e008", "from": "info-low-risk", "to": "proc-exemption", "role": "input"},
+      {"id": "e009", "from": "info-no-danger", "to": "proc-exemption", "role": "input"},
+      {"id": "e010", "from": "proc-exemption", "to": "info-exemption", "role": "output"}
+    ]
+  },
+  "related_laws": [
+    {"law_id": "325CO0000000338", "law_name": "建築基準法施行令", "law_type": "order", "relationship": "delegates_to", "articles": ["A115_2_2:P1:I2"], "description": "令115条の2の2第1項2号"}
+  ],
+  "metadata": {
+    "created_at": "2025-12-24T00:00:00Z",
+    "generator": "claude-code-kijo-generator",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

@@ -1,0 +1,275 @@
+{
+  "id": "CHK-BSL-A87-3-P1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "災害救助用建築物の適用除外判定",
+    "target_subject": "建築物",
+    "description": "非常災害時に用途変更された災害救助用建築物が建築基準法令の適用を除外できるかを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "87の3",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "防災",
+    "規制緩和"
+  ],
+  "text_raw": "非常災害があつた場合において、非常災害区域等内にある建築物の用途を変更して災害救助用建築物（住宅、病院その他これらに類する建築物で、国、地方公共団体又は日本赤十字社が災害救助のために使用するものをいう。以下この条及び第百一条第一項第十六号において同じ。）として使用するとき（その災害が発生した日から一月以内に当該用途の変更に着手するときに限る。）における当該災害救助用建築物については、建築基準法令の規定は、適用しない。ただし、非常災害区域等のうち防火地域内にある建築物については、この限りでない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "event",
+          "value": "非常災害が発生している"
+        },
+        {
+          "type": "location",
+          "value": "非常災害区域等内"
+        }
+      ],
+      "note": "非常災害時の指定された災害区域内"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-disaster-event",
+          "operator": "==",
+          "value": true,
+          "description": "非常災害が発生している"
+        },
+        {
+          "ref": "info-location-in-zone",
+          "operator": "==",
+          "value": true,
+          "description": "非常災害区域等内に位置している"
+        },
+        {
+          "ref": "info-use-change-purpose",
+          "operator": "==",
+          "value": "災害救助用建築物",
+          "description": "災害救助用建築物に用途変更している"
+        },
+        {
+          "ref": "info-change-timeline",
+          "operator": "<=",
+          "value": "発生から一月以内に着手",
+          "description": "災害発生から一月以内に用途変更に着手している"
+        }
+      ]
+    },
+    "exceptions": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "note": "防火地域内の建築物は除外されない",
+          "ref": "info-location-firearea",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "effect": "EXEMPT_CANCELLED"
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "info-disaster-event",
+        "type": "information",
+        "title": "非常災害の発生",
+        "subject": "災害状況",
+        "property": "非常災害の発生有無",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "非常災害が発生しているか否か",
+        "remarks": "暴風、豪雨、豪雪、洪水、崖崩れ、土石流、高潮等の非常災害"
+      },
+      {
+        "id": "info-location-in-zone",
+        "type": "information",
+        "title": "非常災害区域等内の位置",
+        "subject": "建築物",
+        "property": "非常災害区域等内への位置",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "当該建築物が非常災害区域等内に位置しているか否か"
+      },
+      {
+        "id": "info-use-change-purpose",
+        "type": "information",
+        "title": "用途変更後の用途",
+        "subject": "建築物",
+        "property": "用途分類",
+        "property_type": "classification",
+        "plurality": "single",
+        "description": "変更後の用途が災害救助用建築物に該当するか",
+        "remarks": "災害救助用建築物：住宅、病院その他これらに類する建築物で、国、地方公共団体又は日本赤十字社が災害救助のために使用するもの"
+      },
+      {
+        "id": "info-change-timeline",
+        "type": "information",
+        "title": "用途変更の着手時期",
+        "subject": "建築物",
+        "property": "用途変更着手の時期",
+        "property_type": "numeric",
+        "unit": "日",
+        "plurality": "single",
+        "description": "災害発生日から用途変更への着手までの日数",
+        "remarks": "災害発生日から一月（30日）以内に着手することが条件"
+      },
+      {
+        "id": "info-location-firearea",
+        "type": "information",
+        "title": "防火地域内の位置",
+        "subject": "建築物",
+        "property": "防火地域内への位置",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "当該建築物が防火地域内に位置しているか否か"
+      },
+      {
+        "id": "proc-disaster-check",
+        "type": "process",
+        "title": "非常災害の確認",
+        "process_type": "human_judgment",
+        "description": "非常災害が現実に発生しており、当該建築物の敷地が被害を受けた災害区域に含まれているか確認",
+        "target_subject": "建築物"
+      },
+      {
+        "id": "proc-use-check",
+        "type": "process",
+        "title": "用途変更内容の確認",
+        "process_type": "human_judgment",
+        "description": "用途変更後の用途が災害救助用建築物の定義に該当するか確認（国・地方公共団体・赤十字社による災害救助用途であること）",
+        "target_subject": "建築物"
+      },
+      {
+        "id": "proc-timeline-check",
+        "type": "process",
+        "title": "着手期間の確認",
+        "process_type": "mechanical",
+        "description": "災害発生日から用途変更への着手までが一月以内であることを確認",
+        "logic_expression": "(変更着手日 - 災害発生日) ≤ 30日",
+        "target_subject": "建築物"
+      },
+      {
+        "id": "proc-firearea-check",
+        "type": "process",
+        "title": "防火地域判定",
+        "process_type": "mechanical",
+        "description": "建築物が防火地域内に位置するか否かを都市計画データで確認",
+        "target_subject": "建築物"
+      },
+      {
+        "id": "proc-exemption-judgment",
+        "type": "process",
+        "title": "適用除外判定",
+        "process_type": "mechanical",
+        "description": "非常災害、区域内、用途変更、期間要件を全て満たし、防火地域外である場合、建築基準法令の規定が適用除外される",
+        "logic_expression": "災害確認 ∧ 区域内 ∧ 用途該当 ∧ 期間内 ∧ ¬防火地域",
+        "target_subject": "建築物"
+      },
+      {
+        "id": "info-exemption-result",
+        "type": "information",
+        "title": "建築基準法令の適用除外",
+        "subject": "建築物",
+        "property": "建築基準法令適用状態",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "建築基準法令の規定が適用除外されるか否か",
+        "remarks": "適用除外の場合、設計・施工・維持に関する建築基準法令の要件を遵守する必要がない"
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge-disaster-check",
+        "from": "info-disaster-event",
+        "to": "proc-disaster-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-location-check",
+        "from": "info-location-in-zone",
+        "to": "proc-disaster-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-disaster-result",
+        "from": "proc-disaster-check",
+        "to": "proc-exemption-judgment",
+        "role": "input"
+      },
+      {
+        "id": "edge-use-input",
+        "from": "info-use-change-purpose",
+        "to": "proc-use-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-use-result",
+        "from": "proc-use-check",
+        "to": "proc-exemption-judgment",
+        "role": "input"
+      },
+      {
+        "id": "edge-timeline-input",
+        "from": "info-change-timeline",
+        "to": "proc-timeline-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-timeline-result",
+        "from": "proc-timeline-check",
+        "to": "proc-exemption-judgment",
+        "role": "input"
+      },
+      {
+        "id": "edge-firearea-input",
+        "from": "info-location-firearea",
+        "to": "proc-firearea-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-firearea-result",
+        "from": "proc-firearea-check",
+        "to": "proc-exemption-judgment",
+        "role": "input"
+      },
+      {
+        "id": "edge-final-result",
+        "from": "proc-exemption-judgment",
+        "to": "info-exemption-result",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "defines_detail",
+      "articles": [
+        "A101:P1:I16"
+      ],
+      "description": "第101条第1項第16号で災害救助用建築物等を適用除外の対象として規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-24T00:00:00.000Z",
+    "updated_at": "2025-12-24T00:00:00.000Z",
+    "author": "Claude Code",
+    "generator": "claude-haiku-4-5-20251001",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法",
+    "source": "e-Gov法令API"
+  }
+}

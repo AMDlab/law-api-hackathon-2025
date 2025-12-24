@@ -1,0 +1,211 @@
+{
+  "id": "CHK-BSL-A24-P1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "法22条区域の内外にわたる建築物の措置",
+    "target_subject": "建築物",
+    "description": "法22条1項の区域の内外にわたる建築物について、全体が区域内にあるものとみなして法22条・23条を適用することを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "24",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": ["単体規定", "防火", "区域規定"],
+  "text_raw": "建築物が第二十二条第一項の市街地の区域の内外にわたる場合においては、その全部について同項及び前条の規定を適用する。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "法22条区域の内外にわたる",
+          "description": "建築物が法22条1項の市街地の区域の境界をまたいで存在する"
+        }
+      ],
+      "note": "建築物が法22条1項の市街地の区域の内外にわたる場合"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        { "ref": "info-a22-compliance", "operator": "==", "value": true },
+        { "ref": "info-a23-compliance", "operator": "==", "value": true }
+      ]
+    },
+    "exceptions": null
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-building-boundary",
+        "type": "process",
+        "title": "建築物範囲の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の外周（建築物が占める範囲）を特定する"
+      },
+      {
+        "id": "info-building-boundary",
+        "type": "information",
+        "title": "建築物の外周",
+        "symbol": "B",
+        "subject": "建築物",
+        "property": "外周形状",
+        "property_type": "geometric_surface",
+        "description": "建築物の平面的な外周範囲",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-straddle-check",
+        "type": "process",
+        "title": "区域内外判定",
+        "process_type": "mechanical",
+        "description": "建築物の外周と都市計画情報（法22条区域境界）から、建築物が法22条区域の内外にわたるか幾何学的に判定",
+        "logic_expression": "建築物外周 ∩ 区域内 ≠ ∅ AND 建築物外周 ∩ 区域外 ≠ ∅",
+        "remarks": "都市計画情報（法22条区域境界）は処理内で参照される公共データ"
+      },
+      {
+        "id": "info-straddle",
+        "type": "information",
+        "title": "区域内外にわたる建築物",
+        "symbol": "STRADDLE",
+        "subject": "建築物",
+        "property": "法22条区域の内外にわたる",
+        "property_type": "proposition",
+        "description": "建築物が法22条1項の市街地の区域の内外にわたるか（境界をまたぐか）",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-roofs-set",
+        "type": "process",
+        "title": "屋根の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から判定対象となる建築物の屋根を特定する"
+      },
+      {
+        "id": "info-roofs-set",
+        "type": "information",
+        "title": "建築物の屋根",
+        "subject": "建築物",
+        "property": "屋根の集合",
+        "property_type": "set_definition",
+        "description": "判定対象となる建築物に属する屋根を特定",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-a22-compliance",
+        "type": "process",
+        "title": "法22条適合判定",
+        "process_type": "sub_diagram_reference",
+        "description": "建築物の全部について法22条（屋根の構造）の規定を適用し、適合を判定する",
+        "related_articles": ["法::A22:P1"],
+        "sub_diagram_ref": "CHK-BSL-A22-P1"
+      },
+      {
+        "id": "info-a22-compliance",
+        "type": "information",
+        "title": "法22条適合",
+        "symbol": "C22",
+        "subject": "建築物",
+        "property": "法22条適合",
+        "property_type": "proposition",
+        "description": "建築物の全部について法22条1項の規定に適合するか",
+        "related_articles": ["法::A22:P1"],
+        "plurality": "single"
+      },
+      {
+        "id": "proc-walls-set",
+        "type": "process",
+        "title": "外壁の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から判定対象となる建築物の外壁を特定する"
+      },
+      {
+        "id": "info-walls-set",
+        "type": "information",
+        "title": "建築物の外壁",
+        "subject": "建築物",
+        "property": "外壁の集合",
+        "property_type": "set_definition",
+        "description": "判定対象となる建築物に属する外壁を特定",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-a23-compliance",
+        "type": "process",
+        "title": "法23条適合判定",
+        "process_type": "sub_diagram_reference",
+        "description": "建築物の全部について法23条（外壁の構造）の規定を適用し、適合を判定する",
+        "related_articles": ["法::A23:P1"],
+        "sub_diagram_ref": "CHK-BSL-A23-P1"
+      },
+      {
+        "id": "info-a23-compliance",
+        "type": "information",
+        "title": "法23条適合",
+        "symbol": "C23",
+        "subject": "建築物",
+        "property": "法23条適合",
+        "property_type": "proposition",
+        "description": "建築物の全部について法23条の規定に適合するか",
+        "related_articles": ["法::A23:P1"],
+        "plurality": "single"
+      },
+      {
+        "id": "proc-final-judgment",
+        "type": "process",
+        "title": "最終適合判定",
+        "process_type": "mechanical",
+        "description": "建築物が区域内外にわたる場合、法22条と法23条の両方に適合することを確認",
+        "logic_expression": "STRADDLE → (C22 AND C23)"
+      },
+      {
+        "id": "info-compliance",
+        "type": "information",
+        "title": "法24条1項適合",
+        "symbol": "COMPLY",
+        "subject": "建築物",
+        "property": "法24条1項適合",
+        "property_type": "proposition",
+        "description": "建築物が法24条1項の規定に適合するか（区域内外にわたる場合は法22条・23条を満たす）",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "proc-building-boundary", "to": "info-building-boundary", "role": "output" },
+      { "id": "e02", "from": "info-building-boundary", "to": "proc-straddle-check", "role": "input" },
+      { "id": "e03", "from": "proc-straddle-check", "to": "info-straddle", "role": "output" },
+      { "id": "e04", "from": "proc-roofs-set", "to": "info-roofs-set", "role": "output" },
+      { "id": "e05", "from": "info-roofs-set", "to": "proc-a22-compliance", "role": "input" },
+      { "id": "e06", "from": "proc-a22-compliance", "to": "info-a22-compliance", "role": "output" },
+      { "id": "e07", "from": "proc-walls-set", "to": "info-walls-set", "role": "output" },
+      { "id": "e08", "from": "info-walls-set", "to": "proc-a23-compliance", "role": "input" },
+      { "id": "e09", "from": "proc-a23-compliance", "to": "info-a23-compliance", "role": "output" },
+      { "id": "e10", "from": "info-straddle", "to": "proc-final-judgment", "role": "input" },
+      { "id": "e11", "from": "info-a22-compliance", "to": "proc-final-judgment", "role": "input" },
+      { "id": "e12", "from": "info-a23-compliance", "to": "proc-final-judgment", "role": "input" },
+      { "id": "e13", "from": "proc-final-judgment", "to": "info-compliance", "role": "output" }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A22:P1", "A23:P1"],
+      "description": "法24条1項により、区域内外にわたる建築物には法22条（屋根）と法23条（外壁）が適用される"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-23T12:00:00+09:00",
+    "updated_at": "2025-12-23T12:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

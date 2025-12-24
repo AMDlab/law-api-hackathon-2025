@@ -1,0 +1,243 @@
+{
+  "id": "CHK-BSL-A61-P2",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "防火地域等の別の建築物みなし規定",
+    "target_subject": "建築物",
+    "description": "法61条1項の基準適用上、政令で定める部分が2以上ある建築物は、それぞれ別の建築物とみなすことを定める"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "61",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": [
+    "集団規定",
+    "防火",
+    "みなし規定"
+  ],
+  "text_raw": "前項に規定する基準の適用上一の建築物であつても別の建築物とみなすことができる部分として政令で定める部分が二以上ある建築物の当該建築物の部分は、同項の規定の適用については、それぞれ別の建築物とみなす。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "防火地域又は準防火地域内"
+        },
+        {
+          "type": "structure",
+          "value": "政令で定める部分が2以上ある建築物"
+        }
+      ],
+      "note": "法61条1項の基準適用を受ける建築物であって、政令で定める部分が2以上あるものが対象"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-has-two-or-more-parts",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-building-identify",
+        "type": "process",
+        "title": "建築物の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書から判定対象となる建築物を特定する"
+      },
+      {
+        "id": "info-building",
+        "type": "information",
+        "title": "建築物",
+        "symbol": "B",
+        "subject": "建築物",
+        "property": "建築物",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "法61条2項の適用判定を行う建築物"
+      },
+      {
+        "id": "proc-parts-identify",
+        "type": "process",
+        "title": "政令定め部分の特定",
+        "process_type": "human_judgment",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "政令（令第136条の2）で定める別の建築物とみなすことができる部分を特定する",
+        "related_articles": [
+          "令::A136_2"
+        ]
+      },
+      {
+        "id": "info-parts-set",
+        "type": "information",
+        "title": "政令定め部分の集合",
+        "symbol": "P",
+        "subject": "建築物",
+        "property": "政令定め部分の集合",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "別の建築物とみなすことができる部分として政令で定める部分の集合"
+      },
+      {
+        "id": "proc-count-parts",
+        "type": "process",
+        "title": "政令定め部分数の算定",
+        "process_type": "mechanical",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "政令で定める部分の数をカウントする",
+        "logic_expression": "N = |P|"
+      },
+      {
+        "id": "info-parts-count",
+        "type": "information",
+        "title": "政令定め部分の数",
+        "symbol": "N",
+        "subject": "建築物",
+        "property": "政令定め部分数",
+        "property_type": "numeric",
+        "unit": "個",
+        "plurality": "single",
+        "description": "建築物内の政令で定める部分の数"
+      },
+      {
+        "id": "proc-two-or-more-check",
+        "type": "process",
+        "title": "2以上該当判定",
+        "process_type": "mechanical",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "政令で定める部分が2以上あるか判定",
+        "logic_expression": "N >= 2"
+      },
+      {
+        "id": "info-has-two-or-more-parts",
+        "type": "information",
+        "title": "2以上該当",
+        "symbol": "M",
+        "subject": "建築物",
+        "property": "政令定め部分2以上該当",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "政令で定める部分が2以上あるか"
+      },
+      {
+        "id": "proc-separate-judgment",
+        "type": "process",
+        "title": "別建築物みなし判定",
+        "process_type": "mechanical",
+        "target_subject": "建築物の部分",
+        "iteration": "single",
+        "description": "2以上該当する場合、各部分を別の建築物とみなす",
+        "logic_expression": "M = true → 各部分を別の建築物とみなす"
+      },
+      {
+        "id": "info-separate-result",
+        "type": "information",
+        "title": "別建築物みなし適用",
+        "symbol": "R",
+        "subject": "建築物の部分",
+        "property": "別建築物みなし適用",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "法61条1項の適用上、各部分を別の建築物とみなすか"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-building-identify",
+        "to": "info-building",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "info-building",
+        "to": "proc-parts-identify",
+        "role": "input"
+      },
+      {
+        "id": "e03",
+        "from": "proc-parts-identify",
+        "to": "info-parts-set",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "info-parts-set",
+        "to": "proc-count-parts",
+        "role": "input"
+      },
+      {
+        "id": "e05",
+        "from": "proc-count-parts",
+        "to": "info-parts-count",
+        "role": "output"
+      },
+      {
+        "id": "e06",
+        "from": "info-parts-count",
+        "to": "proc-two-or-more-check",
+        "role": "input"
+      },
+      {
+        "id": "e07",
+        "from": "proc-two-or-more-check",
+        "to": "info-has-two-or-more-parts",
+        "role": "output"
+      },
+      {
+        "id": "e08",
+        "from": "info-has-two-or-more-parts",
+        "to": "proc-separate-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e09",
+        "from": "info-parts-set",
+        "to": "proc-separate-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e10",
+        "from": "proc-separate-judgment",
+        "to": "info-separate-result",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "delegates_to",
+      "articles": [
+        "A136_2"
+      ],
+      "description": "法61条2項の政令で定める別の建築物とみなすことができる部分を規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-24T12:00:00Z",
+    "updated_at": "2025-12-24T12:00:00Z",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法",
+    "source": "e-Gov法令API + buildingSMART Japan審査機序図作成手引書"
+  }
+}

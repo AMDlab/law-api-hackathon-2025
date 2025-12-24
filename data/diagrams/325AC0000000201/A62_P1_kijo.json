@@ -1,0 +1,680 @@
+{
+  "id": "CHK-BSL-A62-P1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "準防火地域内の建築物の外壁・軒裏",
+    "target_subject": "建築物",
+    "description": "準防火地域内の建築物の外壁及び軒裏で延焼のおそれのある部分が防火構造であることを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "62",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "集団規定",
+    "防火"
+  ],
+  "text_raw": "準防火地域内にある建築物(法第61条の規定により準耐火建築物等としなければならないものを除く。)は、その外壁及び軒裏で延焼のおそれのある部分を防火構造とし、これに附属する高さ2メートルを超える門又は塀で当該建築物の1階であつて延焼のおそれのある部分に面するものを不燃材料で造り、又は覆わなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "準防火地域内"
+        },
+        {
+          "type": "exclusion",
+          "value": "法61条により準耐火建築物等としなければならないものを除く"
+        }
+      ],
+      "note": "準防火地域内かつ法61条対象外の建築物"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-outer-wall-compliance",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "ref": "info-eaves-compliance",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "ref": "info-fence-compliance",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-a61-check",
+        "type": "process",
+        "title": "法61条適用判定",
+        "process_type": "mechanical",
+        "description": "当該建築物が法61条により準耐火建築物等としなければならないものに該当するか判定",
+        "related_articles": [
+          "法::A61"
+        ]
+      },
+      {
+        "id": "info-a61-applicable",
+        "type": "information",
+        "title": "法61条対象該当",
+        "symbol": "A61",
+        "subject": "建築物",
+        "property": "法61条対象該当",
+        "property_type": "proposition",
+        "description": "法61条により準耐火建築物等としなければならないものに該当するか(該当する場合は法62条1項は適用されない)",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-outer-walls-set",
+        "type": "process",
+        "title": "外壁の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から判定対象となる外壁を特定する"
+      },
+      {
+        "id": "info-outer-walls-set",
+        "type": "information",
+        "title": "建築物の外壁",
+        "subject": "建築物",
+        "property": "外壁の集合",
+        "property_type": "set_definition",
+        "description": "判定対象となる建築物に属する外壁を特定",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-outer-wall-ensho-check",
+        "type": "process",
+        "title": "外壁の延焼のおそれのある部分判定",
+        "process_type": "mechanical",
+        "target_subject": "外壁",
+        "iteration": "iterative",
+        "description": "隣地境界線等からの距離に基づき、外壁の各部分が延焼のおそれのある部分に該当するかを判定",
+        "related_articles": [
+          "法::A2:I6"
+        ]
+      },
+      {
+        "id": "info-outer-wall-ensho",
+        "type": "information",
+        "title": "外壁の延焼のおそれのある部分",
+        "symbol": "EW",
+        "subject": "外壁",
+        "property": "延焼のおそれのある部分への該当",
+        "property_type": "proposition",
+        "description": "当該外壁の部分が延焼のおそれのある部分に該当するか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-outer-wall-structure",
+        "type": "process",
+        "title": "外壁構造の特定",
+        "process_type": "human_judgment",
+        "target_subject": "外壁",
+        "iteration": "iterative",
+        "description": "設計図書等から外壁の構造を特定する"
+      },
+      {
+        "id": "info-outer-wall-structure",
+        "type": "information",
+        "title": "外壁の構造",
+        "symbol": "SW",
+        "subject": "外壁",
+        "property": "構造方法",
+        "property_type": "classification",
+        "description": "外壁の構造方法(防火構造、その他)",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-outer-wall-fireproof-check",
+        "type": "process",
+        "title": "外壁の防火構造該当判定",
+        "process_type": "mechanical",
+        "target_subject": "外壁",
+        "iteration": "iterative",
+        "description": "延焼のおそれのある部分の外壁が防火構造であるかを判定",
+        "related_articles": [
+          "法::A2:I8"
+        ],
+        "logic_expression": "(EW = false) OR (SW = '防火構造')"
+      },
+      {
+        "id": "info-outer-wall-compliance",
+        "type": "information",
+        "title": "外壁の適合",
+        "symbol": "CW",
+        "subject": "外壁",
+        "property": "法62条1項外壁規定適合",
+        "property_type": "proposition",
+        "description": "延焼のおそれのある部分の外壁が防火構造であるか(又は延焼のおそれのない部分)",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-eaves-set",
+        "type": "process",
+        "title": "軒裏の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から判定対象となる軒裏を特定する"
+      },
+      {
+        "id": "info-eaves-set",
+        "type": "information",
+        "title": "建築物の軒裏",
+        "subject": "建築物",
+        "property": "軒裏の集合",
+        "property_type": "set_definition",
+        "description": "判定対象となる建築物に属する軒裏を特定",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-eaves-ensho-check",
+        "type": "process",
+        "title": "軒裏の延焼のおそれのある部分判定",
+        "process_type": "mechanical",
+        "target_subject": "軒裏",
+        "iteration": "iterative",
+        "description": "隣地境界線等からの距離に基づき、軒裏の各部分が延焼のおそれのある部分に該当するかを判定",
+        "related_articles": [
+          "法::A2:I6"
+        ]
+      },
+      {
+        "id": "info-eaves-ensho",
+        "type": "information",
+        "title": "軒裏の延焼のおそれのある部分",
+        "symbol": "EE",
+        "subject": "軒裏",
+        "property": "延焼のおそれのある部分への該当",
+        "property_type": "proposition",
+        "description": "当該軒裏の部分が延焼のおそれのある部分に該当するか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-eaves-structure",
+        "type": "process",
+        "title": "軒裏構造の特定",
+        "process_type": "human_judgment",
+        "target_subject": "軒裏",
+        "iteration": "iterative",
+        "description": "設計図書等から軒裏の構造を特定する"
+      },
+      {
+        "id": "info-eaves-structure",
+        "type": "information",
+        "title": "軒裏の構造",
+        "symbol": "SE",
+        "subject": "軒裏",
+        "property": "構造方法",
+        "property_type": "classification",
+        "description": "軒裏の構造方法(防火構造、その他)",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-eaves-fireproof-check",
+        "type": "process",
+        "title": "軒裏の防火構造該当判定",
+        "process_type": "mechanical",
+        "target_subject": "軒裏",
+        "iteration": "iterative",
+        "description": "延焼のおそれのある部分の軒裏が防火構造であるかを判定",
+        "related_articles": [
+          "法::A2:I8"
+        ],
+        "logic_expression": "(EE = false) OR (SE = '防火構造')"
+      },
+      {
+        "id": "info-eaves-compliance",
+        "type": "information",
+        "title": "軒裏の適合",
+        "symbol": "CE",
+        "subject": "軒裏",
+        "property": "法62条1項軒裏規定適合",
+        "property_type": "proposition",
+        "description": "延焼のおそれのある部分の軒裏が防火構造であるか(又は延焼のおそれのない部分)",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-fences-set",
+        "type": "process",
+        "title": "門・塀の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から判定対象となる建築物附属の門又は塀を特定する"
+      },
+      {
+        "id": "info-fences-set",
+        "type": "information",
+        "title": "建築物附属の門・塀",
+        "subject": "建築物",
+        "property": "門・塀の集合",
+        "property_type": "set_definition",
+        "description": "判定対象となる建築物に附属する門又は塀を特定",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-fence-height",
+        "type": "process",
+        "title": "門・塀の高さ特定",
+        "process_type": "human_judgment",
+        "target_subject": "門・塀",
+        "iteration": "iterative",
+        "description": "設計図書等から門又は塀の高さを読み取る"
+      },
+      {
+        "id": "info-fence-height",
+        "type": "information",
+        "title": "門・塀の高さ",
+        "symbol": "HF",
+        "subject": "門・塀",
+        "property": "高さ",
+        "property_type": "numeric",
+        "unit": "m",
+        "description": "門又は塀の高さ",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-fence-location",
+        "type": "process",
+        "title": "門・塀の位置確認",
+        "process_type": "mechanical",
+        "target_subject": "門・塀",
+        "iteration": "iterative",
+        "description": "門又は塀が建築物の1階で延焼のおそれのある部分に面しているか確認"
+      },
+      {
+        "id": "info-fence-location",
+        "type": "information",
+        "title": "1階延焼部分への面",
+        "symbol": "LF",
+        "subject": "門・塀",
+        "property": "1階延焼部分への面",
+        "property_type": "proposition",
+        "description": "建築物の1階であって延焼のおそれのある部分に面しているか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-fence-material",
+        "type": "process",
+        "title": "門・塀の材料特定",
+        "process_type": "human_judgment",
+        "target_subject": "門・塀",
+        "iteration": "iterative",
+        "description": "設計図書等から門又は塀の材料構成を特定する"
+      },
+      {
+        "id": "info-fence-material",
+        "type": "information",
+        "title": "門・塀の材料構成",
+        "symbol": "MF",
+        "subject": "門・塀",
+        "property": "材料構成",
+        "property_type": "classification",
+        "description": "不燃材料で造られ又は覆われているか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-fence-requirement-check",
+        "type": "process",
+        "title": "門・塀の規定適合判定",
+        "process_type": "mechanical",
+        "target_subject": "門・塀",
+        "iteration": "iterative",
+        "description": "高さ2m超で1階延焼部分に面する門・塀が不燃材料であるかを判定",
+        "logic_expression": "(HF ≤ 2) OR (LF = false) OR (MF = '不燃材料')"
+      },
+      {
+        "id": "info-fence-compliance",
+        "type": "information",
+        "title": "門・塀の適合",
+        "symbol": "CF",
+        "subject": "門・塀",
+        "property": "法62条1項門・塀規定適合",
+        "property_type": "proposition",
+        "description": "高さ2m以下、又は1階延焼部分に面していない、又は不燃材料であるか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-all-outer-wall-check",
+        "type": "process",
+        "title": "全外壁適合確認",
+        "process_type": "mechanical",
+        "description": "全ての外壁が規定に適合することを確認",
+        "logic_expression": "∀wall ∈ OuterWalls: CW(wall) = true"
+      },
+      {
+        "id": "info-all-outer-wall-ok",
+        "type": "information",
+        "title": "全外壁適合",
+        "subject": "建築物",
+        "property": "全外壁適合",
+        "property_type": "proposition",
+        "description": "建築物の全ての外壁が規定に適合するか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-all-eaves-check",
+        "type": "process",
+        "title": "全軒裏適合確認",
+        "process_type": "mechanical",
+        "description": "全ての軒裏が規定に適合することを確認",
+        "logic_expression": "∀eaves ∈ Eaves: CE(eaves) = true"
+      },
+      {
+        "id": "info-all-eaves-ok",
+        "type": "information",
+        "title": "全軒裏適合",
+        "subject": "建築物",
+        "property": "全軒裏適合",
+        "property_type": "proposition",
+        "description": "建築物の全ての軒裏が規定に適合するか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-all-fence-check",
+        "type": "process",
+        "title": "全門・塀適合確認",
+        "process_type": "mechanical",
+        "description": "全ての門・塀が規定に適合することを確認",
+        "logic_expression": "∀fence ∈ Fences: CF(fence) = true"
+      },
+      {
+        "id": "info-all-fence-ok",
+        "type": "information",
+        "title": "全門・塀適合",
+        "subject": "建築物",
+        "property": "全門・塀適合",
+        "property_type": "proposition",
+        "description": "建築物附属の全ての門・塀が規定に適合するか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-final-judgment",
+        "type": "process",
+        "title": "最終適合判定",
+        "process_type": "mechanical",
+        "description": "法61条対象外であり、外壁・軒裏・門塀の全てが規定に適合することを確認",
+        "logic_expression": "(A61 = false) AND (全外壁適合 = true) AND (全軒裏適合 = true) AND (全門塀適合 = true)"
+      },
+      {
+        "id": "info-final",
+        "type": "information",
+        "title": "建築物の法62条1項適合",
+        "subject": "建築物",
+        "property": "法62条1項適合",
+        "property_type": "proposition",
+        "description": "建築物全体として法62条1項の規定に適合するか",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-a61-check",
+        "to": "info-a61-applicable",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "proc-outer-walls-set",
+        "to": "info-outer-walls-set",
+        "role": "output"
+      },
+      {
+        "id": "e03",
+        "from": "info-outer-walls-set",
+        "to": "proc-outer-wall-ensho-check",
+        "role": "input"
+      },
+      {
+        "id": "e04",
+        "from": "proc-outer-wall-ensho-check",
+        "to": "info-outer-wall-ensho",
+        "role": "output"
+      },
+      {
+        "id": "e05",
+        "from": "info-outer-walls-set",
+        "to": "proc-outer-wall-structure",
+        "role": "input"
+      },
+      {
+        "id": "e06",
+        "from": "proc-outer-wall-structure",
+        "to": "info-outer-wall-structure",
+        "role": "output"
+      },
+      {
+        "id": "e07",
+        "from": "info-outer-wall-ensho",
+        "to": "proc-outer-wall-fireproof-check",
+        "role": "input"
+      },
+      {
+        "id": "e08",
+        "from": "info-outer-wall-structure",
+        "to": "proc-outer-wall-fireproof-check",
+        "role": "input"
+      },
+      {
+        "id": "e09",
+        "from": "proc-outer-wall-fireproof-check",
+        "to": "info-outer-wall-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e10",
+        "from": "proc-eaves-set",
+        "to": "info-eaves-set",
+        "role": "output"
+      },
+      {
+        "id": "e11",
+        "from": "info-eaves-set",
+        "to": "proc-eaves-ensho-check",
+        "role": "input"
+      },
+      {
+        "id": "e12",
+        "from": "proc-eaves-ensho-check",
+        "to": "info-eaves-ensho",
+        "role": "output"
+      },
+      {
+        "id": "e13",
+        "from": "info-eaves-set",
+        "to": "proc-eaves-structure",
+        "role": "input"
+      },
+      {
+        "id": "e14",
+        "from": "proc-eaves-structure",
+        "to": "info-eaves-structure",
+        "role": "output"
+      },
+      {
+        "id": "e15",
+        "from": "info-eaves-ensho",
+        "to": "proc-eaves-fireproof-check",
+        "role": "input"
+      },
+      {
+        "id": "e16",
+        "from": "info-eaves-structure",
+        "to": "proc-eaves-fireproof-check",
+        "role": "input"
+      },
+      {
+        "id": "e17",
+        "from": "proc-eaves-fireproof-check",
+        "to": "info-eaves-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e18",
+        "from": "proc-fences-set",
+        "to": "info-fences-set",
+        "role": "output"
+      },
+      {
+        "id": "e19",
+        "from": "info-fences-set",
+        "to": "proc-fence-height",
+        "role": "input"
+      },
+      {
+        "id": "e20",
+        "from": "proc-fence-height",
+        "to": "info-fence-height",
+        "role": "output"
+      },
+      {
+        "id": "e21",
+        "from": "info-fences-set",
+        "to": "proc-fence-location",
+        "role": "input"
+      },
+      {
+        "id": "e22",
+        "from": "proc-fence-location",
+        "to": "info-fence-location",
+        "role": "output"
+      },
+      {
+        "id": "e23",
+        "from": "info-fences-set",
+        "to": "proc-fence-material",
+        "role": "input"
+      },
+      {
+        "id": "e24",
+        "from": "proc-fence-material",
+        "to": "info-fence-material",
+        "role": "output"
+      },
+      {
+        "id": "e25",
+        "from": "info-fence-height",
+        "to": "proc-fence-requirement-check",
+        "role": "input"
+      },
+      {
+        "id": "e26",
+        "from": "info-fence-location",
+        "to": "proc-fence-requirement-check",
+        "role": "input"
+      },
+      {
+        "id": "e27",
+        "from": "info-fence-material",
+        "to": "proc-fence-requirement-check",
+        "role": "input"
+      },
+      {
+        "id": "e28",
+        "from": "proc-fence-requirement-check",
+        "to": "info-fence-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e29",
+        "from": "info-outer-wall-compliance",
+        "to": "proc-all-outer-wall-check",
+        "role": "input"
+      },
+      {
+        "id": "e30",
+        "from": "proc-all-outer-wall-check",
+        "to": "info-all-outer-wall-ok",
+        "role": "output"
+      },
+      {
+        "id": "e31",
+        "from": "info-eaves-compliance",
+        "to": "proc-all-eaves-check",
+        "role": "input"
+      },
+      {
+        "id": "e32",
+        "from": "proc-all-eaves-check",
+        "to": "info-all-eaves-ok",
+        "role": "output"
+      },
+      {
+        "id": "e33",
+        "from": "info-fence-compliance",
+        "to": "proc-all-fence-check",
+        "role": "input"
+      },
+      {
+        "id": "e34",
+        "from": "proc-all-fence-check",
+        "to": "info-all-fence-ok",
+        "role": "output"
+      },
+      {
+        "id": "e35",
+        "from": "info-a61-applicable",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e36",
+        "from": "info-all-outer-wall-ok",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e37",
+        "from": "info-all-eaves-ok",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e38",
+        "from": "info-all-fence-ok",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e39",
+        "from": "proc-final-judgment",
+        "to": "info-final",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": [
+        "A2:I6",
+        "A2:I8",
+        "A61"
+      ],
+      "description": "法2条6号(延焼のおそれのある部分)、法2条8号(防火構造)、法61条(準耐火建築物等)"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-23T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

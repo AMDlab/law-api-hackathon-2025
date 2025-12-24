@@ -1,0 +1,201 @@
+{
+  "id": "CHK-BSL-A68-5-5-P1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "地区計画対応建築物の容積率特例",
+    "target_subject": "建築物",
+    "description": "地区計画の内容に適合し、特定行政庁の承認を得た建築物について第52条第2項の適用を除外する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "68の5の5",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "容積率特例"
+  ],
+  "text_raw": "次に掲げる条件に該当する地区計画等（集落地区計画を除く。以下この条において同じ。）の区域内の建築物で、当該地区計画等の内容に適合し、かつ、特定行政庁が交通上、安全上、防火上及び衛生上支障がないと認めるものについては、第五十二条第二項の規定は、適用しない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "地区計画等の区域内"
+        }
+      ],
+      "note": "集落地区計画を除く"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-plan-compliance",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "ref": "info-authority-approval",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-district-plan-check",
+        "type": "process",
+        "title": "適用地区の確認",
+        "process_type": "mechanical",
+        "description": "対象建築物が、集落地区計画を除く地区計画等の区域内にあることを確認",
+        "related_articles": [
+          "法::A68_5:P1"
+        ]
+      },
+      {
+        "id": "info-location",
+        "type": "information",
+        "title": "建築地の区域",
+        "symbol": "L",
+        "subject": "敷地",
+        "property": "地区計画区域への該当",
+        "property_type": "classification",
+        "description": "地区計画等の区域内であるか、集落地区計画であるか、区域外であるか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-plan-compliance",
+        "type": "process",
+        "title": "計画適合性の確認",
+        "process_type": "human_judgment",
+        "description": "建築計画が当該地区計画等の内容に適合することを確認",
+        "related_articles": [
+          "法::A68_5_5:P1:I1",
+          "法::A68_5_5:P1:I2"
+        ]
+      },
+      {
+        "id": "info-plan-compliance",
+        "type": "information",
+        "title": "地区計画適合性",
+        "symbol": "C",
+        "subject": "建築物",
+        "property": "地区計画内容への適合",
+        "property_type": "proposition",
+        "description": "当該地区計画等の内容に適合するか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-authority-approval",
+        "type": "process",
+        "title": "特定行政庁の承認",
+        "process_type": "human_judgment",
+        "description": "特定行政庁が交通上、安全上、防火上及び衛生上支障がないことを確認・承認",
+        "remarks": "交通上、安全上、防火上及び衛生上の4項目の確認"
+      },
+      {
+        "id": "info-authority-approval",
+        "type": "information",
+        "title": "特定行政庁の承認",
+        "symbol": "A",
+        "subject": "建築物",
+        "property": "特定行政庁による承認",
+        "property_type": "proposition",
+        "description": "特定行政庁が交通上、安全上、防火上及び衛生上支障がないと認めるか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-final-judgment",
+        "type": "process",
+        "title": "第52条第2項の適用判定",
+        "process_type": "mechanical",
+        "description": "計画適合性と特定行政庁承認の両方を満たすことで、第52条第2項の規定を適用しない",
+        "logic_expression": "C AND A → 第52条第2項は適用しない"
+      },
+      {
+        "id": "info-exemption",
+        "type": "information",
+        "title": "第52条第2項の非適用",
+        "symbol": "E",
+        "subject": "建築物",
+        "property": "第52条第2項の適用",
+        "property_type": "proposition",
+        "description": "第52条第2項（容積率の最高限度）の規定が適用されるか否か",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-district-plan-check",
+        "to": "info-location",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "info-location",
+        "to": "proc-plan-compliance",
+        "role": "input"
+      },
+      {
+        "id": "e03",
+        "from": "proc-plan-compliance",
+        "to": "info-plan-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "proc-authority-approval",
+        "to": "info-authority-approval",
+        "role": "output"
+      },
+      {
+        "id": "e05",
+        "from": "info-plan-compliance",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e06",
+        "from": "info-authority-approval",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e07",
+        "from": "proc-final-judgment",
+        "to": "info-exemption",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": [
+        "A52:P2",
+        "A68_5:P1",
+        "A68_2:P1"
+      ],
+      "description": "第52条第2項の適用除外を定める。68条の5は地区計画による容積率特例の一般規定、68条の2は地区計画の条例制定基準を定める"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-24T17:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

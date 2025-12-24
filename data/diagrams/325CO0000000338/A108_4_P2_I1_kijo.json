@@ -1,0 +1,357 @@
+{
+  "id": "CHK-BO-A108_4-P2-I1",
+  "version": "3.1.0",
+  "page_title": {
+    "title": "火災の継続時間の計算",
+    "target_subject": "建築物の室",
+    "description": "耐火性能検証法における、建築物の屋内において発生が予測される火災の継続時間を計算する処理"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "108の4",
+    "paragraph": "2",
+    "item": "1"
+  },
+  "labels": ["単体規定", "火災安全"],
+  "text_raw": "当該建築物の屋内において発生が予測される火災の継続時間を当該建築物の室ごとに次の式により計算すること。ｔｆ＝Ｑｒ／６０ｑｂ（この式において、ｔｆ、Ｑｒ及びｑｂは、それぞれ次の数値を表すものとする。ｔｆ当該室における火災の継続時間（単位　分）Ｑｒ当該室の用途及び床面積並びに当該室の壁、床及び天井（天井のない場合においては、屋根）の室内に面する部分の表面積及び当該部分に使用する建築材料の種類に応じて国土交通大臣が定める方法により算出した当該室内の可燃物の発熱量（単位　メガジュール）ｑｂ当該室の用途及び床面積の合計並びに当該室の開口部の面積及び高さに応じて国土交通大臣が定める方法により算出した当該室内の可燃物の一秒間当たりの発熱量（単位　メガワット）",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "fire_safety_method",
+          "value": "耐火性能検証法を採用する建築物"
+        }
+      ],
+      "note": "耐火建築物の特定主要構造部について耐火性能検証法により確認する場合に適用"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "calculation",
+          "description": "火災継続時間がｔｆ＝Ｑｒ／６０ｑｂの式により算出されている"
+        }
+      ]
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "info-building",
+        "type": "information",
+        "title": "判定対象建築物",
+        "subject": "建築物",
+        "property": "識別情報",
+        "property_type": "classification",
+        "plurality": "single",
+        "description": "耐火性能検証法により確認する対象建築物"
+      },
+      {
+        "id": "info-rooms",
+        "type": "information",
+        "title": "建築物内の室",
+        "subject": "建築物",
+        "property": "室の集合",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "当該建築物に属する火災の継続時間を計算すべき室を特定"
+      },
+      {
+        "id": "info-room-purpose",
+        "type": "information",
+        "title": "室の用途",
+        "subject": "室",
+        "property": "用途",
+        "property_type": "classification",
+        "plurality": "multiple",
+        "description": "各室の用途分類"
+      },
+      {
+        "id": "info-room-area",
+        "type": "information",
+        "title": "室の床面積",
+        "subject": "室",
+        "property": "床面積",
+        "property_type": "numeric",
+        "plurality": "multiple",
+        "unit": "m2",
+        "description": "各室の床面積"
+      },
+      {
+        "id": "info-room-surfaces",
+        "type": "information",
+        "title": "室内に面する表面",
+        "subject": "室",
+        "property": "壁・床・天井の室内面",
+        "property_type": "set_definition",
+        "plurality": "multiple",
+        "description": "各室の壁、床及び天井（天井のない場合は屋根）の室内に面する部分を特定"
+      },
+      {
+        "id": "info-surface-area",
+        "type": "information",
+        "title": "表面積",
+        "subject": "室内に面する部分",
+        "property": "表面積",
+        "property_type": "numeric",
+        "plurality": "multiple",
+        "unit": "m2",
+        "description": "壁、床、天井の室内に面する部分の表面積"
+      },
+      {
+        "id": "info-material-type",
+        "type": "information",
+        "title": "室内面に使用する建築材料",
+        "subject": "室内に面する部分",
+        "property": "材料種別",
+        "property_type": "classification",
+        "plurality": "multiple",
+        "description": "壁、床、天井の室内に面する部分に使用する建築材料の種類"
+      },
+      {
+        "id": "info-openings",
+        "type": "information",
+        "title": "室の開口部",
+        "subject": "室",
+        "property": "開口部の集合",
+        "property_type": "set_definition",
+        "plurality": "multiple",
+        "description": "各室に属する開口部を特定"
+      },
+      {
+        "id": "info-opening-area",
+        "type": "information",
+        "title": "開口部の面積",
+        "subject": "開口部",
+        "property": "開口面積",
+        "property_type": "numeric",
+        "plurality": "multiple",
+        "unit": "m2",
+        "description": "各開口部の面積"
+      },
+      {
+        "id": "info-opening-height",
+        "type": "information",
+        "title": "開口部の高さ",
+        "subject": "開口部",
+        "property": "開口高さ",
+        "property_type": "numeric",
+        "plurality": "multiple",
+        "unit": "m",
+        "description": "各開口部の高さ"
+      },
+      {
+        "id": "proc-qr-calc",
+        "type": "process",
+        "title": "室の可燃物発熱量（Ｑｒ）の算出",
+        "process_type": "mechanical",
+        "description": "国土交通大臣が定める方法により、室の用途、床面積、室内に面する表面積及び建築材料の種類に応じて室内の可燃物の発熱量を算出",
+        "logic_expression": "Qr = f(room_purpose, floor_area, surface_area, material_type)",
+        "remarks": "告示等で定める計算方法に基づき算出"
+      },
+      {
+        "id": "info-qr",
+        "type": "information",
+        "title": "室の可燃物発熱量",
+        "symbol": "Qr",
+        "subject": "室",
+        "property": "可燃物の発熱量",
+        "property_type": "numeric",
+        "plurality": "multiple",
+        "unit": "MJ",
+        "description": "各室内の可燃物の発熱量"
+      },
+      {
+        "id": "proc-qb-calc",
+        "type": "process",
+        "title": "室の可燃物発熱速度（ｑｂ）の算出",
+        "process_type": "mechanical",
+        "description": "国土交通大臣が定める方法により、室の用途、床面積の合計、開口部の面積及び高さに応じて室内の可燃物の一秒間当たりの発熱量を算出",
+        "logic_expression": "qb = f(room_purpose, total_floor_area, opening_area, opening_height)",
+        "remarks": "告示等で定める計算方法に基づき算出"
+      },
+      {
+        "id": "info-qb",
+        "type": "information",
+        "title": "室の可燃物発熱速度",
+        "symbol": "qb",
+        "subject": "室",
+        "property": "可燃物の単位時間当たり発熱量",
+        "property_type": "numeric",
+        "plurality": "multiple",
+        "unit": "MW",
+        "description": "各室内の可燃物の一秒間当たりの発熱量"
+      },
+      {
+        "id": "proc-tf-calc",
+        "type": "process",
+        "title": "火災の継続時間（ｔｆ）の計算",
+        "process_type": "mechanical",
+        "description": "式 tf = Qr / (60 × qb) により火災の継続時間を計算",
+        "logic_expression": "tf = Qr / (60 × qb)",
+        "remarks": "Qr: 可燃物発熱量（MJ）、qb: 可燃物発熱速度（MW）、計算結果の単位は分"
+      },
+      {
+        "id": "info-tf",
+        "type": "information",
+        "title": "火災の継続時間",
+        "symbol": "tf",
+        "subject": "室",
+        "property": "火災継続時間",
+        "property_type": "numeric",
+        "plurality": "multiple",
+        "unit": "min",
+        "description": "各室における火災の継続時間"
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge-building-qr",
+        "from": "info-building",
+        "to": "proc-qr-calc",
+        "role": "input",
+        "description": "計算対象の建築物を特定"
+      },
+      {
+        "id": "edge-rooms-qr",
+        "from": "info-rooms",
+        "to": "proc-qr-calc",
+        "role": "input",
+        "description": "計算対象の室を特定"
+      },
+      {
+        "id": "edge-purpose-qr",
+        "from": "info-room-purpose",
+        "to": "proc-qr-calc",
+        "role": "input",
+        "description": "室の用途は可燃物発熱量に影響"
+      },
+      {
+        "id": "edge-area-qr",
+        "from": "info-room-area",
+        "to": "proc-qr-calc",
+        "role": "input",
+        "description": "室の床面積は可燃物発熱量に影響"
+      },
+      {
+        "id": "edge-surfaces-qr",
+        "from": "info-room-surfaces",
+        "to": "proc-qr-calc",
+        "role": "input",
+        "description": "室内面の範囲を特定"
+      },
+      {
+        "id": "edge-surface-area-qr",
+        "from": "info-surface-area",
+        "to": "proc-qr-calc",
+        "role": "input",
+        "description": "表面積は可燃物発熱量の計算に必要"
+      },
+      {
+        "id": "edge-material-qr",
+        "from": "info-material-type",
+        "to": "proc-qr-calc",
+        "role": "input",
+        "description": "建築材料の種類は可燃物発熱量に影響"
+      },
+      {
+        "id": "edge-qr-output",
+        "from": "proc-qr-calc",
+        "to": "info-qr",
+        "role": "output",
+        "description": "計算により求められた室の可燃物発熱量"
+      },
+      {
+        "id": "edge-purpose-qb",
+        "from": "info-room-purpose",
+        "to": "proc-qb-calc",
+        "role": "input",
+        "description": "室の用途は可燃物発熱速度に影響"
+      },
+      {
+        "id": "edge-area-qb",
+        "from": "info-room-area",
+        "to": "proc-qb-calc",
+        "role": "input",
+        "description": "床面積の合計は可燃物発熱速度に影響"
+      },
+      {
+        "id": "edge-openings-qb",
+        "from": "info-openings",
+        "to": "proc-qb-calc",
+        "role": "input",
+        "description": "開口部を特定"
+      },
+      {
+        "id": "edge-opening-area-qb",
+        "from": "info-opening-area",
+        "to": "proc-qb-calc",
+        "role": "input",
+        "description": "開口部面積は可燃物発熱速度に影響"
+      },
+      {
+        "id": "edge-opening-height-qb",
+        "from": "info-opening-height",
+        "to": "proc-qb-calc",
+        "role": "input",
+        "description": "開口部高さは可燃物発熱速度に影響"
+      },
+      {
+        "id": "edge-qb-output",
+        "from": "proc-qb-calc",
+        "to": "info-qb",
+        "role": "output",
+        "description": "計算により求められた室の可燃物発熱速度"
+      },
+      {
+        "id": "edge-qr-tf",
+        "from": "info-qr",
+        "to": "proc-tf-calc",
+        "role": "input",
+        "description": "火災継続時間の計算に必要"
+      },
+      {
+        "id": "edge-qb-tf",
+        "from": "info-qb",
+        "to": "proc-tf-calc",
+        "role": "input",
+        "description": "火災継続時間の計算に必要"
+      },
+      {
+        "id": "edge-tf-output",
+        "from": "proc-tf-calc",
+        "to": "info-tf",
+        "role": "output",
+        "description": "計算により求められた火災の継続時間"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "defines_detail",
+      "articles": ["A108_4:P1"],
+      "description": "特定主要構造部の技術的基準（耐火性能検証法の適用条件）"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "defines_detail",
+      "articles": ["A108_4:P2:I2", "A108_4:P2:I3", "A108_4:P2:I4"],
+      "description": "耐火性能検証法の他の計算方法（屋内火災保有耐火時間、屋外火災保有耐火時間の算出）"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-24T15:30:00Z",
+    "created_by": "Claude Code",
+    "notes": "火災の継続時間を計算するための機序図。Qr（可燃物発熱量）とqb（可燃物発熱速度）を算出した上で、tf = Qr / (60 × qb) の式により継続時間を計算する。",
+    "checklist_status": "generated"
+  }
+}

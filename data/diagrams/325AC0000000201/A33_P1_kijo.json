@@ -1,0 +1,250 @@
+{
+  "id": "CHK-BSL-A33-P1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "避雷設備",
+    "target_subject": "建築物",
+    "description": "高さ20mを超える建築物に有効な避雷設備が設けられていることを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "33",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": ["単体規定", "避雷設備", "安全"],
+  "text_raw": "高さ二十メートルをこえる建築物には、有効に避雷設備を設けなければならない。ただし、周囲の状況によつて安全上支障がない場合においては、この限りでない。",
+  "compliance_logic": {
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "note": "高さ20m以下",
+          "ref": "info-height-threshold-ok",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "note": "有効な避雷設備あり",
+          "ref": "info-effective-lightning-protection",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    },
+    "exceptions": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "note": "周囲の状況により安全上支障がない",
+          "ref": "info-no-safety-issue",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "effect": "EXEMPT"
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-building-height",
+        "type": "process",
+        "title": "建築物高さの特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の高さを読み取る"
+      },
+      {
+        "id": "info-building-height",
+        "type": "information",
+        "title": "建築物の高さ",
+        "symbol": "H",
+        "subject": "建築物",
+        "property": "高さ",
+        "property_type": "numeric",
+        "unit": "m",
+        "description": "建築物の高さ",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-height-threshold-check",
+        "type": "process",
+        "title": "高さ閾値判定",
+        "process_type": "mechanical",
+        "description": "建築物の高さが20mを超えるか判定する",
+        "logic_expression": "H > 20"
+      },
+      {
+        "id": "info-height-exceeds",
+        "type": "information",
+        "title": "高さ20m超",
+        "symbol": "H1",
+        "subject": "建築物",
+        "property": "高さが20mを超える",
+        "property_type": "proposition",
+        "description": "建築物の高さが20mを超えるか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-height-threshold-ok-check",
+        "type": "process",
+        "title": "高さ適用範囲外判定",
+        "process_type": "mechanical",
+        "description": "建築物の高さが20m以下であるか判定する",
+        "logic_expression": "H ≤ 20"
+      },
+      {
+        "id": "info-height-threshold-ok",
+        "type": "information",
+        "title": "高さ20m以下",
+        "symbol": "H2",
+        "subject": "建築物",
+        "property": "高さが20m以下",
+        "property_type": "proposition",
+        "description": "建築物の高さが20m以下（適用範囲外）",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-lightning-equipment-identification",
+        "type": "process",
+        "title": "避雷設備の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から避雷設備の有無と仕様を読み取る"
+      },
+      {
+        "id": "info-lightning-equipment-exists",
+        "type": "information",
+        "title": "避雷設備の有無",
+        "symbol": "L1",
+        "subject": "建築物",
+        "property": "避雷設備の有無",
+        "property_type": "proposition",
+        "description": "建築物に避雷設備が設けられているか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-effectiveness-check",
+        "type": "process",
+        "title": "有効性判定",
+        "process_type": "human_judgment",
+        "description": "避雷設備が有効に機能するか判定する（JIS A 4201等の基準適合確認）"
+      },
+      {
+        "id": "info-effective-lightning-protection",
+        "type": "information",
+        "title": "有効な避雷設備",
+        "symbol": "L2",
+        "subject": "建築物",
+        "property": "有効な避雷設備の有無",
+        "property_type": "proposition",
+        "description": "建築物に有効な避雷設備が設けられているか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-surrounding-situation",
+        "type": "process",
+        "title": "周囲状況の把握",
+        "process_type": "undefined_input",
+        "description": "設計図書・配置図等から周囲の状況を把握する"
+      },
+      {
+        "id": "info-surrounding-situation",
+        "type": "information",
+        "title": "周囲の状況",
+        "symbol": "S",
+        "subject": "敷地",
+        "property": "周囲の状況",
+        "property_type": "classification",
+        "description": "建築物周囲の状況（周辺建築物の高さ、地形等）",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-safety-assessment",
+        "type": "process",
+        "title": "安全上支障の有無判定",
+        "process_type": "human_judgment",
+        "description": "周囲の状況により安全上支障がないか総合的に判定する"
+      },
+      {
+        "id": "info-no-safety-issue",
+        "type": "information",
+        "title": "安全上支障なし",
+        "symbol": "E",
+        "subject": "建築物",
+        "property": "安全上支障の有無",
+        "property_type": "proposition",
+        "description": "周囲の状況により安全上支障がないか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-exempt-check",
+        "type": "process",
+        "title": "適用除外判定",
+        "process_type": "mechanical",
+        "description": "ただし書きの適用除外に該当するか判定",
+        "logic_expression": "E"
+      },
+      {
+        "id": "info-exempt",
+        "type": "information",
+        "title": "適用除外該当",
+        "symbol": "X",
+        "subject": "建築物",
+        "property": "適用除外への該当",
+        "property_type": "proposition",
+        "description": "ただし書きによる適用除外に該当するか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-final-judgment",
+        "type": "process",
+        "title": "適合判定",
+        "process_type": "mechanical",
+        "description": "高さ20m以下、有効な避雷設備あり、または適用除外のいずれかを満たすことを確認",
+        "logic_expression": "H2 OR L2 OR X"
+      },
+      {
+        "id": "info-compliance",
+        "type": "information",
+        "title": "法33条1項適合",
+        "symbol": "C",
+        "subject": "建築物",
+        "property": "法33条1項適合",
+        "property_type": "proposition",
+        "description": "法33条1項の規定に適合するか",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "proc-building-height", "to": "info-building-height", "role": "output" },
+      { "id": "e02", "from": "info-building-height", "to": "proc-height-threshold-check", "role": "input" },
+      { "id": "e03", "from": "proc-height-threshold-check", "to": "info-height-exceeds", "role": "output" },
+      { "id": "e04", "from": "info-building-height", "to": "proc-height-threshold-ok-check", "role": "input" },
+      { "id": "e05", "from": "proc-height-threshold-ok-check", "to": "info-height-threshold-ok", "role": "output" },
+      { "id": "e05b", "from": "info-height-exceeds", "to": "proc-lightning-equipment-identification", "role": "input" },
+      { "id": "e06", "from": "proc-lightning-equipment-identification", "to": "info-lightning-equipment-exists", "role": "output" },
+      { "id": "e07", "from": "info-lightning-equipment-exists", "to": "proc-effectiveness-check", "role": "input" },
+      { "id": "e08", "from": "proc-effectiveness-check", "to": "info-effective-lightning-protection", "role": "output" },
+      { "id": "e09", "from": "proc-surrounding-situation", "to": "info-surrounding-situation", "role": "output" },
+      { "id": "e10", "from": "info-surrounding-situation", "to": "proc-safety-assessment", "role": "input" },
+      { "id": "e11", "from": "proc-safety-assessment", "to": "info-no-safety-issue", "role": "output" },
+      { "id": "e12", "from": "info-no-safety-issue", "to": "proc-exempt-check", "role": "input" },
+      { "id": "e13", "from": "proc-exempt-check", "to": "info-exempt", "role": "output" },
+      { "id": "e14", "from": "info-height-threshold-ok", "to": "proc-final-judgment", "role": "input" },
+      { "id": "e15", "from": "info-effective-lightning-protection", "to": "proc-final-judgment", "role": "input" },
+      { "id": "e16", "from": "info-exempt", "to": "proc-final-judgment", "role": "input" },
+      { "id": "e17", "from": "proc-final-judgment", "to": "info-compliance", "role": "output" }
+    ]
+  },
+  "related_laws": [],
+  "metadata": {
+    "created_at": "2025-12-23T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

@@ -44,7 +44,13 @@ npm run lint
   - `diagram.ts` - 審査機序図の型
 - `data/diagrams/` - 機序図JSONファイル
 - `schemas/` - JSONスキーマ
-- `prompts/` - 機序図作成手引書
+- `scripts/` - バリデーションスクリプト
+  - `validate-kijo.mjs` - JSONスキーマバリデーション
+  - `validate-kijo-rules.mjs` - 機序図ルールバリデーション（孤立ノード、info→info禁止、エッジロール検証）
+- `.claude/skills/` - スキル定義・参照データ
+  - `kijo-generator.md` - 機序図生成スキル
+  - `flow-generator.md` - フロー図生成スキル
+  - `確認審査報告書チェックリスト.csv` - 作成対象の条文一覧
 
 ## 技術スタック
 
@@ -106,3 +112,31 @@ buildingSMART Japan仕様に基づく審査フロー図。規制文（〜しな�
 - **フロー図**: `schemas/flow-diagram.schema.json`
 - バリデーションは`src/lib/schema-validator.ts`でajvを使用
 - TypeScript型定義は`src/types/diagram.ts`で管理（スキーマと同期を保つこと）
+
+## 確認審査報告書チェックリスト
+
+`.claude/skills/確認審査報告書チェックリスト.csv` は、機序図を作成すべき条文の一覧を管理するCSVファイル。
+
+### CSVフォーマット
+```
+法令,項,号,ファイル名
+法第19条,第1項,,A19_P1_kijo.json
+```
+
+- **法令**: 「法第○条」「令第○条」形式
+- **項**: 「第○項」形式
+- **号**: 「第○号」形式（ない場合は空）
+- **ファイル名**: 対応する機序図JSONファイル名
+
+### セクション構成
+- `=== 建築基準法（法） ===` - 法第19条〜法第87条の4
+- `=== 建築基準法施行令（令） ===` - 令第108条〜令第137条の19
+
+### バリデーションコマンド
+```bash
+# スキーマバリデーション
+node scripts/validate-kijo.mjs
+
+# ルールバリデーション（孤立ノード、info→info、エッジロール）
+node scripts/validate-kijo-rules.mjs
+```

@@ -1,0 +1,211 @@
+{
+  "id": "CHK-ORD-A137_12-P2",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "法22条・法62条適用除外建築物の大規模修繕・模様替の適用除外判定",
+    "target_subject": "建築物",
+    "description": "法22条1項または法62条の適用を受けない建築物について、大規模修繕または大規模模様替が法86条の7の適用除外対象となる条件を判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "137_12",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": [
+    "既存不適格",
+    "大規模修繕",
+    "大規模模様替",
+    "屋根"
+  ],
+  "text_raw": "法第三条第二項の規定により法第二十二条第一項又は法第六十二条の規定の適用を受けない建築物についての法第八十六条の七第一項の政令で定める範囲は、大規模の修繕又は大規模の模様替については、当該建築物における屋根以外の部分に係る全ての大規模の修繕又は大規模の模様替とする。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "applicability_condition",
+          "value": "法3条2項により法22条1項又は法62条の適用を受けない建築物"
+        }
+      ],
+      "note": "既存建築物等で法22条1項（屋根）又は法62条（屋根の構造）の適用除外対象建築物"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-work-type",
+          "operator": "IN",
+          "value": ["大規模修繕", "大規模模様替"]
+        },
+        {
+          "ref": "info-work-location",
+          "operator": "==",
+          "value": "屋根以外の部分"
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-exemption-status",
+        "type": "process",
+        "title": "法22条・法62条適用除外の確認",
+        "process_type": "mechanical",
+        "description": "当該建築物が法3条2項により法22条1項又は法62条の適用を受けない対象か確認する（既存建築物等）",
+        "logic_expression": "法3条2項該当 AND (NOT適用(法22条1項) OR NOT適用(法62条))"
+      },
+      {
+        "id": "info-exemption-status",
+        "type": "information",
+        "title": "法22条・法62条適用除外該当性",
+        "symbol": "E",
+        "subject": "建築物",
+        "property": "法22条1項又は法62条適用除外該当",
+        "property_type": "proposition",
+        "description": "当該建築物が法3条2項により法22条1項又は法62条の適用を受けない対象であるか否か",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-work-type",
+        "type": "process",
+        "title": "施工内容の確認",
+        "process_type": "undefined_input",
+        "description": "当該工事が大規模修繕又は大規模模様替のいずれであるか確認する"
+      },
+      {
+        "id": "info-work-type",
+        "type": "information",
+        "title": "工事種別",
+        "symbol": "W",
+        "subject": "建築物",
+        "property": "実施工事の種別",
+        "property_type": "classification",
+        "description": "大規模修繕又は大規模模様替のいずれか",
+        "plurality": "single",
+        "remarks": "大規模修繕と大規模模様替は令で定義される"
+      },
+      {
+        "id": "proc-work-location",
+        "type": "process",
+        "title": "工事対象部位の確認",
+        "process_type": "undefined_input",
+        "description": "工事が建築物のどの部分に係るか確認する（特に屋根か否かの確認）"
+      },
+      {
+        "id": "info-work-location",
+        "type": "information",
+        "title": "工事対象部位",
+        "symbol": "L",
+        "subject": "建築物",
+        "property": "工事が係る部位",
+        "property_type": "geometric_surface",
+        "description": "工事が係る建築物の部位（屋根、外壁、内部等）",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-judgment",
+        "type": "process",
+        "title": "適用除外判定",
+        "process_type": "mechanical",
+        "description": "法22条・法62条適用除外対象建築物の大規模修繕・模様替が法86条の7の適用除外となるか判定",
+        "logic_expression": "E AND W IN {大規模修繕, 大規模模様替} AND L != 屋根",
+        "iteration": "single"
+      },
+      {
+        "id": "info-judgment-result",
+        "type": "information",
+        "title": "法86条の7適用除外判定",
+        "symbol": "R",
+        "subject": "建築物",
+        "property": "当該工事が法86条の7の政令で定める範囲に含まれるか",
+        "property_type": "proposition",
+        "description": "当該工事が法86条の7第1項の政令で定める除外対象となるか。屋根以外の部分の大規模修繕・模様替は除外対象となる",
+        "plurality": "single",
+        "remarks": "除外対象の場合は法22条1項又は法62条の適用が不要"
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge-001",
+        "from": "proc-exemption-status",
+        "to": "info-exemption-status",
+        "role": "output"
+      },
+      {
+        "id": "edge-002",
+        "from": "info-exemption-status",
+        "to": "proc-judgment",
+        "role": "input"
+      },
+      {
+        "id": "edge-003",
+        "from": "proc-work-type",
+        "to": "info-work-type",
+        "role": "output"
+      },
+      {
+        "id": "edge-004",
+        "from": "info-work-type",
+        "to": "proc-judgment",
+        "role": "input"
+      },
+      {
+        "id": "edge-005",
+        "from": "proc-work-location",
+        "to": "info-work-location",
+        "role": "output"
+      },
+      {
+        "id": "edge-006",
+        "from": "info-work-location",
+        "to": "proc-judgment",
+        "role": "input"
+      },
+      {
+        "id": "edge-007",
+        "from": "proc-judgment",
+        "to": "info-judgment-result",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": [
+        "A3:P2",
+        "A22:P1",
+        "A62",
+        "A86_7"
+      ],
+      "description": "法3条2項で既存建築物等の適用除外を規定。法22条1項は屋根の構造を規定。法62条は準防火地域の屋根の構造を規定。法86条の7は大規模修繕・模様替の適用除外を規定"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "defines_detail",
+      "articles": [
+        "A137_12:P2"
+      ],
+      "description": "大規模修繕・模様替の定義及び適用除外の詳細基準"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T12:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令",
+    "source": "e-Gov法令API"
+  }
+}

@@ -1,0 +1,196 @@
+{
+  "id": "CHK-BSL-A43-P3-I3",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "条例制定対象の特定（開口部のない居室）",
+    "target_subject": "建築物",
+    "description": "建築物が政令で定める窓その他の開口部を有しない居室を有するかを判定し、第43条第3項に基づく条例制定の対象に該当するかを確認する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "43",
+    "paragraph": "3",
+    "item": "3"
+  },
+  "labels": [
+    "集団規定",
+    "敷地と道路",
+    "条例制定対象"
+  ],
+  "text_raw": "政令で定める窓その他の開口部を有しない居室を有する建築物",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "applicable_zone",
+          "value": "地方公共団体の条例制定区域"
+        }
+      ],
+      "note": "法43条3項に基づき条例で制限を付加できる対象建築物の要件の一つ"
+    },
+    "judgment_rule": {
+      "operator": "EXISTS",
+      "conditions": [
+        {
+          "ref": "info-has-windowless-rooms",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-rooms-set",
+        "type": "process",
+        "title": "居室の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から判定対象となる建築物に属する居室を特定する"
+      },
+      {
+        "id": "info-rooms-set",
+        "type": "information",
+        "title": "建築物の居室",
+        "subject": "建築物",
+        "property": "居室の集合",
+        "property_type": "set_definition",
+        "description": "判定対象となる建築物に属する居室を特定",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-openings-check",
+        "type": "process",
+        "title": "開口部の有無確認",
+        "process_type": "undefined_input",
+        "target_subject": "居室",
+        "iteration": "iterative",
+        "description": "設計図書等から各居室の窓その他の開口部の有無を確認する"
+      },
+      {
+        "id": "info-has-openings",
+        "type": "information",
+        "title": "開口部の有無",
+        "symbol": "O",
+        "subject": "居室",
+        "property": "窓その他の開口部の有無",
+        "property_type": "proposition",
+        "description": "当該居室に窓その他の開口部があるか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-order-compliance",
+        "type": "process",
+        "title": "政令基準該当判定",
+        "process_type": "mechanical",
+        "target_subject": "居室",
+        "iteration": "iterative",
+        "description": "開口部を有しない居室が建築基準法施行令で定める基準（令116条の2第1項各号）に該当するかを判定",
+        "related_articles": [
+          "令::A116_2:P1"
+        ],
+        "logic_expression": "O = false"
+      },
+      {
+        "id": "info-order-compliant",
+        "type": "information",
+        "title": "政令基準該当",
+        "symbol": "R",
+        "subject": "居室",
+        "property": "政令で定める開口部なし居室該当",
+        "property_type": "proposition",
+        "description": "政令で定める窓その他の開口部を有しない居室に該当するか",
+        "related_articles": [
+          "令::A116_2:P1"
+        ],
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-exists-check",
+        "type": "process",
+        "title": "該当居室存在判定",
+        "process_type": "mechanical",
+        "description": "政令で定める開口部なし居室が1つでも存在するかを判定（存在命題）",
+        "logic_expression": "∃room ∈ Rooms: R(room) = true"
+      },
+      {
+        "id": "info-has-windowless-rooms",
+        "type": "information",
+        "title": "開口部なし居室の存在",
+        "symbol": "W",
+        "subject": "建築物",
+        "property": "政令で定める開口部なし居室の有無",
+        "property_type": "proposition",
+        "description": "当該建築物が政令で定める窓その他の開口部を有しない居室を有するか",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-rooms-set",
+        "to": "info-rooms-set",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "info-rooms-set",
+        "to": "proc-openings-check",
+        "role": "input"
+      },
+      {
+        "id": "e03",
+        "from": "proc-openings-check",
+        "to": "info-has-openings",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "info-has-openings",
+        "to": "proc-order-compliance",
+        "role": "input"
+      },
+      {
+        "id": "e05",
+        "from": "proc-order-compliance",
+        "to": "info-order-compliant",
+        "role": "output"
+      },
+      {
+        "id": "e06",
+        "from": "info-order-compliant",
+        "to": "proc-exists-check",
+        "role": "input"
+      },
+      {
+        "id": "e07",
+        "from": "proc-exists-check",
+        "to": "info-has-windowless-rooms",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "delegates_to",
+      "articles": [
+        "A116_2:P1"
+      ],
+      "description": "法43条3項第3号の「政令で定める窓その他の開口部を有しない居室」の基準を定める"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-24T12:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

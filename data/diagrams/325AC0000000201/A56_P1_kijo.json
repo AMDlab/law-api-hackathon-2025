@@ -1,0 +1,694 @@
+{
+  "id": "CHK-BSL-A56-P1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "建築物の各部分の高さ制限",
+    "target_subject": "建築物",
+    "description": "建築物の各部分が別表第三に基づく道路斜線制限、隣地斜線制限、日影制限のいずれかを満たすことを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "56",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "集団規定",
+    "高さ制限",
+    "道路斜線制限",
+    "隣地斜線制限",
+    "日影制限"
+  ],
+  "text_raw": "建築物の各部分の高さは、次に掲げるもの以下としなければならない。一別表第三（い）欄及び（ろ）欄に掲げる地域、地区又は区域及び容積率の限度の区分に応じ、前面道路の反対側の境界線からの水平距離が同表（は）欄に掲げる距離以下の範囲内においては、当該部分から前面道路の反対側の境界線までの水平距離に、同表（に）欄に掲げる数値を乗じて得たもの二当該部分から隣地境界線までの水平距離に、次に掲げる区分に従い、イ若しくはニに定める数値が一・二五とされている建築物で高さが二十メートルを超える部分を有するもの又はイからニまでに定める数値が二・五とされている建築物（ロ及びハに掲げる建築物で、特定行政庁が都道府県都市計画審議会の議を経て指定する区域内にあるものを除く。以下この号及び第七項第二号において同じ。）で高さが三十一メートルを超える部分を有するものにあつては、それぞれその部分から隣地境界線までの水平距離のうち最小のものに相当する距離を加えたものに、イからニまでに定める数値を乗じて得たものに、イ又はニに定める数値が一・二五とされている建築物にあつては二十メートルを、イからニまでに定める数値が二・五とされている建築物にあつては三十一メートルを加えたもの三第一種低層住居専用地域、第二種低層住居専用地域若しくは田園住居地域内又は第一種中高層住居専用地域若しくは第二種中高層住居専用地域（次条第一項の規定に基づく条例で別表第四の二の項に規定する（一）、（二）又は（三）の号が指定されているものを除く。以下この号及び第七項第三号において同じ。）内においては、当該部分から前面道路の反対側の境界線又は隣地境界線までの真北方向の水平距離に一・二五を乗じて得たものに、第一種低層住居専用地域、第二種低層住居専用地域又は田園住居地域内の建築物にあつては五メートルを、第一種中高層住居専用地域又は第二種中高層住居専用地域内の建築物にあつては十メートルを加えたもの",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "別表第三に定める地域・地区・区域"
+        }
+      ],
+      "note": "用途地域、容積率により高さ制限が異なる"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "note": "各部分が適用される制限値以下",
+          "ref": "info-part-compliance",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-building-parts",
+        "type": "process",
+        "title": "建築物各部分の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から判定対象となる建築物の各部分を特定する"
+      },
+      {
+        "id": "info-building-parts",
+        "type": "information",
+        "title": "建築物の各部分",
+        "subject": "建築物",
+        "property": "各部分の集合",
+        "property_type": "set_definition",
+        "description": "判定対象となる建築物の各部分（最高高さ位置等）を特定",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-part-height",
+        "type": "process",
+        "title": "各部分の高さ特定",
+        "process_type": "human_judgment",
+        "target_subject": "建築物の各部分",
+        "iteration": "iterative",
+        "description": "設計図書等から建築物の各部分の高さを読み取る"
+      },
+      {
+        "id": "info-part-height",
+        "type": "information",
+        "title": "各部分の高さ",
+        "symbol": "H",
+        "subject": "建築物の各部分",
+        "property": "高さ",
+        "property_type": "numeric",
+        "unit": "m",
+        "description": "建築物の各部分の地盤面からの高さ",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-road-boundary",
+        "type": "process",
+        "title": "前面道路反対側境界線の特定",
+        "process_type": "undefined_input",
+        "description": "敷地に接する前面道路の反対側の境界線を特定する"
+      },
+      {
+        "id": "info-road-boundary",
+        "type": "information",
+        "title": "前面道路反対側境界線",
+        "subject": "前面道路",
+        "property": "反対側境界線の位置",
+        "property_type": "geometric_line",
+        "description": "前面道路の敷地と反対側の境界線",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-road-distance",
+        "type": "process",
+        "title": "道路境界線までの水平距離算出",
+        "process_type": "mechanical",
+        "target_subject": "建築物の各部分",
+        "iteration": "iterative",
+        "description": "各部分から前面道路の反対側境界線までの水平距離を計算",
+        "logic_expression": "D_road = horizontal_distance(Part, RoadBoundary)"
+      },
+      {
+        "id": "info-road-distance",
+        "type": "information",
+        "title": "道路境界線までの水平距離",
+        "symbol": "D_road",
+        "subject": "建築物の各部分",
+        "property": "前面道路反対側境界線までの水平距離",
+        "property_type": "numeric",
+        "unit": "m",
+        "description": "各部分から前面道路の反対側境界線までの水平距離",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-road-slope-ratio",
+        "type": "process",
+        "title": "道路斜線勾配の特定",
+        "process_type": "mechanical",
+        "description": "別表第三により、用途地域と容積率に応じた道路斜線の勾配係数を取得",
+        "related_articles": [
+          "法::A56:P1:I1",
+          "法::別表第三"
+        ]
+      },
+      {
+        "id": "info-road-slope-ratio",
+        "type": "information",
+        "title": "道路斜線勾配係数",
+        "symbol": "K_road",
+        "subject": "敷地",
+        "property": "道路斜線勾配係数",
+        "property_type": "numeric",
+        "description": "別表第三(に)欄の数値（1.25、1.5等）",
+        "plurality": "single",
+        "related_articles": [
+          "法::別表第三"
+        ],
+        "remarks": "住居系地域:1.25、商業系・工業系地域:1.5等"
+      },
+      {
+        "id": "proc-road-limit",
+        "type": "process",
+        "title": "道路斜線制限高さ算出",
+        "process_type": "mechanical",
+        "target_subject": "建築物の各部分",
+        "iteration": "iterative",
+        "description": "各部分における道路斜線による制限高さを計算",
+        "logic_expression": "H_road_limit = D_road × K_road"
+      },
+      {
+        "id": "info-road-limit",
+        "type": "information",
+        "title": "道路斜線制限高さ",
+        "symbol": "H_road_limit",
+        "subject": "建築物の各部分",
+        "property": "道路斜線制限高さ",
+        "property_type": "numeric",
+        "unit": "m",
+        "description": "各部分における道路斜線による制限高さ",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-road-slope-check",
+        "type": "process",
+        "title": "道路斜線適合判定",
+        "process_type": "mechanical",
+        "target_subject": "建築物の各部分",
+        "iteration": "iterative",
+        "description": "各部分の高さが道路斜線制限高さ以下であることを判定",
+        "logic_expression": "H ≤ H_road_limit"
+      },
+      {
+        "id": "info-road-slope-compliance",
+        "type": "information",
+        "title": "道路斜線適合",
+        "symbol": "C_road",
+        "subject": "建築物の各部分",
+        "property": "道路斜線制限適合",
+        "property_type": "proposition",
+        "description": "各部分が道路斜線制限に適合するか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-adjacent-boundary",
+        "type": "process",
+        "title": "隣地境界線の特定",
+        "process_type": "undefined_input",
+        "description": "敷地の隣地境界線を特定する"
+      },
+      {
+        "id": "info-adjacent-boundary",
+        "type": "information",
+        "title": "隣地境界線",
+        "subject": "敷地",
+        "property": "隣地境界線の位置",
+        "property_type": "geometric_line",
+        "description": "敷地の隣地との境界線",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-adjacent-distance",
+        "type": "process",
+        "title": "隣地境界線までの水平距離算出",
+        "process_type": "mechanical",
+        "target_subject": "建築物の各部分",
+        "iteration": "iterative",
+        "description": "各部分から隣地境界線までの水平距離を計算",
+        "logic_expression": "D_adj = horizontal_distance(Part, AdjacentBoundary)"
+      },
+      {
+        "id": "info-adjacent-distance",
+        "type": "information",
+        "title": "隣地境界線までの水平距離",
+        "symbol": "D_adj",
+        "subject": "建築物の各部分",
+        "property": "隣地境界線までの水平距離",
+        "property_type": "numeric",
+        "unit": "m",
+        "description": "各部分から隣地境界線までの水平距離",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-adjacent-limit",
+        "type": "process",
+        "title": "隣地斜線制限高さ算出",
+        "process_type": "mechanical",
+        "target_subject": "建築物の各部分",
+        "iteration": "iterative",
+        "description": "各部分における隣地斜線による制限高さを計算",
+        "logic_expression": "H_adj_limit = D_adj × 1.25 + 20",
+        "related_articles": [
+          "法::A56:P1:I2"
+        ]
+      },
+      {
+        "id": "info-adjacent-limit",
+        "type": "information",
+        "title": "隣地斜線制限高さ",
+        "symbol": "H_adj_limit",
+        "subject": "建築物の各部分",
+        "property": "隣地斜線制限高さ",
+        "property_type": "numeric",
+        "unit": "m",
+        "description": "各部分における隣地斜線による制限高さ",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-adjacent-slope-check",
+        "type": "process",
+        "title": "隣地斜線適合判定",
+        "process_type": "mechanical",
+        "target_subject": "建築物の各部分",
+        "iteration": "iterative",
+        "description": "各部分の高さが隣地斜線制限高さ以下であることを判定",
+        "logic_expression": "H ≤ H_adj_limit"
+      },
+      {
+        "id": "info-adjacent-slope-compliance",
+        "type": "information",
+        "title": "隣地斜線適合",
+        "symbol": "C_adj",
+        "subject": "建築物の各部分",
+        "property": "隣地斜線制限適合",
+        "property_type": "proposition",
+        "description": "各部分が隣地斜線制限に適合するか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-north-boundary",
+        "type": "process",
+        "title": "北側境界線の特定",
+        "process_type": "undefined_input",
+        "description": "北側の隣地境界線または前面道路反対側境界線を特定する"
+      },
+      {
+        "id": "info-north-boundary",
+        "type": "information",
+        "title": "北側境界線",
+        "subject": "敷地",
+        "property": "北側境界線の位置",
+        "property_type": "geometric_line",
+        "description": "北側の隣地境界線又は前面道路の反対側境界線",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-north-distance",
+        "type": "process",
+        "title": "北側境界線までの真北方向水平距離算出",
+        "process_type": "mechanical",
+        "target_subject": "建築物の各部分",
+        "iteration": "iterative",
+        "description": "各部分から北側境界線までの真北方向の水平距離を計算",
+        "logic_expression": "D_north = true_north_distance(Part, NorthBoundary)"
+      },
+      {
+        "id": "info-north-distance",
+        "type": "information",
+        "title": "北側境界線までの真北方向水平距離",
+        "symbol": "D_north",
+        "subject": "建築物の各部分",
+        "property": "北側境界線までの真北方向水平距離",
+        "property_type": "numeric",
+        "unit": "m",
+        "description": "各部分から北側境界線までの真北方向の水平距離",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-north-base-height",
+        "type": "process",
+        "title": "北側斜線立ち上がり高さの特定",
+        "process_type": "mechanical",
+        "description": "用途地域に応じた北側斜線の立ち上がり高さ（5m又は10m）を取得",
+        "related_articles": [
+          "法::A56:P1:I3"
+        ]
+      },
+      {
+        "id": "info-north-base-height",
+        "type": "information",
+        "title": "北側斜線立ち上がり高さ",
+        "symbol": "H_north_base",
+        "subject": "敷地",
+        "property": "北側斜線立ち上がり高さ",
+        "property_type": "numeric",
+        "unit": "m",
+        "description": "北側斜線の立ち上がり高さ（第一種・第二種低層住居専用地域:5m、第一種・第二種中高層住居専用地域:10m）",
+        "plurality": "single",
+        "remarks": "低層住居専用地域:5m、中高層住居専用地域:10m"
+      },
+      {
+        "id": "proc-north-limit",
+        "type": "process",
+        "title": "北側斜線制限高さ算出",
+        "process_type": "mechanical",
+        "target_subject": "建築物の各部分",
+        "iteration": "iterative",
+        "description": "各部分における北側斜線による制限高さを計算",
+        "logic_expression": "H_north_limit = D_north × 1.25 + H_north_base",
+        "related_articles": [
+          "法::A56:P1:I3"
+        ]
+      },
+      {
+        "id": "info-north-limit",
+        "type": "information",
+        "title": "北側斜線制限高さ",
+        "symbol": "H_north_limit",
+        "subject": "建築物の各部分",
+        "property": "北側斜線制限高さ",
+        "property_type": "numeric",
+        "unit": "m",
+        "description": "各部分における北側斜線による制限高さ",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-north-slope-check",
+        "type": "process",
+        "title": "北側斜線適合判定",
+        "process_type": "mechanical",
+        "target_subject": "建築物の各部分",
+        "iteration": "iterative",
+        "description": "各部分の高さが北側斜線制限高さ以下であることを判定",
+        "logic_expression": "H ≤ H_north_limit"
+      },
+      {
+        "id": "info-north-slope-compliance",
+        "type": "information",
+        "title": "北側斜線適合",
+        "symbol": "C_north",
+        "subject": "建築物の各部分",
+        "property": "北側斜線制限適合",
+        "property_type": "proposition",
+        "description": "各部分が北側斜線制限に適合するか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-final-judgment",
+        "type": "process",
+        "title": "各部分の総合適合判定",
+        "process_type": "mechanical",
+        "target_subject": "建築物の各部分",
+        "iteration": "iterative",
+        "description": "各部分について、すべての斜線制限に適合することを確認",
+        "logic_expression": "C_road AND C_adj AND C_north"
+      },
+      {
+        "id": "info-part-compliance",
+        "type": "information",
+        "title": "各部分の法56条1項適合",
+        "symbol": "C_part",
+        "subject": "建築物の各部分",
+        "property": "法56条1項適合",
+        "property_type": "proposition",
+        "description": "各部分が法56条1項の全ての高さ制限に適合するか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-all-parts-check",
+        "type": "process",
+        "title": "全部分適合確認",
+        "process_type": "mechanical",
+        "description": "建築物の全ての部分が法56条1項に適合することを確認",
+        "logic_expression": "∀part ∈ BuildingParts: C_part = true"
+      },
+      {
+        "id": "info-final",
+        "type": "information",
+        "title": "建築物の法56条1項適合",
+        "subject": "建築物",
+        "property": "法56条1項適合",
+        "property_type": "proposition",
+        "description": "建築物全体として法56条1項の規定に適合するか",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-building-parts",
+        "to": "info-building-parts",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "info-building-parts",
+        "to": "proc-part-height",
+        "role": "input"
+      },
+      {
+        "id": "e03",
+        "from": "proc-part-height",
+        "to": "info-part-height",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "proc-road-boundary",
+        "to": "info-road-boundary",
+        "role": "output"
+      },
+      {
+        "id": "e05",
+        "from": "info-building-parts",
+        "to": "proc-road-distance",
+        "role": "input"
+      },
+      {
+        "id": "e06",
+        "from": "info-road-boundary",
+        "to": "proc-road-distance",
+        "role": "input"
+      },
+      {
+        "id": "e07",
+        "from": "proc-road-distance",
+        "to": "info-road-distance",
+        "role": "output"
+      },
+      {
+        "id": "e08",
+        "from": "proc-road-slope-ratio",
+        "to": "info-road-slope-ratio",
+        "role": "output"
+      },
+      {
+        "id": "e09",
+        "from": "info-road-distance",
+        "to": "proc-road-limit",
+        "role": "input"
+      },
+      {
+        "id": "e10",
+        "from": "info-road-slope-ratio",
+        "to": "proc-road-limit",
+        "role": "input"
+      },
+      {
+        "id": "e11",
+        "from": "proc-road-limit",
+        "to": "info-road-limit",
+        "role": "output"
+      },
+      {
+        "id": "e12",
+        "from": "info-part-height",
+        "to": "proc-road-slope-check",
+        "role": "input"
+      },
+      {
+        "id": "e13",
+        "from": "info-road-limit",
+        "to": "proc-road-slope-check",
+        "role": "input"
+      },
+      {
+        "id": "e14",
+        "from": "proc-road-slope-check",
+        "to": "info-road-slope-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e15",
+        "from": "proc-adjacent-boundary",
+        "to": "info-adjacent-boundary",
+        "role": "output"
+      },
+      {
+        "id": "e16",
+        "from": "info-building-parts",
+        "to": "proc-adjacent-distance",
+        "role": "input"
+      },
+      {
+        "id": "e17",
+        "from": "info-adjacent-boundary",
+        "to": "proc-adjacent-distance",
+        "role": "input"
+      },
+      {
+        "id": "e18",
+        "from": "proc-adjacent-distance",
+        "to": "info-adjacent-distance",
+        "role": "output"
+      },
+      {
+        "id": "e19",
+        "from": "info-adjacent-distance",
+        "to": "proc-adjacent-limit",
+        "role": "input"
+      },
+      {
+        "id": "e20",
+        "from": "proc-adjacent-limit",
+        "to": "info-adjacent-limit",
+        "role": "output"
+      },
+      {
+        "id": "e21",
+        "from": "info-part-height",
+        "to": "proc-adjacent-slope-check",
+        "role": "input"
+      },
+      {
+        "id": "e22",
+        "from": "info-adjacent-limit",
+        "to": "proc-adjacent-slope-check",
+        "role": "input"
+      },
+      {
+        "id": "e23",
+        "from": "proc-adjacent-slope-check",
+        "to": "info-adjacent-slope-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e24",
+        "from": "proc-north-boundary",
+        "to": "info-north-boundary",
+        "role": "output"
+      },
+      {
+        "id": "e25",
+        "from": "info-building-parts",
+        "to": "proc-north-distance",
+        "role": "input"
+      },
+      {
+        "id": "e26",
+        "from": "info-north-boundary",
+        "to": "proc-north-distance",
+        "role": "input"
+      },
+      {
+        "id": "e27",
+        "from": "proc-north-distance",
+        "to": "info-north-distance",
+        "role": "output"
+      },
+      {
+        "id": "e28",
+        "from": "proc-north-base-height",
+        "to": "info-north-base-height",
+        "role": "output"
+      },
+      {
+        "id": "e29",
+        "from": "info-north-distance",
+        "to": "proc-north-limit",
+        "role": "input"
+      },
+      {
+        "id": "e30",
+        "from": "info-north-base-height",
+        "to": "proc-north-limit",
+        "role": "input"
+      },
+      {
+        "id": "e31",
+        "from": "proc-north-limit",
+        "to": "info-north-limit",
+        "role": "output"
+      },
+      {
+        "id": "e32",
+        "from": "info-part-height",
+        "to": "proc-north-slope-check",
+        "role": "input"
+      },
+      {
+        "id": "e33",
+        "from": "info-north-limit",
+        "to": "proc-north-slope-check",
+        "role": "input"
+      },
+      {
+        "id": "e34",
+        "from": "proc-north-slope-check",
+        "to": "info-north-slope-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e35",
+        "from": "info-road-slope-compliance",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e36",
+        "from": "info-adjacent-slope-compliance",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e37",
+        "from": "info-north-slope-compliance",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e38",
+        "from": "proc-final-judgment",
+        "to": "info-part-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e39",
+        "from": "info-part-compliance",
+        "to": "proc-all-parts-check",
+        "role": "input"
+      },
+      {
+        "id": "e40",
+        "from": "proc-all-parts-check",
+        "to": "info-final",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "defines_detail",
+      "articles": [
+        "A130",
+        "A131",
+        "A132"
+      ],
+      "description": "道路斜線・隣地斜線・北側斜線の詳細規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-23T20:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

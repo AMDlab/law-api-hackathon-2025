@@ -1,0 +1,314 @@
+{
+  "id": "CHK-BSL-A44-P1-I3",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "道路内の建築制限（第3号例外）",
+    "target_subject": "建築物",
+    "description": "第43条1項2号の道路の上空・路面下に設ける建築物について、地区計画適合性、政令基準適合性、特定行政庁認定を判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "44",
+    "paragraph": "1",
+    "item": "3"
+  },
+  "labels": ["集団規定", "道路", "地区計画"],
+  "text_raw": "第四十三条第一項第二号の道路の上空又は路面下に設ける建築物のうち、当該道路に係る地区計画の内容に適合し、かつ、政令で定める基準に適合するものであつて特定行政庁が安全上、防火上及び衛生上支障がないと認めるもの",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "prerequisite",
+          "ref": "info-road-type-match",
+          "note": "第43条1項2号の道路（地区計画区域内の道路）である"
+        },
+        {
+          "type": "prerequisite",
+          "ref": "info-position-match",
+          "note": "当該道路の上空又は路面下に設ける建築物である"
+        }
+      ]
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-district-plan-compliance",
+          "note": "地区計画の内容に適合する"
+        },
+        {
+          "ref": "info-order-standard-compliance",
+          "note": "政令で定める基準に適合する"
+        },
+        {
+          "ref": "info-admin-approval",
+          "note": "特定行政庁が安全上、防火上及び衛生上支障がないと認める"
+        }
+      ]
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-road-identification",
+        "type": "process",
+        "title": "道路種別の特定",
+        "process_type": "undefined_input",
+        "description": "建築物が接する道路が第43条1項2号の道路（地区計画区域内の道路）であるか特定する"
+      },
+      {
+        "id": "info-road-type",
+        "type": "information",
+        "title": "道路の種別",
+        "symbol": "RT",
+        "subject": "道路",
+        "property": "道路種別",
+        "property_type": "classification",
+        "description": "第43条1項2号に該当する道路か否か",
+        "related_articles": ["法::A43:P1:I2"],
+        "plurality": "single"
+      },
+      {
+        "id": "proc-road-type-check",
+        "type": "process",
+        "title": "43条1項2号道路該当判定",
+        "process_type": "mechanical",
+        "description": "第43条1項2号の道路（地区計画区域内の道路）であるかを判定",
+        "logic_expression": "RT = '法43条1項2号道路'"
+      },
+      {
+        "id": "info-road-type-match",
+        "type": "information",
+        "title": "43条1項2号道路該当",
+        "symbol": "R1",
+        "subject": "道路",
+        "property": "43条1項2号道路への該当",
+        "property_type": "proposition",
+        "description": "第43条1項2号の道路（地区計画区域内の道路）に該当するか",
+        "related_articles": ["法::A43:P1:I2"],
+        "plurality": "single"
+      },
+      {
+        "id": "proc-building-position",
+        "type": "process",
+        "title": "建築物位置の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の3次元位置（上空・路面下）を特定する"
+      },
+      {
+        "id": "info-building-position",
+        "type": "information",
+        "title": "建築物の位置",
+        "symbol": "BP",
+        "subject": "建築物",
+        "property": "3次元位置",
+        "property_type": "geometric_solid",
+        "description": "建築物の空間的位置（上空・路面下の別を含む）",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-road-boundary",
+        "type": "process",
+        "title": "道路境界の特定",
+        "process_type": "undefined_input",
+        "description": "道路台帳等から道路の境界と路面の高さを特定する"
+      },
+      {
+        "id": "info-road-boundary",
+        "type": "information",
+        "title": "道路の境界・路面",
+        "symbol": "RB",
+        "subject": "道路",
+        "property": "道路境界と路面の位置",
+        "property_type": "geometric_solid",
+        "description": "道路の平面的境界と路面の高さ",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-position-check",
+        "type": "process",
+        "title": "上空・路面下判定",
+        "process_type": "mechanical",
+        "description": "建築物が道路の上空又は路面下に設けられているかを幾何学的に判定",
+        "logic_expression": "(BP.z > RB.top) OR (BP.z < RB.bottom)"
+      },
+      {
+        "id": "info-position-match",
+        "type": "information",
+        "title": "上空・路面下該当",
+        "symbol": "P1",
+        "subject": "建築物",
+        "property": "道路上空・路面下への該当",
+        "property_type": "proposition",
+        "description": "道路の上空又は路面下に設けられているか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-district-plan-acquisition",
+        "type": "process",
+        "title": "地区計画内容の取得",
+        "process_type": "undefined_input",
+        "description": "都市計画決定資料等から当該道路に係る地区計画の内容を取得する"
+      },
+      {
+        "id": "info-district-plan-content",
+        "type": "information",
+        "title": "地区計画の内容",
+        "symbol": "DC",
+        "subject": "道路",
+        "property": "地区計画の規定内容",
+        "property_type": "visual",
+        "description": "当該道路に係る地区計画で定められた内容",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-building-spec",
+        "type": "process",
+        "title": "建築物仕様の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書から建築物の用途、形態、構造等の仕様を特定する"
+      },
+      {
+        "id": "info-building-spec",
+        "type": "information",
+        "title": "建築物の仕様",
+        "symbol": "BS",
+        "subject": "建築物",
+        "property": "用途・形態・構造",
+        "property_type": "visual",
+        "description": "建築物の用途、形態、構造等の仕様",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-district-plan-check",
+        "type": "process",
+        "title": "地区計画適合判定",
+        "process_type": "human_judgment",
+        "description": "建築物が地区計画の内容に適合しているかを判定",
+        "remarks": "地区計画の内容は個別に異なるため、人による判断が必要"
+      },
+      {
+        "id": "info-district-plan-compliance",
+        "type": "information",
+        "title": "地区計画適合",
+        "symbol": "C1",
+        "subject": "建築物",
+        "property": "地区計画への適合",
+        "property_type": "proposition",
+        "description": "建築物が地区計画の内容に適合するか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-order-standard-check",
+        "type": "process",
+        "title": "政令基準適合判定",
+        "process_type": "mechanical",
+        "description": "政令で定める基準に適合しているかを判定",
+        "related_articles": ["令::A144_4"],
+        "remarks": "建築基準法施行令第144条の4に規定される基準"
+      },
+      {
+        "id": "info-order-standard-compliance",
+        "type": "information",
+        "title": "政令基準適合",
+        "symbol": "C2",
+        "subject": "建築物",
+        "property": "政令基準への適合",
+        "property_type": "proposition",
+        "description": "政令で定める基準に適合するか",
+        "related_articles": ["令::A144_4"],
+        "plurality": "single"
+      },
+      {
+        "id": "proc-admin-approval-check",
+        "type": "process",
+        "title": "特定行政庁認定確認",
+        "process_type": "undefined_input",
+        "description": "特定行政庁が安全上、防火上及び衛生上支障がないと認めたものであるか確認"
+      },
+      {
+        "id": "info-admin-approval",
+        "type": "information",
+        "title": "特定行政庁認定の有無",
+        "symbol": "C3",
+        "subject": "建築物",
+        "property": "特定行政庁の認定",
+        "property_type": "proposition",
+        "description": "特定行政庁が安全上、防火上及び衛生上支障がないと認めたものか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-exemption-judgment",
+        "type": "process",
+        "title": "第3号該当判定",
+        "process_type": "mechanical",
+        "description": "第44条1項3号の例外要件（道路種別、位置、地区計画適合、政令基準適合、特定行政庁認定）をすべて満たすかを判定",
+        "logic_expression": "R1 AND P1 AND C1 AND C2 AND C3"
+      },
+      {
+        "id": "info-exemption-applicable",
+        "type": "information",
+        "title": "第3号例外該当",
+        "symbol": "E3",
+        "subject": "建築物",
+        "property": "法44条1項3号例外への該当",
+        "property_type": "proposition",
+        "description": "第44条1項3号の例外要件に該当するか",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "proc-road-identification", "to": "info-road-type", "role": "output" },
+      { "id": "e02", "from": "info-road-type", "to": "proc-road-type-check", "role": "input" },
+      { "id": "e03", "from": "proc-road-type-check", "to": "info-road-type-match", "role": "output" },
+      { "id": "e04", "from": "proc-building-position", "to": "info-building-position", "role": "output" },
+      { "id": "e05", "from": "proc-road-boundary", "to": "info-road-boundary", "role": "output" },
+      { "id": "e06", "from": "info-building-position", "to": "proc-position-check", "role": "input" },
+      { "id": "e07", "from": "info-road-boundary", "to": "proc-position-check", "role": "input" },
+      { "id": "e08", "from": "proc-position-check", "to": "info-position-match", "role": "output" },
+      { "id": "e09", "from": "proc-district-plan-acquisition", "to": "info-district-plan-content", "role": "output" },
+      { "id": "e10", "from": "proc-building-spec", "to": "info-building-spec", "role": "output" },
+      { "id": "e11", "from": "info-district-plan-content", "to": "proc-district-plan-check", "role": "input" },
+      { "id": "e12", "from": "info-building-spec", "to": "proc-district-plan-check", "role": "input" },
+      { "id": "e13", "from": "proc-district-plan-check", "to": "info-district-plan-compliance", "role": "output" },
+      { "id": "e14", "from": "info-building-spec", "to": "proc-order-standard-check", "role": "input" },
+      { "id": "e15", "from": "proc-order-standard-check", "to": "info-order-standard-compliance", "role": "output" },
+      { "id": "e16", "from": "proc-admin-approval-check", "to": "info-admin-approval", "role": "output" },
+      { "id": "e17", "from": "info-road-type-match", "to": "proc-exemption-judgment", "role": "input" },
+      { "id": "e18", "from": "info-position-match", "to": "proc-exemption-judgment", "role": "input" },
+      { "id": "e19", "from": "info-district-plan-compliance", "to": "proc-exemption-judgment", "role": "input" },
+      { "id": "e20", "from": "info-order-standard-compliance", "to": "proc-exemption-judgment", "role": "input" },
+      { "id": "e21", "from": "info-admin-approval", "to": "proc-exemption-judgment", "role": "input" },
+      { "id": "e22", "from": "proc-exemption-judgment", "to": "info-exemption-applicable", "role": "output" }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A43:P1:I2"],
+      "description": "第43条1項2号の道路（地区計画区域内の道路）を参照"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "delegates_to",
+      "articles": ["A144_4"],
+      "description": "政令で定める基準を規定（第144条の4）"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-24T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

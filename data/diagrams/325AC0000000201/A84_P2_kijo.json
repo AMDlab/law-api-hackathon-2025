@@ -1,0 +1,239 @@
+{
+  "id": "CHK-BSL-A84-P2",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "被災市街地における建築制限期間の延長確認",
+    "target_subject": "建築計画",
+    "description": "市街地の災害発生時に特定行政庁が指定区域における建築制限期間を延長できる条件の確認"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "84",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "総則"
+  ],
+  "text_raw": "特定行政庁は、更に一月を超えない範囲内において前項の期間を延長することができる。",
+  "compliance_logic": {
+    "scope_condition": {
+      "note": "法第84条第1項で指定された区域内における建築物の建築"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "note": "建築制限期間内に建築物の建築を行う場合、特定行政庁の延長決定が有効か確認",
+          "ref": "info-extension-validity",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-period-check",
+        "type": "process",
+        "title": "建築制限期間の確認",
+        "process_type": "undefined_input",
+        "description": "災害発生日から起算した建築制限期間と延長の有無を確認する",
+        "target_subject": "敷地"
+      },
+      {
+        "id": "info-disaster-date",
+        "type": "information",
+        "title": "災害発生日",
+        "symbol": "D",
+        "subject": "敷地",
+        "property": "災害発生日",
+        "property_type": "numeric",
+        "description": "市街地で災害が発生した日付",
+        "plurality": "single",
+        "unit": "日"
+      },
+      {
+        "id": "info-initial-period",
+        "type": "information",
+        "title": "初期の制限期間",
+        "symbol": "P1",
+        "subject": "敷地",
+        "property": "建築制限期間",
+        "property_type": "numeric",
+        "description": "法第84条第1項に基づく一月以内の建築制限期間",
+        "plurality": "single",
+        "unit": "日",
+        "remarks": "災害発生日から1ヶ月以内の期間"
+      },
+      {
+        "id": "proc-extension-decision",
+        "type": "process",
+        "title": "延長決定の有無確認",
+        "process_type": "human_judgment",
+        "description": "特定行政庁が建築制限期間を延長する決定を行ったか確認する",
+        "target_subject": "敷地"
+      },
+      {
+        "id": "info-extension-decision",
+        "type": "information",
+        "title": "延長決定",
+        "symbol": "E",
+        "subject": "敷地",
+        "property": "延長の有無",
+        "property_type": "proposition",
+        "description": "特定行政庁が建築制限期間を延長する決定を行ったか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-extension-period-calc",
+        "type": "process",
+        "title": "延長期間の計算",
+        "process_type": "mechanical",
+        "description": "延長される期間（最大1ヶ月）を計算する",
+        "logic_expression": "延長期間 ≤ 1ヶ月",
+        "target_subject": "敷地"
+      },
+      {
+        "id": "info-extension-period",
+        "type": "information",
+        "title": "延長期間",
+        "symbol": "EP",
+        "subject": "敷地",
+        "property": "延長される期間",
+        "property_type": "numeric",
+        "description": "初期期間を超えない範囲内での延長期間（最大1ヶ月）",
+        "plurality": "single",
+        "unit": "日",
+        "remarks": "延長期間は一月を超えない"
+      },
+      {
+        "id": "proc-total-period-calc",
+        "type": "process",
+        "title": "実効的な建築制限期間の計算",
+        "process_type": "mechanical",
+        "description": "初期期間と延長期間を合算して実効的な制限期間を計算する",
+        "logic_expression": "総制限期間 = 初期期間 + 延長期間",
+        "target_subject": "敷地"
+      },
+      {
+        "id": "info-total-period",
+        "type": "information",
+        "title": "実効的な建築制限期間",
+        "symbol": "TP",
+        "subject": "敷地",
+        "property": "実効的な建築制限期間",
+        "property_type": "numeric",
+        "description": "特定行政庁の決定に基づく実際の建築制限期間",
+        "plurality": "single",
+        "unit": "日"
+      },
+      {
+        "id": "proc-compliance-check",
+        "type": "process",
+        "title": "建築制限期間内のステータス確認",
+        "process_type": "mechanical",
+        "description": "当該建築計画が建築制限期間内に該当するか判定",
+        "logic_expression": "現在日時 ≤ 制限期限",
+        "target_subject": "建築計画"
+      },
+      {
+        "id": "info-extension-validity",
+        "type": "information",
+        "title": "法適合性（延長判定）",
+        "symbol": "R",
+        "subject": "建築計画",
+        "property": "法適合性",
+        "property_type": "proposition",
+        "description": "建築物が法第84条第2項の延長規定に基づく制限に適合しているか",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge-001",
+        "from": "proc-period-check",
+        "to": "info-disaster-date",
+        "role": "output"
+      },
+      {
+        "id": "edge-002",
+        "from": "proc-period-check",
+        "to": "info-initial-period",
+        "role": "output"
+      },
+      {
+        "id": "edge-003",
+        "from": "info-disaster-date",
+        "to": "proc-extension-decision",
+        "role": "input"
+      },
+      {
+        "id": "edge-004",
+        "from": "info-initial-period",
+        "to": "proc-extension-decision",
+        "role": "input"
+      },
+      {
+        "id": "edge-005",
+        "from": "proc-extension-decision",
+        "to": "info-extension-decision",
+        "role": "output"
+      },
+      {
+        "id": "edge-006",
+        "from": "info-extension-decision",
+        "to": "proc-extension-period-calc",
+        "role": "input"
+      },
+      {
+        "id": "edge-007",
+        "from": "proc-extension-period-calc",
+        "to": "info-extension-period",
+        "role": "output"
+      },
+      {
+        "id": "edge-008",
+        "from": "info-initial-period",
+        "to": "proc-total-period-calc",
+        "role": "input"
+      },
+      {
+        "id": "edge-009",
+        "from": "info-extension-period",
+        "to": "proc-total-period-calc",
+        "role": "input"
+      },
+      {
+        "id": "edge-010",
+        "from": "proc-total-period-calc",
+        "to": "info-total-period",
+        "role": "output"
+      },
+      {
+        "id": "edge-011",
+        "from": "info-total-period",
+        "to": "proc-compliance-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-012",
+        "from": "proc-compliance-check",
+        "to": "info-extension-validity",
+        "role": "output"
+      }
+    ]
+  },
+  "metadata": {
+    "created_at": "2025-12-24T16:45:00Z",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

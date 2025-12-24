@@ -1,0 +1,513 @@
+{
+  "id": "CHK-BSL-A52-P8",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "住宅用建築物の容積率緩和判定（空地確保による特例）",
+    "target_subject": "建築物",
+    "description": "住宅用途を含む建築物が一定の空地を有する場合における容積率の緩和適用判定"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "52",
+    "paragraph": "8"
+  },
+  "labels": [
+    "集団規定",
+    "容積率",
+    "住宅用途",
+    "空地確保",
+    "容積率緩和"
+  ],
+  "text_raw": "その全部又は一部を住宅の用途に供する建築物（居住環境向上用途誘導地区内の建築物であつてその一部を当該居住環境向上用途誘導地区に関する都市計画において定められた誘導すべき用途に供するもの及び特定用途誘導地区内の建築物であつてその一部を当該特定用途誘導地区に関する都市計画において定められた誘導すべき用途に供するものを除く。）であつて次に掲げる条件に該当するものについては、当該建築物がある地域に関する都市計画において定められた第一項第二号又は第三号に定める数値の一・五倍以下で当該建築物の住宅の用途に供する部分の床面積の合計のその延べ面積に対する割合に応じて政令で定める方法により算出した数値（特定行政庁が都道府県都市計画審議会の議を経て指定する区域内にあつては、当該都市計画において定められた数値から当該算出した数値までの範囲内で特定行政庁が都道府県都市計画審議会の議を経て別に定めた数値）を同項第二号又は第三号に定める数値とみなして、同項及び第三項から前項までの規定を適用する。ただし、当該建築物が第三項の規定により建築物の延べ面積の算定に当たりその床面積が当該建築物の延べ面積に算入されない部分を有するときは、当該部分の床面積を含む当該建築物の容積率は、当該建築物がある地域に関する都市計画において定められた第一項第二号又は第三号に定める数値の一・五倍以下でなければならない。一第一種住居地域、第二種住居地域、準住居地域、近隣商業地域若しくは準工業地域（高層住居誘導地区及び特定行政庁が都道府県都市計画審議会の議を経て指定する区域を除く。）又は商業地域（特定行政庁が都道府県都市計画審議会の議を経て指定する区域を除く。）内にあること。二その敷地内に政令で定める規模以上の空地（道路に接して有効な部分が政令で定める規模以上であるものに限る。）を有し、かつ、その敷地面積が政令で定める規模以上であること。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "第一種住居地域、第二種住居地域、準住居地域、近隣商業地域、準工業地域又は商業地域内（一部区域を除く）"
+        },
+        {
+          "type": "building_characteristic",
+          "value": "全部又は一部を住宅の用途に供する建築物"
+        },
+        {
+          "type": "exclusion",
+          "value": "居住環境向上用途誘導地区・特定用途誘導地区の誘導用途供給建築物を除く"
+        }
+      ],
+      "note": "特定の用途地域内で住宅用途を含み、かつ一定規模以上の空地を有する建築物が対象"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "proposition",
+          "description": "容積率緩和の適用要件を満たすか",
+          "logic": "(A1 = true) AND (B1 ≥ B1_min) AND (B2 ≥ B2_min) AND (B3 ≥ B3_min)"
+        }
+      ]
+    },
+    "exceptions": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "type": "proviso",
+          "description": "地階住宅部分を有する場合の上限容積率",
+          "note": "第3項により不算入部分を有する場合、容積率上限は基準数値の1.5倍まで"
+        }
+      ],
+      "effect": "MODIFIED_LIMIT"
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-use-input",
+        "type": "process",
+        "title": "建築物の用途の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物に住宅用途が含まれるかを読み取る"
+      },
+      {
+        "id": "info-residential-use",
+        "type": "information",
+        "title": "建築物の住宅用途該当",
+        "symbol": "A1",
+        "subject": "建築物",
+        "property": "全部又は一部が住宅用途であるか",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "建築物の全部または一部が住宅の用途に供されるか"
+      },
+      {
+        "id": "proc-floor-area-input",
+        "type": "process",
+        "title": "住宅用途部分床面積の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書から住宅用途に供する部分の床面積の合計を読み取る"
+      },
+      {
+        "id": "info-residential-floor-area",
+        "type": "information",
+        "title": "住宅用途部分の床面積合計",
+        "symbol": "Ar",
+        "subject": "建築物",
+        "property": "住宅用途部分の床面積合計",
+        "property_type": "numeric",
+        "unit": "m²",
+        "plurality": "single",
+        "description": "建築物の住宅の用途に供する部分の床面積の合計"
+      },
+      {
+        "id": "proc-total-floor-area-input",
+        "type": "process",
+        "title": "延べ面積の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書から建築物の延べ面積を読み取る"
+      },
+      {
+        "id": "info-total-floor-area",
+        "type": "information",
+        "title": "建築物の延べ面積",
+        "symbol": "At",
+        "subject": "建築物",
+        "property": "延べ面積",
+        "property_type": "numeric",
+        "unit": "m²",
+        "plurality": "single",
+        "description": "建築物の延べ面積"
+      },
+      {
+        "id": "proc-residential-ratio-calc",
+        "type": "process",
+        "title": "住宅用途比率の算定",
+        "process_type": "mechanical",
+        "description": "住宅用途部分の床面積合計を延べ面積で除して住宅用途比率を算定",
+        "logic_expression": "Rr = Ar / At"
+      },
+      {
+        "id": "info-residential-ratio",
+        "type": "information",
+        "title": "住宅用途比率",
+        "symbol": "Rr",
+        "subject": "建築物",
+        "property": "住宅用途部分の延べ面積に対する割合",
+        "property_type": "numeric",
+        "plurality": "single",
+        "description": "住宅用途部分の床面積合計の延べ面積に対する割合"
+      },
+      {
+        "id": "proc-site-area-input",
+        "type": "process",
+        "title": "敷地面積の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書から敷地面積を読み取る"
+      },
+      {
+        "id": "info-site-area",
+        "type": "information",
+        "title": "敷地面積",
+        "symbol": "As",
+        "subject": "敷地",
+        "property": "面積",
+        "property_type": "numeric",
+        "unit": "m²",
+        "plurality": "single",
+        "description": "建築物の敷地面積"
+      },
+      {
+        "id": "proc-open-space-area-input",
+        "type": "process",
+        "title": "空地面積の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書から敷地内の空地の面積を読み取る"
+      },
+      {
+        "id": "info-open-space-area",
+        "type": "information",
+        "title": "敷地内空地面積",
+        "symbol": "Ao",
+        "subject": "敷地",
+        "property": "空地の面積",
+        "property_type": "numeric",
+        "unit": "m²",
+        "plurality": "single",
+        "description": "敷地内に確保された空地の面積"
+      },
+      {
+        "id": "proc-road-facing-area-input",
+        "type": "process",
+        "title": "道路接続空地面積の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書から道路に接して有効な空地部分の面積を読み取る"
+      },
+      {
+        "id": "info-road-facing-open-space",
+        "type": "information",
+        "title": "道路接続有効空地面積",
+        "symbol": "Aor",
+        "subject": "敷地",
+        "property": "道路接続部の空地面積",
+        "property_type": "numeric",
+        "unit": "m²",
+        "plurality": "single",
+        "description": "道路に接して有効な部分の空地面積"
+      },
+      {
+        "id": "proc-exemption-check",
+        "type": "process",
+        "title": "適用除外判定",
+        "process_type": "mechanical",
+        "description": "居住環境向上用途誘導地区・特定用途誘導地区の誘導用途供給建築物に該当するかを判定",
+        "logic_expression": "E = NOT (居住環境向上用途誘導地区の誘導用途供給 OR 特定用途誘導地区の誘導用途供給)",
+        "related_articles": ["法::A52:P1:I6", "法::A52:P1:I7"]
+      },
+      {
+        "id": "info-exemption-result",
+        "type": "information",
+        "title": "適用除外非該当",
+        "symbol": "E",
+        "subject": "建築物",
+        "property": "適用除外に非該当",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "居住環境向上用途誘導地区・特定用途誘導地区の誘導用途供給建築物に該当しない"
+      },
+      {
+        "id": "proc-requirement-1-check",
+        "type": "process",
+        "title": "地域要件判定",
+        "process_type": "mechanical",
+        "description": "第一号の地域要件（第一種住居地域等又は商業地域内）に該当するかを判定",
+        "logic_expression": "B1 ∈ {第一種住居地域, 第二種住居地域, 準住居地域, 近隣商業地域, 準工業地域, 商業地域}（ただし一部除外区域を除く）",
+        "related_articles": ["法::A52:P8:I1"]
+      },
+      {
+        "id": "info-requirement-1",
+        "type": "information",
+        "title": "地域要件適合",
+        "symbol": "B1",
+        "subject": "建築物",
+        "property": "第一号地域要件適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "第一種住居地域等又は商業地域内（除外区域を除く）に所在"
+      },
+      {
+        "id": "proc-requirement-2-check",
+        "type": "process",
+        "title": "空地・敷地規模要件判定",
+        "process_type": "mechanical",
+        "description": "第二号の要件（政令で定める規模以上の空地・道路接続空地・敷地面積）を満たすかを判定",
+        "logic_expression": "(Ao ≥ Ao_min) AND (Aor ≥ Aor_min) AND (As ≥ As_min)",
+        "related_articles": ["法::A52:P8:I2", "令::A135_2"]
+      },
+      {
+        "id": "info-requirement-2",
+        "type": "information",
+        "title": "空地・敷地規模要件適合",
+        "symbol": "B2",
+        "subject": "敷地",
+        "property": "第二号空地・敷地規模要件適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "政令で定める規模以上の空地（道路接続有効部分を含む）及び敷地面積を有する",
+        "remarks": "令第135条の2: 敷地面積500m²以上、空地面積が敷地面積の20%以上かつ道路接続有効部分6m以上"
+      },
+      {
+        "id": "proc-bonus-eligibility",
+        "type": "process",
+        "title": "容積率緩和適用可否判定",
+        "process_type": "mechanical",
+        "description": "全要件を満たすかを統合判定",
+        "logic_expression": "C = A1 AND E AND B1 AND B2"
+      },
+      {
+        "id": "info-bonus-eligible",
+        "type": "information",
+        "title": "容積率緩和適用可",
+        "symbol": "C",
+        "subject": "建築物",
+        "property": "法52条8項容積率緩和適用可",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "住宅用建築物の容積率緩和規定を適用できる"
+      },
+      {
+        "id": "proc-bonus-far-calc",
+        "type": "process",
+        "title": "緩和後容積率の算定",
+        "process_type": "mechanical",
+        "description": "住宅用途比率に応じて政令で定める方法により容積率緩和数値を算出",
+        "logic_expression": "FARbonus = f(Rr, FAR_base) ≤ 1.5 × FAR_base",
+        "related_articles": ["令::A135_3"],
+        "remarks": "政令で定める方法: 住宅用途比率に応じた算出式、基準値の1.5倍が上限"
+      },
+      {
+        "id": "info-bonus-far",
+        "type": "information",
+        "title": "緩和後容積率限度",
+        "symbol": "FARbonus",
+        "subject": "建築物",
+        "property": "容積率の緩和後数値",
+        "property_type": "numeric",
+        "plurality": "single",
+        "description": "住宅用途比率に応じて政令で定める方法により算出された容積率",
+        "remarks": "基準容積率の1.5倍以下"
+      },
+      {
+        "id": "proc-final-compliance",
+        "type": "process",
+        "title": "容積率基準適合判定",
+        "process_type": "mechanical",
+        "description": "建築物の容積率が緩和後の限度以下であることを判定",
+        "logic_expression": "D = (At / As ≤ FARbonus)",
+        "remarks": "ただし書: 第3項不算入部分を有する場合は別途上限あり"
+      },
+      {
+        "id": "info-compliance",
+        "type": "information",
+        "title": "法52条8項適合",
+        "symbol": "D",
+        "subject": "建築物",
+        "property": "法52条8項容積率基準適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "空地確保による容積率緩和基準に適合している"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-use-input",
+        "to": "info-residential-use",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "proc-floor-area-input",
+        "to": "info-residential-floor-area",
+        "role": "output"
+      },
+      {
+        "id": "e03",
+        "from": "proc-total-floor-area-input",
+        "to": "info-total-floor-area",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "info-residential-floor-area",
+        "to": "proc-residential-ratio-calc",
+        "role": "input"
+      },
+      {
+        "id": "e05",
+        "from": "info-total-floor-area",
+        "to": "proc-residential-ratio-calc",
+        "role": "input"
+      },
+      {
+        "id": "e06",
+        "from": "proc-residential-ratio-calc",
+        "to": "info-residential-ratio",
+        "role": "output"
+      },
+      {
+        "id": "e07",
+        "from": "proc-site-area-input",
+        "to": "info-site-area",
+        "role": "output"
+      },
+      {
+        "id": "e08",
+        "from": "proc-open-space-area-input",
+        "to": "info-open-space-area",
+        "role": "output"
+      },
+      {
+        "id": "e09",
+        "from": "proc-road-facing-area-input",
+        "to": "info-road-facing-open-space",
+        "role": "output"
+      },
+      {
+        "id": "e10",
+        "from": "info-residential-use",
+        "to": "proc-exemption-check",
+        "role": "input"
+      },
+      {
+        "id": "e11",
+        "from": "proc-exemption-check",
+        "to": "info-exemption-result",
+        "role": "output"
+      },
+      {
+        "id": "e12",
+        "from": "proc-requirement-1-check",
+        "to": "info-requirement-1",
+        "role": "output"
+      },
+      {
+        "id": "e13",
+        "from": "info-open-space-area",
+        "to": "proc-requirement-2-check",
+        "role": "input"
+      },
+      {
+        "id": "e14",
+        "from": "info-road-facing-open-space",
+        "to": "proc-requirement-2-check",
+        "role": "input"
+      },
+      {
+        "id": "e15",
+        "from": "info-site-area",
+        "to": "proc-requirement-2-check",
+        "role": "input"
+      },
+      {
+        "id": "e16",
+        "from": "proc-requirement-2-check",
+        "to": "info-requirement-2",
+        "role": "output"
+      },
+      {
+        "id": "e17",
+        "from": "info-residential-use",
+        "to": "proc-bonus-eligibility",
+        "role": "input"
+      },
+      {
+        "id": "e18",
+        "from": "info-exemption-result",
+        "to": "proc-bonus-eligibility",
+        "role": "input"
+      },
+      {
+        "id": "e19",
+        "from": "info-requirement-1",
+        "to": "proc-bonus-eligibility",
+        "role": "input"
+      },
+      {
+        "id": "e20",
+        "from": "info-requirement-2",
+        "to": "proc-bonus-eligibility",
+        "role": "input"
+      },
+      {
+        "id": "e21",
+        "from": "proc-bonus-eligibility",
+        "to": "info-bonus-eligible",
+        "role": "output"
+      },
+      {
+        "id": "e22",
+        "from": "info-residential-ratio",
+        "to": "proc-bonus-far-calc",
+        "role": "input"
+      },
+      {
+        "id": "e23",
+        "from": "info-bonus-eligible",
+        "to": "proc-bonus-far-calc",
+        "role": "input"
+      },
+      {
+        "id": "e24",
+        "from": "proc-bonus-far-calc",
+        "to": "info-bonus-far",
+        "role": "output"
+      },
+      {
+        "id": "e25",
+        "from": "info-total-floor-area",
+        "to": "proc-final-compliance",
+        "role": "input"
+      },
+      {
+        "id": "e26",
+        "from": "info-site-area",
+        "to": "proc-final-compliance",
+        "role": "input"
+      },
+      {
+        "id": "e27",
+        "from": "info-bonus-far",
+        "to": "proc-final-compliance",
+        "role": "input"
+      },
+      {
+        "id": "e28",
+        "from": "proc-final-compliance",
+        "to": "info-compliance",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "defines_detail",
+      "articles": ["A135_2", "A135_3"],
+      "description": "空地の規模、敷地面積の最低限度、容積率算出方法を規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-24T07:00:00.000Z",
+    "updated_at": "2025-12-24T07:00:00.000Z",
+    "author": "Claude Code (Sonnet 4.5)",
+    "generator": "kijo-generator-skill-v2",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法",
+    "source": "e-Gov法令API - 建築基準法第52条第8項"
+  }
+}

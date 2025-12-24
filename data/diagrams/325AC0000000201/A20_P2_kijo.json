@@ -1,0 +1,345 @@
+{
+  "id": "CHK-BSL-A20-P2",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "構造耐力基準の建築物部分別適用",
+    "target_subject": "建築物",
+    "description": "政令で定める部分が二以上ある建築物について、各部分を別の建築物とみなして前項の構造耐力基準を適用する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "20",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": ["単体規定", "構造", "みなし規定"],
+  "text_raw": "前項に規定する基準の適用上一の建築物であつても別の建築物とみなすことができる部分として政令で定める部分が二以上ある建築物の当該部分は、前項の規定の適用については、それぞれ別の建築物とみなす。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "building_structure",
+          "note": "政令で定める部分が二以上ある建築物"
+        }
+      ],
+      "note": "エキスパンションジョイント等で区画された部分が二以上ある場合"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-deemed-parts",
+          "operator": "exists",
+          "note": "政令で定める部分が特定されている"
+        },
+        {
+          "ref": "info-parts-count",
+          "operator": ">=",
+          "value": 2,
+          "note": "当該部分が二以上"
+        },
+        {
+          "ref": "info-each-compliance",
+          "operator": "==",
+          "value": true,
+          "note": "各部分が法20条1項基準に適合"
+        }
+      ]
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-building-structure",
+        "type": "process",
+        "title": "建築物の構造形式の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の構造形式（エキスパンションジョイントの有無等）を読み取る"
+      },
+      {
+        "id": "info-building-structure",
+        "type": "information",
+        "title": "建築物の構造形式",
+        "symbol": "BS",
+        "subject": "建築物",
+        "property": "構造形式",
+        "property_type": "classification",
+        "description": "建築物の構造形式（一体構造、エキスパンションジョイント分離等）",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-check-deemed-criteria",
+        "type": "process",
+        "title": "政令で定める部分の該当判定",
+        "process_type": "mechanical",
+        "description": "建築物の構造形式が政令で定める部分（令36条の3）に該当するか判定",
+        "related_articles": ["令::A36_3"],
+        "logic_expression": "BS ∈ {エキスパンションジョイント等で区画}"
+      },
+      {
+        "id": "info-deemed-applicable",
+        "type": "information",
+        "title": "政令で定める部分該当",
+        "symbol": "DA",
+        "subject": "建築物",
+        "property": "政令で定める部分該当",
+        "property_type": "proposition",
+        "description": "建築物が政令で定める部分（令36条の3）に該当するか",
+        "related_articles": ["令::A36_3"],
+        "delegated_requirements": [
+          {
+            "article_ref": "令::A36_3:P1",
+            "requirement": "エキスパンションジョイントその他の相互に応力を伝えない構造方法のみで接している部分であること"
+          }
+        ],
+        "plurality": "single"
+      },
+      {
+        "id": "proc-identify-parts",
+        "type": "process",
+        "title": "区画部分の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から政令で定める構造方法で区画された各部分を特定する",
+        "related_articles": ["令::A36_3"]
+      },
+      {
+        "id": "info-deemed-parts",
+        "type": "information",
+        "title": "建築物の区画部分",
+        "symbol": "P",
+        "subject": "建築物",
+        "property": "区画部分の集合",
+        "property_type": "set_definition",
+        "description": "政令で定める構造方法により区画された部分の集合",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-count-parts",
+        "type": "process",
+        "title": "部分数の計数",
+        "process_type": "mechanical",
+        "description": "区画された部分の個数を計数",
+        "logic_expression": "count(P)"
+      },
+      {
+        "id": "info-parts-count",
+        "type": "information",
+        "title": "区画部分の数",
+        "symbol": "N",
+        "subject": "建築物",
+        "property": "区画部分の数",
+        "property_type": "numeric",
+        "unit": "個",
+        "description": "政令で定める構造方法により区画された部分の個数",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-check-count",
+        "type": "process",
+        "title": "二以上判定",
+        "process_type": "mechanical",
+        "description": "区画部分が二以上あるか判定",
+        "logic_expression": "N >= 2"
+      },
+      {
+        "id": "info-two-or-more",
+        "type": "information",
+        "title": "二以上該当",
+        "symbol": "T",
+        "subject": "建築物",
+        "property": "区画部分が二以上",
+        "property_type": "proposition",
+        "description": "政令で定める部分が二以上あるか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-check-applicability",
+        "type": "process",
+        "title": "法20条2項適用可否判定",
+        "process_type": "mechanical",
+        "description": "政令で定める部分に該当し、かつ二以上ある場合に法20条2項が適用される",
+        "logic_expression": "DA AND T"
+      },
+      {
+        "id": "info-applicability",
+        "type": "information",
+        "title": "法20条2項適用",
+        "symbol": "A",
+        "subject": "建築物",
+        "property": "法20条2項適用",
+        "property_type": "proposition",
+        "description": "法20条2項のみなし規定が適用されるか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-part-height",
+        "type": "process",
+        "title": "各部分の高さの特定",
+        "process_type": "undefined_input",
+        "description": "各区画部分の高さを設計図書等から読み取る",
+        "iteration": "iterative"
+      },
+      {
+        "id": "info-part-height",
+        "type": "information",
+        "title": "区画部分の高さ",
+        "symbol": "H_i",
+        "subject": "区画部分",
+        "property": "高さ",
+        "property_type": "numeric",
+        "unit": "m",
+        "description": "各区画部分の高さ",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-part-structure",
+        "type": "process",
+        "title": "各部分の構造種別の特定",
+        "process_type": "undefined_input",
+        "description": "各区画部分の構造種別を設計図書等から読み取る",
+        "iteration": "iterative"
+      },
+      {
+        "id": "info-part-structure",
+        "type": "information",
+        "title": "区画部分の構造種別",
+        "symbol": "S_i",
+        "subject": "区画部分",
+        "property": "構造種別",
+        "property_type": "classification",
+        "description": "各区画部分の構造種別（木造、鉄骨造、鉄筋コンクリート造等）",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-part-area",
+        "type": "process",
+        "title": "各部分の延べ面積の特定",
+        "process_type": "undefined_input",
+        "description": "各区画部分の延べ面積を設計図書等から読み取る",
+        "iteration": "iterative"
+      },
+      {
+        "id": "info-part-area",
+        "type": "information",
+        "title": "区画部分の延べ面積",
+        "symbol": "A_i",
+        "subject": "区画部分",
+        "property": "延べ面積",
+        "property_type": "numeric",
+        "unit": "m2",
+        "description": "各区画部分の延べ面積",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-each-compliance",
+        "type": "process",
+        "title": "各部分の法20条1項適合判定",
+        "process_type": "sub_diagram_reference",
+        "description": "各区画部分を別の建築物とみなし、法20条1項の基準への適合を判定（部分審査機序図A20-P1を参照）",
+        "sub_diagram_ref": "CHK-BSL-A20-P1",
+        "related_articles": ["法::A20:P1"],
+        "iteration": "iterative",
+        "target_subject": "区画部分"
+      },
+      {
+        "id": "info-each-compliance",
+        "type": "information",
+        "title": "各部分の法20条1項適合",
+        "symbol": "C_i",
+        "subject": "区画部分",
+        "property": "法20条1項適合",
+        "property_type": "proposition",
+        "description": "各区画部分が法20条1項の基準に適合するか",
+        "related_articles": ["法::A20:P1"],
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-all-parts-check",
+        "type": "process",
+        "title": "全部分適合判定",
+        "process_type": "mechanical",
+        "description": "すべての区画部分が法20条1項基準に適合するか判定（全称命題）",
+        "logic_expression": "∀i (C_i = true)"
+      },
+      {
+        "id": "info-all-parts-compliance",
+        "type": "information",
+        "title": "全部分適合",
+        "symbol": "AC",
+        "subject": "建築物",
+        "property": "全区画部分法20条1項適合",
+        "property_type": "proposition",
+        "description": "すべての区画部分が法20条1項に適合するか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-final-judgment",
+        "type": "process",
+        "title": "法20条2項適合判定",
+        "process_type": "mechanical",
+        "description": "法20条2項が適用され、全部分が法20条1項に適合する場合に適合",
+        "logic_expression": "A AND AC"
+      },
+      {
+        "id": "info-final-compliance",
+        "type": "information",
+        "title": "法20条2項適合",
+        "subject": "建築物",
+        "property": "法20条2項適合",
+        "property_type": "proposition",
+        "description": "建築物が法20条2項の規定に適合するか",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "proc-building-structure", "to": "info-building-structure", "role": "output" },
+      { "id": "e02", "from": "info-building-structure", "to": "proc-check-deemed-criteria", "role": "input" },
+      { "id": "e03", "from": "proc-check-deemed-criteria", "to": "info-deemed-applicable", "role": "output" },
+      { "id": "e04", "from": "proc-identify-parts", "to": "info-deemed-parts", "role": "output" },
+      { "id": "e05", "from": "info-deemed-parts", "to": "proc-count-parts", "role": "input" },
+      { "id": "e06", "from": "proc-count-parts", "to": "info-parts-count", "role": "output" },
+      { "id": "e07", "from": "info-parts-count", "to": "proc-check-count", "role": "input" },
+      { "id": "e08", "from": "proc-check-count", "to": "info-two-or-more", "role": "output" },
+      { "id": "e09", "from": "info-deemed-applicable", "to": "proc-check-applicability", "role": "input" },
+      { "id": "e10", "from": "info-two-or-more", "to": "proc-check-applicability", "role": "input" },
+      { "id": "e11", "from": "proc-check-applicability", "to": "info-applicability", "role": "output" },
+      { "id": "e12", "from": "info-deemed-parts", "to": "proc-part-height", "role": "input" },
+      { "id": "e13", "from": "proc-part-height", "to": "info-part-height", "role": "output" },
+      { "id": "e14", "from": "info-deemed-parts", "to": "proc-part-structure", "role": "input" },
+      { "id": "e15", "from": "proc-part-structure", "to": "info-part-structure", "role": "output" },
+      { "id": "e16", "from": "info-deemed-parts", "to": "proc-part-area", "role": "input" },
+      { "id": "e17", "from": "proc-part-area", "to": "info-part-area", "role": "output" },
+      { "id": "e18", "from": "info-deemed-parts", "to": "proc-each-compliance", "role": "input" },
+      { "id": "e19", "from": "info-part-height", "to": "proc-each-compliance", "role": "input" },
+      { "id": "e20", "from": "info-part-structure", "to": "proc-each-compliance", "role": "input" },
+      { "id": "e21", "from": "info-part-area", "to": "proc-each-compliance", "role": "input" },
+      { "id": "e22", "from": "proc-each-compliance", "to": "info-each-compliance", "role": "output" },
+      { "id": "e23", "from": "info-each-compliance", "to": "proc-all-parts-check", "role": "input" },
+      { "id": "e24", "from": "proc-all-parts-check", "to": "info-all-parts-compliance", "role": "output" },
+      { "id": "e25", "from": "info-applicability", "to": "proc-final-judgment", "role": "input" },
+      { "id": "e26", "from": "info-all-parts-compliance", "to": "proc-final-judgment", "role": "input" },
+      { "id": "e27", "from": "proc-final-judgment", "to": "info-final-compliance", "role": "output" }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "delegates_to",
+      "articles": ["A36_3"],
+      "description": "別の建築物とみなすことができる部分を定める"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-24T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

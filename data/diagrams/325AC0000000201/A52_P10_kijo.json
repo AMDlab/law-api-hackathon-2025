@@ -1,0 +1,312 @@
+{
+  "id": "CHK-BSL-A52-P10",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "計画道路の前面道路みなし規定(容積率)",
+    "target_subject": "建築物",
+    "description": "計画道路を前面道路とみなして容積率を算定する特例"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "52",
+    "paragraph": "10",
+    "item": null
+  },
+  "labels": ["集団規定", "容積率", "計画道路", "特定行政庁許可"],
+  "text_raw": "建築物の敷地が都市計画において定められた計画道路（第四十二条第一項第四号に該当するものを除くものとし、以下この項において「計画道路」という。）に接する場合又は当該敷地内に計画道路がある場合において、特定行政庁が交通上、安全上、防火上及び衛生上支障がないと認めて許可した建築物については、当該計画道路を第二項の前面道路とみなして、同項から第七項まで及び前項の規定を適用するものとする。この場合においては、当該敷地のうち計画道路に係る部分の面積は、敷地面積又は敷地の部分の面積に算入しないものとする。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "敷地が計画道路に接する又は敷地内に計画道路がある場合"
+        },
+        {
+          "type": "permission",
+          "value": "特定行政庁の許可を受けた建築物"
+        }
+      ],
+      "note": "計画道路(法42条1項4号を除く)に関係し、特定行政庁の許可を受けた建築物に適用"
+    },
+    "judgment_rule": {
+      "operator": "DEEM_AS",
+      "description": "計画道路を第2項の前面道路とみなす",
+      "conditions": [
+        {
+          "type": "geometry",
+          "note": "計画道路を前面道路として容積率を算定"
+        },
+        {
+          "type": "area_exclusion",
+          "note": "計画道路部分の面積を敷地面積から除外"
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-site-identify",
+        "type": "process",
+        "title": "敷地の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の敷地を特定する"
+      },
+      {
+        "id": "info-site",
+        "type": "information",
+        "title": "敷地",
+        "symbol": "S",
+        "subject": "敷地",
+        "property": "敷地の範囲",
+        "property_type": "geometric_surface",
+        "description": "判定対象となる建築物の敷地",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-building-identify",
+        "type": "process",
+        "title": "建築物の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から敷地上の建築物を特定する"
+      },
+      {
+        "id": "info-building",
+        "type": "information",
+        "title": "敷地上の建築物",
+        "subject": "敷地",
+        "property": "建築物の集合",
+        "property_type": "set_definition",
+        "description": "当該敷地に計画される建築物",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-planned-road-check",
+        "type": "process",
+        "title": "計画道路との関係判定",
+        "process_type": "mechanical",
+        "description": "都市計画で定められた計画道路(法42条1項4号を除く)に敷地が接する又は敷地内にあるか判定",
+        "related_articles": ["法::A42:P1:I4"]
+      },
+      {
+        "id": "info-planned-road-relation",
+        "type": "information",
+        "title": "計画道路との関係",
+        "symbol": "PR",
+        "subject": "敷地",
+        "property": "計画道路への接触又は内包",
+        "property_type": "proposition",
+        "description": "敷地が都市計画の計画道路に接する又は敷地内に計画道路がある",
+        "plurality": "single",
+        "related_articles": ["法::A42:P1:I4"],
+        "remarks": "法42条1項4号に該当する計画道路は除外"
+      },
+      {
+        "id": "proc-authority-permit",
+        "type": "process",
+        "title": "特定行政庁許可の確認",
+        "process_type": "undefined_input",
+        "description": "特定行政庁が交通上、安全上、防火上及び衛生上支障がないと認めて許可したか確認"
+      },
+      {
+        "id": "info-authority-permit",
+        "type": "information",
+        "title": "特定行政庁許可の有無",
+        "symbol": "P",
+        "subject": "建築物",
+        "property": "特定行政庁の許可",
+        "property_type": "proposition",
+        "description": "交通上、安全上、防火上及び衛生上支障がないことについての特定行政庁による許可の有無",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-special-provision-applicability",
+        "type": "process",
+        "title": "特例適用可否判定",
+        "process_type": "mechanical",
+        "description": "計画道路との関係があり、かつ特定行政庁の許可があるか判定",
+        "logic_expression": "PR AND P"
+      },
+      {
+        "id": "info-special-provision-applicable",
+        "type": "information",
+        "title": "特例適用可",
+        "symbol": "SP",
+        "subject": "建築物",
+        "property": "法52条10項特例の適用",
+        "property_type": "proposition",
+        "description": "計画道路を前面道路とみなす特例が適用可能か",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-planned-road-geometry",
+        "type": "process",
+        "title": "計画道路の幾何学情報取得",
+        "process_type": "mechanical",
+        "description": "都市計画で定められた計画道路の位置・幅員等の幾何学情報を取得",
+        "remarks": "都市計画情報から計画道路の形状を特定"
+      },
+      {
+        "id": "info-planned-road-geometry",
+        "type": "information",
+        "title": "計画道路の幾何学情報",
+        "symbol": "PRG",
+        "subject": "計画道路",
+        "property": "位置・幅員",
+        "property_type": "geometric_line",
+        "description": "計画道路の幾何学的形状(位置、幅員等)",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-deemed-front-road",
+        "type": "process",
+        "title": "前面道路のみなし処理",
+        "process_type": "mechanical",
+        "description": "計画道路を法52条2項の前面道路とみなして容積率算定に使用",
+        "related_articles": ["法::A52:P2", "法::A52:P3", "法::A52:P4", "法::A52:P5", "法::A52:P6", "法::A52:P7", "法::A52:P9"],
+        "remarks": "法52条2項〜7項及び9項の規定を適用"
+      },
+      {
+        "id": "info-deemed-front-road",
+        "type": "information",
+        "title": "みなし前面道路",
+        "symbol": "FR",
+        "subject": "建築物",
+        "property": "容積率算定用前面道路",
+        "property_type": "geometric_line",
+        "description": "容積率算定に使用する前面道路(計画道路をみなしたもの)",
+        "plurality": "single",
+        "related_articles": ["法::A52:P2"]
+      },
+      {
+        "id": "proc-planned-road-area",
+        "type": "process",
+        "title": "計画道路部分の面積算出",
+        "process_type": "mechanical",
+        "description": "敷地のうち計画道路に係る部分の面積を算出",
+        "logic_expression": "A_PR = area(S ∩ PRG)"
+      },
+      {
+        "id": "info-planned-road-area",
+        "type": "information",
+        "title": "計画道路部分の面積",
+        "symbol": "A_PR",
+        "subject": "敷地",
+        "property": "計画道路部分の面積",
+        "property_type": "numeric",
+        "unit": "m²",
+        "description": "敷地のうち計画道路に係る部分の面積",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-effective-site-area",
+        "type": "process",
+        "title": "有効敷地面積の算出",
+        "process_type": "mechanical",
+        "description": "容積率算定に用いる敷地面積から計画道路部分を除外",
+        "logic_expression": "A_eff = A_total - A_PR",
+        "remarks": "計画道路部分を敷地面積に算入しない"
+      },
+      {
+        "id": "info-effective-site-area",
+        "type": "information",
+        "title": "有効敷地面積",
+        "symbol": "A_eff",
+        "subject": "敷地",
+        "property": "容積率算定用敷地面積",
+        "property_type": "numeric",
+        "unit": "m²",
+        "description": "計画道路部分を除いた容積率算定用の敷地面積",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-total-site-area",
+        "type": "process",
+        "title": "敷地面積の特定",
+        "process_type": "mechanical",
+        "description": "設計図書から敷地全体の面積を特定",
+        "logic_expression": "A_total = area(S)"
+      },
+      {
+        "id": "info-total-site-area",
+        "type": "information",
+        "title": "敷地面積",
+        "symbol": "A_total",
+        "subject": "敷地",
+        "property": "全体面積",
+        "property_type": "numeric",
+        "unit": "m²",
+        "description": "敷地全体の面積",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-compliance-check",
+        "type": "process",
+        "title": "適合判定",
+        "process_type": "mechanical",
+        "description": "計画道路を前面道路とみなし、計画道路部分を除外した敷地面積を用いて容積率規定に適合するか判定",
+        "related_articles": ["法::A52:P2", "法::A52:P3", "法::A52:P4", "法::A52:P5", "法::A52:P6", "法::A52:P7", "法::A52:P9"]
+      },
+      {
+        "id": "info-compliance",
+        "type": "information",
+        "title": "法52条10項適合",
+        "symbol": "C",
+        "subject": "建築物",
+        "property": "法52条10項適合",
+        "property_type": "proposition",
+        "description": "計画道路みなし規定を適用した容積率規定への適合",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "proc-site-identify", "to": "info-site", "role": "output" },
+      { "id": "e02", "from": "proc-building-identify", "to": "info-building", "role": "output" },
+      { "id": "e03", "from": "info-site", "to": "proc-planned-road-check", "role": "input" },
+      { "id": "e04", "from": "proc-planned-road-check", "to": "info-planned-road-relation", "role": "output" },
+      { "id": "e05", "from": "proc-authority-permit", "to": "info-authority-permit", "role": "output" },
+      { "id": "e06", "from": "info-planned-road-relation", "to": "proc-special-provision-applicability", "role": "input" },
+      { "id": "e07", "from": "info-authority-permit", "to": "proc-special-provision-applicability", "role": "input" },
+      { "id": "e08", "from": "proc-special-provision-applicability", "to": "info-special-provision-applicable", "role": "output" },
+      { "id": "e09", "from": "info-site", "to": "proc-planned-road-geometry", "role": "input" },
+      { "id": "e10", "from": "proc-planned-road-geometry", "to": "info-planned-road-geometry", "role": "output" },
+      { "id": "e11", "from": "info-special-provision-applicable", "to": "proc-deemed-front-road", "role": "input" },
+      { "id": "e12", "from": "info-planned-road-geometry", "to": "proc-deemed-front-road", "role": "input" },
+      { "id": "e13", "from": "proc-deemed-front-road", "to": "info-deemed-front-road", "role": "output" },
+      { "id": "e14", "from": "info-site", "to": "proc-total-site-area", "role": "input" },
+      { "id": "e15", "from": "proc-total-site-area", "to": "info-total-site-area", "role": "output" },
+      { "id": "e16", "from": "info-site", "to": "proc-planned-road-area", "role": "input" },
+      { "id": "e17", "from": "info-planned-road-geometry", "to": "proc-planned-road-area", "role": "input" },
+      { "id": "e18", "from": "proc-planned-road-area", "to": "info-planned-road-area", "role": "output" },
+      { "id": "e19", "from": "info-total-site-area", "to": "proc-effective-site-area", "role": "input" },
+      { "id": "e20", "from": "info-planned-road-area", "to": "proc-effective-site-area", "role": "input" },
+      { "id": "e21", "from": "proc-effective-site-area", "to": "info-effective-site-area", "role": "output" },
+      { "id": "e22", "from": "info-deemed-front-road", "to": "proc-compliance-check", "role": "input" },
+      { "id": "e23", "from": "info-effective-site-area", "to": "proc-compliance-check", "role": "input" },
+      { "id": "e24", "from": "info-building", "to": "proc-compliance-check", "role": "input" },
+      { "id": "e25", "from": "proc-compliance-check", "to": "info-compliance", "role": "output" }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A42:P1:I4", "A52:P2", "A52:P3", "A52:P4", "A52:P5", "A52:P6", "A52:P7", "A52:P9"],
+      "description": "計画道路の定義(法42条1項4号除外)及び容積率規定(法52条2項〜7項、9項)を参照"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-24T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

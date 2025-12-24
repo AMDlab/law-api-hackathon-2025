@@ -1,0 +1,211 @@
+{
+  "id": "CHK-BSL-A39-P2",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "災害危険区域内の建築制限適合確認",
+    "target_subject": "建築物",
+    "description": "災害危険区域内における建築物の建築制限（条例）への適合を判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "39",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": ["集団規定", "災害防止", "条例委任"],
+  "text_raw": "災害危険区域内における住居の用に供する建築物の建築の禁止その他建築物の建築に関する制限で災害防止上必要なものは、前項の条例で定める。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        { "type": "location", "value": "災害危険区域内" },
+        { "type": "ordinance", "value": "地方公共団体が法39条1項に基づき制定した条例が存在" }
+      ],
+      "note": "敷地が災害危険区域内に位置する場合に適用。具体的な制限内容は地方公共団体の条例で定められる。"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        { "type": "ordinance_compliance", "ref": "info-restriction-compliance", "operator": "==", "value": true }
+      ],
+      "note": "地方公共団体の条例で定められた建築制限（住居用建築物の建築禁止その他災害防止上必要な制限）に適合すること"
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-site-location",
+        "type": "process",
+        "title": "敷地位置の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から敷地の位置を特定する"
+      },
+      {
+        "id": "info-site-location",
+        "type": "information",
+        "title": "敷地の位置",
+        "symbol": "L",
+        "subject": "敷地",
+        "property": "位置",
+        "property_type": "geometric_point",
+        "description": "敷地の位置を示す幾何学的情報",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-zone-check",
+        "type": "process",
+        "title": "災害危険区域内判定",
+        "process_type": "mechanical",
+        "description": "敷地が条例で指定された災害危険区域内に位置するかを判定する（法39条1項による指定）",
+        "related_articles": ["法::A39:P1"],
+        "remarks": "法39条1項の機序図による判定結果を参照"
+      },
+      {
+        "id": "info-in-zone",
+        "type": "information",
+        "title": "災害危険区域内該当",
+        "symbol": "Z",
+        "subject": "敷地",
+        "property": "災害危険区域内への該当",
+        "property_type": "proposition",
+        "description": "当該敷地が災害危険区域内に位置するか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-building-use",
+        "type": "process",
+        "title": "建築物用途の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の用途を特定する"
+      },
+      {
+        "id": "info-building-use",
+        "type": "information",
+        "title": "建築物の用途",
+        "symbol": "U",
+        "subject": "建築物",
+        "property": "用途",
+        "property_type": "classification",
+        "description": "建築物の用途区分（住居用、非住居用等）",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-building-details",
+        "type": "process",
+        "title": "建築物諸元の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の構造、規模等の諸元を特定する"
+      },
+      {
+        "id": "info-building-details",
+        "type": "information",
+        "title": "建築物の諸元",
+        "symbol": "B",
+        "subject": "建築物",
+        "property": "構造・規模等の諸元",
+        "property_type": "classification",
+        "description": "建築物の構造種別、階数、高さ、床面積等の諸元",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-ordinance-acquisition",
+        "type": "process",
+        "title": "条例制限内容の取得",
+        "process_type": "mechanical",
+        "description": "管轄地方公共団体が法39条1項に基づき制定した条例における建築制限の内容を取得する",
+        "related_articles": ["法::A39:P1"],
+        "remarks": "条例で定められる制限例：住居用建築物の建築禁止、構造制限、用途制限、規模制限等"
+      },
+      {
+        "id": "info-ordinance-restrictions",
+        "type": "information",
+        "title": "条例による建築制限内容",
+        "symbol": "R",
+        "subject": "災害危険区域",
+        "property": "建築制限の内容",
+        "property_type": "classification",
+        "description": "条例で定められた建築制限（住居用建築物の建築禁止その他災害防止上必要な制限）",
+        "plurality": "single",
+        "remarks": "地方公共団体ごとに異なる制限内容が定められる"
+      },
+      {
+        "id": "proc-compliance-check",
+        "type": "process",
+        "title": "条例制限適合判定",
+        "process_type": "mechanical",
+        "description": "建築物が条例で定められた建築制限に適合するかを判定する",
+        "logic_expression": "(Z == false) OR (条例制限に適合)",
+        "remarks": "災害危険区域外であれば適用除外。区域内の場合は条例制限への適合が必要。"
+      },
+      {
+        "id": "info-restriction-compliance",
+        "type": "information",
+        "title": "条例制限適合",
+        "symbol": "C",
+        "subject": "建築物",
+        "property": "条例による建築制限への適合",
+        "property_type": "proposition",
+        "description": "建築物が法39条2項に基づく条例の建築制限に適合するか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-final-determination",
+        "type": "process",
+        "title": "法39条2項適合判定",
+        "process_type": "mechanical",
+        "description": "災害危険区域内における建築制限（条例）への適合を最終判定する",
+        "related_articles": ["法::A39:P2"],
+        "logic_expression": "C"
+      },
+      {
+        "id": "info-final",
+        "type": "information",
+        "title": "法39条2項適合",
+        "symbol": "F",
+        "subject": "建築物",
+        "property": "法39条2項への適合",
+        "property_type": "proposition",
+        "description": "災害危険区域内における建築制限（条例）への適合判定結果",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "proc-site-location", "to": "info-site-location", "role": "output" },
+      { "id": "e02", "from": "info-site-location", "to": "proc-zone-check", "role": "input" },
+      { "id": "e03", "from": "proc-zone-check", "to": "info-in-zone", "role": "output" },
+      { "id": "e04", "from": "proc-building-use", "to": "info-building-use", "role": "output" },
+      { "id": "e05", "from": "proc-building-details", "to": "info-building-details", "role": "output" },
+      { "id": "e06", "from": "info-site-location", "to": "proc-ordinance-acquisition", "role": "input" },
+      { "id": "e07", "from": "proc-ordinance-acquisition", "to": "info-ordinance-restrictions", "role": "output" },
+      { "id": "e08", "from": "info-in-zone", "to": "proc-compliance-check", "role": "input" },
+      { "id": "e09", "from": "info-building-use", "to": "proc-compliance-check", "role": "input" },
+      { "id": "e10", "from": "info-building-details", "to": "proc-compliance-check", "role": "input" },
+      { "id": "e11", "from": "info-ordinance-restrictions", "to": "proc-compliance-check", "role": "input" },
+      { "id": "e12", "from": "proc-compliance-check", "to": "info-restriction-compliance", "role": "output" },
+      { "id": "e13", "from": "info-restriction-compliance", "to": "proc-final-determination", "role": "input" },
+      { "id": "e14", "from": "proc-final-determination", "to": "info-final", "role": "output" }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A39:P1"],
+      "description": "災害危険区域の指定（第39条第1項）"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-24T00:00:00+09:00",
+    "updated_at": "2025-12-24T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法",
+    "source": "e-Gov法令API v2"
+  }
+}

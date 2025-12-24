@@ -1,0 +1,257 @@
+{
+  "id": "CHK-BSL-A87-P3-I3",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "用途変更時の採光適用除外判定",
+    "target_subject": "建築物",
+    "description": "第三条第二項の適用を受けない建築物の用途を変更する場合において、第48条1項～14項の適用除外に該当するか判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "87",
+    "paragraph": "3",
+    "item": "3"
+  },
+  "labels": [
+    "集団規定",
+    "採光"
+  ],
+  "text_raw": "第四十八条第一項から第十四項までの規定に関しては、用途の変更が政令で定める範囲内である場合",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "rule",
+          "value": "第三条第二項の規定により第27条、28条1項もしくは3項、29条、30条、35条～35条の3、36条中28条1項もしくは35条に関する部分、48条1項～14項もしくは51条の規定の適用を受けない建築物"
+        },
+        {
+          "type": "action",
+          "value": "用途変更"
+        }
+      ],
+      "note": "既存建築物で新規制を受けない建築物"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-use-change-scope",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    },
+    "exceptions": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "note": "87条3項1号：増築、改築、大規模の修繕または大規模の模様替をする場合",
+          "ref": "87-P3-I1"
+        },
+        {
+          "note": "87条3項2号：政令で指定する類似の用途相互間かつ修繕・模様替が大規模でない場合",
+          "ref": "87-P3-I2"
+        }
+      ],
+      "effect": "EXEMPT"
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-use-change-detect",
+        "type": "process",
+        "title": "用途変更の有無確認",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の用途が変更されたかを確認する"
+      },
+      {
+        "id": "info-use-change",
+        "type": "information",
+        "title": "用途変更の有無",
+        "symbol": "P",
+        "subject": "建築物",
+        "property": "用途変更の実施",
+        "property_type": "proposition",
+        "description": "建築物の用途が変更されるか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-use-change-scope-check",
+        "type": "process",
+        "title": "用途変更の範囲確認",
+        "process_type": "mechanical",
+        "description": "政令（建築基準法施行令第2条1項）で定める類似の用途範囲内での変更か判定",
+        "related_articles": [
+          "令::A2:P1"
+        ],
+        "logic_expression": "新用途 ∈ {政令で指定する類似用途グループ}"
+      },
+      {
+        "id": "info-use-change-scope",
+        "type": "information",
+        "title": "用途変更の範囲内",
+        "symbol": "U",
+        "subject": "建築物",
+        "property": "用途変更が政令で定める範囲内か",
+        "property_type": "proposition",
+        "description": "用途変更が政令（令第2条1項）で定める範囲内か",
+        "related_articles": [
+          "令::A2:P1"
+        ],
+        "plurality": "single"
+      },
+      {
+        "id": "proc-a48-applicability",
+        "type": "process",
+        "title": "第48条の適用判定",
+        "process_type": "mechanical",
+        "description": "87条3項3号の条件に基づいて、48条1項～14項の適用除外か判定",
+        "logic_expression": "用途変更が政令範囲内 → 48条1項～14項の適用除外"
+      },
+      {
+        "id": "info-a48-exempt",
+        "type": "information",
+        "title": "第48条の適用除外",
+        "symbol": "E",
+        "subject": "建築物",
+        "property": "第48条1項～14項の適用除外",
+        "property_type": "proposition",
+        "description": "用途変更が政令で定める範囲内の場合、第48条1項～14項の規定の適用除外",
+        "related_articles": [
+          "法::A48:P1-14",
+          "法::A87:P3:I3"
+        ],
+        "plurality": "single"
+      },
+      {
+        "id": "proc-other-requirements-check",
+        "type": "process",
+        "title": "その他の適用除外要件確認",
+        "process_type": "mechanical",
+        "description": "87条3項1号、2号の適用除外要件の確認（他の除外条件）",
+        "related_articles": [
+          "法::A87:P3:I1",
+          "法::A87:P3:I2"
+        ]
+      },
+      {
+        "id": "info-other-exempts",
+        "type": "information",
+        "title": "その他の適用除外",
+        "symbol": "O",
+        "subject": "建築物",
+        "property": "87条3項1号2号の適用除外",
+        "property_type": "proposition",
+        "description": "87条3項1号（増築等）または2号（類似用途・小規模改修）に該当するか",
+        "related_articles": [
+          "法::A87:P3:I1",
+          "法::A87:P3:I2"
+        ],
+        "plurality": "single"
+      },
+      {
+        "id": "proc-final-judgment",
+        "type": "process",
+        "title": "採光要件の適用判定",
+        "process_type": "mechanical",
+        "description": "87条3項の各号により、48条1項～14項の採光要件が適用除外となるかを総合判定",
+        "logic_expression": "E OR O"
+      },
+      {
+        "id": "info-final",
+        "type": "information",
+        "title": "採光要件の適用除外判定結果",
+        "symbol": "C",
+        "subject": "建築物",
+        "property": "第48条採光要件の適用除外",
+        "property_type": "proposition",
+        "description": "87条3項に基づいて、第48条1項～14項の採光要件の適用が除外されるか",
+        "related_articles": [
+          "法::A87:P3:I3",
+          "法::A48:P1-14"
+        ],
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-use-change-detect",
+        "to": "info-use-change",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "info-use-change",
+        "to": "proc-use-change-scope-check",
+        "role": "input"
+      },
+      {
+        "id": "e03",
+        "from": "proc-use-change-scope-check",
+        "to": "info-use-change-scope",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "info-use-change-scope",
+        "to": "proc-a48-applicability",
+        "role": "input"
+      },
+      {
+        "id": "e05",
+        "from": "proc-a48-applicability",
+        "to": "info-a48-exempt",
+        "role": "output"
+      },
+      {
+        "id": "e06",
+        "from": "proc-other-requirements-check",
+        "to": "info-other-exempts",
+        "role": "output"
+      },
+      {
+        "id": "e07",
+        "from": "info-a48-exempt",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e08",
+        "from": "info-other-exempts",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e09",
+        "from": "proc-final-judgment",
+        "to": "info-final",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": [
+        "A2"
+      ],
+      "description": "政令第2条第1項で用途の類似範囲を定める"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-24T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

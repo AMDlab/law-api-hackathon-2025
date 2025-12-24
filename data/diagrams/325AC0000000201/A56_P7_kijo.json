@@ -1,0 +1,523 @@
+{
+  "id": "CHK-BSL-A56-P7",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "高さ制限の適用除外判定",
+    "target_subject": "建築物",
+    "description": "採光・通風等の確保により高さ制限の適用を除外する建築物の判定"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "56",
+    "paragraph": "7",
+    "item": null
+  },
+  "labels": [
+    "集団規定",
+    "高さ制限",
+    "適用除外"
+  ],
+  "text_raw": "次の各号のいずれかに掲げる規定によりその高さが制限された場合にそれぞれ当該各号に定める位置において確保される採光、通風等と同程度以上の採光、通風等が当該位置において確保されるものとして政令で定める基準に適合する建築物については、それぞれ当該各号に掲げる規定は、適用しない。\n一　第一項第一号、第二項から第四項まで及び前項（同号の規定の適用の緩和に係る部分に限る。）前面道路の反対側の境界線上の政令で定める位置\n二　第一項第二号、第五項及び前項（同号の規定の適用の緩和に係る部分に限る。）隣地境界線からの水平距離が、第一項第二号イ又はニに定める数値が一・二五とされている建築物にあつては十六メートル、第一項第二号イからニまでに定める数値が二・五とされている建築物にあつては十二・四メートルだけ外側の線上の政令で定める位置\n三　第一項第三号、第五項及び前項（同号の規定の適用の緩和に係る部分に限る。）隣地境界線から真北方向への水平距離が、第一種低層住居専用地域、第二種低層住居専用地域又は田園住居地域内の建築物にあつては四メートル、第一種中高層住居専用地域又は第二種中高層住居専用地域内の建築物にあつては八メートルだけ外側の線上の政令で定める位置",
+  "compliance_logic": {
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "note": "道路斜線制限の適用除外判定",
+          "ref": "info-road-exemption",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "note": "隣地斜線制限の適用除外判定",
+          "ref": "info-adjacent-exemption",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "note": "北側斜線制限の適用除外判定",
+          "ref": "info-north-exemption",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    },
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "legal_condition",
+          "value": "当該建築物が高さ制限の対象となること（第56条1項〜第6項のいずれかが適用）"
+        }
+      ],
+      "note": "第56条7項は、1項〜6項のいずれかが適用される場合に限り、その規定の適用を除外するための規定"
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-building-type-check",
+        "type": "process",
+        "title": "対象建築物の確認",
+        "process_type": "mechanical",
+        "description": "建築物がいずれかの高さ制限規定の適用対象であることを確認"
+      },
+      {
+        "id": "info-building-type",
+        "type": "information",
+        "title": "適用対象の高さ制限規定",
+        "subject": "建築物",
+        "property": "高さ制限規定の区分",
+        "property_type": "classification",
+        "description": "第56条1項〜6項のいずれが適用されるか（道路斜線、隣地斜線、北側斜線）",
+        "plurality": "single",
+        "remarks": "複数の規定が同時に適用される場合もある"
+      },
+      {
+        "id": "proc-reference-position",
+        "type": "process",
+        "title": "基準位置の特定",
+        "process_type": "mechanical",
+        "target_subject": "建築物",
+        "description": "適用される規定に応じた基準位置を特定する（道路斜線:前面道路反対側境界線上、隣地斜線:隣地境界線から所定距離外側、北側斜線:北側境界線から所定距離外側）"
+      },
+      {
+        "id": "info-reference-position",
+        "type": "information",
+        "title": "基準位置",
+        "subject": "敷地",
+        "property": "採光・通風等の確保を判定する基準位置",
+        "property_type": "geometric_point",
+        "description": "当該規定に定める位置（政令で定める位置）",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-standard-daylight",
+        "type": "process",
+        "title": "基準位置での採光・通風等の確認",
+        "process_type": "human_judgment",
+        "target_subject": "建築物",
+        "description": "基準位置において確保される採光、通風等を設計図書等から確認する"
+      },
+      {
+        "id": "info-standard-daylight",
+        "type": "information",
+        "title": "基準位置での採光・通風等",
+        "subject": "基準位置",
+        "property": "採光・通風等の状態",
+        "property_type": "visual",
+        "description": "政令規定位置での採光・通風等の確保状況",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-actual-daylight",
+        "type": "process",
+        "title": "当該位置での採光・通風等の確認",
+        "process_type": "human_judgment",
+        "target_subject": "建築物",
+        "description": "建築物の設計により当該位置において確保される採光、通風等を確認する"
+      },
+      {
+        "id": "info-actual-daylight",
+        "type": "information",
+        "title": "当該位置での採光・通風等",
+        "subject": "建築物",
+        "property": "採光・通風等の状態",
+        "property_type": "visual",
+        "description": "建築物設計により確保される採光・通風等",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-daylight-comparison",
+        "type": "process",
+        "title": "採光・通風等の同等性判定",
+        "process_type": "human_judgment",
+        "description": "当該位置における採光・通風等が基準位置と同程度以上であるかを判定する（政令で定める基準に基づく）",
+        "remarks": "判定は政令で定める基準に従う（例：天空率等の定量的基準）"
+      },
+      {
+        "id": "info-daylight-compliance",
+        "type": "information",
+        "title": "採光・通風等の基準適合",
+        "subject": "建築物",
+        "property": "採光・通風等の確保状況",
+        "property_type": "proposition",
+        "description": "当該位置において基準以上の採光・通風等が確保されているか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-road-slope-reference",
+        "type": "process",
+        "title": "道路斜線制限の適用確認",
+        "process_type": "mechanical",
+        "target_subject": "建築物",
+        "description": "当該建築物が道路斜線制限（第56条1項第1号、2項〜4項）の対象であることを確認"
+      },
+      {
+        "id": "info-road-slope-applicable",
+        "type": "information",
+        "title": "道路斜線制限の適用",
+        "subject": "建築物",
+        "property": "道路斜線制限の適用可否",
+        "property_type": "proposition",
+        "description": "道路斜線制限が適用される建築物であるか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-road-daylight-check",
+        "type": "process",
+        "title": "道路斜線適用除外判定",
+        "process_type": "human_judgment",
+        "description": "前面道路反対側境界線上の政令位置での採光・通風等が基準を満たすことを確認",
+        "remarks": "第56条7項第1号に該当する場合"
+      },
+      {
+        "id": "info-road-exemption",
+        "type": "information",
+        "title": "道路斜線制限の適用除外",
+        "subject": "建築物",
+        "property": "道路斜線制限適用除外",
+        "property_type": "proposition",
+        "description": "道路斜線制限の適用が除外されるか（第56条1項第1号等が適用しない）",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-adjacent-slope-reference",
+        "type": "process",
+        "title": "隣地斜線制限の適用確認",
+        "process_type": "mechanical",
+        "target_subject": "建築物",
+        "description": "当該建築物が隣地斜線制限（第56条1項第2号、5項）の対象であることを確認"
+      },
+      {
+        "id": "info-adjacent-slope-applicable",
+        "type": "information",
+        "title": "隣地斜線制限の適用",
+        "subject": "建築物",
+        "property": "隣地斜線制限の適用可否",
+        "property_type": "proposition",
+        "description": "隣地斜線制限が適用される建築物であるか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-adjacent-reference-distance",
+        "type": "process",
+        "title": "隣地斜線基準位置の計算",
+        "process_type": "mechanical",
+        "description": "隣地境界線から所定距離（勾配係数に応じて16m又は12.4m）外側の線上の位置を計算"
+      },
+      {
+        "id": "info-adjacent-reference-distance",
+        "type": "information",
+        "title": "隣地斜線基準距離",
+        "symbol": "D_adj_ref",
+        "subject": "敷地",
+        "property": "隣地境界線からの基準距離",
+        "property_type": "numeric",
+        "unit": "m",
+        "description": "隣地斜線の基準位置（勾配係数1.25:16m、2.5:12.4m）",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-adjacent-daylight-check",
+        "type": "process",
+        "title": "隣地斜線適用除外判定",
+        "process_type": "human_judgment",
+        "description": "隣地境界線から基準距離外側の位置での採光・通風等が基準を満たすことを確認",
+        "remarks": "第56条7項第2号に該当する場合"
+      },
+      {
+        "id": "info-adjacent-exemption",
+        "type": "information",
+        "title": "隣地斜線制限の適用除外",
+        "subject": "建築物",
+        "property": "隣地斜線制限適用除外",
+        "property_type": "proposition",
+        "description": "隣地斜線制限の適用が除外されるか（第56条1項第2号等が適用しない）",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-north-slope-reference",
+        "type": "process",
+        "title": "北側斜線制限の適用確認",
+        "process_type": "mechanical",
+        "target_subject": "建築物",
+        "description": "当該建築物が北側斜線制限（第56条1項第3号、5項）の対象であることを確認"
+      },
+      {
+        "id": "info-north-slope-applicable",
+        "type": "information",
+        "title": "北側斜線制限の適用",
+        "subject": "建築物",
+        "property": "北側斜線制限の適用可否",
+        "property_type": "proposition",
+        "description": "北側斜線制限が適用される建築物であるか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-north-reference-distance",
+        "type": "process",
+        "title": "北側斜線基準位置の計算",
+        "process_type": "mechanical",
+        "description": "隣地境界線から真北方向に所定距離（低層:4m、中高層:8m）外側の線上の位置を計算"
+      },
+      {
+        "id": "info-north-reference-distance",
+        "type": "information",
+        "title": "北側斜線基準距離",
+        "symbol": "D_north_ref",
+        "subject": "敷地",
+        "property": "北側斜線基準距離",
+        "property_type": "numeric",
+        "unit": "m",
+        "description": "北側斜線の基準位置（低層住居:4m、中高層住居:8m）",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-north-daylight-check",
+        "type": "process",
+        "title": "北側斜線適用除外判定",
+        "process_type": "human_judgment",
+        "description": "北側境界線から基準距離外側の位置での採光・通風等が基準を満たすことを確認",
+        "remarks": "第56条7項第3号に該当する場合"
+      },
+      {
+        "id": "info-north-exemption",
+        "type": "information",
+        "title": "北側斜線制限の適用除外",
+        "subject": "建築物",
+        "property": "北側斜線制限適用除外",
+        "property_type": "proposition",
+        "description": "北側斜線制限の適用が除外されるか（第56条1項第3号等が適用しない）",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-final-exemption-judgment",
+        "type": "process",
+        "title": "適用除外対象の判定",
+        "process_type": "mechanical",
+        "description": "当該建築物が第56条7項による適用除外の対象となるかを判定（いずれかの規定が除外される場合）"
+      },
+      {
+        "id": "info-exemption-status",
+        "type": "information",
+        "title": "高さ制限の適用除外状態",
+        "subject": "建築物",
+        "property": "第56条7項適用除外該当",
+        "property_type": "proposition",
+        "description": "建築物が第56条7項の適用除外の対象であるか",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-building-type-check",
+        "to": "info-building-type",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "info-building-type",
+        "to": "proc-reference-position",
+        "role": "input"
+      },
+      {
+        "id": "e03",
+        "from": "proc-reference-position",
+        "to": "info-reference-position",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "info-reference-position",
+        "to": "proc-standard-daylight",
+        "role": "input"
+      },
+      {
+        "id": "e05",
+        "from": "proc-standard-daylight",
+        "to": "info-standard-daylight",
+        "role": "output"
+      },
+      {
+        "id": "e06",
+        "from": "proc-actual-daylight",
+        "to": "info-actual-daylight",
+        "role": "output"
+      },
+      {
+        "id": "e07",
+        "from": "info-standard-daylight",
+        "to": "proc-daylight-comparison",
+        "role": "input"
+      },
+      {
+        "id": "e08",
+        "from": "info-actual-daylight",
+        "to": "proc-daylight-comparison",
+        "role": "input"
+      },
+      {
+        "id": "e09",
+        "from": "proc-daylight-comparison",
+        "to": "info-daylight-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e10",
+        "from": "proc-road-slope-reference",
+        "to": "info-road-slope-applicable",
+        "role": "output"
+      },
+      {
+        "id": "e11",
+        "from": "info-road-slope-applicable",
+        "to": "proc-road-daylight-check",
+        "role": "input"
+      },
+      {
+        "id": "e12",
+        "from": "info-daylight-compliance",
+        "to": "proc-road-daylight-check",
+        "role": "input"
+      },
+      {
+        "id": "e13",
+        "from": "proc-road-daylight-check",
+        "to": "info-road-exemption",
+        "role": "output"
+      },
+      {
+        "id": "e14",
+        "from": "proc-adjacent-slope-reference",
+        "to": "info-adjacent-slope-applicable",
+        "role": "output"
+      },
+      {
+        "id": "e15",
+        "from": "proc-adjacent-reference-distance",
+        "to": "info-adjacent-reference-distance",
+        "role": "output"
+      },
+      {
+        "id": "e16",
+        "from": "info-adjacent-slope-applicable",
+        "to": "proc-adjacent-reference-distance",
+        "role": "input"
+      },
+      {
+        "id": "e17",
+        "from": "info-adjacent-reference-distance",
+        "to": "proc-adjacent-daylight-check",
+        "role": "input"
+      },
+      {
+        "id": "e18",
+        "from": "info-daylight-compliance",
+        "to": "proc-adjacent-daylight-check",
+        "role": "input"
+      },
+      {
+        "id": "e19",
+        "from": "proc-adjacent-daylight-check",
+        "to": "info-adjacent-exemption",
+        "role": "output"
+      },
+      {
+        "id": "e20",
+        "from": "proc-north-slope-reference",
+        "to": "info-north-slope-applicable",
+        "role": "output"
+      },
+      {
+        "id": "e21",
+        "from": "proc-north-reference-distance",
+        "to": "info-north-reference-distance",
+        "role": "output"
+      },
+      {
+        "id": "e22",
+        "from": "info-north-slope-applicable",
+        "to": "proc-north-reference-distance",
+        "role": "input"
+      },
+      {
+        "id": "e23",
+        "from": "info-north-reference-distance",
+        "to": "proc-north-daylight-check",
+        "role": "input"
+      },
+      {
+        "id": "e24",
+        "from": "info-daylight-compliance",
+        "to": "proc-north-daylight-check",
+        "role": "input"
+      },
+      {
+        "id": "e25",
+        "from": "proc-north-daylight-check",
+        "to": "info-north-exemption",
+        "role": "output"
+      },
+      {
+        "id": "e26",
+        "from": "info-road-exemption",
+        "to": "proc-final-exemption-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e27",
+        "from": "info-adjacent-exemption",
+        "to": "proc-final-exemption-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e28",
+        "from": "info-north-exemption",
+        "to": "proc-final-exemption-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e29",
+        "from": "proc-final-exemption-judgment",
+        "to": "info-exemption-status",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": [
+        "A56_P1",
+        "A56_P2",
+        "A56_P3",
+        "A56_P4",
+        "A56_P5",
+        "A56_P6"
+      ],
+      "description": "第56条の各項で定める高さ制限規定の適用除外要件"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "defines_detail",
+      "description": "採光・通風等の基準を定める政令（天空率等）"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-24T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

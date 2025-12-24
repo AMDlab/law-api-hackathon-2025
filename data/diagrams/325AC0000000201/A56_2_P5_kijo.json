@@ -1,0 +1,340 @@
+{
+  "id": "CHK-BSL-A56_2-P5",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "区域をまたがる建築物の日影制限の適用",
+    "target_subject": "建築物",
+    "description": "日影時間の制限の異なる区域をまたがる建築物、または対象区域外に日影を生じさせる建築物についての適用措置を定める"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "56の2",
+    "paragraph": "5",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "採光・日影"
+  ],
+  "text_raw": "建築物が第一項の規定による日影時間の制限の異なる区域の内外にわたる場合又は建築物が、冬至日において、対象区域のうち当該建築物がある区域外の土地に日影を生じさせる場合における同項の規定の適用に関し必要な事項は、政令で定める。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "type": "case",
+          "value": "建築物が異なる日影時間制限の区域をまたがる"
+        },
+        {
+          "type": "case",
+          "value": "建築物が対象区域外の土地に日影を生じさせる"
+        }
+      ],
+      "note": "第56条の2第1項の日影制限が適用される状況"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "note": "建築物の位置・範囲が複雑な場合、政令で定める適用措置に従う"
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-building-location",
+        "type": "process",
+        "title": "建築物の位置・範囲の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書から建築物の敷地位置と建築物の範囲を特定する"
+      },
+      {
+        "id": "info-building-location",
+        "type": "information",
+        "title": "建築物の敷地位置",
+        "symbol": "L",
+        "subject": "建築物",
+        "property": "敷地位置",
+        "property_type": "geometric_solid",
+        "description": "建築物の敷地および建築物本体の空間位置",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-zone-boundary",
+        "type": "process",
+        "title": "日影制限区域の確認",
+        "process_type": "mechanical",
+        "description": "対象区域の境界および異なる日影時間制限の区域区分を確認"
+      },
+      {
+        "id": "info-zone-boundary",
+        "type": "information",
+        "title": "日影制限区域の分布",
+        "symbol": "Z",
+        "subject": "建築物",
+        "property": "所在する日影制限区域",
+        "property_type": "classification",
+        "description": "建築物が複数の日影時間制限区域にまたがるか単一区域か",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-span-zones-check",
+        "type": "process",
+        "title": "異なる区域をまたがるか判定",
+        "process_type": "mechanical",
+        "description": "建築物が日影時間の制限の異なる区域の内外にまたがるかを判定",
+        "logic_expression": "建築物の敷地または建築物本体が2つ以上の異なる日影時間制限区域に属する"
+      },
+      {
+        "id": "info-span-zones",
+        "type": "information",
+        "title": "異なる区域またがり",
+        "symbol": "S",
+        "subject": "建築物",
+        "property": "異なる日影制限区域をまたがる",
+        "property_type": "proposition",
+        "description": "建築物が日影時間の制限の異なる区域をまたがるか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-shadow-area",
+        "type": "process",
+        "title": "日影投影範囲の判定",
+        "process_type": "mechanical",
+        "description": "冬至日における建築物の日影がどの範囲に及ぶかを判定"
+      },
+      {
+        "id": "info-shadow-area",
+        "type": "information",
+        "title": "日影投影範囲",
+        "symbol": "SH",
+        "subject": "建築物",
+        "property": "冬至日における日影の投影範囲",
+        "property_type": "geometric_surface",
+        "description": "冬至日の日影が及ぶ範囲（対象区域内外の両方を含む）",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-shadow-outside",
+        "type": "process",
+        "title": "対象区域外への日影判定",
+        "process_type": "mechanical",
+        "description": "日影が対象区域外の土地に及ぶかを判定",
+        "logic_expression": "日影投影範囲 ∩ 対象区域外の土地 ≠ ∅"
+      },
+      {
+        "id": "info-shadow-outside",
+        "type": "information",
+        "title": "対象区域外への日影有無",
+        "symbol": "SO",
+        "subject": "建築物",
+        "property": "対象区域外に日影を生じさせる",
+        "property_type": "proposition",
+        "description": "建築物が対象区域のうち当該建築物がある区域外の土地に日影を生じさせるか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-complex-case-check",
+        "type": "process",
+        "title": "複雑な適用ケースの判定",
+        "process_type": "mechanical",
+        "description": "建築物が複雑な位置関係（区域またがり、区域外日影）に該当するかを判定",
+        "logic_expression": "S OR SO"
+      },
+      {
+        "id": "info-complex-case",
+        "type": "information",
+        "title": "複雑な適用ケースに該当",
+        "symbol": "C",
+        "subject": "建築物",
+        "property": "第56条の2第5項の適用ケースに該当",
+        "property_type": "proposition",
+        "description": "建築物が第56条の2第5項で政令により適用措置が定められるケースに該当するか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-ordinance-application",
+        "type": "process",
+        "title": "政令による適用措置の確認",
+        "process_type": "undefined_input",
+        "description": "複雑な位置関係の場合、政令で定められた適用措置を確認する。具体的な措置は政令で定められる。",
+        "related_articles": [
+          "令::適用措置（未定義）"
+        ]
+      },
+      {
+        "id": "info-ordinance-measure",
+        "type": "information",
+        "title": "適用すべき措置",
+        "symbol": "M",
+        "subject": "建築物",
+        "property": "第56条の2第1項の適用に関する措置",
+        "property_type": "classification",
+        "description": "政令で定められた、複雑な位置関係における日影制限の適用措置",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-final-judgment",
+        "type": "process",
+        "title": "適用措置の決定",
+        "process_type": "mechanical",
+        "description": "複雑な適用ケースに該当する場合は政令の措置を適用する",
+        "logic_expression": "IF C THEN M（政令で定める適用措置を適用）ELSE 第56条の2第1項を通常通り適用"
+      },
+      {
+        "id": "info-final",
+        "type": "information",
+        "title": "日影制限の適用決定",
+        "subject": "建築物",
+        "property": "第56条の2による日影制限の適用方法",
+        "property_type": "classification",
+        "description": "建築物に適用される日影制限の具体的措置",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-building-location",
+        "to": "info-building-location",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "proc-zone-boundary",
+        "to": "info-zone-boundary",
+        "role": "output"
+      },
+      {
+        "id": "e03",
+        "from": "info-building-location",
+        "to": "proc-span-zones-check",
+        "role": "input"
+      },
+      {
+        "id": "e04",
+        "from": "info-zone-boundary",
+        "to": "proc-span-zones-check",
+        "role": "input"
+      },
+      {
+        "id": "e05",
+        "from": "proc-span-zones-check",
+        "to": "info-span-zones",
+        "role": "output"
+      },
+      {
+        "id": "e06",
+        "from": "info-building-location",
+        "to": "proc-shadow-area",
+        "role": "input"
+      },
+      {
+        "id": "e07",
+        "from": "proc-shadow-area",
+        "to": "info-shadow-area",
+        "role": "output"
+      },
+      {
+        "id": "e08",
+        "from": "info-shadow-area",
+        "to": "proc-shadow-outside",
+        "role": "input"
+      },
+      {
+        "id": "e09",
+        "from": "info-zone-boundary",
+        "to": "proc-shadow-outside",
+        "role": "input"
+      },
+      {
+        "id": "e10",
+        "from": "proc-shadow-outside",
+        "to": "info-shadow-outside",
+        "role": "output"
+      },
+      {
+        "id": "e11",
+        "from": "info-span-zones",
+        "to": "proc-complex-case-check",
+        "role": "input"
+      },
+      {
+        "id": "e12",
+        "from": "info-shadow-outside",
+        "to": "proc-complex-case-check",
+        "role": "input"
+      },
+      {
+        "id": "e13",
+        "from": "proc-complex-case-check",
+        "to": "info-complex-case",
+        "role": "output"
+      },
+      {
+        "id": "e14",
+        "from": "info-complex-case",
+        "to": "proc-ordinance-application",
+        "role": "input"
+      },
+      {
+        "id": "e15",
+        "from": "proc-ordinance-application",
+        "to": "info-ordinance-measure",
+        "role": "output"
+      },
+      {
+        "id": "e16",
+        "from": "info-ordinance-measure",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e17",
+        "from": "info-complex-case",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e18",
+        "from": "proc-final-judgment",
+        "to": "info-final",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": [
+        "A56_2:P1"
+      ],
+      "description": "第56条の2第1項の規定の適用"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "delegated_from",
+      "articles": [],
+      "description": "区域をまたがる建築物の日影制限の適用措置を定める（具体的な条項は政令で未定義）"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-24T00:00:00+09:00",
+    "updated_at": "2025-12-24T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

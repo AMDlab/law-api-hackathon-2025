@@ -1,0 +1,300 @@
+{
+  "id": "CHK-BSL-ORD-A128-P1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "敷地内の通路",
+    "target_subject": "敷地内通路",
+    "description": "屋外避難階段及び出口から道等に通ずる通路の幅員基準"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "128",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "避難",
+    "敷地内通路"
+  ],
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-stair-identify",
+        "type": "process",
+        "title": "屋外避難階段の特定",
+        "process_type": "undefined_input",
+        "description": "令123条2項の屋外に設ける避難階段を特定"
+      },
+      {
+        "id": "info-stair-set",
+        "type": "information",
+        "title": "屋外避難階段",
+        "subject": "敷地",
+        "property": "屋外避難階段の集合",
+        "property_type": "set_definition",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-exit-identify",
+        "type": "process",
+        "title": "出口の特定",
+        "process_type": "undefined_input",
+        "description": "令125条1項の出口を特定"
+      },
+      {
+        "id": "info-exit-set",
+        "type": "information",
+        "title": "出口",
+        "subject": "敷地",
+        "property": "出口の集合",
+        "property_type": "set_definition",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-scale-check",
+        "type": "process",
+        "title": "建築物規模の確認",
+        "process_type": "undefined_input",
+        "description": "階数及び延べ面積を確認"
+      },
+      {
+        "id": "info-floors",
+        "type": "information",
+        "title": "階数",
+        "symbol": "N",
+        "subject": "建築物",
+        "property": "階数",
+        "property_type": "numeric",
+        "unit": "階",
+        "plurality": "single"
+      },
+      {
+        "id": "info-area",
+        "type": "information",
+        "title": "延べ面積",
+        "symbol": "A",
+        "subject": "建築物",
+        "property": "延べ面積",
+        "property_type": "numeric",
+        "unit": "㎡",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-width-req-judge",
+        "type": "process",
+        "title": "必要幅員判定",
+        "process_type": "mechanical",
+        "description": "階数3以下かつ延べ面積200㎡未満の場合90cm、それ以外1.5m",
+        "logic_expression": "IF (N<=3 AND A<200) THEN 0.9m ELSE 1.5m"
+      },
+      {
+        "id": "info-req-width",
+        "type": "information",
+        "title": "必要幅員",
+        "symbol": "W_req",
+        "subject": "敷地",
+        "property": "必要通路幅員",
+        "property_type": "numeric",
+        "unit": "m",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-path-identify",
+        "type": "process",
+        "title": "通路の特定",
+        "process_type": "undefined_input",
+        "description": "避難階段・出口から道又は公園、広場等の空地に通ずる通路を特定"
+      },
+      {
+        "id": "info-path-set",
+        "type": "information",
+        "title": "敷地内通路",
+        "subject": "敷地",
+        "property": "敷地内通路の集合",
+        "property_type": "set_definition",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-width-check",
+        "type": "process",
+        "title": "通路幅員確認",
+        "process_type": "undefined_input",
+        "description": "各通路の幅員を確認",
+        "iteration": "iterative"
+      },
+      {
+        "id": "info-path-width",
+        "type": "information",
+        "title": "通路幅員",
+        "symbol": "W",
+        "subject": "敷地内通路",
+        "property": "通路幅員",
+        "property_type": "numeric",
+        "unit": "m",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-width-judge",
+        "type": "process",
+        "title": "幅員適合判定",
+        "process_type": "mechanical",
+        "description": "通路幅員が必要幅員以上か判定",
+        "logic_expression": "W >= W_req",
+        "iteration": "iterative"
+      },
+      {
+        "id": "info-width-compliance",
+        "type": "information",
+        "title": "幅員適合",
+        "symbol": "WC",
+        "subject": "敷地内通路",
+        "property": "幅員適合",
+        "property_type": "proposition",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-final-judge",
+        "type": "process",
+        "title": "最終適合判定",
+        "process_type": "mechanical",
+        "description": "全通路の幅員適合性を総合判定",
+        "logic_expression": "ALL(WC)"
+      },
+      {
+        "id": "info-final-compliance",
+        "type": "information",
+        "title": "令第128条第1項適合",
+        "symbol": "COMPLIANT",
+        "subject": "敷地",
+        "property": "令第128条第1項適合性",
+        "property_type": "proposition",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-stair-identify",
+        "to": "info-stair-set",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "proc-exit-identify",
+        "to": "info-exit-set",
+        "role": "output"
+      },
+      {
+        "id": "e03",
+        "from": "proc-scale-check",
+        "to": "info-floors",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "proc-scale-check",
+        "to": "info-area",
+        "role": "output"
+      },
+      {
+        "id": "e05",
+        "from": "info-floors",
+        "to": "proc-width-req-judge",
+        "role": "input"
+      },
+      {
+        "id": "e06",
+        "from": "info-area",
+        "to": "proc-width-req-judge",
+        "role": "input"
+      },
+      {
+        "id": "e07",
+        "from": "proc-width-req-judge",
+        "to": "info-req-width",
+        "role": "output"
+      },
+      {
+        "id": "e08",
+        "from": "info-stair-set",
+        "to": "proc-path-identify",
+        "role": "input"
+      },
+      {
+        "id": "e09",
+        "from": "info-exit-set",
+        "to": "proc-path-identify",
+        "role": "input"
+      },
+      {
+        "id": "e10",
+        "from": "proc-path-identify",
+        "to": "info-path-set",
+        "role": "output"
+      },
+      {
+        "id": "e11",
+        "from": "info-path-set",
+        "to": "proc-width-check",
+        "role": "input"
+      },
+      {
+        "id": "e12",
+        "from": "proc-width-check",
+        "to": "info-path-width",
+        "role": "output"
+      },
+      {
+        "id": "e13",
+        "from": "info-path-width",
+        "to": "proc-width-judge",
+        "role": "input"
+      },
+      {
+        "id": "e14",
+        "from": "info-req-width",
+        "to": "proc-width-judge",
+        "role": "input"
+      },
+      {
+        "id": "e15",
+        "from": "proc-width-judge",
+        "to": "info-width-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e16",
+        "from": "info-width-compliance",
+        "to": "proc-final-judge",
+        "role": "input"
+      },
+      {
+        "id": "e17",
+        "from": "proc-final-judge",
+        "to": "info-final-compliance",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": ["A123:P2", "A125:P1"],
+      "description": "屋外避難階段（令123条2項）及び出口（令125条1項）を参照"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-24T00:00:00+09:00",
+    "author": "Claude",
+    "generator": "kijo-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

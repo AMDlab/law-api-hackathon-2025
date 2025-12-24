@@ -1,0 +1,298 @@
+{
+  "id": "CHK-BSL-A67-P3",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "敷地面積の最低限度",
+    "target_subject": "敷地",
+    "description": "特定防災街区整備地区内の建築物の敷地が都市計画で定められた最低限度以上であることを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "67",
+    "paragraph": "3",
+    "item": null
+  },
+  "labels": [
+    "集団規定",
+    "防火",
+    "特定防災街区整備地区"
+  ],
+  "text_raw": "特定防災街区整備地区内においては、建築物の敷地面積は、特定防災街区整備地区に関する都市計画において定められた建築物の敷地面積の最低限度以上でなければならない。ただし、次の各号のいずれかに該当する建築物の敷地については、この限りでない。一公衆便所、巡査派出所その他これらに類する建築物で公益上必要なもの二特定行政庁が用途上又は構造上やむを得ないと認めて許可したもの",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "特定防災街区整備地区内"
+        }
+      ],
+      "note": "法67条で指定された特定防災街区整備地区"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-site-area",
+          "operator": ">=",
+          "ref-compare": "info-min-limit"
+        }
+      ]
+    },
+    "exceptions": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "note": "公益上必要な建築物（公衆便所、巡査派出所等）",
+          "ref": "info-exempt-public",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "note": "特定行政庁の許可を得たもの",
+          "ref": "info-exempt-approval",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "effect": "EXEMPT"
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-building-type",
+        "type": "process",
+        "title": "建築物の用途の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の用途（公衆便所、巡査派出所等の公益上必要な用途、その他一般用途等）を特定する"
+      },
+      {
+        "id": "info-building-type",
+        "type": "information",
+        "title": "建築物の用途",
+        "symbol": "B",
+        "subject": "建築物",
+        "property": "用途分類",
+        "property_type": "classification",
+        "description": "建築物が公衆便所、巡査派出所その他これらに類する公益上必要な建築物に該当するか、その他一般建築物か",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-exemption-approval",
+        "type": "process",
+        "title": "特定行政庁の許可確認",
+        "process_type": "undefined_input",
+        "description": "建築物が特定行政庁から用途上又は構造上やむを得ないと認めて許可されているか確認"
+      },
+      {
+        "id": "info-exemption-approval",
+        "type": "information",
+        "title": "特定行政庁の許可",
+        "symbol": "P",
+        "subject": "建築物",
+        "property": "特定行政庁による許可の有無",
+        "property_type": "proposition",
+        "description": "用途上又は構造上やむを得ないと認めて特定行政庁が許可したか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-exempt-check",
+        "type": "process",
+        "title": "適用除外判定",
+        "process_type": "mechanical",
+        "description": "公益上必要な建築物または特定行政庁の許可のいずれかに該当するか判定",
+        "logic_expression": "(B ∈ {公衆便所等}) OR (P = true)"
+      },
+      {
+        "id": "info-exempt-status",
+        "type": "information",
+        "title": "適用除外該当",
+        "symbol": "E",
+        "subject": "建築物",
+        "property": "敷地面積最低限度除外",
+        "property_type": "proposition",
+        "description": "ただし書きによる適用除外に該当するか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-site-area",
+        "type": "process",
+        "title": "敷地面積の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の敷地面積を読み取る"
+      },
+      {
+        "id": "info-site-area",
+        "type": "information",
+        "title": "敷地面積",
+        "symbol": "A",
+        "subject": "敷地",
+        "property": "面積",
+        "property_type": "numeric",
+        "unit": "m2",
+        "description": "建築物が建築される敷地の面積",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-min-limit",
+        "type": "process",
+        "title": "敷地面積最低限度の確認",
+        "process_type": "mechanical",
+        "description": "都市計画データから特定防災街区整備地区に関する都市計画において定められた建築物の敷地面積最低限度を確認"
+      },
+      {
+        "id": "info-min-limit",
+        "type": "information",
+        "title": "敷地面積最低限度",
+        "symbol": "L",
+        "subject": "敷地",
+        "property": "最低限度値",
+        "property_type": "numeric",
+        "unit": "m2",
+        "description": "都市計画において定められた敷地面積の最低限度",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-area-comparison",
+        "type": "process",
+        "title": "敷地面積基準判定",
+        "process_type": "mechanical",
+        "description": "敷地面積が敷地面積最低限度以上であるか判定",
+        "logic_expression": "A ≥ L"
+      },
+      {
+        "id": "info-area-compliant",
+        "type": "information",
+        "title": "敷地面積基準適合",
+        "symbol": "C",
+        "subject": "敷地",
+        "property": "最低限度基準への適合",
+        "property_type": "proposition",
+        "description": "敷地面積が都市計画で定められた最低限度以上であるか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-final-judgment",
+        "type": "process",
+        "title": "適合判定",
+        "process_type": "mechanical",
+        "description": "適用除外に該当するか、または敷地面積基準を満たすか確認",
+        "logic_expression": "E OR C"
+      },
+      {
+        "id": "info-final",
+        "type": "information",
+        "title": "法67条3項適合",
+        "subject": "敷地",
+        "property": "法67条3項適合",
+        "property_type": "proposition",
+        "description": "敷地が法67条3項の規定に適合するか",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-building-type",
+        "to": "info-building-type",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "proc-exemption-approval",
+        "to": "info-exemption-approval",
+        "role": "output"
+      },
+      {
+        "id": "e03",
+        "from": "info-building-type",
+        "to": "proc-exempt-check",
+        "role": "input"
+      },
+      {
+        "id": "e04",
+        "from": "info-exemption-approval",
+        "to": "proc-exempt-check",
+        "role": "input"
+      },
+      {
+        "id": "e05",
+        "from": "proc-exempt-check",
+        "to": "info-exempt-status",
+        "role": "output"
+      },
+      {
+        "id": "e06",
+        "from": "proc-site-area",
+        "to": "info-site-area",
+        "role": "output"
+      },
+      {
+        "id": "e07",
+        "from": "proc-min-limit",
+        "to": "info-min-limit",
+        "role": "output"
+      },
+      {
+        "id": "e08",
+        "from": "info-site-area",
+        "to": "proc-area-comparison",
+        "role": "input"
+      },
+      {
+        "id": "e09",
+        "from": "info-min-limit",
+        "to": "proc-area-comparison",
+        "role": "input"
+      },
+      {
+        "id": "e10",
+        "from": "proc-area-comparison",
+        "to": "info-area-compliant",
+        "role": "output"
+      },
+      {
+        "id": "e11",
+        "from": "info-exempt-status",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e12",
+        "from": "info-area-compliant",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e13",
+        "from": "proc-final-judgment",
+        "to": "info-final",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": [
+        "A67:P1",
+        "A67:P4"
+      ],
+      "description": "第67条の他の項に基づく規定との関連"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-24T07:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

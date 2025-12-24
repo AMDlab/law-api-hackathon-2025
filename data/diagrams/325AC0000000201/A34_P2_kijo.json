@@ -1,0 +1,366 @@
+{
+  "id": "CHK-BSL-A34-P2",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "非常用昇降機の設置",
+    "target_subject": "建築物",
+    "description": "高さ31メートルを超える建築物に非常用の昇降機を設置することを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "34",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "避難・安全"
+  ],
+  "text_raw": "高さ三十一メートルをこえる建築物（政令で定めるものを除く。）には、非常用の昇降機を設けなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "numeric_threshold",
+          "property": "建築物の高さ",
+          "operator": ">",
+          "value": 31,
+          "unit": "m"
+        }
+      ],
+      "note": "政令で定める建築物を除く"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-height-exceeds",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "ref": "info-not-exempt",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "ref": "info-emergency-elevator-installed",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    },
+    "exceptions": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "type": "exemption",
+          "description": "政令で定める建築物",
+          "related_articles": ["令::A129_2"]
+        }
+      ],
+      "effect": "EXEMPT"
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-height-input",
+        "type": "process",
+        "title": "建築物高さの特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の高さを読み取る"
+      },
+      {
+        "id": "info-height",
+        "type": "information",
+        "title": "建築物の高さ",
+        "symbol": "H",
+        "subject": "建築物",
+        "property": "高さ",
+        "property_type": "numeric",
+        "unit": "m",
+        "description": "建築物の高さ（メートル）",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-height-check",
+        "type": "process",
+        "title": "高さ31m超過判定",
+        "process_type": "mechanical",
+        "description": "建築物の高さが31メートルを超えるかを判定",
+        "logic_expression": "H > 31"
+      },
+      {
+        "id": "info-height-exceeds",
+        "type": "information",
+        "title": "高さ31m超過",
+        "symbol": "H31",
+        "subject": "建築物",
+        "property": "高さ31m超過",
+        "property_type": "proposition",
+        "description": "建築物の高さが31メートルを超えるか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-structure-input",
+        "type": "process",
+        "title": "主要構造部の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から主要構造部の構造種別を読み取る"
+      },
+      {
+        "id": "info-structure",
+        "type": "information",
+        "title": "主要構造部の構造",
+        "symbol": "S",
+        "subject": "建築物",
+        "property": "主要構造部の構造種別",
+        "property_type": "classification",
+        "description": "準耐火構造、耐火構造、不燃材料造、その他",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-verification-input",
+        "type": "process",
+        "title": "避難安全検証の有無確認",
+        "process_type": "undefined_input",
+        "description": "全館避難安全検証法による確認または国土交通大臣認定の有無を確認"
+      },
+      {
+        "id": "info-verification",
+        "type": "information",
+        "title": "全館避難安全性能確認",
+        "symbol": "V",
+        "subject": "建築物",
+        "property": "全館避難安全性能確認の有無",
+        "property_type": "proposition",
+        "description": "全館避難安全検証法による確認または国土交通大臣認定の有無",
+        "related_articles": ["令::A129_2"],
+        "plurality": "single"
+      },
+      {
+        "id": "proc-exemption-check",
+        "type": "process",
+        "title": "政令適用除外判定",
+        "process_type": "mechanical",
+        "description": "政令で定める適用除外建築物に該当するかを判定",
+        "related_articles": ["令::A129_2"],
+        "logic_expression": "V AND (S ∈ {準耐火構造, 特定耐火構造, 不燃材料造})"
+      },
+      {
+        "id": "info-exempt",
+        "type": "information",
+        "title": "政令適用除外該当",
+        "symbol": "E",
+        "subject": "建築物",
+        "property": "政令適用除外該当",
+        "property_type": "proposition",
+        "description": "政令で定める適用除外建築物（全館避難安全性能確認建築物等）に該当するか",
+        "related_articles": ["令::A129_2"],
+        "plurality": "single"
+      },
+      {
+        "id": "proc-not-exempt-check",
+        "type": "process",
+        "title": "適用対象判定",
+        "process_type": "mechanical",
+        "description": "適用除外に該当しないことを確認",
+        "logic_expression": "NOT E"
+      },
+      {
+        "id": "info-not-exempt",
+        "type": "information",
+        "title": "法34条2項適用対象",
+        "symbol": "A",
+        "subject": "建築物",
+        "property": "法34条2項適用対象",
+        "property_type": "proposition",
+        "description": "法34条2項の適用対象となる建築物か",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-elevator-set-input",
+        "type": "process",
+        "title": "非常用昇降機の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から非常用昇降機の設置状況を確認"
+      },
+      {
+        "id": "info-elevator-set",
+        "type": "information",
+        "title": "建築物の非常用昇降機",
+        "subject": "建築物",
+        "property": "非常用昇降機の集合",
+        "property_type": "set_definition",
+        "description": "建築物に設置される非常用昇降機を特定",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-elevator-existence-check",
+        "type": "process",
+        "title": "非常用昇降機設置確認",
+        "process_type": "mechanical",
+        "description": "非常用昇降機が設置されているかを確認",
+        "logic_expression": "|非常用昇降機の集合| ≥ 1"
+      },
+      {
+        "id": "info-emergency-elevator-installed",
+        "type": "information",
+        "title": "非常用昇降機設置",
+        "symbol": "EE",
+        "subject": "建築物",
+        "property": "非常用昇降機設置の有無",
+        "property_type": "proposition",
+        "description": "非常用の昇降機が設置されているか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-compliance-check",
+        "type": "process",
+        "title": "法34条2項適合判定",
+        "process_type": "mechanical",
+        "description": "高さ31m超過かつ適用対象の場合、非常用昇降機が設置されていることを確認",
+        "logic_expression": "(H31 AND A) → EE"
+      },
+      {
+        "id": "info-final",
+        "type": "information",
+        "title": "法34条2項適合",
+        "subject": "建築物",
+        "property": "法34条2項適合",
+        "property_type": "proposition",
+        "description": "建築物が法34条2項の規定に適合するか",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-height-input",
+        "to": "info-height",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "info-height",
+        "to": "proc-height-check",
+        "role": "input"
+      },
+      {
+        "id": "e03",
+        "from": "proc-height-check",
+        "to": "info-height-exceeds",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "proc-structure-input",
+        "to": "info-structure",
+        "role": "output"
+      },
+      {
+        "id": "e05",
+        "from": "proc-verification-input",
+        "to": "info-verification",
+        "role": "output"
+      },
+      {
+        "id": "e06",
+        "from": "info-structure",
+        "to": "proc-exemption-check",
+        "role": "input"
+      },
+      {
+        "id": "e07",
+        "from": "info-verification",
+        "to": "proc-exemption-check",
+        "role": "input"
+      },
+      {
+        "id": "e08",
+        "from": "proc-exemption-check",
+        "to": "info-exempt",
+        "role": "output"
+      },
+      {
+        "id": "e09",
+        "from": "info-exempt",
+        "to": "proc-not-exempt-check",
+        "role": "input"
+      },
+      {
+        "id": "e10",
+        "from": "proc-not-exempt-check",
+        "to": "info-not-exempt",
+        "role": "output"
+      },
+      {
+        "id": "e11",
+        "from": "proc-elevator-set-input",
+        "to": "info-elevator-set",
+        "role": "output"
+      },
+      {
+        "id": "e12",
+        "from": "info-elevator-set",
+        "to": "proc-elevator-existence-check",
+        "role": "input"
+      },
+      {
+        "id": "e13",
+        "from": "proc-elevator-existence-check",
+        "to": "info-emergency-elevator-installed",
+        "role": "output"
+      },
+      {
+        "id": "e14",
+        "from": "info-height-exceeds",
+        "to": "proc-compliance-check",
+        "role": "input"
+      },
+      {
+        "id": "e15",
+        "from": "info-not-exempt",
+        "to": "proc-compliance-check",
+        "role": "input"
+      },
+      {
+        "id": "e16",
+        "from": "info-emergency-elevator-installed",
+        "to": "proc-compliance-check",
+        "role": "input"
+      },
+      {
+        "id": "e17",
+        "from": "proc-compliance-check",
+        "to": "info-final",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "delegates_to",
+      "articles": [
+        "A129_2"
+      ],
+      "description": "法34条2項の政令で定める建築物（全館避難安全性能確認建築物）を規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-24T09:00:00+09:00",
+    "updated_at": "2025-12-24T09:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

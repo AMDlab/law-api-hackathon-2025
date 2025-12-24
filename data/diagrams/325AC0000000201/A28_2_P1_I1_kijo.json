@@ -1,0 +1,219 @@
+{
+  "id": "CHK-BSL-A28_2-P1-I1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "建築材料への石綿等の添加禁止",
+    "target_subject": "建築材料",
+    "description": "建築材料に石綿等を添加しないことを確認する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "28の2",
+    "paragraph": "1",
+    "item": "1"
+  },
+  "labels": [
+    "単体規定",
+    "衛生",
+    "石綿規制"
+  ],
+  "text_raw": "建築材料に石綿その他の著しく衛生上有害なものとして政令で定める物質（次号及び第三号において「石綿等」という。）を添加しないこと。",
+  "compliance_logic": {
+    "judgment_rule": {
+      "operator": "NOT",
+      "conditions": [
+        {
+          "ref": "info-asbestos-added",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-materials-set",
+        "type": "process",
+        "title": "建築材料の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から使用される建築材料を特定する"
+      },
+      {
+        "id": "info-materials-set",
+        "type": "information",
+        "title": "建築物の建築材料",
+        "subject": "建築物",
+        "property": "建築材料の集合",
+        "property_type": "set_definition",
+        "description": "判定対象となる建築物に使用される建築材料を特定",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-material-composition",
+        "type": "process",
+        "title": "材料組成の特定",
+        "process_type": "undefined_input",
+        "target_subject": "建築材料",
+        "iteration": "iterative",
+        "description": "設計図書、製品仕様書等から各建築材料の組成を特定する"
+      },
+      {
+        "id": "info-material-composition",
+        "type": "information",
+        "title": "建築材料の組成",
+        "symbol": "C",
+        "subject": "建築材料",
+        "property": "材料組成",
+        "property_type": "classification",
+        "description": "建築材料に含まれる成分の情報",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-asbestos-check",
+        "type": "process",
+        "title": "石綿等添加の確認",
+        "process_type": "mechanical",
+        "target_subject": "建築材料",
+        "iteration": "iterative",
+        "description": "石綿その他の著しく衛生上有害なものとして政令で定める物質が添加されているか判定",
+        "related_articles": [
+          "令::A20_7"
+        ],
+        "logic_expression": "C ∈ {石綿, クロルピリホス, その他政令指定物質}",
+        "remarks": "令第20条の7で定める物質: クロルピリホス等"
+      },
+      {
+        "id": "info-asbestos-added",
+        "type": "information",
+        "title": "石綿等添加の有無",
+        "symbol": "A",
+        "subject": "建築材料",
+        "property": "石綿等の添加",
+        "property_type": "proposition",
+        "description": "石綿その他の政令で定める有害物質が添加されているか",
+        "related_articles": [
+          "令::A20_7"
+        ],
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-material-compliance",
+        "type": "process",
+        "title": "材料適合判定",
+        "process_type": "mechanical",
+        "target_subject": "建築材料",
+        "iteration": "iterative",
+        "description": "各建築材料が石綿等を添加していないことを確認",
+        "logic_expression": "A = false"
+      },
+      {
+        "id": "info-material-compliance",
+        "type": "information",
+        "title": "材料の法28の2条1項1号適合",
+        "symbol": "M",
+        "subject": "建築材料",
+        "property": "法28の2条1項1号適合",
+        "property_type": "proposition",
+        "description": "当該建築材料が法28の2条1項1号の規定に適合するか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-all-materials-check",
+        "type": "process",
+        "title": "全建築材料適合確認",
+        "process_type": "mechanical",
+        "description": "全ての建築材料が法28の2条1項1号に適合することを確認",
+        "logic_expression": "∀material ∈ Materials: M(material) = true"
+      },
+      {
+        "id": "info-final",
+        "type": "information",
+        "title": "建築物の法28の2条1項1号適合",
+        "subject": "建築物",
+        "property": "法28の2条1項1号適合",
+        "property_type": "proposition",
+        "description": "建築物全体として法28の2条1項1号の規定に適合するか",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-materials-set",
+        "to": "info-materials-set",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "info-materials-set",
+        "to": "proc-material-composition",
+        "role": "input"
+      },
+      {
+        "id": "e03",
+        "from": "proc-material-composition",
+        "to": "info-material-composition",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "info-material-composition",
+        "to": "proc-asbestos-check",
+        "role": "input"
+      },
+      {
+        "id": "e05",
+        "from": "proc-asbestos-check",
+        "to": "info-asbestos-added",
+        "role": "output"
+      },
+      {
+        "id": "e06",
+        "from": "info-asbestos-added",
+        "to": "proc-material-compliance",
+        "role": "input"
+      },
+      {
+        "id": "e07",
+        "from": "proc-material-compliance",
+        "to": "info-material-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e08",
+        "from": "info-material-compliance",
+        "to": "proc-all-materials-check",
+        "role": "input"
+      },
+      {
+        "id": "e09",
+        "from": "proc-all-materials-check",
+        "to": "info-final",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "delegates_to",
+      "articles": [
+        "A20_7"
+      ],
+      "description": "法28の2条1項1号の政令で定める物質を規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-24T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

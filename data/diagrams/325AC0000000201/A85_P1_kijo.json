@@ -1,0 +1,214 @@
+{
+  "id": "CHK-BSL-A85-P1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "仮設建築物の適用除外",
+    "target_subject": "建築物",
+    "description": "非常災害時の応急仮設建築物等について、特定行政庁が許可した場合に法の適用を除外する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "85",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": ["手続規定", "適用除外"],
+  "text_raw": "非常災害があつた場合において、その発生した区域又はこれに隣接する区域で特定行政庁が指定するものの内においては、災害により破損した建築物の応急の修繕又は次の各号のいずれかに該当する応急仮設建築物の建築で、その災害が発生した日から一月以内にその工事に着手するものについては、建築基準法令の規定は、適用しない。ただし、防火地域内に建築する場合については、この限りでない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        { "type": "disaster", "value": "非常災害が発生した場合" },
+        { "type": "location", "value": "災害発生区域又は隣接区域で特定行政庁が指定した区域内" },
+        { "type": "time", "value": "災害発生日から1月以内に工事着手" }
+      ],
+      "note": "非常災害時の応急措置に限定"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        { "type": "work_type", "value": "災害により破損した建築物の応急の修繕" },
+        { "type": "building_type", "value": "応急仮設建築物" }
+      ]
+    },
+    "exceptions": {
+      "operator": "AND",
+      "conditions": [
+        { "type": "location", "value": "防火地域内", "effect": "NOT_EXEMPT" }
+      ],
+      "effect": "EXCLUDE_FROM_EXEMPTION",
+      "note": "防火地域内では適用除外されない"
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-disaster-occurrence",
+        "type": "process",
+        "title": "非常災害の発生確認",
+        "process_type": "undefined_input",
+        "description": "非常災害が発生したか確認する（地震、台風、火災等）"
+      },
+      {
+        "id": "info-disaster-occurred",
+        "type": "information",
+        "title": "非常災害の発生",
+        "symbol": "D",
+        "subject": "地域",
+        "property": "非常災害発生の有無",
+        "property_type": "proposition",
+        "description": "対象地域において非常災害が発生したか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-designated-area",
+        "type": "process",
+        "title": "指定区域の確認",
+        "process_type": "mechanical",
+        "description": "特定行政庁が指定した災害発生区域又は隣接区域に該当するか確認",
+        "related_articles": ["法::A85:P1"]
+      },
+      {
+        "id": "info-in-designated-area",
+        "type": "information",
+        "title": "指定区域内",
+        "symbol": "Z",
+        "subject": "建築物",
+        "property": "指定区域内への該当",
+        "property_type": "proposition",
+        "description": "特定行政庁が指定した区域内に建築物が所在するか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-building-type",
+        "type": "process",
+        "title": "建築物種別の特定",
+        "process_type": "undefined_input",
+        "description": "応急修繕か応急仮設建築物かを特定する"
+      },
+      {
+        "id": "info-building-type",
+        "type": "information",
+        "title": "建築物の種別",
+        "symbol": "T",
+        "subject": "建築物",
+        "property": "種別区分",
+        "property_type": "classification",
+        "description": "災害破損建築物の応急修繕、応急仮設建築物のいずれか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-construction-start",
+        "type": "process",
+        "title": "工事着手時期の確認",
+        "process_type": "undefined_input",
+        "description": "災害発生日から1月以内に工事着手するか確認"
+      },
+      {
+        "id": "info-within-one-month",
+        "type": "information",
+        "title": "1月以内着手",
+        "symbol": "M",
+        "subject": "建築物",
+        "property": "1月以内着手の有無",
+        "property_type": "proposition",
+        "description": "災害発生日から1月以内に工事着手するか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-fire-prevention-area",
+        "type": "process",
+        "title": "防火地域判定",
+        "process_type": "mechanical",
+        "description": "建築物の敷地が防火地域内に所在するか判定",
+        "related_articles": ["法::A61"]
+      },
+      {
+        "id": "info-in-fire-prevention-area",
+        "type": "information",
+        "title": "防火地域内",
+        "symbol": "F",
+        "subject": "建築物",
+        "property": "防火地域内への該当",
+        "property_type": "proposition",
+        "description": "建築物の敷地が防火地域内に所在するか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-exemption-check",
+        "type": "process",
+        "title": "適用除外該当判定",
+        "process_type": "mechanical",
+        "description": "法85条1項の適用除外要件を全て満たすか判定",
+        "logic_expression": "D AND Z AND (T = '応急修繕' OR T = '応急仮設') AND M AND NOT F"
+      },
+      {
+        "id": "info-exemption-applicable",
+        "type": "information",
+        "title": "適用除外該当",
+        "symbol": "E",
+        "subject": "建築物",
+        "property": "法85条1項適用除外該当",
+        "property_type": "proposition",
+        "description": "法85条1項により建築基準法令の規定が適用除外されるか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-final-judgment",
+        "type": "process",
+        "title": "最終適合判定",
+        "process_type": "mechanical",
+        "description": "適用除外に該当する場合は建築基準法令の規定を適用しない",
+        "logic_expression": "適用除外該当 = E"
+      },
+      {
+        "id": "info-compliance",
+        "type": "information",
+        "title": "法85条1項適合",
+        "subject": "建築物",
+        "property": "法85条1項規定への適合",
+        "property_type": "proposition",
+        "description": "法85条1項の要件に適合し、建築基準法令の適用除外を受けるか",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "proc-disaster-occurrence", "to": "info-disaster-occurred", "role": "output" },
+      { "id": "e02", "from": "info-disaster-occurred", "to": "proc-designated-area", "role": "input" },
+      { "id": "e03", "from": "proc-designated-area", "to": "info-in-designated-area", "role": "output" },
+      { "id": "e04", "from": "proc-building-type", "to": "info-building-type", "role": "output" },
+      { "id": "e05", "from": "proc-construction-start", "to": "info-within-one-month", "role": "output" },
+      { "id": "e06", "from": "proc-fire-prevention-area", "to": "info-in-fire-prevention-area", "role": "output" },
+      { "id": "e07", "from": "info-disaster-occurred", "to": "proc-exemption-check", "role": "input" },
+      { "id": "e08", "from": "info-in-designated-area", "to": "proc-exemption-check", "role": "input" },
+      { "id": "e09", "from": "info-building-type", "to": "proc-exemption-check", "role": "input" },
+      { "id": "e10", "from": "info-within-one-month", "to": "proc-exemption-check", "role": "input" },
+      { "id": "e11", "from": "info-in-fire-prevention-area", "to": "proc-exemption-check", "role": "input" },
+      { "id": "e12", "from": "proc-exemption-check", "to": "info-exemption-applicable", "role": "output" },
+      { "id": "e13", "from": "info-exemption-applicable", "to": "proc-final-judgment", "role": "input" },
+      { "id": "e14", "from": "proc-final-judgment", "to": "info-compliance", "role": "output" }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A61"],
+      "description": "防火地域の定義"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-23T18:00:00+09:00",
+    "updated_at": "2025-12-23T18:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法",
+    "source": "法令知識に基づく生成"
+  }
+}

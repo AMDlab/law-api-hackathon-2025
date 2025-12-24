@@ -1,0 +1,115 @@
+{
+  "id": "CHK-BSL-A58-P1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "建築物の高さ（高度地区）",
+    "target_subject": "建築物",
+    "description": "高度地区内の建築物の高さが都市計画に定められた内容に適合することを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "58",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": ["集団規定", "高度地区"],
+  "text_raw": "高度地区内においては、建築物の高さは、高度地区に関する都市計画において定められた内容に適合するものでなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        { "type": "location", "value": "高度地区内" }
+      ],
+      "note": "都市計画法に基づき指定された高度地区"
+    },
+    "judgment_rule": {
+      "operator": "==",
+      "lhs": {
+        "ref": "info-compliance",
+        "type": "proposition"
+      },
+      "rhs": {
+        "value": true
+      }
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-building-height",
+        "type": "process",
+        "title": "建築物の高さの特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の高さを読み取る"
+      },
+      {
+        "id": "info-building-height",
+        "type": "information",
+        "title": "建築物の高さ",
+        "symbol": "H",
+        "subject": "建築物",
+        "property": "高さ",
+        "property_type": "numeric",
+        "unit": "m",
+        "description": "建築物の高さ（地盤面からの高さ）",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-urban-plan-limit",
+        "type": "process",
+        "title": "都市計画制限値の取得",
+        "process_type": "mechanical",
+        "description": "高度地区に関する都市計画で定められた建築物の高さの制限値を取得する。都市計画情報（最高限度・最低限度）との照合。"
+      },
+      {
+        "id": "info-urban-plan-limit",
+        "type": "information",
+        "title": "高度地区の制限内容",
+        "symbol": "L",
+        "subject": "敷地",
+        "property": "高度地区制限",
+        "property_type": "classification",
+        "description": "都市計画で定められた高さの最高限度または最低限度",
+        "plurality": "single",
+        "remarks": "最高限度が定められる場合と最低限度が定められる場合がある"
+      },
+      {
+        "id": "proc-compliance-check",
+        "type": "process",
+        "title": "制限適合判定",
+        "process_type": "mechanical",
+        "description": "建築物の高さが都市計画で定められた高度地区の制限内容に適合するかを判定",
+        "logic_expression": "H が L の定める制限に適合"
+      },
+      {
+        "id": "info-compliance",
+        "type": "information",
+        "title": "法58条1項適合",
+        "symbol": "C",
+        "subject": "建築物",
+        "property": "法58条1項適合",
+        "property_type": "proposition",
+        "description": "建築物の高さが高度地区に関する都市計画の内容に適合するか",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "proc-building-height", "to": "info-building-height", "role": "output" },
+      { "id": "e02", "from": "proc-urban-plan-limit", "to": "info-urban-plan-limit", "role": "output" },
+      { "id": "e03", "from": "info-building-height", "to": "proc-compliance-check", "role": "input" },
+      { "id": "e04", "from": "info-urban-plan-limit", "to": "proc-compliance-check", "role": "input" },
+      { "id": "e05", "from": "proc-compliance-check", "to": "info-compliance", "role": "output" }
+    ]
+  },
+  "related_laws": [],
+  "metadata": {
+    "created_at": "2025-12-23T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

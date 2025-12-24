@@ -1,0 +1,509 @@
+{
+  "id": "CHK-BSL-A60_2-P1-I1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "都市再生特別地区内の建築物規制適合判定（臨時的小規模建築物除外判定）",
+    "target_subject": "建築物",
+    "description": "都市再生特別地区内に建築する建築物が、容積率・建蔽率・建築面積・高さの規制に適合するかを判定し、臨時的かつ容易に移転・除却できる小規模木造等建築物の場合は規制を除外する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "60の2",
+    "paragraph": "1",
+    "item": "1"
+  },
+  "labels": [
+    "単体規定",
+    "都市計画関連",
+    "容積率・建蔽率"
+  ],
+  "text_raw": "都市再生特別地区内においては、建築物の容積率及び建蔽率、建築物の建築面積（同一敷地内に二以上の建築物がある場合においては、それぞれの建築面積）並びに建築物の高さは、都市再生特別地区に関する都市計画において定められた内容に適合するものでなければならない。ただし、次の各号のいずれかに該当する建築物については、この限りでない。\n\n一　主要構造部が木造、鉄骨造、コンクリートブロック造その他これらに類する構造であつて、階数が二以下で、かつ、地階を有しない建築物で、容易に移転し、又は除却することができるもの",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "都市再生特別地区内"
+        }
+      ],
+      "note": "都市計画において指定される都市再生特別地区"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "description": "主要要件を満たす場合",
+          "operator": "AND",
+          "conditions": [
+            {
+              "info_ref": "info-far",
+              "condition": "都市計画で定められた容積率に適合"
+            },
+            {
+              "info_ref": "info-bcr",
+              "condition": "都市計画で定められた建蔽率に適合"
+            },
+            {
+              "info_ref": "info-floor-area",
+              "condition": "都市計画で定められた建築面積に適合"
+            },
+            {
+              "info_ref": "info-height",
+              "condition": "都市計画で定められた高さに適合"
+            }
+          ]
+        },
+        {
+          "description": "I1の除外要件に該当する場合",
+          "operator": "AND",
+          "conditions": [
+            {
+              "info_ref": "info-structure-type",
+              "condition": "木造、鉄骨造、コンクリートブロック造等に該当"
+            },
+            {
+              "info_ref": "info-story-count",
+              "condition": "階数が2以下"
+            },
+            {
+              "info_ref": "info-basement",
+              "condition": "地階を有さない"
+            },
+            {
+              "info_ref": "info-removability",
+              "condition": "容易に移転し、又は除却することができる"
+            }
+          ]
+        }
+      ]
+    },
+    "exceptions": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "description": "I1の除外事由に該当",
+          "condition": "主要構造部が木造等で、2階以下で地階なく、容易に移転・除却できる建築物"
+        },
+        {
+          "description": "I2の除外事由に該当",
+          "condition": "公衆便所、派出所等の公益上必要な建築物"
+        },
+        {
+          "description": "I3の除外事由に該当",
+          "condition": "学校、駅舎等で特定行政庁の許可を得た建築物"
+        }
+      ],
+      "effect": "規制適用除外（容積率、建蔽率、建築面積、高さの制限不適用）"
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "info-building",
+        "type": "information",
+        "title": "判定対象建築物",
+        "subject": "建築物",
+        "property": "特定",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "都市再生特別地区内に建築される建築物"
+      },
+      {
+        "id": "info-far",
+        "type": "information",
+        "title": "建築物の容積率",
+        "subject": "建築物",
+        "property": "容積率",
+        "property_type": "numeric",
+        "plurality": "single",
+        "unit": "%",
+        "description": "延べ面積と敷地面積の比率"
+      },
+      {
+        "id": "info-bcr",
+        "type": "information",
+        "title": "建築物の建蔽率",
+        "subject": "建築物",
+        "property": "建蔽率",
+        "property_type": "numeric",
+        "plurality": "single",
+        "unit": "%",
+        "description": "建築面積と敷地面積の比率"
+      },
+      {
+        "id": "info-floor-area",
+        "type": "information",
+        "title": "建築物の建築面積",
+        "subject": "建築物",
+        "property": "建築面積",
+        "property_type": "numeric",
+        "plurality": "single",
+        "unit": "m²",
+        "description": "建築物が敷地を占める面積"
+      },
+      {
+        "id": "info-height",
+        "type": "information",
+        "title": "建築物の高さ",
+        "subject": "建築物",
+        "property": "高さ",
+        "property_type": "numeric",
+        "plurality": "single",
+        "unit": "m",
+        "description": "建築物の地盤面からの高さ"
+      },
+      {
+        "id": "proc-far-check",
+        "type": "process",
+        "title": "容積率規制適合判定",
+        "process_type": "mechanical",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "計画建築物の容積率が都市計画で定められた値以下であることを確認",
+        "logic_expression": "計画FAR ≤ 都市計画FAR",
+        "related_articles": [
+          "法::A60_2:P1"
+        ]
+      },
+      {
+        "id": "proc-bcr-check",
+        "type": "process",
+        "title": "建蔽率規制適合判定",
+        "process_type": "mechanical",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "計画建築物の建蔽率が都市計画で定められた値以下であることを確認",
+        "logic_expression": "計画BCR ≤ 都市計画BCR",
+        "related_articles": [
+          "法::A60_2:P1"
+        ]
+      },
+      {
+        "id": "proc-floor-area-check",
+        "type": "process",
+        "title": "建築面積規制適合判定",
+        "process_type": "mechanical",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "計画建築物の建築面積が都市計画で定められた値以下であることを確認",
+        "logic_expression": "計画建築面積 ≤ 都市計画建築面積",
+        "related_articles": [
+          "法::A60_2:P1"
+        ]
+      },
+      {
+        "id": "proc-height-check",
+        "type": "process",
+        "title": "高さ規制適合判定",
+        "process_type": "mechanical",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "計画建築物の高さが都市計画で定められた値以下であることを確認",
+        "logic_expression": "計画高さ ≤ 都市計画高さ",
+        "related_articles": [
+          "法::A60_2:P1"
+        ]
+      },
+      {
+        "id": "info-structure-type",
+        "type": "information",
+        "title": "主要構造部の構造種別",
+        "subject": "建築物",
+        "property": "構造種別",
+        "property_type": "classification",
+        "plurality": "single",
+        "description": "建築物の主要構造部の構造（木造、鉄骨造、RC造、コンクリートブロック造等）"
+      },
+      {
+        "id": "info-story-count",
+        "type": "information",
+        "title": "建築物の階数",
+        "subject": "建築物",
+        "property": "階数",
+        "property_type": "numeric",
+        "plurality": "single",
+        "unit": "階",
+        "description": "建築物の地上階数"
+      },
+      {
+        "id": "info-basement",
+        "type": "information",
+        "title": "地階の有無",
+        "subject": "建築物",
+        "property": "地階有無",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "建築物が地階を有するか否か"
+      },
+      {
+        "id": "info-removability",
+        "type": "information",
+        "title": "移転・除却の容易性",
+        "subject": "建築物",
+        "property": "容易に移転し、又は除却することができるか",
+        "property_type": "visual",
+        "plurality": "single",
+        "description": "建築物が仮設的・一時的な性質を有し、容易に移転・除却できるか（設計図書の視認判定）"
+      },
+      {
+        "id": "proc-i1-exemption-check",
+        "type": "process",
+        "title": "I1除外事由判定",
+        "process_type": "mechanical",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "建築物がI1の除外要件（主要構造部が木造等で、2階以下で地階なく、容易に移転・除却できる）に該当するか判定",
+        "logic_expression": "(構造 ∈ {木造, 鉄骨造, CB造等}) AND (階数 ≤ 2) AND (地階なし) AND (容易に移転・除却可)",
+        "related_articles": [
+          "法::A60_2:P1:I1"
+        ]
+      },
+      {
+        "id": "info-i1-exemption-result",
+        "type": "information",
+        "title": "I1適用による規制除外適否",
+        "subject": "建築物",
+        "property": "I1除外事由該当性",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "建築物がI1の除外要件に該当し、容積率・建蔽率・建築面積・高さの制限が適用されないか否か"
+      },
+      {
+        "id": "info-far-compliance",
+        "type": "information",
+        "title": "容積率規制適合",
+        "subject": "建築物",
+        "property": "容積率適合性",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "建築物の容積率が都市計画で定められた基準に適合するか"
+      },
+      {
+        "id": "info-bcr-compliance",
+        "type": "information",
+        "title": "建蔽率規制適合",
+        "subject": "建築物",
+        "property": "建蔽率適合性",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "建築物の建蔽率が都市計画で定められた基準に適合するか"
+      },
+      {
+        "id": "info-floor-area-compliance",
+        "type": "information",
+        "title": "建築面積規制適合",
+        "subject": "建築物",
+        "property": "建築面積適合性",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "建築物の建築面積が都市計画で定められた基準に適合するか"
+      },
+      {
+        "id": "info-height-compliance",
+        "type": "information",
+        "title": "高さ規制適合",
+        "subject": "建築物",
+        "property": "高さ適合性",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "建築物の高さが都市計画で定められた基準に適合するか"
+      },
+      {
+        "id": "proc-main-compliance",
+        "type": "process",
+        "title": "法60条の2第1項規制適合判定",
+        "process_type": "mechanical",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "建築物が容積率・建蔽率・建築面積・高さの全ての規制に適合しているか判定。I1の除外要件に該当する場合は規制適用除外。",
+        "logic_expression": "I1除外該当 OR (容積率適合 AND 建蔽率適合 AND 建築面積適合 AND 高さ適合)",
+        "related_articles": [
+          "法::A60_2:P1",
+          "法::A60_2:P1:I1"
+        ]
+      },
+      {
+        "id": "info-final-compliance",
+        "type": "information",
+        "title": "法60条の2第1項適合性",
+        "subject": "建築物",
+        "property": "適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "建築物が法60条の2第1項の規制に適合するか（I1除外事由該当または主要規制基準に適合）"
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge-001",
+        "from": "info-building",
+        "to": "proc-far-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-002",
+        "from": "info-far",
+        "to": "proc-far-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-003",
+        "from": "proc-far-check",
+        "to": "info-far-compliance",
+        "role": "output"
+      },
+      {
+        "id": "edge-004",
+        "from": "info-building",
+        "to": "proc-bcr-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-005",
+        "from": "info-bcr",
+        "to": "proc-bcr-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-006",
+        "from": "proc-bcr-check",
+        "to": "info-bcr-compliance",
+        "role": "output"
+      },
+      {
+        "id": "edge-007",
+        "from": "info-building",
+        "to": "proc-floor-area-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-008",
+        "from": "info-floor-area",
+        "to": "proc-floor-area-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-009",
+        "from": "proc-floor-area-check",
+        "to": "info-floor-area-compliance",
+        "role": "output"
+      },
+      {
+        "id": "edge-010",
+        "from": "info-building",
+        "to": "proc-height-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-011",
+        "from": "info-height",
+        "to": "proc-height-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-012",
+        "from": "proc-height-check",
+        "to": "info-height-compliance",
+        "role": "output"
+      },
+      {
+        "id": "edge-013",
+        "from": "info-building",
+        "to": "proc-i1-exemption-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-014",
+        "from": "info-structure-type",
+        "to": "proc-i1-exemption-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-015",
+        "from": "info-story-count",
+        "to": "proc-i1-exemption-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-016",
+        "from": "info-basement",
+        "to": "proc-i1-exemption-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-017",
+        "from": "info-removability",
+        "to": "proc-i1-exemption-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-018",
+        "from": "proc-i1-exemption-check",
+        "to": "info-i1-exemption-result",
+        "role": "output"
+      },
+      {
+        "id": "edge-019",
+        "from": "info-far-compliance",
+        "to": "proc-main-compliance",
+        "role": "input"
+      },
+      {
+        "id": "edge-020",
+        "from": "info-bcr-compliance",
+        "to": "proc-main-compliance",
+        "role": "input"
+      },
+      {
+        "id": "edge-021",
+        "from": "info-floor-area-compliance",
+        "to": "proc-main-compliance",
+        "role": "input"
+      },
+      {
+        "id": "edge-022",
+        "from": "info-height-compliance",
+        "to": "proc-main-compliance",
+        "role": "input"
+      },
+      {
+        "id": "edge-023",
+        "from": "info-i1-exemption-result",
+        "to": "proc-main-compliance",
+        "role": "input"
+      },
+      {
+        "id": "edge-024",
+        "from": "proc-main-compliance",
+        "to": "info-final-compliance",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "defines_detail",
+      "articles": [
+        "A60_2:P1:I2",
+        "A60_2:P1:I3"
+      ],
+      "description": "同条第1項第2号及び第3号の除外要件"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-24T00:00:00Z",
+    "updated_at": "2025-12-24T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法",
+    "source": "e-Gov法令API v2"
+  }
+}

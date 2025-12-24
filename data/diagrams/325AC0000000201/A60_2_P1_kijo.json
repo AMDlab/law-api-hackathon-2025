@@ -1,0 +1,299 @@
+{
+  "id": "CHK-BSL-A60-2-P1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "都市再生特別地区における建築物の容積率、建蔽率、建築面積及び高さの適合判定",
+    "target_subject": "建築物",
+    "description": "都市再生特別地区内における建築物の容積率・建蔽率・建築面積・高さが都市計画に適合するか否かを判定"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "60の2",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "都市再生特別地区"
+  ],
+  "text_raw": "都市再生特別地区内においては、建築物の容積率及び建蔽率、建築物の建築面積（同一敷地内に二以上の建築物がある場合においては、それぞれの建築面積）並びに建築物の高さは、都市再生特別地区に関する都市計画において定められた内容に適合するものでなければならない。ただし、次の各号のいずれかに該当する建築物については、この限りでない。一主要構造部が木造、鉄骨造、コンクリートブロック造その他これらに類する構造であつて、階数が二以下で、かつ、地階を有しない建築物で、容易に移転し、又は除却することができるもの二公衆便所、巡査派出所その他これらに類する建築物で、公益上必要なもの三学校、駅舎、卸売市場その他これらに類する公益上必要な建築物で、特定行政庁が用途上又は構造上やむを得ないと認めて許可したもの",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "都市再生特別地区内"
+        }
+      ],
+      "note": "適用される地区は都市再生特別地区内に限定される"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "name": "容積率の適合",
+          "condition": "敷地の容積率 ≤ 都市計画で定められた最高限度"
+        },
+        {
+          "name": "建蔽率の適合",
+          "condition": "敷地の建蔽率 ≤ 都市計画で定められた最高限度"
+        },
+        {
+          "name": "建築面積の適合",
+          "condition": "建築物の建築面積 ≤ 都市計画で定められた最大値"
+        },
+        {
+          "name": "高さの適合",
+          "condition": "建築物の高さ ≤ 都市計画で定められた最高限度"
+        }
+      ]
+    },
+    "exceptions": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "name": "臨時建築物",
+          "description": "主要構造部が木造等で、階数が2以下、地階なし、容易に移転・除却可能",
+          "article_ref": "法::A60_2:P1:I1"
+        },
+        {
+          "name": "公益上必要な施設",
+          "description": "公衆便所、巡査派出所等の公益上必要な建築物",
+          "article_ref": "法::A60_2:P1:I2"
+        },
+        {
+          "name": "特定行政庁許可建築物",
+          "description": "学校、駅舎等で特定行政庁が用途上又は構造上必要と認めて許可したもの",
+          "article_ref": "法::A60_2:P1:I3"
+        }
+      ],
+      "effect": "EXEMPT"
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "info-location",
+        "type": "information",
+        "title": "敷地の位置",
+        "subject": "敷地",
+        "property": "都市再生特別地区の区域内か否か",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "建築物の敷地が都市再生特別地区内にあるか否かを判定"
+      },
+      {
+        "id": "info-buildings-set",
+        "type": "information",
+        "title": "敷地内の建築物",
+        "subject": "敷地",
+        "property": "建築物の集合",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "当該敷地に属する建築物（対象建築物及び既存建築物）を特定"
+      },
+      {
+        "id": "info-building-type",
+        "type": "information",
+        "title": "建築物の種類",
+        "subject": "建築物",
+        "property": "構造・用途・規模の特性",
+        "property_type": "classification",
+        "plurality": "multiple",
+        "description": "建築物が臨時建築物、公益施設、又は特定行政庁許可建築物に該当するかを判定するため、構造種別、階数、地階有無、用途、構造上の特性を取得"
+      },
+      {
+        "id": "proc-exempt-check",
+        "type": "process",
+        "title": "適用除外判定",
+        "process_type": "mechanical",
+        "description": "建築物が適用除外対象に該当するか否かを判定",
+        "logic_expression": "(主要構造部 ∈ {木造,鉄骨造,CB造等} AND 階数 ≤ 2 AND 地階なし AND 容易移転可能) OR (用途 ∈ {公益施設}) OR (特定行政庁許可)",
+        "related_articles": [
+          "法::A60_2:P1:I1",
+          "法::A60_2:P1:I2",
+          "法::A60_2:P1:I3"
+        ]
+      },
+      {
+        "id": "info-exempt-result",
+        "type": "information",
+        "title": "適用除外判定結果",
+        "subject": "建築物",
+        "property": "適用除外対象であるか否か",
+        "property_type": "proposition",
+        "plurality": "multiple",
+        "description": "建築物が適用除外対象に該当したか否か"
+      },
+      {
+        "id": "info-floor-area-ratio",
+        "type": "information",
+        "title": "敷地の容積率",
+        "subject": "敷地",
+        "property": "容積率の数値",
+        "property_type": "numeric",
+        "unit": "%",
+        "plurality": "single",
+        "description": "建築物の延べ面積を敷地面積で除した値"
+      },
+      {
+        "id": "info-building-coverage-ratio",
+        "type": "information",
+        "title": "敷地の建蔽率",
+        "subject": "敷地",
+        "property": "建蔽率の数値",
+        "property_type": "numeric",
+        "unit": "%",
+        "plurality": "single",
+        "description": "建築物の建築面積を敷地面積で除した値"
+      },
+      {
+        "id": "info-building-area",
+        "type": "information",
+        "title": "建築物の建築面積",
+        "subject": "建築物",
+        "property": "建築面積の数値",
+        "property_type": "numeric",
+        "unit": "m²",
+        "plurality": "multiple",
+        "description": "各建築物の建築面積（同一敷地内に複数ある場合はそれぞれ）"
+      },
+      {
+        "id": "info-building-height",
+        "type": "information",
+        "title": "建築物の高さ",
+        "subject": "建築物",
+        "property": "高さの数値",
+        "property_type": "numeric",
+        "unit": "m",
+        "plurality": "multiple",
+        "description": "建築基準法第2条第1項で定義される建築物の高さ"
+      },
+      {
+        "id": "info-plan-standards",
+        "type": "information",
+        "title": "都市計画で定められた基準",
+        "subject": "敷地",
+        "property": "容積率・建蔽率・建築面積・高さの基準値",
+        "property_type": "classification",
+        "plurality": "single",
+        "description": "都市再生特別地区に関する都市計画において定められた容積率、建蔽率、建築面積、高さの制限値"
+      },
+      {
+        "id": "proc-standards-check",
+        "type": "process",
+        "title": "都市計画基準の照合",
+        "process_type": "mechanical",
+        "description": "建築物の容積率・建蔽率・建築面積・高さが都市計画で定められた基準に適合しているか否かを判定",
+        "logic_expression": "(容積率 ≤ 計画値) AND (建蔽率 ≤ 計画値) AND (建築面積 ≤ 計画値) AND (高さ ≤ 計画値)",
+        "related_articles": [
+          "法::A60_2:P1"
+        ]
+      },
+      {
+        "id": "info-compliance-result",
+        "type": "information",
+        "title": "都市計画基準への適合判定",
+        "subject": "建築物",
+        "property": "都市計画で定められた内容に適合するか否か",
+        "property_type": "proposition",
+        "plurality": "multiple",
+        "description": "建築物の容積率・建蔽率・建築面積・高さが都市計画で定められた内容に適合しているか否か"
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge-001",
+        "from": "info-location",
+        "to": "proc-exempt-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-002",
+        "from": "info-buildings-set",
+        "to": "proc-exempt-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-003",
+        "from": "info-building-type",
+        "to": "proc-exempt-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-004",
+        "from": "proc-exempt-check",
+        "to": "info-exempt-result",
+        "role": "output"
+      },
+      {
+        "id": "edge-005",
+        "from": "info-exempt-result",
+        "to": "proc-standards-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-006",
+        "from": "info-floor-area-ratio",
+        "to": "proc-standards-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-007",
+        "from": "info-building-coverage-ratio",
+        "to": "proc-standards-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-008",
+        "from": "info-building-area",
+        "to": "proc-standards-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-009",
+        "from": "info-building-height",
+        "to": "proc-standards-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-010",
+        "from": "info-plan-standards",
+        "to": "proc-standards-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-011",
+        "from": "proc-standards-check",
+        "to": "info-compliance-result",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": [
+        "A52",
+        "A55"
+      ],
+      "description": "容積率・建蔽率の定義と制限基準"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-24T06:45:00Z",
+    "updated_at": "2025-12-24T06:45:00Z",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法",
+    "source": "e-Gov法令API v2"
+  }
+}

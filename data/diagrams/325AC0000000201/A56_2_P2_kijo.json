@@ -1,0 +1,224 @@
+{
+  "id": "CHK-BSL-A56-2-P2",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "同一敷地内複数建築物の日影規制統一処理",
+    "target_subject": "敷地内の複数建築物",
+    "description": "同一敷地内に二以上の建築物がある場合、これら複数建築物を一の建築物とみなして、第一項の日影規制を適用する判定メカニズム"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "56の2",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": [
+    "集団規定",
+    "日影規制"
+  ],
+  "text_raw": "同一の敷地内に二以上の建築物がある場合においては、これらの建築物を一の建築物とみなして、前項の規定を適用する。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "法56条の2第1項の対象区域内"
+        },
+        {
+          "type": "building_condition",
+          "value": "同一敷地内の建築物が2以上"
+        }
+      ],
+      "note": "別表第四（い）欄の各項に掲げる地域又は区域の全部又は一部で地方公共団体の条例で指定する区域内"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "description": "複数建築物を一体として第一項の日影規制基準に適合することを判定"
+        }
+      ]
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-building-count-check",
+        "type": "process",
+        "title": "敷地内の建築物数の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から同一敷地内の建築物数を確認する"
+      },
+      {
+        "id": "info-building-count",
+        "type": "information",
+        "title": "敷地内の建築物数",
+        "symbol": "N",
+        "subject": "敷地",
+        "property": "建築物の個数",
+        "property_type": "numeric",
+        "unit": "棟",
+        "plurality": "single",
+        "description": "同一敷地内に存在する建築物の棟数（既存建築物と計画建築物を含む）"
+      },
+      {
+        "id": "proc-multiple-check",
+        "type": "process",
+        "title": "複数建築物の有無判定",
+        "process_type": "mechanical",
+        "description": "敷地内の建築物数が2以上であるかを判定",
+        "logic_expression": "N ≥ 2"
+      },
+      {
+        "id": "info-multi-building-condition",
+        "type": "information",
+        "title": "複数建築物の存在",
+        "symbol": "M",
+        "subject": "敷地",
+        "property": "複数建築物の有無",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "敷地内に2以上の建築物が存在しているか"
+      },
+      {
+        "id": "proc-buildings-identification",
+        "type": "process",
+        "title": "敷地内建築物の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書から同一敷地内のすべての建築物（既存・計画）を特定し、これらを統合対象として確認する"
+      },
+      {
+        "id": "info-buildings-set",
+        "type": "information",
+        "title": "敷地内の建築物群",
+        "symbol": "B",
+        "subject": "敷地",
+        "property": "建築物の集合",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "第一項の日影規制を適用する対象となる敷地内の全建築物を統合した概念"
+      },
+      {
+        "id": "proc-combined-geometry",
+        "type": "process",
+        "title": "統合建築物の幾何学的形状確認",
+        "process_type": "undefined_input",
+        "description": "複数建築物を一体化した場合の外周形状、各部位の高さ及び敷地境界線からの位置関係を設計図書から確認"
+      },
+      {
+        "id": "info-combined-geometry",
+        "type": "information",
+        "title": "統合建築物の形状及び高さ",
+        "symbol": "G",
+        "subject": "建築物群",
+        "property": "外周形状と高さ寸法",
+        "property_type": "geometric_solid",
+        "plurality": "single",
+        "description": "複数建築物を一の建築物とみなした場合の立体形状（外周形状、高さ、敷地との位置関係）"
+      },
+      {
+        "id": "proc-apply-part1",
+        "type": "process",
+        "title": "第一項の日影規制適用",
+        "process_type": "sub_diagram_reference",
+        "description": "統合建築物に対して第一項の日影規制基準（別表第四参照）を適用して判定",
+        "related_articles": [
+          "法::A56_2:P1"
+        ],
+        "sub_diagram_ref": "CHK-BSL-A56-2-P1"
+      },
+      {
+        "id": "info-compliance-judgment",
+        "type": "information",
+        "title": "第一項規定への適合判定結果",
+        "symbol": "C",
+        "subject": "建築物群",
+        "property": "法56条の2第一項への適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "統合建築物が第一項の日影規制基準を満たすか否か"
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge-001",
+        "from": "proc-building-count-check",
+        "to": "info-building-count",
+        "role": "output"
+      },
+      {
+        "id": "edge-002",
+        "from": "info-building-count",
+        "to": "proc-multiple-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-003",
+        "from": "proc-multiple-check",
+        "to": "info-multi-building-condition",
+        "role": "output"
+      },
+      {
+        "id": "edge-004",
+        "from": "info-multi-building-condition",
+        "to": "proc-buildings-identification",
+        "role": "input"
+      },
+      {
+        "id": "edge-005",
+        "from": "proc-buildings-identification",
+        "to": "info-buildings-set",
+        "role": "output"
+      },
+      {
+        "id": "edge-006",
+        "from": "info-buildings-set",
+        "to": "proc-combined-geometry",
+        "role": "input"
+      },
+      {
+        "id": "edge-007",
+        "from": "proc-combined-geometry",
+        "to": "info-combined-geometry",
+        "role": "output"
+      },
+      {
+        "id": "edge-008",
+        "from": "info-combined-geometry",
+        "to": "proc-apply-part1",
+        "role": "input"
+      },
+      {
+        "id": "edge-009",
+        "from": "proc-apply-part1",
+        "to": "info-compliance-judgment",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": [
+        "A56_2:P1"
+      ],
+      "description": "日影による中高層建築物の高さ制限の基準及び適用方法"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-24T00:00:00Z",
+    "updated_at": "2025-12-24T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v2",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法",
+    "source": "e-Gov法令API v2"
+  }
+}

@@ -1,0 +1,56 @@
+{
+  "id": "CHK-BSL-A27-P3",
+  "version": "3.0.0",
+  "page_title": {"title": "特殊建築物の耐火・準耐火建築物要件", "target_subject": "特殊建築物", "description": "次の各号に該当する特殊建築物は耐火建築物又は準耐火建築物としなければならない"},
+  "legal_ref": {"law_id": "325AC0000000201", "law_type": "act", "law_name": "建築基準法", "law_abbrev": "法", "article": "27", "paragraph": "3", "item": null},
+  "labels": ["単体規定", "防火", "準耐火建築物"],
+  "text_raw": "次の各号のいずれかに該当する特殊建築物は、耐火建築物又は準耐火建築物（別表第一（い）欄（六）項に掲げる用途に供するものにあつては、特定避難時間倒壊等防止建築物に限る。）としなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "==",
+      "conditions": [{"type": "category", "value": "次の各号のいずれか"}]
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {"ref": "info-fireproof", "value": true},
+        {"ref": "info-quasi-fireproof", "value": true}
+      ]
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {"id": "proc-category", "type": "process", "title": "各号該当判定", "process_type": "undefined_input"},
+      {"id": "info-category", "type": "information", "title": "法27条3項各号該当", "subject": "建築物", "property": "各号該当", "property_type": "proposition", "plurality": "single"},
+      {"id": "proc-use", "type": "process", "title": "建築物用途の特定", "process_type": "undefined_input"},
+      {"id": "info-use", "type": "information", "title": "建築物の用途", "subject": "建築物", "property": "用途", "property_type": "classification", "plurality": "single"},
+      {"id": "proc-use-check", "type": "process", "title": "別表第一(六)項判定", "process_type": "mechanical", "description": "自動車車庫等(六)項該当判定"},
+      {"id": "info-garage", "type": "information", "title": "自動車車庫等", "subject": "建築物", "property": "別表第一(い)欄(六)項該当", "property_type": "proposition", "plurality": "single"},
+      {"id": "proc-building-type", "type": "process", "title": "建築物種別の特定", "process_type": "undefined_input"},
+      {"id": "info-building-type", "type": "information", "title": "建築物の種別", "subject": "建築物", "property": "建築物種別", "property_type": "classification", "plurality": "single"},
+      {"id": "proc-fireproof-check", "type": "process", "title": "耐火建築物判定", "process_type": "mechanical"},
+      {"id": "info-fireproof", "type": "information", "title": "耐火建築物", "subject": "建築物", "property": "耐火建築物該当", "property_type": "proposition", "plurality": "single"},
+      {"id": "proc-quasi-check", "type": "process", "title": "準耐火建築物判定", "process_type": "mechanical", "description": "(六)項の場合は特定避難時間倒壊等防止建築物に限る"},
+      {"id": "info-quasi-fireproof", "type": "information", "title": "準耐火建築物", "subject": "建築物", "property": "準耐火建築物該当", "property_type": "proposition", "plurality": "single"},
+      {"id": "proc-final", "type": "process", "title": "法27条3項適合判定", "process_type": "mechanical", "logic_expression": "NOT category OR (fireproof OR quasi)"},
+      {"id": "info-compliance", "type": "information", "title": "法27条3項適合", "symbol": "PASS", "subject": "建築物", "property": "法27条3項適合", "property_type": "proposition", "plurality": "single"}
+    ],
+    "edges": [
+      {"id": "e001", "from": "proc-category", "to": "info-category", "role": "output"},
+      {"id": "e002", "from": "proc-use", "to": "info-use", "role": "output"},
+      {"id": "e003", "from": "info-use", "to": "proc-use-check", "role": "input"},
+      {"id": "e004", "from": "proc-use-check", "to": "info-garage", "role": "output"},
+      {"id": "e005", "from": "proc-building-type", "to": "info-building-type", "role": "output"},
+      {"id": "e006", "from": "info-building-type", "to": "proc-fireproof-check", "role": "input"},
+      {"id": "e007", "from": "proc-fireproof-check", "to": "info-fireproof", "role": "output"},
+      {"id": "e008", "from": "info-building-type", "to": "proc-quasi-check", "role": "input"},
+      {"id": "e009", "from": "info-garage", "to": "proc-quasi-check", "role": "input"},
+      {"id": "e010", "from": "proc-quasi-check", "to": "info-quasi-fireproof", "role": "output"},
+      {"id": "e011", "from": "info-category", "to": "proc-final", "role": "input"},
+      {"id": "e012", "from": "info-fireproof", "to": "proc-final", "role": "input"},
+      {"id": "e013", "from": "info-quasi-fireproof", "to": "proc-final", "role": "input"},
+      {"id": "e014", "from": "proc-final", "to": "info-compliance", "role": "output"}
+    ]
+  },
+  "metadata": {"created_at": "2025-12-24T00:00:00Z", "generator": "claude-code-kijo-generator", "law_id": "325AC0000000201", "law_name": "建築基準法"}
+}

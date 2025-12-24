@@ -1,0 +1,790 @@
+{
+  "id": "CHK-BSL-A59-P1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "高度利用地区内の建築物の容積率等",
+    "target_subject": "建築物",
+    "description": "高度利用地区内の建築物の容積率、建蔽率及び建築面積が都市計画で定められた内容に適合することを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "59",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "集団規定",
+    "高度利用地区"
+  ],
+  "text_raw": "高度利用地区内においては、建築物の容積率及び建蔽率並びに建築物の建築面積（同一敷地内に二以上の建築物がある場合においては、それぞれの建築面積）は、高度利用地区に関する都市計画において定められた内容に適合するものでなければならない。ただし、次の各号のいずれかに該当する建築物については、この限りでない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "高度利用地区内"
+        }
+      ],
+      "note": "高度利用地区に関する都市計画で指定された区域"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "ref": "info-exempt",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "operator": "AND",
+          "conditions": [
+            {
+              "ref": "info-volume-ratio-compliance",
+              "operator": "==",
+              "value": true
+            },
+            {
+              "ref": "info-coverage-ratio-compliance",
+              "operator": "==",
+              "value": true
+            },
+            {
+              "ref": "info-building-area-compliance",
+              "operator": "==",
+              "value": true
+            }
+          ]
+        }
+      ]
+    },
+    "exceptions": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "note": "一号：主要構造部が木造等で階数2以下、地階なし、容易に移転・除却可能",
+          "operator": "AND",
+          "conditions": [
+            {
+              "ref": "info-main-structure",
+              "value": "木造・鉄骨造・CB造等"
+            },
+            {
+              "ref": "info-floors",
+              "operator": "<=",
+              "value": 2
+            },
+            {
+              "ref": "info-has-basement",
+              "operator": "==",
+              "value": false
+            },
+            {
+              "ref": "info-removable",
+              "operator": "==",
+              "value": true
+            }
+          ]
+        },
+        {
+          "note": "二号：公衆便所、巡査派出所等で公益上必要なもの",
+          "ref": "info-public-utility-type",
+          "value": "公衆便所・巡査派出所等"
+        },
+        {
+          "note": "三号：学校、駅舎、卸売市場等で特定行政庁許可",
+          "operator": "AND",
+          "conditions": [
+            {
+              "ref": "info-public-building-type",
+              "value": "学校・駅舎・卸売市場等"
+            },
+            {
+              "ref": "info-admin-permission",
+              "operator": "==",
+              "value": true
+            }
+          ]
+        }
+      ],
+      "effect": "EXEMPT"
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-building-type",
+        "type": "process",
+        "title": "建築物用途の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の用途を特定する"
+      },
+      {
+        "id": "info-building-type",
+        "type": "information",
+        "title": "建築物の用途",
+        "symbol": "U",
+        "subject": "建築物",
+        "property": "用途",
+        "property_type": "classification",
+        "description": "建築物の用途種別",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-main-structure",
+        "type": "process",
+        "title": "主要構造部種別の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から主要構造部の構造種別を特定する"
+      },
+      {
+        "id": "info-main-structure",
+        "type": "information",
+        "title": "主要構造部の構造",
+        "symbol": "S",
+        "subject": "建築物",
+        "property": "主要構造部の構造種別",
+        "property_type": "classification",
+        "description": "木造、鉄骨造、コンクリートブロック造等の構造種別",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-floors",
+        "type": "process",
+        "title": "階数の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の階数を特定する"
+      },
+      {
+        "id": "info-floors",
+        "type": "information",
+        "title": "階数",
+        "symbol": "F",
+        "subject": "建築物",
+        "property": "階数",
+        "property_type": "numeric",
+        "unit": "階",
+        "description": "建築物の階数",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-basement",
+        "type": "process",
+        "title": "地階の有無の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から地階の有無を特定する"
+      },
+      {
+        "id": "info-has-basement",
+        "type": "information",
+        "title": "地階の有無",
+        "symbol": "B",
+        "subject": "建築物",
+        "property": "地階の有無",
+        "property_type": "proposition",
+        "description": "地階を有するか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-removable",
+        "type": "process",
+        "title": "移転・除却容易性の判定",
+        "process_type": "human_judgment",
+        "description": "建築物が容易に移転し又は除却することができるかを判定"
+      },
+      {
+        "id": "info-removable",
+        "type": "information",
+        "title": "移転・除却容易性",
+        "symbol": "R",
+        "subject": "建築物",
+        "property": "移転・除却の容易性",
+        "property_type": "proposition",
+        "description": "容易に移転し又は除却することができるか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-public-utility-check",
+        "type": "process",
+        "title": "公益施設該当判定",
+        "process_type": "mechanical",
+        "description": "公衆便所、巡査派出所等の公益上必要な建築物に該当するかを判定",
+        "logic_expression": "U ∈ {公衆便所, 巡査派出所, これらに類するもの}"
+      },
+      {
+        "id": "info-public-utility-type",
+        "type": "information",
+        "title": "公益施設該当",
+        "symbol": "P1",
+        "subject": "建築物",
+        "property": "公益施設該当",
+        "property_type": "proposition",
+        "description": "公衆便所、巡査派出所等の公益上必要な建築物に該当するか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-public-building-check",
+        "type": "process",
+        "title": "公益的大規模施設該当判定",
+        "process_type": "mechanical",
+        "description": "学校、駅舎、卸売市場等の公益上必要な建築物に該当するかを判定",
+        "logic_expression": "U ∈ {学校, 駅舎, 卸売市場, これらに類するもの}"
+      },
+      {
+        "id": "info-public-building-type",
+        "type": "information",
+        "title": "公益的大規模施設該当",
+        "symbol": "P2",
+        "subject": "建築物",
+        "property": "公益的大規模施設該当",
+        "property_type": "proposition",
+        "description": "学校、駅舎、卸売市場等の公益上必要な建築物に該当するか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-admin-permission",
+        "type": "process",
+        "title": "特定行政庁許可の確認",
+        "process_type": "undefined_input",
+        "description": "特定行政庁の許可を受けているかを確認"
+      },
+      {
+        "id": "info-admin-permission",
+        "type": "information",
+        "title": "特定行政庁許可",
+        "symbol": "AP",
+        "subject": "建築物",
+        "property": "特定行政庁許可の有無",
+        "property_type": "proposition",
+        "description": "用途上又は構造上やむを得ないと認める特定行政庁の許可を受けているか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-exempt-check",
+        "type": "process",
+        "title": "適用除外判定",
+        "process_type": "mechanical",
+        "description": "各号のいずれかに該当し適用除外となるかを判定",
+        "logic_expression": "((S ∈ {木造,鉄骨造,CB造等}) AND (F ≤ 2) AND (B = false) AND (R = true)) OR (P1 = true) OR ((P2 = true) AND (AP = true))"
+      },
+      {
+        "id": "info-exempt",
+        "type": "information",
+        "title": "適用除外該当",
+        "symbol": "X",
+        "subject": "建築物",
+        "property": "適用除外該当",
+        "property_type": "proposition",
+        "description": "ただし書きによる適用除外に該当するか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-site-buildings-set",
+        "type": "process",
+        "title": "敷地内建築物の特定",
+        "process_type": "undefined_input",
+        "description": "同一敷地内に二以上の建築物がある場合、それぞれの建築物を特定する"
+      },
+      {
+        "id": "info-site-buildings-set",
+        "type": "information",
+        "title": "敷地内の建築物",
+        "subject": "敷地",
+        "property": "建築物の集合",
+        "property_type": "set_definition",
+        "description": "同一敷地内の建築物の集合（二以上ある場合はそれぞれを特定）",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-building-area-actual",
+        "type": "process",
+        "title": "建築面積の特定",
+        "process_type": "human_judgment",
+        "target_subject": "建築物",
+        "iteration": "iterative",
+        "description": "設計図書等から各建築物の建築面積を特定する"
+      },
+      {
+        "id": "info-building-area-actual",
+        "type": "information",
+        "title": "建築面積",
+        "symbol": "BA",
+        "subject": "建築物",
+        "property": "建築面積",
+        "property_type": "numeric",
+        "unit": "m2",
+        "description": "建築物の建築面積",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-volume-ratio-actual",
+        "type": "process",
+        "title": "容積率の特定",
+        "process_type": "mechanical",
+        "description": "建築物の延べ面積と敷地面積から容積率を算出",
+        "logic_expression": "VR = (延べ面積 / 敷地面積) × 100"
+      },
+      {
+        "id": "info-volume-ratio-actual",
+        "type": "information",
+        "title": "建築物の容積率",
+        "symbol": "VR",
+        "subject": "建築物",
+        "property": "容積率",
+        "property_type": "numeric",
+        "unit": "%",
+        "description": "建築物の容積率（実際値）",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-coverage-ratio-actual",
+        "type": "process",
+        "title": "建蔽率の特定",
+        "process_type": "mechanical",
+        "description": "建築面積と敷地面積から建蔽率を算出",
+        "logic_expression": "CR = (建築面積 / 敷地面積) × 100"
+      },
+      {
+        "id": "info-coverage-ratio-actual",
+        "type": "information",
+        "title": "建築物の建蔽率",
+        "symbol": "CR",
+        "subject": "建築物",
+        "property": "建蔽率",
+        "property_type": "numeric",
+        "unit": "%",
+        "description": "建築物の建蔽率（実際値）",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-urban-plan-limits",
+        "type": "process",
+        "title": "都市計画制限値の取得",
+        "process_type": "mechanical",
+        "description": "高度利用地区に関する都市計画において定められた容積率、建蔽率、建築面積の制限値を取得",
+        "remarks": "都市計画情報（公共データ）から制限値を参照"
+      },
+      {
+        "id": "info-volume-ratio-limit",
+        "type": "information",
+        "title": "容積率制限",
+        "symbol": "VRL",
+        "subject": "敷地",
+        "property": "容積率の最高限度",
+        "property_type": "numeric",
+        "unit": "%",
+        "description": "高度利用地区の都市計画で定められた容積率の最高限度",
+        "plurality": "single"
+      },
+      {
+        "id": "info-volume-ratio-min",
+        "type": "information",
+        "title": "容積率最低限度",
+        "symbol": "VRM",
+        "subject": "敷地",
+        "property": "容積率の最低限度",
+        "property_type": "numeric",
+        "unit": "%",
+        "description": "高度利用地区の都市計画で定められた容積率の最低限度",
+        "plurality": "single"
+      },
+      {
+        "id": "info-coverage-ratio-limit",
+        "type": "information",
+        "title": "建蔽率制限",
+        "symbol": "CRL",
+        "subject": "敷地",
+        "property": "建蔽率の最高限度",
+        "property_type": "numeric",
+        "unit": "%",
+        "description": "高度利用地区の都市計画で定められた建蔽率の最高限度",
+        "plurality": "single"
+      },
+      {
+        "id": "info-building-area-min",
+        "type": "information",
+        "title": "建築面積最低限度",
+        "symbol": "BAM",
+        "subject": "敷地",
+        "property": "建築面積の最低限度",
+        "property_type": "numeric",
+        "unit": "m2",
+        "description": "高度利用地区の都市計画で定められた建築面積の最低限度",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-volume-ratio-check",
+        "type": "process",
+        "title": "容積率適合判定",
+        "process_type": "mechanical",
+        "description": "容積率が都市計画で定められた最低限度以上かつ最高限度以下であることを判定",
+        "logic_expression": "VRM ≤ VR ≤ VRL"
+      },
+      {
+        "id": "info-volume-ratio-compliance",
+        "type": "information",
+        "title": "容積率適合",
+        "symbol": "VC",
+        "subject": "建築物",
+        "property": "容積率適合",
+        "property_type": "proposition",
+        "description": "容積率が都市計画で定められた内容に適合するか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-coverage-ratio-check",
+        "type": "process",
+        "title": "建蔽率適合判定",
+        "process_type": "mechanical",
+        "description": "建蔽率が都市計画で定められた最高限度以下であることを判定",
+        "logic_expression": "CR ≤ CRL"
+      },
+      {
+        "id": "info-coverage-ratio-compliance",
+        "type": "information",
+        "title": "建蔽率適合",
+        "symbol": "CC",
+        "subject": "建築物",
+        "property": "建蔽率適合",
+        "property_type": "proposition",
+        "description": "建蔽率が都市計画で定められた内容に適合するか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-building-area-check",
+        "type": "process",
+        "title": "建築面積適合判定",
+        "process_type": "mechanical",
+        "target_subject": "建築物",
+        "iteration": "iterative",
+        "description": "各建築物の建築面積が都市計画で定められた最低限度以上であることを判定",
+        "logic_expression": "BA ≥ BAM"
+      },
+      {
+        "id": "info-building-area-compliance",
+        "type": "information",
+        "title": "建築面積適合",
+        "symbol": "BAC",
+        "subject": "建築物",
+        "property": "建築面積適合",
+        "property_type": "proposition",
+        "description": "建築面積が都市計画で定められた内容に適合するか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-all-building-area-check",
+        "type": "process",
+        "title": "全建築物建築面積適合確認",
+        "process_type": "mechanical",
+        "description": "同一敷地内の全ての建築物の建築面積が適合することを確認",
+        "logic_expression": "∀building ∈ Buildings: BAC(building) = true"
+      },
+      {
+        "id": "info-all-building-area-compliance",
+        "type": "information",
+        "title": "全建築物建築面積適合",
+        "symbol": "ABAC",
+        "subject": "敷地",
+        "property": "全建築物建築面積適合",
+        "property_type": "proposition",
+        "description": "敷地内の全ての建築物が建築面積制限に適合するか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-final-judgment",
+        "type": "process",
+        "title": "最終適合判定",
+        "process_type": "mechanical",
+        "description": "適用除外または全ての基準適合のいずれかを満たすことを確認",
+        "logic_expression": "X OR (VC AND CC AND ABAC)"
+      },
+      {
+        "id": "info-compliance",
+        "type": "information",
+        "title": "法59条1項適合",
+        "subject": "建築物",
+        "property": "法59条1項適合",
+        "property_type": "proposition",
+        "description": "法59条1項の規定に適合するか",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-building-type",
+        "to": "info-building-type",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "proc-main-structure",
+        "to": "info-main-structure",
+        "role": "output"
+      },
+      {
+        "id": "e03",
+        "from": "proc-floors",
+        "to": "info-floors",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "proc-basement",
+        "to": "info-has-basement",
+        "role": "output"
+      },
+      {
+        "id": "e05",
+        "from": "proc-removable",
+        "to": "info-removable",
+        "role": "output"
+      },
+      {
+        "id": "e06",
+        "from": "info-building-type",
+        "to": "proc-public-utility-check",
+        "role": "input"
+      },
+      {
+        "id": "e07",
+        "from": "proc-public-utility-check",
+        "to": "info-public-utility-type",
+        "role": "output"
+      },
+      {
+        "id": "e08",
+        "from": "info-building-type",
+        "to": "proc-public-building-check",
+        "role": "input"
+      },
+      {
+        "id": "e09",
+        "from": "proc-public-building-check",
+        "to": "info-public-building-type",
+        "role": "output"
+      },
+      {
+        "id": "e10",
+        "from": "proc-admin-permission",
+        "to": "info-admin-permission",
+        "role": "output"
+      },
+      {
+        "id": "e11",
+        "from": "info-main-structure",
+        "to": "proc-exempt-check",
+        "role": "input"
+      },
+      {
+        "id": "e12",
+        "from": "info-floors",
+        "to": "proc-exempt-check",
+        "role": "input"
+      },
+      {
+        "id": "e13",
+        "from": "info-has-basement",
+        "to": "proc-exempt-check",
+        "role": "input"
+      },
+      {
+        "id": "e14",
+        "from": "info-removable",
+        "to": "proc-exempt-check",
+        "role": "input"
+      },
+      {
+        "id": "e15",
+        "from": "info-public-utility-type",
+        "to": "proc-exempt-check",
+        "role": "input"
+      },
+      {
+        "id": "e16",
+        "from": "info-public-building-type",
+        "to": "proc-exempt-check",
+        "role": "input"
+      },
+      {
+        "id": "e17",
+        "from": "info-admin-permission",
+        "to": "proc-exempt-check",
+        "role": "input"
+      },
+      {
+        "id": "e18",
+        "from": "proc-exempt-check",
+        "to": "info-exempt",
+        "role": "output"
+      },
+      {
+        "id": "e19",
+        "from": "proc-site-buildings-set",
+        "to": "info-site-buildings-set",
+        "role": "output"
+      },
+      {
+        "id": "e20",
+        "from": "info-site-buildings-set",
+        "to": "proc-building-area-actual",
+        "role": "input"
+      },
+      {
+        "id": "e21",
+        "from": "proc-building-area-actual",
+        "to": "info-building-area-actual",
+        "role": "output"
+      },
+      {
+        "id": "e22",
+        "from": "proc-volume-ratio-actual",
+        "to": "info-volume-ratio-actual",
+        "role": "output"
+      },
+      {
+        "id": "e23",
+        "from": "proc-coverage-ratio-actual",
+        "to": "info-coverage-ratio-actual",
+        "role": "output"
+      },
+      {
+        "id": "e24",
+        "from": "proc-urban-plan-limits",
+        "to": "info-volume-ratio-limit",
+        "role": "output"
+      },
+      {
+        "id": "e25",
+        "from": "proc-urban-plan-limits",
+        "to": "info-volume-ratio-min",
+        "role": "output"
+      },
+      {
+        "id": "e26",
+        "from": "proc-urban-plan-limits",
+        "to": "info-coverage-ratio-limit",
+        "role": "output"
+      },
+      {
+        "id": "e27",
+        "from": "proc-urban-plan-limits",
+        "to": "info-building-area-min",
+        "role": "output"
+      },
+      {
+        "id": "e28",
+        "from": "info-volume-ratio-actual",
+        "to": "proc-volume-ratio-check",
+        "role": "input"
+      },
+      {
+        "id": "e29",
+        "from": "info-volume-ratio-limit",
+        "to": "proc-volume-ratio-check",
+        "role": "input"
+      },
+      {
+        "id": "e30",
+        "from": "info-volume-ratio-min",
+        "to": "proc-volume-ratio-check",
+        "role": "input"
+      },
+      {
+        "id": "e31",
+        "from": "proc-volume-ratio-check",
+        "to": "info-volume-ratio-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e32",
+        "from": "info-coverage-ratio-actual",
+        "to": "proc-coverage-ratio-check",
+        "role": "input"
+      },
+      {
+        "id": "e33",
+        "from": "info-coverage-ratio-limit",
+        "to": "proc-coverage-ratio-check",
+        "role": "input"
+      },
+      {
+        "id": "e34",
+        "from": "proc-coverage-ratio-check",
+        "to": "info-coverage-ratio-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e35",
+        "from": "info-building-area-actual",
+        "to": "proc-building-area-check",
+        "role": "input"
+      },
+      {
+        "id": "e36",
+        "from": "info-building-area-min",
+        "to": "proc-building-area-check",
+        "role": "input"
+      },
+      {
+        "id": "e37",
+        "from": "proc-building-area-check",
+        "to": "info-building-area-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e38",
+        "from": "info-building-area-compliance",
+        "to": "proc-all-building-area-check",
+        "role": "input"
+      },
+      {
+        "id": "e39",
+        "from": "proc-all-building-area-check",
+        "to": "info-all-building-area-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e40",
+        "from": "info-exempt",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e41",
+        "from": "info-volume-ratio-compliance",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e42",
+        "from": "info-coverage-ratio-compliance",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e43",
+        "from": "info-all-building-area-compliance",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e44",
+        "from": "proc-final-judgment",
+        "to": "info-compliance",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [],
+  "metadata": {
+    "created_at": "2025-12-23T00:00:00Z",
+    "author": "Claude Sonnet 4.5",
+    "generator": "kijo-generator-skill",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

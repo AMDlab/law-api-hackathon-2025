@@ -1,0 +1,328 @@
+{
+  "id": "CHK-BSL-A87-3-P2",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "用途変更時の適用除外判定（準用規定の適用除外）",
+    "target_subject": "建築計画",
+    "description": "第3条第2項の適用を受けない建築物の用途変更における準用規定の適用除外判定。異なる用途への変更時に、修繕等の工事内容に基づいて適用規定の除外可否を判定するメカニズム"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "87",
+    "paragraph": "3",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "用途変更",
+    "準用規定"
+  ],
+  "text_raw": "第三条第二項の規定により第二十七条、第二十八条第一項若しくは第三項、第二十九条、第三十条、第三十五条から第三十五条の三まで、第三十六条中第二十八条第一項若しくは第三十五条に関する部分、第四十八条第一項から第十四項まで若しくは第五十一条の規定又は第三十九条第二項、第四十条、第四十三条第三項、第四十三条の二、第四十九条から第五十条まで、第六十八条の二第一項若しくは第六十八条の九第一項の規定に基づく条例の規定（次条第一項において「第二十七条等の規定」という。）の適用を受けない建築物の用途を変更する場合においては、次の各号のいずれかに該当する場合を除き、これらの規定を準用する。一増築、改築、大規模の修繕又は大規模の模様替をする場合二当該用途の変更が政令で指定する類似の用途相互間におけるものであつて、かつ、建築物の修繕若しくは模様替をしない場合又はその修繕若しくは模様替が大規模でない場合三第四十八条第一項から第十四項までの規定に関しては、用途の変更が政令で定める範囲内である場合",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "applicability",
+          "value": "第3条第2項の規定により準用規定の適用を受けない建築物が対象"
+        },
+        {
+          "type": "action",
+          "value": "建築物の用途を変更する場合"
+        }
+      ],
+      "note": "用途変更時に適用除外判定が必要"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "note": "次の各号のいずれかに該当する場合は準用規定を適用しない",
+          "operator": "OR",
+          "conditions": [
+            {
+              "type": "exemption_1",
+              "value": "増築、改築、大規模の修繕又は大規模の模様替をする場合"
+            },
+            {
+              "type": "exemption_2",
+              "value": "類似用途相互間の変更で修繕がない又は大規模でない場合"
+            },
+            {
+              "type": "exemption_3_partial",
+              "value": "第48条の規定に関しては、用途の変更が政令で定める範囲内である場合"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-input-usage-change",
+        "type": "process",
+        "title": "用途変更内容の確認",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の用途変更の内容を読み取る"
+      },
+      {
+        "id": "info-usage-change-type",
+        "type": "information",
+        "title": "用途変更の類型",
+        "symbol": "U",
+        "subject": "建築物",
+        "property": "用途変更の内容",
+        "property_type": "classification",
+        "description": "変更前後の用途種別、及び政令で指定する類似の用途相互間であるか否か",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-input-works",
+        "type": "process",
+        "title": "工事内容の確認",
+        "process_type": "undefined_input",
+        "description": "設計図書等から用途変更に伴う工事の内容を読み取る"
+      },
+      {
+        "id": "info-works-type",
+        "type": "information",
+        "title": "工事の種別",
+        "symbol": "W",
+        "subject": "建築物",
+        "property": "工事内容",
+        "property_type": "classification",
+        "description": "増築、改築、修繕、模様替等の工事の種類及び規模（大規模／その他）",
+        "remarks": "用途変更に伴う工事がない場合を含む",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-check-exemption-1",
+        "type": "process",
+        "title": "第1号適用除外判定（大規模工事の有無）",
+        "process_type": "mechanical",
+        "description": "増築、改築、大規模の修繕又は大規模の模様替をする場合に該当するか判定",
+        "logic_expression": "W = (増築 OR 改築 OR 大規模修繕 OR 大規模模様替)",
+        "iteration": "single"
+      },
+      {
+        "id": "info-exemption-1",
+        "type": "information",
+        "title": "第1号適用除外判定結果",
+        "symbol": "E1",
+        "subject": "建築計画",
+        "property": "第1号に該当するか",
+        "property_type": "proposition",
+        "description": "増築等の大規模工事がある場合は準用規定を適用しない",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-check-exemption-2",
+        "type": "process",
+        "title": "第2号適用除外判定（類似用途相互間・工事規模）",
+        "process_type": "mechanical",
+        "description": "類似用途相互間の変更で修繕等がない又は大規模でない場合に該当するか判定",
+        "logic_expression": "(U = 類似用途相互間) AND ((W = 工事なし) OR (W = 大規模でない修繕または模様替))",
+        "iteration": "single"
+      },
+      {
+        "id": "info-exemption-2",
+        "type": "information",
+        "title": "第2号適用除外判定結果",
+        "symbol": "E2",
+        "subject": "建築計画",
+        "property": "第2号に該当するか",
+        "property_type": "proposition",
+        "description": "類似用途相互間の小規模変更の場合は準用規定を適用しない",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-check-exemption-3",
+        "type": "process",
+        "title": "第3号適用除外判定（第48条に関する範囲確認）",
+        "process_type": "mechanical",
+        "description": "第48条の規定に関して、用途の変更が政令で定める範囲内であるか判定",
+        "logic_expression": "用途変更 ⊆ 政令で定める範囲",
+        "remarks": "第48条は容積率制限に関する規定",
+        "iteration": "single"
+      },
+      {
+        "id": "info-exemption-3",
+        "type": "information",
+        "title": "第3号適用除外判定結果",
+        "symbol": "E3",
+        "subject": "建築計画",
+        "property": "第3号（第48条）に該当するか",
+        "property_type": "proposition",
+        "description": "政令で定める範囲内の用途変更の場合、第48条の適用を除外",
+        "remarks": "第1号、第2号と異なり、第48条に限定した除外条件",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-integrate",
+        "type": "process",
+        "title": "適用除外判定の統合",
+        "process_type": "mechanical",
+        "description": "第1号〜第3号の判定結果から、準用規定の全体的な適用除外判定を決定",
+        "logic_expression": "E1 OR E2 OR (E3 AND 第48条関連)",
+        "remarks": "各号は独立した除外要件。第1号または第2号に該当する場合は全規定を適用しない。第3号に該当する場合は第48条のみ適用除外。",
+        "iteration": "single"
+      },
+      {
+        "id": "info-compliance",
+        "type": "information",
+        "title": "準用規定の適用判定",
+        "symbol": "R",
+        "subject": "建築計画",
+        "property": "規定の適用可否",
+        "property_type": "proposition",
+        "description": "第87条第3項の適用除外要件に基づいた、準用規定（第27条等）の適用／不適用の判定",
+        "remarks": "準用規定が適用される場合：適合判定には第27条、第28条等の規定に基づく確認が必要。準用規定が適用されない場合：用途変更の確認申請は不要。",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge-001",
+        "from": "proc-input-usage-change",
+        "to": "info-usage-change-type",
+        "role": "output"
+      },
+      {
+        "id": "edge-002",
+        "from": "proc-input-works",
+        "to": "info-works-type",
+        "role": "output"
+      },
+      {
+        "id": "edge-003",
+        "from": "info-usage-change-type",
+        "to": "proc-check-exemption-2",
+        "role": "input"
+      },
+      {
+        "id": "edge-004",
+        "from": "info-works-type",
+        "to": "proc-check-exemption-1",
+        "role": "input"
+      },
+      {
+        "id": "edge-005",
+        "from": "info-works-type",
+        "to": "proc-check-exemption-2",
+        "role": "input"
+      },
+      {
+        "id": "edge-006",
+        "from": "proc-check-exemption-1",
+        "to": "info-exemption-1",
+        "role": "output"
+      },
+      {
+        "id": "edge-007",
+        "from": "proc-check-exemption-2",
+        "to": "info-exemption-2",
+        "role": "output"
+      },
+      {
+        "id": "edge-008",
+        "from": "info-usage-change-type",
+        "to": "proc-check-exemption-3",
+        "role": "input"
+      },
+      {
+        "id": "edge-009",
+        "from": "proc-check-exemption-3",
+        "to": "info-exemption-3",
+        "role": "output"
+      },
+      {
+        "id": "edge-010",
+        "from": "info-exemption-1",
+        "to": "proc-integrate",
+        "role": "input"
+      },
+      {
+        "id": "edge-011",
+        "from": "info-exemption-2",
+        "to": "proc-integrate",
+        "role": "input"
+      },
+      {
+        "id": "edge-012",
+        "from": "info-exemption-3",
+        "to": "proc-integrate",
+        "role": "input"
+      },
+      {
+        "id": "edge-013",
+        "from": "proc-integrate",
+        "to": "info-compliance",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": [
+        "A27:P1",
+        "A28:P1",
+        "A28:P3",
+        "A29:P1",
+        "A30:P1",
+        "A35:P1",
+        "A35-2:P1",
+        "A35-3:P1",
+        "A36:P1",
+        "A39:P2",
+        "A40:P1",
+        "A43:P3",
+        "A43-2:P1",
+        "A48:P1-14",
+        "A49:P1",
+        "A50:P1",
+        "A51:P1",
+        "A68-2:P1",
+        "A68-9:P1"
+      ],
+      "description": "第87条第3項で準用対象となる規定"
+    },
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": [
+        "A3:P2"
+      ],
+      "description": "第87条第3項の適用対象の限定"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": [
+        "A87:P1",
+        "A87:P2"
+      ],
+      "description": "類似の用途、用途変更の範囲を規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-24T00:00:00.000Z",
+    "updated_at": "2025-12-24T00:00:00.000Z",
+    "author": "Claude Code",
+    "generator": "kijo-generator-claude",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法",
+    "source": "建築基準法第87条第3項"
+  }
+}

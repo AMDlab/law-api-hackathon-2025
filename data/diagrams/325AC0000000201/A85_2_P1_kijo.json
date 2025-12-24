@@ -1,0 +1,214 @@
+{
+  "id": "CHK-BSL-A85-P2-I1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "災害時の応急仮設建築物の適用除外判定",
+    "target_subject": "応急仮設建築物",
+    "description": "災害時に建築する停車場、官公署、工事関連施設等の応急仮設建築物について、建築基準法令の適用除外要件を判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "85",
+    "paragraph": "2",
+    "item": "1"
+  },
+  "labels": ["集団規定", "災害対応"],
+  "text_raw": "第八十五条第２項 災害があつた場合において建築する停車場、官公署その他これらに類する公益上必要な用途に供する応急仮設建築物又は工事を施工するために現場に設ける事務所、下小屋、材料置場その他これらに類する仮設建築物については、第六条から第七条の六まで、第十二条第一項から第四項まで、第十五条、第十八条（第四十一項を除く。）、第十九条、第二十一条から第二十三条まで、第二十六条、第三十一条、第三十三条、第三十四条第二項、第三十五条、第三十六条（第十九条、第二十一条、第二十六条、第三十一条、第三十三条、第三十四条第二項及び第三十五条に係る部分に限る。）、第三十七条、第三十九条及び第四十条の規定並びに第三章の規定は、適用しない。ただし、防火地域又は準防火地域内にある延べ面積が五十平方メートルを超えるものについては、第六十二条の規定の適用があるものとする。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "event",
+          "value": "災害があった場合"
+        }
+      ],
+      "note": "非常災害区域内において災害が発生した場合"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "proposition",
+          "description": "応急仮設建築物の用途が停車場、官公署等の公益用途、または工事関連施設である"
+        },
+        {
+          "type": "proposition",
+          "description": "指定条項の適用除外が認められる"
+        }
+      ]
+    },
+    "exceptions": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "type": "location_and_scale",
+          "description": "防火地域または準防火地域内にあり、かつ延べ面積が50m²を超える場合"
+        }
+      ],
+      "effect": "第62条（防火地域及び準防火地域内の建築物）の規定を適用"
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "info-disaster-check",
+        "type": "information",
+        "title": "災害発生の有無",
+        "subject": "建築計画",
+        "property": "災害による破損等の事実",
+        "property_type": "proposition",
+        "description": "非常災害が発生し、建築物の破損などの被害が生じたか",
+        "plurality": "single"
+      },
+      {
+        "id": "info-purpose-classification",
+        "type": "information",
+        "title": "応急仮設建築物の用途",
+        "subject": "応急仮設建築物",
+        "property": "用途区分",
+        "property_type": "classification",
+        "description": "停車場、官公署、工事関連施設などの公益用途または工事関連施設に分類される用途",
+        "remarks": "停車場、官公署その他これらに類する公益上必要な用途、または工事施工のための事務所、下小屋、材料置場等の仮設建築物",
+        "plurality": "single"
+      },
+      {
+        "id": "info-location-classification",
+        "type": "information",
+        "title": "敷地の位置区分",
+        "subject": "敷地",
+        "property": "防火地域・準防火地域の指定",
+        "property_type": "classification",
+        "description": "敷地が防火地域または準防火地域内に位置するか",
+        "remarks": "公共データ（都市計画情報）として取得される情報",
+        "plurality": "single"
+      },
+      {
+        "id": "info-area",
+        "type": "information",
+        "title": "応急仮設建築物の延べ面積",
+        "subject": "応急仮設建築物",
+        "property": "延べ面積",
+        "property_type": "numeric",
+        "unit": "m²",
+        "description": "応急仮設建築物の総延べ面積",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-purpose-check",
+        "type": "process",
+        "title": "用途適格判定",
+        "process_type": "mechanical",
+        "description": "応急仮設建築物の用途が、停車場・官公署等の公益用途または工事関連施設に該当するか判定",
+        "logic_expression": "用途 ∈ {停車場, 官公署, 公益施設, 工事事務所, 下小屋, 材料置場}",
+        "iteration": "single"
+      },
+      {
+        "id": "proc-exemption-eligible",
+        "type": "process",
+        "title": "基本的な適用除外要件充足",
+        "process_type": "mechanical",
+        "description": "災害発生と用途適格の両条件により、指定条項の適用除外が認められるか判定",
+        "logic_expression": "災害発生 AND 用途適格",
+        "iteration": "single"
+      },
+      {
+        "id": "proc-fireproof-check",
+        "type": "process",
+        "title": "防火地域等における規模判定",
+        "process_type": "mechanical",
+        "description": "防火地域または準防火地域内に位置し、延べ面積が50m²を超える場合、第62条適用対象であるか判定",
+        "logic_expression": "(位置区分 ∈ {防火地域, 準防火地域}) AND (延べ面積 > 50)",
+        "iteration": "single"
+      },
+      {
+        "id": "info-exemption-status",
+        "type": "information",
+        "title": "適用除外の適否",
+        "subject": "応急仮設建築物",
+        "property": "建築基準法令の適用除外",
+        "property_type": "proposition",
+        "description": "当該応急仮設建築物について、法第85条第2項に基づく指定条項の適用除外が認められるか",
+        "remarks": "防火地域等における規模による例外を考慮した最終判定",
+        "plurality": "single"
+      },
+      {
+        "id": "info-fireproof-applicable",
+        "type": "information",
+        "title": "第62条（防火地域等）の適用",
+        "subject": "応急仮設建築物",
+        "property": "防火規制の適用",
+        "property_type": "proposition",
+        "description": "防火地域または準防火地域内で延べ面積が50m²を超える場合、第62条が適用される",
+        "remarks": "ただし書きによる例外規定",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge-disaster-to-exemption",
+        "from": "info-disaster-check",
+        "to": "proc-exemption-eligible",
+        "role": "input"
+      },
+      {
+        "id": "edge-purpose-to-check",
+        "from": "info-purpose-classification",
+        "to": "proc-purpose-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-purpose-result",
+        "from": "proc-purpose-check",
+        "to": "proc-exemption-eligible",
+        "role": "input"
+      },
+      {
+        "id": "edge-location-to-fireproof",
+        "from": "info-location-classification",
+        "to": "proc-fireproof-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-area-to-fireproof",
+        "from": "info-area",
+        "to": "proc-fireproof-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-exemption-to-status",
+        "from": "proc-exemption-eligible",
+        "to": "info-exemption-status",
+        "role": "output"
+      },
+      {
+        "id": "edge-fireproof-to-applicable",
+        "from": "proc-fireproof-check",
+        "to": "info-fireproof-applicable",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A6", "A7_6", "A12", "A15", "A18", "A19", "A21", "A22", "A23", "A26", "A31", "A33", "A34", "A35", "A36", "A37", "A39", "A40", "A62"],
+      "description": "第85条第2項で適用除外が定められている各条項（ただし防火地域等では第62条を適用）"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-24T06:45:00Z",
+    "updated_at": "2025-12-24T06:45:00Z",
+    "author": "Claude Code",
+    "generator": "kijo-generator",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法",
+    "source": "e-Gov法令API v2"
+  }
+}

@@ -1,0 +1,393 @@
+{
+  "id": "CHK-BSL-A60-P2",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "壁面の位置の制限への適合",
+    "target_subject": "建築物の壁又は柱",
+    "description": "特定街区内の建築物の壁又は柱が、都市計画で定められた壁面の位置の制限に適合することを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "60",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": [
+    "集団規定",
+    "特定街区"
+  ],
+  "text_raw": "特定街区内においては、建築物の壁又はこれに代わる柱は、建築物の地盤面下の部分及び国土交通大臣が指定する歩廊の柱その他これに類するものを除き、特定街区に関する都市計画において定められた壁面の位置の制限に反して建築してはならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "特定街区内"
+        }
+      ],
+      "note": "都市計画において特定街区として定められた区域"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-exempt-status",
+          "operator": "==",
+          "value": true,
+          "note": "地盤面下部分又は指定歩廊の柱等である"
+        },
+        {
+          "operator": "OR",
+          "conditions": [
+            {
+              "ref": "info-exempt-status",
+              "operator": "==",
+              "value": true
+            },
+            {
+              "ref": "info-position-compliance",
+              "operator": "==",
+              "value": true
+            }
+          ]
+        }
+      ]
+    },
+    "exceptions": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "note": "建築物の地盤面下の部分",
+          "ref": "info-underground"
+        },
+        {
+          "note": "国土交通大臣が指定する歩廊の柱",
+          "ref": "info-designated-corridor"
+        },
+        {
+          "note": "これらに類するもの",
+          "ref": "info-similar-exempts"
+        }
+      ],
+      "effect": "EXEMPT"
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-wall-column-identify",
+        "type": "process",
+        "title": "壁又は柱の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から判定対象となる壁又は柱を特定する"
+      },
+      {
+        "id": "info-wall-column-set",
+        "type": "information",
+        "title": "建築物の壁又は柱",
+        "symbol": "W",
+        "subject": "建築物",
+        "property": "壁又は柱の集合",
+        "property_type": "set_definition",
+        "description": "判定対象となる建築物に属する壁又は柱を特定",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-underground-check",
+        "type": "process",
+        "title": "地盤面下部分の確認",
+        "process_type": "mechanical",
+        "target_subject": "壁又は柱",
+        "iteration": "iterative",
+        "description": "当該壁又は柱が建築物の地盤面下の部分であるか判定"
+      },
+      {
+        "id": "info-underground",
+        "type": "information",
+        "title": "地盤面下部分への該当",
+        "symbol": "U",
+        "subject": "壁又は柱",
+        "property": "地盤面下部分該当",
+        "property_type": "proposition",
+        "description": "当該壁又は柱が建築物の地盤面下の部分に該当するか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-corridor-check",
+        "type": "process",
+        "title": "指定歩廊柱の確認",
+        "process_type": "mechanical",
+        "target_subject": "壁又は柱",
+        "iteration": "iterative",
+        "description": "当該壁又は柱が国土交通大臣が指定する歩廊の柱に該当するか判定"
+      },
+      {
+        "id": "info-designated-corridor",
+        "type": "information",
+        "title": "指定歩廊の柱への該当",
+        "symbol": "C",
+        "subject": "壁又は柱",
+        "property": "指定歩廊柱該当",
+        "property_type": "proposition",
+        "description": "当該壁又は柱が国土交通大臣が指定する歩廊の柱に該当するか",
+        "remarks": "告示等で指定される歩廊の柱",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-similar-exempt-check",
+        "type": "process",
+        "title": "類似適用除外の確認",
+        "process_type": "human_judgment",
+        "target_subject": "壁又は柱",
+        "iteration": "iterative",
+        "description": "当該壁又は柱が『これに類するもの』に該当するか判定"
+      },
+      {
+        "id": "info-similar-exempts",
+        "type": "information",
+        "title": "類似適用除外該当",
+        "symbol": "S",
+        "subject": "壁又は柱",
+        "property": "類似適用除外該当",
+        "property_type": "proposition",
+        "description": "地盤面下部分や指定歩廊の柱に類するものに該当するか",
+        "remarks": "設計の実態と運用慣例に基づき判断",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-exempt-judgment",
+        "type": "process",
+        "title": "適用除外判定",
+        "process_type": "mechanical",
+        "target_subject": "壁又は柱",
+        "iteration": "iterative",
+        "description": "壁面の位置の制限適用除外に該当するか判定",
+        "logic_expression": "U OR C OR S"
+      },
+      {
+        "id": "info-exempt-status",
+        "type": "information",
+        "title": "適用除外該当",
+        "symbol": "X",
+        "subject": "壁又は柱",
+        "property": "適用除外への該当",
+        "property_type": "proposition",
+        "description": "壁面位置制限の適用除外に該当するか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-position-identify",
+        "type": "process",
+        "title": "壁面の位置の特定",
+        "process_type": "undefined_input",
+        "target_subject": "壁又は柱",
+        "iteration": "iterative",
+        "description": "設計図書等から壁又は柱の位置を特定する"
+      },
+      {
+        "id": "info-wall-position",
+        "type": "information",
+        "title": "壁面の位置",
+        "symbol": "P",
+        "subject": "壁又は柱",
+        "property": "位置座標",
+        "property_type": "geometric_surface",
+        "description": "建築物の壁又は柱の平面位置（敷地境界からの距離等で表現）",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-position-limit-check",
+        "type": "process",
+        "title": "壁面位置の制限適合判定",
+        "process_type": "mechanical",
+        "target_subject": "壁又は柱",
+        "iteration": "iterative",
+        "description": "壁面の位置が都市計画で定められた制限に適合するか判定",
+        "logic_expression": "壁面位置 ≤ 都市計画で定められた制限値"
+      },
+      {
+        "id": "info-position-compliance",
+        "type": "information",
+        "title": "壁面位置の制限適合",
+        "symbol": "L",
+        "subject": "壁又は柱",
+        "property": "壁面位置の制限適合",
+        "property_type": "proposition",
+        "description": "特定街区に関する都市計画で定められた壁面の位置の制限に適合するか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-final-judgment",
+        "type": "process",
+        "title": "適合判定",
+        "process_type": "mechanical",
+        "target_subject": "壁又は柱",
+        "iteration": "iterative",
+        "description": "各壁又は柱について、適用除外又は位置制限適合のいずれかを満たすことを確認",
+        "logic_expression": "X OR L"
+      },
+      {
+        "id": "info-compliance",
+        "type": "information",
+        "title": "法60条2項適合",
+        "symbol": "R",
+        "subject": "壁又は柱",
+        "property": "法60条2項適合",
+        "property_type": "proposition",
+        "description": "法60条2項の規定に適合するか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-all-check",
+        "type": "process",
+        "title": "全壁及び柱の適合確認",
+        "process_type": "mechanical",
+        "description": "全ての壁及び柱が法60条2項に適合することを確認",
+        "logic_expression": "∀wall_column ∈ WallColumns: R(wall_column) = true"
+      },
+      {
+        "id": "info-final",
+        "type": "information",
+        "title": "建築物の法60条2項適合",
+        "subject": "建築物",
+        "property": "法60条2項適合",
+        "property_type": "proposition",
+        "description": "建築物全体として法60条2項の規定に適合するか",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-wall-column-identify",
+        "to": "info-wall-column-set",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "info-wall-column-set",
+        "to": "proc-underground-check",
+        "role": "input"
+      },
+      {
+        "id": "e03",
+        "from": "proc-underground-check",
+        "to": "info-underground",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "info-wall-column-set",
+        "to": "proc-corridor-check",
+        "role": "input"
+      },
+      {
+        "id": "e05",
+        "from": "proc-corridor-check",
+        "to": "info-designated-corridor",
+        "role": "output"
+      },
+      {
+        "id": "e06",
+        "from": "info-wall-column-set",
+        "to": "proc-similar-exempt-check",
+        "role": "input"
+      },
+      {
+        "id": "e07",
+        "from": "proc-similar-exempt-check",
+        "to": "info-similar-exempts",
+        "role": "output"
+      },
+      {
+        "id": "e08",
+        "from": "info-underground",
+        "to": "proc-exempt-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e09",
+        "from": "info-designated-corridor",
+        "to": "proc-exempt-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e10",
+        "from": "info-similar-exempts",
+        "to": "proc-exempt-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e11",
+        "from": "proc-exempt-judgment",
+        "to": "info-exempt-status",
+        "role": "output"
+      },
+      {
+        "id": "e12",
+        "from": "info-wall-column-set",
+        "to": "proc-position-identify",
+        "role": "input"
+      },
+      {
+        "id": "e13",
+        "from": "proc-position-identify",
+        "to": "info-wall-position",
+        "role": "output"
+      },
+      {
+        "id": "e14",
+        "from": "info-wall-position",
+        "to": "proc-position-limit-check",
+        "role": "input"
+      },
+      {
+        "id": "e15",
+        "from": "proc-position-limit-check",
+        "to": "info-position-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e16",
+        "from": "info-exempt-status",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e17",
+        "from": "info-position-compliance",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e18",
+        "from": "proc-final-judgment",
+        "to": "info-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e19",
+        "from": "info-compliance",
+        "to": "proc-all-check",
+        "role": "input"
+      },
+      {
+        "id": "e20",
+        "from": "proc-all-check",
+        "to": "info-final",
+        "role": "output"
+      }
+    ]
+  },
+  "metadata": {
+    "created_at": "2025-12-24T09:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

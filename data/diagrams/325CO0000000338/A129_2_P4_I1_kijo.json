@@ -1,0 +1,303 @@
+{
+  "id": "CHK-BSL-KIJO-A129_2-P4-I1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "全館避難安全検証法（避難時間に基づく検証）",
+    "target_subject": "建築物",
+    "description": "火災発生時において建築物からの避難の安全性を避難に要する時間に基づき検証する方法"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "129の2",
+    "paragraph": "4",
+    "item": "1"
+  },
+  "labels": [
+    "単体規定",
+    "避難安全検証"
+  ],
+  "text_raw": "次に定めるところにより、火災発生時において当該建築物からの避難が安全に行われることを当該建築物からの避難に要する時間に基づき検証する方法",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "building_standard",
+          "value": "主要構造部が準耐火構造（特定主要構造部が耐火構造を含む）又は不燃材料で造られた建築物"
+        }
+      ],
+      "note": "全館避難安全検証法の適用対象"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "verification",
+          "value": "避難時間に基づく検証",
+          "description": "各階が階避難安全性能を有し、全館避難時間が煙流入時間を超えないこと"
+        }
+      ]
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-floors-set",
+        "type": "process",
+        "title": "建築物の階の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の各階を特定"
+      },
+      {
+        "id": "info-floors-set",
+        "type": "information",
+        "title": "建築物の階",
+        "symbol": "FS",
+        "subject": "建築物",
+        "property": "階の集合",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "判定対象となる建築物に属する階を特定"
+      },
+      {
+        "id": "proc-floor-safety-check",
+        "type": "process",
+        "title": "階避難安全性能の確認（イ）",
+        "process_type": "sub_diagram_reference",
+        "target_subject": "階",
+        "iteration": "iterative",
+        "description": "各階が階避難安全性能を有することを令第129条第3項第1号に定める方法により確認",
+        "sub_diagram_ref": "CHK-BSL-KIJO-A129-P3-I1",
+        "related_articles": [
+          "令::A129:P3:I1"
+        ]
+      },
+      {
+        "id": "info-floor-safety",
+        "type": "information",
+        "title": "各階の階避難安全性能",
+        "symbol": "FSR",
+        "subject": "階",
+        "property": "階避難安全性能",
+        "property_type": "proposition",
+        "plurality": "multiple",
+        "description": "各階が階避難安全性能を有するか"
+      },
+      {
+        "id": "proc-fire-rooms-set",
+        "type": "process",
+        "title": "各階火災室の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から各階の火災室を特定"
+      },
+      {
+        "id": "info-fire-rooms-set",
+        "type": "information",
+        "title": "各階の火災室",
+        "symbol": "FR",
+        "subject": "建築物",
+        "property": "各階火災室の集合",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "判定対象となる各階における火災室"
+      },
+      {
+        "id": "proc-building-evac-time",
+        "type": "process",
+        "title": "全館避難時間の計算（ロ）",
+        "process_type": "mechanical",
+        "target_subject": "火災室",
+        "iteration": "iterative",
+        "description": "在館者全てが火災室で火災が発生してから建築物からの避難を終了するまでに要する時間を計算",
+        "logic_expression": "tbuilding = f(各室用途, 床面積, 歩行距離, 出口幅)"
+      },
+      {
+        "id": "info-building-evac-time",
+        "type": "information",
+        "title": "全館避難時間",
+        "symbol": "Tb",
+        "subject": "火災室",
+        "property": "建築物からの避難終了時間",
+        "property_type": "numeric",
+        "unit": "min",
+        "plurality": "multiple",
+        "description": "建築物からの避難を終了するまでに要する時間"
+      },
+      {
+        "id": "proc-smoke-inflow-time",
+        "type": "process",
+        "title": "煙流入時間の計算（ハ）",
+        "process_type": "mechanical",
+        "target_subject": "火災室",
+        "iteration": "iterative",
+        "description": "煙が階段の部分または直上階以上の階に流入するために要する時間を計算",
+        "logic_expression": "ts_inflow = f(各室用途, 床面積, 天井高さ, 壁・開口部構造, 排煙設備, 内装材料, 階段区画壁・開口部構造)"
+      },
+      {
+        "id": "info-smoke-inflow-time",
+        "type": "information",
+        "title": "煙流入時間",
+        "symbol": "Ti",
+        "subject": "火災室",
+        "property": "煙流入所要時間",
+        "property_type": "numeric",
+        "unit": "min",
+        "plurality": "multiple",
+        "description": "煙が階段の部分または直上階に流入するために要する時間"
+      },
+      {
+        "id": "proc-building-check",
+        "type": "process",
+        "title": "全館避難安全確認（ニ）",
+        "process_type": "mechanical",
+        "target_subject": "火災室",
+        "iteration": "iterative",
+        "description": "全館避難時間が煙流入時間を超えないことを確認",
+        "logic_expression": "Tb <= Ti"
+      },
+      {
+        "id": "info-building-check-result",
+        "type": "information",
+        "title": "全館避難安全確認結果",
+        "symbol": "RB",
+        "subject": "火災室",
+        "property": "全館避難安全",
+        "property_type": "proposition",
+        "plurality": "multiple",
+        "description": "各火災室について全館避難時間が煙流入時間を超えないか"
+      },
+      {
+        "id": "proc-final-check",
+        "type": "process",
+        "title": "全館避難安全性能判定",
+        "process_type": "mechanical",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "全ての階が階避難安全性能を有し、全ての火災室について全館避難安全が確認されたか総合判定",
+        "logic_expression": "FSR_all AND RB_all"
+      },
+      {
+        "id": "info-final-result",
+        "type": "information",
+        "title": "全館避難安全性能",
+        "symbol": "R",
+        "subject": "建築物",
+        "property": "全館避難安全性能適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "当該建築物が全館避難安全性能を有するか"
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge-001",
+        "from": "proc-floors-set",
+        "to": "info-floors-set",
+        "role": "output"
+      },
+      {
+        "id": "edge-002",
+        "from": "info-floors-set",
+        "to": "proc-floor-safety-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-003",
+        "from": "proc-floor-safety-check",
+        "to": "info-floor-safety",
+        "role": "output"
+      },
+      {
+        "id": "edge-004",
+        "from": "proc-fire-rooms-set",
+        "to": "info-fire-rooms-set",
+        "role": "output"
+      },
+      {
+        "id": "edge-005",
+        "from": "info-fire-rooms-set",
+        "to": "proc-building-evac-time",
+        "role": "input"
+      },
+      {
+        "id": "edge-006",
+        "from": "proc-building-evac-time",
+        "to": "info-building-evac-time",
+        "role": "output"
+      },
+      {
+        "id": "edge-007",
+        "from": "info-fire-rooms-set",
+        "to": "proc-smoke-inflow-time",
+        "role": "input"
+      },
+      {
+        "id": "edge-008",
+        "from": "proc-smoke-inflow-time",
+        "to": "info-smoke-inflow-time",
+        "role": "output"
+      },
+      {
+        "id": "edge-009",
+        "from": "info-building-evac-time",
+        "to": "proc-building-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-010",
+        "from": "info-smoke-inflow-time",
+        "to": "proc-building-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-011",
+        "from": "proc-building-check",
+        "to": "info-building-check-result",
+        "role": "output"
+      },
+      {
+        "id": "edge-012",
+        "from": "info-floor-safety",
+        "to": "proc-final-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-013",
+        "from": "info-building-check-result",
+        "to": "proc-final-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-014",
+        "from": "proc-final-check",
+        "to": "info-final-result",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": [
+        "A129:P2",
+        "A129:P3:I1"
+      ],
+      "description": "階避難安全性能の定義および検証法"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-24T00:00:00Z",
+    "updated_at": "2025-12-24T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "kijo-generator",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令",
+    "source": "e-Gov法令API"
+  }
+}

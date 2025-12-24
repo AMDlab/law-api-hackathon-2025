@@ -1,0 +1,186 @@
+{
+  "id": "CHK-BSL-A48-P14",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "用途地域の指定のない区域における建築物の用途制限",
+    "target_subject": "建築物",
+    "description": "用途地域の指定のない区域（市街化調整区域を除く）内において、別表第二(か)項に掲げる建築物が建築不可であることを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "48",
+    "paragraph": "14",
+    "item": null
+  },
+  "labels": ["集団規定", "用途制限"],
+  "text_raw": "第一種低層住居専用地域、第二種低層住居専用地域、第一種中高層住居専用地域、第二種中高層住居専用地域、第一種住居地域、第二種住居地域、準住居地域、田園住居地域、近隣商業地域、商業地域、準工業地域、工業地域又は工業専用地域（以下「用途地域」と総称する。）の指定のない区域（都市計画法第七条第一項に規定する市街化調整区域を除く。）内においては、別表第二（か）項に掲げる建築物は、建築してはならない。ただし、特定行政庁が当該区域における適正かつ合理的な土地利用及び環境の保全を図る上で支障がないと認め、又は公益上やむを得ないと認めて許可した場合においては、この限りでない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        { "type": "location", "value": "用途地域の指定のない区域内" },
+        { "type": "exclusion", "value": "都市計画法第七条第一項に規定する市街化調整区域を除く" }
+      ],
+      "note": "用途地域（第一種低層住居専用地域から工業専用地域まで）の指定のない区域で、かつ市街化調整区域以外の区域"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        { "ref": "info-table2-not-applicable", "operator": "==", "value": true },
+        { "ref": "info-special-approval", "operator": "==", "value": true }
+      ]
+    },
+    "exceptions": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "note": "特定行政庁の許可を受けた場合（適正かつ合理的な土地利用及び環境の保全を図る上で支障がない、又は公益上やむを得ない）",
+          "ref": "info-special-approval",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "effect": "EXEMPT"
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-building-use",
+        "type": "process",
+        "title": "建築物の用途の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の用途を特定する"
+      },
+      {
+        "id": "info-building-use",
+        "type": "information",
+        "title": "建築物の用途",
+        "symbol": "U",
+        "subject": "建築物",
+        "property": "用途",
+        "property_type": "classification",
+        "description": "建築物の用途種別（住宅、店舗、事務所、工場等）",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-table2-check",
+        "type": "process",
+        "title": "別表第二(か)項該当判定",
+        "process_type": "mechanical",
+        "description": "建築物の用途が別表第二(か)項に掲げられているか（建築禁止用途か）を判定",
+        "related_articles": ["法::別表第二(か)"],
+        "remarks": "別表第二(か)項: 用途地域の指定のない区域における建築禁止用途。危険性または環境への悪影響が大きい施設（一定規模以上の工場、劇場・映画館・演芸場・観覧場、風俗営業関連施設、危険物貯蔵・処理施設等）が含まれる",
+        "logic_expression": "U ∈ {別表第二(か)項に掲げる用途}"
+      },
+      {
+        "id": "info-table2-applicable",
+        "type": "information",
+        "title": "別表第二(か)項該当",
+        "symbol": "T",
+        "subject": "建築物",
+        "property": "別表第二(か)項該当",
+        "property_type": "proposition",
+        "description": "建築物の用途が別表第二(か)項の建築禁止用途に該当するか",
+        "related_articles": ["法::別表第二(か)"],
+        "plurality": "single"
+      },
+      {
+        "id": "proc-invert-judgment",
+        "type": "process",
+        "title": "非該当判定",
+        "process_type": "mechanical",
+        "description": "別表第二(か)項に該当しない（建築可能）かを判定",
+        "logic_expression": "NOT T"
+      },
+      {
+        "id": "info-table2-not-applicable",
+        "type": "information",
+        "title": "別表第二(か)項非該当",
+        "symbol": "NT",
+        "subject": "建築物",
+        "property": "別表第二(か)項非該当",
+        "property_type": "proposition",
+        "description": "建築物の用途が別表第二(か)項に該当せず建築可能であるか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-special-approval-check",
+        "type": "process",
+        "title": "特定行政庁の許可の確認",
+        "process_type": "undefined_input",
+        "description": "特定行政庁の許可（当該区域における適正かつ合理的な土地利用及び環境の保全を図る上で支障がない、又は公益上やむを得ない）を受けているかを確認",
+        "remarks": "許可要件: 1)適正かつ合理的な土地利用及び環境の保全を図る上で支障がない、又は 2)公益上やむを得ない"
+      },
+      {
+        "id": "info-special-approval",
+        "type": "information",
+        "title": "特定行政庁の許可",
+        "symbol": "A",
+        "subject": "建築物",
+        "property": "特定行政庁の許可の有無",
+        "property_type": "proposition",
+        "description": "特定行政庁の許可を受けているか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-final-judgment",
+        "type": "process",
+        "title": "適合判定",
+        "process_type": "mechanical",
+        "description": "別表第二(か)項に該当しないか、又は特定行政庁の許可を受けているかを判定",
+        "logic_expression": "NT OR A"
+      },
+      {
+        "id": "info-compliance",
+        "type": "information",
+        "title": "法48条14項適合",
+        "symbol": "C",
+        "subject": "建築物",
+        "property": "法48条14項適合",
+        "property_type": "proposition",
+        "description": "法48条14項の規定に適合するか",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "proc-building-use", "to": "info-building-use", "role": "output" },
+      { "id": "e02", "from": "info-building-use", "to": "proc-table2-check", "role": "input" },
+      { "id": "e03", "from": "proc-table2-check", "to": "info-table2-applicable", "role": "output" },
+      { "id": "e04", "from": "info-table2-applicable", "to": "proc-invert-judgment", "role": "input" },
+      { "id": "e05", "from": "proc-invert-judgment", "to": "info-table2-not-applicable", "role": "output" },
+      { "id": "e06", "from": "proc-special-approval-check", "to": "info-special-approval", "role": "output" },
+      { "id": "e07", "from": "info-table2-not-applicable", "to": "proc-final-judgment", "role": "input" },
+      { "id": "e08", "from": "info-special-approval", "to": "proc-final-judgment", "role": "input" },
+      { "id": "e09", "from": "proc-final-judgment", "to": "info-compliance", "role": "output" }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["別表第二(か)"],
+      "description": "用途地域の指定のない区域において建築不可の建築物を定める"
+    },
+    {
+      "law_id": "325AC1954000100",
+      "law_name": "都市計画法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A7:P1"],
+      "description": "市街化調整区域の定義"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-24T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

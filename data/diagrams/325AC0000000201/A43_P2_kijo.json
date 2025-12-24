@@ -1,0 +1,507 @@
+{
+  "id": "CHK-BSL-A43-P2",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "接道義務の適用除外(43条2項)",
+    "target_subject": "建築物",
+    "description": "第43条第1項の接道義務規定の適用除外要件を判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "43",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": ["集団規定", "道路", "接道", "適用除外"],
+  "text_raw": "前項の規定は、次の各号のいずれかに該当する建築物については、適用しない。\n一 その敷地が幅員四メートル以上の道（道路に該当するものを除き、避難及び通行の安全上必要な国土交通省令で定める基準に適合するものに限る。）に二メートル以上接する建築物のうち、利用者が少数であるものとしてその用途及び規模に関し国土交通省令で定める基準に適合するもので、特定行政庁が交通上、安全上、防火上及び衛生上支障がないと認めるもの\n二 その敷地の周囲に広い空地を有する建築物その他の国土交通省令で定める基準に適合する建築物で、特定行政庁が交通上、安全上、防火上及び衛生上支障がないと認めて建築審査会の同意を得て許可したもの",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        { "type": "general", "value": "すべての建築物" }
+      ],
+      "note": "法43条1項が原則として適用される建築物のうち、本項各号に該当するものは適用除外となる"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "note": "1号該当: 幅員4m以上の道に2m以上接し、省令基準に適合し、特定行政庁が認めるもの",
+          "operator": "AND",
+          "conditions": [
+            { "ref": "info-road-contact-4m", "operator": "==", "value": true },
+            { "ref": "info-ministerial-standard-evacuation", "operator": "==", "value": true },
+            { "ref": "info-ministerial-standard-use-scale", "operator": "==", "value": true },
+            { "ref": "info-authority-approval-1", "operator": "==", "value": true }
+          ]
+        },
+        {
+          "note": "2号該当: 広い空地を有する建築物等で、省令基準に適合し、特定行政庁が許可したもの",
+          "operator": "AND",
+          "conditions": [
+            { "ref": "info-wide-open-space-or-standard", "operator": "==", "value": true },
+            { "ref": "info-authority-permit-2", "operator": "==", "value": true }
+          ]
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-building-identify",
+        "type": "process",
+        "title": "建築物の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から判定対象となる建築物を特定する"
+      },
+      {
+        "id": "info-building",
+        "type": "information",
+        "title": "建築物",
+        "symbol": "B",
+        "subject": "建築物",
+        "property": "建築物の存在",
+        "property_type": "set_definition",
+        "description": "判定対象となる建築物",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-site-identify",
+        "type": "process",
+        "title": "敷地の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の敷地を特定する"
+      },
+      {
+        "id": "info-site",
+        "type": "information",
+        "title": "建築物の敷地",
+        "symbol": "S",
+        "subject": "敷地",
+        "property": "敷地の範囲",
+        "property_type": "geometric_surface",
+        "description": "判定対象となる建築物の敷地",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-road-width",
+        "type": "process",
+        "title": "道の幅員の計測",
+        "process_type": "mechanical",
+        "description": "敷地が接する道(道路に該当しないもの)の幅員を計測する"
+      },
+      {
+        "id": "info-road-width",
+        "type": "information",
+        "title": "道の幅員",
+        "symbol": "W1",
+        "subject": "道",
+        "property": "幅員",
+        "property_type": "numeric",
+        "unit": "m",
+        "description": "敷地が接する道(道路でないもの)の幅員",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-width-check",
+        "type": "process",
+        "title": "幅員4m以上判定",
+        "process_type": "mechanical",
+        "description": "道の幅員が4メートル以上であるか判定",
+        "logic_expression": "W1 >= 4.0"
+      },
+      {
+        "id": "info-width-4m",
+        "type": "information",
+        "title": "幅員4m以上",
+        "symbol": "W4",
+        "subject": "道",
+        "property": "幅員4m以上",
+        "property_type": "proposition",
+        "description": "道の幅員が4メートル以上であるか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-contact-length",
+        "type": "process",
+        "title": "接道長さの計測",
+        "process_type": "mechanical",
+        "description": "敷地が道に接する部分の長さを計測する"
+      },
+      {
+        "id": "info-contact-length",
+        "type": "information",
+        "title": "道への接道長さ",
+        "symbol": "L",
+        "subject": "敷地",
+        "property": "道に接する長さ",
+        "property_type": "numeric",
+        "unit": "m",
+        "description": "敷地が道に接する部分の長さ",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-contact-2m-check",
+        "type": "process",
+        "title": "接道2m以上判定",
+        "process_type": "mechanical",
+        "description": "接道長さが2メートル以上であるか判定",
+        "logic_expression": "L >= 2.0"
+      },
+      {
+        "id": "info-contact-2m",
+        "type": "information",
+        "title": "接道2m以上",
+        "symbol": "L2",
+        "subject": "敷地",
+        "property": "道に2m以上接する",
+        "property_type": "proposition",
+        "description": "敷地が道に2メートル以上接するか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-evacuation-standard",
+        "type": "process",
+        "title": "避難・通行安全基準適合判定",
+        "process_type": "mechanical",
+        "description": "道が避難及び通行の安全上必要な国土交通省令で定める基準に適合するか判定",
+        "related_articles": ["規則::A10_3:P1:I1"]
+      },
+      {
+        "id": "info-ministerial-standard-evacuation",
+        "type": "information",
+        "title": "避難・通行安全基準適合",
+        "symbol": "M1",
+        "subject": "道",
+        "property": "省令基準(避難・通行)適合",
+        "property_type": "proposition",
+        "description": "避難及び通行の安全上必要な国土交通省令で定める基準への適合",
+        "plurality": "single",
+        "related_articles": ["規則::A10_3:P1:I1"]
+      },
+      {
+        "id": "proc-road-contact-4m-check",
+        "type": "process",
+        "title": "1号イ要件判定",
+        "process_type": "mechanical",
+        "description": "幅員4m以上の道に2m以上接し、省令基準に適合するか判定",
+        "logic_expression": "W4 AND L2 AND M1"
+      },
+      {
+        "id": "info-road-contact-4m",
+        "type": "information",
+        "title": "1号イ要件適合",
+        "symbol": "R1",
+        "subject": "敷地",
+        "property": "1号イ要件適合",
+        "property_type": "proposition",
+        "description": "幅員4m以上の道に2m以上接し、避難・通行安全基準に適合",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-use-identify",
+        "type": "process",
+        "title": "建築物の用途の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の用途を特定する"
+      },
+      {
+        "id": "info-use",
+        "type": "information",
+        "title": "建築物の用途",
+        "symbol": "U",
+        "subject": "建築物",
+        "property": "用途",
+        "property_type": "classification",
+        "description": "建築物の用途区分",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-scale-identify",
+        "type": "process",
+        "title": "建築物の規模の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の規模(延べ面積等)を特定する"
+      },
+      {
+        "id": "info-scale",
+        "type": "information",
+        "title": "建築物の規模",
+        "symbol": "A",
+        "subject": "建築物",
+        "property": "規模",
+        "property_type": "numeric",
+        "unit": "m2",
+        "description": "建築物の規模(延べ面積)",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-use-scale-standard",
+        "type": "process",
+        "title": "用途・規模基準適合判定",
+        "process_type": "mechanical",
+        "description": "利用者が少数であるものとしてその用途及び規模に関し国土交通省令で定める基準に適合するか判定",
+        "related_articles": ["規則::A10_3:P1:I2"]
+      },
+      {
+        "id": "info-ministerial-standard-use-scale",
+        "type": "information",
+        "title": "用途・規模基準適合",
+        "symbol": "M2",
+        "subject": "建築物",
+        "property": "省令基準(用途・規模)適合",
+        "property_type": "proposition",
+        "description": "利用者が少数であるものとしての用途・規模基準への適合",
+        "plurality": "single",
+        "related_articles": ["規則::A10_3:P1:I2"],
+        "delegated_requirements": [
+          {
+            "article_ref": "規則::A10_3:P1:I2:a",
+            "requirement": "延べ面積が200㎡以内の建築物"
+          },
+          {
+            "article_ref": "規則::A10_3:P1:I2:b",
+            "requirement": "法別表第2(は)項第6号に掲げる建築物で延べ面積500㎡以内"
+          }
+        ]
+      },
+      {
+        "id": "proc-authority-approval-1",
+        "type": "process",
+        "title": "特定行政庁の認定確認(1号)",
+        "process_type": "undefined_input",
+        "description": "特定行政庁が交通上、安全上、防火上及び衛生上支障がないと認めたか確認"
+      },
+      {
+        "id": "info-authority-approval-1",
+        "type": "information",
+        "title": "特定行政庁認定(1号)",
+        "symbol": "A1",
+        "subject": "建築物",
+        "property": "特定行政庁の認定(1号)",
+        "property_type": "proposition",
+        "description": "特定行政庁が交通上、安全上、防火上及び衛生上支障がないと認定",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-item1-check",
+        "type": "process",
+        "title": "1号該当判定",
+        "process_type": "mechanical",
+        "description": "1号の全要件を満たすか判定",
+        "logic_expression": "R1 AND M2 AND A1"
+      },
+      {
+        "id": "info-item1-applicable",
+        "type": "information",
+        "title": "1号該当",
+        "symbol": "I1",
+        "subject": "建築物",
+        "property": "1号該当",
+        "property_type": "proposition",
+        "description": "法43条2項1号に該当するか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-open-space-check",
+        "type": "process",
+        "title": "広い空地の有無判定",
+        "process_type": "human_judgment",
+        "description": "敷地の周囲に広い空地を有するかを判定する"
+      },
+      {
+        "id": "info-wide-open-space",
+        "type": "information",
+        "title": "広い空地の有無",
+        "symbol": "O",
+        "subject": "敷地",
+        "property": "周囲に広い空地を有する",
+        "property_type": "proposition",
+        "description": "敷地の周囲に広い空地を有するか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-other-standard",
+        "type": "process",
+        "title": "その他省令基準適合判定",
+        "process_type": "mechanical",
+        "description": "その他の国土交通省令で定める基準に適合するか判定",
+        "related_articles": ["規則::A10_3:P2"]
+      },
+      {
+        "id": "info-other-standard",
+        "type": "information",
+        "title": "その他省令基準適合",
+        "symbol": "M3",
+        "subject": "建築物",
+        "property": "省令基準(その他)適合",
+        "property_type": "proposition",
+        "description": "その他の国土交通省令で定める基準への適合",
+        "plurality": "single",
+        "related_articles": ["規則::A10_3:P2"],
+        "delegated_requirements": [
+          {
+            "article_ref": "規則::A10_3:P2:I1",
+            "requirement": "道路に通ずる幅員4m以上の通路(避難・通行の安全上支障がないものに限る)に有効に2m以上接する"
+          },
+          {
+            "article_ref": "規則::A10_3:P2:I2",
+            "requirement": "農道・林道その他これらに類する幅員4m以上の道に有効に2m以上接する(避難・通行の安全上支障がないものに限る)"
+          },
+          {
+            "article_ref": "規則::A10_3:P2:I3",
+            "requirement": "敷地の周囲に公園・緑地・広場等広い空地を有する"
+          }
+        ]
+      },
+      {
+        "id": "proc-open-space-or-standard",
+        "type": "process",
+        "title": "2号イ要件判定",
+        "process_type": "mechanical",
+        "description": "広い空地を有する建築物またはその他の省令基準に適合するか判定",
+        "logic_expression": "O OR M3"
+      },
+      {
+        "id": "info-wide-open-space-or-standard",
+        "type": "information",
+        "title": "2号イ要件適合",
+        "symbol": "R2",
+        "subject": "建築物",
+        "property": "2号イ要件適合",
+        "property_type": "proposition",
+        "description": "広い空地を有するまたはその他の省令基準に適合",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-authority-permit-2",
+        "type": "process",
+        "title": "特定行政庁の許可確認(2号)",
+        "process_type": "undefined_input",
+        "description": "特定行政庁が交通上、安全上、防火上及び衛生上支障がないと認めて建築審査会の同意を得て許可したか確認"
+      },
+      {
+        "id": "info-authority-permit-2",
+        "type": "information",
+        "title": "特定行政庁許可(2号)",
+        "symbol": "A2",
+        "subject": "建築物",
+        "property": "特定行政庁の許可(2号)",
+        "property_type": "proposition",
+        "description": "特定行政庁が建築審査会の同意を得て許可",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-item2-check",
+        "type": "process",
+        "title": "2号該当判定",
+        "process_type": "mechanical",
+        "description": "2号の全要件を満たすか判定",
+        "logic_expression": "R2 AND A2"
+      },
+      {
+        "id": "info-item2-applicable",
+        "type": "information",
+        "title": "2号該当",
+        "symbol": "I2",
+        "subject": "建築物",
+        "property": "2号該当",
+        "property_type": "proposition",
+        "description": "法43条2項2号に該当するか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-exempt-check",
+        "type": "process",
+        "title": "適用除外判定",
+        "process_type": "mechanical",
+        "description": "1号または2号のいずれかに該当するか判定",
+        "logic_expression": "I1 OR I2"
+      },
+      {
+        "id": "info-exempt",
+        "type": "information",
+        "title": "法43条2項該当(適用除外)",
+        "symbol": "E",
+        "subject": "建築物",
+        "property": "法43条2項該当",
+        "property_type": "proposition",
+        "description": "法43条1項の適用除外に該当するか",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "proc-building-identify", "to": "info-building", "role": "output" },
+      { "id": "e02", "from": "proc-site-identify", "to": "info-site", "role": "output" },
+      { "id": "e03", "from": "info-site", "to": "proc-road-width", "role": "input" },
+      { "id": "e04", "from": "proc-road-width", "to": "info-road-width", "role": "output" },
+      { "id": "e05", "from": "info-road-width", "to": "proc-width-check", "role": "input" },
+      { "id": "e06", "from": "proc-width-check", "to": "info-width-4m", "role": "output" },
+      { "id": "e07", "from": "info-site", "to": "proc-contact-length", "role": "input" },
+      { "id": "e08", "from": "proc-contact-length", "to": "info-contact-length", "role": "output" },
+      { "id": "e09", "from": "info-contact-length", "to": "proc-contact-2m-check", "role": "input" },
+      { "id": "e10", "from": "proc-contact-2m-check", "to": "info-contact-2m", "role": "output" },
+      { "id": "e11", "from": "proc-evacuation-standard", "to": "info-ministerial-standard-evacuation", "role": "output" },
+      { "id": "e12", "from": "info-width-4m", "to": "proc-road-contact-4m-check", "role": "input" },
+      { "id": "e13", "from": "info-contact-2m", "to": "proc-road-contact-4m-check", "role": "input" },
+      { "id": "e14", "from": "info-ministerial-standard-evacuation", "to": "proc-road-contact-4m-check", "role": "input" },
+      { "id": "e15", "from": "proc-road-contact-4m-check", "to": "info-road-contact-4m", "role": "output" },
+      { "id": "e16", "from": "proc-use-identify", "to": "info-use", "role": "output" },
+      { "id": "e17", "from": "proc-scale-identify", "to": "info-scale", "role": "output" },
+      { "id": "e18", "from": "info-use", "to": "proc-use-scale-standard", "role": "input" },
+      { "id": "e19", "from": "info-scale", "to": "proc-use-scale-standard", "role": "input" },
+      { "id": "e20", "from": "proc-use-scale-standard", "to": "info-ministerial-standard-use-scale", "role": "output" },
+      { "id": "e21", "from": "proc-authority-approval-1", "to": "info-authority-approval-1", "role": "output" },
+      { "id": "e22", "from": "info-road-contact-4m", "to": "proc-item1-check", "role": "input" },
+      { "id": "e23", "from": "info-ministerial-standard-use-scale", "to": "proc-item1-check", "role": "input" },
+      { "id": "e24", "from": "info-authority-approval-1", "to": "proc-item1-check", "role": "input" },
+      { "id": "e25", "from": "proc-item1-check", "to": "info-item1-applicable", "role": "output" },
+      { "id": "e26", "from": "info-site", "to": "proc-open-space-check", "role": "input" },
+      { "id": "e27", "from": "proc-open-space-check", "to": "info-wide-open-space", "role": "output" },
+      { "id": "e28", "from": "info-building", "to": "proc-other-standard", "role": "input" },
+      { "id": "e29", "from": "proc-other-standard", "to": "info-other-standard", "role": "output" },
+      { "id": "e30", "from": "info-wide-open-space", "to": "proc-open-space-or-standard", "role": "input" },
+      { "id": "e31", "from": "info-other-standard", "to": "proc-open-space-or-standard", "role": "input" },
+      { "id": "e32", "from": "proc-open-space-or-standard", "to": "info-wide-open-space-or-standard", "role": "output" },
+      { "id": "e33", "from": "proc-authority-permit-2", "to": "info-authority-permit-2", "role": "output" },
+      { "id": "e34", "from": "info-wide-open-space-or-standard", "to": "proc-item2-check", "role": "input" },
+      { "id": "e35", "from": "info-authority-permit-2", "to": "proc-item2-check", "role": "input" },
+      { "id": "e36", "from": "proc-item2-check", "to": "info-item2-applicable", "role": "output" },
+      { "id": "e37", "from": "info-item1-applicable", "to": "proc-exempt-check", "role": "input" },
+      { "id": "e38", "from": "info-item2-applicable", "to": "proc-exempt-check", "role": "input" },
+      { "id": "e39", "from": "proc-exempt-check", "to": "info-exempt", "role": "output" }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A43:P1"],
+      "description": "第1項の接道義務規定の適用除外を定める"
+    },
+    {
+      "law_id": "325M50004000040",
+      "law_name": "建築基準法施行規則",
+      "law_type": "regulation",
+      "relationship": "delegates_to",
+      "articles": ["A10_3"],
+      "description": "法43条2項各号の詳細基準を定める"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-24T00:00:00+09:00",
+    "updated_at": "2025-12-24T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法",
+    "source": "e-Gov法令API v2"
+  }
+}

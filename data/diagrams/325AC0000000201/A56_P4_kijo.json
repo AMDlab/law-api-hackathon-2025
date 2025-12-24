@@ -1,0 +1,416 @@
+{
+  "id": "CHK-BSL-A56-P4",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "後退した建築物における高さ制限の特例",
+    "target_subject": "建築物",
+    "description": "前面道路から後退した建築物で、前面道路の幅員が12m以上の場合、高さ制限の計算方法を変更適用する判定"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "56",
+    "paragraph": "4",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "高さ制限"
+  ],
+  "text_raw": "前項に規定する建築物で前面道路の境界線から後退したものに対する同項の規定の適用については、同項中「前面道路の反対側の境界線」とあるのは「前面道路の反対側の境界線から当該建築物の後退距離（当該建築物（地盤面下の部分その他政令で定める部分を除く。）から前面道路の境界線までの水平距離のうち最小のものをいう。以下この表において同じ。）に相当する距離だけ外側の線」と、「前面道路の幅員に」とあるのは「、前面道路の幅員に、当該建築物の後退距離に二を乗じて得たものを加えたものに」とすることができる。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "第一種中高層住居専用地域、第二種中高層住居専用地域、第一種住居地域、第二種住居地域又は準住居地域内"
+        },
+        {
+          "type": "building_characteristic",
+          "value": "前面道路の幅員が12m以上"
+        },
+        {
+          "type": "building_characteristic",
+          "value": "前面道路の境界線から後退した建築物"
+        }
+      ],
+      "note": "法56条第3項に規定する建築物であって前面道路から後退しているもの"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-retreat-distance",
+          "operator": ">",
+          "value": 0
+        },
+        {
+          "ref": "info-road-width",
+          "operator": ">=",
+          "value": 12
+        },
+        {
+          "ref": "info-adjusted-boundary",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "ref": "info-adjusted-width",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-location-check",
+        "type": "process",
+        "title": "対象地域の確認",
+        "process_type": "mechanical",
+        "description": "敷地が対象となる用途地域（中高層住居専用地域、住居地域、準住居地域）内にあるかを確認"
+      },
+      {
+        "id": "info-target-zone",
+        "type": "information",
+        "title": "対象地域該当",
+        "symbol": "Z",
+        "subject": "敷地",
+        "property": "対象用途地域への該当",
+        "property_type": "proposition",
+        "description": "第一種中高層住居専用地域、第二種中高層住居専用地域、第一種住居地域、第二種住居地域又は準住居地域に該当するか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-road-width-check",
+        "type": "process",
+        "title": "前面道路幅員の特定",
+        "process_type": "undefined_input",
+        "description": "都市計画図等から前面道路の幅員を読み取る"
+      },
+      {
+        "id": "info-road-width",
+        "type": "information",
+        "title": "前面道路の幅員",
+        "symbol": "W",
+        "subject": "前面道路",
+        "property": "幅員",
+        "property_type": "numeric",
+        "unit": "m",
+        "description": "建築物が接する前面道路の幅員",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-retreat-distance",
+        "type": "process",
+        "title": "後退距離の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の後退距離（地盤面下の部分を除く）を読み取る"
+      },
+      {
+        "id": "info-retreat-distance",
+        "type": "information",
+        "title": "建築物の後退距離",
+        "symbol": "D",
+        "subject": "建築物",
+        "property": "後退距離",
+        "property_type": "numeric",
+        "unit": "m",
+        "description": "前面道路の境界線から建築物までの水平距離のうち最小のもの（地盤面下の部分を除く）",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-applicable-check",
+        "type": "process",
+        "title": "適用条件確認",
+        "process_type": "mechanical",
+        "description": "対象地域内、12m以上の道路幅員、後退距離がある建築物であるか確認",
+        "logic_expression": "Z AND (W >= 12) AND (D > 0)"
+      },
+      {
+        "id": "info-applicable",
+        "type": "information",
+        "title": "特例適用対象該当",
+        "symbol": "A",
+        "subject": "建築物",
+        "property": "56条4項適用対象",
+        "property_type": "proposition",
+        "description": "法56条4項の特例が適用される対象か",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-boundary-adjustment",
+        "type": "process",
+        "title": "基準となる境界線の調整",
+        "process_type": "mechanical",
+        "description": "「前面道路の反対側の境界線」を後退距離分外側に移動した調整後の線を計算",
+        "logic_expression": "調整後の境界線 = 前面道路の反対側の境界線 + D"
+      },
+      {
+        "id": "info-adjusted-boundary",
+        "type": "information",
+        "title": "調整後の基準線",
+        "subject": "敷地",
+        "property": "調整後の基準となる境界線",
+        "property_type": "geometric_line",
+        "description": "前面道路の反対側の境界線から後退距離分外側に調整した線（高さ計算に使用）",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-width-adjustment",
+        "type": "process",
+        "title": "前面道路幅員の調整",
+        "process_type": "mechanical",
+        "description": "「前面道路の幅員に」について、後退距離の2倍を加算した値を計算",
+        "logic_expression": "調整後の幅員係数用値 = W + (D × 2)"
+      },
+      {
+        "id": "info-adjusted-width",
+        "type": "information",
+        "title": "調整後の幅員係数用値",
+        "subject": "前面道路",
+        "property": "調整後の幅員",
+        "property_type": "numeric",
+        "unit": "m",
+        "description": "前面道路の幅員に、当該建築物の後退距離に2を乗じて得たものを加えた値（高さ計算に使用）",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-height-calculation",
+        "type": "process",
+        "title": "調整後の高さ基準値の計算",
+        "process_type": "mechanical",
+        "description": "調整後の境界線と調整後の幅員係数用値を用いて高さ制限値を再計算",
+        "logic_expression": "調整後の高さ制限 = (建築物からB'までの水平距離) × (別表第三(に)欄の数値) + (該当する高さ加算値)"
+      },
+      {
+        "id": "info-adjusted-height-limit",
+        "type": "information",
+        "title": "調整後の高さ制限値",
+        "subject": "建築物",
+        "property": "調整後の高さ制限値",
+        "property_type": "numeric",
+        "unit": "m",
+        "description": "後退を考慮して調整された高さ制限値（調整後の境界線と幅員係数用値を用いて計算）",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-building-height",
+        "type": "process",
+        "title": "建築物の計画高さの特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の最高高さを読み取る"
+      },
+      {
+        "id": "info-building-height",
+        "type": "information",
+        "title": "建築物の計画高さ",
+        "symbol": "H",
+        "subject": "建築物",
+        "property": "計画高さ",
+        "property_type": "numeric",
+        "unit": "m",
+        "description": "建築物の最高高さ",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-height-compliance",
+        "type": "process",
+        "title": "調整後の高さ基準適合判定",
+        "process_type": "mechanical",
+        "description": "建築物の計画高さが調整後の高さ制限値以下であるか判定",
+        "logic_expression": "H <= H'"
+      },
+      {
+        "id": "info-height-compliance",
+        "type": "information",
+        "title": "調整後高さ基準適合",
+        "symbol": "C",
+        "subject": "建築物",
+        "property": "調整後の高さ基準への適合",
+        "property_type": "proposition",
+        "description": "計画高さが調整後の高さ制限値以下か",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-final-judgment",
+        "type": "process",
+        "title": "適合判定",
+        "process_type": "mechanical",
+        "description": "法56条4項の適用条件と高さ基準両方を満たすか確認",
+        "logic_expression": "A AND C"
+      },
+      {
+        "id": "info-final",
+        "type": "information",
+        "title": "法56条4項適合",
+        "subject": "建築物",
+        "property": "法56条4項への適合",
+        "property_type": "proposition",
+        "description": "後退建築物について法56条4項の特例を適用した高さ基準に適合するか",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-location-check",
+        "to": "info-target-zone",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "proc-road-width-check",
+        "to": "info-road-width",
+        "role": "output"
+      },
+      {
+        "id": "e03",
+        "from": "proc-retreat-distance",
+        "to": "info-retreat-distance",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "info-target-zone",
+        "to": "proc-applicable-check",
+        "role": "input"
+      },
+      {
+        "id": "e05",
+        "from": "info-road-width",
+        "to": "proc-applicable-check",
+        "role": "input"
+      },
+      {
+        "id": "e06",
+        "from": "info-retreat-distance",
+        "to": "proc-applicable-check",
+        "role": "input"
+      },
+      {
+        "id": "e07",
+        "from": "proc-applicable-check",
+        "to": "info-applicable",
+        "role": "output"
+      },
+      {
+        "id": "e08",
+        "from": "info-retreat-distance",
+        "to": "proc-boundary-adjustment",
+        "role": "input"
+      },
+      {
+        "id": "e09",
+        "from": "proc-boundary-adjustment",
+        "to": "info-adjusted-boundary",
+        "role": "output"
+      },
+      {
+        "id": "e10",
+        "from": "info-road-width",
+        "to": "proc-width-adjustment",
+        "role": "input"
+      },
+      {
+        "id": "e11",
+        "from": "info-retreat-distance",
+        "to": "proc-width-adjustment",
+        "role": "input"
+      },
+      {
+        "id": "e12",
+        "from": "proc-width-adjustment",
+        "to": "info-adjusted-width",
+        "role": "output"
+      },
+      {
+        "id": "e13",
+        "from": "info-adjusted-boundary",
+        "to": "proc-height-calculation",
+        "role": "input"
+      },
+      {
+        "id": "e14",
+        "from": "info-adjusted-width",
+        "to": "proc-height-calculation",
+        "role": "input"
+      },
+      {
+        "id": "e15",
+        "from": "proc-height-calculation",
+        "to": "info-adjusted-height-limit",
+        "role": "output"
+      },
+      {
+        "id": "e16",
+        "from": "proc-building-height",
+        "to": "info-building-height",
+        "role": "output"
+      },
+      {
+        "id": "e17",
+        "from": "info-building-height",
+        "to": "proc-height-compliance",
+        "role": "input"
+      },
+      {
+        "id": "e18",
+        "from": "info-adjusted-height-limit",
+        "to": "proc-height-compliance",
+        "role": "input"
+      },
+      {
+        "id": "e19",
+        "from": "proc-height-compliance",
+        "to": "info-height-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e20",
+        "from": "info-applicable",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e21",
+        "from": "info-height-compliance",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e22",
+        "from": "proc-final-judgment",
+        "to": "info-final",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": [
+        "A56:P1",
+        "A56:P2",
+        "A56:P3"
+      ],
+      "description": "第1項から第3項の高さ制限に対する特例を定める"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-24T12:00:00+09:00",
+    "updated_at": "2025-12-24T12:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

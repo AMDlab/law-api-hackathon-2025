@@ -1,0 +1,349 @@
+{
+  "id": "CHK-BSL-A57_5-P2",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "敷地が高層住居誘導地区内外にわたる場合の建蔽率限度の適用",
+    "target_subject": "建築物",
+    "description": "建築物の敷地が高層住居誘導地区の内外にわたる場合、建築物の高層住居誘導地区内部分に係る建蔽率限度を判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "57_5",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "敷地分割"
+  ],
+  "text_raw": "前項の場合において、建築物の敷地が高層住居誘導地区の内外にわたるときは、当該高層住居誘導地区に関する都市計画において定められた建築物の建蔽率の最高限度を、当該建築物の当該高層住居誘導地区内にある部分に係る第五十三条第一項の規定による建築物の建蔽率の限度とみなして、同条第二項の規定を適用する。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "敷地が高層住居誘導地区の内外にわたる場合"
+        },
+        {
+          "type": "prerequisite",
+          "value": "第57条の5第1項が適用される"
+        }
+      ],
+      "note": "建築物の敷地が高層住居誘導地区内外にわたる場合のみ適用"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-site-span",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "ref": "info-bcr-limit-set",
+          "operator": "!=",
+          "value": null
+        }
+      ]
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-site-location",
+        "type": "process",
+        "title": "敷地位置の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書および都市計画情報から敷地が高層住居誘導地区の内外にわたるかを判定"
+      },
+      {
+        "id": "info-site-span",
+        "type": "information",
+        "title": "敷地が区内外にわたるか",
+        "symbol": "S",
+        "subject": "敷地",
+        "property": "高層住居誘導地区への跨境",
+        "property_type": "proposition",
+        "description": "敷地が高層住居誘導地区の内外にわたるか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-site-division",
+        "type": "process",
+        "title": "敷地部分の分割",
+        "process_type": "mechanical",
+        "description": "敷地を高層住居誘導地区内の部分と区外の部分に分割"
+      },
+      {
+        "id": "info-site-in-district",
+        "type": "information",
+        "title": "区内敷地部分",
+        "symbol": "A1",
+        "subject": "敷地",
+        "property": "高層住居誘導地区内の部分",
+        "property_type": "geometric_surface",
+        "unit": "m2",
+        "description": "敷地のうち高層住居誘導地区内にある部分",
+        "plurality": "single"
+      },
+      {
+        "id": "info-site-out-district",
+        "type": "information",
+        "title": "区外敷地部分",
+        "symbol": "A2",
+        "subject": "敷地",
+        "property": "高層住居誘導地区外の部分",
+        "property_type": "geometric_surface",
+        "unit": "m2",
+        "description": "敷地のうち高層住居誘導地区外にある部分",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-bcr-limit-query",
+        "type": "process",
+        "title": "建蔽率最高限度の確認",
+        "process_type": "mechanical",
+        "description": "高層住居誘導地区に関する都市計画に定められた建蔽率最高限度を確認"
+      },
+      {
+        "id": "info-bcr-limit-set",
+        "type": "information",
+        "title": "都市計画の建蔽率最高限度",
+        "symbol": "R1",
+        "subject": "高層住居誘導地区",
+        "property": "建蔽率最高限度",
+        "property_type": "numeric",
+        "unit": "%",
+        "description": "高層住居誘導地区に関する都市計画において定められた建築物の建蔽率の最高限度",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-building-extraction",
+        "type": "process",
+        "title": "建築物の区内部分の特定",
+        "process_type": "mechanical",
+        "description": "建築物全体から高層住居誘導地区内にある部分を抽出"
+      },
+      {
+        "id": "info-building-in-district",
+        "type": "information",
+        "title": "建築物の区内部分",
+        "symbol": "B1",
+        "subject": "建築物",
+        "property": "高層住居誘導地区内にある部分",
+        "property_type": "geometric_solid",
+        "description": "建築物のうち高層住居誘導地区内にある部分",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-building-footprint",
+        "type": "process",
+        "title": "建築物の区内部分の建築面積計算",
+        "process_type": "mechanical",
+        "description": "建築物の区内部分の建築面積を計算する（法2条における建築面積の定義に基づく）",
+        "related_articles": [
+          "法::A2:I4"
+        ]
+      },
+      {
+        "id": "info-building-footprint",
+        "type": "information",
+        "title": "建築物の区内部分の建築面積",
+        "symbol": "Ba",
+        "subject": "建築物",
+        "property": "高層住居誘導地区内部分の建築面積",
+        "property_type": "numeric",
+        "unit": "m2",
+        "description": "建築物のうち高層住居誘導地区内にある部分の建築面積",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-site-in-footprint",
+        "type": "process",
+        "title": "区内敷地面積の特定",
+        "process_type": "mechanical",
+        "description": "敷地のうち高層住居誘導地区内にある部分の面積を特定"
+      },
+      {
+        "id": "info-site-in-area",
+        "type": "information",
+        "title": "敷地の区内部分の面積",
+        "symbol": "Sa",
+        "subject": "敷地",
+        "property": "高層住居誘導地区内の面積",
+        "property_type": "numeric",
+        "unit": "m2",
+        "description": "敷地のうち高層住居誘導地区内にある部分の面積",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-bcr-calculation",
+        "type": "process",
+        "title": "建蔽率の計算",
+        "process_type": "mechanical",
+        "description": "建築物の区内部分の建築面積を敷地の区内部分の面積で除して建蔽率を計算",
+        "logic_expression": "BCR = Ba / Sa × 100"
+      },
+      {
+        "id": "info-calculated-bcr",
+        "type": "information",
+        "title": "計算された建蔽率",
+        "symbol": "BCR",
+        "subject": "建築物",
+        "property": "高層住居誘導地区内部分の建蔽率",
+        "property_type": "numeric",
+        "unit": "%",
+        "description": "建築物の高層住居誘導地区内部分の実際の建蔽率",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-bcr-compliance",
+        "type": "process",
+        "title": "建蔽率適合判定",
+        "process_type": "mechanical",
+        "description": "計算された建蔽率が都市計画で定められた最高限度以下であるか判定",
+        "logic_expression": "BCR ≤ R1"
+      },
+      {
+        "id": "info-compliance",
+        "type": "information",
+        "title": "建蔽率適合",
+        "symbol": "C",
+        "subject": "建築物",
+        "property": "法57条の5第2項適合",
+        "property_type": "proposition",
+        "description": "敷地が区内外にわたる場合の建蔽率限度に適合するか",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-site-location",
+        "to": "info-site-span",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "info-site-span",
+        "to": "proc-site-division",
+        "role": "input"
+      },
+      {
+        "id": "e03",
+        "from": "proc-site-division",
+        "to": "info-site-in-district",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "proc-site-division",
+        "to": "info-site-out-district",
+        "role": "output"
+      },
+      {
+        "id": "e05",
+        "from": "proc-bcr-limit-query",
+        "to": "info-bcr-limit-set",
+        "role": "output"
+      },
+      {
+        "id": "e06",
+        "from": "info-site-span",
+        "to": "proc-building-extraction",
+        "role": "input"
+      },
+      {
+        "id": "e07",
+        "from": "proc-building-extraction",
+        "to": "info-building-in-district",
+        "role": "output"
+      },
+      {
+        "id": "e08",
+        "from": "info-building-in-district",
+        "to": "proc-building-footprint",
+        "role": "input"
+      },
+      {
+        "id": "e09",
+        "from": "proc-building-footprint",
+        "to": "info-building-footprint",
+        "role": "output"
+      },
+      {
+        "id": "e10",
+        "from": "info-site-in-district",
+        "to": "proc-site-in-footprint",
+        "role": "input"
+      },
+      {
+        "id": "e11",
+        "from": "proc-site-in-footprint",
+        "to": "info-site-in-area",
+        "role": "output"
+      },
+      {
+        "id": "e12",
+        "from": "info-building-footprint",
+        "to": "proc-bcr-calculation",
+        "role": "input"
+      },
+      {
+        "id": "e13",
+        "from": "info-site-in-area",
+        "to": "proc-bcr-calculation",
+        "role": "input"
+      },
+      {
+        "id": "e14",
+        "from": "proc-bcr-calculation",
+        "to": "info-calculated-bcr",
+        "role": "output"
+      },
+      {
+        "id": "e15",
+        "from": "info-calculated-bcr",
+        "to": "proc-bcr-compliance",
+        "role": "input"
+      },
+      {
+        "id": "e16",
+        "from": "info-bcr-limit-set",
+        "to": "proc-bcr-compliance",
+        "role": "input"
+      },
+      {
+        "id": "e17",
+        "from": "proc-bcr-compliance",
+        "to": "info-compliance",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": [
+        "A57_5:P1",
+        "A53:P1",
+        "A53:P2"
+      ],
+      "description": "第57条の5第1項の適用、第53条第1項及び第2項の規定を適用"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-24T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

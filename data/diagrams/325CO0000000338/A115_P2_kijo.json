@@ -1,0 +1,185 @@
+{
+  "id": "CHK-ORD-A115-P2",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "煙突構造要件の適用除外判定",
+    "target_subject": "煙突",
+    "description": "廃ガスの温度が低い等の理由により防火上支障がないと判定される場合に、第1項の第1号から第3号までの煙突構造要件が適用除外となるか判定するメカニズム"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "115",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": [
+    "煙突",
+    "防火",
+    "適用除外",
+    "廃ガス温度"
+  ],
+  "text_raw": "前項第一号から第三号までの規定は、廃ガスその他の生成物の温度が低いことその他の理由により防火上支障がないものとして国土交通大臣が定める基準に適合する場合においては、適用しない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "type": "material_property",
+          "description": "廃ガスその他の生成物の温度が低いこと"
+        },
+        {
+          "type": "other_condition",
+          "description": "その他の理由により防火上支障がないこと"
+        }
+      ],
+      "note": "国土交通大臣が定める基準に適合することが要件"
+    },
+    "judgment_rule": {
+      "operator": "NOT",
+      "lhs": {
+        "text": "第1項第1号から第3号までの煙突構造要件",
+        "value": "適用されない"
+      },
+      "conditions": [
+        {
+          "type": "mechanical_exemption",
+          "description": "国土交通大臣が定める基準に適合する場合"
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "info-chimney-type",
+        "type": "information",
+        "title": "煙突の種類・用途",
+        "subject": "煙突",
+        "property": "種類・用途",
+        "property_type": "classification",
+        "plurality": "single",
+        "description": "建築物に設ける煙突の種類（暖房用、給湯用、ボイラー用等）"
+      },
+      {
+        "id": "info-gas-property",
+        "type": "information",
+        "title": "廃ガス・生成物の温度",
+        "subject": "煙突",
+        "property": "廃ガス・生成物の温度",
+        "property_type": "numeric",
+        "unit": "℃",
+        "plurality": "single",
+        "description": "煙突から排出される廃ガスその他の生成物の温度"
+      },
+      {
+        "id": "info-combustion-condition",
+        "type": "information",
+        "title": "防火上支障がない理由",
+        "subject": "煙突",
+        "property": "防火上支障がない理由",
+        "property_type": "visual",
+        "plurality": "single",
+        "description": "廃ガス温度が低い等その他の理由により防火上支障がないと判断される状況",
+        "remarks": "国土交通大臣が定める基準に適合することが必要"
+      },
+      {
+        "id": "proc-gas-temp-measurement",
+        "type": "process",
+        "title": "廃ガス温度の確認",
+        "process_type": "undefined_input",
+        "description": "設計仕様書等から廃ガスその他の生成物の温度を特定",
+        "target_subject": "煙突",
+        "remarks": "煙突の熱源（暖房機器、給湯機等）に基づいて温度情報を取得"
+      },
+      {
+        "id": "proc-exempt-criteria",
+        "type": "process",
+        "title": "適用除外基準判定",
+        "process_type": "mechanical",
+        "description": "廃ガス温度が低い等の理由により防火上支障がないものとして国土交通大臣が定める基準に適合するか判定",
+        "target_subject": "煙突",
+        "logic_expression": "(ガス温度 < 閾値) OR (その他の防火上支障がない理由に該当)",
+        "remarks": "国土交通大臣が定める具体的な基準値・条件については大臣告示等を参照"
+      },
+      {
+        "id": "info-exemption-decision",
+        "type": "information",
+        "title": "第1項第1号～第3号の適用除外判定",
+        "subject": "煙突",
+        "property": "適用除外該当性",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "第1項第1号から第3号までの煙突構造要件が適用除外となるか否かの判定結果"
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge-001",
+        "from": "info-chimney-type",
+        "to": "proc-gas-temp-measurement",
+        "role": "input"
+      },
+      {
+        "id": "edge-002",
+        "from": "proc-gas-temp-measurement",
+        "to": "info-gas-property",
+        "role": "output"
+      },
+      {
+        "id": "edge-003",
+        "from": "info-gas-property",
+        "to": "proc-exempt-criteria",
+        "role": "input"
+      },
+      {
+        "id": "edge-004",
+        "from": "info-combustion-condition",
+        "to": "proc-exempt-criteria",
+        "role": "input"
+      },
+      {
+        "id": "edge-005",
+        "from": "proc-exempt-criteria",
+        "to": "info-exemption-decision",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": [
+        "A115:P1:I1",
+        "A115:P1:I2",
+        "A115:P1:I3"
+      ],
+      "description": "第1項第1号から第3号までの煙突構造要件（本条が例外規定として機能）"
+    },
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": [
+        "A35:P1"
+      ],
+      "description": "防火上支障がないことの判定基準"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-24T12:00:00Z",
+    "updated_at": "2025-12-24T12:00:00Z",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令",
+    "source": "e-Gov法令API v2"
+  }
+}

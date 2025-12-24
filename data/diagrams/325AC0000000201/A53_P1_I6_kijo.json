@@ -1,0 +1,324 @@
+{
+  "id": "CHK-BSL-A53-P1-I6",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "建蔽率の限度判定（用途地域未指定区域）",
+    "target_subject": "建築物",
+    "description": "用途地域の指定のない区域内の建築物について、特定行政庁が定める建蔽率の限度への適合を判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "53",
+    "paragraph": "1",
+    "item": "6"
+  },
+  "labels": [
+    "集団規定",
+    "建蔽率",
+    "容積・建蔽率"
+  ],
+  "text_raw": "用途地域の指定のない区域内の建築物\n十分の三、十分の四、十分の五、十分の六又は十分の七のうち、特定行政庁が土地利用の状況等を考慮し当該区域を区分して都道府県都市計画審議会の議を経て定めるもの",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "用途地域の指定のない区域内"
+        }
+      ],
+      "note": "用途地域の指定のない区域（都市計画区域内の白地地域、または準都市計画区域）に適用"
+    },
+    "judgment_rule": {
+      "operator": "<=",
+      "lhs": {
+        "type": "ratio",
+        "symbol": "BCR",
+        "description": "建築物の建蔽率"
+      },
+      "rhs": {
+        "type": "classification",
+        "symbol": "L",
+        "description": "特定行政庁が定める建蔽率の限度",
+        "possible_values": ["3/10", "4/10", "5/10", "6/10", "7/10"]
+      }
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "info-site",
+        "type": "information",
+        "title": "建築物の敷地",
+        "subject": "敷地",
+        "property": "形状・範囲",
+        "property_type": "geometric_surface",
+        "property_type_description": "幾何学概念（面形状） - 例: 隣地境界",
+        "plurality": "single",
+        "description": "判定対象となる建築物の敷地の範囲"
+      },
+      {
+        "id": "proc-site",
+        "type": "process",
+        "title": "敷地範囲の特定",
+        "process_type": "undefined_input",
+        "process_type_description": "入力情報不定処理 - 導出されるアウトプット情報を得るための情報源の所在や手続きのメカニズムも含めて人が判断する処理。インプット情報を繋がない。左側の辺を消した状態で表示。",
+        "description": "設計図書等から敷地の範囲を特定する"
+      },
+      {
+        "id": "info-site-area",
+        "type": "information",
+        "title": "敷地面積",
+        "symbol": "As",
+        "subject": "敷地",
+        "property": "面積",
+        "property_type": "numeric",
+        "property_type_description": "数値 - 大小関係に位置づけられる整数値または実数値（例: 延べ面積、高さ）",
+        "unit": "m²",
+        "plurality": "single",
+        "description": "建築物の敷地面積"
+      },
+      {
+        "id": "proc-site-area",
+        "type": "process",
+        "title": "敷地面積の算定",
+        "process_type": "mechanical",
+        "process_type_description": "機械的処理 - 自動化可能な論理演算や計算。視認情報をこれに繋ぐことはできない。水色で表示。",
+        "description": "敷地の幾何形状から面積を算定する",
+        "logic_expression": "As = Area(敷地)"
+      },
+      {
+        "id": "info-buildings-set",
+        "type": "information",
+        "title": "敷地内の建築物",
+        "subject": "敷地",
+        "property": "建築物の集合",
+        "property_type": "set_definition",
+        "property_type_description": "集合定義 - 主体と特定の関係にある他の主体がどれであるかを示す情報（例: 階に属する外壁の集合）【必須ケース: 建築物⇔屋根、建築物⇔外壁、敷地⇔建築物など親子関係がある場合】",
+        "plurality": "single",
+        "description": "当該敷地に属する建築物（同一敷地内に二以上の建築物がある場合を含む）を特定"
+      },
+      {
+        "id": "proc-buildings",
+        "type": "process",
+        "title": "建築物の特定",
+        "process_type": "undefined_input",
+        "process_type_description": "入力情報不定処理 - 導出されるアウトプット情報を得るための情報源の所在や手続きのメカニズムも含めて人が判断する処理。インプット情報を繋がない。左側の辺を消した状態で表示。",
+        "description": "設計図書等から敷地内の建築物（既存・新築含む）を特定する"
+      },
+      {
+        "id": "info-building-area-each",
+        "type": "information",
+        "title": "各建築物の建築面積",
+        "symbol": "Ab_i",
+        "subject": "建築物",
+        "property": "建築面積",
+        "property_type": "numeric",
+        "property_type_description": "数値 - 大小関係に位置づけられる整数値または実数値（例: 延べ面積、高さ）",
+        "unit": "m²",
+        "plurality": "multiple",
+        "description": "敷地内の各建築物の建築面積"
+      },
+      {
+        "id": "proc-building-area",
+        "type": "process",
+        "title": "建築面積の算定",
+        "process_type": "mechanical",
+        "process_type_description": "機械的処理 - 自動化可能な論理演算や計算。視認情報をこれに繋ぐことはできない。水色で表示。",
+        "target_subject": "建築物",
+        "iteration": "iterative",
+        "description": "各建築物の水平投影面積を算定する",
+        "logic_expression": "Ab_i = HorizontalProjectionArea(建築物_i)"
+      },
+      {
+        "id": "info-building-area-total",
+        "type": "information",
+        "title": "建築面積の合計",
+        "symbol": "Ab",
+        "subject": "敷地",
+        "property": "建築面積の合計",
+        "property_type": "numeric",
+        "property_type_description": "数値 - 大小関係に位置づけられる整数値または実数値（例: 延べ面積、高さ）",
+        "unit": "m²",
+        "plurality": "single",
+        "description": "同一敷地内に二以上の建築物がある場合はその建築面積の合計"
+      },
+      {
+        "id": "proc-total-area",
+        "type": "process",
+        "title": "建築面積合計の算定",
+        "process_type": "mechanical",
+        "process_type_description": "機械的処理 - 自動化可能な論理演算や計算。視認情報をこれに繋ぐことはできない。水色で表示。",
+        "description": "敷地内の全建築物の建築面積を合計する",
+        "logic_expression": "Ab = Σ Ab_i"
+      },
+      {
+        "id": "info-bcr-actual",
+        "type": "information",
+        "title": "建築物の建蔽率",
+        "symbol": "BCR",
+        "subject": "建築物",
+        "property": "建蔽率",
+        "property_type": "numeric",
+        "property_type_description": "数値 - 大小関係に位置づけられる整数値または実数値（例: 延べ面積、高さ）",
+        "unit": "無次元",
+        "plurality": "single",
+        "description": "建築面積の敷地面積に対する割合"
+      },
+      {
+        "id": "proc-bcr",
+        "type": "process",
+        "title": "建蔽率の算定",
+        "process_type": "mechanical",
+        "process_type_description": "機械的処理 - 自動化可能な論理演算や計算。視認情報をこれに繋ぐことはできない。水色で表示。",
+        "description": "建築面積を敷地面積で除して建蔽率を算定",
+        "logic_expression": "BCR = Ab / As"
+      },
+      {
+        "id": "info-district-designation",
+        "type": "information",
+        "title": "特定行政庁の建蔽率指定",
+        "symbol": "L",
+        "subject": "区域",
+        "property": "指定建蔽率",
+        "property_type": "classification",
+        "property_type_description": "区分情報 - 既定のいくつかの区分の中のいずれかを示すもの（例: 用途地域、建物用途コード）",
+        "plurality": "single",
+        "description": "特定行政庁が土地利用の状況等を考慮し当該区域を区分して都道府県都市計画審議会の議を経て定めた建蔽率（3/10、4/10、5/10、6/10、7/10のいずれか）",
+        "remarks": "都市計画審議会の議を経て区域ごとに指定される"
+      },
+      {
+        "id": "proc-designation",
+        "type": "process",
+        "title": "指定建蔽率の照合",
+        "process_type": "mechanical",
+        "process_type_description": "機械的処理 - 自動化可能な論理演算や計算。視認情報をこれに繋ぐことはできない。水色で表示。",
+        "description": "敷地の所在する区域について特定行政庁が定めた建蔽率の限度を特定行政庁告示等から照合する"
+      },
+      {
+        "id": "info-compliance",
+        "type": "information",
+        "title": "建蔽率適合判定",
+        "symbol": "R",
+        "subject": "建築物",
+        "property": "建蔽率基準適合性",
+        "property_type": "proposition",
+        "property_type_description": "命題真偽 - 真か偽かが判定可能な事実（例: 技術基準を満たすか否か）",
+        "plurality": "single",
+        "description": "建蔽率が特定行政庁の定める限度以下であること"
+      },
+      {
+        "id": "proc-compliance",
+        "type": "process",
+        "title": "建蔽率基準適合判定",
+        "process_type": "mechanical",
+        "process_type_description": "機械的処理 - 自動化可能な論理演算や計算。視認情報をこれに繋ぐことはできない。水色で表示。",
+        "description": "建蔽率が指定された限度以下であるかを判定",
+        "logic_expression": "R = (BCR ≤ L)"
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge-01",
+        "from": "proc-site",
+        "to": "info-site",
+        "role": "output"
+      },
+      {
+        "id": "edge-02",
+        "from": "info-site",
+        "to": "proc-site-area",
+        "role": "input"
+      },
+      {
+        "id": "edge-03",
+        "from": "proc-site-area",
+        "to": "info-site-area",
+        "role": "output"
+      },
+      {
+        "id": "edge-04",
+        "from": "proc-buildings",
+        "to": "info-buildings-set",
+        "role": "output"
+      },
+      {
+        "id": "edge-05",
+        "from": "info-buildings-set",
+        "to": "proc-building-area",
+        "role": "input"
+      },
+      {
+        "id": "edge-06",
+        "from": "proc-building-area",
+        "to": "info-building-area-each",
+        "role": "output"
+      },
+      {
+        "id": "edge-07",
+        "from": "info-building-area-each",
+        "to": "proc-total-area",
+        "role": "input"
+      },
+      {
+        "id": "edge-08",
+        "from": "proc-total-area",
+        "to": "info-building-area-total",
+        "role": "output"
+      },
+      {
+        "id": "edge-09",
+        "from": "info-building-area-total",
+        "to": "proc-bcr",
+        "role": "input"
+      },
+      {
+        "id": "edge-10",
+        "from": "info-site-area",
+        "to": "proc-bcr",
+        "role": "input"
+      },
+      {
+        "id": "edge-11",
+        "from": "proc-bcr",
+        "to": "info-bcr-actual",
+        "role": "output"
+      },
+      {
+        "id": "edge-12",
+        "from": "proc-designation",
+        "to": "info-district-designation",
+        "role": "output"
+      },
+      {
+        "id": "edge-13",
+        "from": "info-bcr-actual",
+        "to": "proc-compliance",
+        "role": "input"
+      },
+      {
+        "id": "edge-14",
+        "from": "info-district-designation",
+        "to": "proc-compliance",
+        "role": "input"
+      },
+      {
+        "id": "edge-15",
+        "from": "proc-compliance",
+        "to": "info-compliance",
+        "role": "output"
+      }
+    ]
+  },
+  "metadata": {
+    "created_at": "2025-12-24T12:00:00Z",
+    "author": "Claude Code",
+    "generator": "kijo-generator-manual",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法",
+    "source": "e-Gov法令API"
+  }
+}

@@ -1,0 +1,178 @@
+{
+  "id": "CHK-BSL-A60-2-P4",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "容積率上限の適用",
+    "target_subject": "都市再生特別地区内の建築物",
+    "description": "都市計画で定められた容積率上限値を第52条に適用する際の情報処理"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "60の2",
+    "paragraph": "4",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "容積率"
+  ],
+  "text_raw": "都市再生特別地区内の建築物については、当該都市再生特別地区に関する都市計画において定められた建築物の容積率の最高限度を第五十二条第一項各号に掲げる数値（第五十七条の二第六項の規定により当該数値とみなされる特例容積率の限度の数値を含む。）とみなして、第五十二条の規定を適用する。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "都市再生特別地区内"
+        }
+      ],
+      "note": "都市計画で指定された都市再生特別地区"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "lhs": {
+        "info_ref": "info-zoning-fsi",
+        "description": "都市計画で定められた容積率上限"
+      },
+      "rhs": {
+        "info_ref": "info-applied-fsi",
+        "description": "第52条適用時の容積率上限"
+      },
+      "conditions": [
+        {
+          "type": "substitution",
+          "rule": "当該都市計画で定められた容積率上限値を、第52条第1項各号の数値とみなして適用"
+        }
+      ]
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "info-building",
+        "type": "information",
+        "title": "都市再生特別地区内の建築物",
+        "subject": "建築物",
+        "property": "位置する区域",
+        "property_type": "classification",
+        "plurality": "single",
+        "description": "都市再生特別地区に指定された区域内に建築する建築物",
+        "related_articles": [
+          "法::A60_2:P1"
+        ]
+      },
+      {
+        "id": "info-zoning-fsi",
+        "type": "information",
+        "title": "都市計画で定められた容積率上限",
+        "symbol": "FSI_plan",
+        "subject": "都市再生特別地区",
+        "property": "容積率の最高限度",
+        "property_type": "numeric",
+        "plurality": "single",
+        "unit": "%",
+        "description": "当該都市再生特別地区に関する都市計画において定められた建築物の容積率の最高限度。第57条の2第6項の特例容積率を含む。",
+        "related_articles": [
+          "法::A57_2:P6",
+          "法::A52:P1"
+        ]
+      },
+      {
+        "id": "info-article52-fsi",
+        "type": "information",
+        "title": "第52条第1項の基準容積率",
+        "symbol": "FSI_standard",
+        "subject": "都市再生特別地区内の建築物",
+        "property": "適用される基準容積率",
+        "property_type": "numeric",
+        "plurality": "single",
+        "unit": "%",
+        "description": "第52条第1項各号に掲げられている基準となる容積率数値",
+        "related_articles": [
+          "法::A52:P1"
+        ]
+      },
+      {
+        "id": "proc-determine-fsi",
+        "type": "process",
+        "title": "容積率上限の判定",
+        "process_type": "mechanical",
+        "target_subject": "都市再生特別地区内の建築物",
+        "description": "都市計画で定められた容積率上限を第52条の基準容積率とみなし、その値を適用する",
+        "logic_expression": "FSI_applicable = FSI_plan（FSI_standardの代わりに使用）",
+        "related_articles": [
+          "法::A60_2:P4",
+          "法::A52:P1"
+        ]
+      },
+      {
+        "id": "info-applied-fsi",
+        "type": "information",
+        "title": "適用される容積率上限",
+        "symbol": "FSI_applicable",
+        "subject": "都市再生特別地区内の建築物",
+        "property": "容積率規制の上限値",
+        "property_type": "numeric",
+        "plurality": "single",
+        "unit": "%",
+        "description": "第60条の2第4項により、都市計画で定められた値を第52条の基準として適用した結果の容積率上限",
+        "remarks": "この値を超える容積率を計画すればならない"
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge-building-to-proc",
+        "from": "info-building",
+        "to": "proc-determine-fsi",
+        "role": "input",
+        "description": "判定対象の建築物を特定"
+      },
+      {
+        "id": "edge-zoning-fsi-to-proc",
+        "from": "info-zoning-fsi",
+        "to": "proc-determine-fsi",
+        "role": "input",
+        "description": "都市計画で定められた容積率上限値"
+      },
+      {
+        "id": "edge-article52-to-proc",
+        "from": "info-article52-fsi",
+        "to": "proc-determine-fsi",
+        "role": "input",
+        "description": "通常は第52条で適用される基準容積率"
+      },
+      {
+        "id": "edge-proc-to-applied-fsi",
+        "from": "proc-determine-fsi",
+        "to": "info-applied-fsi",
+        "role": "output",
+        "description": "容積率上限の決定結果"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": [
+        "A52:P1",
+        "A57_2:P6"
+      ],
+      "description": "容積率規制の基準となる条項"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-24T00:00:00Z",
+    "updated_at": "2025-12-24T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "kijo-generator-manual",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法",
+    "source": "e-Gov法令API v2"
+  }
+}

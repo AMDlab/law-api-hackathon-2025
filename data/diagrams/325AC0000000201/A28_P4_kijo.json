@@ -1,0 +1,199 @@
+{
+  "id": "CHK-BSL-A28-P4",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "仕切られた二室の一室判定",
+    "target_subject": "居室",
+    "description": "随時開放可能な仕切りで区切られた二室を一室とみなす判定処理のメカニズム"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "28",
+    "paragraph": "4",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "居室の採光及び換気",
+    "解釈規定"
+  ],
+  "text_raw": "ふすま、障子その他随時開放することができるもので仕切られた二室は、前三項の規定の適用については、一室とみなす。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "subject_type",
+          "value": "居室が二室に仕切られている"
+        }
+      ],
+      "note": "前三項（採光・換気規定）の適用時の解釈規定"
+    },
+    "judgment_rule": {
+      "operator": "IMPLIES",
+      "lhs": {
+        "type": "proposition",
+        "value": "二室が随時開放可能な仕切りで区切られている"
+      },
+      "rhs": {
+        "type": "proposition",
+        "value": "二室を一室とみなす"
+      }
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-rooms-identify",
+        "type": "process",
+        "title": "二室の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から仕切られた二室を読み取り特定する",
+        "related_articles": ["法::A28:P4"]
+      },
+      {
+        "id": "info-rooms-set",
+        "type": "information",
+        "title": "対象となる二室",
+        "subject": "建築物",
+        "property": "居室の集合",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "第28条第1項から第3項の規定を適用する対象となる、仕切られた二室を特定"
+      },
+      {
+        "id": "proc-partition-type-check",
+        "type": "process",
+        "title": "仕切りの種別確認",
+        "process_type": "undefined_input",
+        "description": "設計図書等から仕切りの種類（ふすま、障子、その他）を読み取る",
+        "related_articles": ["法::A28:P4"]
+      },
+      {
+        "id": "info-partition-type",
+        "type": "information",
+        "title": "仕切りの種別",
+        "symbol": "P",
+        "subject": "居室間の仕切り",
+        "property": "仕切りの種類",
+        "property_type": "classification",
+        "plurality": "single",
+        "description": "ふすま、障子、その他の開放可能な仕切りの種類",
+        "remarks": "ふすま、障子、その他随時開放することができるもの"
+      },
+      {
+        "id": "proc-openability-check",
+        "type": "process",
+        "title": "随時開放可能性判定",
+        "process_type": "human_judgment",
+        "description": "仕切りが随時開放することができる構造であるかを判断する",
+        "related_articles": ["法::A28:P4"]
+      },
+      {
+        "id": "info-openability",
+        "type": "information",
+        "title": "随時開放可能性",
+        "symbol": "O",
+        "subject": "居室間の仕切り",
+        "property": "随時開放することができるか",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "仕切りが常時開放可能な構造であるか否か"
+      },
+      {
+        "id": "proc-single-room-judgment",
+        "type": "process",
+        "title": "一室とみなす判定",
+        "process_type": "mechanical",
+        "description": "二室が随時開放可能な仕切りで区切られている場合、一室とみなす",
+        "logic_expression": "O = TRUE → R = TRUE (一室とみなす)",
+        "related_articles": ["法::A28:P4"]
+      },
+      {
+        "id": "info-single-room-judgment",
+        "type": "information",
+        "title": "一室とみなす判定",
+        "symbol": "R",
+        "subject": "二室",
+        "property": "一室とみなす適否",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "第28条第1項から第3項の適用において、二室を一室として扱うか否かの判定結果"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e1",
+        "from": "proc-rooms-identify",
+        "to": "info-rooms-set",
+        "role": "output"
+      },
+      {
+        "id": "e2",
+        "from": "proc-partition-type-check",
+        "to": "info-partition-type",
+        "role": "output"
+      },
+      {
+        "id": "e3",
+        "from": "proc-openability-check",
+        "to": "info-openability",
+        "role": "output"
+      },
+      {
+        "id": "e4",
+        "from": "info-rooms-set",
+        "to": "proc-single-room-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e5",
+        "from": "info-partition-type",
+        "to": "proc-single-room-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e6",
+        "from": "info-openability",
+        "to": "proc-single-room-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e7",
+        "from": "proc-single-room-judgment",
+        "to": "info-single-room-judgment",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A28:P1", "A28:P2", "A28:P3"],
+      "description": "前三項の規定（採光及び換気の基準）の適用時の解釈規定"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "delegates_to",
+      "articles": ["A19", "A20"],
+      "description": "採光及び換気の技術的基準"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-24T00:00:00Z",
+    "updated_at": "2025-12-24T00:00:00Z",
+    "author": "Claude Sonnet 4.5",
+    "generator": "kijo-generator-skill",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法",
+    "source": "e-Gov法令API"
+  }
+}

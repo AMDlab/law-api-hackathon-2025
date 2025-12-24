@@ -1,0 +1,298 @@
+{
+  "id": "CHK-BSL-A53-P7",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "防火地域内外にわたる敷地の建蔽率緩和の特例（耐火建築物等による全域みなし規定）",
+    "target_subject": "敷地",
+    "description": "敷地が防火地域の内外にわたる場合で、敷地内の全建築物が耐火建築物等である場合における、敷地全体を防火地域内とみなす規定の適用判定"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "53",
+    "paragraph": "7",
+    "item": null
+  },
+  "labels": ["集団規定", "建蔽率", "防火地域", "敷地みなし規定"],
+  "text_raw": "建築物の敷地が防火地域の内外にわたる場合において、その敷地内の建築物の全部が耐火建築物等であるときは、その敷地は、全て防火地域内にあるものとみなして、第三項第一号又は前項第一号の規定を適用する。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "敷地が防火地域の内外にわたる"
+        }
+      ],
+      "note": "敷地が防火地域の境界をまたいでいる場合に適用"
+    },
+    "judgment_rule": {
+      "operator": "IMPLICATION",
+      "conditions": [
+        {
+          "type": "proposition",
+          "description": "敷地内の建築物の全部が耐火建築物等である",
+          "symbol": "A"
+        }
+      ],
+      "effect": {
+        "type": "legal_fiction",
+        "description": "敷地全体を防火地域内にあるものとみなす",
+        "applied_articles": ["法::A53:P3:I1", "法::A53:P6:I1"]
+      },
+      "note": "敷地内の全建築物が耐火建築物等であれば、敷地全体を防火地域内とみなして第53条第3項第1号又は第6項第1号を適用（建蔽率の緩和）"
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "info-site-location",
+        "type": "information",
+        "title": "敷地の位置",
+        "symbol": "S",
+        "subject": "敷地",
+        "property": "防火地域との位置関係",
+        "property_type": "geometric_surface",
+        "plurality": "single",
+        "description": "敷地が防火地域の内外にわたる（境界をまたぐ）かどうか"
+      },
+      {
+        "id": "proc-site-location-check",
+        "type": "process",
+        "title": "敷地位置の確認",
+        "process_type": "undefined_input",
+        "description": "敷地図と都市計画図から敷地が防火地域の内外にわたるかを確認"
+      },
+      {
+        "id": "info-buildings-set",
+        "type": "information",
+        "title": "敷地内の建築物",
+        "symbol": "Bs",
+        "subject": "敷地",
+        "property": "建築物の集合",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "当該敷地内に存在する全ての建築物を特定"
+      },
+      {
+        "id": "proc-buildings-identification",
+        "type": "process",
+        "title": "敷地内建築物の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から敷地内の全建築物を特定"
+      },
+      {
+        "id": "info-building-fireproof",
+        "type": "information",
+        "title": "建築物の耐火性能",
+        "symbol": "Bf",
+        "subject": "建築物",
+        "property": "耐火建築物等該当性",
+        "property_type": "proposition",
+        "plurality": "multiple",
+        "description": "各建築物が耐火建築物等（耐火建築物又はこれと同等以上の延焼防止性能を有する建築物）に該当するか",
+        "related_articles": ["法::A53:P3:I1"]
+      },
+      {
+        "id": "proc-fireproof-check",
+        "type": "process",
+        "title": "耐火建築物等該当判定",
+        "process_type": "sub_diagram_reference",
+        "description": "各建築物が耐火建築物等に該当するかを判定",
+        "sub_diagram_ref": "CHK-BSL-A53-P3-I1-fireproof",
+        "remarks": "法第53条第3項第1号イの規定による耐火建築物等の定義を適用"
+      },
+      {
+        "id": "info-all-fireproof",
+        "type": "information",
+        "title": "全建築物の耐火性能充足",
+        "symbol": "A",
+        "subject": "敷地",
+        "property": "全建築物の耐火建築物等該当",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "敷地内の建築物の全部が耐火建築物等である"
+      },
+      {
+        "id": "proc-all-fireproof-eval",
+        "type": "process",
+        "title": "全称命題の評価",
+        "process_type": "mechanical",
+        "iteration": "iterative",
+        "description": "敷地内の全建築物について耐火建築物等該当性を確認",
+        "logic_expression": "∀b ∈ Bs: Bf(b) = true"
+      },
+      {
+        "id": "info-deemed-fire-district",
+        "type": "information",
+        "title": "防火地域内みなし",
+        "symbol": "D",
+        "subject": "敷地",
+        "property": "防火地域内みなし適用",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "敷地の全部が防火地域内にあるものとみなされる"
+      },
+      {
+        "id": "proc-deeming-judgment",
+        "type": "process",
+        "title": "みなし規定適用判定",
+        "process_type": "mechanical",
+        "description": "全建築物が耐火建築物等であれば、敷地全体を防火地域内とみなす",
+        "logic_expression": "D = A",
+        "remarks": "この結果、法第53条第3項第1号又は第6項第1号の建蔽率緩和規定が適用される"
+      },
+      {
+        "id": "info-applicable-provision",
+        "type": "information",
+        "title": "適用される緩和規定",
+        "symbol": "P",
+        "subject": "敷地",
+        "property": "建蔽率緩和規定の適用",
+        "property_type": "classification",
+        "plurality": "single",
+        "description": "第53条第3項第1号（建蔽率+1/10緩和）又は第6項第1号（建蔽率制限適用除外）のいずれが適用されるか",
+        "related_articles": ["法::A53:P3:I1", "法::A53:P6:I1"]
+      },
+      {
+        "id": "proc-provision-selection",
+        "type": "process",
+        "title": "適用規定の特定",
+        "process_type": "mechanical",
+        "description": "防火地域の種類（建蔽率8/10の地域か否か）に応じて、第3項第1号又は第6項第1号を適用",
+        "remarks": "第1項第2号～第4号で建蔽率8/10の地域であれば第6項第1号（制限適用除外）、それ以外であれば第3項第1号（+1/10緩和）"
+      },
+      {
+        "id": "info-compliance",
+        "type": "information",
+        "title": "法第53条第7項適合",
+        "symbol": "C",
+        "subject": "敷地",
+        "property": "適合判定結果",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "法第53条第7項のみなし規定が適用され、建蔽率緩和の要件を満たす"
+      },
+      {
+        "id": "proc-compliance-eval",
+        "type": "process",
+        "title": "適合判定",
+        "process_type": "mechanical",
+        "description": "みなし規定が適用される場合、法第53条第7項の要件を満たす",
+        "logic_expression": "C = D"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-site-location-check",
+        "to": "info-site-location",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "proc-buildings-identification",
+        "to": "info-buildings-set",
+        "role": "output"
+      },
+      {
+        "id": "e03",
+        "from": "info-buildings-set",
+        "to": "proc-fireproof-check",
+        "role": "input"
+      },
+      {
+        "id": "e04",
+        "from": "proc-fireproof-check",
+        "to": "info-building-fireproof",
+        "role": "output"
+      },
+      {
+        "id": "e05",
+        "from": "info-buildings-set",
+        "to": "proc-all-fireproof-eval",
+        "role": "input"
+      },
+      {
+        "id": "e06",
+        "from": "info-building-fireproof",
+        "to": "proc-all-fireproof-eval",
+        "role": "input"
+      },
+      {
+        "id": "e07",
+        "from": "proc-all-fireproof-eval",
+        "to": "info-all-fireproof",
+        "role": "output"
+      },
+      {
+        "id": "e08",
+        "from": "info-all-fireproof",
+        "to": "proc-deeming-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e09",
+        "from": "proc-deeming-judgment",
+        "to": "info-deemed-fire-district",
+        "role": "output"
+      },
+      {
+        "id": "e10",
+        "from": "info-deemed-fire-district",
+        "to": "proc-provision-selection",
+        "role": "input"
+      },
+      {
+        "id": "e11",
+        "from": "info-site-location",
+        "to": "proc-provision-selection",
+        "role": "input"
+      },
+      {
+        "id": "e12",
+        "from": "proc-provision-selection",
+        "to": "info-applicable-provision",
+        "role": "output"
+      },
+      {
+        "id": "e13",
+        "from": "info-applicable-provision",
+        "to": "proc-compliance-eval",
+        "role": "input"
+      },
+      {
+        "id": "e14",
+        "from": "info-deemed-fire-district",
+        "to": "proc-compliance-eval",
+        "role": "input"
+      },
+      {
+        "id": "e15",
+        "from": "proc-compliance-eval",
+        "to": "info-compliance",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A53:P3:I1", "A53:P6:I1"],
+      "description": "第3項第1号（耐火建築物等による建蔽率+1/10緩和）及び第6項第1号（建蔽率8/10地域での適用除外）を参照"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-24T06:50:00.000Z",
+    "author": "Claude Sonnet 4.5",
+    "generator": "kijo-generator-manual-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法",
+    "source": "e-Gov法令API v2"
+  }
+}

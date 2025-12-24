@@ -1,0 +1,546 @@
+{
+  "id": "CHK-BSL-A28_2-P1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "石綿その他の物質の飛散又は発散に対する衛生上の措置",
+    "target_subject": "建築物",
+    "description": "建築物が石綿等の有害物質による衛生上の支障を生じないための基準適合を判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "28_2",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "衛生"
+  ],
+  "text_raw": "建築物は、石綿その他の物質の建築材料からの飛散又は発散による衛生上の支障がないよう、次に掲げる基準に適合するものとしなければならない。一建築材料に石綿その他の著しく衛生上有害なものとして政令で定める物質（次号及び第三号において「石綿等」という。）を添加しないこと。二石綿等をあらかじめ添加した建築材料（石綿等を飛散又は発散させるおそれがないものとして国土交通大臣が定めたもの又は国土交通大臣の認定を受けたものを除く。）を使用しないこと。三居室を有する建築物にあつては、前二号に定めるもののほか、石綿等以外の物質でその居室内において衛生上の支障を生ずるおそれがあるものとして政令で定める物質の区分に応じ、建築材料及び換気設備について政令で定める技術的基準に適合すること。",
+  "compliance_logic": {
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-item1-compliance",
+          "operator": "==",
+          "value": true,
+          "note": "第1号基準（石綿等の添加禁止）"
+        },
+        {
+          "ref": "info-item2-compliance",
+          "operator": "==",
+          "value": true,
+          "note": "第2号基準（石綿等添加済材料の使用禁止）"
+        },
+        {
+          "operator": "OR",
+          "conditions": [
+            {
+              "ref": "info-has-habitable-room",
+              "operator": "==",
+              "value": false,
+              "note": "居室を有しない場合は第3号適用除外"
+            },
+            {
+              "ref": "info-item3-compliance",
+              "operator": "==",
+              "value": true,
+              "note": "居室を有する場合は第3号基準適合"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-materials-set",
+        "type": "process",
+        "title": "建築材料の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物に使用する建築材料を特定する"
+      },
+      {
+        "id": "info-materials-set",
+        "type": "information",
+        "title": "建築物の建築材料",
+        "subject": "建築物",
+        "property": "建築材料の集合",
+        "property_type": "set_definition",
+        "description": "建築物に使用される建築材料を特定",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-material-composition",
+        "type": "process",
+        "title": "建築材料の成分確認",
+        "process_type": "human_judgment",
+        "target_subject": "建築材料",
+        "iteration": "iterative",
+        "description": "各建築材料に石綿等が添加されているかを確認（製品仕様書等から）"
+      },
+      {
+        "id": "info-material-asbestos-added",
+        "type": "information",
+        "title": "石綿等の添加の有無",
+        "symbol": "MA",
+        "subject": "建築材料",
+        "property": "石綿等添加の有無",
+        "property_type": "proposition",
+        "description": "建築材料に石綿等（政令で定める物質）が添加されているか",
+        "related_articles": [
+          "令::A5_6"
+        ],
+        "plurality": "multiple",
+        "remarks": "政令第5条の6で定める物質：クロシドライト、アモサイト等の石綿"
+      },
+      {
+        "id": "proc-item1-check",
+        "type": "process",
+        "title": "第1号適合判定",
+        "process_type": "mechanical",
+        "description": "全ての建築材料について石綿等が添加されていないことを確認",
+        "logic_expression": "∀m ∈ Materials: MA(m) = false"
+      },
+      {
+        "id": "info-item1-compliance",
+        "type": "information",
+        "title": "第1号基準適合",
+        "symbol": "C1",
+        "subject": "建築物",
+        "property": "第1号基準適合",
+        "property_type": "proposition",
+        "description": "建築材料に石綿等を添加しないという基準に適合するか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-material-preaddition",
+        "type": "process",
+        "title": "石綿等の事前添加確認",
+        "process_type": "human_judgment",
+        "target_subject": "建築材料",
+        "iteration": "iterative",
+        "description": "各建築材料に石綿等があらかじめ添加されているかを確認"
+      },
+      {
+        "id": "info-material-preadded",
+        "type": "information",
+        "title": "石綿等の事前添加の有無",
+        "symbol": "MP",
+        "subject": "建築材料",
+        "property": "石綿等事前添加の有無",
+        "property_type": "proposition",
+        "description": "建築材料に石綿等があらかじめ添加されているか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-minister-spec",
+        "type": "process",
+        "title": "大臣定め該当判定",
+        "process_type": "mechanical",
+        "target_subject": "建築材料",
+        "iteration": "iterative",
+        "description": "石綿等を飛散又は発散させるおそれがないものとして国土交通大臣が定めた建築材料に該当するか判定"
+      },
+      {
+        "id": "info-minister-spec",
+        "type": "information",
+        "title": "大臣定め該当",
+        "symbol": "MS",
+        "subject": "建築材料",
+        "property": "大臣定め該当",
+        "property_type": "proposition",
+        "description": "石綿等を飛散又は発散させるおそれがないものとして国土交通大臣が定めた建築材料か",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-minister-approval",
+        "type": "process",
+        "title": "大臣認定確認",
+        "process_type": "undefined_input",
+        "target_subject": "建築材料",
+        "iteration": "iterative",
+        "description": "国土交通大臣の認定を受けた建築材料であるか確認"
+      },
+      {
+        "id": "info-minister-approval",
+        "type": "information",
+        "title": "大臣認定の有無",
+        "symbol": "MR",
+        "subject": "建築材料",
+        "property": "大臣認定の有無",
+        "property_type": "proposition",
+        "description": "国土交通大臣の認定を受けた建築材料であるか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-material-item2-check",
+        "type": "process",
+        "title": "建築材料別第2号適合判定",
+        "process_type": "mechanical",
+        "target_subject": "建築材料",
+        "iteration": "iterative",
+        "description": "各建築材料について、石綿等が事前添加されていないか、または例外に該当することを確認",
+        "logic_expression": "(MP = false) OR (MS = true) OR (MR = true)"
+      },
+      {
+        "id": "info-material-item2-ok",
+        "type": "information",
+        "title": "建築材料の第2号適合",
+        "symbol": "M2",
+        "subject": "建築材料",
+        "property": "第2号基準適合",
+        "property_type": "proposition",
+        "description": "当該建築材料が第2号基準に適合するか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-item2-check",
+        "type": "process",
+        "title": "第2号適合判定",
+        "process_type": "mechanical",
+        "description": "全ての建築材料について第2号基準に適合することを確認",
+        "logic_expression": "∀m ∈ Materials: M2(m) = true"
+      },
+      {
+        "id": "info-item2-compliance",
+        "type": "information",
+        "title": "第2号基準適合",
+        "symbol": "C2",
+        "subject": "建築物",
+        "property": "第2号基準適合",
+        "property_type": "proposition",
+        "description": "石綿等をあらかじめ添加した建築材料を使用しない（または例外該当）という基準に適合するか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-has-habitable",
+        "type": "process",
+        "title": "居室の有無の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物が居室を有するか特定する"
+      },
+      {
+        "id": "info-has-habitable-room",
+        "type": "information",
+        "title": "居室の有無",
+        "symbol": "HR",
+        "subject": "建築物",
+        "property": "居室の有無",
+        "property_type": "proposition",
+        "description": "建築物が居室を有するか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-harmful-substances",
+        "type": "process",
+        "title": "政令定め有害物質の特定",
+        "process_type": "mechanical",
+        "description": "石綿等以外の物質で居室内において衛生上の支障を生ずるおそれがある政令で定める物質の区分を特定",
+        "related_articles": [
+          "令::A20_7"
+        ],
+        "remarks": "クロルピリホス、ホルムアルデヒド等"
+      },
+      {
+        "id": "info-harmful-substance-types",
+        "type": "information",
+        "title": "政令定め有害物質の区分",
+        "symbol": "HS",
+        "subject": "建築物",
+        "property": "適用される有害物質区分",
+        "property_type": "classification",
+        "description": "政令第20条の7で定める物質の区分",
+        "related_articles": [
+          "令::A20_7"
+        ],
+        "plurality": "single"
+      },
+      {
+        "id": "proc-materials-ventilation",
+        "type": "process",
+        "title": "建築材料・換気設備の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から居室に使用する建築材料及び換気設備を特定する"
+      },
+      {
+        "id": "info-materials-ventilation",
+        "type": "information",
+        "title": "居室の建築材料・換気設備",
+        "subject": "建築物",
+        "property": "居室の建築材料・換気設備",
+        "property_type": "set_definition",
+        "description": "居室に使用される建築材料及び換気設備の仕様",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-item3-tech-standard",
+        "type": "process",
+        "title": "第3号技術的基準適合判定",
+        "process_type": "mechanical",
+        "description": "建築材料及び換気設備について政令で定める技術的基準に適合するか判定",
+        "related_articles": [
+          "令::A20_8",
+          "令::A20_9"
+        ],
+        "remarks": "有害物質の区分に応じた発散量の制限、換気回数等の基準"
+      },
+      {
+        "id": "info-item3-compliance",
+        "type": "information",
+        "title": "第3号基準適合",
+        "symbol": "C3",
+        "subject": "建築物",
+        "property": "第3号基準適合",
+        "property_type": "proposition",
+        "description": "建築材料及び換気設備について政令で定める技術的基準に適合するか",
+        "related_articles": [
+          "令::A20_8",
+          "令::A20_9"
+        ],
+        "plurality": "single"
+      },
+      {
+        "id": "proc-item3-check",
+        "type": "process",
+        "title": "第3号適用判定",
+        "process_type": "mechanical",
+        "description": "居室を有しない場合は第3号適用除外、有する場合は第3号基準適合を確認",
+        "logic_expression": "(HR = false) OR (C3 = true)"
+      },
+      {
+        "id": "info-item3-ok",
+        "type": "information",
+        "title": "第3号適用判定結果",
+        "symbol": "C3OK",
+        "subject": "建築物",
+        "property": "第3号要件充足",
+        "property_type": "proposition",
+        "description": "居室を有しないか、または第3号基準に適合するか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-final-judgment",
+        "type": "process",
+        "title": "法28条の2第1項適合判定",
+        "process_type": "mechanical",
+        "description": "第1号、第2号、第3号の全ての基準に適合することを確認",
+        "logic_expression": "C1 AND C2 AND C3OK"
+      },
+      {
+        "id": "info-final-compliance",
+        "type": "information",
+        "title": "法28条の2第1項適合",
+        "symbol": "C",
+        "subject": "建築物",
+        "property": "法28条の2第1項適合",
+        "property_type": "proposition",
+        "description": "法28条の2第1項の規定に適合するか",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-materials-set",
+        "to": "info-materials-set",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "info-materials-set",
+        "to": "proc-material-composition",
+        "role": "input"
+      },
+      {
+        "id": "e03",
+        "from": "proc-material-composition",
+        "to": "info-material-asbestos-added",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "info-material-asbestos-added",
+        "to": "proc-item1-check",
+        "role": "input"
+      },
+      {
+        "id": "e05",
+        "from": "proc-item1-check",
+        "to": "info-item1-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e06",
+        "from": "info-materials-set",
+        "to": "proc-material-preaddition",
+        "role": "input"
+      },
+      {
+        "id": "e07",
+        "from": "proc-material-preaddition",
+        "to": "info-material-preadded",
+        "role": "output"
+      },
+      {
+        "id": "e08",
+        "from": "info-material-preadded",
+        "to": "proc-minister-spec",
+        "role": "input"
+      },
+      {
+        "id": "e09",
+        "from": "proc-minister-spec",
+        "to": "info-minister-spec",
+        "role": "output"
+      },
+      {
+        "id": "e10",
+        "from": "proc-minister-approval",
+        "to": "info-minister-approval",
+        "role": "output"
+      },
+      {
+        "id": "e11",
+        "from": "info-material-preadded",
+        "to": "proc-material-item2-check",
+        "role": "input"
+      },
+      {
+        "id": "e12",
+        "from": "info-minister-spec",
+        "to": "proc-material-item2-check",
+        "role": "input"
+      },
+      {
+        "id": "e13",
+        "from": "info-minister-approval",
+        "to": "proc-material-item2-check",
+        "role": "input"
+      },
+      {
+        "id": "e14",
+        "from": "proc-material-item2-check",
+        "to": "info-material-item2-ok",
+        "role": "output"
+      },
+      {
+        "id": "e15",
+        "from": "info-material-item2-ok",
+        "to": "proc-item2-check",
+        "role": "input"
+      },
+      {
+        "id": "e16",
+        "from": "proc-item2-check",
+        "to": "info-item2-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e17",
+        "from": "proc-has-habitable",
+        "to": "info-has-habitable-room",
+        "role": "output"
+      },
+      {
+        "id": "e18",
+        "from": "proc-harmful-substances",
+        "to": "info-harmful-substance-types",
+        "role": "output"
+      },
+      {
+        "id": "e19",
+        "from": "proc-materials-ventilation",
+        "to": "info-materials-ventilation",
+        "role": "output"
+      },
+      {
+        "id": "e20",
+        "from": "info-harmful-substance-types",
+        "to": "proc-item3-tech-standard",
+        "role": "input"
+      },
+      {
+        "id": "e21",
+        "from": "info-materials-ventilation",
+        "to": "proc-item3-tech-standard",
+        "role": "input"
+      },
+      {
+        "id": "e22",
+        "from": "proc-item3-tech-standard",
+        "to": "info-item3-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e23",
+        "from": "info-has-habitable-room",
+        "to": "proc-item3-check",
+        "role": "input"
+      },
+      {
+        "id": "e24",
+        "from": "info-item3-compliance",
+        "to": "proc-item3-check",
+        "role": "input"
+      },
+      {
+        "id": "e25",
+        "from": "proc-item3-check",
+        "to": "info-item3-ok",
+        "role": "output"
+      },
+      {
+        "id": "e26",
+        "from": "info-item1-compliance",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e27",
+        "from": "info-item2-compliance",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e28",
+        "from": "info-item3-ok",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e29",
+        "from": "proc-final-judgment",
+        "to": "info-final-compliance",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "delegates_to",
+      "articles": [
+        "A5_6",
+        "A20_7",
+        "A20_8",
+        "A20_9"
+      ],
+      "description": "石綿等の定義、有害物質の区分、技術的基準を定める"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-24T06:30:00+09:00",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

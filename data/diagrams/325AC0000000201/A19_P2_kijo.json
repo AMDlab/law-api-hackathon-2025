@@ -1,0 +1,251 @@
+{
+  "id": "CHK-BSL-A19-P2",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "湿潤な土地等における措置",
+    "target_subject": "建築物",
+    "description": "湿潤な土地等に建築物を建築する場合の衛生上・安全上必要な措置を判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "19",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "敷地・地盤"
+  ],
+  "text_raw": "湿潤な土地、出水のおそれの多い土地又はごみその他これに類する物で埋め立てられた土地に建築物を建築する場合においては、盛土、地盤の改良その他衛生上又は安全上必要な措置を講じなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "type": "land_condition",
+          "value": "湿潤な土地"
+        },
+        {
+          "type": "land_condition",
+          "value": "出水のおそれの多い土地"
+        },
+        {
+          "type": "land_condition",
+          "value": "ごみ等で埋め立てられた土地"
+        }
+      ],
+      "note": "対象となる土地の条件（いずれかに該当する場合に適用）"
+    },
+    "judgment_rule": {
+      "operator": "==",
+      "conditions": [
+        {
+          "ref": "info-measures-compliance",
+          "operator": "==",
+          "value": true,
+          "note": "衛生上又は安全上必要な措置を講じている"
+        }
+      ]
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "info-site",
+        "type": "information",
+        "title": "建築敷地",
+        "subject": "敷地",
+        "property": "特定",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "建築物を建築する敷地を特定"
+      },
+      {
+        "id": "proc-site-input",
+        "type": "process",
+        "title": "敷地の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築敷地を特定する"
+      },
+      {
+        "id": "info-land-type",
+        "type": "information",
+        "title": "敷地の土地種別",
+        "subject": "敷地",
+        "property": "土地種別",
+        "property_type": "classification",
+        "plurality": "single",
+        "description": "湿潤な土地、出水のおそれの多い土地、ごみ等埋立地等の種別"
+      },
+      {
+        "id": "proc-land-type",
+        "type": "process",
+        "title": "土地種別の判定",
+        "process_type": "human_judgment",
+        "description": "設計図書、地盤調査報告書等から土地の種別を判定する"
+      },
+      {
+        "id": "info-is-target-land",
+        "type": "information",
+        "title": "対象土地該当性",
+        "symbol": "T1",
+        "subject": "敷地",
+        "property": "法19条2項の対象土地か",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "湿潤・出水・埋立のいずれかに該当するか"
+      },
+      {
+        "id": "proc-target-land-check",
+        "type": "process",
+        "title": "対象土地判定",
+        "process_type": "mechanical",
+        "logic_expression": "T ∈ {湿潤, 出水, 埋立}",
+        "description": "土地種別が法19条2項の対象に該当するかを判定"
+      },
+      {
+        "id": "info-measures-plan",
+        "type": "information",
+        "title": "講じる措置の内容",
+        "subject": "建築計画",
+        "property": "地盤対策措置",
+        "property_type": "classification",
+        "plurality": "single",
+        "description": "盛土、地盤改良等の措置内容"
+      },
+      {
+        "id": "proc-measures-input",
+        "type": "process",
+        "title": "措置内容の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から講じる措置の内容を読み取る"
+      },
+      {
+        "id": "info-measures-adequacy",
+        "type": "information",
+        "title": "措置の適切性",
+        "subject": "地盤対策措置",
+        "property": "衛生上・安全上の妥当性",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "措置が衛生上又は安全上適切か"
+      },
+      {
+        "id": "proc-measures-check",
+        "type": "process",
+        "title": "措置の妥当性判定",
+        "process_type": "human_judgment",
+        "description": "講じる措置が土地の状況に応じて衛生上又は安全上適切かを判定する"
+      },
+      {
+        "id": "info-measures-compliance",
+        "type": "information",
+        "title": "法19条2項適合",
+        "symbol": "PASS",
+        "subject": "建築物",
+        "property": "必要措置の実施",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "対象土地でない、又は適切な措置を講じている"
+      },
+      {
+        "id": "proc-final-judgment",
+        "type": "process",
+        "title": "適合判定",
+        "process_type": "mechanical",
+        "logic_expression": "NOT T1 OR (T1 AND 措置適切)",
+        "description": "対象土地でない場合は適用外、該当する場合は措置の妥当性で判定"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e001",
+        "from": "proc-site-input",
+        "to": "info-site",
+        "role": "output"
+      },
+      {
+        "id": "e002",
+        "from": "info-site",
+        "to": "proc-land-type",
+        "role": "input"
+      },
+      {
+        "id": "e003",
+        "from": "proc-land-type",
+        "to": "info-land-type",
+        "role": "output"
+      },
+      {
+        "id": "e004",
+        "from": "info-land-type",
+        "to": "proc-target-land-check",
+        "role": "input"
+      },
+      {
+        "id": "e005",
+        "from": "proc-target-land-check",
+        "to": "info-is-target-land",
+        "role": "output"
+      },
+      {
+        "id": "e006",
+        "from": "proc-measures-input",
+        "to": "info-measures-plan",
+        "role": "output"
+      },
+      {
+        "id": "e007",
+        "from": "info-site",
+        "to": "proc-measures-check",
+        "role": "input"
+      },
+      {
+        "id": "e008",
+        "from": "info-land-type",
+        "to": "proc-measures-check",
+        "role": "input"
+      },
+      {
+        "id": "e009",
+        "from": "info-measures-plan",
+        "to": "proc-measures-check",
+        "role": "input"
+      },
+      {
+        "id": "e010",
+        "from": "proc-measures-check",
+        "to": "info-measures-adequacy",
+        "role": "output"
+      },
+      {
+        "id": "e011",
+        "from": "info-is-target-land",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e012",
+        "from": "info-measures-adequacy",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e013",
+        "from": "proc-final-judgment",
+        "to": "info-measures-compliance",
+        "role": "output"
+      }
+    ]
+  },
+  "metadata": {
+    "created_at": "2025-12-24T00:00:00Z",
+    "generator": "claude-code-kijo-generator",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法",
+    "checklist_ref": "確認審査報告書チェックリスト"
+  }
+}

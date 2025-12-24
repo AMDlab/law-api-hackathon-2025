@@ -69,8 +69,13 @@ npm run dev
 - `schemas`: JSONスキーマ定義
   - `kijo-diagram.schema.json`: 機序図スキーマ
   - `flow-diagram.schema.json`: フロー図スキーマ
-- `prompts`: 機序図作成手引書・生成プロンプト
+- `scripts`: バリデーションスクリプト
+  - `validate-kijo.mjs`: JSONスキーマバリデーション
+  - `validate-kijo-rules.mjs`: 機序図ルールバリデーション
 - `.claude/skills`: Claude Code用スキル定義
+  - `kijo-generator.md`: 機序図生成スキル
+  - `flow-generator.md`: フロー図生成スキル
+  - `確認審査報告書チェックリスト.csv`: 作成対象の条文一覧（約400件）
 
 ## 機序図・フロー図の作成方法
 
@@ -139,3 +144,34 @@ Claude Code で以下のように指示します。
 | 建築基準法 | 法 | 325AC0000000201 |
 | 建築基準法施行令 | 令 | 325CO0000000338 |
 | 建築基準法施行規則 | 規則 | 325M50004000040 |
+
+## 確認審査報告書チェックリスト
+
+`.claude/skills/確認審査報告書チェックリスト.csv` に、機序図を作成すべき条文の一覧が管理されています。
+
+### 対象範囲
+
+- **建築基準法（法）**: 法第19条〜法第87条の4
+- **建築基準法施行令（令）**: 令第108条〜令第137条の19
+- **合計**: 約400件の条文
+
+### CSVフォーマット
+
+| 列 | 内容 | 例 |
+|---|---|---|
+| 法令 | 法令名と条番号 | 法第19条 |
+| 項 | 項番号 | 第1項 |
+| 号 | 号番号（任意） | 第1号 |
+| ファイル名 | 機序図JSONファイル名 | A19_P1_kijo.json |
+
+## バリデーション
+
+機序図JSONファイルの検証コマンド：
+
+```bash
+# JSONスキーマバリデーション
+node scripts/validate-kijo.mjs
+
+# ルールバリデーション（孤立ノード、info→info禁止、エッジロール）
+node scripts/validate-kijo-rules.mjs
+```

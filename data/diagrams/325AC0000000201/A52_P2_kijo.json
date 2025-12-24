@@ -1,0 +1,289 @@
+{
+  "id": "CHK-BSL-A52-P2",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "前面道路幅員による容積率制限",
+    "target_subject": "建築物",
+    "description": "前面道路の幅員が12メートル未満の場合の容積率制限の判定"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "52",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": [
+    "集団規定",
+    "容積率"
+  ],
+  "text_raw": "前項に定めるもののほか、前面道路（前面道路が二以上あるときは、その幅員の最大のもの。以下この項及び第十二項において同じ。）の幅員が十二メートル未満である建築物の容積率は、当該前面道路の幅員のメートルの数値に、次の各号に掲げる区分に従い、当該各号に定める数値を乗じたもの以下でなければならない。\n一 第一種低層住居専用地域、第二種低層住居専用地域又は田園住居地域内の建築物 十分の四\n二 第一種中高層住居専用地域若しくは第二種中高層住居専用地域内の建築物又は第一種住居地域、第二種住居地域若しくは準住居地域内の建築物（高層住居誘導地区内の建築物であつて、その住宅の用途に供する部分の床面積の合計がその延べ面積の三分の二以上であるもの（当該高層住居誘導地区に関する都市計画において建築物の敷地面積の最低限度が定められたときは、その敷地面積が当該最低限度以上のものに限る。第五十六条第一項第二号ハ及び別表第三の四の項において同じ。）を除く。） 十分の四（特定行政庁が都道府県都市計画審議会の議を経て指定する区域内の建築物にあつては、十分の六）\n三 その他の建築物 十分の六（特定行政庁が都道府県都市計画審議会の議を経て指定する区域内の建築物にあつては、十分の四又は十分の八のうち特定行政庁が都道府県都市計画審議会の議を経て定めるもの）",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "road_condition",
+          "value": "前面道路の幅員 < 12m"
+        }
+      ],
+      "note": "前面道路の幅員が12メートル未満である場合に適用"
+    },
+    "judgment_rule": {
+      "operator": "<=",
+      "lhs": {
+        "type": "property",
+        "value": "容積率"
+      },
+      "rhs": {
+        "type": "calculation",
+        "value": "前面道路幅員(m) × 法定乗数"
+      }
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "info-front-roads",
+        "type": "information",
+        "title": "敷地の前面道路",
+        "subject": "敷地",
+        "property": "前面道路の集合",
+        "property_type": "set_definition",
+        "property_type_description": "集合定義 - 主体と特定の関係にある他の主体がどれであるかを示す情報（例: 階に属する外壁の集合）【必須ケース: 建築物⇔屋根、建築物⇔外壁、敷地⇔建築物など親子関係がある場合】",
+        "plurality": "single",
+        "description": "敷地に接する前面道路を特定（2以上ある場合はその幅員の最大のもの）"
+      },
+      {
+        "id": "proc-front-roads",
+        "type": "process",
+        "title": "前面道路の特定",
+        "process_type": "undefined_input",
+        "process_type_description": "入力情報不定処理 - 導出されるアウトプット情報を得るための情報源の所在や手続きのメカニズムも含めて人が判断する処理。インプット情報を繋がない。左側の辺を消した状態で表示。",
+        "description": "設計図書等から敷地に接する前面道路を特定する。前面道路が2以上ある場合は幅員の最大のものを選定"
+      },
+      {
+        "id": "info-road-width",
+        "type": "information",
+        "title": "前面道路の幅員",
+        "symbol": "W",
+        "subject": "前面道路",
+        "property": "幅員",
+        "property_type": "numeric",
+        "property_type_description": "数値 - 大小関係に位置づけられる整数値または実数値（例: 延べ面積、高さ）",
+        "unit": "m",
+        "plurality": "single",
+        "description": "前面道路の幅員（メートル）"
+      },
+      {
+        "id": "proc-road-width",
+        "type": "process",
+        "title": "幅員の特定",
+        "process_type": "undefined_input",
+        "process_type_description": "入力情報不定処理 - 導出されるアウトプット情報を得るための情報源の所在や手続きのメカニズムも含めて人が判断する処理。インプット情報を繋がない。左側の辺を消した状態で表示。",
+        "description": "設計図書・道路台帳等から前面道路の幅員を読み取る"
+      },
+      {
+        "id": "info-building-location",
+        "type": "information",
+        "title": "建築物の所在地域",
+        "symbol": "Z",
+        "subject": "建築物",
+        "property": "所在地域区分",
+        "property_type": "classification",
+        "property_type_description": "区分情報 - 既定のいくつかの区分の中のいずれかを示すもの（例: 用途地域、建物用途コード）",
+        "plurality": "single",
+        "description": "建築物の敷地が属する用途地域等の区分（第一種低層住居専用地域、第一種中高層住居専用地域、第一種住居地域、商業地域、工業地域など）"
+      },
+      {
+        "id": "proc-building-location",
+        "type": "process",
+        "title": "所在地域の特定",
+        "process_type": "mechanical",
+        "process_type_description": "機械的処理 - 自動化可能な論理演算や計算。視認情報をこれに繋ぐことはできない。水色で表示。",
+        "description": "敷地の位置情報と都市計画情報を照合して所在地域を特定"
+      },
+      {
+        "id": "info-multiplier",
+        "type": "information",
+        "title": "法定乗数",
+        "symbol": "C",
+        "subject": "建築物",
+        "property": "容積率計算用乗数",
+        "property_type": "numeric",
+        "property_type_description": "数値 - 大小関係に位置づけられる整数値または実数値（例: 延べ面積、高さ）",
+        "plurality": "single",
+        "description": "地域区分に応じた乗数（4/10、6/10、8/10のいずれか）",
+        "remarks": "第一種低層住居専用地域等: 4/10、第一種中高層住居専用地域等: 4/10（指定区域内は6/10）、その他: 6/10（指定区域内は4/10または8/10）"
+      },
+      {
+        "id": "proc-multiplier",
+        "type": "process",
+        "title": "法定乗数の判定",
+        "process_type": "mechanical",
+        "process_type_description": "機械的処理 - 自動化可能な論理演算や計算。視認情報をこれに繋ぐことはできない。水色で表示。",
+        "description": "所在地域区分に基づき、法第52条第2項各号に定める乗数を判定",
+        "logic_expression": "IF (Z ∈ {第一種低層住居専用地域, 第二種低層住居専用地域, 田園住居地域}) THEN C = 4/10; ELSE IF (Z ∈ {第一種中高層住居専用地域, 第二種中高層住居専用地域, 第一種住居地域, 第二種住居地域, 準住居地域} AND NOT 高層住居誘導地区適用除外) THEN C = 4/10 OR 6/10（指定区域）; ELSE C = 6/10 OR 4/10 OR 8/10（指定区域）",
+        "related_articles": [
+          "法::A52:P2:I1",
+          "法::A52:P2:I2",
+          "法::A52:P2:I3"
+        ]
+      },
+      {
+        "id": "info-limit",
+        "type": "information",
+        "title": "前面道路による容積率上限",
+        "symbol": "R_limit",
+        "subject": "建築物",
+        "property": "容積率上限値",
+        "property_type": "numeric",
+        "property_type_description": "数値 - 大小関係に位置づけられる整数値または実数値（例: 延べ面積、高さ）",
+        "plurality": "single",
+        "description": "前面道路幅員と法定乗数から算出される容積率の上限",
+        "remarks": "W × C で算出"
+      },
+      {
+        "id": "proc-limit-calc",
+        "type": "process",
+        "title": "容積率上限の算出",
+        "process_type": "mechanical",
+        "process_type_description": "機械的処理 - 自動化可能な論理演算や計算。視認情報をこれに繋ぐことはできない。水色で表示。",
+        "description": "前面道路幅員(m)に法定乗数を乗じて容積率上限を算出",
+        "logic_expression": "R_limit = W × C"
+      },
+      {
+        "id": "info-actual-ratio",
+        "type": "information",
+        "title": "建築物の容積率",
+        "symbol": "R",
+        "subject": "建築物",
+        "property": "容積率",
+        "property_type": "numeric",
+        "property_type_description": "数値 - 大小関係に位置づけられる整数値または実数値（例: 延べ面積、高さ）",
+        "plurality": "single",
+        "description": "延べ面積の敷地面積に対する割合"
+      },
+      {
+        "id": "proc-actual-ratio",
+        "type": "process",
+        "title": "容積率の算定",
+        "process_type": "mechanical",
+        "process_type_description": "機械的処理 - 自動化可能な論理演算や計算。視認情報をこれに繋ぐことはできない。水色で表示。",
+        "description": "建築物の延べ面積を敷地面積で除して容積率を算定",
+        "logic_expression": "R = 延べ面積 / 敷地面積"
+      },
+      {
+        "id": "info-compliance",
+        "type": "information",
+        "title": "法第52条第2項適合",
+        "symbol": "P",
+        "subject": "建築物",
+        "property": "前面道路容積率制限適合",
+        "property_type": "proposition",
+        "property_type_description": "命題真偽 - 真か偽かが判定可能な事実（例: 技術基準を満たすか否か）",
+        "plurality": "single",
+        "description": "前面道路幅員による容積率制限に適合しているか"
+      },
+      {
+        "id": "proc-compliance",
+        "type": "process",
+        "title": "適合判定",
+        "process_type": "mechanical",
+        "process_type_description": "機械的処理 - 自動化可能な論理演算や計算。視認情報をこれに繋ぐことはできない。水色で表示。",
+        "description": "容積率が前面道路による上限以下であることを判定",
+        "logic_expression": "P = (R ≤ R_limit)"
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge-01",
+        "from": "proc-front-roads",
+        "to": "info-front-roads",
+        "role": "output"
+      },
+      {
+        "id": "edge-02",
+        "from": "info-front-roads",
+        "to": "proc-road-width",
+        "role": "input"
+      },
+      {
+        "id": "edge-03",
+        "from": "proc-road-width",
+        "to": "info-road-width",
+        "role": "output"
+      },
+      {
+        "id": "edge-04",
+        "from": "proc-building-location",
+        "to": "info-building-location",
+        "role": "output"
+      },
+      {
+        "id": "edge-05",
+        "from": "info-building-location",
+        "to": "proc-multiplier",
+        "role": "input"
+      },
+      {
+        "id": "edge-06",
+        "from": "proc-multiplier",
+        "to": "info-multiplier",
+        "role": "output"
+      },
+      {
+        "id": "edge-07",
+        "from": "info-road-width",
+        "to": "proc-limit-calc",
+        "role": "input"
+      },
+      {
+        "id": "edge-08",
+        "from": "info-multiplier",
+        "to": "proc-limit-calc",
+        "role": "input"
+      },
+      {
+        "id": "edge-09",
+        "from": "proc-limit-calc",
+        "to": "info-limit",
+        "role": "output"
+      },
+      {
+        "id": "edge-10",
+        "from": "proc-actual-ratio",
+        "to": "info-actual-ratio",
+        "role": "output"
+      },
+      {
+        "id": "edge-11",
+        "from": "info-actual-ratio",
+        "to": "proc-compliance",
+        "role": "input"
+      },
+      {
+        "id": "edge-12",
+        "from": "info-limit",
+        "to": "proc-compliance",
+        "role": "input"
+      },
+      {
+        "id": "edge-13",
+        "from": "proc-compliance",
+        "to": "info-compliance",
+        "role": "output"
+      }
+    ]
+  },
+  "metadata": {
+    "created_at": "2025-12-24T07:00:00.000Z",
+    "generator": "kijo-generator-claude",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法",
+    "checklist_ref": "確認審査報告書チェックリスト 行98 法第52条第2項",
+    "source": "e-Gov法令API v2"
+  }
+}

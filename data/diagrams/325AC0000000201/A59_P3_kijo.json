@@ -1,0 +1,282 @@
+{
+  "id": "CHK-BSL-A59-P3",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "高度利用地区の容積率制限への52条適用",
+    "target_subject": "建築物",
+    "description": "高度利用地区内の建築物に対して、容積率制限に関する第52条の規定を、高度利用地区の都市計画で定められた容積率最高限度を用いて適用する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "59",
+    "paragraph": "3",
+    "item": null
+  },
+  "labels": [
+    "集団規定",
+    "高度利用地区",
+    "容積率"
+  ],
+  "text_raw": "高度利用地区内の建築物については、当該高度利用地区に関する都市計画において定められた建築物の容積率の最高限度を第五十二条第一項各号に掲げる数値とみなして、同条の規定を適用する。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "高度利用地区内"
+        }
+      ],
+      "note": "高度利用地区に関する都市計画で指定された区域"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "description": "高度利用地区の都市計画で定められた容積率最高限度を取得",
+          "ref": "info-plan-volume-ratio-limit"
+        },
+        {
+          "description": "第52条の規定を高度利用地区の容積率最高限度を用いて適用",
+          "ref": "info-a52-applied"
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-location-confirm",
+        "type": "process",
+        "title": "高度利用地区内判定",
+        "process_type": "mechanical",
+        "description": "敷地が高度利用地区内に位置するかを判定",
+        "logic_expression": "敷地 ∈ 高度利用地区"
+      },
+      {
+        "id": "info-in-hdo-zone",
+        "type": "information",
+        "title": "高度利用地区内判定",
+        "symbol": "HDO",
+        "subject": "敷地",
+        "property": "高度利用地区内判定",
+        "property_type": "proposition",
+        "description": "敷地が高度利用地区内に位置するか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-plan-volume-ratio",
+        "type": "process",
+        "title": "都市計画容積率最高限度の取得",
+        "process_type": "mechanical",
+        "description": "高度利用地区に関する都市計画において定められた建築物の容積率最高限度を取得",
+        "remarks": "都市計画情報（公共データ）から容積率制限値を参照"
+      },
+      {
+        "id": "info-plan-volume-ratio-limit",
+        "type": "information",
+        "title": "都市計画容積率最高限度",
+        "symbol": "VRL_plan",
+        "subject": "敷地",
+        "property": "容積率の最高限度",
+        "property_type": "numeric",
+        "unit": "%",
+        "description": "高度利用地区の都市計画において定められた建築物の容積率の最高限度",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-get-a52-base-values",
+        "type": "process",
+        "title": "第52条基準値の取得",
+        "process_type": "mechanical",
+        "description": "建築基準法第52条第1項各号に掲げる容積率の基準値を取得",
+        "remarks": "用途地域別の基準容積率値を参照"
+      },
+      {
+        "id": "info-a52-base-values",
+        "type": "information",
+        "title": "第52条基準値",
+        "symbol": "VRL_A52",
+        "subject": "敷地",
+        "property": "第52条による容積率基準値",
+        "property_type": "classification",
+        "description": "建築基準法第52条第1項各号に掲げる容積率の基準値（用途地域別）",
+        "plurality": "single",
+        "remarks": "容積率上限値として用いられる基準値"
+      },
+      {
+        "id": "proc-apply-substitution",
+        "type": "process",
+        "title": "第52条へ都市計画値を代入適用",
+        "process_type": "mechanical",
+        "description": "高度利用地区の都市計画で定められた容積率最高限度を、第52条の基準値として用いて適用する（置換適用）",
+        "logic_expression": "第52条適用時 VRL := VRL_plan"
+      },
+      {
+        "id": "info-a52-applied",
+        "type": "information",
+        "title": "第52条適用完了",
+        "symbol": "A52_applied",
+        "subject": "建築物",
+        "property": "第52条適用状況",
+        "property_type": "proposition",
+        "description": "高度利用地区の都市計画容積率最高限度を用いて第52条の規定が適用されたか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-building-volume-check",
+        "type": "process",
+        "title": "建築物容積率の確認",
+        "process_type": "mechanical",
+        "description": "建築物の容積率が、置換適用された第52条基準値以下であることを確認",
+        "logic_expression": "VR ≤ VRL_plan"
+      },
+      {
+        "id": "info-building-volume-ratio",
+        "type": "information",
+        "title": "建築物容積率",
+        "symbol": "VR",
+        "subject": "建築物",
+        "property": "容積率",
+        "property_type": "numeric",
+        "unit": "%",
+        "description": "建築物の実際の容積率",
+        "plurality": "single"
+      },
+      {
+        "id": "info-volume-compliance",
+        "type": "information",
+        "title": "容積率適合",
+        "symbol": "VC",
+        "subject": "建築物",
+        "property": "容積率適合",
+        "property_type": "proposition",
+        "description": "建築物の容積率が第52条（高度利用地区の都市計画値を適用）に適合するか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-final-judgment",
+        "type": "process",
+        "title": "法59条3項適合判定",
+        "process_type": "mechanical",
+        "description": "敷地が高度利用地区内であり、建築物の容積率が規定に適合することを確認",
+        "logic_expression": "HDO = true AND VC = true"
+      },
+      {
+        "id": "info-a59p3-compliance",
+        "type": "information",
+        "title": "法59条3項適合",
+        "symbol": "Comp",
+        "subject": "建築物",
+        "property": "法59条3項適合",
+        "property_type": "proposition",
+        "description": "法59条3項の規定に適合するか",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-location-confirm",
+        "to": "info-in-hdo-zone",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "proc-plan-volume-ratio",
+        "to": "info-plan-volume-ratio-limit",
+        "role": "output"
+      },
+      {
+        "id": "e03",
+        "from": "proc-get-a52-base-values",
+        "to": "info-a52-base-values",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "info-plan-volume-ratio-limit",
+        "to": "proc-apply-substitution",
+        "role": "input"
+      },
+      {
+        "id": "e05",
+        "from": "info-a52-base-values",
+        "to": "proc-apply-substitution",
+        "role": "input"
+      },
+      {
+        "id": "e06",
+        "from": "proc-apply-substitution",
+        "to": "info-a52-applied",
+        "role": "output"
+      },
+      {
+        "id": "e07",
+        "from": "info-plan-volume-ratio-limit",
+        "to": "proc-building-volume-check",
+        "role": "input"
+      },
+      {
+        "id": "e08",
+        "from": "info-building-volume-ratio",
+        "to": "proc-building-volume-check",
+        "role": "input"
+      },
+      {
+        "id": "e09",
+        "from": "proc-building-volume-check",
+        "to": "info-volume-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e10",
+        "from": "info-in-hdo-zone",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e11",
+        "from": "info-volume-compliance",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e12",
+        "from": "info-a52-applied",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e13",
+        "from": "proc-final-judgment",
+        "to": "info-a59p3-compliance",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegates_to",
+      "articles": [
+        "A52:P1"
+      ],
+      "description": "第52条第1項の容積率規定を、高度利用地区の都市計画容積率最高限度により置換して適用する"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-24T00:00:00Z",
+    "updated_at": "2025-12-24T00:00:00Z",
+    "author": "Claude Sonnet 4.5",
+    "generator": "kijo-generator-skill",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

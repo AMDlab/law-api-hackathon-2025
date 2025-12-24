@@ -1,0 +1,494 @@
+{
+  "id": "CHK-BSL-A53_2-P3",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "既存不適格敷地の適用除外",
+    "target_subject": "敷地",
+    "description": "敷地面積最低限度の制定・変更時に既存の敷地が第1項の規定の適用除外となる条件を判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "53の2",
+    "paragraph": "3",
+    "item": null
+  },
+  "labels": [
+    "集団規定",
+    "敷地",
+    "既存不適格"
+  ],
+  "text_raw": "第一項の都市計画において建築物の敷地面積の最低限度が定められ、又は変更された際、現に建築物の敷地として使用されている土地で同項の規定に適合しないもの又は現に存する所有権その他の権利に基づいて建築物の敷地として使用するならば同項の規定に適合しないこととなる土地について、その全部を一の敷地として使用する場合においては、同項の規定は、適用しない。ただし、次の各号のいずれかに該当する土地については、この限りでない。一 第一項の都市計画における建築物の敷地面積の最低限度が変更された際、建築物の敷地面積の最低限度に関する従前の制限に違反していた建築物の敷地又は所有権その他の権利に基づいて建築物の敷地として使用するならば当該制限に違反することとなつた土地二 第一項の規定に適合するに至つた建築物の敷地又は所有権その他の権利に基づいて建築物の敷地として使用するならば同項の規定に適合するに至つた土地",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "第1項の都市計画において敷地面積最低限度が定められた区域内"
+        },
+        {
+          "type": "temporal",
+          "value": "最低限度が定められ又は変更された際"
+        }
+      ],
+      "note": "用途地域に関する都市計画において敷地面積最低限度が定められ又は変更された区域"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "operator": "OR",
+          "conditions": [
+            {
+              "ref": "info-existing-nonconforming-site",
+              "operator": "==",
+              "value": true,
+              "note": "制定・変更時に既に不適格だった敷地"
+            },
+            {
+              "ref": "info-rights-based-nonconforming",
+              "operator": "==",
+              "value": true,
+              "note": "制定・変更時に所有権等に基づき使用すれば不適格となる土地"
+            }
+          ]
+        },
+        {
+          "ref": "info-single-site-use",
+          "operator": "==",
+          "value": true,
+          "note": "全部を一の敷地として使用"
+        }
+      ]
+    },
+    "exceptions": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "ref": "info-previous-violation",
+          "operator": "==",
+          "value": true,
+          "note": "変更前の制限に既に違反していた"
+        },
+        {
+          "ref": "info-became-conforming",
+          "operator": "==",
+          "value": true,
+          "note": "後に適合するに至った"
+        }
+      ],
+      "effect": "NO_EXEMPTION"
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-regulation-timing",
+        "type": "process",
+        "title": "規制制定・変更時期の特定",
+        "process_type": "undefined_input",
+        "description": "都市計画において敷地面積最低限度が定められ又は変更された時期を特定する"
+      },
+      {
+        "id": "info-regulation-timing",
+        "type": "information",
+        "title": "規制の制定・変更時期",
+        "symbol": "T",
+        "subject": "敷地面積最低限度規制",
+        "property": "制定・変更時期",
+        "property_type": "classification",
+        "description": "第1項の都市計画における敷地面積最低限度の制定又は変更がなされた時期",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-site-status-at-regulation",
+        "type": "process",
+        "title": "規制時の敷地状況の特定",
+        "process_type": "undefined_input",
+        "description": "規制制定・変更時における敷地の使用状況を特定する"
+      },
+      {
+        "id": "info-site-status-at-regulation",
+        "type": "information",
+        "title": "規制時の敷地使用状況",
+        "symbol": "S",
+        "subject": "敷地",
+        "property": "規制時の使用状況",
+        "property_type": "classification",
+        "description": "現に建築物の敷地として使用されているか、所有権等の権利が存する土地か",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-site-area-at-regulation",
+        "type": "process",
+        "title": "規制時の敷地面積の特定",
+        "process_type": "undefined_input",
+        "description": "規制制定・変更時における敷地面積を特定する"
+      },
+      {
+        "id": "info-site-area-at-regulation",
+        "type": "information",
+        "title": "規制時の敷地面積",
+        "symbol": "A1",
+        "subject": "敷地",
+        "property": "規制時の敷地面積",
+        "property_type": "numeric",
+        "unit": "m2",
+        "description": "規制制定・変更時における敷地面積",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-minimum-area",
+        "type": "process",
+        "title": "最低限度の特定",
+        "process_type": "undefined_input",
+        "description": "第1項の都市計画で定められた敷地面積の最低限度を特定する"
+      },
+      {
+        "id": "info-minimum-area",
+        "type": "information",
+        "title": "敷地面積の最低限度",
+        "symbol": "Amin",
+        "subject": "敷地面積規制",
+        "property": "最低限度",
+        "property_type": "numeric",
+        "unit": "m2",
+        "description": "第1項の都市計画で定められた敷地面積の最低限度（200m2以下）",
+        "plurality": "single",
+        "related_articles": ["法::A53_2:P1"]
+      },
+      {
+        "id": "proc-nonconforming-check",
+        "type": "process",
+        "title": "不適合判定",
+        "process_type": "mechanical",
+        "description": "規制時の敷地面積が最低限度未満であるかを判定する",
+        "logic_expression": "A1 < Amin"
+      },
+      {
+        "id": "info-existing-nonconforming-site",
+        "type": "information",
+        "title": "既存不適格の該当性",
+        "symbol": "N1",
+        "subject": "敷地",
+        "property": "既存不適格該当性",
+        "property_type": "proposition",
+        "description": "規制制定・変更時に現に建築物の敷地として使用されており第1項に適合しない",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-rights-based-check",
+        "type": "process",
+        "title": "権利に基づく不適合判定",
+        "process_type": "mechanical",
+        "description": "規制時に所有権等に基づき敷地として使用すれば第1項に適合しないこととなる土地かを判定する"
+      },
+      {
+        "id": "info-rights-based-nonconforming",
+        "type": "information",
+        "title": "権利に基づく不適格該当性",
+        "symbol": "N2",
+        "subject": "敷地",
+        "property": "権利に基づく不適格該当性",
+        "property_type": "proposition",
+        "description": "規制時に所有権等に基づき建築物の敷地として使用するならば第1項に適合しないこととなる",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-single-site-check",
+        "type": "process",
+        "title": "一の敷地使用の確認",
+        "process_type": "undefined_input",
+        "description": "当該土地の全部を一の敷地として使用するかを確認する"
+      },
+      {
+        "id": "info-single-site-use",
+        "type": "information",
+        "title": "一の敷地としての使用",
+        "symbol": "U",
+        "subject": "敷地",
+        "property": "一の敷地としての使用の有無",
+        "property_type": "proposition",
+        "description": "当該土地の全部を一の敷地として使用する",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-previous-minimum",
+        "type": "process",
+        "title": "従前の最低限度の特定",
+        "process_type": "undefined_input",
+        "description": "規制変更前の敷地面積最低限度を特定する（変更の場合のみ）"
+      },
+      {
+        "id": "info-previous-minimum",
+        "type": "information",
+        "title": "従前の最低限度",
+        "symbol": "Aprev",
+        "subject": "敷地面積規制",
+        "property": "従前の最低限度",
+        "property_type": "numeric",
+        "unit": "m2",
+        "description": "規制変更前の敷地面積最低限度",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-previous-violation-check",
+        "type": "process",
+        "title": "従前違反の判定",
+        "process_type": "mechanical",
+        "description": "規制変更時に従前の制限に既に違反していたかを判定する",
+        "logic_expression": "A1 < Aprev"
+      },
+      {
+        "id": "info-previous-violation",
+        "type": "information",
+        "title": "従前制限への違反",
+        "symbol": "V",
+        "subject": "敷地",
+        "property": "従前制限違反の有無",
+        "property_type": "proposition",
+        "description": "規制変更時に既に従前の敷地面積最低限度制限に違反していた（第3項第1号）",
+        "plurality": "single",
+        "related_articles": ["法::A53_2:P3:I1"]
+      },
+      {
+        "id": "proc-current-area",
+        "type": "process",
+        "title": "現在の敷地面積の特定",
+        "process_type": "undefined_input",
+        "description": "現在の敷地面積を特定する"
+      },
+      {
+        "id": "info-current-area",
+        "type": "information",
+        "title": "現在の敷地面積",
+        "symbol": "A2",
+        "subject": "敷地",
+        "property": "現在の敷地面積",
+        "property_type": "numeric",
+        "unit": "m2",
+        "description": "現在の敷地面積",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-became-conforming-check",
+        "type": "process",
+        "title": "適合化の判定",
+        "process_type": "mechanical",
+        "description": "第1項の規定に適合するに至ったかを判定する",
+        "logic_expression": "A2 >= Amin"
+      },
+      {
+        "id": "info-became-conforming",
+        "type": "information",
+        "title": "適合への変更",
+        "symbol": "C",
+        "subject": "敷地",
+        "property": "適合化の有無",
+        "property_type": "proposition",
+        "description": "第1項の規定に適合するに至った（第3項第2号）",
+        "plurality": "single",
+        "related_articles": ["法::A53_2:P3:I2"]
+      },
+      {
+        "id": "proc-exemption-judgment",
+        "type": "process",
+        "title": "適用除外の判定",
+        "process_type": "mechanical",
+        "description": "第1項の適用除外となるかを総合判定する",
+        "logic_expression": "(N1 OR N2) AND U AND NOT V AND NOT C"
+      },
+      {
+        "id": "info-exemption-result",
+        "type": "information",
+        "title": "第1項適用除外の可否",
+        "symbol": "E",
+        "subject": "敷地",
+        "property": "第1項適用除外の該当性",
+        "property_type": "proposition",
+        "description": "第53条の2第1項の規定が適用されない（適用除外）",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge-001",
+        "from": "proc-regulation-timing",
+        "to": "info-regulation-timing",
+        "role": "output"
+      },
+      {
+        "id": "edge-002",
+        "from": "proc-site-status-at-regulation",
+        "to": "info-site-status-at-regulation",
+        "role": "output"
+      },
+      {
+        "id": "edge-003",
+        "from": "proc-site-area-at-regulation",
+        "to": "info-site-area-at-regulation",
+        "role": "output"
+      },
+      {
+        "id": "edge-004",
+        "from": "proc-minimum-area",
+        "to": "info-minimum-area",
+        "role": "output"
+      },
+      {
+        "id": "edge-005",
+        "from": "info-site-area-at-regulation",
+        "to": "proc-nonconforming-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-006",
+        "from": "info-minimum-area",
+        "to": "proc-nonconforming-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-007",
+        "from": "proc-nonconforming-check",
+        "to": "info-existing-nonconforming-site",
+        "role": "output"
+      },
+      {
+        "id": "edge-008",
+        "from": "info-site-status-at-regulation",
+        "to": "proc-rights-based-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-009",
+        "from": "info-site-area-at-regulation",
+        "to": "proc-rights-based-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-010",
+        "from": "info-minimum-area",
+        "to": "proc-rights-based-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-011",
+        "from": "proc-rights-based-check",
+        "to": "info-rights-based-nonconforming",
+        "role": "output"
+      },
+      {
+        "id": "edge-012",
+        "from": "proc-single-site-check",
+        "to": "info-single-site-use",
+        "role": "output"
+      },
+      {
+        "id": "edge-013",
+        "from": "proc-previous-minimum",
+        "to": "info-previous-minimum",
+        "role": "output"
+      },
+      {
+        "id": "edge-014",
+        "from": "info-site-area-at-regulation",
+        "to": "proc-previous-violation-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-015",
+        "from": "info-previous-minimum",
+        "to": "proc-previous-violation-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-016",
+        "from": "proc-previous-violation-check",
+        "to": "info-previous-violation",
+        "role": "output"
+      },
+      {
+        "id": "edge-017",
+        "from": "proc-current-area",
+        "to": "info-current-area",
+        "role": "output"
+      },
+      {
+        "id": "edge-018",
+        "from": "info-current-area",
+        "to": "proc-became-conforming-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-019",
+        "from": "info-minimum-area",
+        "to": "proc-became-conforming-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-020",
+        "from": "proc-became-conforming-check",
+        "to": "info-became-conforming",
+        "role": "output"
+      },
+      {
+        "id": "edge-021",
+        "from": "info-existing-nonconforming-site",
+        "to": "proc-exemption-judgment",
+        "role": "input"
+      },
+      {
+        "id": "edge-022",
+        "from": "info-rights-based-nonconforming",
+        "to": "proc-exemption-judgment",
+        "role": "input"
+      },
+      {
+        "id": "edge-023",
+        "from": "info-single-site-use",
+        "to": "proc-exemption-judgment",
+        "role": "input"
+      },
+      {
+        "id": "edge-024",
+        "from": "info-previous-violation",
+        "to": "proc-exemption-judgment",
+        "role": "input"
+      },
+      {
+        "id": "edge-025",
+        "from": "info-became-conforming",
+        "to": "proc-exemption-judgment",
+        "role": "input"
+      },
+      {
+        "id": "edge-026",
+        "from": "proc-exemption-judgment",
+        "to": "info-exemption-result",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A53_2:P1"],
+      "description": "第1項の敷地面積最低限度規制を参照"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-24T00:00:00.000Z",
+    "updated_at": "2025-12-24T00:00:00.000Z",
+    "author": "Claude Code",
+    "generator": "kijo-generator-manual-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法",
+    "source": "e-Gov法令API + 審査機序図作成手引書"
+  }
+}

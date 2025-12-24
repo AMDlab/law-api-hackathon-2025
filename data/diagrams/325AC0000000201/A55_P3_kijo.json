@@ -1,0 +1,432 @@
+{
+  "id": "CHK-BSL-A55-P3",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "再生可能エネルギー設備設置による高さ制限緩和",
+    "target_subject": "建築物",
+    "description": "再生可能エネルギー源の利用設備設置のため必要な工事を行う建築物が、特定行政庁の許可により高さ制限を超えることができるかの判定"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "55",
+    "paragraph": "3"
+  },
+  "labels": [
+    "集団規定",
+    "高さ制限",
+    "再生可能エネルギー",
+    "特定行政庁許可"
+  ],
+  "text_raw": "再生可能エネルギー源（太陽光、風力その他非化石エネルギー源のうち、エネルギー源として永続的に利用することができると認められるものをいう。第五十八条第二項において同じ。）の利用に資する設備の設置のため必要な屋根に関する工事その他の屋外に面する建築物の部分に関する工事を行う建築物で構造上やむを得ないものとして国土交通省令で定めるものであつて、特定行政庁が低層住宅に係る良好な住居の環境を害するおそれがないと認めて許可したものの高さは、前二項の規定にかかわらず、その許可の範囲内において、これらの規定による限度を超えるものとすることができる。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "第一種低層住居専用地域、第二種低層住居専用地域又は田園住居地域内"
+        }
+      ],
+      "note": "第55条第1項の高さ制限が適用される地域"
+    },
+    "judgment_rule": {
+      "operator": "CAN_EXCEED",
+      "lhs": {
+        "ref": "info-height",
+        "description": "建築物の高さ"
+      },
+      "rhs": {
+        "ref": "info-height-limit",
+        "description": "第55条第1項又は第2項の高さ制限"
+      }
+    },
+    "exceptions": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "equipment_installation",
+          "ref": "info-renewable-energy-equipment",
+          "value": "再生可能エネルギー設備を設置"
+        },
+        {
+          "type": "structural_necessity",
+          "ref": "info-structural-necessity",
+          "value": "国土交通省令で定める構造上やむを得ないもの"
+        },
+        {
+          "type": "administrative_approval",
+          "ref": "info-permission-granted",
+          "value": "特定行政庁の許可を受けている"
+        }
+      ],
+      "effect": "EXEMPT_WITH_PERMISSION",
+      "note": "許可の範囲内において高さ制限を超えることができる"
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-building-identification",
+        "type": "process",
+        "title": "建築物の特定",
+        "process_type": "undefined_input",
+        "description": "判定対象となる建築物を設計図書等から特定する"
+      },
+      {
+        "id": "info-building",
+        "type": "information",
+        "title": "建築物",
+        "subject": "建築物",
+        "property": "建築物の特定",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "判定対象となる建築物を特定"
+      },
+      {
+        "id": "proc-height-read",
+        "type": "process",
+        "title": "建築物の高さの読取",
+        "process_type": "undefined_input",
+        "description": "設計図書から建築物の高さを読み取る"
+      },
+      {
+        "id": "info-height",
+        "type": "information",
+        "title": "建築物の高さ",
+        "symbol": "H",
+        "subject": "建築物",
+        "property": "高さ",
+        "property_type": "numeric",
+        "unit": "m",
+        "plurality": "single",
+        "description": "建築物の高さ（法令で定める算定方法による）"
+      },
+      {
+        "id": "proc-height-limit-read",
+        "type": "process",
+        "title": "高さ制限値の読取",
+        "process_type": "undefined_input",
+        "description": "第55条第1項又は第2項で定める高さ制限値を特定する"
+      },
+      {
+        "id": "info-height-limit",
+        "type": "information",
+        "title": "高さの制限値",
+        "symbol": "Hlim",
+        "subject": "建築物",
+        "property": "適用される高さ制限値",
+        "property_type": "numeric",
+        "unit": "m",
+        "plurality": "single",
+        "description": "第55条第1項又は第2項により適用される高さの限度（10m又は12m）",
+        "related_articles": ["法::A55:P1", "法::A55:P2"]
+      },
+      {
+        "id": "proc-equipment-identification",
+        "type": "process",
+        "title": "再生可能エネルギー設備の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から再生可能エネルギー源の利用に資する設備を特定する"
+      },
+      {
+        "id": "info-renewable-energy-equipment",
+        "type": "information",
+        "title": "再生可能エネルギー設備",
+        "subject": "建築物",
+        "property": "再生可能エネルギー設備の有無",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "太陽光、風力等の再生可能エネルギー源の利用に資する設備の設置の有無",
+        "remarks": "太陽光発電パネル、風力発電設備等"
+      },
+      {
+        "id": "proc-construction-type-check",
+        "type": "process",
+        "title": "工事種別の確認",
+        "process_type": "undefined_input",
+        "description": "設備設置のために行う工事が屋根又は屋外に面する建築物の部分に関する工事であることを確認"
+      },
+      {
+        "id": "info-construction-type",
+        "type": "information",
+        "title": "工事種別",
+        "subject": "建築物",
+        "property": "工事の種別",
+        "property_type": "classification",
+        "plurality": "single",
+        "description": "屋根に関する工事、屋外に面する建築物の部分に関する工事",
+        "remarks": "設備設置のため必要な工事"
+      },
+      {
+        "id": "proc-ordinance-compliance-check",
+        "type": "process",
+        "title": "省令適合性の判定",
+        "process_type": "human_judgment",
+        "description": "国土交通省令で定める「構造上やむを得ないもの」に該当するか判定",
+        "remarks": "国土交通省令（建築基準法施行規則等）の基準に照らして判定"
+      },
+      {
+        "id": "info-structural-necessity",
+        "type": "information",
+        "title": "構造上やむを得ないものへの該当",
+        "symbol": "S",
+        "subject": "建築物",
+        "property": "省令基準該当性",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "国土交通省令で定める「構造上やむを得ないもの」に該当する"
+      },
+      {
+        "id": "proc-permission-check",
+        "type": "process",
+        "title": "特定行政庁許可の確認",
+        "process_type": "undefined_input",
+        "description": "特定行政庁が低層住宅に係る良好な住居の環境を害するおそれがないと認めて許可したか確認"
+      },
+      {
+        "id": "info-permission-granted",
+        "type": "information",
+        "title": "特定行政庁の許可",
+        "symbol": "P",
+        "subject": "建築物",
+        "property": "許可の有無",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "特定行政庁が低層住宅に係る良好な住居の環境を害するおそれがないと認めて許可したもの"
+      },
+      {
+        "id": "proc-permission-scope-check",
+        "type": "process",
+        "title": "許可範囲の確認",
+        "process_type": "undefined_input",
+        "description": "許可において認められた高さの上限を確認"
+      },
+      {
+        "id": "info-permitted-height",
+        "type": "information",
+        "title": "許可された高さの上限",
+        "symbol": "Hp",
+        "subject": "建築物",
+        "property": "許可範囲内の高さ上限",
+        "property_type": "numeric",
+        "unit": "m",
+        "plurality": "single",
+        "description": "特定行政庁の許可において認められた高さの上限値"
+      },
+      {
+        "id": "proc-exemption-check",
+        "type": "process",
+        "title": "高さ制限緩和要件の判定",
+        "process_type": "mechanical",
+        "description": "再生可能エネルギー設備設置、省令適合、許可取得の全てを満たすか判定",
+        "logic_expression": "S AND P",
+        "remarks": "全ての要件を満たす場合、許可範囲内で高さ制限を超えることができる"
+      },
+      {
+        "id": "info-exemption-applicable",
+        "type": "information",
+        "title": "高さ制限緩和の適用",
+        "symbol": "E",
+        "subject": "建築物",
+        "property": "高さ制限緩和の適用可否",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "第55条第3項による高さ制限緩和が適用される"
+      },
+      {
+        "id": "proc-final-compliance-check",
+        "type": "process",
+        "title": "高さ適合性の判定",
+        "process_type": "mechanical",
+        "description": "緩和適用時は許可範囲内か、非適用時は通常の高さ制限内か判定",
+        "logic_expression": "(E = TRUE AND H ≤ Hp) OR (E = FALSE AND H ≤ Hlim)",
+        "remarks": "緩和適用の場合は許可された高さの上限以下、非適用の場合は通常の高さ制限以下であることを確認"
+      },
+      {
+        "id": "info-compliance-result",
+        "type": "information",
+        "title": "高さ制限適合",
+        "symbol": "C",
+        "subject": "建築物",
+        "property": "高さ制限適合性",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "建築物の高さが第55条の規定に適合する"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e-01",
+        "from": "proc-building-identification",
+        "to": "info-building",
+        "role": "output"
+      },
+      {
+        "id": "e-02",
+        "from": "info-building",
+        "to": "proc-height-read",
+        "role": "input"
+      },
+      {
+        "id": "e-03",
+        "from": "proc-height-read",
+        "to": "info-height",
+        "role": "output"
+      },
+      {
+        "id": "e-04",
+        "from": "info-building",
+        "to": "proc-height-limit-read",
+        "role": "input"
+      },
+      {
+        "id": "e-05",
+        "from": "proc-height-limit-read",
+        "to": "info-height-limit",
+        "role": "output"
+      },
+      {
+        "id": "e-06",
+        "from": "info-building",
+        "to": "proc-equipment-identification",
+        "role": "input"
+      },
+      {
+        "id": "e-07",
+        "from": "proc-equipment-identification",
+        "to": "info-renewable-energy-equipment",
+        "role": "output"
+      },
+      {
+        "id": "e-08",
+        "from": "info-building",
+        "to": "proc-construction-type-check",
+        "role": "input"
+      },
+      {
+        "id": "e-09",
+        "from": "info-renewable-energy-equipment",
+        "to": "proc-construction-type-check",
+        "role": "input"
+      },
+      {
+        "id": "e-10",
+        "from": "proc-construction-type-check",
+        "to": "info-construction-type",
+        "role": "output"
+      },
+      {
+        "id": "e-11",
+        "from": "info-construction-type",
+        "to": "proc-ordinance-compliance-check",
+        "role": "input"
+      },
+      {
+        "id": "e-12",
+        "from": "proc-ordinance-compliance-check",
+        "to": "info-structural-necessity",
+        "role": "output"
+      },
+      {
+        "id": "e-13",
+        "from": "info-building",
+        "to": "proc-permission-check",
+        "role": "input"
+      },
+      {
+        "id": "e-14",
+        "from": "proc-permission-check",
+        "to": "info-permission-granted",
+        "role": "output"
+      },
+      {
+        "id": "e-15",
+        "from": "info-permission-granted",
+        "to": "proc-permission-scope-check",
+        "role": "input"
+      },
+      {
+        "id": "e-16",
+        "from": "proc-permission-scope-check",
+        "to": "info-permitted-height",
+        "role": "output"
+      },
+      {
+        "id": "e-17",
+        "from": "info-structural-necessity",
+        "to": "proc-exemption-check",
+        "role": "input"
+      },
+      {
+        "id": "e-18",
+        "from": "info-permission-granted",
+        "to": "proc-exemption-check",
+        "role": "input"
+      },
+      {
+        "id": "e-19",
+        "from": "proc-exemption-check",
+        "to": "info-exemption-applicable",
+        "role": "output"
+      },
+      {
+        "id": "e-20",
+        "from": "info-height",
+        "to": "proc-final-compliance-check",
+        "role": "input"
+      },
+      {
+        "id": "e-21",
+        "from": "info-height-limit",
+        "to": "proc-final-compliance-check",
+        "role": "input"
+      },
+      {
+        "id": "e-22",
+        "from": "info-permitted-height",
+        "to": "proc-final-compliance-check",
+        "role": "input"
+      },
+      {
+        "id": "e-23",
+        "from": "info-exemption-applicable",
+        "to": "proc-final-compliance-check",
+        "role": "input"
+      },
+      {
+        "id": "e-24",
+        "from": "proc-final-compliance-check",
+        "to": "info-compliance-result",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A55:P1", "A55:P2"],
+      "description": "第1項・第2項の高さ制限規定を参照"
+    },
+    {
+      "law_id": "325M50004000040",
+      "law_name": "建築基準法施行規則",
+      "law_type": "regulation",
+      "relationship": "delegates_to",
+      "description": "構造上やむを得ないものの基準を国土交通省令で定める"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-24T07:00:00.000Z",
+    "author": "Claude Code (Sonnet 4.5)",
+    "generator": "kijo-generator-skill-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法",
+    "source": "e-Gov法令API"
+  }
+}

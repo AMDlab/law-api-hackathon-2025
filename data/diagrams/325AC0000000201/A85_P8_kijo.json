@@ -1,0 +1,274 @@
+{
+  "id": "CHK-BSL-A85-P8",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "建築審査会の同意",
+    "target_subject": "許可",
+    "description": "法85条5項の許可期間延長又は法85条7項の許可をする場合に、建築審査会の同意を得なければならないことを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "85",
+    "paragraph": "8",
+    "item": null
+  },
+  "labels": [
+    "雑則",
+    "仮設建築物",
+    "許可",
+    "建築審査会"
+  ],
+  "text_raw": "特定行政庁は、第五項の規定により許可の期間を延長する場合又は前項の規定による許可をする場合においては、あらかじめ、建築審査会の同意を得なければならない。ただし、官公署、病院、学校その他の公益上特に必要なものとして国土交通省令で定める用途に供する応急仮設建築物について第五項の規定により許可の期間を延長する場合は、この限りでない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "type": "reference",
+          "value": "法85条5項の許可期間延長"
+        },
+        {
+          "type": "reference",
+          "value": "法85条7項の許可"
+        }
+      ]
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "ref": "info-consent-required",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "ref": "info-exempt",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    },
+    "exceptions": {
+      "note": "公益上特に必要な用途の応急仮設建築物の期間延長は除外",
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-public-use",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "ref": "info-is-extension",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-permit-type-identify",
+        "type": "process",
+        "title": "許可種別の特定",
+        "process_type": "undefined_input",
+        "description": "法85条5項の期間延長か法85条7項の許可かを特定"
+      },
+      {
+        "id": "info-permit-type",
+        "type": "information",
+        "title": "許可種別",
+        "symbol": "T",
+        "subject": "許可",
+        "property": "許可種別",
+        "property_type": "classification",
+        "plurality": "single",
+        "description": "5項期間延長又は7項許可"
+      },
+      {
+        "id": "proc-is-extension-check",
+        "type": "process",
+        "title": "期間延長該当確認",
+        "process_type": "mechanical",
+        "description": "法85条5項の期間延長に該当するか確認"
+      },
+      {
+        "id": "info-is-extension",
+        "type": "information",
+        "title": "期間延長該当",
+        "symbol": "E",
+        "subject": "許可",
+        "property": "期間延長該当",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "5項の期間延長に該当するか"
+      },
+      {
+        "id": "proc-public-use-check",
+        "type": "process",
+        "title": "公益用途確認",
+        "process_type": "human_judgment",
+        "description": "官公署、病院、学校その他の公益上特に必要な用途に供する応急仮設建築物か確認"
+      },
+      {
+        "id": "info-public-use",
+        "type": "information",
+        "title": "公益用途該当",
+        "symbol": "P",
+        "subject": "建築物",
+        "property": "公益用途該当",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "省令で定める公益用途に供する応急仮設建築物か"
+      },
+      {
+        "id": "proc-exempt-check",
+        "type": "process",
+        "title": "適用除外判定",
+        "process_type": "mechanical",
+        "description": "ただし書きの適用除外に該当するか判定",
+        "logic_expression": "E AND P"
+      },
+      {
+        "id": "info-exempt",
+        "type": "information",
+        "title": "適用除外該当",
+        "symbol": "X",
+        "subject": "許可",
+        "property": "適用除外該当",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "建築審査会同意の適用除外に該当するか"
+      },
+      {
+        "id": "proc-consent-required",
+        "type": "process",
+        "title": "同意要否判定",
+        "process_type": "mechanical",
+        "description": "建築審査会の同意が必要か判定",
+        "logic_expression": "NOT X"
+      },
+      {
+        "id": "info-consent-required",
+        "type": "information",
+        "title": "建築審査会同意要否",
+        "symbol": "C",
+        "subject": "許可",
+        "property": "建築審査会同意要否",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "建築審査会の同意が必要か"
+      },
+      {
+        "id": "proc-final-judgment",
+        "type": "process",
+        "title": "適合判定",
+        "process_type": "mechanical",
+        "description": "法85条8項の要件を満たすか判定",
+        "logic_expression": "(C AND 同意取得) OR X"
+      },
+      {
+        "id": "info-final",
+        "type": "information",
+        "title": "法85条8項適合",
+        "symbol": "R",
+        "subject": "許可",
+        "property": "法85条8項適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "法85条8項の規定に適合するか"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-permit-type-identify",
+        "to": "info-permit-type",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "info-permit-type",
+        "to": "proc-is-extension-check",
+        "role": "input"
+      },
+      {
+        "id": "e03",
+        "from": "proc-is-extension-check",
+        "to": "info-is-extension",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "info-permit-type",
+        "to": "proc-public-use-check",
+        "role": "input"
+      },
+      {
+        "id": "e05",
+        "from": "proc-public-use-check",
+        "to": "info-public-use",
+        "role": "output"
+      },
+      {
+        "id": "e06",
+        "from": "info-is-extension",
+        "to": "proc-exempt-check",
+        "role": "input"
+      },
+      {
+        "id": "e07",
+        "from": "info-public-use",
+        "to": "proc-exempt-check",
+        "role": "input"
+      },
+      {
+        "id": "e08",
+        "from": "proc-exempt-check",
+        "to": "info-exempt",
+        "role": "output"
+      },
+      {
+        "id": "e09",
+        "from": "info-exempt",
+        "to": "proc-consent-required",
+        "role": "input"
+      },
+      {
+        "id": "e10",
+        "from": "proc-consent-required",
+        "to": "info-consent-required",
+        "role": "output"
+      },
+      {
+        "id": "e11",
+        "from": "info-consent-required",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e12",
+        "from": "info-exempt",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e13",
+        "from": "proc-final-judgment",
+        "to": "info-final",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [],
+  "metadata": {
+    "created_at": "2025-12-24T12:00:00Z",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

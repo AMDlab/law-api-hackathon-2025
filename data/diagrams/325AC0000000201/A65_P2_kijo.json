@@ -1,0 +1,273 @@
+{
+  "id": "CHK-BSL-A65-P2",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "防火地域外の部分への規定適用除外の確認",
+    "target_subject": "建築物",
+    "description": "防火壁で区画された防火地域外部分について、規定適用除外の条件を判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "65",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": ["集団規定", "防火", "例外"],
+  "text_raw": "前項ただし書の規定により当該建築物が防火地域又は準防火地域外において防火壁で区画されている場合においては、その防火壁外の部分については、当該建築物に関する規定を適用しない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "建築物が防火地域又は準防火地域とこれらの地域外にわたる"
+        },
+        {
+          "type": "construction",
+          "value": "防火壁で区画されている"
+        }
+      ],
+      "note": "前項の但し書き適用条件を満たす場合"
+    },
+    "judgment_rule": {
+      "operator": "IF-THEN",
+      "conditions": [
+        {
+          "condition": "防火壁の設置位置が地域外",
+          "result": "防火壁外部分には適用規定なし"
+        },
+        {
+          "condition": "防火壁の設置位置が地域内",
+          "result": "全体に適用規定あり"
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "info-buildings-set",
+        "type": "information",
+        "title": "敷地内の建築物",
+        "subject": "敷地",
+        "property": "建築物の集合",
+        "property_type": "set_definition",
+        "description": "当該敷地に属する建築物（既存を含む）を特定",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-firewall-location-verify",
+        "type": "process",
+        "title": "防火壁の位置確認",
+        "process_type": "undefined_input",
+        "description": "設計図書等から防火壁が防火地域外に設置されていることを確認"
+      },
+      {
+        "id": "info-firewall-location-verified",
+        "type": "information",
+        "title": "防火壁の位置確認",
+        "symbol": "Fp",
+        "subject": "防火壁",
+        "property": "防火地域外設置の確認",
+        "property_type": "proposition",
+        "description": "防火壁が防火地域又は準防火地域の外側に設置されているか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-exterior-part-geometry",
+        "type": "process",
+        "title": "防火壁外部の部分特定",
+        "process_type": "undefined_input",
+        "description": "防火壁外側に位置する建築物部分を特定する"
+      },
+      {
+        "id": "info-exterior-part",
+        "type": "information",
+        "title": "防火壁外の建築物部分",
+        "symbol": "E",
+        "subject": "建築物",
+        "property": "防火壁外部分の範囲",
+        "property_type": "geometric_solid",
+        "description": "防火壁の外側に位置する建築物部分",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-scope-applicability-check",
+        "type": "process",
+        "title": "適用除外範囲の確認",
+        "process_type": "mechanical",
+        "description": "防火壁外部分について、適用除外の条件を確認",
+        "logic_expression": "Fp AND E → 適用除外対象"
+      },
+      {
+        "id": "info-exemption-scope",
+        "type": "information",
+        "title": "適用除外対象",
+        "symbol": "X",
+        "subject": "建築物",
+        "property": "防火規定適用除外",
+        "property_type": "proposition",
+        "description": "防火壁外の建築物部分が防火規定の適用除外となるか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-applicable-scope-determination",
+        "type": "process",
+        "title": "適用規定範囲の決定",
+        "process_type": "mechanical",
+        "description": "防火壁内外別に適用すべき規定の範囲を決定",
+        "logic_expression": "IF X THEN (防火壁内→防火規定適用、防火壁外→適用除外) ELSE (全体→防火規定適用)"
+      },
+      {
+        "id": "info-final-regulation-scope",
+        "type": "information",
+        "title": "適用規定の範囲決定",
+        "symbol": "R",
+        "subject": "建築物",
+        "property": "防火規定適用範囲",
+        "property_type": "classification",
+        "description": "建築物のどの部分に防火規定が適用されるか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-exterior-compliance-exemption",
+        "type": "process",
+        "title": "防火壁外部適合判定",
+        "process_type": "mechanical",
+        "description": "防火壁外の部分については防火規定の適用が除外される",
+        "logic_expression": "X = TRUE → 適用除外確定"
+      },
+      {
+        "id": "info-compliance-exemption",
+        "type": "information",
+        "title": "防火壁外の適合判定",
+        "subject": "建築物",
+        "property": "防火壁外部の適用除外",
+        "property_type": "proposition",
+        "description": "防火壁外の部分について適用規定が除外される",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-final-judgment-a65p2",
+        "type": "process",
+        "title": "法65条2項適合判定",
+        "process_type": "mechanical",
+        "description": "防火壁外の部分について規定適用除外が正しく適用されているか確認",
+        "logic_expression": "Fp AND E → 法65条2項適合"
+      },
+      {
+        "id": "info-final-a65p2",
+        "type": "information",
+        "title": "法65条2項適合",
+        "subject": "建築物",
+        "property": "法65条2項適合",
+        "property_type": "proposition",
+        "description": "建築物が法65条2項の規定に適合するか",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "info-buildings-set",
+        "to": "proc-firewall-location-verify",
+        "role": "input"
+      },
+      {
+        "id": "e02",
+        "from": "proc-firewall-location-verify",
+        "to": "info-firewall-location-verified",
+        "role": "output"
+      },
+      {
+        "id": "e03",
+        "from": "proc-exterior-part-geometry",
+        "to": "info-exterior-part",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "info-firewall-location-verified",
+        "to": "proc-scope-applicability-check",
+        "role": "input"
+      },
+      {
+        "id": "e05",
+        "from": "info-exterior-part",
+        "to": "proc-scope-applicability-check",
+        "role": "input"
+      },
+      {
+        "id": "e06",
+        "from": "proc-scope-applicability-check",
+        "to": "info-exemption-scope",
+        "role": "output"
+      },
+      {
+        "id": "e07",
+        "from": "info-exemption-scope",
+        "to": "proc-applicable-scope-determination",
+        "role": "input"
+      },
+      {
+        "id": "e08",
+        "from": "proc-applicable-scope-determination",
+        "to": "info-final-regulation-scope",
+        "role": "output"
+      },
+      {
+        "id": "e09",
+        "from": "info-exemption-scope",
+        "to": "proc-exterior-compliance-exemption",
+        "role": "input"
+      },
+      {
+        "id": "e10",
+        "from": "proc-exterior-compliance-exemption",
+        "to": "info-compliance-exemption",
+        "role": "output"
+      },
+      {
+        "id": "e11",
+        "from": "info-compliance-exemption",
+        "to": "proc-final-judgment-a65p2",
+        "role": "input"
+      },
+      {
+        "id": "e12",
+        "from": "info-final-regulation-scope",
+        "to": "proc-final-judgment-a65p2",
+        "role": "input"
+      },
+      {
+        "id": "e13",
+        "from": "proc-final-judgment-a65p2",
+        "to": "info-final-a65p2",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A65:P1", "A61", "A62", "A63", "A64"],
+      "description": "法65条1項の但し書き適用による例外規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-24T00:00:00+09:00",
+    "updated_at": "2025-12-24T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法",
+    "source": "e-Gov法令API v2"
+  }
+}

@@ -1,0 +1,362 @@
+{
+  "id": "CHK-BSL-A68-3-P3",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "地区計画等内の日影制限の緩和（再開発等促進区）",
+    "target_subject": "建築物",
+    "description": "再開発等促進区等内における日影制限の適用除外判定"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "68の3",
+    "paragraph": "3"
+  },
+  "labels": [
+    "集団規定",
+    "日影制限"
+  ],
+  "text_raw": "地区計画又は沿道地区計画の区域のうち再開発等促進区又は沿道再開発等促進区（地区整備計画又は沿道地区整備計画が定められている区域のうち二十メートル以下の高さで建築物の高さの最高限度が定められている区域に限る。）内においては、当該地区計画又は沿道地区計画の内容に適合し、かつ、その敷地面積が政令で定める規模以上の建築物であつて特定行政庁が交通上、安全上、防火上及び衛生上支障がないと認めるものについては、第五十五条第一項及び第二項の規定は、適用しない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "地区計画又は沿道地区計画の区域内"
+        },
+        {
+          "type": "location",
+          "value": "再開発等促進区又は沿道再開発等促進区内"
+        },
+        {
+          "type": "location",
+          "value": "建築物の高さの最高限度が20m以下で定められている区域"
+        }
+      ],
+      "note": "地区整備計画又は沿道地区整備計画が定められていることが前提"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "compliance",
+          "description": "地区計画又は沿道地区計画の内容に適合すること",
+          "reference": "info-district-plan-conformance"
+        },
+        {
+          "type": "property",
+          "description": "敷地面積が政令で定める規模以上であること",
+          "reference": "info-site-area"
+        },
+        {
+          "type": "judgment",
+          "description": "特定行政庁が交通上、安全上、防火上及び衛生上支障がないと認めること",
+          "reference": "proc-authority-judgment"
+        }
+      ],
+      "effect": "第55条1項及び2項の日影制限規定は適用しない"
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "info-building",
+        "type": "information",
+        "title": "対象建築物",
+        "subject": "建築物",
+        "property": "種類",
+        "property_type": "classification",
+        "plurality": "single",
+        "description": "再開発等促進区等内での建築計画",
+        "remarks": "地区計画又は沿道地区計画の区域内に位置する"
+      },
+      {
+        "id": "info-site-area",
+        "type": "information",
+        "title": "敷地面積",
+        "subject": "建築物",
+        "property": "敷地面積",
+        "property_type": "numeric",
+        "plurality": "single",
+        "unit": "m2",
+        "description": "建築物の敷地面積",
+        "related_articles": [
+          "令::A129"
+        ]
+      },
+      {
+        "id": "info-site-area-threshold",
+        "type": "information",
+        "title": "政令で定める敷地面積",
+        "subject": "敷地",
+        "property": "最小面積基準",
+        "property_type": "numeric",
+        "plurality": "single",
+        "unit": "m2",
+        "description": "令第129条で定める敷地面積の最小値",
+        "remarks": "令129条1項で規定される"
+      },
+      {
+        "id": "info-height-limit",
+        "type": "information",
+        "title": "高さの最高限度",
+        "subject": "敷地",
+        "property": "地区整備計画における高さ制限",
+        "property_type": "numeric",
+        "plurality": "single",
+        "unit": "m",
+        "description": "当該地区で定められている建築物高さの最高限度",
+        "remarks": "20m以下の値が定められている区域"
+      },
+      {
+        "id": "proc-scope-check",
+        "type": "process",
+        "title": "適用範囲確認",
+        "process_type": "mechanical",
+        "target_subject": "敷地",
+        "description": "敷地が20m以下の高さ制限が定められている再開発等促進区内に位置するかを確認",
+        "logic_expression": "高さ最高限度 ≤ 20m",
+        "software_functions": [
+          {
+            "category": "program_processing",
+            "description": "地区整備計画における高さ制限値の確認"
+          }
+        ]
+      },
+      {
+        "id": "info-scope-conformance",
+        "type": "information",
+        "title": "適用範囲適合",
+        "subject": "敷地",
+        "property": "高さ制限適用要件",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "高さの最高限度が20m以下の区域内であるか否か"
+      },
+      {
+        "id": "info-district-plan-conformance",
+        "type": "information",
+        "title": "地区計画適合性",
+        "subject": "建築物",
+        "property": "地区計画適合状況",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "当該地区計画又は沿道地区計画の内容に適合するか否か"
+      },
+      {
+        "id": "proc-district-plan-conformance-check",
+        "type": "process",
+        "title": "地区計画適合性確認",
+        "process_type": "human_judgment",
+        "target_subject": "建築物",
+        "description": "設計図書から地区計画への適合性を確認",
+        "software_functions": [
+          {
+            "category": "user_input",
+            "description": "地区計画適合性の確認結果入力"
+          }
+        ]
+      },
+      {
+        "id": "proc-site-area-check",
+        "type": "process",
+        "title": "敷地面積判定",
+        "process_type": "mechanical",
+        "target_subject": "建築物",
+        "description": "敷地面積が政令で定める規模以上であるかを判定",
+        "logic_expression": "敷地面積 ≥ 政令で定める規模",
+        "software_functions": [
+          {
+            "category": "program_processing",
+            "description": "敷地面積と基準値の数値比較判定"
+          }
+        ]
+      },
+      {
+        "id": "info-area-conformance",
+        "type": "information",
+        "title": "敷地面積要件適合",
+        "subject": "建築物",
+        "property": "敷地面積が基準以上",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "敷地面積が政令で定める規模以上であるか否か"
+      },
+      {
+        "id": "proc-authority-judgment",
+        "type": "process",
+        "title": "特定行政庁による総合判定",
+        "process_type": "human_judgment",
+        "target_subject": "建築物",
+        "description": "交通上、安全上、防火上及び衛生上支障がないかを特定行政庁が判定",
+        "software_functions": [
+          {
+            "category": "user_input",
+            "description": "特定行政庁の承認/判定結果"
+          }
+        ]
+      },
+      {
+        "id": "info-authority-judgment-result",
+        "type": "information",
+        "title": "特定行政庁の判定結果",
+        "subject": "建築物",
+        "property": "交通・安全・防火・衛生上の支障判定",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "特定行政庁が交通上、安全上、防火上及び衛生上支障がないと認めたか否か"
+      },
+      {
+        "id": "proc-final-judgment",
+        "type": "process",
+        "title": "第55条適用判定",
+        "process_type": "mechanical",
+        "target_subject": "建築物",
+        "description": "全ての適合条件を満たすかにより第55条の適用除外を判定",
+        "logic_expression": "適用範囲適合 AND 地区計画適合性 AND 敷地面積要件適合 AND 特定行政庁判定 → 第55条適用除外"
+      },
+      {
+        "id": "info-article55-exemption",
+        "type": "information",
+        "title": "第55条適用除外",
+        "subject": "建築物",
+        "property": "日影制限の適用除外",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "第55条第1項及び第2項（日影制限）が適用されるか否か"
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge-1",
+        "from": "info-height-limit",
+        "to": "proc-scope-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-2",
+        "from": "proc-scope-check",
+        "to": "info-scope-conformance",
+        "role": "output"
+      },
+      {
+        "id": "edge-3",
+        "from": "info-building",
+        "to": "proc-district-plan-conformance-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-4",
+        "from": "proc-district-plan-conformance-check",
+        "to": "info-district-plan-conformance",
+        "role": "output"
+      },
+      {
+        "id": "edge-5",
+        "from": "info-site-area",
+        "to": "proc-site-area-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-6",
+        "from": "info-site-area-threshold",
+        "to": "proc-site-area-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-7",
+        "from": "proc-site-area-check",
+        "to": "info-area-conformance",
+        "role": "output"
+      },
+      {
+        "id": "edge-8",
+        "from": "info-scope-conformance",
+        "to": "proc-authority-judgment",
+        "role": "input"
+      },
+      {
+        "id": "edge-9",
+        "from": "info-district-plan-conformance",
+        "to": "proc-authority-judgment",
+        "role": "input"
+      },
+      {
+        "id": "edge-10",
+        "from": "info-area-conformance",
+        "to": "proc-authority-judgment",
+        "role": "input"
+      },
+      {
+        "id": "edge-11",
+        "from": "proc-authority-judgment",
+        "to": "info-authority-judgment-result",
+        "role": "output"
+      },
+      {
+        "id": "edge-12",
+        "from": "info-scope-conformance",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "edge-13",
+        "from": "info-district-plan-conformance",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "edge-14",
+        "from": "info-area-conformance",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "edge-15",
+        "from": "info-authority-judgment-result",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "edge-16",
+        "from": "proc-final-judgment",
+        "to": "info-article55-exemption",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "defines_detail",
+      "articles": [
+        "A129:P1"
+      ],
+      "description": "敷地面積の最小値を定める"
+    },
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": [
+        "A55:P1",
+        "A55:P2"
+      ],
+      "description": "日影制限に関する規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-24T10:00:00Z",
+    "updated_at": "2025-12-24T10:00:00Z",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

@@ -1,0 +1,404 @@
+{
+  "id": "CHK-ORD-A109-2-2-P1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "準耐火構造建築物の主要構造部の構成",
+    "target_subject": "建築物",
+    "description": "主要構造部を準耐火構造とした建築物（特定主要構造部を耐火構造とした建築物を含む）の適合判定"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "109の2の2",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "耐火構造・準耐火構造"
+  ],
+  "text_raw": "主要構造部を準耐火構造とした建築物（特定主要構造部を耐火構造とした建築物を含む。）は、次の各号に掲げる場合の区分に応じて、当該各号に定める基準に適合するものとしなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "building_characteristic",
+          "value": "主要構造部を準耐火構造とした建築物"
+        }
+      ],
+      "note": "特定主要構造部を耐火構造とした建築物を含む"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "note": "第1号の場合",
+          "ref": "info-case1"
+        },
+        {
+          "note": "第2号の場合",
+          "ref": "info-case2"
+        }
+      ]
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-building-classification",
+        "type": "process",
+        "title": "建築物用途等の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の用途、階数等の基本特性を特定する"
+      },
+      {
+        "id": "info-building-use",
+        "type": "information",
+        "title": "建築物の用途",
+        "symbol": "B",
+        "subject": "建築物",
+        "property": "用途種別",
+        "property_type": "classification",
+        "description": "建築物の用途（用途地域内での区分、特殊建築物等）",
+        "plurality": "single"
+      },
+      {
+        "id": "info-floor-area",
+        "type": "information",
+        "title": "延べ面積",
+        "symbol": "A",
+        "subject": "建築物",
+        "property": "延べ面積",
+        "property_type": "numeric",
+        "unit": "m2",
+        "description": "建築物の延べ面積",
+        "plurality": "single"
+      },
+      {
+        "id": "info-building-height",
+        "type": "information",
+        "title": "建築物の高さ",
+        "symbol": "H",
+        "subject": "建築物",
+        "property": "高さ",
+        "property_type": "numeric",
+        "unit": "m",
+        "description": "建築物の最高部分の地盤面からの高さ",
+        "plurality": "single"
+      },
+      {
+        "id": "info-number-of-stories",
+        "type": "information",
+        "title": "階数",
+        "symbol": "S",
+        "subject": "建築物",
+        "property": "階数",
+        "property_type": "numeric",
+        "unit": "階",
+        "description": "建築物の階数",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-primary-structural-parts",
+        "type": "process",
+        "title": "主要構造部の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から主要構造部（柱、梁、壁等）と特定主要構造部を特定する"
+      },
+      {
+        "id": "info-structural-parts-set",
+        "type": "information",
+        "title": "建築物の主要構造部",
+        "symbol": "P",
+        "subject": "建築物",
+        "property": "主要構造部の集合",
+        "property_type": "set_definition",
+        "description": "判定対象となる建築物に属する柱、梁、壁等の主要構造部",
+        "plurality": "single"
+      },
+      {
+        "id": "info-specific-primary-structural-parts-set",
+        "type": "information",
+        "title": "建築物の特定主要構造部",
+        "symbol": "P_spec",
+        "subject": "建築物",
+        "property": "特定主要構造部の集合",
+        "property_type": "set_definition",
+        "description": "特定主要構造部（外壁、床版、屋根版等の建築物の性質上、特に耐火性能が求められる部分）",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-structural-type-check",
+        "type": "process",
+        "title": "主要構造部の構造種別確認",
+        "process_type": "mechanical",
+        "description": "主要構造部が準耐火構造であるか、特定主要構造部が耐火構造であるかを確認",
+        "logic_expression": "P_fireproof = SemiFireproof AND (P_specific_fireproof = Fireproof OR P_fireproof = SemiFireproof_only)"
+      },
+      {
+        "id": "info-quasi-fireproof-part-type",
+        "type": "information",
+        "title": "準耐火構造の種別",
+        "symbol": "QT",
+        "subject": "主要構造部",
+        "property": "準耐火構造の種別",
+        "property_type": "classification",
+        "description": "準耐火構造Ⅰ型、準耐火構造Ⅱ型、準耐火構造Ⅲ型のいずれか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-fireproof-standard-check",
+        "type": "process",
+        "title": "耐火基準適合判定",
+        "process_type": "mechanical",
+        "description": "令第106条～第115条の規定する準耐火構造の基準に適合するか判定",
+        "related_articles": [
+          "令::A106",
+          "令::A107",
+          "令::A108",
+          "令::A109",
+          "令::A110",
+          "令::A111",
+          "令::A112",
+          "令::A113",
+          "令::A114",
+          "令::A115"
+        ]
+      },
+      {
+        "id": "info-fireproof-compliance",
+        "type": "information",
+        "title": "準耐火基準適合判定結果",
+        "symbol": "QC",
+        "subject": "建築物",
+        "property": "準耐火基準への適合",
+        "property_type": "proposition",
+        "description": "建築物の主要構造部が準耐火構造の基準に適合するか否か",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-case-determination",
+        "type": "process",
+        "title": "適用基準の場合分け判定",
+        "process_type": "mechanical",
+        "description": "建築物の特性（用途、階数、延べ面積等）に基づいて第109条の2の2各号のいずれに該当するかを判定",
+        "logic_expression": "IF 用途 = 特定用途 AND 階数等条件 THEN 第n号該当"
+      },
+      {
+        "id": "info-applicable-case",
+        "type": "information",
+        "title": "適用される場合分け",
+        "symbol": "C",
+        "subject": "建築物",
+        "property": "第109条の2の2の適用場合",
+        "property_type": "classification",
+        "description": "第1号、第2号等の該当する場合分け",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-specific-case-standard",
+        "type": "process",
+        "title": "場合別基準適合判定",
+        "process_type": "sub_diagram_reference",
+        "description": "適用される場合に応じた個別基準の適合判定（各号の詳細基準は別図を参照）",
+        "sub_diagram_ref": "A109_2_2_case_detail"
+      },
+      {
+        "id": "info-case-compliance",
+        "type": "information",
+        "title": "場合別基準適合結果",
+        "symbol": "CC",
+        "subject": "建築物",
+        "property": "該当場合の基準への適合",
+        "property_type": "proposition",
+        "description": "該当する場合に規定される基準に適合するか否か",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-final-judgment",
+        "type": "process",
+        "title": "第109条の2の2適合判定",
+        "process_type": "mechanical",
+        "description": "準耐火構造基準と場合別基準の両方に適合するか総合判定",
+        "logic_expression": "QC = True AND CC = True → 適合"
+      },
+      {
+        "id": "info-final-compliance",
+        "type": "information",
+        "title": "第109条の2の2適合判定結果",
+        "symbol": "RESULT",
+        "subject": "建築物",
+        "property": "第109条の2の2規定への適合",
+        "property_type": "proposition",
+        "description": "建築物が令第109条の2の2の全ての基準に適合するか否か",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge-1",
+        "from": "proc-building-classification",
+        "to": "info-building-use",
+        "role": "output"
+      },
+      {
+        "id": "edge-2",
+        "from": "proc-building-classification",
+        "to": "info-floor-area",
+        "role": "output"
+      },
+      {
+        "id": "edge-3",
+        "from": "proc-building-classification",
+        "to": "info-building-height",
+        "role": "output"
+      },
+      {
+        "id": "edge-4",
+        "from": "proc-building-classification",
+        "to": "info-number-of-stories",
+        "role": "output"
+      },
+      {
+        "id": "edge-5",
+        "from": "proc-primary-structural-parts",
+        "to": "info-structural-parts-set",
+        "role": "output"
+      },
+      {
+        "id": "edge-6",
+        "from": "proc-primary-structural-parts",
+        "to": "info-specific-primary-structural-parts-set",
+        "role": "output"
+      },
+      {
+        "id": "edge-7",
+        "from": "info-structural-parts-set",
+        "to": "proc-structural-type-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-8",
+        "from": "info-specific-primary-structural-parts-set",
+        "to": "proc-structural-type-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-9",
+        "from": "proc-structural-type-check",
+        "to": "info-quasi-fireproof-part-type",
+        "role": "output"
+      },
+      {
+        "id": "edge-10",
+        "from": "info-quasi-fireproof-part-type",
+        "to": "proc-fireproof-standard-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-11",
+        "from": "proc-fireproof-standard-check",
+        "to": "info-fireproof-compliance",
+        "role": "output"
+      },
+      {
+        "id": "edge-12",
+        "from": "info-building-use",
+        "to": "proc-case-determination",
+        "role": "input"
+      },
+      {
+        "id": "edge-13",
+        "from": "info-floor-area",
+        "to": "proc-case-determination",
+        "role": "input"
+      },
+      {
+        "id": "edge-14",
+        "from": "info-number-of-stories",
+        "to": "proc-case-determination",
+        "role": "input"
+      },
+      {
+        "id": "edge-15",
+        "from": "proc-case-determination",
+        "to": "info-applicable-case",
+        "role": "output"
+      },
+      {
+        "id": "edge-16",
+        "from": "info-applicable-case",
+        "to": "proc-specific-case-standard",
+        "role": "input"
+      },
+      {
+        "id": "edge-17",
+        "from": "proc-specific-case-standard",
+        "to": "info-case-compliance",
+        "role": "output"
+      },
+      {
+        "id": "edge-18",
+        "from": "info-fireproof-compliance",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "edge-19",
+        "from": "info-case-compliance",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "edge-20",
+        "from": "proc-final-judgment",
+        "to": "info-final-compliance",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": [
+        "27",
+        "28"
+      ],
+      "description": "準耐火構造の定義と要件の基本"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": [
+        "106",
+        "107",
+        "108",
+        "109",
+        "110",
+        "111",
+        "112",
+        "113",
+        "114",
+        "115"
+      ],
+      "description": "準耐火構造の詳細基準"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-24T12:00:00Z",
+    "updated_at": "2025-12-24T12:00:00Z",
+    "author": "Claude Code",
+    "generator": "kijo-generator-manual",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令",
+    "source": "e-Gov法令API v2"
+  }
+}

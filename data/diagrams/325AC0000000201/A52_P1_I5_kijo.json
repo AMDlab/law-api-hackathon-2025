@@ -1,0 +1,382 @@
+{
+  "id": "CHK-BSL-A52-P1-I5",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "高層住居誘導地区内建築物の容積率基準適用判定",
+    "target_subject": "建築物",
+    "description": "高層住居誘導地区内の建築物について、第52条第1項第5号に基づく容積率基準が適用されるかを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "52",
+    "paragraph": "1",
+    "item": "5"
+  },
+  "labels": [
+    "集団規定",
+    "容積率",
+    "高層住居誘導地区"
+  ],
+  "text_raw": "高層住居誘導地区内の建築物（第七号に掲げる建築物を除く。）であつて、その住宅の用途に供する部分の床面積の合計がその延べ面積の三分の二以上であるもの（当該高層住居誘導地区に関する都市計画において建築物の敷地面積の最低限度が定められたときは、その敷地面積が当該最低限度以上のものに限る。）",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "高層住居誘導地区内"
+        },
+        {
+          "type": "exclusion",
+          "value": "特定用途誘導地区内の誘導用途建築物を除く（第7号）"
+        }
+      ]
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "proposition",
+          "description": "住宅用途床面積比率が2/3以上",
+          "formula": "R_h ≥ 2/3",
+          "note": "R_h = 住宅用途供する部分の床面積合計 / 延べ面積"
+        },
+        {
+          "type": "conditional",
+          "description": "敷地面積最低限度が定められた場合の条件",
+          "condition": "IF 都市計画で敷地面積最低限度が定められているとき",
+          "then": "敷地面積 ≥ 都市計画で定められた最低限度"
+        }
+      ]
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-001",
+        "type": "process",
+        "title": "延べ面積の特定",
+        "process_type": "undefined_input",
+        "process_type_description": "入力情報不定処理 - 導出されるアウトプット情報を得るための情報源の所在や手続きのメカニズムも含めて人が判断する処理。インプット情報を繋がない。左側の辺を消した状態で表示。",
+        "target_subject": "建築物",
+        "description": "設計図書等から建築物の延べ面積を読み取る"
+      },
+      {
+        "id": "info-001",
+        "type": "information",
+        "title": "建築物の延べ面積",
+        "symbol": "A_total",
+        "subject": "建築物",
+        "property": "延べ面積",
+        "property_type": "numeric",
+        "property_type_description": "数値 - 大小関係に位置づけられる整数値または実数値（例: 延べ面積、高さ）",
+        "unit": "m²",
+        "plurality": "single",
+        "description": "建築物の延べ面積"
+      },
+      {
+        "id": "proc-002",
+        "type": "process",
+        "title": "住宅用途部分床面積合計の特定",
+        "process_type": "undefined_input",
+        "process_type_description": "入力情報不定処理 - 導出されるアウトプット情報を得るための情報源の所在や手続きのメカニズムも含めて人が判断する処理。インプット情報を繋がない。左側の辺を消した状態で表示。",
+        "target_subject": "建築物",
+        "description": "設計図書等から住宅の用途に供する部分の床面積合計を読み取る"
+      },
+      {
+        "id": "info-002",
+        "type": "information",
+        "title": "住宅用途部分の床面積合計",
+        "symbol": "A_house",
+        "subject": "建築物",
+        "property": "住宅用途に供する部分の床面積合計",
+        "property_type": "numeric",
+        "property_type_description": "数値 - 大小関係に位置づけられる整数値または実数値（例: 延べ面積、高さ）",
+        "unit": "m²",
+        "plurality": "single",
+        "description": "建築物のうち住宅の用途に供する部分の床面積の合計"
+      },
+      {
+        "id": "proc-003",
+        "type": "process",
+        "title": "住宅用途床面積比率の算出",
+        "process_type": "mechanical",
+        "process_type_description": "機械的処理 - 自動化可能な論理演算や計算。視認情報をこれに繋ぐことはできない。水色で表示。",
+        "target_subject": "建築物",
+        "description": "住宅用途部分の床面積合計を延べ面積で除して比率を算出",
+        "logic_expression": "R_h = A_house / A_total"
+      },
+      {
+        "id": "info-003",
+        "type": "information",
+        "title": "住宅用途床面積比率",
+        "symbol": "R_h",
+        "subject": "建築物",
+        "property": "住宅用途床面積比率",
+        "property_type": "numeric",
+        "property_type_description": "数値 - 大小関係に位置づけられる整数値または実数値（例: 延べ面積、高さ）",
+        "unit": "",
+        "plurality": "single",
+        "description": "住宅用途部分の床面積合計の延べ面積に対する割合（R_h = A_house / A_total）"
+      },
+      {
+        "id": "proc-004",
+        "type": "process",
+        "title": "住宅用途床面積比率基準判定",
+        "process_type": "mechanical",
+        "process_type_description": "機械的処理 - 自動化可能な論理演算や計算。視認情報をこれに繋ぐことはできない。水色で表示。",
+        "target_subject": "建築物",
+        "description": "住宅用途床面積比率が2/3以上であるか判定",
+        "logic_expression": "M1 = (R_h ≥ 2/3)"
+      },
+      {
+        "id": "info-004",
+        "type": "information",
+        "title": "住宅用途床面積比率基準適合",
+        "symbol": "M1",
+        "subject": "建築物",
+        "property": "住宅用途床面積比率が2/3以上であるか",
+        "property_type": "proposition",
+        "property_type_description": "命題真偽 - 真か偽かが判定可能な事実（例: 技術基準を満たすか否か）",
+        "plurality": "single",
+        "description": "住宅用途床面積比率が2/3以上である"
+      },
+      {
+        "id": "proc-005",
+        "type": "process",
+        "title": "敷地面積最低限度指定の確認",
+        "process_type": "mechanical",
+        "process_type_description": "機械的処理 - 自動化可能な論理演算や計算。視認情報をこれに繋ぐことはできない。水色で表示。",
+        "target_subject": "高層住居誘導地区",
+        "description": "都市計画情報から当該高層住居誘導地区に関する敷地面積最低限度の指定有無を確認",
+        "remarks": "都市計画情報は公共データであり、処理内部で参照される"
+      },
+      {
+        "id": "info-005",
+        "type": "information",
+        "title": "敷地面積の最低限度指定有無",
+        "symbol": "B1",
+        "subject": "高層住居誘導地区",
+        "property": "都市計画で敷地面積最低限度が定められているか",
+        "property_type": "proposition",
+        "property_type_description": "命題真偽 - 真か偽かが判定可能な事実（例: 技術基準を満たすか否か）",
+        "plurality": "single",
+        "description": "当該高層住居誘導地区に関する都市計画において建築物の敷地面積の最低限度が定められているか"
+      },
+      {
+        "id": "proc-006",
+        "type": "process",
+        "title": "敷地面積最低限度の取得",
+        "process_type": "mechanical",
+        "process_type_description": "機械的処理 - 自動化可能な論理演算や計算。視認情報をこれに繋ぐことはできない。水色で表示。",
+        "target_subject": "高層住居誘導地区",
+        "description": "都市計画情報から敷地面積最低限度の数値を取得（指定がある場合のみ実行）",
+        "remarks": "都市計画情報は公共データであり、処理内部で参照される"
+      },
+      {
+        "id": "info-006",
+        "type": "information",
+        "title": "敷地面積最低限度",
+        "symbol": "A_min",
+        "subject": "高層住居誘導地区",
+        "property": "都市計画で定められた敷地面積最低限度",
+        "property_type": "numeric",
+        "property_type_description": "数値 - 大小関係に位置づけられる整数値または実数値（例: 延べ面積、高さ）",
+        "unit": "m²",
+        "plurality": "single",
+        "description": "都市計画において定められた建築物の敷地面積の最低限度"
+      },
+      {
+        "id": "proc-007",
+        "type": "process",
+        "title": "敷地面積の特定",
+        "process_type": "undefined_input",
+        "process_type_description": "入力情報不定処理 - 導出されるアウトプット情報を得るための情報源の所在や手続きのメカニズムも含めて人が判断する処理。インプット情報を繋がない。左側の辺を消した状態で表示。",
+        "target_subject": "建築物",
+        "description": "設計図書等から建築物の敷地面積を読み取る"
+      },
+      {
+        "id": "info-007",
+        "type": "information",
+        "title": "建築物の敷地面積",
+        "symbol": "A_site",
+        "subject": "建築物",
+        "property": "敷地面積",
+        "property_type": "numeric",
+        "property_type_description": "数値 - 大小関係に位置づけられる整数値または実数値（例: 延べ面積、高さ）",
+        "unit": "m²",
+        "plurality": "single",
+        "description": "建築物の敷地面積"
+      },
+      {
+        "id": "proc-008",
+        "type": "process",
+        "title": "敷地面積最低限度基準判定",
+        "process_type": "mechanical",
+        "process_type_description": "機械的処理 - 自動化可能な論理演算や計算。視認情報をこれに繋ぐことはできない。水色で表示。",
+        "target_subject": "建築物",
+        "description": "建築物の敷地面積が都市計画で定められた最低限度以上であるか判定",
+        "logic_expression": "M2 = (A_site ≥ A_min)"
+      },
+      {
+        "id": "info-008",
+        "type": "information",
+        "title": "敷地面積最低限度基準適合",
+        "symbol": "M2",
+        "subject": "建築物",
+        "property": "敷地面積が都市計画で定められた最低限度以上であるか",
+        "property_type": "proposition",
+        "property_type_description": "命題真偽 - 真か偽かが判定可能な事実（例: 技術基準を満たすか否か）",
+        "plurality": "single",
+        "description": "建築物の敷地面積が都市計画で定められた最低限度以上である"
+      },
+      {
+        "id": "proc-009",
+        "type": "process",
+        "title": "第52条第1項第5号該当判定",
+        "process_type": "mechanical",
+        "process_type_description": "機械的処理 - 自動化可能な論理演算や計算。視認情報をこれに繋ぐことはできない。水色で表示。",
+        "target_subject": "建築物",
+        "description": "住宅用途床面積比率基準と敷地面積最低限度基準（指定がある場合）の両方を満たすか判定",
+        "logic_expression": "C = M1 AND (NOT B1 OR M2)",
+        "remarks": "敷地面積最低限度が定められていない場合(NOT B1)、または定められている場合で基準を満たす場合(M2)に適合"
+      },
+      {
+        "id": "info-009",
+        "type": "information",
+        "title": "第52条第1項第5号該当",
+        "symbol": "C",
+        "subject": "建築物",
+        "property": "法第52条第1項第5号に該当するか",
+        "property_type": "proposition",
+        "property_type_description": "命題真偽 - 真か偽かが判定可能な事実（例: 技術基準を満たすか否か）",
+        "plurality": "single",
+        "description": "法第52条第1項第5号に定める建築物に該当する"
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge-001",
+        "from": "proc-001",
+        "to": "info-001",
+        "role": "output"
+      },
+      {
+        "id": "edge-002",
+        "from": "proc-002",
+        "to": "info-002",
+        "role": "output"
+      },
+      {
+        "id": "edge-003",
+        "from": "info-001",
+        "to": "proc-003",
+        "role": "input"
+      },
+      {
+        "id": "edge-004",
+        "from": "info-002",
+        "to": "proc-003",
+        "role": "input"
+      },
+      {
+        "id": "edge-005",
+        "from": "proc-003",
+        "to": "info-003",
+        "role": "output"
+      },
+      {
+        "id": "edge-006",
+        "from": "info-003",
+        "to": "proc-004",
+        "role": "input"
+      },
+      {
+        "id": "edge-007",
+        "from": "proc-004",
+        "to": "info-004",
+        "role": "output"
+      },
+      {
+        "id": "edge-008",
+        "from": "proc-005",
+        "to": "info-005",
+        "role": "output"
+      },
+      {
+        "id": "edge-009",
+        "from": "info-005",
+        "to": "proc-006",
+        "role": "input"
+      },
+      {
+        "id": "edge-010",
+        "from": "proc-006",
+        "to": "info-006",
+        "role": "output"
+      },
+      {
+        "id": "edge-011",
+        "from": "proc-007",
+        "to": "info-007",
+        "role": "output"
+      },
+      {
+        "id": "edge-012",
+        "from": "info-006",
+        "to": "proc-008",
+        "role": "input"
+      },
+      {
+        "id": "edge-013",
+        "from": "info-007",
+        "to": "proc-008",
+        "role": "input"
+      },
+      {
+        "id": "edge-014",
+        "from": "proc-008",
+        "to": "info-008",
+        "role": "output"
+      },
+      {
+        "id": "edge-015",
+        "from": "info-004",
+        "to": "proc-009",
+        "role": "input"
+      },
+      {
+        "id": "edge-016",
+        "from": "info-005",
+        "to": "proc-009",
+        "role": "input"
+      },
+      {
+        "id": "edge-017",
+        "from": "info-008",
+        "to": "proc-009",
+        "role": "input"
+      },
+      {
+        "id": "edge-018",
+        "from": "proc-009",
+        "to": "info-009",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [],
+  "metadata": {
+    "created_at": "2025-12-24T00:00:00.000Z",
+    "updated_at": "2025-12-24T00:00:00.000Z",
+    "author": "Claude Sonnet 4.5",
+    "generator": "kijo-generator-skill",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法",
+    "checklist_ref": "確認審査報告書チェックリスト 行96",
+    "source": "e-Gov法令API"
+  }
+}

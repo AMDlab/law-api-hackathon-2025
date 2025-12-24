@@ -1,0 +1,275 @@
+{
+  "id": "CHK-BSL-A56-P7-I2",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "第1項第2号の高さ制限の適用除外判定（採光・通風確保時）",
+    "target_subject": "建築物",
+    "description": "隣地境界線からの水平距離に基づく高さ制限に関し、採光・通風が同程度以上確保される場合の適用除外判定"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "56",
+    "paragraph": "7",
+    "item": "2"
+  },
+  "labels": [
+    "単体規定",
+    "高さ制限",
+    "適用除外"
+  ],
+  "text_raw": "第一項第二号、第五項及び前項（同号の規定の適用の緩和に係る部分に限る。）隣地境界線からの水平距離が、第一項第二号イ又はニに定める数値が一・二五とされている建築物にあつては十六メートル、第一項第二号イからニまでに定める数値が二・五とされている建築物にあつては十二・四メートルだけ外側の線上の政令で定める位置",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "applicable_provision",
+          "value": "法56条1項2号の高さ制限が適用される建築物"
+        }
+      ],
+      "note": "第1項2号により高さが制限された場合"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "lighting_condition",
+          "description": "当該位置において確保される採光、通風等と同程度以上の採光、通風等が確保される"
+        },
+        {
+          "type": "compliance_condition",
+          "description": "政令で定める基準に適合する"
+        }
+      ]
+    },
+    "exceptions": {
+      "operator": "EXEMPT",
+      "effect": "第1項2号の規定は適用しない"
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "info-building-height",
+        "type": "information",
+        "title": "建築物の高さ",
+        "subject": "建築物",
+        "property": "高さ",
+        "property_type": "numeric",
+        "unit": "m",
+        "plurality": "single",
+        "description": "判定対象となる建築物の高さ"
+      },
+      {
+        "id": "info-boundary-distance",
+        "type": "information",
+        "title": "隣地境界線からの水平距離",
+        "subject": "建築物",
+        "property": "隣地境界線からの距離",
+        "property_type": "numeric",
+        "unit": "m",
+        "plurality": "single",
+        "description": "当該建築物から隣地境界線までの最小水平距離"
+      },
+      {
+        "id": "info-adjunct-factor",
+        "type": "information",
+        "title": "高さ制限係数",
+        "subject": "建築物",
+        "property": "係数値",
+        "property_type": "classification",
+        "plurality": "single",
+        "description": "用途地域に基づく係数（1.25または2.5）",
+        "remarks": "イまたはニ定める数値が1.25の場合、ロまたはハ定める数値が2.5の場合に分類"
+      },
+      {
+        "id": "info-height-limit",
+        "type": "information",
+        "title": "通常の高さ制限値",
+        "subject": "建築物",
+        "property": "制限高さ",
+        "property_type": "numeric",
+        "unit": "m",
+        "plurality": "single",
+        "description": "第1項2号に基づく通常の高さ制限値（隣地境界線からの距離 × 係数）"
+      },
+      {
+        "id": "info-exterior-distance",
+        "type": "information",
+        "title": "適用除外の測定基準位置までの外側距離",
+        "subject": "建築物",
+        "property": "基準位置距離",
+        "property_type": "numeric",
+        "unit": "m",
+        "plurality": "single",
+        "description": "係数1.25の場合16m、係数2.5の場合12.4m外側の線",
+        "remarks": "隣地境界線から外側へ測定"
+      },
+      {
+        "id": "info-lighting-standard",
+        "type": "information",
+        "title": "通常高さ制限位置での採光・通風条件",
+        "subject": "建築物",
+        "property": "採光・通風等",
+        "property_type": "visual",
+        "plurality": "single",
+        "description": "第1項2号に基づく通常の高さ制限を遵守した場合の採光・通風等の水準"
+      },
+      {
+        "id": "info-actual-lighting",
+        "type": "information",
+        "title": "実際に確保される採光・通風",
+        "subject": "建築物",
+        "property": "採光・通風等",
+        "property_type": "visual",
+        "plurality": "single",
+        "description": "設計図書等により確認可能な当該位置での採光・通風等の水準"
+      },
+      {
+        "id": "proc-coefficient-determination",
+        "type": "process",
+        "title": "高さ制限係数の特定",
+        "process_type": "mechanical",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "用途地域に基づき、適用される係数（1.25または2.5）を判定",
+        "logic_expression": "coefficient ∈ {1.25, 2.5}"
+      },
+      {
+        "id": "proc-standard-distance-calc",
+        "type": "process",
+        "title": "基準外側距離の決定",
+        "process_type": "mechanical",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "係数に応じた基準位置までの外側距離を決定（1.25→16m、2.5→12.4m）",
+        "logic_expression": "IF coefficient = 1.25 THEN distance = 16m ELSE IF coefficient = 2.5 THEN distance = 12.4m"
+      },
+      {
+        "id": "proc-lighting-comparison",
+        "type": "process",
+        "title": "採光・通風等の同等性確認",
+        "process_type": "human_judgment",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "基準位置での標準的な採光・通風等の水準と、実際に確保される水準を比較判定"
+      },
+      {
+        "id": "proc-ordinance-compliance",
+        "type": "process",
+        "title": "政令基準への適合性確認",
+        "process_type": "mechanical",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "政令で定める基準への適合を確認",
+        "remarks": "政令基準の詳細は政令に定める"
+      },
+      {
+        "id": "info-exemption-judgment",
+        "type": "information",
+        "title": "第1項2号の適用除外判定",
+        "subject": "建築物",
+        "property": "適用除外の判定結果",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "採光・通風条件と政令基準を満たすことで、第1項2号は適用しない"
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge-adjunct-to-coeff",
+        "from": "info-adjunct-factor",
+        "to": "proc-coefficient-determination",
+        "role": "input"
+      },
+      {
+        "id": "edge-coeff-output",
+        "from": "proc-coefficient-determination",
+        "to": "info-adjunct-factor",
+        "role": "output"
+      },
+      {
+        "id": "edge-coeff-to-distance",
+        "from": "info-adjunct-factor",
+        "to": "proc-standard-distance-calc",
+        "role": "input"
+      },
+      {
+        "id": "edge-distance-output",
+        "from": "proc-standard-distance-calc",
+        "to": "info-exterior-distance",
+        "role": "output"
+      },
+      {
+        "id": "edge-lighting-standard-input",
+        "from": "info-height-limit",
+        "to": "proc-lighting-comparison",
+        "role": "input"
+      },
+      {
+        "id": "edge-actual-lighting-input",
+        "from": "info-actual-lighting",
+        "to": "proc-lighting-comparison",
+        "role": "input"
+      },
+      {
+        "id": "edge-lighting-comparison-output",
+        "from": "proc-lighting-comparison",
+        "to": "info-lighting-standard",
+        "role": "output"
+      },
+      {
+        "id": "edge-lighting-to-ordinance",
+        "from": "info-lighting-standard",
+        "to": "proc-ordinance-compliance",
+        "role": "input"
+      },
+      {
+        "id": "edge-ordinance-output",
+        "from": "proc-ordinance-compliance",
+        "to": "info-exemption-judgment",
+        "role": "output"
+      },
+      {
+        "id": "edge-building-height-input",
+        "from": "info-building-height",
+        "to": "proc-lighting-comparison",
+        "role": "input"
+      },
+      {
+        "id": "edge-boundary-distance-input",
+        "from": "info-boundary-distance",
+        "to": "proc-standard-distance-calc",
+        "role": "input"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A56:P1:I2", "A56:P5", "A56:P6"],
+      "description": "同条第1項2号、第5項、第6項を参照する例外規定"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "delegated_from",
+      "description": "採光・通風等の基準に関する詳細は政令で定める"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-24T16:35:00.000Z",
+    "author": "Claude Code (kijo-generator)",
+    "generator": "kijo-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法",
+    "source": "e-Gov法令API v2 + local cache"
+  }
+}

@@ -1,0 +1,285 @@
+{
+  "id": "CHK-BSL-A40-P1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "地方公共団体の条例による制限の附加",
+    "target_subject": "建築物",
+    "description": "法40条に基づく地方公共団体の条例による附加的制限への適合を判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "40",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": ["単体規定", "地方条例"],
+  "text_raw": "地方公共団体は、その地方の気候若しくは風土の特殊性又は特殊建築物の用途若しくは規模に因り、この章の規定又はこれに基づく命令の規定のみによつては建築物の安全、防火又は衛生の目的を充分に達し難いと認める場合においては、条例で、建築物の敷地、構造又は建築設備に関して安全上、防火上又は衛生上必要な制限を附加することができる。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "existence",
+          "value": "法40条に基づく条例が制定されている地方公共団体の区域内"
+        }
+      ],
+      "note": "当該敷地の所在する地方公共団体において法40条に基づく条例が制定されている場合に適用"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-ordinance-applicable",
+          "operator": "==",
+          "value": false,
+          "note": "条例が適用されない場合は適合とみなす"
+        },
+        {
+          "operator": "OR",
+          "conditions": [
+            {
+              "ref": "info-ordinance-applicable",
+              "operator": "==",
+              "value": false
+            },
+            {
+              "ref": "info-ordinance-compliance",
+              "operator": "==",
+              "value": true
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-site-location",
+        "type": "process",
+        "title": "敷地所在地の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の敷地が所在する地方公共団体（都道府県・市区町村）を特定する"
+      },
+      {
+        "id": "info-site-location",
+        "type": "information",
+        "title": "敷地所在地",
+        "symbol": "L",
+        "subject": "敷地",
+        "property": "所在地",
+        "property_type": "classification",
+        "description": "敷地が所在する地方公共団体（都道府県・市区町村）",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-ordinance-existence",
+        "type": "process",
+        "title": "条例の有無確認",
+        "process_type": "mechanical",
+        "description": "当該地方公共団体において法40条に基づく条例が制定されているかを確認"
+      },
+      {
+        "id": "info-ordinance-existence",
+        "type": "information",
+        "title": "条例の有無",
+        "symbol": "E",
+        "subject": "敷地",
+        "property": "法40条条例の有無",
+        "property_type": "proposition",
+        "description": "当該敷地の所在地において法40条に基づく条例が制定されているか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-building-use",
+        "type": "process",
+        "title": "建築物用途の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の用途を特定する"
+      },
+      {
+        "id": "info-building-use",
+        "type": "information",
+        "title": "建築物の用途",
+        "symbol": "U",
+        "subject": "建築物",
+        "property": "用途",
+        "property_type": "classification",
+        "description": "建築物の用途（特殊建築物に該当する場合はその種類）",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-building-scale",
+        "type": "process",
+        "title": "建築物規模の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の規模（延べ面積、階数等）を特定する"
+      },
+      {
+        "id": "info-building-scale",
+        "type": "information",
+        "title": "建築物の規模",
+        "symbol": "S",
+        "subject": "建築物",
+        "property": "規模",
+        "property_type": "numeric",
+        "description": "建築物の規模（延べ面積、階数等）",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-ordinance-applicable",
+        "type": "process",
+        "title": "条例適用対象判定",
+        "process_type": "mechanical",
+        "description": "当該建築計画が条例の適用対象に該当するかを判定（用途・規模・構造等の条件に基づく）",
+        "logic_expression": "E AND (条例の適用対象条件を満たすか)"
+      },
+      {
+        "id": "info-ordinance-applicable",
+        "type": "information",
+        "title": "条例適用対象該当",
+        "symbol": "A",
+        "subject": "建築物",
+        "property": "条例適用対象該当",
+        "property_type": "proposition",
+        "description": "当該建築計画が法40条に基づく条例の適用対象に該当するか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-site-specs",
+        "type": "process",
+        "title": "敷地諸元の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から敷地の諸元（敷地面積、接道状況等）を特定する"
+      },
+      {
+        "id": "info-site-specs",
+        "type": "information",
+        "title": "敷地の諸元",
+        "symbol": "SS",
+        "subject": "敷地",
+        "property": "諸元",
+        "property_type": "classification",
+        "description": "敷地の面積、形状、接道状況等",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-structure-specs",
+        "type": "process",
+        "title": "構造諸元の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の構造諸元を特定する"
+      },
+      {
+        "id": "info-structure-specs",
+        "type": "information",
+        "title": "構造の諸元",
+        "symbol": "ST",
+        "subject": "建築物",
+        "property": "構造諸元",
+        "property_type": "classification",
+        "description": "建築物の構造種別、部材の仕様等",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-equipment-specs",
+        "type": "process",
+        "title": "建築設備諸元の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築設備の諸元を特定する"
+      },
+      {
+        "id": "info-equipment-specs",
+        "type": "information",
+        "title": "建築設備の諸元",
+        "symbol": "EQ",
+        "subject": "建築物",
+        "property": "建築設備諸元",
+        "property_type": "classification",
+        "description": "建築設備の種類、仕様等",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-ordinance-check",
+        "type": "process",
+        "title": "条例基準適合判定",
+        "process_type": "mechanical",
+        "description": "当該地方公共団体の条例で定められた基準（敷地、構造、建築設備に関する制限）への適合を判定",
+        "remarks": "条例の具体的内容は地方公共団体ごとに異なるため、詳細は各条例を参照"
+      },
+      {
+        "id": "info-ordinance-compliance",
+        "type": "information",
+        "title": "条例基準適合",
+        "symbol": "OC",
+        "subject": "建築物",
+        "property": "条例基準適合",
+        "property_type": "proposition",
+        "description": "法40条に基づく条例で定められた基準に適合するか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-final-judgment",
+        "type": "process",
+        "title": "適合判定",
+        "process_type": "mechanical",
+        "description": "条例が適用されない場合、または条例基準に適合する場合に適合とする",
+        "logic_expression": "(A = false) OR (A = true AND OC = true)"
+      },
+      {
+        "id": "info-compliance",
+        "type": "information",
+        "title": "法40条1項適合",
+        "symbol": "C",
+        "subject": "建築物",
+        "property": "法40条1項適合",
+        "property_type": "proposition",
+        "description": "法40条1項に基づく条例の規定に適合するか",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "proc-site-location", "to": "info-site-location", "role": "output" },
+      { "id": "e02", "from": "info-site-location", "to": "proc-ordinance-existence", "role": "input" },
+      { "id": "e03", "from": "proc-ordinance-existence", "to": "info-ordinance-existence", "role": "output" },
+      { "id": "e04", "from": "proc-building-use", "to": "info-building-use", "role": "output" },
+      { "id": "e05", "from": "proc-building-scale", "to": "info-building-scale", "role": "output" },
+      { "id": "e06", "from": "info-ordinance-existence", "to": "proc-ordinance-applicable", "role": "input" },
+      { "id": "e07", "from": "info-building-use", "to": "proc-ordinance-applicable", "role": "input" },
+      { "id": "e08", "from": "info-building-scale", "to": "proc-ordinance-applicable", "role": "input" },
+      { "id": "e09", "from": "proc-ordinance-applicable", "to": "info-ordinance-applicable", "role": "output" },
+      { "id": "e10", "from": "proc-site-specs", "to": "info-site-specs", "role": "output" },
+      { "id": "e11", "from": "proc-structure-specs", "to": "info-structure-specs", "role": "output" },
+      { "id": "e12", "from": "proc-equipment-specs", "to": "info-equipment-specs", "role": "output" },
+      { "id": "e13", "from": "info-ordinance-applicable", "to": "proc-ordinance-check", "role": "input" },
+      { "id": "e14", "from": "info-site-specs", "to": "proc-ordinance-check", "role": "input" },
+      { "id": "e15", "from": "info-structure-specs", "to": "proc-ordinance-check", "role": "input" },
+      { "id": "e16", "from": "info-equipment-specs", "to": "proc-ordinance-check", "role": "input" },
+      { "id": "e17", "from": "proc-ordinance-check", "to": "info-ordinance-compliance", "role": "output" },
+      { "id": "e18", "from": "info-ordinance-applicable", "to": "proc-final-judgment", "role": "input" },
+      { "id": "e19", "from": "info-ordinance-compliance", "to": "proc-final-judgment", "role": "input" },
+      { "id": "e20", "from": "proc-final-judgment", "to": "info-compliance", "role": "output" }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "各地方公共団体の条例",
+      "law_name": "地方公共団体の条例（法40条に基づく）",
+      "law_type": "regulation",
+      "relationship": "delegated_from",
+      "description": "法40条に基づき地方公共団体が制定する条例で、建築物の敷地、構造、建築設備に関する附加的制限を定める"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-23T12:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法",
+    "checklist_ref": "法40条に基づく条例の存在と適用範囲の確認が必要",
+    "source": "建築基準法第40条第1項"
+  }
+}

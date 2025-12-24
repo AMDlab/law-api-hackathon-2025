@@ -1,0 +1,196 @@
+{
+  "id": "CHK-BSL-A68_3-P4",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "第56条の適用除外判定（再開発等促進区）",
+    "target_subject": "建築物",
+    "description": "再開発等促進区内の建築物が敷地内の有効な空地確保と特定行政庁の許可により第56条の適用を除外されるかを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "68の3",
+    "paragraph": "4",
+    "item": null
+  },
+  "labels": [
+    "集団規定",
+    "都市計画"
+  ],
+  "text_raw": "地区計画又は沿道地区計画の区域のうち再開発等促進区又は沿道再開発等促進区（地区整備計画又は沿道地区整備計画が定められている区域に限る。第六項において同じ。）内においては、敷地内に有効な空地が確保されていること等により、特定行政庁が交通上、安全上、防火上及び衛生上支障がないと認めて許可した建築物については、第五十六条の規定は、適用しない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "再開発等促進区又は沿道再開発等促進区内"
+        },
+        {
+          "type": "location",
+          "value": "地区整備計画又は沿道地区整備計画が定められている区域"
+        }
+      ],
+      "note": "地区計画又は沿道地区計画の区域のうち"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-lot-open-space",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "ref": "info-admin-approval",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "description": "敷地内有効空地確保かつ特定行政庁が許可した場合に適用除外"
+    },
+    "exemption": {
+      "article": "56",
+      "effect": "NOT_APPLICABLE"
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-lot-space-check",
+        "type": "process",
+        "title": "敷地内有効空地の確保確認",
+        "process_type": "human_judgment",
+        "description": "設計図書等から敷地内に有効な空地が確保されているか確認する",
+        "target_subject": "敷地",
+        "iteration": "single"
+      },
+      {
+        "id": "info-lot-open-space",
+        "type": "information",
+        "title": "敷地内有効空地確保",
+        "symbol": "M1",
+        "subject": "敷地",
+        "property": "有効空地確保状況",
+        "property_type": "proposition",
+        "description": "敷地内に有効な空地が確保されているか否か",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-admin-approval",
+        "type": "process",
+        "title": "特定行政庁許可判定",
+        "process_type": "human_judgment",
+        "description": "特定行政庁が交通上、安全上、防火上及び衛生上支障がないと認めるか否かを判定",
+        "target_subject": "建築物",
+        "iteration": "single"
+      },
+      {
+        "id": "info-admin-approval",
+        "type": "information",
+        "title": "特定行政庁の許可判定",
+        "symbol": "M2",
+        "subject": "建築物",
+        "property": "許可判定結果",
+        "property_type": "proposition",
+        "description": "特定行政庁が交通上、安全上、防火上及び衛生上支障がないと認めるか否か",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-article56-exemption",
+        "type": "process",
+        "title": "第56条適用除外判定",
+        "process_type": "mechanical",
+        "logic_expression": "(M1 ∧ M2) → 適用除外",
+        "description": "敷地内有効空地確保かつ特定行政庁許可により第56条は適用されない",
+        "target_subject": "建築物",
+        "iteration": "single"
+      },
+      {
+        "id": "info-article56-exemption",
+        "type": "information",
+        "title": "第56条の適用可否",
+        "symbol": "R",
+        "subject": "建築物",
+        "property": "第56条適用除外",
+        "property_type": "proposition",
+        "description": "第56条が適用されるか、除外されるか",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge-001",
+        "from": "proc-lot-space-check",
+        "to": "info-lot-open-space",
+        "role": "output"
+      },
+      {
+        "id": "edge-002",
+        "from": "info-lot-open-space",
+        "to": "proc-article56-exemption",
+        "role": "input"
+      },
+      {
+        "id": "edge-003",
+        "from": "proc-admin-approval",
+        "to": "info-admin-approval",
+        "role": "output"
+      },
+      {
+        "id": "edge-004",
+        "from": "info-admin-approval",
+        "to": "proc-article56-exemption",
+        "role": "input"
+      },
+      {
+        "id": "edge-005",
+        "from": "proc-article56-exemption",
+        "to": "info-article56-exemption",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": [
+        "A56"
+      ],
+      "description": "敷地と道路との関係（本条により適用除外される対象規定）"
+    },
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "defines_detail",
+      "articles": [
+        "A68_3:P3"
+      ],
+      "description": "第3項との関連 - 地区計画の区域内での制限の緩和"
+    },
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": [
+        "A44:P2"
+      ],
+      "description": "第5項で第44条第2項が準用される（建築物の敷地が2以上の地域にわたる場合の扱い）"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-24T17:00:00Z",
+    "updated_at": "2025-12-24T17:00:00Z",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

@@ -1,0 +1,460 @@
+{
+  "id": "CHK-BSL-A86-2-P3",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "公告許可対象区域における建築物新築・増築等の許可判定",
+    "target_subject": "建築物",
+    "description": "公告許可対象区域内で新築・増築等をしようとする建築物について、特定行政庁が許可する場合の適合条件を判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "86の2",
+    "paragraph": "3",
+    "item": null
+  },
+  "labels": [
+    "集団規定",
+    "総合設計",
+    "許可制度"
+  ],
+  "text_raw": "公告許可対象区域（前条第三項又は第四項の規定による許可に係る公告対象区域をいう。以下同じ。）内において、同条第三項又は第四項の規定により一の敷地内にあるものとみなされる建築物（以下「一敷地内許可建築物」という。）以外の建築物を新築し、又は一敷地内許可建築物について増築等をしようとする者は、国土交通省令で定めるところにより、特定行政庁の許可を受けなければならない。この場合において、特定行政庁は、当該新築又は増築等に係る建築物が、その位置及び建蔽率、容積率、各部分の高さその他の構造について、他の一敷地内許可建築物の位置及び建蔽率、容積率、各部分の高さその他の構造との関係において、交通上、安全上、防火上及び衛生上支障がなく、かつ、市街地の環境の整備改善を阻害することがないと認めるとともに、当該区域内に同条第三項又は第四項の政令で定める空地を維持することとなると認める場合に限り、許可するものとする。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "公告許可対象区域内"
+        }
+      ],
+      "note": "公告許可対象区域内での建築物の新築又は増築等に限定される"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-permit-applicability",
+          "operator": "==",
+          "value": true,
+          "description": "許可対象であること"
+        },
+        {
+          "ref": "info-position-structure-safety",
+          "operator": "==",
+          "value": true,
+          "description": "位置及び構造について交通上・安全上・防火上・衛生上支障がないこと"
+        },
+        {
+          "ref": "info-environment-improvement",
+          "operator": "==",
+          "value": true,
+          "description": "市街地の環境整備改善を阻害しないこと"
+        },
+        {
+          "ref": "info-open-space-maintenance",
+          "operator": "==",
+          "value": true,
+          "description": "政令で定める空地の維持"
+        }
+      ]
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-project-type-check",
+        "type": "process",
+        "title": "建築等の区分判定",
+        "process_type": "undefined_input",
+        "description": "新築、増築、改築、移転、大規模修繕、大規模模様替（位置又は構造の変更を伴うもの）のいずれかを特定"
+      },
+      {
+        "id": "info-project-type",
+        "type": "information",
+        "title": "実施予定の建築等の区分",
+        "symbol": "PT",
+        "subject": "建築物",
+        "property": "建築等の区分",
+        "property_type": "classification",
+        "description": "新築、増築、改築、移転、大規模修繕、大規模模様替のいずれか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-target-building-check",
+        "type": "process",
+        "title": "対象建築物の特定",
+        "process_type": "undefined_input",
+        "description": "当該建築物が新築対象か増築等対象かを特定"
+      },
+      {
+        "id": "info-target-building",
+        "type": "information",
+        "title": "対象建築物",
+        "symbol": "TB",
+        "subject": "建築物",
+        "property": "新築又は増築等対象の別",
+        "property_type": "classification",
+        "description": "一敷地内許可建築物以外の新築、又は一敷地内許可建築物の増築等",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-permit-applicability-check",
+        "type": "process",
+        "title": "許可対象判定",
+        "process_type": "mechanical",
+        "description": "当該建築物が第86条の2第3項の許可対象であるか判定",
+        "logic_expression": "(PT ∈ {新築,増築,改築,移転,大規模修繕,大規模模様替}) AND ((TB = '新築') OR (TB = '増築等'))"
+      },
+      {
+        "id": "info-permit-applicability",
+        "type": "information",
+        "title": "許可対象判定結果",
+        "symbol": "PA",
+        "subject": "建築物",
+        "property": "許可対象該当",
+        "property_type": "proposition",
+        "description": "第86条の2第3項の許可対象に該当するか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-existing-buildings-set",
+        "type": "process",
+        "title": "既存一敷地内許可建築物の特定",
+        "process_type": "undefined_input",
+        "description": "当該区域内に既に存在する一敷地内許可建築物を特定"
+      },
+      {
+        "id": "info-existing-buildings-set",
+        "type": "information",
+        "title": "既存の一敷地内許可建築物",
+        "symbol": "EB",
+        "subject": "公告許可対象区域",
+        "property": "既存許可建築物の集合",
+        "property_type": "set_definition",
+        "description": "当該区域内に存在する一敷地内許可建築物",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-building-position-spec",
+        "type": "process",
+        "title": "当該建築物の位置特定",
+        "process_type": "human_judgment",
+        "target_subject": "建築物",
+        "description": "新築又は増築等対象の建築物の配置位置を特定"
+      },
+      {
+        "id": "info-building-position",
+        "type": "information",
+        "title": "当該建築物の位置",
+        "symbol": "POS",
+        "subject": "建築物",
+        "property": "配置位置",
+        "property_type": "geometric_point",
+        "description": "当該区域内における建築物の配置位置",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-existing-building-position-spec",
+        "type": "process",
+        "title": "既存建築物の位置確認",
+        "process_type": "undefined_input",
+        "target_subject": "建築物",
+        "iteration": "iterative",
+        "description": "各既存一敷地内許可建築物の配置位置を確認"
+      },
+      {
+        "id": "info-existing-building-position",
+        "type": "information",
+        "title": "既存建築物の位置",
+        "symbol": "EPOS",
+        "subject": "建築物",
+        "property": "配置位置",
+        "property_type": "geometric_point",
+        "description": "既存一敷地内許可建築物の配置位置",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-building-structure-spec",
+        "type": "process",
+        "title": "当該建築物の構造等特定",
+        "process_type": "human_judgment",
+        "target_subject": "建築物",
+        "description": "建蔽率、容積率、各部分の高さその他の構造を特定"
+      },
+      {
+        "id": "info-building-structure",
+        "type": "information",
+        "title": "当該建築物の構造等",
+        "symbol": "STR",
+        "subject": "建築物",
+        "property": "構造要件",
+        "property_type": "classification",
+        "description": "建蔽率、容積率、各部分の高さその他の構造",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-existing-building-structure-spec",
+        "type": "process",
+        "title": "既存建築物の構造等確認",
+        "process_type": "undefined_input",
+        "target_subject": "建築物",
+        "iteration": "iterative",
+        "description": "各既存一敷地内許可建築物の構造等を確認"
+      },
+      {
+        "id": "info-existing-building-structure",
+        "type": "information",
+        "title": "既存建築物の構造等",
+        "symbol": "ESTR",
+        "subject": "建築物",
+        "property": "構造要件",
+        "property_type": "classification",
+        "description": "既存一敷地内許可建築物の建蔽率、容積率、各部分の高さその他の構造",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-position-structure-comparison",
+        "type": "process",
+        "title": "位置及び構造の整合確認",
+        "process_type": "human_judgment",
+        "description": "当該建築物と既存建築物の位置及び構造を比較し、交通上・安全上・防火上・衛生上の支障を判定"
+      },
+      {
+        "id": "info-position-structure-safety",
+        "type": "information",
+        "title": "位置及び構造の安全性判定",
+        "symbol": "SAFE",
+        "subject": "建築物",
+        "property": "位置構造安全性",
+        "property_type": "proposition",
+        "description": "位置及び構造について交通上・安全上・防火上・衛生上支障がないか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-environment-improvement-check",
+        "type": "process",
+        "title": "市街地環境整備改善阻害判定",
+        "process_type": "human_judgment",
+        "description": "当該建築物の新築又は増築等が市街地の環境整備改善を阻害しないか判定"
+      },
+      {
+        "id": "info-environment-improvement",
+        "type": "information",
+        "title": "環境整備改善への影響",
+        "symbol": "ENV",
+        "subject": "建築物",
+        "property": "環境阻害の有無",
+        "property_type": "proposition",
+        "description": "市街地の環境整備改善を阻害しないか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-open-space-spec",
+        "type": "process",
+        "title": "政令で定める空地の確認",
+        "process_type": "undefined_input",
+        "description": "当該区域内に政令で定める空地が維持されるか確認"
+      },
+      {
+        "id": "info-open-space-maintenance",
+        "type": "information",
+        "title": "政令で定める空地の維持",
+        "symbol": "OS",
+        "subject": "公告許可対象区域",
+        "property": "空地維持",
+        "property_type": "proposition",
+        "description": "当該区域内に政令で定める空地が維持されるか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-permit-decision",
+        "type": "process",
+        "title": "許可判定",
+        "process_type": "mechanical",
+        "description": "全ての要件が満たされた場合に許可",
+        "logic_expression": "PA AND SAFE AND ENV AND OS"
+      },
+      {
+        "id": "info-permit-result",
+        "type": "information",
+        "title": "許可判定結果",
+        "symbol": "PR",
+        "subject": "建築物",
+        "property": "許可の適否",
+        "property_type": "proposition",
+        "description": "特定行政庁の許可を得られるか",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge-001",
+        "from": "proc-project-type-check",
+        "to": "info-project-type",
+        "role": "output"
+      },
+      {
+        "id": "edge-002",
+        "from": "info-project-type",
+        "to": "proc-permit-applicability-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-003",
+        "from": "proc-target-building-check",
+        "to": "info-target-building",
+        "role": "output"
+      },
+      {
+        "id": "edge-004",
+        "from": "info-target-building",
+        "to": "proc-permit-applicability-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-005",
+        "from": "proc-permit-applicability-check",
+        "to": "info-permit-applicability",
+        "role": "output"
+      },
+      {
+        "id": "edge-006",
+        "from": "proc-existing-buildings-set",
+        "to": "info-existing-buildings-set",
+        "role": "output"
+      },
+      {
+        "id": "edge-007",
+        "from": "info-existing-buildings-set",
+        "to": "proc-existing-building-position-spec",
+        "role": "input"
+      },
+      {
+        "id": "edge-008",
+        "from": "proc-existing-building-position-spec",
+        "to": "info-existing-building-position",
+        "role": "output"
+      },
+      {
+        "id": "edge-009",
+        "from": "info-existing-buildings-set",
+        "to": "proc-existing-building-structure-spec",
+        "role": "input"
+      },
+      {
+        "id": "edge-010",
+        "from": "proc-existing-building-structure-spec",
+        "to": "info-existing-building-structure",
+        "role": "output"
+      },
+      {
+        "id": "edge-011",
+        "from": "proc-building-position-spec",
+        "to": "info-building-position",
+        "role": "output"
+      },
+      {
+        "id": "edge-012",
+        "from": "proc-building-structure-spec",
+        "to": "info-building-structure",
+        "role": "output"
+      },
+      {
+        "id": "edge-013",
+        "from": "info-building-position",
+        "to": "proc-position-structure-comparison",
+        "role": "input"
+      },
+      {
+        "id": "edge-014",
+        "from": "info-existing-building-position",
+        "to": "proc-position-structure-comparison",
+        "role": "input"
+      },
+      {
+        "id": "edge-015",
+        "from": "info-building-structure",
+        "to": "proc-position-structure-comparison",
+        "role": "input"
+      },
+      {
+        "id": "edge-016",
+        "from": "info-existing-building-structure",
+        "to": "proc-position-structure-comparison",
+        "role": "input"
+      },
+      {
+        "id": "edge-017",
+        "from": "proc-position-structure-comparison",
+        "to": "info-position-structure-safety",
+        "role": "output"
+      },
+      {
+        "id": "edge-018",
+        "from": "proc-environment-improvement-check",
+        "to": "info-environment-improvement",
+        "role": "output"
+      },
+      {
+        "id": "edge-019",
+        "from": "proc-open-space-spec",
+        "to": "info-open-space-maintenance",
+        "role": "output"
+      },
+      {
+        "id": "edge-020",
+        "from": "info-permit-applicability",
+        "to": "proc-permit-decision",
+        "role": "input"
+      },
+      {
+        "id": "edge-021",
+        "from": "info-position-structure-safety",
+        "to": "proc-permit-decision",
+        "role": "input"
+      },
+      {
+        "id": "edge-022",
+        "from": "info-environment-improvement",
+        "to": "proc-permit-decision",
+        "role": "input"
+      },
+      {
+        "id": "edge-023",
+        "from": "info-open-space-maintenance",
+        "to": "proc-permit-decision",
+        "role": "input"
+      },
+      {
+        "id": "edge-024",
+        "from": "proc-permit-decision",
+        "to": "info-permit-result",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": [
+        "A85:P3",
+        "A85:P4"
+      ],
+      "description": "前条第3項、第4項における公告許可対象区域の指定と関連"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-24T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "kijo-generator-manual",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法",
+    "source": "e-Gov法令API + 手動生成"
+  }
+}

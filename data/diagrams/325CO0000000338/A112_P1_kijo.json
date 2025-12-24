@@ -1,0 +1,303 @@
+{
+  "id": "CHK-BSL-KIJO-A112-P1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "防火区画の必要性判定と区画方法の決定",
+    "target_subject": "建築物",
+    "description": "1500㎡超の建築物における防火区画区分要件の判定"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "112",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "集団規定",
+    "防火区画"
+  ],
+  "text_raw": "法第二条第九号の三イ若しくはロのいずれかに該当する建築物（特定主要構造部を耐火構造とした建築物を含む。）又は第百三十六条の二第一号ロ若しくは第二号ロに掲げる基準に適合する建築物で、延べ面積（スプリンクラー設備、水噴霧消火設備、泡消火設備その他これらに類するもので自動式のものを設けた部分の床面積の二分の一に相当する床面積を除く。以下この条において同じ。）が千五百平方メートルを超えるものは、床面積の合計（スプリンクラー設備、水噴霧消火設備、泡消火設備その他これらに類するもので自動式のものを設けた部分の床面積の二分の一に相当する床面積を除く。以下この条において同じ。）千五百平方メートル以内ごとに一時間準耐火基準に適合する準耐火構造の床若しくは壁又は特定防火設備で区画しなければならない。ただし、次の各号のいずれかに該当する建築物の部分でその用途上やむを得ないものについては、この限りでない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "building_standard",
+          "value": "法第2条第9号の3 イ・ロまたは令第136条の2第1号ロ・第2号ロ適合"
+        }
+      ],
+      "note": "適用対象となる建築物の種別"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "numeric",
+          "value": "延べ面積 > 1500㎡",
+          "description": "スプリンクラー等自動消火設備設置部分は床面積の1/2を除外"
+        },
+        {
+          "type": "requirement",
+          "value": "防火区画区分",
+          "description": "1500㎡以内ごとに一時間準耐火基準に適合する準耐火構造の床・壁または特定防火設備で区画"
+        }
+      ]
+    },
+    "exceptions": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "type": "building_use",
+          "value": "劇場、映画館、演芸場、観覧場、公会堂又は集会場の客席、体育館、工場等の用途に供する建築物の部分"
+        },
+        {
+          "type": "building_use",
+          "value": "階段室の部分又は昇降機の昇降路の部分で準耐火構造の床・壁または特定防火設備で区画されたもの"
+        }
+      ],
+      "effect": "EXEMPT",
+      "description": "その用途上やむを得ないものについては、防火区画の要件を適用しない"
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "info-001",
+        "type": "information",
+        "title": "建築物の構造種別",
+        "symbol": "B",
+        "subject": "建築物",
+        "property": "構造種別分類",
+        "property_type": "classification",
+        "plurality": "single",
+        "description": "建築物が法第2条第9号の3イ・ロまたは令第136条の2に該当するか否か",
+        "related_articles": [
+          "法::A2:P1",
+          "令::A136_2:P1"
+        ]
+      },
+      {
+        "id": "info-002",
+        "type": "information",
+        "title": "建築物の延べ面積",
+        "symbol": "A",
+        "subject": "建築物",
+        "property": "延べ面積",
+        "property_type": "numeric",
+        "unit": "㎡",
+        "plurality": "single",
+        "description": "スプリンクラー設備等自動消火設備設置部分の床面積の1/2を除外した延べ面積",
+        "remarks": "自動スプリンクラー設備、水噴霧消火設備、泡消火設備その他これらに類するもので自動式のもの設置部分は除外"
+      },
+      {
+        "id": "info-003",
+        "type": "information",
+        "title": "防火区画対象外の建築物部分",
+        "symbol": "E",
+        "subject": "建築物",
+        "property": "除外対象用途",
+        "property_type": "classification",
+        "plurality": "multiple",
+        "description": "その用途上やむを得ない部分（劇場、体育館等の客席、工場等、階段室等）",
+        "remarks": "ただし書で除外される用途：劇場・映画館・演芸場・観覧場・公会堂・集会場の客席、体育館、工場その他これらに類する用途"
+      },
+      {
+        "id": "proc-001",
+        "type": "process",
+        "title": "建築物の構造種別判定",
+        "process_type": "mechanical",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "申請建築物が適用対象となる構造種別か判定",
+        "logic_expression": "B ∈ {法9号の3イ・ロ, 令136条の2適合}",
+        "software_functions": [
+          {
+            "category": "program_processing",
+            "description": "建築物の構造種別をチェック"
+          }
+        ]
+      },
+      {
+        "id": "proc-002",
+        "type": "process",
+        "title": "防火区画の適用判定",
+        "process_type": "mechanical",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "延べ面積が1500㎡を超えるか否かを判定",
+        "logic_expression": "A > 1500",
+        "remarks": "スプリンクラー等自動消火設備の除外計算を適用した延べ面積で判定"
+      },
+      {
+        "id": "proc-003",
+        "type": "process",
+        "title": "除外対象用途の確認",
+        "process_type": "mechanical",
+        "target_subject": "建築物",
+        "iteration": "iterative",
+        "description": "建築物の部分が除外対象用途か否かを判定",
+        "logic_expression": "当該部分の用途 ∈ E",
+        "remarks": "除外対象となる場合は防火区画要件を適用しない（ただし書）"
+      },
+      {
+        "id": "info-004",
+        "type": "information",
+        "title": "防火区画判定結果",
+        "symbol": "R",
+        "subject": "建築物",
+        "property": "防火区画必要性",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "防火区画を設置する必要があるか否か"
+      },
+      {
+        "id": "proc-004",
+        "type": "process",
+        "title": "防火区画区分間隔の決定",
+        "process_type": "mechanical",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "1500㎡以内ごとに防火区画を設置する区分方法を決定",
+        "logic_expression": "区画間隔 = min(A, 1500)",
+        "remarks": "床面積の合計1500㎡以内ごと"
+      },
+      {
+        "id": "info-005",
+        "type": "information",
+        "title": "防火区画区分間隔",
+        "symbol": "I",
+        "subject": "建築物",
+        "property": "区画床面積上限",
+        "property_type": "numeric",
+        "unit": "㎡",
+        "plurality": "single",
+        "description": "防火区画で区分する最大床面積"
+      },
+      {
+        "id": "info-006",
+        "type": "information",
+        "title": "防火区画の仕様",
+        "symbol": "S",
+        "subject": "防火区画",
+        "property": "構造仕様",
+        "property_type": "classification",
+        "plurality": "multiple",
+        "description": "一時間準耐火基準に適合する準耐火構造の床・壁または特定防火設備",
+        "remarks": "一時間準耐火基準：第112条第2項に規定する基準に適合するもの"
+      },
+      {
+        "id": "proc-005",
+        "type": "process",
+        "title": "防火区画設置方法の決定",
+        "process_type": "mechanical",
+        "target_subject": "防火区画",
+        "iteration": "iterative",
+        "description": "準耐火構造の床・壁または特定防火設備を選択して設置",
+        "logic_expression": "区画 = {準耐火床 ∪ 準耐火壁 ∪ 特定防火設備}",
+        "remarks": "いずれかの方法で区分要件を満たす必要がある"
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge-001",
+        "from": "info-001",
+        "to": "proc-001",
+        "role": "input"
+      },
+      {
+        "id": "edge-002",
+        "from": "proc-001",
+        "to": "info-004",
+        "role": "output"
+      },
+      {
+        "id": "edge-003",
+        "from": "info-002",
+        "to": "proc-002",
+        "role": "input"
+      },
+      {
+        "id": "edge-004",
+        "from": "proc-002",
+        "to": "info-004",
+        "role": "output"
+      },
+      {
+        "id": "edge-005",
+        "from": "info-003",
+        "to": "proc-003",
+        "role": "input"
+      },
+      {
+        "id": "edge-006",
+        "from": "proc-003",
+        "to": "info-004",
+        "role": "output"
+      },
+      {
+        "id": "edge-007",
+        "from": "info-004",
+        "to": "proc-004",
+        "role": "input"
+      },
+      {
+        "id": "edge-008",
+        "from": "proc-004",
+        "to": "info-005",
+        "role": "output"
+      },
+      {
+        "id": "edge-009",
+        "from": "info-005",
+        "to": "proc-005",
+        "role": "input"
+      },
+      {
+        "id": "edge-010",
+        "from": "proc-005",
+        "to": "info-006",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": [
+        "A2:P1",
+        "A27:P1",
+        "A61:P1",
+        "A67:P1"
+      ],
+      "description": "第112条は建築基準法の規定を参照。法第2条第9号の3、第27条等で建築物の適用対象を規定"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "defines_detail",
+      "articles": [
+        "A109:P1",
+        "A109_2:P1",
+        "A136_2:P1"
+      ],
+      "description": "第109条で特定防火設備を規定。第136条の2で一定基準に適合する建築物の基準を規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-24T00:00:00Z",
+    "updated_at": "2025-12-24T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "kijo-generator",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令",
+    "checklist_ref": "建築基準法施行令第112条第1項（防火区画）",
+    "source": "e-Gov法令API"
+  }
+}

@@ -1,0 +1,282 @@
+{
+  "id": "CHK-BSL-A68-7-P4",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "予定道路に対する道路みなし規定の適用",
+    "target_subject": "予定道路",
+    "description": "第1項の規定により指定された予定道路を建築基準法42条1項の道路とみなし、第44条の規定を適用する処理"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "68の7",
+    "paragraph": "4",
+    "item": null
+  },
+  "labels": [
+    "集団規定",
+    "みなし規定",
+    "適用規定"
+  ],
+  "text_raw": "第一項の規定により予定道路が指定された場合においては、当該予定道路を第四十二条第一項に規定する道路とみなして、第四十四条の規定を適用する。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "administrative_action",
+          "value": "第1項の規定により予定道路が指定される"
+        }
+      ],
+      "note": "法68条の7第1項の指定要件を充たして予定道路が指定されることが前提"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "description": "予定道路が法42条1項の道路とみなされる",
+          "operator": "AND",
+          "conditions": [
+            {
+              "ref": "info-scheduled-road-designation",
+              "operator": "==",
+              "value": true
+            }
+          ]
+        },
+        {
+          "description": "法44条の規定が準用される",
+          "operator": "AND",
+          "conditions": [
+            {
+              "ref": "info-scheduled-road-deemed",
+              "operator": "==",
+              "value": true
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-p1-designation-confirmation",
+        "type": "process",
+        "title": "第1項の規定による予定道路指定確認",
+        "process_type": "undefined_input",
+        "description": "第68条の7第1項の規定に基づいて予定道路が指定されているかを確認",
+        "target_subject": "予定道路"
+      },
+      {
+        "id": "info-scheduled-road-designation",
+        "type": "information",
+        "title": "予定道路の指定",
+        "symbol": "S",
+        "subject": "予定道路",
+        "property": "指定状態",
+        "property_type": "proposition",
+        "description": "第68条の7第1項の規定により予定道路が指定されているか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-article42p1-understanding",
+        "type": "process",
+        "title": "法42条1項の道路要件確認",
+        "process_type": "human_judgment",
+        "description": "法42条1項に規定する道路の定義と要件を確認し、その要件内容を理解",
+        "target_subject": "予定道路",
+        "remarks": "42条1項: 次のいずれかに該当する道路"
+      },
+      {
+        "id": "info-article42p1-requirement",
+        "type": "information",
+        "title": "法42条1項の道路要件",
+        "symbol": "R42",
+        "subject": "道路",
+        "property": "法42条1項該当性",
+        "property_type": "proposition",
+        "description": "予定道路が法42条1項に規定する道路の要件に該当するか（みなし後）",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-deeming-application",
+        "type": "process",
+        "title": "道路みなし規定の適用",
+        "process_type": "mechanical",
+        "description": "予定道路が指定された場合、これを法42条1項の道路とみなして適用する",
+        "logic_expression": "S = true → 予定道路 ≡ 法42条1項の道路",
+        "target_subject": "予定道路"
+      },
+      {
+        "id": "info-scheduled-road-deemed",
+        "type": "information",
+        "title": "予定道路のみなし適用",
+        "symbol": "D",
+        "subject": "予定道路",
+        "property": "法42条1項の道路としてのみなし",
+        "property_type": "proposition",
+        "description": "予定道路が法42条1項の道路とみなされたか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-article44-understanding",
+        "type": "process",
+        "title": "法44条の規定内容確認",
+        "process_type": "human_judgment",
+        "description": "法44条に規定される道路の変更届出等の手続規定を確認",
+        "target_subject": "予定道路",
+        "remarks": "44条: 道路の変更届出、協議、同意等に関する手続"
+      },
+      {
+        "id": "info-article44-requirement",
+        "type": "information",
+        "title": "法44条の規定内容",
+        "symbol": "R44",
+        "subject": "予定道路",
+        "property": "法44条適用対象",
+        "property_type": "proposition",
+        "description": "法44条の規定が予定道路に適用可能であるか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-article44-application",
+        "type": "process",
+        "title": "法44条の規定適用",
+        "process_type": "mechanical",
+        "description": "予定道路がみなし適用された場合、法44条の規定を適用する",
+        "logic_expression": "D = true → 法44条が予定道路に適用される",
+        "target_subject": "予定道路"
+      },
+      {
+        "id": "info-article44-applied",
+        "type": "information",
+        "title": "法44条の規定適用完了",
+        "symbol": "A44",
+        "subject": "予定道路",
+        "property": "法44条規定の適用",
+        "property_type": "proposition",
+        "description": "法44条の規定が予定道路に適用されたか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-final-compliance",
+        "type": "process",
+        "title": "法68条の7第4項適合判定",
+        "process_type": "mechanical",
+        "description": "予定道路がみなし規定により法42条1項の道路として扱われ、法44条が適用されているか判定",
+        "logic_expression": "D AND A44",
+        "target_subject": "予定道路"
+      },
+      {
+        "id": "info-final-compliance",
+        "type": "information",
+        "title": "法68条の7第4項適合",
+        "subject": "予定道路",
+        "property": "法68条の7第4項適合",
+        "property_type": "proposition",
+        "description": "法68条の7第4項の規定に適合するか（予定道路がみなし規定により適切に扱われているか）",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge-p1-check-to-designation",
+        "from": "proc-p1-designation-confirmation",
+        "to": "info-scheduled-road-designation",
+        "role": "output"
+      },
+      {
+        "id": "edge-designation-to-deeming",
+        "from": "info-scheduled-road-designation",
+        "to": "proc-deeming-application",
+        "role": "input"
+      },
+      {
+        "id": "edge-a42-understanding-to-requirement",
+        "from": "proc-article42p1-understanding",
+        "to": "info-article42p1-requirement",
+        "role": "output"
+      },
+      {
+        "id": "edge-a42-requirement-to-deeming",
+        "from": "info-article42p1-requirement",
+        "to": "proc-deeming-application",
+        "role": "input"
+      },
+      {
+        "id": "edge-deeming-to-deemed",
+        "from": "proc-deeming-application",
+        "to": "info-scheduled-road-deemed",
+        "role": "output"
+      },
+      {
+        "id": "edge-deemed-to-a44-application",
+        "from": "info-scheduled-road-deemed",
+        "to": "proc-article44-application",
+        "role": "input"
+      },
+      {
+        "id": "edge-a44-understanding-to-requirement",
+        "from": "proc-article44-understanding",
+        "to": "info-article44-requirement",
+        "role": "output"
+      },
+      {
+        "id": "edge-a44-requirement-to-application",
+        "from": "info-article44-requirement",
+        "to": "proc-article44-application",
+        "role": "input"
+      },
+      {
+        "id": "edge-a44-application-to-applied",
+        "from": "proc-article44-application",
+        "to": "info-article44-applied",
+        "role": "output"
+      },
+      {
+        "id": "edge-deemed-to-final",
+        "from": "info-scheduled-road-deemed",
+        "to": "proc-final-compliance",
+        "role": "input"
+      },
+      {
+        "id": "edge-a44-applied-to-final",
+        "from": "info-article44-applied",
+        "to": "proc-final-compliance",
+        "role": "input"
+      },
+      {
+        "id": "edge-final-to-compliance",
+        "from": "proc-final-compliance",
+        "to": "info-final-compliance",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": [
+        "A68_7:P1",
+        "A42:P1",
+        "A44"
+      ],
+      "description": "予定道路が法42条1項の道路とみなされ、法44条が準用される"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-24T12:00:00+09:00",
+    "updated_at": "2025-12-24T12:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法",
+    "source": "e-Gov法令API"
+  }
+}

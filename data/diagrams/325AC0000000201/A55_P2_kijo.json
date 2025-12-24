@@ -1,0 +1,403 @@
+{
+  "id": "CHK-BSL-A55-P2",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "空地確保による高さ制限の緩和",
+    "target_subject": "建築物",
+    "description": "敷地内空地及び敷地面積が政令基準以上で特定行政庁の認定を受けた建築物の高さ限度を12mに緩和する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "55",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": [
+    "集団規定",
+    "高さ制限",
+    "緩和規定"
+  ],
+  "text_raw": "前項の都市計画において建築物の高さの限度が十メートルと定められた第一種低層住居専用地域、第二種低層住居専用地域又は田園住居地域内においては、その敷地内に政令で定める空地を有し、かつ、その敷地面積が政令で定める規模以上である建築物であつて、特定行政庁が低層住宅に係る良好な住居の環境を害するおそれがないと認めるものの高さの限度は、同項の規定にかかわらず、十二メートルとする。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "第一種低層住居専用地域、第二種低層住居専用地域又は田園住居地域内"
+        },
+        {
+          "type": "urban_planning",
+          "value": "都市計画において建築物の高さの限度が10mと定められた区域"
+        }
+      ],
+      "note": "法55条1項で10m制限が適用される区域内"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "note": "緩和要件を満たす場合",
+          "operator": "AND",
+          "conditions": [
+            {
+              "ref": "info-openspace-compliance",
+              "operator": "==",
+              "value": true
+            },
+            {
+              "ref": "info-sitearea-compliance",
+              "operator": "==",
+              "value": true
+            },
+            {
+              "ref": "info-admin-approval",
+              "operator": "==",
+              "value": true
+            },
+            {
+              "ref": "info-height",
+              "operator": "<=",
+              "value": 12
+            }
+          ]
+        },
+        {
+          "note": "緩和要件を満たさない場合",
+          "operator": "AND",
+          "conditions": [
+            {
+              "ref": "info-height",
+              "operator": "<=",
+              "value": 10
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-height",
+        "type": "process",
+        "title": "建築物高さの特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の高さを読み取る",
+        "target_subject": "建築物"
+      },
+      {
+        "id": "info-height",
+        "type": "information",
+        "title": "建築物の高さ",
+        "symbol": "H",
+        "subject": "建築物",
+        "property": "高さ",
+        "property_type": "numeric",
+        "unit": "m",
+        "description": "敷地の平均地盤面からの建築物の高さ",
+        "plurality": "single",
+        "related_articles": [
+          "令::A2:P1:I6"
+        ]
+      },
+      {
+        "id": "proc-openspace",
+        "type": "process",
+        "title": "敷地内空地の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から敷地内の空地の面積・配置を読み取る",
+        "target_subject": "敷地"
+      },
+      {
+        "id": "info-openspace",
+        "type": "information",
+        "title": "敷地内空地",
+        "symbol": "OS",
+        "subject": "敷地",
+        "property": "空地の面積・配置",
+        "property_type": "geometric_surface",
+        "description": "敷地内に確保される空地",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-openspace-check",
+        "type": "process",
+        "title": "空地基準適合判定",
+        "process_type": "mechanical",
+        "description": "政令で定める空地の基準（令135条の16）に適合するか判定",
+        "target_subject": "敷地",
+        "related_articles": [
+          "令::A135_16"
+        ],
+        "logic_expression": "OS ≥ 令135条の16基準"
+      },
+      {
+        "id": "info-openspace-compliance",
+        "type": "information",
+        "title": "空地基準適合",
+        "symbol": "OS_OK",
+        "subject": "敷地",
+        "property": "政令基準空地適合",
+        "property_type": "proposition",
+        "description": "政令で定める空地を有するか",
+        "plurality": "single",
+        "related_articles": [
+          "令::A135_16"
+        ]
+      },
+      {
+        "id": "proc-sitearea",
+        "type": "process",
+        "title": "敷地面積の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から敷地面積を読み取る",
+        "target_subject": "敷地"
+      },
+      {
+        "id": "info-sitearea",
+        "type": "information",
+        "title": "敷地面積",
+        "symbol": "SA",
+        "subject": "敷地",
+        "property": "敷地面積",
+        "property_type": "numeric",
+        "unit": "m2",
+        "description": "建築物の敷地面積",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-sitearea-check",
+        "type": "process",
+        "title": "敷地面積基準適合判定",
+        "process_type": "mechanical",
+        "description": "政令で定める規模以上（令135条の16）であるか判定",
+        "target_subject": "敷地",
+        "related_articles": [
+          "令::A135_16"
+        ],
+        "logic_expression": "SA ≥ 令135条の16基準"
+      },
+      {
+        "id": "info-sitearea-compliance",
+        "type": "information",
+        "title": "敷地面積基準適合",
+        "symbol": "SA_OK",
+        "subject": "敷地",
+        "property": "政令基準面積適合",
+        "property_type": "proposition",
+        "description": "敷地面積が政令で定める規模以上であるか",
+        "plurality": "single",
+        "related_articles": [
+          "令::A135_16"
+        ]
+      },
+      {
+        "id": "proc-admin-approval",
+        "type": "process",
+        "title": "特定行政庁認定の確認",
+        "process_type": "undefined_input",
+        "description": "特定行政庁が低層住宅に係る良好な住居の環境を害するおそれがないと認定しているか確認",
+        "target_subject": "建築物"
+      },
+      {
+        "id": "info-admin-approval",
+        "type": "information",
+        "title": "特定行政庁認定",
+        "symbol": "ADM",
+        "subject": "建築物",
+        "property": "特定行政庁認定の有無",
+        "property_type": "proposition",
+        "description": "特定行政庁が低層住宅に係る良好な住居の環境を害するおそれがないと認めたか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-relaxation-check",
+        "type": "process",
+        "title": "緩和要件適合判定",
+        "process_type": "mechanical",
+        "description": "空地基準、敷地面積基準、特定行政庁認定の全てを満たすか判定",
+        "target_subject": "建築物",
+        "logic_expression": "OS_OK AND SA_OK AND ADM"
+      },
+      {
+        "id": "info-relaxation-applicable",
+        "type": "information",
+        "title": "緩和規定適用可否",
+        "symbol": "REL",
+        "subject": "建築物",
+        "property": "法55条2項緩和適用",
+        "property_type": "proposition",
+        "description": "高さ制限の緩和（12mまで）が適用できるか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-height-limit",
+        "type": "process",
+        "title": "適用高さ限度の決定",
+        "process_type": "mechanical",
+        "description": "緩和適用可能な場合は12m、不可の場合は10mを高さ限度とする",
+        "target_subject": "建築物",
+        "logic_expression": "Hlimit = REL ? 12 : 10"
+      },
+      {
+        "id": "info-height-limit",
+        "type": "information",
+        "title": "適用高さ限度",
+        "symbol": "Hlimit",
+        "subject": "建築物",
+        "property": "適用される高さ限度",
+        "property_type": "numeric",
+        "unit": "m",
+        "description": "当該建築物に適用される高さの限度（10m又は12m）",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-final-judgment",
+        "type": "process",
+        "title": "高さ制限適合判定",
+        "process_type": "mechanical",
+        "description": "建築物の高さが適用される限度以下であることを確認",
+        "target_subject": "建築物",
+        "logic_expression": "H ≤ Hlimit"
+      },
+      {
+        "id": "info-compliance",
+        "type": "information",
+        "title": "法55条2項適合",
+        "symbol": "C",
+        "subject": "建築物",
+        "property": "法55条2項適合",
+        "property_type": "proposition",
+        "description": "建築物の高さが法55条2項の規定に適合するか",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-height",
+        "to": "info-height",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "proc-openspace",
+        "to": "info-openspace",
+        "role": "output"
+      },
+      {
+        "id": "e03",
+        "from": "info-openspace",
+        "to": "proc-openspace-check",
+        "role": "input"
+      },
+      {
+        "id": "e04",
+        "from": "proc-openspace-check",
+        "to": "info-openspace-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e05",
+        "from": "proc-sitearea",
+        "to": "info-sitearea",
+        "role": "output"
+      },
+      {
+        "id": "e06",
+        "from": "info-sitearea",
+        "to": "proc-sitearea-check",
+        "role": "input"
+      },
+      {
+        "id": "e07",
+        "from": "proc-sitearea-check",
+        "to": "info-sitearea-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e08",
+        "from": "proc-admin-approval",
+        "to": "info-admin-approval",
+        "role": "output"
+      },
+      {
+        "id": "e09",
+        "from": "info-openspace-compliance",
+        "to": "proc-relaxation-check",
+        "role": "input"
+      },
+      {
+        "id": "e10",
+        "from": "info-sitearea-compliance",
+        "to": "proc-relaxation-check",
+        "role": "input"
+      },
+      {
+        "id": "e11",
+        "from": "info-admin-approval",
+        "to": "proc-relaxation-check",
+        "role": "input"
+      },
+      {
+        "id": "e12",
+        "from": "proc-relaxation-check",
+        "to": "info-relaxation-applicable",
+        "role": "output"
+      },
+      {
+        "id": "e13",
+        "from": "info-relaxation-applicable",
+        "to": "proc-height-limit",
+        "role": "input"
+      },
+      {
+        "id": "e14",
+        "from": "proc-height-limit",
+        "to": "info-height-limit",
+        "role": "output"
+      },
+      {
+        "id": "e15",
+        "from": "info-height",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e16",
+        "from": "info-height-limit",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e17",
+        "from": "proc-final-judgment",
+        "to": "info-compliance",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "delegates_to",
+      "articles": [
+        "A135_16"
+      ],
+      "description": "法55条2項の空地及び敷地面積の基準を定める"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-24T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

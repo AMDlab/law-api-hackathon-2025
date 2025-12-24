@@ -1,0 +1,297 @@
+{
+  "id": "CHK-BSL-A44-P1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "道路内の建築制限",
+    "target_subject": "建築物",
+    "description": "建築物又は擁壁が道路内・道路突出位置に建築されていないことを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "44",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": ["集団規定", "道路"],
+  "text_raw": "建築物又は敷地を造成するための擁壁は、道路内に、又は道路に突き出して建築し、又は築造してはならない。ただし、次の各号のいずれかに該当する建築物については、この限りでない。一 地盤面下に設ける建築物 二 公衆便所、巡査派出所その他これらに類する公益上必要な建築物で特定行政庁が通行上支障がないと認めて建築審査会の同意を得て許可したもの",
+  "compliance_logic": {
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "note": "原則：道路内・道路突出位置に建築物等が存在しない",
+          "operator": "NOT",
+          "ref": "info-in-road-area"
+        },
+        {
+          "note": "例外：ただし書き各号のいずれかに該当",
+          "ref": "info-exempt"
+        }
+      ]
+    },
+    "exceptions": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "note": "第1号：地盤面下に設ける建築物",
+          "ref": "info-underground",
+          "related_article": "法::A44:P1:I1"
+        },
+        {
+          "note": "第2号：公益上必要な建築物で特定行政庁の許可を受けたもの",
+          "operator": "AND",
+          "conditions": [
+            { "ref": "info-public-interest", "value": true },
+            { "ref": "info-permission", "value": true }
+          ],
+          "related_article": "法::A44:P1:I2"
+        }
+      ],
+      "effect": "EXEMPT"
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-building-location",
+        "type": "process",
+        "title": "建築物位置の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の位置（平面座標、地盤面との関係）を特定する"
+      },
+      {
+        "id": "info-building-location",
+        "type": "information",
+        "title": "建築物の位置",
+        "symbol": "B",
+        "subject": "建築物",
+        "property": "位置座標",
+        "property_type": "geometric_solid",
+        "description": "建築物の3次元形状と位置",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-road-boundary",
+        "type": "process",
+        "title": "道路境界の特定",
+        "process_type": "undefined_input",
+        "description": "道路台帳、地籍図等から道路の境界を特定する"
+      },
+      {
+        "id": "info-road-boundary",
+        "type": "information",
+        "title": "道路の境界",
+        "symbol": "R",
+        "subject": "道路",
+        "property": "道路境界線",
+        "property_type": "geometric_surface",
+        "description": "法第42条に規定する道路の境界",
+        "related_articles": ["法::A42"],
+        "plurality": "single"
+      },
+      {
+        "id": "proc-in-road-check",
+        "type": "process",
+        "title": "道路内・道路突出判定",
+        "process_type": "mechanical",
+        "description": "建築物が道路内に存在するか、道路に突き出しているかを幾何学的に判定",
+        "logic_expression": "intersection(B, R) ≠ ∅ OR protrusion(B, R) = true"
+      },
+      {
+        "id": "info-in-road-area",
+        "type": "information",
+        "title": "道路内・道路突出該当",
+        "symbol": "I",
+        "subject": "建築物",
+        "property": "道路内・道路突出への該当",
+        "property_type": "proposition",
+        "description": "建築物が道路内に存在するか、道路に突き出しているか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-ground-level",
+        "type": "process",
+        "title": "地盤面位置の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書から地盤面の位置を特定する"
+      },
+      {
+        "id": "info-ground-level",
+        "type": "information",
+        "title": "地盤面の位置",
+        "symbol": "G",
+        "subject": "敷地",
+        "property": "地盤面の高さ",
+        "property_type": "geometric_surface",
+        "description": "建築物の地盤面",
+        "related_articles": ["令::A2:I2"],
+        "plurality": "single"
+      },
+      {
+        "id": "proc-underground-check",
+        "type": "process",
+        "title": "地盤面下判定",
+        "process_type": "mechanical",
+        "description": "建築物が地盤面下に設けられているかを判定",
+        "logic_expression": "max(B.z) < G.z"
+      },
+      {
+        "id": "info-underground",
+        "type": "information",
+        "title": "地盤面下該当",
+        "symbol": "U",
+        "subject": "建築物",
+        "property": "地盤面下への該当",
+        "property_type": "proposition",
+        "description": "建築物が地盤面下に設けられているか（第1号）",
+        "related_articles": ["法::A44:P1:I1"],
+        "plurality": "single"
+      },
+      {
+        "id": "proc-building-use",
+        "type": "process",
+        "title": "建築物用途の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の用途を特定する"
+      },
+      {
+        "id": "info-building-use",
+        "type": "information",
+        "title": "建築物の用途",
+        "symbol": "T",
+        "subject": "建築物",
+        "property": "用途種別",
+        "property_type": "classification",
+        "description": "建築物の用途",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-public-interest-check",
+        "type": "process",
+        "title": "公益上必要な建築物判定",
+        "process_type": "mechanical",
+        "description": "公衆便所、巡査派出所等の公益上必要な建築物に該当するかを判定",
+        "logic_expression": "T ∈ {公衆便所, 巡査派出所, その他公益上必要な建築物}"
+      },
+      {
+        "id": "info-public-interest",
+        "type": "information",
+        "title": "公益上必要な建築物該当",
+        "symbol": "P",
+        "subject": "建築物",
+        "property": "公益上必要な建築物への該当",
+        "property_type": "proposition",
+        "description": "公衆便所、巡査派出所その他これらに類する公益上必要な建築物か",
+        "related_articles": ["法::A44:P1:I2"],
+        "plurality": "single"
+      },
+      {
+        "id": "proc-permission-check",
+        "type": "process",
+        "title": "特定行政庁許可確認",
+        "process_type": "undefined_input",
+        "description": "特定行政庁が通行上支障がないと認めて建築審査会の同意を得て許可したものであるか確認"
+      },
+      {
+        "id": "info-permission",
+        "type": "information",
+        "title": "特定行政庁許可の有無",
+        "symbol": "A",
+        "subject": "建築物",
+        "property": "特定行政庁の許可",
+        "property_type": "proposition",
+        "description": "特定行政庁が通行上支障がないと認めて建築審査会の同意を得て許可したものか",
+        "related_articles": ["法::A44:P1:I2"],
+        "plurality": "single"
+      },
+      {
+        "id": "proc-exempt-check",
+        "type": "process",
+        "title": "適用除外判定",
+        "process_type": "mechanical",
+        "description": "ただし書きの例外に該当するかを判定",
+        "logic_expression": "U OR (P AND A)"
+      },
+      {
+        "id": "info-exempt",
+        "type": "information",
+        "title": "適用除外該当",
+        "symbol": "E",
+        "subject": "建築物",
+        "property": "適用除外への該当",
+        "property_type": "proposition",
+        "description": "ただし書きによる適用除外に該当するか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-final-judgment",
+        "type": "process",
+        "title": "適合判定",
+        "process_type": "mechanical",
+        "description": "道路内に建築物が存在しないか、または例外に該当することを確認",
+        "logic_expression": "NOT(I) OR E"
+      },
+      {
+        "id": "info-compliance",
+        "type": "information",
+        "title": "法44条1項適合",
+        "symbol": "C",
+        "subject": "建築物",
+        "property": "法44条1項適合",
+        "property_type": "proposition",
+        "description": "法44条1項の規定に適合するか",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "proc-building-location", "to": "info-building-location", "role": "output" },
+      { "id": "e02", "from": "proc-road-boundary", "to": "info-road-boundary", "role": "output" },
+      { "id": "e03", "from": "info-building-location", "to": "proc-in-road-check", "role": "input" },
+      { "id": "e04", "from": "info-road-boundary", "to": "proc-in-road-check", "role": "input" },
+      { "id": "e05", "from": "proc-in-road-check", "to": "info-in-road-area", "role": "output" },
+      { "id": "e06", "from": "proc-ground-level", "to": "info-ground-level", "role": "output" },
+      { "id": "e07", "from": "info-building-location", "to": "proc-underground-check", "role": "input" },
+      { "id": "e08", "from": "info-ground-level", "to": "proc-underground-check", "role": "input" },
+      { "id": "e09", "from": "proc-underground-check", "to": "info-underground", "role": "output" },
+      { "id": "e10", "from": "proc-building-use", "to": "info-building-use", "role": "output" },
+      { "id": "e11", "from": "info-building-use", "to": "proc-public-interest-check", "role": "input" },
+      { "id": "e12", "from": "proc-public-interest-check", "to": "info-public-interest", "role": "output" },
+      { "id": "e13", "from": "proc-permission-check", "to": "info-permission", "role": "output" },
+      { "id": "e14", "from": "info-underground", "to": "proc-exempt-check", "role": "input" },
+      { "id": "e15", "from": "info-public-interest", "to": "proc-exempt-check", "role": "input" },
+      { "id": "e16", "from": "info-permission", "to": "proc-exempt-check", "role": "input" },
+      { "id": "e17", "from": "proc-exempt-check", "to": "info-exempt", "role": "output" },
+      { "id": "e18", "from": "info-in-road-area", "to": "proc-final-judgment", "role": "input" },
+      { "id": "e19", "from": "info-exempt", "to": "proc-final-judgment", "role": "input" },
+      { "id": "e20", "from": "proc-final-judgment", "to": "info-compliance", "role": "output" }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A42"],
+      "description": "道路の定義を参照"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": ["A2:I2"],
+      "description": "地盤面の定義を参照"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-23T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

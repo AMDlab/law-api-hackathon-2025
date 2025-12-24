@@ -1,0 +1,230 @@
+{
+  "id": "CHK-BSJ-CO-A137_16-P1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "建築物の移転条件の適合判定",
+    "target_subject": "建築物",
+    "description": "法第86条の7第4項で定める移転の範囲（同一敷地内又は支障なし）に適合するかの判定"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "137_16",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "建築物移転"
+  ],
+  "text_raw": "（移転）\n第百三十七条の十六\n法第八十六条の七第四項の政令で定める範囲は、次の各号のいずれかに該当することとする。一移転が同一敷地内におけるものであること。二移転が交通上、安全上、防火上、避難上、衛生上及び市街地の環境の保全上支障がないと特定行政庁が認めるものであること。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "applicability",
+          "description": "法第86条の7第4項で定める建築物の移転が対象"
+        }
+      ],
+      "note": "本条は移転に関する政令で定める範囲の規定"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "description": "移転が同一敷地内におけるもの",
+          "ref": "Item1"
+        },
+        {
+          "description": "特定行政庁が支障なしと認める移転",
+          "ref": "Item2"
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "info-building",
+        "type": "information",
+        "title": "移転される建築物",
+        "symbol": "B1",
+        "subject": "建築物",
+        "property": "移転対象の特定",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "法第86条の7第4項の対象となる移転建築物を特定"
+      },
+      {
+        "id": "info-relocation-method",
+        "type": "information",
+        "title": "移転の方法・内容",
+        "symbol": "M1",
+        "subject": "建築物",
+        "property": "移転内容",
+        "property_type": "visual",
+        "plurality": "single",
+        "description": "設計図書から移転の詳細内容（新築地、既存地、距離等）を読み取る"
+      },
+      {
+        "id": "proc-same-site-check",
+        "type": "process",
+        "title": "同一敷地内移転判定",
+        "process_type": "mechanical",
+        "iteration": "single",
+        "description": "移転前後の建築物が同一敷地内に位置するかを判定",
+        "logic_expression": "M1 ∈ {同一敷地内移転}",
+        "remarks": "土地の登記簿謄本等で敷地を確認"
+      },
+      {
+        "id": "info-same-site-result",
+        "type": "information",
+        "title": "同一敷地内移転か否か",
+        "symbol": "R1",
+        "subject": "移転",
+        "property": "敷地範囲内か否か",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "第1号に該当するか否かの判定結果"
+      },
+      {
+        "id": "proc-authority-approval",
+        "type": "process",
+        "title": "特定行政庁の認定判定",
+        "process_type": "human_judgment",
+        "iteration": "single",
+        "description": "特定行政庁が交通上、安全上、防火上、避難上、衛生上及び市街地環境保全上の支障がないかを認定",
+        "remarks": "特定行政庁の判断に基づく。技術的な詳細は個別協議"
+      },
+      {
+        "id": "info-support-criteria",
+        "type": "information",
+        "title": "支障判定の基準項目",
+        "symbol": "C1",
+        "subject": "移転",
+        "property": "審査基準",
+        "property_type": "classification",
+        "plurality": "single",
+        "description": "交通上・安全上・防火上・避難上・衛生上・環境保全上の6項目を確認",
+        "remarks": "各項目について特定行政庁の基準に基づき判定"
+      },
+      {
+        "id": "info-authority-judgment",
+        "type": "information",
+        "title": "特定行政庁の支障認定結果",
+        "symbol": "R2",
+        "subject": "移転",
+        "property": "支障の有無",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "第2号に該当するか否かの判定結果"
+      },
+      {
+        "id": "proc-final-judgment",
+        "type": "process",
+        "title": "移転範囲適合判定",
+        "process_type": "mechanical",
+        "iteration": "single",
+        "description": "第1号または第2号のいずれかに該当するか判定",
+        "logic_expression": "R1 OR R2"
+      },
+      {
+        "id": "info-compliance",
+        "type": "information",
+        "title": "令第137条の16第1項適合性",
+        "symbol": "Result",
+        "subject": "建築物",
+        "property": "法86条の7第4項適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "政令で定める移転範囲に適合するか否かの最終判定"
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge-building-to-check",
+        "from": "info-building",
+        "to": "proc-same-site-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-method-to-check",
+        "from": "info-relocation-method",
+        "to": "proc-same-site-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-check-to-result",
+        "from": "proc-same-site-check",
+        "to": "info-same-site-result",
+        "role": "output"
+      },
+      {
+        "id": "edge-building-to-approval",
+        "from": "info-building",
+        "to": "proc-authority-approval",
+        "role": "input"
+      },
+      {
+        "id": "edge-method-to-approval",
+        "from": "info-relocation-method",
+        "to": "proc-authority-approval",
+        "role": "input"
+      },
+      {
+        "id": "edge-criteria-to-approval",
+        "from": "info-support-criteria",
+        "to": "proc-authority-approval",
+        "role": "input"
+      },
+      {
+        "id": "edge-approval-to-judgment",
+        "from": "proc-authority-approval",
+        "to": "info-authority-judgment",
+        "role": "output"
+      },
+      {
+        "id": "edge-result1-to-final",
+        "from": "info-same-site-result",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "edge-result2-to-final",
+        "from": "info-authority-judgment",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "edge-final-to-compliance",
+        "from": "proc-final-judgment",
+        "to": "info-compliance",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegates_to",
+      "articles": [
+        "A86_7:P4"
+      ],
+      "description": "本条は法第86条の7第4項で政令で定める範囲を規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-24T09:03:27.146Z",
+    "author": "Claude Code",
+    "generator": "kijo-generator-manual",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令",
+    "source": "e-Gov法令API v2"
+  }
+}

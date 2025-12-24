@@ -1,0 +1,331 @@
+{
+  "id": "CHK-BSL-A67-P2",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "特定防災街区にわたる建築物の全体適用要件",
+    "target_subject": "建築物",
+    "description": "敷地が特定防災街区整備地区と指定区域外にわたる建築物に対する第1項適用規定の判定と例外要件を判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "67",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "防火",
+    "敷地",
+    "区域判定"
+  ],
+  "text_raw": "建築物が特定防災街区整備地区と特定防災街区整備地区として指定されていない区域にわたる場合においては、その全部について、前項の規定を適用する。ただし、その建築物が特定防災街区整備地区外において防火壁で区画されている場合においては、その防火壁外の部分については、この限りでない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "特定防災街区整備地区内"
+        },
+        {
+          "type": "structural",
+          "value": "建築物が2つ以上の区域にわたる"
+        }
+      ],
+      "note": "特定防災街区整備地区と指定区域外の両方にわたる建築物に適用"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "lhs": {
+        "operator": "AND",
+        "conditions": [
+          {
+            "ref": "info-spans-zones",
+            "operator": "==",
+            "value": true
+          },
+          {
+            "ref": "info-firewall-partition",
+            "operator": "==",
+            "value": false
+          }
+        ]
+      },
+      "rhs": {
+        "operator": "AND",
+        "conditions": [
+          {
+            "ref": "info-spans-zones",
+            "operator": "==",
+            "value": false
+          }
+        ]
+      }
+    },
+    "exceptions": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-spans-zones",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "ref": "info-firewall-partition",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "effect": "PARTIAL_EXEMPT",
+      "note": "防火壁で区画されている場合、防火壁外の部分は第1項適用除外"
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-zone-location-check",
+        "type": "process",
+        "title": "敷地位置の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書及び登記簿等から敷地が特定防災街区整備地区にわたるかどうかを判定する情報を取得"
+      },
+      {
+        "id": "info-zone-location",
+        "type": "information",
+        "title": "敷地の位置",
+        "symbol": "L",
+        "subject": "敷地",
+        "property": "区域区分該当",
+        "property_type": "classification",
+        "description": "特定防災街区整備地区のみ、指定区域外のみ、又は両方にわたる",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-spans-check",
+        "type": "process",
+        "title": "複数区域わたり判定",
+        "process_type": "mechanical",
+        "description": "敷地が特定防災街区整備地区と指定区域外の両方にわたるか判定",
+        "logic_expression": "L ∈ {両区域にわたる}"
+      },
+      {
+        "id": "info-spans-zones",
+        "type": "information",
+        "title": "複数区域わたり",
+        "symbol": "Z",
+        "subject": "敷地",
+        "property": "複数区域にわたる",
+        "property_type": "proposition",
+        "description": "敷地が特定防災街区整備地区と指定区域外の両方にわたるか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-firewall-check",
+        "type": "process",
+        "title": "防火壁による区画状況の確認",
+        "process_type": "human_judgment",
+        "description": "設計図書等から建築物が防火壁で区画されているかを確認する",
+        "remarks": "防火壁により区画された場合、区画外の部分の適用状況が変わる"
+      },
+      {
+        "id": "info-firewall-partition",
+        "type": "information",
+        "title": "防火壁による区画",
+        "symbol": "F",
+        "subject": "建築物",
+        "property": "防火壁による区画状況",
+        "property_type": "proposition",
+        "description": "建築物が特定防災街区整備地区外において防火壁で区画されているか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-applies-all-check",
+        "type": "process",
+        "title": "全体適用の判定",
+        "process_type": "mechanical",
+        "description": "複数区域わたりの場合、原則として第1項の規定を全部に適用するか判定",
+        "logic_expression": "Z AND NOT F"
+      },
+      {
+        "id": "info-applies-all",
+        "type": "information",
+        "title": "第1項規定の全体適用",
+        "symbol": "A",
+        "subject": "建築物",
+        "property": "第1項全体適用",
+        "property_type": "proposition",
+        "description": "建築物の全部に第1項の規定を適用するか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-exempt-area-identify",
+        "type": "process",
+        "title": "適用除外部分の特定",
+        "process_type": "human_judgment",
+        "description": "防火壁で区画されている場合、防火壁外の部分を特定する"
+      },
+      {
+        "id": "info-exempt-area",
+        "type": "information",
+        "title": "適用除外部分",
+        "symbol": "E",
+        "subject": "建築物",
+        "property": "第1項適用除外部分",
+        "property_type": "set_definition",
+        "description": "防火壁外の建築物部分（第1項適用除外）",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-applicable-area-identify",
+        "type": "process",
+        "title": "適用対象部分の特定",
+        "process_type": "mechanical",
+        "description": "防火壁で区画されている場合、防火壁内の部分を特用",
+        "logic_expression": "建築物全体 - 除外部分"
+      },
+      {
+        "id": "info-applicable-area",
+        "type": "information",
+        "title": "第1項適用対象部分",
+        "symbol": "Aa",
+        "subject": "建築物",
+        "property": "第1項適用対象部分",
+        "property_type": "set_definition",
+        "description": "防火壁内の建築物部分（第1項適用対象）",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-final-judgment",
+        "type": "process",
+        "title": "最終適用判定",
+        "process_type": "mechanical",
+        "description": "複数区域わたり、防火壁の有無を総合判定して第1項適用範囲を決定",
+        "logic_expression": "IF Z=true AND F=false THEN 全体適用 ELSE IF Z=true AND F=true THEN 部分適用 ELSE 適用不要"
+      },
+      {
+        "id": "info-final",
+        "type": "information",
+        "title": "法67条第2項判定結果",
+        "subject": "建築物",
+        "property": "第1項適用範囲",
+        "property_type": "classification",
+        "description": "建築物全体適用、部分適用（除外部分あり）、又は適用なし",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-zone-location-check",
+        "to": "info-zone-location",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "info-zone-location",
+        "to": "proc-spans-check",
+        "role": "input"
+      },
+      {
+        "id": "e03",
+        "from": "proc-spans-check",
+        "to": "info-spans-zones",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "info-spans-zones",
+        "to": "proc-firewall-check",
+        "role": "input"
+      },
+      {
+        "id": "e05",
+        "from": "proc-firewall-check",
+        "to": "info-firewall-partition",
+        "role": "output"
+      },
+      {
+        "id": "e06",
+        "from": "info-spans-zones",
+        "to": "proc-applies-all-check",
+        "role": "input"
+      },
+      {
+        "id": "e07",
+        "from": "info-firewall-partition",
+        "to": "proc-applies-all-check",
+        "role": "input"
+      },
+      {
+        "id": "e08",
+        "from": "proc-applies-all-check",
+        "to": "info-applies-all",
+        "role": "output"
+      },
+      {
+        "id": "e09",
+        "from": "info-firewall-partition",
+        "to": "proc-exempt-area-identify",
+        "role": "input"
+      },
+      {
+        "id": "e10",
+        "from": "proc-exempt-area-identify",
+        "to": "info-exempt-area",
+        "role": "output"
+      },
+      {
+        "id": "e11",
+        "from": "info-exempt-area",
+        "to": "proc-applicable-area-identify",
+        "role": "input"
+      },
+      {
+        "id": "e12",
+        "from": "proc-applicable-area-identify",
+        "to": "info-applicable-area",
+        "role": "output"
+      },
+      {
+        "id": "e13",
+        "from": "info-applies-all",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e14",
+        "from": "info-applicable-area",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e15",
+        "from": "proc-final-judgment",
+        "to": "info-final",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": [
+        "A67:P1"
+      ],
+      "description": "第2項で参照される第1項の適用要件（耐火建築物等、準耐火建築物等の要件）"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-24T15:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

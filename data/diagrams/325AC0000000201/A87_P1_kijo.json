@@ -1,0 +1,478 @@
+{
+  "id": "CHK-BSL-A87-P1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "用途変更時の法準用に関する申請・届出",
+    "target_subject": "建築物",
+    "description": "建築物の用途を特殊建築物に変更する場合における、建築確認申請・届出の手続き（第6条・第7条等の準用）"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "87",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "集団規定",
+    "手続き",
+    "用途変更"
+  ],
+  "text_raw": "建築物の用途を変更して第六条第一項第一号の特殊建築物のいずれかとする場合（当該用途の変更が政令で指定する類似の用途相互間におけるものである場合を除く。）においては、同条（第三項、第五項及び第六項を除く。）、第六条の二（第三項を除く。）、第六条の四（第一項第一号及び第二号の建築物に係る部分に限る。）、第七条第一項並びに第十八条第一項から第四項まで及び第十五項から第二十項までの規定を準用する。この場合において、第七条第一項中「建築主事等の検査（建築副主事の検査にあつては、大規模建築物以外の建築物に係るものに限る。第七条の三第一項において同じ。）を申請しなければならない」とあるのは、「建築主事等（当該用途の変更が大規模建築物に係るものである場合にあつては、建築主事）に届け出なければならない」と読み替えるものとする。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "application",
+          "value": "用途の変更"
+        },
+        {
+          "type": "target_building_type",
+          "value": "特殊建築物（第6条第1項第1号に列挙）"
+        }
+      ],
+      "note": "類似の用途相互間の場合は除外"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-use-change",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "ref": "info-target-building-type",
+          "operator": "==",
+          "value": "special"
+        },
+        {
+          "ref": "info-similar-use-exception",
+          "operator": "==",
+          "value": false
+        }
+      ]
+    },
+    "procedure": {
+      "application_type": "notification",
+      "note": "第7条第1項の「検査申請」は「届出」に読み替えられる。大規模建築物の場合は建築主事、それ以外は建築主事等。"
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-use-change-determination",
+        "type": "process",
+        "title": "用途の変更該当判定",
+        "process_type": "undefined_input",
+        "description": "変更前後の用途の確認により、これが「用途を変更する」に該当するか判定"
+      },
+      {
+        "id": "info-use-change",
+        "type": "information",
+        "title": "用途の変更の有無",
+        "symbol": "UC",
+        "subject": "建築物",
+        "property": "用途の変更",
+        "property_type": "proposition",
+        "description": "用途の変更が行われるか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-target-use-determination",
+        "type": "process",
+        "title": "変更後用途の判定",
+        "process_type": "mechanical",
+        "description": "変更後の用途が法第6条第1項第1号の特殊建築物に該当するか判定"
+      },
+      {
+        "id": "info-target-building-type",
+        "type": "information",
+        "title": "変更後の建築物用途分類",
+        "symbol": "BT",
+        "subject": "建築物",
+        "property": "用途分類",
+        "property_type": "classification",
+        "description": "変更後の用途が一般建築物か特殊建築物か",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-similar-use-check",
+        "type": "process",
+        "title": "類似の用途相互間の判定",
+        "process_type": "mechanical",
+        "description": "変更前後の用途が政令で指定する類似の用途相互間に該当するか判定"
+      },
+      {
+        "id": "info-similar-use-exception",
+        "type": "information",
+        "title": "類似の用途相互間該当",
+        "symbol": "SU",
+        "subject": "建築物",
+        "property": "類似の用途相互間への該当",
+        "property_type": "proposition",
+        "description": "政令で指定する類似の用途相互間に該当するか（該当する場合は第87条第1項の準用は不要）",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-applicability-determination",
+        "type": "process",
+        "title": "第87条第1項の適用判定",
+        "process_type": "mechanical",
+        "description": "用途変更が特殊建築物への変更で、類似用途相互間でない場合、第87条第1項の規定を準用する",
+        "logic_expression": "(UC = true) AND (BT = 'special') AND (SU = false)"
+      },
+      {
+        "id": "info-article87-applicable",
+        "type": "information",
+        "title": "第87条第1項の準用適用",
+        "symbol": "A87",
+        "subject": "建築物",
+        "property": "第87条第1項の適用",
+        "property_type": "proposition",
+        "description": "用途変更に対して第87条第1項の規定を準用するか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-building-scale-determination",
+        "type": "process",
+        "title": "建築物規模の判定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物が大規模建築物に該当するか判定（床面積による判定）"
+      },
+      {
+        "id": "info-building-scale",
+        "type": "information",
+        "title": "建築物の規模分類",
+        "symbol": "BS",
+        "subject": "建築物",
+        "property": "規模分類",
+        "property_type": "classification",
+        "description": "大規模建築物か通常規模建築物か",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-inspection-notification-determination",
+        "type": "process",
+        "title": "検査申請・届出の決定",
+        "process_type": "mechanical",
+        "description": "第7条第1項の「検査申請」を「届出」に読み替え、建築物規模に応じて届出先を決定する。大規模建築物は建築主事、それ以外は建築主事等。",
+        "logic_expression": "if (BS = 'large') then 届出先 = '建築主事' else 届出先 = '建築主事等'"
+      },
+      {
+        "id": "info-notification-requirement",
+        "type": "information",
+        "title": "届出の要件",
+        "symbol": "NR",
+        "subject": "建築物",
+        "property": "届出の要件と届出先",
+        "property_type": "proposition",
+        "description": "第7条第1項を準用する場合、建築主事等（大規模の場合は建築主事のみ）に届け出なければならない",
+        "plurality": "single",
+        "related_articles": [
+          "法::A7:P1"
+        ]
+      },
+      {
+        "id": "proc-article6-applicability",
+        "type": "process",
+        "title": "第6条各項の準用適用判定",
+        "process_type": "mechanical",
+        "description": "第87条第1項により、第6条（第3項、第5項及び第6項を除く）の規定を準用する"
+      },
+      {
+        "id": "info-article6-applied",
+        "type": "information",
+        "title": "第6条準用適用",
+        "symbol": "A6",
+        "subject": "建築物",
+        "property": "第6条準用の適用",
+        "property_type": "proposition",
+        "description": "第6条（第3項、第5項及び第6項を除く）の規定が準用される",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-article6-2-applicability",
+        "type": "process",
+        "title": "第6条の2の準用適用判定",
+        "process_type": "mechanical",
+        "description": "第87条第1項により、第6条の2（第3項を除く）の規定を準用する"
+      },
+      {
+        "id": "info-article6-2-applied",
+        "type": "information",
+        "title": "第6条の2準用適用",
+        "symbol": "A6_2",
+        "subject": "建築物",
+        "property": "第6条の2準用の適用",
+        "property_type": "proposition",
+        "description": "第6条の2（第3項を除く）の規定が準用される",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-article7-applicability",
+        "type": "process",
+        "title": "第7条第1項の準用適用判定",
+        "process_type": "mechanical",
+        "description": "第87条第1項により、第7条第1項の規定を準用する（読み替えあり）"
+      },
+      {
+        "id": "info-article7-applied",
+        "type": "information",
+        "title": "第7条第1項準用適用",
+        "symbol": "A7",
+        "subject": "建築物",
+        "property": "第7条第1項準用の適用",
+        "property_type": "proposition",
+        "description": "第7条第1項の規定が準用され、「検査申請」は「届出」に読み替えられる",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-article18-applicability",
+        "type": "process",
+        "title": "第18条各項の準用適用判定",
+        "process_type": "mechanical",
+        "description": "第87条第1項により、第18条第1項から第4項まで及び第15項から第20項までの規定を準用する"
+      },
+      {
+        "id": "info-article18-applied",
+        "type": "information",
+        "title": "第18条準用適用",
+        "symbol": "A18",
+        "subject": "建築物",
+        "property": "第18条準用の適用",
+        "property_type": "proposition",
+        "description": "第18条第1項～4項及び第15項～20項の規定が準用される",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-final-compliance",
+        "type": "process",
+        "title": "第87条第1項準用の適否判定",
+        "process_type": "mechanical",
+        "description": "用途変更に対して第6条・第6条の2・第7条第1項・第18条各項を準用し、届出等の手続きが完了しているか確認",
+        "logic_expression": "A87 AND A6 AND A6_2 AND A7 AND A18 AND NR"
+      },
+      {
+        "id": "info-final-compliance",
+        "type": "information",
+        "title": "第87条第1項の遵守状況",
+        "symbol": "FC",
+        "subject": "建築物",
+        "property": "第87条第1項準用の適合",
+        "property_type": "proposition",
+        "description": "用途変更が第87条第1項の規定に準用する諸規定に適合するか",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-use-change-determination",
+        "to": "info-use-change",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "info-use-change",
+        "to": "proc-target-use-determination",
+        "role": "input"
+      },
+      {
+        "id": "e03",
+        "from": "proc-target-use-determination",
+        "to": "info-target-building-type",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "info-use-change",
+        "to": "proc-similar-use-check",
+        "role": "input"
+      },
+      {
+        "id": "e05",
+        "from": "info-target-building-type",
+        "to": "proc-similar-use-check",
+        "role": "input"
+      },
+      {
+        "id": "e06",
+        "from": "proc-similar-use-check",
+        "to": "info-similar-use-exception",
+        "role": "output"
+      },
+      {
+        "id": "e07",
+        "from": "info-use-change",
+        "to": "proc-applicability-determination",
+        "role": "input"
+      },
+      {
+        "id": "e08",
+        "from": "info-target-building-type",
+        "to": "proc-applicability-determination",
+        "role": "input"
+      },
+      {
+        "id": "e09",
+        "from": "info-similar-use-exception",
+        "to": "proc-applicability-determination",
+        "role": "input"
+      },
+      {
+        "id": "e10",
+        "from": "proc-applicability-determination",
+        "to": "info-article87-applicable",
+        "role": "output"
+      },
+      {
+        "id": "e11",
+        "from": "info-article87-applicable",
+        "to": "proc-building-scale-determination",
+        "role": "input"
+      },
+      {
+        "id": "e12",
+        "from": "proc-building-scale-determination",
+        "to": "info-building-scale",
+        "role": "output"
+      },
+      {
+        "id": "e13",
+        "from": "info-article87-applicable",
+        "to": "proc-inspection-notification-determination",
+        "role": "input"
+      },
+      {
+        "id": "e14",
+        "from": "info-building-scale",
+        "to": "proc-inspection-notification-determination",
+        "role": "input"
+      },
+      {
+        "id": "e15",
+        "from": "proc-inspection-notification-determination",
+        "to": "info-notification-requirement",
+        "role": "output"
+      },
+      {
+        "id": "e16",
+        "from": "info-article87-applicable",
+        "to": "proc-article6-applicability",
+        "role": "input"
+      },
+      {
+        "id": "e17",
+        "from": "proc-article6-applicability",
+        "to": "info-article6-applied",
+        "role": "output"
+      },
+      {
+        "id": "e18",
+        "from": "info-article87-applicable",
+        "to": "proc-article6-2-applicability",
+        "role": "input"
+      },
+      {
+        "id": "e19",
+        "from": "proc-article6-2-applicability",
+        "to": "info-article6-2-applied",
+        "role": "output"
+      },
+      {
+        "id": "e20",
+        "from": "info-article87-applicable",
+        "to": "proc-article7-applicability",
+        "role": "input"
+      },
+      {
+        "id": "e21",
+        "from": "proc-article7-applicability",
+        "to": "info-article7-applied",
+        "role": "output"
+      },
+      {
+        "id": "e22",
+        "from": "info-article87-applicable",
+        "to": "proc-article18-applicability",
+        "role": "input"
+      },
+      {
+        "id": "e23",
+        "from": "proc-article18-applicability",
+        "to": "info-article18-applied",
+        "role": "output"
+      },
+      {
+        "id": "e24",
+        "from": "info-article6-applied",
+        "to": "proc-final-compliance",
+        "role": "input"
+      },
+      {
+        "id": "e25",
+        "from": "info-article6-2-applied",
+        "to": "proc-final-compliance",
+        "role": "input"
+      },
+      {
+        "id": "e26",
+        "from": "info-article7-applied",
+        "to": "proc-final-compliance",
+        "role": "input"
+      },
+      {
+        "id": "e27",
+        "from": "info-article18-applied",
+        "to": "proc-final-compliance",
+        "role": "input"
+      },
+      {
+        "id": "e28",
+        "from": "info-notification-requirement",
+        "to": "proc-final-compliance",
+        "role": "input"
+      },
+      {
+        "id": "e29",
+        "from": "proc-final-compliance",
+        "to": "info-final-compliance",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": [
+        "A6",
+        "A6_2",
+        "A6_4",
+        "A7",
+        "A18"
+      ],
+      "description": "第87条第1項で準用される規定"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "defines_detail",
+      "description": "類似の用途相互間の定義等"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-24T17:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

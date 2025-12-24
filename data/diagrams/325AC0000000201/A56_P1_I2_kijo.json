@@ -1,0 +1,290 @@
+{
+  "id": "CHK-BSL-A56-P1-I2",
+  "version": "3.1.0",
+  "page_title": {
+    "title": "隣地斜線制限（第56条第1項第2号）",
+    "target_subject": "建築物",
+    "description": "隣地境界線から建築物各部分までの水平距離と建物用途別の容積率係数に基づく高さ制限の判定"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "56",
+    "paragraph": "1",
+    "item": "2"
+  },
+  "labels": ["単体規定", "高さ制限"],
+  "text_raw": "当該部分から隣地境界線までの水平距離に、次に掲げる区分に従い、イ若しくはニに定める数値が一・二五とされている建築物で高さが二十メートルを超える部分を有するもの又はイからニまでに定める数値が二・五とされている建築物（ロ及びハに掲げる建築物で、特定行政庁が都道府県都市計画審議会の議を経て指定する区域内にあるものを除く。以下この号及び第七項第二号において同じ。）で高さが三十一メートルを超える部分を有するものにあつては、それぞれその部分から隣地境界線までの水平距離のうち最小のものに相当する距離を加えたものに、イからニまでに定める数値を乗じて得たものに、イ又はニに定める数値が一・二五とされている建築物にあつては二十メートルを、イからニまでに定める数値が二・五とされている建築物にあつては三十一メートルを加えたもの",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "height_threshold",
+          "value": "適用あり（高さ20m超の場合は係数1.25、31m超の場合は係数2.5）"
+        }
+      ],
+      "note": "隣地斜線制限は、イ又はニの係数（1.25）で高さ20m超部分を持つ建築物、またはイからニの係数（2.5）で高さ31m超部分を持つ建築物に適用される。"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "description": "係数1.25適用建築物で高さ20m超部分を有する場合",
+          "condition": "(h1.25 > 20m)"
+        },
+        {
+          "description": "係数2.5適用建築物で高さ31m超部分を有する場合",
+          "condition": "(h2.5 > 31m)"
+        }
+      ]
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "info-building",
+        "type": "information",
+        "title": "判定対象の建築物",
+        "subject": "建築物",
+        "property": "建築物の同定",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "高さ制限の対象となる建築物を特定"
+      },
+      {
+        "id": "info-height",
+        "type": "information",
+        "title": "建築物の高さ",
+        "symbol": "H",
+        "subject": "建築物",
+        "property": "高さ",
+        "property_type": "numeric",
+        "plurality": "single",
+        "unit": "m",
+        "description": "建築物の各部分の高さ"
+      },
+      {
+        "id": "info-usage-zone",
+        "type": "information",
+        "title": "建築物の用途地域・建物用途",
+        "symbol": "C",
+        "subject": "建築物",
+        "property": "用途地域・建物用途区分",
+        "property_type": "classification",
+        "plurality": "single",
+        "description": "建築物が該当するA項（イ・ニ=1.25係数）またはB項（ロ・ハ=2.5係数）の区分。ロ・ハについては特定行政庁指定区域除外条件あり",
+        "remarks": "イ：第一種中高層住居専用地域、第二種中高層住居専用地域、第一種住居地域、第二種住居地域、準住居地域\nロ：近隣商業地域、準工業地域（除外：ハの建築物）、商業地域、工業地域、工業専用地域\nハ：高層住居誘導地区（住宅70%以上）\nニ：用途地域未指定地域（ただし特定行政庁による区分指定あり）"
+      },
+      {
+        "id": "info-neighbor-distance",
+        "type": "information",
+        "title": "建築物から隣地境界線までの水平距離",
+        "symbol": "D",
+        "subject": "建築物",
+        "property": "隣地境界線までの最小距離",
+        "property_type": "numeric",
+        "plurality": "single",
+        "unit": "m",
+        "description": "建築物（またはその各部分）から最も近い隣地境界線までの水平距離"
+      },
+      {
+        "id": "info-coefficient",
+        "type": "information",
+        "title": "隣地斜線係数",
+        "symbol": "k",
+        "subject": "建築物",
+        "property": "用途別係数",
+        "property_type": "numeric",
+        "plurality": "single",
+        "description": "建築物の用途地域・建物用途によって定まる係数（1.25または2.5）"
+      },
+      {
+        "id": "info-high-part-distance",
+        "type": "information",
+        "title": "高さ超過部分の隣地境界線からの距離",
+        "symbol": "Dp",
+        "subject": "建築物",
+        "property": "高さ超過部分から隣地境界線までの最小距離",
+        "property_type": "numeric",
+        "plurality": "single",
+        "unit": "m",
+        "description": "建築物の高さが基準を超える部分から隣地境界線までの最小距離。この距離を距離D加えたものを使用"
+      },
+      {
+        "id": "proc-determine-coefficient",
+        "type": "process",
+        "title": "係数値の決定",
+        "process_type": "mechanical",
+        "description": "建築物の用途地域・用途分類に基づいて隣地斜線係数（1.25または2.5）を決定",
+        "logic_expression": "k = 1.25（C ∈ {イ, ニ}） OR k = 2.5（C ∈ {ロ, ハ}）",
+        "remarks": "特定行政庁指定区域除外条件を確認してから係数を適用"
+      },
+      {
+        "id": "proc-check-height-threshold",
+        "type": "process",
+        "title": "高さ基準超過判定",
+        "process_type": "mechanical",
+        "description": "建築物の高さが係数別の基準高さを超えているかを判定。係数1.25の場合は20m、係数2.5の場合は31mが基準",
+        "logic_expression": "(k = 1.25 AND H > 20) OR (k = 2.5 AND H > 31)",
+        "remarks": "高さが基準以下の場合、隣地斜線制限は適用されない（第7項で除外可能）"
+      },
+      {
+        "id": "proc-calc-max-height",
+        "type": "process",
+        "title": "隣地斜線適用時の最大許容高さ算定",
+        "process_type": "mechanical",
+        "iteration": "single",
+        "description": "高さ基準超過時に、隣地斜線制限値を計算。隣地境界線までの距離（高さ超過部分を考慮）に係数を乗じ、基準高さを加算",
+        "logic_expression": "Hmax = (D + D') × k + H_base\n（H_base: k=1.25の場合は20m、k=2.5の場合は31m）"
+      },
+      {
+        "id": "info-max-height",
+        "type": "information",
+        "title": "隣地斜線制限値",
+        "symbol": "Hmax",
+        "subject": "建築物",
+        "property": "隣地斜線制限による最大高さ",
+        "property_type": "numeric",
+        "plurality": "single",
+        "unit": "m",
+        "description": "隣地斜線制限によって定められた最大高さ限度。実際の高さはこの値以下となる必要がある"
+      },
+      {
+        "id": "proc-compliance-judgment",
+        "type": "process",
+        "title": "適合判定",
+        "process_type": "mechanical",
+        "description": "建築物の実際の高さが隣地斜線制限値以下であるかを判定",
+        "logic_expression": "H ≤ Hmax",
+        "remarks": "この判定が真の場合、建築物は第56条第1項第2号の隣地斜線制限に適合している"
+      },
+      {
+        "id": "info-compliance-result",
+        "type": "information",
+        "title": "第56条第1項第2号適合判定結果",
+        "symbol": "R",
+        "subject": "建築物",
+        "property": "隣地斜線制限への適合性",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "建築物が隣地斜線制限に適合しているか否か"
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge-building-coeff",
+        "from": "info-building",
+        "to": "proc-determine-coefficient",
+        "role": "input"
+      },
+      {
+        "id": "edge-usage-coeff",
+        "from": "info-usage-zone",
+        "to": "proc-determine-coefficient",
+        "role": "input"
+      },
+      {
+        "id": "edge-coeff-output",
+        "from": "proc-determine-coefficient",
+        "to": "info-coefficient",
+        "role": "output"
+      },
+      {
+        "id": "edge-building-height",
+        "from": "info-building",
+        "to": "proc-check-height-threshold",
+        "role": "input"
+      },
+      {
+        "id": "edge-height-value",
+        "from": "info-height",
+        "to": "proc-check-height-threshold",
+        "role": "input"
+      },
+      {
+        "id": "edge-coeff-threshold",
+        "from": "info-coefficient",
+        "to": "proc-check-height-threshold",
+        "role": "input"
+      },
+      {
+        "id": "edge-building-calc",
+        "from": "info-building",
+        "to": "proc-calc-max-height",
+        "role": "input"
+      },
+      {
+        "id": "edge-distance-calc",
+        "from": "info-neighbor-distance",
+        "to": "proc-calc-max-height",
+        "role": "input"
+      },
+      {
+        "id": "edge-high-part-calc",
+        "from": "info-high-part-distance",
+        "to": "proc-calc-max-height",
+        "role": "input"
+      },
+      {
+        "id": "edge-coeff-calc",
+        "from": "info-coefficient",
+        "to": "proc-calc-max-height",
+        "role": "input"
+      },
+      {
+        "id": "edge-max-height-output",
+        "from": "proc-calc-max-height",
+        "to": "info-max-height",
+        "role": "output"
+      },
+      {
+        "id": "edge-height-judgment",
+        "from": "info-height",
+        "to": "proc-compliance-judgment",
+        "role": "input"
+      },
+      {
+        "id": "edge-max-height-judgment",
+        "from": "info-max-height",
+        "to": "proc-compliance-judgment",
+        "role": "input"
+      },
+      {
+        "id": "edge-compliance-result",
+        "from": "proc-compliance-judgment",
+        "to": "info-compliance-result",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A55", "A57"],
+      "description": "隣接する前面道路斜線制限（第55条）および北側斜線制限（第57条）との関連"
+    },
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegates_to",
+      "articles": ["別表第三"],
+      "description": "用途地域別の容積率制限と係数の定義は別表第三に記載"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-24T17:00:00Z",
+    "updated_at": "2025-12-24T17:00:00Z",
+    "author": "Claude Code",
+    "generator": "kijo-generator-manual",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法",
+    "source": "e-Gov法令API v2 + Manual Analysis"
+  }
+}

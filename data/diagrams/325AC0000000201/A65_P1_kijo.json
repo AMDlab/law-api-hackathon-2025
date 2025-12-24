@@ -1,0 +1,426 @@
+{
+  "id": "CHK-BSL-A65-P1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "防火地域等の内外にわたる建築物の規定適用",
+    "target_subject": "建築物",
+    "description": "建築物が防火地域又は準防火地域とこれらの地域外にわたる場合の適用規定を判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "65",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": ["集団規定", "防火"],
+  "text_raw": "建築物が防火地域又は準防火地域とこれらの地域として指定されていない区域にわたる場合においては、その全部についてそれぞれ防火地域又は準防火地域内の建築物に関する規定を適用する。ただし、その建築物が防火地域又は準防火地域外において防火壁で区画されている場合においては、その防火壁外の部分については、この限りでない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "建築物が防火地域又は準防火地域とこれらの地域外にわたる"
+        }
+      ],
+      "note": "建築物が複数の防火規制区域にまたがる場合"
+    },
+    "judgment_rule": {
+      "operator": "IF-THEN",
+      "conditions": [
+        {
+          "condition": "防火壁による区画なし",
+          "result": "全部に防火地域又は準防火地域の規定を適用"
+        },
+        {
+          "condition": "防火壁による区画あり",
+          "result": "防火壁内部のみに防火地域又は準防火地域の規定を適用"
+        }
+      ]
+    },
+    "exceptions": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "note": "防火壁で区画されている場合の例外",
+          "ref": "info-firewall-exists",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "note": "防火壁が地域外に設置されている",
+          "ref": "info-firewall-location-valid",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "effect": "PARTIAL_EXEMPT"
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-site-location",
+        "type": "process",
+        "title": "敷地の位置特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の敷地の位置を特定する"
+      },
+      {
+        "id": "info-site-location",
+        "type": "information",
+        "title": "敷地の位置",
+        "symbol": "L",
+        "subject": "敷地",
+        "property": "所在地座標",
+        "property_type": "geometric_point",
+        "description": "建築物の敷地の位置（緯度経度等）",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-zone-check",
+        "type": "process",
+        "title": "区域判定",
+        "process_type": "mechanical",
+        "description": "都市計画情報と照合し、敷地が防火地域・準防火地域・未指定区域のどれにまたがるかを判定",
+        "related_articles": ["法::A2:I9_2", "法::A61"]
+      },
+      {
+        "id": "info-zone-span",
+        "type": "information",
+        "title": "区域またがり状況",
+        "symbol": "Z",
+        "subject": "敷地",
+        "property": "またがる区域の組合せ",
+        "property_type": "classification",
+        "description": "防火地域と未指定区域にまたがる、準防火地域と未指定区域にまたがる、等",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-building-geometry",
+        "type": "process",
+        "title": "建築物形状の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の形状（配置・範囲）を特定する"
+      },
+      {
+        "id": "info-building-geometry",
+        "type": "information",
+        "title": "建築物の形状",
+        "symbol": "G",
+        "subject": "建築物",
+        "property": "形状・配置",
+        "property_type": "geometric_solid",
+        "description": "建築物の3次元形状と敷地内配置",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-zone-overlap-check",
+        "type": "process",
+        "title": "区域またがり該当判定",
+        "process_type": "mechanical",
+        "description": "建築物の配置と区域境界線を照合し、建築物が実際に複数区域にまたがるかを判定",
+        "logic_expression": "(Z ∈ {防火地域×未指定区域, 準防火地域×未指定区域}) AND (G ∩ 境界線 ≠ ∅)"
+      },
+      {
+        "id": "info-spans-zones",
+        "type": "information",
+        "title": "区域またがり該当",
+        "symbol": "S",
+        "subject": "建築物",
+        "property": "複数区域にまたがるか",
+        "property_type": "proposition",
+        "description": "建築物が防火地域又は準防火地域と未指定区域にまたがるか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-firewall-exists",
+        "type": "process",
+        "title": "防火壁の有無確認",
+        "process_type": "undefined_input",
+        "description": "設計図書等から防火壁の有無を確認する"
+      },
+      {
+        "id": "info-firewall-exists",
+        "type": "information",
+        "title": "防火壁の有無",
+        "symbol": "F",
+        "subject": "建築物",
+        "property": "防火壁の設置有無",
+        "property_type": "proposition",
+        "description": "建築物に防火壁が設置されているか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-firewall-location",
+        "type": "process",
+        "title": "防火壁位置の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から防火壁の位置を特定する"
+      },
+      {
+        "id": "info-firewall-location",
+        "type": "information",
+        "title": "防火壁の位置",
+        "symbol": "Fp",
+        "subject": "防火壁",
+        "property": "位置",
+        "property_type": "geometric_surface",
+        "description": "防火壁の設置位置（3次元座標）",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-firewall-zone-check",
+        "type": "process",
+        "title": "防火壁位置判定",
+        "process_type": "mechanical",
+        "description": "防火壁が防火地域又は準防火地域の外側に設置されているかを判定",
+        "logic_expression": "Fp ∩ 未指定区域 = Fp"
+      },
+      {
+        "id": "info-firewall-location-valid",
+        "type": "information",
+        "title": "防火壁が地域外に設置",
+        "symbol": "Fv",
+        "subject": "防火壁",
+        "property": "地域外設置該当",
+        "property_type": "proposition",
+        "description": "防火壁が防火地域又は準防火地域外に設置されているか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-exception-check",
+        "type": "process",
+        "title": "例外適用判定",
+        "process_type": "mechanical",
+        "description": "ただし書きの例外条件（防火壁による区画）に該当するか判定",
+        "logic_expression": "F AND Fv"
+      },
+      {
+        "id": "info-exception-applies",
+        "type": "information",
+        "title": "例外適用該当",
+        "symbol": "E",
+        "subject": "建築物",
+        "property": "例外適用該当",
+        "property_type": "proposition",
+        "description": "ただし書きの例外が適用されるか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-applicable-zone",
+        "type": "process",
+        "title": "適用区域の特定",
+        "process_type": "mechanical",
+        "description": "建築物のどの部分にどの区域の規定を適用するかを決定",
+        "logic_expression": "IF E THEN (防火壁内部→防火地域等規定, 防火壁外部→適用除外) ELSE (全部→防火地域等規定)"
+      },
+      {
+        "id": "info-applicable-regulations",
+        "type": "information",
+        "title": "適用規定",
+        "symbol": "R",
+        "subject": "建築物",
+        "property": "適用すべき規定",
+        "property_type": "classification",
+        "description": "建築物の各部分に適用すべき規定（防火地域内規定、準防火地域内規定、適用なし）",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-regulation-compliance",
+        "type": "process",
+        "title": "適用規定への適合確認",
+        "process_type": "sub_diagram_reference",
+        "description": "決定された適用規定（法61条等の防火地域内規定）への適合を確認",
+        "related_articles": ["法::A61", "法::A62", "法::A63", "法::A64"],
+        "sub_diagram_ref": "CHK-BSL-A61-P1",
+        "remarks": "防火地域内の建築物の規定（法61条）等の機序図を参照"
+      },
+      {
+        "id": "info-compliance",
+        "type": "information",
+        "title": "適用規定への適合",
+        "symbol": "C",
+        "subject": "建築物",
+        "property": "適用規定への適合",
+        "property_type": "proposition",
+        "description": "決定された適用規定に建築物が適合しているか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-final-judgment",
+        "type": "process",
+        "title": "法65条1項適合判定",
+        "process_type": "mechanical",
+        "description": "適用範囲条件を満たし、かつ適用規定に適合することを確認",
+        "logic_expression": "S AND C"
+      },
+      {
+        "id": "info-final",
+        "type": "information",
+        "title": "法65条1項適合",
+        "subject": "建築物",
+        "property": "法65条1項適合",
+        "property_type": "proposition",
+        "description": "建築物が法65条1項の規定に適合するか",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-site-location",
+        "to": "info-site-location",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "info-site-location",
+        "to": "proc-zone-check",
+        "role": "input"
+      },
+      {
+        "id": "e03",
+        "from": "proc-zone-check",
+        "to": "info-zone-span",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "proc-building-geometry",
+        "to": "info-building-geometry",
+        "role": "output"
+      },
+      {
+        "id": "e05",
+        "from": "info-zone-span",
+        "to": "proc-zone-overlap-check",
+        "role": "input"
+      },
+      {
+        "id": "e06",
+        "from": "info-building-geometry",
+        "to": "proc-zone-overlap-check",
+        "role": "input"
+      },
+      {
+        "id": "e07",
+        "from": "proc-zone-overlap-check",
+        "to": "info-spans-zones",
+        "role": "output"
+      },
+      {
+        "id": "e08",
+        "from": "proc-firewall-exists",
+        "to": "info-firewall-exists",
+        "role": "output"
+      },
+      {
+        "id": "e09",
+        "from": "proc-firewall-location",
+        "to": "info-firewall-location",
+        "role": "output"
+      },
+      {
+        "id": "e10",
+        "from": "info-firewall-location",
+        "to": "proc-firewall-zone-check",
+        "role": "input"
+      },
+      {
+        "id": "e11",
+        "from": "proc-firewall-zone-check",
+        "to": "info-firewall-location-valid",
+        "role": "output"
+      },
+      {
+        "id": "e12",
+        "from": "info-firewall-exists",
+        "to": "proc-exception-check",
+        "role": "input"
+      },
+      {
+        "id": "e13",
+        "from": "info-firewall-location-valid",
+        "to": "proc-exception-check",
+        "role": "input"
+      },
+      {
+        "id": "e14",
+        "from": "proc-exception-check",
+        "to": "info-exception-applies",
+        "role": "output"
+      },
+      {
+        "id": "e15",
+        "from": "info-zone-span",
+        "to": "proc-applicable-zone",
+        "role": "input"
+      },
+      {
+        "id": "e16",
+        "from": "info-exception-applies",
+        "to": "proc-applicable-zone",
+        "role": "input"
+      },
+      {
+        "id": "e17",
+        "from": "proc-applicable-zone",
+        "to": "info-applicable-regulations",
+        "role": "output"
+      },
+      {
+        "id": "e18",
+        "from": "info-applicable-regulations",
+        "to": "proc-regulation-compliance",
+        "role": "input"
+      },
+      {
+        "id": "e19",
+        "from": "proc-regulation-compliance",
+        "to": "info-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e20",
+        "from": "info-spans-zones",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e21",
+        "from": "info-compliance",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e22",
+        "from": "proc-final-judgment",
+        "to": "info-final",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A2:I9_2", "A61", "A62", "A63", "A64"],
+      "description": "防火地域・準防火地域の定義と防火規制"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-23T18:30:00+09:00",
+    "updated_at": "2025-12-23T18:30:00+09:00",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法",
+    "source": "e-Gov法令API v2"
+  }
+}

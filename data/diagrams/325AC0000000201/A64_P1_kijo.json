@@ -1,0 +1,348 @@
+{
+  "id": "CHK-BSL-A64-P1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "耐火構造外壁の隣地境界線接続",
+    "target_subject": "建築物",
+    "description": "防火・準防火地域内で外壁が耐火構造の建築物が隣地境界線に接して設けることができることを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "64",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "集団規定",
+    "防火"
+  ],
+  "text_raw": "防火地域又は準防火地域内にある建築物で、外壁が耐火構造のものについては、その外壁を隣地境界線に接して設けることができる。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "防火地域内"
+        },
+        {
+          "type": "location",
+          "value": "準防火地域内"
+        }
+      ],
+      "note": "防火地域または準防火地域内に限定"
+    },
+    "judgment_rule": {
+      "operator": "IMPLIES",
+      "lhs": {
+        "operator": "AND",
+        "conditions": [
+          {
+            "ref": "info-fire-structure",
+            "operator": "==",
+            "value": true
+          }
+        ]
+      },
+      "rhs": {
+        "operator": "==",
+        "conditions": [
+          {
+            "ref": "info-can-adjoin",
+            "operator": "==",
+            "value": true
+          }
+        ]
+      }
+    },
+    "exceptions": null
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-walls-set",
+        "type": "process",
+        "title": "外壁の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から判定対象となる建築物の外壁を特定する"
+      },
+      {
+        "id": "info-walls-set",
+        "type": "information",
+        "title": "建築物の外壁",
+        "subject": "建築物",
+        "property": "外壁の集合",
+        "property_type": "set_definition",
+        "description": "判定対象となる建築物に属する外壁を特定",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-wall-structure",
+        "type": "process",
+        "title": "外壁構造の特定",
+        "process_type": "human_judgment",
+        "target_subject": "外壁",
+        "iteration": "iterative",
+        "description": "設計図書等から各外壁の構造種別を読み取る"
+      },
+      {
+        "id": "info-wall-structure",
+        "type": "information",
+        "title": "外壁の構造",
+        "symbol": "S",
+        "subject": "外壁",
+        "property": "構造種別",
+        "property_type": "classification",
+        "description": "外壁の構造種別（耐火構造、準耐火構造、その他）",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-fire-structure-check",
+        "type": "process",
+        "title": "耐火構造該当判定",
+        "process_type": "mechanical",
+        "target_subject": "外壁",
+        "iteration": "iterative",
+        "description": "各外壁が耐火構造に該当するか判定",
+        "related_articles": [
+          "法::A2:I7"
+        ],
+        "logic_expression": "S = '耐火構造'"
+      },
+      {
+        "id": "info-fire-structure-each",
+        "type": "information",
+        "title": "外壁の耐火構造該当",
+        "symbol": "F",
+        "subject": "外壁",
+        "property": "耐火構造該当",
+        "property_type": "proposition",
+        "description": "当該外壁が耐火構造であるか",
+        "related_articles": [
+          "法::A2:I7"
+        ],
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-all-walls-fire-structure",
+        "type": "process",
+        "title": "全外壁耐火構造確認",
+        "process_type": "mechanical",
+        "description": "全ての外壁が耐火構造であることを確認",
+        "logic_expression": "∀wall ∈ Walls: F(wall) = true"
+      },
+      {
+        "id": "info-fire-structure",
+        "type": "information",
+        "title": "外壁が耐火構造",
+        "symbol": "FA",
+        "subject": "建築物",
+        "property": "外壁が耐火構造",
+        "property_type": "proposition",
+        "description": "建築物の外壁が耐火構造であるか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-boundary-lines-set",
+        "type": "process",
+        "title": "隣地境界線の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から敷地の隣地境界線を特定する"
+      },
+      {
+        "id": "info-boundary-lines-set",
+        "type": "information",
+        "title": "敷地の隣地境界線",
+        "subject": "敷地",
+        "property": "隣地境界線の集合",
+        "property_type": "set_definition",
+        "description": "判定対象となる敷地の隣地境界線を特定",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-wall-position",
+        "type": "process",
+        "title": "外壁位置の特定",
+        "process_type": "human_judgment",
+        "target_subject": "外壁",
+        "iteration": "iterative",
+        "description": "設計図書等から各外壁の隣地境界線からの距離を読み取る"
+      },
+      {
+        "id": "info-wall-position",
+        "type": "information",
+        "title": "外壁の境界線距離",
+        "symbol": "D",
+        "subject": "外壁",
+        "property": "隣地境界線からの距離",
+        "property_type": "numeric",
+        "unit": "m",
+        "description": "外壁が隣地境界線から何m離れているか（0の場合は接している）",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-can-adjoin-check",
+        "type": "process",
+        "title": "隣地境界線接続可否判定",
+        "process_type": "mechanical",
+        "description": "外壁が耐火構造であれば隣地境界線に接して設けることができる",
+        "logic_expression": "FA → (D = 0 は適法)"
+      },
+      {
+        "id": "info-can-adjoin",
+        "type": "information",
+        "title": "隣地境界線接続可能",
+        "symbol": "C",
+        "subject": "建築物",
+        "property": "外壁を隣地境界線に接して設けることが可能",
+        "property_type": "proposition",
+        "description": "法64条1項により、外壁を隣地境界線に接して設けることができるか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-compliance-check",
+        "type": "process",
+        "title": "法64条1項適合判定",
+        "process_type": "mechanical",
+        "description": "外壁が耐火構造の場合、隣地境界線に接して設けることが可能であることを確認",
+        "logic_expression": "FA → C"
+      },
+      {
+        "id": "info-compliance",
+        "type": "information",
+        "title": "法64条1項適合",
+        "subject": "建築物",
+        "property": "法64条1項適合",
+        "property_type": "proposition",
+        "description": "建築物が法64条1項の規定に適合するか（防火・準防火地域内で耐火構造外壁なら隣地境界線に接続可能）",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-walls-set",
+        "to": "info-walls-set",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "info-walls-set",
+        "to": "proc-wall-structure",
+        "role": "input"
+      },
+      {
+        "id": "e03",
+        "from": "proc-wall-structure",
+        "to": "info-wall-structure",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "info-wall-structure",
+        "to": "proc-fire-structure-check",
+        "role": "input"
+      },
+      {
+        "id": "e05",
+        "from": "proc-fire-structure-check",
+        "to": "info-fire-structure-each",
+        "role": "output"
+      },
+      {
+        "id": "e06",
+        "from": "info-fire-structure-each",
+        "to": "proc-all-walls-fire-structure",
+        "role": "input"
+      },
+      {
+        "id": "e07",
+        "from": "proc-all-walls-fire-structure",
+        "to": "info-fire-structure",
+        "role": "output"
+      },
+      {
+        "id": "e08",
+        "from": "proc-boundary-lines-set",
+        "to": "info-boundary-lines-set",
+        "role": "output"
+      },
+      {
+        "id": "e09",
+        "from": "info-walls-set",
+        "to": "proc-wall-position",
+        "role": "input"
+      },
+      {
+        "id": "e10",
+        "from": "info-boundary-lines-set",
+        "to": "proc-wall-position",
+        "role": "input"
+      },
+      {
+        "id": "e11",
+        "from": "proc-wall-position",
+        "to": "info-wall-position",
+        "role": "output"
+      },
+      {
+        "id": "e12",
+        "from": "info-fire-structure",
+        "to": "proc-can-adjoin-check",
+        "role": "input"
+      },
+      {
+        "id": "e13",
+        "from": "info-wall-position",
+        "to": "proc-can-adjoin-check",
+        "role": "input"
+      },
+      {
+        "id": "e14",
+        "from": "proc-can-adjoin-check",
+        "to": "info-can-adjoin",
+        "role": "output"
+      },
+      {
+        "id": "e15",
+        "from": "info-fire-structure",
+        "to": "proc-compliance-check",
+        "role": "input"
+      },
+      {
+        "id": "e16",
+        "from": "info-can-adjoin",
+        "to": "proc-compliance-check",
+        "role": "input"
+      },
+      {
+        "id": "e17",
+        "from": "proc-compliance-check",
+        "to": "info-compliance",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": [
+        "A2:I7"
+      ],
+      "description": "耐火構造の定義"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-23T22:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

@@ -1,0 +1,262 @@
+{
+  "id": "CHK-BSL-A56-2-P4",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "対象区域外建築物の日影制限適用判定",
+    "target_subject": "対象区域外にある建築物",
+    "description": "対象区域外にある建築物が対象区域内の土地に日影を生じさせる場合、当該建築物に対して日影制限を適用するかを判定する機序"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "56の2",
+    "paragraph": "4",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "日影制限"
+  ],
+  "text_raw": "対象区域外にある高さが十メートルを超える建築物で、冬至日において、対象区域内の土地に日影を生じさせるものは、当該対象区域内にある建築物とみなして、第一項の規定を適用する。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "対象区域外"
+        },
+        {
+          "type": "winter_solstice",
+          "value": "true"
+        }
+      ],
+      "note": "対象区域は法56条の2の規定に基づき地方公共団体が条例で指定する区域"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "numeric_comparison",
+          "variable": "建築物の高さ",
+          "operator": ">",
+          "value": 10,
+          "unit": "m"
+        },
+        {
+          "type": "shadow_detection",
+          "variable": "冬至日における対象区域内の土地への日影",
+          "operator": "exists",
+          "value": true
+        }
+      ],
+      "conclusion": "対象区域内にある建築物とみなして、法56条の2第1項の規定を適用する"
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "info-001",
+        "type": "information",
+        "title": "建築物の敷地位置",
+        "subject": "建築物",
+        "property": "敷地の位置（対象区域内外の別）",
+        "property_type": "classification",
+        "plurality": "single",
+        "description": "判定対象となる建築物の敷地が対象区域内か対象区域外かを特定",
+        "remarks": "対象区域は法56条の2の規定に基づき地方公共団体が条例で指定する区域"
+      },
+      {
+        "id": "info-002",
+        "type": "information",
+        "title": "建築物の高さ",
+        "subject": "建築物",
+        "property": "高さ",
+        "property_type": "numeric",
+        "plurality": "single",
+        "unit": "m",
+        "description": "建築物の平均地盤面からの高さ"
+      },
+      {
+        "id": "info-003",
+        "type": "information",
+        "title": "冬至日の日影範囲",
+        "subject": "建築物",
+        "property": "冬至日における日影が及ぶ範囲",
+        "property_type": "geometric_surface",
+        "plurality": "single",
+        "description": "冬至日の真太陽時における建築物が生成する日影の領域"
+      },
+      {
+        "id": "info-004",
+        "type": "information",
+        "title": "対象区域内の土地",
+        "subject": "対象区域",
+        "property": "区域内の土地",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "法56条の2で規定される日影制限の対象となる区域内の土地範囲"
+      },
+      {
+        "id": "proc-001",
+        "type": "process",
+        "title": "敷地位置確認",
+        "process_type": "mechanical",
+        "description": "判定対象建築物の敷地が対象区域外であることを確認",
+        "logic_expression": "敷地位置 = 対象区域外"
+      },
+      {
+        "id": "proc-002",
+        "type": "process",
+        "title": "高さ判定",
+        "process_type": "mechanical",
+        "description": "建築物の高さが10メートルを超えるかを判定",
+        "logic_expression": "建築物高さ > 10m",
+        "software_functions": [
+          {
+            "category": "program_processing",
+            "description": "数値比較による高さ閾値判定"
+          }
+        ]
+      },
+      {
+        "id": "proc-003",
+        "type": "process",
+        "title": "日影範囲判定",
+        "process_type": "mechanical",
+        "description": "冬至日における建築物の日影が対象区域内の土地に及ぶかを判定",
+        "logic_expression": "日影範囲 ∩ 対象区域内の土地 ≠ ∅"
+      },
+      {
+        "id": "info-005",
+        "type": "information",
+        "title": "適用対象判定",
+        "subject": "建築物",
+        "property": "法56条の2第1項の適用対象となるか否か",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "対象区域外の建築物が、対象区域内の土地に日影を生じさせる場合、法56条の2第1項を適用する建築物として扱うか否かの判定結果"
+      },
+      {
+        "id": "proc-004",
+        "type": "process",
+        "title": "適用対象統合判定",
+        "process_type": "mechanical",
+        "description": "全ての条件を満たす場合、当該建築物を法56条の2第1項の適用対象と判定",
+        "logic_expression": "(敷地位置 = 対象区域外) AND (高さ > 10m) AND (冬至日日影 ∩ 対象区域内の土地 ≠ ∅) → 適用対象 = TRUE",
+        "software_functions": [
+          {
+            "category": "program_processing",
+            "description": "3条件のAND論理演算"
+          }
+        ]
+      },
+      {
+        "id": "info-006",
+        "type": "information",
+        "title": "法56条の2第1項の規定適用",
+        "subject": "建築物",
+        "property": "適用される規定",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "当該建築物に対して法56条の2第1項の日影時間制限規定を適用することが確定"
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge-001",
+        "from": "info-001",
+        "to": "proc-001",
+        "role": "input"
+      },
+      {
+        "id": "edge-002",
+        "from": "proc-001",
+        "to": "proc-004",
+        "role": "supporting"
+      },
+      {
+        "id": "edge-003",
+        "from": "info-002",
+        "to": "proc-002",
+        "role": "input"
+      },
+      {
+        "id": "edge-004",
+        "from": "proc-002",
+        "to": "proc-004",
+        "role": "supporting"
+      },
+      {
+        "id": "edge-005",
+        "from": "info-003",
+        "to": "proc-003",
+        "role": "input"
+      },
+      {
+        "id": "edge-006",
+        "from": "info-004",
+        "to": "proc-003",
+        "role": "input"
+      },
+      {
+        "id": "edge-007",
+        "from": "proc-003",
+        "to": "proc-004",
+        "role": "supporting"
+      },
+      {
+        "id": "edge-008",
+        "from": "proc-004",
+        "to": "info-005",
+        "role": "output"
+      },
+      {
+        "id": "edge-009",
+        "from": "info-005",
+        "to": "proc-004",
+        "role": "input"
+      },
+      {
+        "id": "edge-010",
+        "from": "proc-004",
+        "to": "info-006",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": [
+        "A56_2:P1"
+      ],
+      "description": "第1項の日影制限規定を対象区域外の建築物にも適用する"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": [
+        "A130",
+        "A131"
+      ],
+      "description": "日影制限の具体的な計算方法や基準を定める"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-24T00:00:00Z",
+    "updated_at": "2025-12-24T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "kijo-generator",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法",
+    "source": "e-Gov法令API v2"
+  }
+}

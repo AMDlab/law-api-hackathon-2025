@@ -1,0 +1,338 @@
+{
+  "id": "CHK-BSL-A52-P9",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "特定道路接続時の前面道路幅員加算",
+    "target_subject": "建築物",
+    "description": "特定道路に接続する前面道路に面する敷地について、前面道路幅員の加算値を算定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "52",
+    "paragraph": "9",
+    "item": null
+  },
+  "labels": ["集団規定", "容積率", "前面道路", "特定道路"],
+  "text_raw": "建築物の敷地が、幅員十五メートル以上の道路（以下この項において「特定道路」という。）に接続する幅員六メートル以上十二メートル未満の前面道路のうち当該特定道路からの延長が七十メートル以内の部分において接する場合における当該建築物に対する第二項から第七項までの規定の適用については、第二項中「幅員」とあるのは、「幅員（第九項の特定道路に接続する同項の前面道路のうち当該特定道路からの延長が七十メートル以内の部分にあつては、その幅員に、当該特定道路から当該建築物の敷地が接する当該前面道路の部分までの延長に応じて政令で定める数値を加えたもの）」とする。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "geometric",
+          "description": "敷地が幅員15m以上の道路に接続する幅員6m以上12m未満の前面道路に接する",
+          "operator": "AND",
+          "conditions": [
+            { "description": "前面道路の幅員が6m以上12m未満" },
+            { "description": "前面道路が幅員15m以上の特定道路に接続している" },
+            { "description": "敷地が前面道路に接する位置が特定道路から70m以内" }
+          ]
+        }
+      ],
+      "note": "特定道路からの延長70m以内の前面道路に接する敷地に適用"
+    },
+    "judgment_rule": {
+      "operator": "CALCULATION",
+      "description": "前面道路幅員の読み替え（第2項の「幅員」を加算後の値に読み替える）",
+      "formula": "W_effective = W_front + α",
+      "note": "W_front: 前面道路の幅員、α: 政令で定める数値（特定道路からの延長に応じて算定）"
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-site-identify",
+        "type": "process",
+        "title": "敷地の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の敷地を特定する"
+      },
+      {
+        "id": "info-site",
+        "type": "information",
+        "title": "敷地",
+        "symbol": "S",
+        "subject": "敷地",
+        "property": "敷地の範囲",
+        "property_type": "geometric_surface",
+        "description": "判定対象となる建築物の敷地",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-front-road-identify",
+        "type": "process",
+        "title": "前面道路の特定",
+        "process_type": "mechanical",
+        "description": "敷地に接する前面道路を特定する",
+        "related_articles": ["法::A52:P2"]
+      },
+      {
+        "id": "info-front-road",
+        "type": "information",
+        "title": "前面道路",
+        "symbol": "FR",
+        "subject": "敷地",
+        "property": "前面道路",
+        "property_type": "geometric_line",
+        "description": "敷地が接する前面道路（幅員が最大のもの）",
+        "plurality": "single",
+        "related_articles": ["法::A52:P2"]
+      },
+      {
+        "id": "proc-front-road-width",
+        "type": "process",
+        "title": "前面道路幅員の計測",
+        "process_type": "mechanical",
+        "description": "前面道路の幅員を計測する"
+      },
+      {
+        "id": "info-front-road-width",
+        "type": "information",
+        "title": "前面道路の幅員",
+        "symbol": "W_front",
+        "subject": "前面道路",
+        "property": "幅員",
+        "property_type": "numeric",
+        "unit": "m",
+        "description": "前面道路の幅員",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-width-range-check",
+        "type": "process",
+        "title": "前面道路幅員範囲判定",
+        "process_type": "mechanical",
+        "description": "前面道路の幅員が6m以上12m未満であるか判定",
+        "logic_expression": "6 ≤ W_front < 12"
+      },
+      {
+        "id": "info-width-range",
+        "type": "information",
+        "title": "前面道路幅員範囲適合",
+        "symbol": "R1",
+        "subject": "前面道路",
+        "property": "幅員が6m以上12m未満",
+        "property_type": "proposition",
+        "description": "前面道路の幅員が6m以上12m未満であるか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-specified-road-identify",
+        "type": "process",
+        "title": "特定道路の特定",
+        "process_type": "mechanical",
+        "description": "前面道路が接続する幅員15m以上の道路（特定道路）を特定する"
+      },
+      {
+        "id": "info-specified-road",
+        "type": "information",
+        "title": "特定道路",
+        "symbol": "SR",
+        "subject": "前面道路",
+        "property": "接続する幅員15m以上の道路",
+        "property_type": "geometric_line",
+        "description": "前面道路が接続する幅員15m以上の道路（特定道路）",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-specified-road-check",
+        "type": "process",
+        "title": "特定道路接続判定",
+        "process_type": "mechanical",
+        "description": "前面道路が幅員15m以上の特定道路に接続しているか判定"
+      },
+      {
+        "id": "info-specified-road-exists",
+        "type": "information",
+        "title": "特定道路接続の有無",
+        "symbol": "R2",
+        "subject": "前面道路",
+        "property": "特定道路への接続",
+        "property_type": "proposition",
+        "description": "前面道路が幅員15m以上の特定道路に接続しているか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-contact-point-identify",
+        "type": "process",
+        "title": "敷地接道位置の特定",
+        "process_type": "mechanical",
+        "description": "敷地が前面道路に接する部分の中心位置を特定する"
+      },
+      {
+        "id": "info-contact-point",
+        "type": "information",
+        "title": "敷地接道位置",
+        "symbol": "CP",
+        "subject": "敷地",
+        "property": "前面道路との接道位置",
+        "property_type": "geometric_point",
+        "description": "敷地が前面道路に接する部分の代表点",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-distance-calc",
+        "type": "process",
+        "title": "特定道路からの延長計測",
+        "process_type": "mechanical",
+        "description": "特定道路から敷地が前面道路に接する位置までの延長を計測する",
+        "logic_expression": "L = distance(SR, CP)"
+      },
+      {
+        "id": "info-distance",
+        "type": "information",
+        "title": "特定道路からの延長",
+        "symbol": "L",
+        "subject": "敷地",
+        "property": "特定道路からの延長",
+        "property_type": "numeric",
+        "unit": "m",
+        "description": "特定道路から敷地が前面道路に接する位置までの延長",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-distance-check",
+        "type": "process",
+        "title": "延長範囲判定",
+        "process_type": "mechanical",
+        "description": "特定道路からの延長が70m以内であるか判定",
+        "logic_expression": "L ≤ 70"
+      },
+      {
+        "id": "info-distance-range",
+        "type": "information",
+        "title": "延長範囲適合",
+        "symbol": "R3",
+        "subject": "敷地",
+        "property": "特定道路から70m以内",
+        "property_type": "proposition",
+        "description": "特定道路からの延長が70m以内であるか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-applicability-check",
+        "type": "process",
+        "title": "本項適用要件判定",
+        "process_type": "mechanical",
+        "description": "第9項の適用要件（幅員6m以上12m未満、特定道路接続、延長70m以内）を全て満たすか判定",
+        "logic_expression": "R1 AND R2 AND R3"
+      },
+      {
+        "id": "info-applicability",
+        "type": "information",
+        "title": "本項適用該当",
+        "symbol": "A",
+        "subject": "敷地",
+        "property": "第9項の適用該当",
+        "property_type": "proposition",
+        "description": "第52条第9項の適用要件に該当するか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-addition-calc",
+        "type": "process",
+        "title": "幅員加算値の算定",
+        "process_type": "mechanical",
+        "description": "特定道路からの延長に応じて政令で定める数値を算定する",
+        "related_articles": ["令::A135_11"],
+        "logic_expression": "α = (12 - W_front) × (70 - L) / 70",
+        "remarks": "建築基準法施行令第135条の11により、α = (12 - W_front) × (70 - L) / 70"
+      },
+      {
+        "id": "info-addition-value",
+        "type": "information",
+        "title": "幅員加算値",
+        "symbol": "alpha",
+        "subject": "前面道路",
+        "property": "幅員加算値",
+        "property_type": "numeric",
+        "unit": "m",
+        "description": "政令で定める数値（特定道路からの延長に応じた加算値）",
+        "plurality": "single",
+        "related_articles": ["令::A135_11"]
+      },
+      {
+        "id": "proc-effective-width-calc",
+        "type": "process",
+        "title": "有効前面道路幅員の算定",
+        "process_type": "mechanical",
+        "description": "前面道路の幅員に加算値を加えた有効幅員を算定する",
+        "logic_expression": "W_effective = W_front + α"
+      },
+      {
+        "id": "info-effective-width",
+        "type": "information",
+        "title": "有効前面道路幅員",
+        "symbol": "W_effective",
+        "subject": "前面道路",
+        "property": "有効幅員（加算後）",
+        "property_type": "numeric",
+        "unit": "m",
+        "description": "第2項の「幅員」として用いる加算後の有効幅員",
+        "plurality": "single",
+        "remarks": "この値を用いて第2項から第7項までの規定を適用する"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "proc-site-identify", "to": "info-site", "role": "output" },
+      { "id": "e02", "from": "info-site", "to": "proc-front-road-identify", "role": "input" },
+      { "id": "e03", "from": "proc-front-road-identify", "to": "info-front-road", "role": "output" },
+      { "id": "e04", "from": "info-front-road", "to": "proc-front-road-width", "role": "input" },
+      { "id": "e05", "from": "proc-front-road-width", "to": "info-front-road-width", "role": "output" },
+      { "id": "e06", "from": "info-front-road-width", "to": "proc-width-range-check", "role": "input" },
+      { "id": "e07", "from": "proc-width-range-check", "to": "info-width-range", "role": "output" },
+      { "id": "e08", "from": "info-front-road", "to": "proc-specified-road-identify", "role": "input" },
+      { "id": "e09", "from": "proc-specified-road-identify", "to": "info-specified-road", "role": "output" },
+      { "id": "e10", "from": "info-specified-road", "to": "proc-specified-road-check", "role": "input" },
+      { "id": "e11", "from": "proc-specified-road-check", "to": "info-specified-road-exists", "role": "output" },
+      { "id": "e12", "from": "info-site", "to": "proc-contact-point-identify", "role": "input" },
+      { "id": "e13", "from": "info-front-road", "to": "proc-contact-point-identify", "role": "input" },
+      { "id": "e14", "from": "proc-contact-point-identify", "to": "info-contact-point", "role": "output" },
+      { "id": "e15", "from": "info-specified-road", "to": "proc-distance-calc", "role": "input" },
+      { "id": "e16", "from": "info-contact-point", "to": "proc-distance-calc", "role": "input" },
+      { "id": "e17", "from": "proc-distance-calc", "to": "info-distance", "role": "output" },
+      { "id": "e18", "from": "info-distance", "to": "proc-distance-check", "role": "input" },
+      { "id": "e19", "from": "proc-distance-check", "to": "info-distance-range", "role": "output" },
+      { "id": "e20", "from": "info-width-range", "to": "proc-applicability-check", "role": "input" },
+      { "id": "e21", "from": "info-specified-road-exists", "to": "proc-applicability-check", "role": "input" },
+      { "id": "e22", "from": "info-distance-range", "to": "proc-applicability-check", "role": "input" },
+      { "id": "e23", "from": "proc-applicability-check", "to": "info-applicability", "role": "output" },
+      { "id": "e24", "from": "info-front-road-width", "to": "proc-addition-calc", "role": "input" },
+      { "id": "e25", "from": "info-distance", "to": "proc-addition-calc", "role": "input" },
+      { "id": "e26", "from": "proc-addition-calc", "to": "info-addition-value", "role": "output" },
+      { "id": "e27", "from": "info-front-road-width", "to": "proc-effective-width-calc", "role": "input" },
+      { "id": "e28", "from": "info-addition-value", "to": "proc-effective-width-calc", "role": "input" },
+      { "id": "e29", "from": "info-applicability", "to": "proc-effective-width-calc", "role": "input" },
+      { "id": "e30", "from": "proc-effective-width-calc", "to": "info-effective-width", "role": "output" }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A52:P2", "A52:P3", "A52:P4", "A52:P5", "A52:P6", "A52:P7"],
+      "description": "第2項から第7項までの規定適用時に前面道路幅員を読み替える"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "delegates_to",
+      "articles": ["A135_11"],
+      "description": "特定道路からの延長に応じた加算値の算定方法を定める"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-24T06:00:00Z",
+    "updated_at": "2025-12-24T06:00:00Z",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

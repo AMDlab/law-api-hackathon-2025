@@ -1,0 +1,433 @@
+{
+  "id": "CHK-BSL-A36-P1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "特殊建築物等の建築材料の品質",
+    "target_subject": "建築物",
+    "description": "特殊建築物等に使用する建築材料が居室内で衛生上支障を生じさせるおそれのあるホルムアルデヒド等の化学物質の発散による衛生上の支障がないことを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "36",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "居室の採光",
+    "建材"
+  ],
+  "text_raw": "居室を有する建築物は、その居室内において化学物質の発散による衛生上の支障がないよう、建築材料及び換気設備について政令で定める技術的基準に適合するものとしなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "building_component",
+          "value": "居室を有する建築物"
+        }
+      ],
+      "note": "居室を有する建築物が対象"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-material-compliance",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "ref": "info-ventilation-compliance",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-rooms-set",
+        "type": "process",
+        "title": "居室の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から判定対象となる居室を特定する"
+      },
+      {
+        "id": "info-rooms-set",
+        "type": "information",
+        "title": "建築物の居室",
+        "subject": "建築物",
+        "property": "居室の集合",
+        "property_type": "set_definition",
+        "description": "判定対象となる建築物に属する居室を特定",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-materials-set",
+        "type": "process",
+        "title": "建築材料の特定",
+        "process_type": "human_judgment",
+        "target_subject": "居室",
+        "iteration": "iterative",
+        "description": "設計図書等から各居室で使用される建築材料（内装仕上げ材料、下地材料、断熱材料等）を特定する"
+      },
+      {
+        "id": "info-materials-set",
+        "type": "information",
+        "title": "居室の建築材料",
+        "subject": "居室",
+        "property": "建築材料の集合",
+        "property_type": "set_definition",
+        "description": "各居室で使用される建築材料の集合",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-material-type",
+        "type": "process",
+        "title": "建築材料の種類・仕様の特定",
+        "process_type": "human_judgment",
+        "target_subject": "建築材料",
+        "iteration": "iterative",
+        "description": "各建築材料の種類、仕様、化学物質発散等級等を特定する"
+      },
+      {
+        "id": "info-material-type",
+        "type": "information",
+        "title": "建築材料の種類・仕様",
+        "symbol": "M",
+        "subject": "建築材料",
+        "property": "種類・仕様",
+        "property_type": "classification",
+        "description": "建築材料の種類、仕様、化学物質発散等級（F☆☆☆☆、F☆☆☆等）",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-material-area",
+        "type": "process",
+        "title": "建築材料の使用面積の特定",
+        "process_type": "human_judgment",
+        "target_subject": "建築材料",
+        "iteration": "iterative",
+        "description": "各居室における各建築材料の使用面積を特定する"
+      },
+      {
+        "id": "info-material-area",
+        "type": "information",
+        "title": "建築材料の使用面積",
+        "symbol": "Am",
+        "subject": "建築材料",
+        "property": "使用面積",
+        "property_type": "numeric",
+        "unit": "m2",
+        "description": "居室における当該建築材料の使用面積",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-room-volume",
+        "type": "process",
+        "title": "居室容積の特定",
+        "process_type": "human_judgment",
+        "target_subject": "居室",
+        "iteration": "iterative",
+        "description": "設計図書等から各居室の容積を特定する"
+      },
+      {
+        "id": "info-room-volume",
+        "type": "information",
+        "title": "居室の容積",
+        "symbol": "V",
+        "subject": "居室",
+        "property": "容積",
+        "property_type": "numeric",
+        "unit": "m3",
+        "description": "居室の容積",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-material-tech-standard",
+        "type": "process",
+        "title": "建築材料の技術的基準適合判定",
+        "process_type": "mechanical",
+        "target_subject": "居室",
+        "iteration": "iterative",
+        "description": "令20条の5、令20条の6、令20条の7の技術的基準（内装仕上げの制限、ホルムアルデヒド発散建築材料の使用面積制限等）への適合を判定",
+        "related_articles": [
+          "令::A20_5",
+          "令::A20_6",
+          "令::A20_7"
+        ],
+        "logic_expression": "(内装仕上げ制限適合) AND (ホルムアルデヒド発散材料使用面積制限適合)"
+      },
+      {
+        "id": "info-material-compliance",
+        "type": "information",
+        "title": "建築材料の技術的基準適合",
+        "symbol": "Tm",
+        "subject": "居室",
+        "property": "建築材料の技術的基準適合",
+        "property_type": "proposition",
+        "description": "令20条の5～7の建築材料に関する技術的基準に適合するか",
+        "related_articles": [
+          "令::A20_5",
+          "令::A20_6",
+          "令::A20_7"
+        ],
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-ventilation-system",
+        "type": "process",
+        "title": "換気設備の仕様の特定",
+        "process_type": "human_judgment",
+        "target_subject": "居室",
+        "iteration": "iterative",
+        "description": "設計図書等から各居室の換気設備の仕様（機械換気、自然換気、換気回数等）を特定する"
+      },
+      {
+        "id": "info-ventilation-system",
+        "type": "information",
+        "title": "換気設備の仕様",
+        "symbol": "E",
+        "subject": "居室",
+        "property": "換気設備の仕様",
+        "property_type": "classification",
+        "description": "換気設備の種類、換気方式、換気回数等",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-ventilation-tech-standard",
+        "type": "process",
+        "title": "換気設備の技術的基準適合判定",
+        "process_type": "mechanical",
+        "target_subject": "居室",
+        "iteration": "iterative",
+        "description": "令20条の8の技術的基準（換気回数、有効換気量等の基準）への適合を判定",
+        "related_articles": [
+          "令::A20_8"
+        ],
+        "logic_expression": "換気回数基準適合 AND 有効換気量基準適合"
+      },
+      {
+        "id": "info-ventilation-compliance",
+        "type": "information",
+        "title": "換気設備の技術的基準適合",
+        "symbol": "Tv",
+        "subject": "居室",
+        "property": "換気設備の技術的基準適合",
+        "property_type": "proposition",
+        "description": "令20条の8の換気設備に関する技術的基準に適合するか",
+        "related_articles": [
+          "令::A20_8"
+        ],
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-room-compliance",
+        "type": "process",
+        "title": "居室適合判定",
+        "process_type": "mechanical",
+        "target_subject": "居室",
+        "iteration": "iterative",
+        "description": "各居室について、建築材料及び換気設備の両方の技術的基準に適合することを確認",
+        "logic_expression": "Tm AND Tv"
+      },
+      {
+        "id": "info-room-compliance",
+        "type": "information",
+        "title": "居室の法36条1項適合",
+        "symbol": "Cr",
+        "subject": "居室",
+        "property": "法36条1項適合",
+        "property_type": "proposition",
+        "description": "居室が法36条1項の規定に適合するか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-all-rooms-check",
+        "type": "process",
+        "title": "全居室適合確認",
+        "process_type": "mechanical",
+        "description": "全ての居室が法36条1項に適合することを確認",
+        "logic_expression": "∀room ∈ Rooms: Cr(room) = true"
+      },
+      {
+        "id": "info-final-compliance",
+        "type": "information",
+        "title": "建築物の法36条1項適合",
+        "subject": "建築物",
+        "property": "法36条1項適合",
+        "property_type": "proposition",
+        "description": "建築物全体として法36条1項の規定に適合するか",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-rooms-set",
+        "to": "info-rooms-set",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "info-rooms-set",
+        "to": "proc-materials-set",
+        "role": "input"
+      },
+      {
+        "id": "e03",
+        "from": "proc-materials-set",
+        "to": "info-materials-set",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "info-materials-set",
+        "to": "proc-material-type",
+        "role": "input"
+      },
+      {
+        "id": "e05",
+        "from": "proc-material-type",
+        "to": "info-material-type",
+        "role": "output"
+      },
+      {
+        "id": "e06",
+        "from": "info-materials-set",
+        "to": "proc-material-area",
+        "role": "input"
+      },
+      {
+        "id": "e07",
+        "from": "proc-material-area",
+        "to": "info-material-area",
+        "role": "output"
+      },
+      {
+        "id": "e08",
+        "from": "info-rooms-set",
+        "to": "proc-room-volume",
+        "role": "input"
+      },
+      {
+        "id": "e09",
+        "from": "proc-room-volume",
+        "to": "info-room-volume",
+        "role": "output"
+      },
+      {
+        "id": "e10",
+        "from": "info-material-type",
+        "to": "proc-material-tech-standard",
+        "role": "input"
+      },
+      {
+        "id": "e11",
+        "from": "info-material-area",
+        "to": "proc-material-tech-standard",
+        "role": "input"
+      },
+      {
+        "id": "e12",
+        "from": "info-room-volume",
+        "to": "proc-material-tech-standard",
+        "role": "input"
+      },
+      {
+        "id": "e13",
+        "from": "proc-material-tech-standard",
+        "to": "info-material-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e14",
+        "from": "info-rooms-set",
+        "to": "proc-ventilation-system",
+        "role": "input"
+      },
+      {
+        "id": "e15",
+        "from": "proc-ventilation-system",
+        "to": "info-ventilation-system",
+        "role": "output"
+      },
+      {
+        "id": "e16",
+        "from": "info-ventilation-system",
+        "to": "proc-ventilation-tech-standard",
+        "role": "input"
+      },
+      {
+        "id": "e17",
+        "from": "info-room-volume",
+        "to": "proc-ventilation-tech-standard",
+        "role": "input"
+      },
+      {
+        "id": "e18",
+        "from": "proc-ventilation-tech-standard",
+        "to": "info-ventilation-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e19",
+        "from": "info-material-compliance",
+        "to": "proc-room-compliance",
+        "role": "input"
+      },
+      {
+        "id": "e20",
+        "from": "info-ventilation-compliance",
+        "to": "proc-room-compliance",
+        "role": "input"
+      },
+      {
+        "id": "e21",
+        "from": "proc-room-compliance",
+        "to": "info-room-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e22",
+        "from": "info-room-compliance",
+        "to": "proc-all-rooms-check",
+        "role": "input"
+      },
+      {
+        "id": "e23",
+        "from": "proc-all-rooms-check",
+        "to": "info-final-compliance",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "delegates_to",
+      "articles": [
+        "A20_5",
+        "A20_6",
+        "A20_7",
+        "A20_8"
+      ],
+      "description": "法36条1項の技術的基準を定める。令20条の5（居室を有する建築物の建築材料についてのホルムアルデヒドに関する技術的基準）、令20条の6（居室を有する建築物のホルムアルデヒドに関する技術的基準）、令20条の7（居室を有する建築物のクロルピリホスに関する技術的基準）、令20条の8（換気設備についてのホルムアルデヒドに関する技術的基準）"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-23T18:10:00+09:00",
+    "updated_at": "2025-12-23T18:10:00+09:00",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

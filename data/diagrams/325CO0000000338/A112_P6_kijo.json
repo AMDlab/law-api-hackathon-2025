@@ -1,0 +1,175 @@
+{
+  "id": "CHK-BSL-KIJO-A112-P6",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "防火区画の適用除外（体育館・工場等）",
+    "target_subject": "建築物",
+    "description": "体育館・工場等の用途で内装制限を満たす場合の第4項・第5項の適用除外"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "112",
+    "paragraph": "6",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "防火区画",
+    "適用除外"
+  ],
+  "text_raw": "前二項の規定は、次の各号のいずれかに該当する建築物の部分で、天井（天井のない場合においては、屋根。以下この条において同じ。）及び壁の室内に面する部分の仕上げを準不燃材料でしたものについては、適用しない。一 体育館、工場その他これらに類する用途に供する建築物の部分 二 第一項第二号に掲げる建築物の部分",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "type": "building_use",
+          "value": "体育館、工場その他これらに類する用途"
+        },
+        {
+          "type": "building_part",
+          "value": "第1項第2号の階段室等"
+        }
+      ]
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "finish_material",
+          "value": "天井及び壁の室内に面する部分の仕上げが準不燃材料"
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-use-check",
+        "type": "process",
+        "title": "用途の特定",
+        "process_type": "undefined_input",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "建築物の用途を特定"
+      },
+      {
+        "id": "info-use",
+        "type": "information",
+        "title": "建築物の用途",
+        "symbol": "U",
+        "subject": "建築物",
+        "property": "用途種別",
+        "property_type": "classification",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-finish-check",
+        "type": "process",
+        "title": "内装仕上げの確認",
+        "process_type": "undefined_input",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "天井・壁の仕上げ材料を確認"
+      },
+      {
+        "id": "info-ceiling-finish",
+        "type": "information",
+        "title": "天井の仕上げ",
+        "symbol": "CF",
+        "subject": "建築物",
+        "property": "天井仕上げ材料",
+        "property_type": "classification",
+        "plurality": "single"
+      },
+      {
+        "id": "info-wall-finish",
+        "type": "information",
+        "title": "壁の仕上げ",
+        "symbol": "WF",
+        "subject": "建築物",
+        "property": "壁仕上げ材料",
+        "property_type": "classification",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-exemption-judge",
+        "type": "process",
+        "title": "適用除外判定",
+        "process_type": "mechanical",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "第4項・第5項の適用除外判定",
+        "logic_expression": "(U in {体育館,工場等}) AND (CF = 準不燃材料) AND (WF = 準不燃材料)"
+      },
+      {
+        "id": "info-exemption",
+        "type": "information",
+        "title": "適用除外判定結果",
+        "symbol": "EX",
+        "subject": "建築物",
+        "property": "適用除外の有無",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "第4項・第5項が適用除外されるか"
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge-001",
+        "from": "proc-use-check",
+        "to": "info-use",
+        "role": "output"
+      },
+      {
+        "id": "edge-002",
+        "from": "proc-finish-check",
+        "to": "info-ceiling-finish",
+        "role": "output"
+      },
+      {
+        "id": "edge-003",
+        "from": "proc-finish-check",
+        "to": "info-wall-finish",
+        "role": "output"
+      },
+      {
+        "id": "edge-004",
+        "from": "info-use",
+        "to": "proc-exemption-judge",
+        "role": "input"
+      },
+      {
+        "id": "edge-005",
+        "from": "info-ceiling-finish",
+        "to": "proc-exemption-judge",
+        "role": "input"
+      },
+      {
+        "id": "edge-006",
+        "from": "info-wall-finish",
+        "to": "proc-exemption-judge",
+        "role": "input"
+      },
+      {
+        "id": "edge-007",
+        "from": "proc-exemption-judge",
+        "to": "info-exemption",
+        "role": "output"
+      }
+    ]
+  },
+  "metadata": {
+    "created_at": "2025-12-24T00:00:00Z",
+    "updated_at": "2025-12-24T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "kijo-generator",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令",
+    "source": "e-Gov法令API"
+  }
+}

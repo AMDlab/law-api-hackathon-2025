@@ -1,0 +1,244 @@
+{
+  "id": "CHK-BSL-A21-P3",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "大規模建築物基準の建築物部分別適用",
+    "target_subject": "建築物",
+    "description": "政令で定める部分が二以上ある建築物について、各部分を別の建築物とみなして前二項の基準を適用する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "21",
+    "paragraph": "3",
+    "item": null
+  },
+  "labels": ["単体規定", "防火", "みなし規定"],
+  "text_raw": "前二項に規定する基準の適用上一の建築物であつても別の建築物とみなすことができる部分として政令で定める部分が二以上ある建築物の当該部分は、前二項の規定の適用については、それぞれ別の建築物とみなす。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "building_structure",
+          "note": "政令で定める部分が二以上ある建築物"
+        }
+      ],
+      "note": "エキスパンションジョイント等で区画された部分が二以上ある場合"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-parts-count",
+          "operator": ">=",
+          "value": 2,
+          "note": "当該部分が二以上"
+        },
+        {
+          "ref": "info-each-compliance",
+          "operator": "==",
+          "value": true,
+          "note": "各部分が法21条1項または2項基準に適合"
+        }
+      ]
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-building-structure",
+        "type": "process",
+        "title": "建築物の構造形式の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の構造形式を読み取る"
+      },
+      {
+        "id": "info-building-structure",
+        "type": "information",
+        "title": "建築物の構造形式",
+        "subject": "建築物",
+        "property": "構造形式",
+        "property_type": "classification",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-check-deemed",
+        "type": "process",
+        "title": "政令で定める部分の該当判定",
+        "process_type": "mechanical",
+        "description": "建築物の構造形式が政令で定める部分に該当するか判定",
+        "related_articles": ["令::A109_3_3"]
+      },
+      {
+        "id": "info-deemed-applicable",
+        "type": "information",
+        "title": "政令で定める部分該当",
+        "subject": "建築物",
+        "property": "政令で定める部分該当",
+        "property_type": "proposition",
+        "plurality": "single",
+        "related_articles": ["令::A109_3_3"]
+      },
+      {
+        "id": "proc-identify-parts",
+        "type": "process",
+        "title": "区画部分の特定",
+        "process_type": "undefined_input",
+        "description": "政令で定める構造方法で区画された各部分を特定する"
+      },
+      {
+        "id": "info-deemed-parts",
+        "type": "information",
+        "title": "建築物の区画部分",
+        "subject": "建築物",
+        "property": "区画部分の集合",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "政令で定める構造方法で区画された部分の集合"
+      },
+      {
+        "id": "proc-count-parts",
+        "type": "process",
+        "title": "区画部分の計数",
+        "process_type": "mechanical",
+        "description": "区画部分が二以上あるか計数する"
+      },
+      {
+        "id": "info-parts-count",
+        "type": "information",
+        "title": "区画部分の数",
+        "subject": "建築物",
+        "property": "区画部分の数",
+        "property_type": "numeric",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-check-two-or-more",
+        "type": "process",
+        "title": "二以上判定",
+        "process_type": "mechanical",
+        "logic_expression": "count >= 2",
+        "description": "区画部分が二以上あるか判定"
+      },
+      {
+        "id": "info-two-or-more",
+        "type": "information",
+        "title": "二以上該当",
+        "subject": "建築物",
+        "property": "区画部分が二以上",
+        "property_type": "proposition",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-each-part-info",
+        "type": "process",
+        "title": "各部分の情報取得",
+        "process_type": "undefined_input",
+        "iteration": "iterative",
+        "description": "各区画部分の延べ面積、主要構造部等を特定する"
+      },
+      {
+        "id": "info-each-part",
+        "type": "information",
+        "title": "各部分の情報",
+        "subject": "区画部分",
+        "property": "延べ面積・構造等",
+        "property_type": "classification",
+        "plurality": "multiple",
+        "description": "各区画部分の延べ面積、主要構造部の情報"
+      },
+      {
+        "id": "proc-each-compliance-check",
+        "type": "process",
+        "title": "各部分の適合判定",
+        "process_type": "sub_diagram_reference",
+        "sub_diagram_ref": "CHK-BSL-A21-P1_P2",
+        "iteration": "iterative",
+        "description": "各区画部分を別の建築物とみなし、法21条1項または2項基準への適合を判定"
+      },
+      {
+        "id": "info-each-compliance",
+        "type": "information",
+        "title": "各部分の適合",
+        "subject": "区画部分",
+        "property": "法21条1項・2項適合",
+        "property_type": "proposition",
+        "plurality": "multiple",
+        "description": "各区画部分が法21条前二項の基準に適合するか"
+      },
+      {
+        "id": "proc-all-check",
+        "type": "process",
+        "title": "全部分適合判定",
+        "process_type": "mechanical",
+        "logic_expression": "∀part: each_compliance(part) = true",
+        "description": "すべての区画部分が基準に適合するか判定（全称命題）"
+      },
+      {
+        "id": "info-all-compliance",
+        "type": "information",
+        "title": "全部分適合",
+        "subject": "建築物",
+        "property": "全区画部分の適合",
+        "property_type": "proposition",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-final-judgment",
+        "type": "process",
+        "title": "法21条3項適合判定",
+        "process_type": "mechanical",
+        "logic_expression": "NOT(two_or_more AND deemed_applicable) OR all_compliance",
+        "description": "適用範囲外、または全区画部分が適合するか判定"
+      },
+      {
+        "id": "info-compliance",
+        "type": "information",
+        "title": "法21条3項適合",
+        "subject": "建築物",
+        "property": "法21条3項適合",
+        "property_type": "proposition",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      {"id": "e001", "from": "proc-building-structure", "to": "info-building-structure", "role": "output"},
+      {"id": "e002", "from": "info-building-structure", "to": "proc-check-deemed", "role": "input"},
+      {"id": "e003", "from": "proc-check-deemed", "to": "info-deemed-applicable", "role": "output"},
+      {"id": "e004", "from": "proc-identify-parts", "to": "info-deemed-parts", "role": "output"},
+      {"id": "e005", "from": "info-deemed-parts", "to": "proc-count-parts", "role": "input"},
+      {"id": "e006", "from": "proc-count-parts", "to": "info-parts-count", "role": "output"},
+      {"id": "e007", "from": "info-parts-count", "to": "proc-check-two-or-more", "role": "input"},
+      {"id": "e008", "from": "proc-check-two-or-more", "to": "info-two-or-more", "role": "output"},
+      {"id": "e009", "from": "info-deemed-parts", "to": "proc-each-part-info", "role": "input"},
+      {"id": "e010", "from": "proc-each-part-info", "to": "info-each-part", "role": "output"},
+      {"id": "e011", "from": "info-each-part", "to": "proc-each-compliance-check", "role": "input"},
+      {"id": "e012", "from": "proc-each-compliance-check", "to": "info-each-compliance", "role": "output"},
+      {"id": "e013", "from": "info-each-compliance", "to": "proc-all-check", "role": "input"},
+      {"id": "e014", "from": "proc-all-check", "to": "info-all-compliance", "role": "output"},
+      {"id": "e015", "from": "info-two-or-more", "to": "proc-final-judgment", "role": "input"},
+      {"id": "e016", "from": "info-deemed-applicable", "to": "proc-final-judgment", "role": "input"},
+      {"id": "e017", "from": "info-all-compliance", "to": "proc-final-judgment", "role": "input"},
+      {"id": "e018", "from": "proc-final-judgment", "to": "info-compliance", "role": "output"}
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "delegates_to",
+      "articles": ["A109_3_3"],
+      "description": "第109条の3第3号（別の建築物とみなす部分）"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-24T00:00:00Z",
+    "generator": "claude-code-kijo-generator",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

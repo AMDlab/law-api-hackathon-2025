@@ -1,0 +1,387 @@
+{
+  "id": "CHK-BSL-A35_3-P1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "無窓居室の主要構造部",
+    "target_subject": "居室",
+    "description": "政令で定める窓その他の開口部を有しない居室の主要構造部が所定の構造基準を満たすことを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "35_3",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "防火"
+  ],
+  "text_raw": "政令で定める窓その他の開口部を有しない居室は、その居室を区画する主要構造部を耐火構造とし、又は不燃材料で造らなければならない。ただし、別表第一（い）欄（一）項に掲げる用途に供するものについては、この限りでない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "room_characteristic",
+          "value": "政令で定める窓その他の開口部を有しない居室"
+        }
+      ],
+      "note": "政令で定める無窓居室に適用"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "ref": "info-fireproof-structure",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "ref": "info-noncombustible-material",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    },
+    "exceptions": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "note": "別表第一（い）欄（一）項の用途（劇場等）に供する建築物",
+          "ref": "info-use-category",
+          "value": "別表第一（い）欄（一）項"
+        }
+      ],
+      "effect": "EXEMPT"
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-building-use",
+        "type": "process",
+        "title": "建築物用途の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の用途を特定する"
+      },
+      {
+        "id": "info-building-use",
+        "type": "information",
+        "title": "建築物の用途",
+        "symbol": "U",
+        "subject": "建築物",
+        "property": "用途",
+        "property_type": "classification",
+        "description": "建築物の用途（別表第一（い）欄（一）項の用途か否か）",
+        "remarks": "別表第一（い）欄（一）項: 劇場、映画館、演芸場、観覧場、公会堂、集会場その他これらに類するもの",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-exempt-check",
+        "type": "process",
+        "title": "適用除外判定",
+        "process_type": "mechanical",
+        "description": "建築物が別表第一（い）欄（一）項の用途に該当するか判定",
+        "logic_expression": "U ∈ {劇場, 映画館, 演芸場, 観覧場, 公会堂, 集会場, ...}"
+      },
+      {
+        "id": "info-exempt",
+        "type": "information",
+        "title": "適用除外該当",
+        "symbol": "X",
+        "subject": "建築物",
+        "property": "適用除外への該当",
+        "property_type": "proposition",
+        "description": "別表第一（い）欄（一）項の用途に供する建築物として適用除外に該当するか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-rooms-set",
+        "type": "process",
+        "title": "無窓居室の特定",
+        "process_type": "human_judgment",
+        "description": "設計図書等から政令で定める窓その他の開口部を有しない居室を特定する",
+        "related_articles": [
+          "令::A111"
+        ]
+      },
+      {
+        "id": "info-rooms-set",
+        "type": "information",
+        "title": "建築物の無窓居室",
+        "subject": "建築物",
+        "property": "無窓居室の集合",
+        "property_type": "set_definition",
+        "description": "判定対象となる建築物に属する無窓居室（政令で定める窓その他の開口部を有しない居室）を特定",
+        "related_articles": [
+          "令::A111"
+        ],
+        "plurality": "single"
+      },
+      {
+        "id": "proc-structure-parts",
+        "type": "process",
+        "title": "主要構造部の特定",
+        "process_type": "human_judgment",
+        "target_subject": "居室",
+        "iteration": "iterative",
+        "description": "各無窓居室について、その居室を区画する主要構造部を特定する"
+      },
+      {
+        "id": "info-structure-parts",
+        "type": "information",
+        "title": "居室区画主要構造部",
+        "subject": "居室",
+        "property": "区画する主要構造部",
+        "property_type": "set_definition",
+        "description": "当該居室を区画する主要構造部（壁、柱、床、はり、屋根、階段）",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-structure-type",
+        "type": "process",
+        "title": "主要構造部の構造の特定",
+        "process_type": "human_judgment",
+        "target_subject": "居室",
+        "iteration": "iterative",
+        "description": "設計図書等から主要構造部の構造種別を特定する"
+      },
+      {
+        "id": "info-structure-type",
+        "type": "information",
+        "title": "主要構造部の構造",
+        "symbol": "S",
+        "subject": "居室",
+        "property": "主要構造部の構造種別",
+        "property_type": "classification",
+        "description": "主要構造部の構造（耐火構造、不燃材料造、その他）",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-fireproof-check",
+        "type": "process",
+        "title": "耐火構造該当判定",
+        "process_type": "mechanical",
+        "target_subject": "居室",
+        "iteration": "iterative",
+        "description": "主要構造部が耐火構造に該当するか判定",
+        "related_articles": [
+          "法::A2:I7"
+        ],
+        "logic_expression": "S = '耐火構造'"
+      },
+      {
+        "id": "info-fireproof-structure",
+        "type": "information",
+        "title": "耐火構造該当",
+        "symbol": "F",
+        "subject": "居室",
+        "property": "主要構造部が耐火構造",
+        "property_type": "proposition",
+        "description": "居室を区画する主要構造部が耐火構造であるか",
+        "related_articles": [
+          "法::A2:I7"
+        ],
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-noncombustible-check",
+        "type": "process",
+        "title": "不燃材料該当判定",
+        "process_type": "mechanical",
+        "target_subject": "居室",
+        "iteration": "iterative",
+        "description": "主要構造部が不燃材料で造られているか判定",
+        "related_articles": [
+          "法::A2:I9"
+        ],
+        "logic_expression": "S = '不燃材料造'"
+      },
+      {
+        "id": "info-noncombustible-material",
+        "type": "information",
+        "title": "不燃材料該当",
+        "symbol": "N",
+        "subject": "居室",
+        "property": "主要構造部が不燃材料造",
+        "property_type": "proposition",
+        "description": "居室を区画する主要構造部が不燃材料で造られているか",
+        "related_articles": [
+          "法::A2:I9"
+        ],
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-room-compliance",
+        "type": "process",
+        "title": "居室適合判定",
+        "process_type": "mechanical",
+        "target_subject": "居室",
+        "iteration": "iterative",
+        "description": "各無窓居室について、適用除外または構造基準適合のいずれかを満たすことを確認",
+        "logic_expression": "X OR F OR N"
+      },
+      {
+        "id": "info-room-compliance",
+        "type": "information",
+        "title": "法35条の3第1項適合",
+        "symbol": "C",
+        "subject": "居室",
+        "property": "法35条の3第1項適合",
+        "property_type": "proposition",
+        "description": "無窓居室が法35条の3第1項の規定に適合するか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-all-rooms-check",
+        "type": "process",
+        "title": "全無窓居室適合確認",
+        "process_type": "mechanical",
+        "description": "建築物内の全ての無窓居室が法35条の3第1項に適合することを確認",
+        "logic_expression": "∀room ∈ WindowlessRooms: C(room) = true"
+      },
+      {
+        "id": "info-final",
+        "type": "information",
+        "title": "建築物の法35条の3第1項適合",
+        "subject": "建築物",
+        "property": "法35条の3第1項適合",
+        "property_type": "proposition",
+        "description": "建築物全体として法35条の3第1項の規定に適合するか",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-building-use",
+        "to": "info-building-use",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "info-building-use",
+        "to": "proc-exempt-check",
+        "role": "input"
+      },
+      {
+        "id": "e03",
+        "from": "proc-exempt-check",
+        "to": "info-exempt",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "proc-rooms-set",
+        "to": "info-rooms-set",
+        "role": "output"
+      },
+      {
+        "id": "e05",
+        "from": "info-rooms-set",
+        "to": "proc-structure-parts",
+        "role": "input"
+      },
+      {
+        "id": "e06",
+        "from": "proc-structure-parts",
+        "to": "info-structure-parts",
+        "role": "output"
+      },
+      {
+        "id": "e07",
+        "from": "info-structure-parts",
+        "to": "proc-structure-type",
+        "role": "input"
+      },
+      {
+        "id": "e08",
+        "from": "proc-structure-type",
+        "to": "info-structure-type",
+        "role": "output"
+      },
+      {
+        "id": "e09",
+        "from": "info-structure-type",
+        "to": "proc-fireproof-check",
+        "role": "input"
+      },
+      {
+        "id": "e10",
+        "from": "proc-fireproof-check",
+        "to": "info-fireproof-structure",
+        "role": "output"
+      },
+      {
+        "id": "e11",
+        "from": "info-structure-type",
+        "to": "proc-noncombustible-check",
+        "role": "input"
+      },
+      {
+        "id": "e12",
+        "from": "proc-noncombustible-check",
+        "to": "info-noncombustible-material",
+        "role": "output"
+      },
+      {
+        "id": "e13",
+        "from": "info-exempt",
+        "to": "proc-room-compliance",
+        "role": "input"
+      },
+      {
+        "id": "e14",
+        "from": "info-fireproof-structure",
+        "to": "proc-room-compliance",
+        "role": "input"
+      },
+      {
+        "id": "e15",
+        "from": "info-noncombustible-material",
+        "to": "proc-room-compliance",
+        "role": "input"
+      },
+      {
+        "id": "e16",
+        "from": "proc-room-compliance",
+        "to": "info-room-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e17",
+        "from": "info-room-compliance",
+        "to": "proc-all-rooms-check",
+        "role": "input"
+      },
+      {
+        "id": "e18",
+        "from": "proc-all-rooms-check",
+        "to": "info-final",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "delegates_to",
+      "articles": [
+        "A111"
+      ],
+      "description": "法35条の3第1項の政令で定める窓その他の開口部を定める"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-24T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

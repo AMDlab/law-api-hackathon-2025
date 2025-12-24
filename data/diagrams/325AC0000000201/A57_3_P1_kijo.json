@@ -1,0 +1,239 @@
+{
+  "id": "CHK-BSL-A57-3-P1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "特例敷地の指定取消し申請要件",
+    "target_subject": "特例敷地",
+    "description": "特例敷地の指定取消しを申請する場合の要件を判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "57の3",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "集団規定",
+    "容積率"
+  ],
+  "text_raw": "前条第四項の規定により公告された特例敷地である土地について所有権又は借地権を有する者は、その全員の合意により、同条第三項の指定の取消しを特定行政庁に申請することができる。この場合においては、あらかじめ、当該特例敷地について政令で定める利害関係を有する者の同意を得なければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "property",
+          "value": "前条第四項により指定された特例敷地"
+        }
+      ],
+      "note": "第57条の2に基づいて指定された特例敷地"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-unanimous-consent",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "ref": "info-stakeholder-consent",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-land-ownership",
+        "type": "process",
+        "title": "土地所有権等の特定",
+        "process_type": "undefined_input",
+        "description": "特例敷地に対する所有権または借地権を有する者を特定する"
+      },
+      {
+        "id": "info-landowners",
+        "type": "information",
+        "title": "土地所有権等保有者",
+        "symbol": "O",
+        "subject": "特例敷地",
+        "property": "所有権又は借地権保有者の集合",
+        "property_type": "set_definition",
+        "description": "指定取消し申請に関与する所有権又は借地権保有者",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-unanimous-consent",
+        "type": "process",
+        "title": "全員合意の確認",
+        "process_type": "human_judgment",
+        "description": "土地所有権等保有者全員の合意を確認する",
+        "iteration": "single"
+      },
+      {
+        "id": "info-unanimous-consent",
+        "type": "information",
+        "title": "全員の合意",
+        "symbol": "U",
+        "subject": "土地所有権等保有者",
+        "property": "全員合意の有無",
+        "property_type": "proposition",
+        "description": "所有権又は借地権を有する者全員が指定の取消しに合意しているか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-stakeholder-identification",
+        "type": "process",
+        "title": "利害関係人の特定",
+        "process_type": "mechanical",
+        "description": "政令で定める利害関係を有する者を特定する",
+        "related_articles": [
+          "令::A108_3:P1:I3"
+        ]
+      },
+      {
+        "id": "info-stakeholders",
+        "type": "information",
+        "title": "利害関係人",
+        "symbol": "S",
+        "subject": "特例敷地",
+        "property": "利害関係人の集合",
+        "property_type": "set_definition",
+        "description": "政令で定める利害関係を有する者の集合",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-stakeholder-consent",
+        "type": "process",
+        "title": "利害関係人同意の確認",
+        "process_type": "human_judgment",
+        "description": "利害関係人から指定の取消しについての同意を確認する",
+        "iteration": "iterative"
+      },
+      {
+        "id": "info-stakeholder-consent",
+        "type": "information",
+        "title": "利害関係人の同意",
+        "symbol": "T",
+        "subject": "利害関係人",
+        "property": "同意の有無",
+        "property_type": "proposition",
+        "description": "政令で定める利害関係を有する者が指定の取消しに同意しているか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-compliance-judgment",
+        "type": "process",
+        "title": "取消し申請適格判定",
+        "process_type": "mechanical",
+        "description": "指定取消し申請の要件を全て満たすかを判定する",
+        "logic_expression": "U AND (∀S:T)"
+      },
+      {
+        "id": "info-compliance",
+        "type": "information",
+        "title": "申請要件適合",
+        "symbol": "J",
+        "subject": "特例敷地",
+        "property": "申請要件適合性",
+        "property_type": "proposition",
+        "description": "指定取消し申請要件を満たすか否か",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge-01",
+        "from": "proc-land-ownership",
+        "to": "info-landowners",
+        "role": "output"
+      },
+      {
+        "id": "edge-02",
+        "from": "info-landowners",
+        "to": "proc-unanimous-consent",
+        "role": "input"
+      },
+      {
+        "id": "edge-03",
+        "from": "proc-unanimous-consent",
+        "to": "info-unanimous-consent",
+        "role": "output"
+      },
+      {
+        "id": "edge-04",
+        "from": "proc-stakeholder-identification",
+        "to": "info-stakeholders",
+        "role": "output"
+      },
+      {
+        "id": "edge-05",
+        "from": "info-stakeholders",
+        "to": "proc-stakeholder-consent",
+        "role": "input"
+      },
+      {
+        "id": "edge-06",
+        "from": "proc-stakeholder-consent",
+        "to": "info-stakeholder-consent",
+        "role": "output"
+      },
+      {
+        "id": "edge-07",
+        "from": "info-unanimous-consent",
+        "to": "proc-compliance-judgment",
+        "role": "input"
+      },
+      {
+        "id": "edge-08",
+        "from": "info-stakeholder-consent",
+        "to": "proc-compliance-judgment",
+        "role": "input"
+      },
+      {
+        "id": "edge-09",
+        "from": "proc-compliance-judgment",
+        "to": "info-compliance",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": [
+        "A57_2:P3",
+        "A57_2:P4"
+      ],
+      "description": "特例敷地の指定要件及び公告規定"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "defines_detail",
+      "articles": [
+        "A108_3:P1:I3"
+      ],
+      "description": "利害関係人の定義"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-24T09:00:00Z",
+    "updated_at": "2025-12-24T09:00:00Z",
+    "author": "Claude Code",
+    "generator": "kijo-generator-manual",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法",
+    "source": "e-Gov法令API"
+  }
+}

@@ -1,0 +1,403 @@
+{
+  "id": "CHK-BSL-KIJO-A129-P3-I1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "階避難安全検証法（避難時間に基づく検証）",
+    "target_subject": "建築物の階",
+    "description": "火災発生時において階からの避難の安全性を避難に要する時間に基づき検証する方法"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "129",
+    "paragraph": "3",
+    "item": "1"
+  },
+  "labels": [
+    "単体規定",
+    "避難安全検証"
+  ],
+  "text_raw": "次に定めるところにより、火災発生時において当該建築物の階からの避難が安全に行われることを当該階からの避難に要する時間に基づき検証する方法",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "building_standard",
+          "value": "主要構造部が準耐火構造又は不燃材料で造られた建築物の階"
+        }
+      ],
+      "note": "階避難安全検証法の適用対象"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "verification",
+          "value": "避難時間に基づく検証",
+          "description": "居室避難時間≦煙降下時間、かつ階避難時間≦煙流入時間"
+        }
+      ]
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-rooms-set",
+        "type": "process",
+        "title": "階の居室の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から当該階に含まれる居室を特定"
+      },
+      {
+        "id": "info-rooms-set",
+        "type": "information",
+        "title": "階の居室",
+        "symbol": "RS",
+        "subject": "階",
+        "property": "居室の集合",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "判定対象となる階に属する居室を特定"
+      },
+      {
+        "id": "proc-room-info",
+        "type": "process",
+        "title": "居室情報の取得",
+        "process_type": "undefined_input",
+        "description": "設計図書等から居室の用途、床面積等を読み取る"
+      },
+      {
+        "id": "info-room-info",
+        "type": "information",
+        "title": "居室情報",
+        "symbol": "RI",
+        "subject": "居室",
+        "property": "諸元",
+        "property_type": "classification",
+        "plurality": "multiple",
+        "description": "居室の用途、床面積、歩行距離、出口幅等"
+      },
+      {
+        "id": "proc-room-evac-time",
+        "type": "process",
+        "title": "居室避難時間の計算（イ）",
+        "process_type": "mechanical",
+        "target_subject": "居室",
+        "iteration": "iterative",
+        "description": "当該居室において火災が発生してから避難を終了するまでに要する時間を計算",
+        "logic_expression": "troom = f(用途, 床面積, 歩行距離, 出口幅)"
+      },
+      {
+        "id": "info-room-evac-time",
+        "type": "information",
+        "title": "居室避難時間",
+        "symbol": "Tr",
+        "subject": "居室",
+        "property": "避難終了時間",
+        "property_type": "numeric",
+        "unit": "min",
+        "plurality": "multiple",
+        "description": "居室からの避難を終了するまでに要する時間"
+      },
+      {
+        "id": "proc-room-smoke-time",
+        "type": "process",
+        "title": "居室煙降下時間の計算（ロ）",
+        "process_type": "mechanical",
+        "target_subject": "居室",
+        "iteration": "iterative",
+        "description": "煙が避難上支障のある高さまで降下する時間を計算",
+        "logic_expression": "ts_room = f(用途, 床面積, 天井高さ, 排煙設備, 内装材料)"
+      },
+      {
+        "id": "info-room-smoke-time",
+        "type": "information",
+        "title": "居室煙降下時間",
+        "symbol": "Tsr",
+        "subject": "居室",
+        "property": "煙降下時間",
+        "property_type": "numeric",
+        "unit": "min",
+        "plurality": "multiple",
+        "description": "煙が避難上支障のある高さまで降下するために要する時間"
+      },
+      {
+        "id": "proc-room-check",
+        "type": "process",
+        "title": "居室避難安全確認（ハ）",
+        "process_type": "mechanical",
+        "target_subject": "居室",
+        "iteration": "iterative",
+        "description": "居室避難時間が煙降下時間を超えないことを確認",
+        "logic_expression": "Tr <= Tsr"
+      },
+      {
+        "id": "info-room-check-result",
+        "type": "information",
+        "title": "居室避難安全確認結果",
+        "symbol": "RRr",
+        "subject": "居室",
+        "property": "居室避難安全",
+        "property_type": "proposition",
+        "plurality": "multiple",
+        "description": "各居室について避難時間が煙降下時間を超えないか"
+      },
+      {
+        "id": "proc-fire-rooms-set",
+        "type": "process",
+        "title": "火災室の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から火災室を特定"
+      },
+      {
+        "id": "info-fire-rooms-set",
+        "type": "information",
+        "title": "階の火災室",
+        "symbol": "FS",
+        "subject": "階",
+        "property": "火災室の集合",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "判定対象となる階における火災室"
+      },
+      {
+        "id": "proc-floor-evac-time",
+        "type": "process",
+        "title": "階避難時間の計算（ニ）",
+        "process_type": "mechanical",
+        "target_subject": "火災室",
+        "iteration": "iterative",
+        "description": "火災室で火災が発生してから階からの避難を終了するまでに要する時間を計算",
+        "logic_expression": "tfloor = f(各室用途, 床面積, 歩行距離, 出口幅)"
+      },
+      {
+        "id": "info-floor-evac-time",
+        "type": "information",
+        "title": "階避難時間",
+        "symbol": "Tf",
+        "subject": "火災室",
+        "property": "階からの避難終了時間",
+        "property_type": "numeric",
+        "unit": "min",
+        "plurality": "multiple",
+        "description": "階からの避難を終了するまでに要する時間"
+      },
+      {
+        "id": "proc-floor-smoke-time",
+        "type": "process",
+        "title": "階煙降下時間の計算（ホ）",
+        "process_type": "mechanical",
+        "target_subject": "火災室",
+        "iteration": "iterative",
+        "description": "各居室及び廊下において煙が避難上支障のある高さまで降下する時間を計算",
+        "logic_expression": "ts_floor = f(各室用途, 床面積, 天井高さ, 壁・開口部構造, 排煙設備, 内装材料)"
+      },
+      {
+        "id": "info-floor-smoke-time",
+        "type": "information",
+        "title": "階煙降下時間",
+        "symbol": "Tsf",
+        "subject": "火災室",
+        "property": "階の煙降下時間",
+        "property_type": "numeric",
+        "unit": "min",
+        "plurality": "multiple",
+        "description": "各居室及び廊下において煙が避難上支障のある高さまで降下するために要する時間"
+      },
+      {
+        "id": "proc-floor-check",
+        "type": "process",
+        "title": "階避難安全確認（ヘ）",
+        "process_type": "mechanical",
+        "target_subject": "火災室",
+        "iteration": "iterative",
+        "description": "階避難時間が煙降下時間を超えないことを確認",
+        "logic_expression": "Tf <= Tsf"
+      },
+      {
+        "id": "info-floor-check-result",
+        "type": "information",
+        "title": "階避難安全確認結果",
+        "symbol": "RRf",
+        "subject": "火災室",
+        "property": "階避難安全",
+        "property_type": "proposition",
+        "plurality": "multiple",
+        "description": "各火災室について階避難時間が煙降下時間を超えないか"
+      },
+      {
+        "id": "proc-final-check",
+        "type": "process",
+        "title": "階避難安全性能判定",
+        "process_type": "mechanical",
+        "target_subject": "階",
+        "iteration": "single",
+        "description": "全ての居室及び火災室について避難安全が確認されたか総合判定",
+        "logic_expression": "RRr_all AND RRf_all"
+      },
+      {
+        "id": "info-final-result",
+        "type": "information",
+        "title": "階避難安全性能",
+        "symbol": "R",
+        "subject": "階",
+        "property": "階避難安全性能適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "当該階が階避難安全性能を有するか"
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge-001",
+        "from": "proc-rooms-set",
+        "to": "info-rooms-set",
+        "role": "output"
+      },
+      {
+        "id": "edge-002",
+        "from": "proc-room-info",
+        "to": "info-room-info",
+        "role": "output"
+      },
+      {
+        "id": "edge-003",
+        "from": "info-rooms-set",
+        "to": "proc-room-evac-time",
+        "role": "input"
+      },
+      {
+        "id": "edge-004",
+        "from": "info-room-info",
+        "to": "proc-room-evac-time",
+        "role": "input"
+      },
+      {
+        "id": "edge-005",
+        "from": "proc-room-evac-time",
+        "to": "info-room-evac-time",
+        "role": "output"
+      },
+      {
+        "id": "edge-006",
+        "from": "info-room-info",
+        "to": "proc-room-smoke-time",
+        "role": "input"
+      },
+      {
+        "id": "edge-007",
+        "from": "proc-room-smoke-time",
+        "to": "info-room-smoke-time",
+        "role": "output"
+      },
+      {
+        "id": "edge-008",
+        "from": "info-room-evac-time",
+        "to": "proc-room-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-009",
+        "from": "info-room-smoke-time",
+        "to": "proc-room-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-010",
+        "from": "proc-room-check",
+        "to": "info-room-check-result",
+        "role": "output"
+      },
+      {
+        "id": "edge-011",
+        "from": "proc-fire-rooms-set",
+        "to": "info-fire-rooms-set",
+        "role": "output"
+      },
+      {
+        "id": "edge-012",
+        "from": "info-fire-rooms-set",
+        "to": "proc-floor-evac-time",
+        "role": "input"
+      },
+      {
+        "id": "edge-013",
+        "from": "proc-floor-evac-time",
+        "to": "info-floor-evac-time",
+        "role": "output"
+      },
+      {
+        "id": "edge-014",
+        "from": "info-fire-rooms-set",
+        "to": "proc-floor-smoke-time",
+        "role": "input"
+      },
+      {
+        "id": "edge-015",
+        "from": "proc-floor-smoke-time",
+        "to": "info-floor-smoke-time",
+        "role": "output"
+      },
+      {
+        "id": "edge-016",
+        "from": "info-floor-evac-time",
+        "to": "proc-floor-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-017",
+        "from": "info-floor-smoke-time",
+        "to": "proc-floor-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-018",
+        "from": "proc-floor-check",
+        "to": "info-floor-check-result",
+        "role": "output"
+      },
+      {
+        "id": "edge-019",
+        "from": "info-room-check-result",
+        "to": "proc-final-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-020",
+        "from": "info-floor-check-result",
+        "to": "proc-final-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-021",
+        "from": "proc-final-check",
+        "to": "info-final-result",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": [
+        "A129:P2"
+      ],
+      "description": "階避難安全性能の定義"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-24T00:00:00Z",
+    "updated_at": "2025-12-24T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "kijo-generator",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令",
+    "source": "e-Gov法令API"
+  }
+}

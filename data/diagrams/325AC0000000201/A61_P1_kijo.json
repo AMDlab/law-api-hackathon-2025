@@ -1,0 +1,688 @@
+{
+  "id": "CHK-BSL-A61-P1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "防火地域等内建築物の防火設備・構造",
+    "target_subject": "建築物",
+    "description": "防火地域又は準防火地域内の建築物が外壁開口部の防火設備設置と建築物部分の技術的基準適合を満たすことを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "61",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "集団規定",
+    "防火"
+  ],
+  "text_raw": "防火地域又は準防火地域内にある建築物は、その外壁の開口部で延焼のおそれのある部分に防火戸その他の政令で定める防火設備を設け、かつ、壁、柱、床その他の建築物の部分及び当該防火設備を通常の火災による周囲への延焼を防止するためにこれらに必要とされる性能に関して防火地域及び準防火地域の別並びに建築物の規模に応じて政令で定める技術的基準に適合するもので、国土交通大臣が定めた構造方法を用いるもの又は国土交通大臣の認定を受けたものとしなければならない。ただし、門又は塀で、高さ二メートル以下のもの又は準防火地域内にある建築物（木造建築物等を除く。）に附属するものについては、この限りでない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "防火地域内"
+        },
+        {
+          "type": "location",
+          "value": "準防火地域内"
+        }
+      ],
+      "note": "防火地域又は準防火地域内の建築物に適用"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-fire-equipment-installed",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "ref": "info-tech-compliance",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "operator": "OR",
+          "conditions": [
+            {
+              "ref": "info-minister-method",
+              "operator": "==",
+              "value": true
+            },
+            {
+              "ref": "info-minister-approval",
+              "operator": "==",
+              "value": true
+            }
+          ]
+        }
+      ]
+    },
+    "exceptions": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "note": "高さ2m以下の門又は塀",
+          "operator": "AND",
+          "conditions": [
+            {
+              "ref": "info-structure-type",
+              "value": "門又は塀"
+            },
+            {
+              "ref": "info-height",
+              "operator": "<=",
+              "value": 2
+            }
+          ]
+        },
+        {
+          "note": "準防火地域内の建築物（木造建築物等を除く）に附属する門又は塀",
+          "operator": "AND",
+          "conditions": [
+            {
+              "ref": "info-structure-type",
+              "value": "門又は塀"
+            },
+            {
+              "type": "location",
+              "value": "準防火地域内"
+            },
+            {
+              "ref": "info-main-building-type",
+              "operator": "!=",
+              "value": "木造建築物等"
+            },
+            {
+              "ref": "info-is-attached",
+              "operator": "==",
+              "value": true
+            }
+          ]
+        }
+      ],
+      "effect": "EXEMPT"
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-structure-type",
+        "type": "process",
+        "title": "建築物種類の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の種類（建築物本体、門、塀等）を特定する"
+      },
+      {
+        "id": "info-structure-type",
+        "type": "information",
+        "title": "建築物の種類",
+        "symbol": "S",
+        "subject": "建築物",
+        "property": "種類",
+        "property_type": "classification",
+        "description": "建築物本体、門、塀等の種別",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-height",
+        "type": "process",
+        "title": "高さの特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から門又は塀の高さを読み取る"
+      },
+      {
+        "id": "info-height",
+        "type": "information",
+        "title": "門又は塀の高さ",
+        "symbol": "H",
+        "subject": "門又は塀",
+        "property": "高さ",
+        "property_type": "numeric",
+        "unit": "m",
+        "description": "門又は塀の高さ",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-main-building-type",
+        "type": "process",
+        "title": "主たる建築物の構造種別の特定",
+        "process_type": "undefined_input",
+        "description": "準防火地域内で門又は塀が附属する主たる建築物の構造種別（木造建築物等か否か）を特定"
+      },
+      {
+        "id": "info-main-building-type",
+        "type": "information",
+        "title": "主たる建築物の構造種別",
+        "symbol": "M",
+        "subject": "建築物",
+        "property": "構造種別",
+        "property_type": "classification",
+        "description": "木造建築物等、又はそれ以外の構造",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-is-attached",
+        "type": "process",
+        "title": "附属関係の特定",
+        "process_type": "undefined_input",
+        "description": "門又は塀が建築物に附属するか否かを特定"
+      },
+      {
+        "id": "info-is-attached",
+        "type": "information",
+        "title": "建築物への附属の有無",
+        "symbol": "A",
+        "subject": "門又は塀",
+        "property": "附属の有無",
+        "property_type": "proposition",
+        "description": "門又は塀が建築物に附属するか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-exempt-check",
+        "type": "process",
+        "title": "適用除外判定",
+        "process_type": "mechanical",
+        "description": "ただし書きの適用除外に該当するか判定",
+        "logic_expression": "((S = '門又は塀') AND (H ≤ 2.0)) OR ((S = '門又は塀') AND (準防火地域内) AND (M ≠ '木造建築物等') AND (A = true))"
+      },
+      {
+        "id": "info-exempt",
+        "type": "information",
+        "title": "適用除外該当",
+        "symbol": "X",
+        "subject": "建築物",
+        "property": "適用除外への該当",
+        "property_type": "proposition",
+        "description": "ただし書きによる適用除外に該当するか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-openings-set",
+        "type": "process",
+        "title": "外壁開口部の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の外壁の開口部を特定する"
+      },
+      {
+        "id": "info-openings-set",
+        "type": "information",
+        "title": "建築物の外壁開口部",
+        "subject": "建築物",
+        "property": "外壁開口部の集合",
+        "property_type": "set_definition",
+        "description": "判定対象となる建築物の外壁に存在する開口部を特定",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-ensho-check",
+        "type": "process",
+        "title": "延焼のおそれのある部分の判定",
+        "process_type": "mechanical",
+        "target_subject": "外壁開口部",
+        "iteration": "iterative",
+        "description": "隣地境界線等からの距離に基づき、各開口部が延焼のおそれのある部分に該当するかを判定",
+        "related_articles": [
+          "法::A2:I6"
+        ]
+      },
+      {
+        "id": "info-ensho-openings",
+        "type": "information",
+        "title": "延焼のおそれのある開口部",
+        "symbol": "E",
+        "subject": "外壁開口部",
+        "property": "延焼のおそれのある部分への該当",
+        "property_type": "proposition",
+        "description": "当該開口部が延焼のおそれのある部分に該当するか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-fire-equipment-type",
+        "type": "process",
+        "title": "防火設備の特定",
+        "process_type": "human_judgment",
+        "target_subject": "外壁開口部",
+        "iteration": "iterative",
+        "description": "設計図書等から各開口部に設けられる防火設備（防火戸等）を特定する"
+      },
+      {
+        "id": "info-fire-equipment-type",
+        "type": "information",
+        "title": "防火設備の種類",
+        "symbol": "F",
+        "subject": "外壁開口部",
+        "property": "防火設備種類",
+        "property_type": "classification",
+        "description": "防火戸、その他政令で定める防火設備の種類",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-fire-equipment-check",
+        "type": "process",
+        "title": "防火設備設置確認",
+        "process_type": "mechanical",
+        "target_subject": "外壁開口部",
+        "iteration": "iterative",
+        "description": "延焼のおそれのある開口部全てに防火設備が設けられていることを確認",
+        "logic_expression": "E = true → F ≠ null"
+      },
+      {
+        "id": "info-fire-equipment-installed",
+        "type": "information",
+        "title": "防火設備設置適合",
+        "symbol": "FI",
+        "subject": "建築物",
+        "property": "防火設備設置適合",
+        "property_type": "proposition",
+        "description": "全ての延焼のおそれのある開口部に防火設備が設置されているか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-building-parts-set",
+        "type": "process",
+        "title": "建築物部分の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から判定対象となる建築物の壁、柱、床等の部分を特定する"
+      },
+      {
+        "id": "info-building-parts-set",
+        "type": "information",
+        "title": "建築物の壁・柱・床等",
+        "subject": "建築物",
+        "property": "壁・柱・床等の部分の集合",
+        "property_type": "set_definition",
+        "description": "判定対象となる建築物の壁、柱、床その他の建築物の部分及び防火設備を特定",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-part-structure",
+        "type": "process",
+        "title": "建築物部分の構造の特定",
+        "process_type": "human_judgment",
+        "target_subject": "建築物部分",
+        "iteration": "iterative",
+        "description": "設計図書等から壁、柱、床等の構造方法を特定する"
+      },
+      {
+        "id": "info-part-structure",
+        "type": "information",
+        "title": "建築物部分の構造",
+        "symbol": "P",
+        "subject": "建築物部分",
+        "property": "構造方法",
+        "property_type": "classification",
+        "description": "壁、柱、床、防火設備等の構造方法",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-tech-standard",
+        "type": "process",
+        "title": "技術的基準適合判定",
+        "process_type": "mechanical",
+        "target_subject": "建築物部分",
+        "iteration": "iterative",
+        "description": "防火地域・準防火地域の別及び建築物の規模に応じた政令で定める技術的基準への適合を判定",
+        "related_articles": [
+          "令::A107",
+          "令::A108"
+        ],
+        "logic_expression": "(通常の火災による周囲への延焼防止性能を満たす)"
+      },
+      {
+        "id": "info-tech-compliance",
+        "type": "information",
+        "title": "技術的基準適合",
+        "symbol": "T",
+        "subject": "建築物部分",
+        "property": "技術的基準への適合",
+        "property_type": "proposition",
+        "description": "政令で定める技術的基準に適合するか",
+        "related_articles": [
+          "令::A107",
+          "令::A108"
+        ],
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-minister-method",
+        "type": "process",
+        "title": "大臣定め構造方法該当判定",
+        "process_type": "mechanical",
+        "target_subject": "建築物部分",
+        "iteration": "iterative",
+        "description": "国土交通大臣が定めた構造方法（告示）に該当するかを判定"
+      },
+      {
+        "id": "info-minister-method",
+        "type": "information",
+        "title": "大臣定め構造方法への該当",
+        "symbol": "MM",
+        "subject": "建築物部分",
+        "property": "大臣定め構造方法該当",
+        "property_type": "proposition",
+        "description": "国土交通大臣が定めた構造方法（告示）に該当するか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-minister-approval",
+        "type": "process",
+        "title": "大臣認定確認",
+        "process_type": "undefined_input",
+        "target_subject": "建築物部分",
+        "iteration": "iterative",
+        "description": "国土交通大臣の認定を受けた構造方法であるか確認"
+      },
+      {
+        "id": "info-minister-approval",
+        "type": "information",
+        "title": "大臣認定の有無",
+        "symbol": "MA",
+        "subject": "建築物部分",
+        "property": "大臣認定の有無",
+        "property_type": "proposition",
+        "description": "国土交通大臣の認定を受けた構造方法であるか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-part-compliance",
+        "type": "process",
+        "title": "各部分の適合判定",
+        "process_type": "mechanical",
+        "target_subject": "建築物部分",
+        "iteration": "iterative",
+        "description": "各建築物部分が技術的基準を満たし、かつ、大臣定め構造方法又は大臣認定のいずれかに該当することを確認",
+        "logic_expression": "T AND (MM OR MA)"
+      },
+      {
+        "id": "info-part-compliance",
+        "type": "information",
+        "title": "各部分の適合",
+        "symbol": "PC",
+        "subject": "建築物部分",
+        "property": "基準適合",
+        "property_type": "proposition",
+        "description": "各建築物部分が法61条1項の基準に適合するか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-all-parts-check",
+        "type": "process",
+        "title": "全部分適合確認",
+        "process_type": "mechanical",
+        "description": "全ての建築物部分が法61条1項の基準に適合することを確認",
+        "logic_expression": "∀part ∈ BuildingParts: PC(part) = true"
+      },
+      {
+        "id": "info-all-parts-compliance",
+        "type": "information",
+        "title": "建築物部分の基準適合",
+        "subject": "建築物",
+        "property": "建築物部分の基準適合",
+        "property_type": "proposition",
+        "description": "建築物の全ての壁・柱・床等及び防火設備が基準に適合するか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-final-judgment",
+        "type": "process",
+        "title": "適合判定",
+        "process_type": "mechanical",
+        "description": "適用除外に該当するか、又は全ての要件（防火設備設置+建築物部分の基準適合）を満たすことを確認",
+        "logic_expression": "X OR (FI AND info-all-parts-compliance)"
+      },
+      {
+        "id": "info-final",
+        "type": "information",
+        "title": "法61条1項適合",
+        "subject": "建築物",
+        "property": "法61条1項適合",
+        "property_type": "proposition",
+        "description": "建築物全体として法61条1項の規定に適合するか",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-structure-type",
+        "to": "info-structure-type",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "proc-height",
+        "to": "info-height",
+        "role": "output"
+      },
+      {
+        "id": "e03",
+        "from": "proc-main-building-type",
+        "to": "info-main-building-type",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "proc-is-attached",
+        "to": "info-is-attached",
+        "role": "output"
+      },
+      {
+        "id": "e05",
+        "from": "info-structure-type",
+        "to": "proc-exempt-check",
+        "role": "input"
+      },
+      {
+        "id": "e06",
+        "from": "info-height",
+        "to": "proc-exempt-check",
+        "role": "input"
+      },
+      {
+        "id": "e07",
+        "from": "info-main-building-type",
+        "to": "proc-exempt-check",
+        "role": "input"
+      },
+      {
+        "id": "e08",
+        "from": "info-is-attached",
+        "to": "proc-exempt-check",
+        "role": "input"
+      },
+      {
+        "id": "e09",
+        "from": "proc-exempt-check",
+        "to": "info-exempt",
+        "role": "output"
+      },
+      {
+        "id": "e10",
+        "from": "proc-openings-set",
+        "to": "info-openings-set",
+        "role": "output"
+      },
+      {
+        "id": "e11",
+        "from": "info-openings-set",
+        "to": "proc-ensho-check",
+        "role": "input"
+      },
+      {
+        "id": "e12",
+        "from": "proc-ensho-check",
+        "to": "info-ensho-openings",
+        "role": "output"
+      },
+      {
+        "id": "e13",
+        "from": "info-openings-set",
+        "to": "proc-fire-equipment-type",
+        "role": "input"
+      },
+      {
+        "id": "e14",
+        "from": "proc-fire-equipment-type",
+        "to": "info-fire-equipment-type",
+        "role": "output"
+      },
+      {
+        "id": "e15",
+        "from": "info-ensho-openings",
+        "to": "proc-fire-equipment-check",
+        "role": "input"
+      },
+      {
+        "id": "e16",
+        "from": "info-fire-equipment-type",
+        "to": "proc-fire-equipment-check",
+        "role": "input"
+      },
+      {
+        "id": "e17",
+        "from": "proc-fire-equipment-check",
+        "to": "info-fire-equipment-installed",
+        "role": "output"
+      },
+      {
+        "id": "e18",
+        "from": "proc-building-parts-set",
+        "to": "info-building-parts-set",
+        "role": "output"
+      },
+      {
+        "id": "e19",
+        "from": "info-building-parts-set",
+        "to": "proc-part-structure",
+        "role": "input"
+      },
+      {
+        "id": "e20",
+        "from": "proc-part-structure",
+        "to": "info-part-structure",
+        "role": "output"
+      },
+      {
+        "id": "e21",
+        "from": "info-part-structure",
+        "to": "proc-tech-standard",
+        "role": "input"
+      },
+      {
+        "id": "e22",
+        "from": "proc-tech-standard",
+        "to": "info-tech-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e23",
+        "from": "info-part-structure",
+        "to": "proc-minister-method",
+        "role": "input"
+      },
+      {
+        "id": "e24",
+        "from": "proc-minister-method",
+        "to": "info-minister-method",
+        "role": "output"
+      },
+      {
+        "id": "e25",
+        "from": "proc-minister-approval",
+        "to": "info-minister-approval",
+        "role": "output"
+      },
+      {
+        "id": "e26",
+        "from": "info-tech-compliance",
+        "to": "proc-part-compliance",
+        "role": "input"
+      },
+      {
+        "id": "e27",
+        "from": "info-minister-method",
+        "to": "proc-part-compliance",
+        "role": "input"
+      },
+      {
+        "id": "e28",
+        "from": "info-minister-approval",
+        "to": "proc-part-compliance",
+        "role": "input"
+      },
+      {
+        "id": "e29",
+        "from": "proc-part-compliance",
+        "to": "info-part-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e30",
+        "from": "info-part-compliance",
+        "to": "proc-all-parts-check",
+        "role": "input"
+      },
+      {
+        "id": "e31",
+        "from": "proc-all-parts-check",
+        "to": "info-all-parts-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e32",
+        "from": "info-exempt",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e33",
+        "from": "info-fire-equipment-installed",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e34",
+        "from": "info-all-parts-compliance",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e35",
+        "from": "proc-final-judgment",
+        "to": "info-final",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "delegates_to",
+      "articles": [
+        "A107",
+        "A108",
+        "A109",
+        "A109_2"
+      ],
+      "description": "法61条1項の技術的基準、防火設備の詳細を定める"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-23T18:30:00+09:00",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

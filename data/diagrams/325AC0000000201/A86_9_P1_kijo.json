@@ -1,0 +1,303 @@
+{
+  "id": "CHK-BSL-A86-9-P1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "公共事業による敷地面積減少時の適用",
+    "target_subject": "建築物・敷地",
+    "description": "公共事業施行により敷地面積が減少した場合に、建築物が法令に適合しないこととなった時の第三条の準用適用を判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "86-9",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "適用除外"
+  ],
+  "text_raw": "第三条第二項及び第三項（第一号及び第二号を除く。）の規定は、次に掲げる事業の施行の際現に存する建築物若しくはその敷地又は現に建築、修繕若しくは模様替の工事中の建築物若しくはその敷地が、当該事業の施行によるこれらの建築物の敷地面積の減少により、この法律若しくはこれに基づく命令若しくは条例の規定に適合しないこととなつた場合又はこれらの規定に適合しない部分を有するに至つた場合について準用する。この場合において、同項第三号中「この法律又はこれに基づく命令若しくは条例の規定の施行又は適用」とあるのは、「第八十六条の九第一項各号に掲げる事業の施行による建築物の敷地面積の減少」と読み替えるものとする。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "status",
+          "value": "公共事業施行による敷地面積減少が発生"
+        }
+      ],
+      "note": "土地収用法又は都市計画法に基づく公共事業施行による敷地面積の減少"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-public-project-type",
+          "operator": "in",
+          "value": ["土地収用法事業", "都市計画事業", "関連事業"]
+        },
+        {
+          "operator": "OR",
+          "conditions": [
+            {
+              "ref": "info-noncompliance-status",
+              "operator": "==",
+              "value": true
+            },
+            {
+              "ref": "info-noncompliance-part",
+              "operator": "==",
+              "value": true
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-project-identification",
+        "type": "process",
+        "title": "公共事業の種類確認",
+        "process_type": "undefined_input",
+        "description": "施工中の事業が土地収用法第3条に掲げるもの、都市計画法による土地収用・使用事業、又はこれらに係る関連事業に該当するかを確認"
+      },
+      {
+        "id": "info-public-project-type",
+        "type": "information",
+        "title": "公共事業の種類",
+        "symbol": "P",
+        "subject": "公共事業",
+        "property": "事業の種類",
+        "property_type": "classification",
+        "description": "土地収用法事業、都市計画事業、又は関連事業のいずれか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-area-check",
+        "type": "process",
+        "title": "敷地面積減少の確認",
+        "process_type": "mechanical",
+        "description": "公共事業施行により敷地面積が減少したことを確認"
+      },
+      {
+        "id": "info-area-reduction",
+        "type": "information",
+        "title": "敷地面積の減少",
+        "symbol": "AR",
+        "subject": "敷地",
+        "property": "面積減少の有無",
+        "property_type": "proposition",
+        "description": "敷地面積が公共事業により減少しているか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-building-status",
+        "type": "process",
+        "title": "建築物の存在状態確認",
+        "process_type": "undefined_input",
+        "description": "事業施行時に建築物が既存として存在するか、または建築・修繕・模様替の工事中であるかを確認"
+      },
+      {
+        "id": "info-building-status",
+        "type": "information",
+        "title": "建築物の存在状態",
+        "symbol": "BS",
+        "subject": "建築物",
+        "property": "存在状態",
+        "property_type": "classification",
+        "description": "既存建築物、建築工事中、修繕工事中、または模様替工事中のいずれか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-compliance-check-before",
+        "type": "process",
+        "title": "事業施行前の法令適合状態確認",
+        "process_type": "mechanical",
+        "description": "敷地面積減少前の建築物が法令要件を満たしていた状態を確認"
+      },
+      {
+        "id": "info-compliance-before",
+        "type": "information",
+        "title": "事業施行前の法令適合性",
+        "symbol": "CB",
+        "subject": "建築物",
+        "property": "法令適合状態（施行前）",
+        "property_type": "proposition",
+        "description": "敷地面積減少前に法令要件を満たしていたか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-compliance-check-after",
+        "type": "process",
+        "title": "事業施行後の法令適合状態確認",
+        "process_type": "mechanical",
+        "description": "敷地面積減少により、建築物又は敷地が法令に適合しなくなった状態を確認"
+      },
+      {
+        "id": "info-noncompliance-status",
+        "type": "information",
+        "title": "全体的な非適合性",
+        "symbol": "NC",
+        "subject": "建築物・敷地",
+        "property": "全体的な法令非適合への該当",
+        "property_type": "proposition",
+        "description": "敷地面積減少により、建築物又は敷地全体が法令に適合しなくなったか",
+        "plurality": "single"
+      },
+      {
+        "id": "info-noncompliance-part",
+        "type": "information",
+        "title": "部分的な非適合性",
+        "symbol": "NCP",
+        "subject": "建築物・敷地",
+        "property": "部分的な法令非適合への該当",
+        "property_type": "proposition",
+        "description": "敷地面積減少により、建築物又は敷地が適合しない部分を有するようになったか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-article3-applicability",
+        "type": "process",
+        "title": "第3条準用の適用可否判定",
+        "process_type": "mechanical",
+        "target_subject": "建築物・敷地",
+        "iteration": "single",
+        "description": "敷地面積減少により適合しなくなった場合、第3条第2項及び第3項（第1号及び第2号を除く）の規定を準用適用するかを判定",
+        "logic_expression": "(P ∈ {公共事業}) AND (AR = true) AND (CB = true) AND ((NC = true) OR (NCP = true))"
+      },
+      {
+        "id": "info-article3-application",
+        "type": "information",
+        "title": "第3条準用適用の判定",
+        "symbol": "A3",
+        "subject": "建築物・敷地",
+        "property": "第3条準用適用の適否",
+        "property_type": "proposition",
+        "description": "第3条第2項及び第3項（第1号及び第2号を除く）を準用適用すべきか",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge-proj-type",
+        "from": "proc-project-identification",
+        "to": "info-public-project-type",
+        "role": "output"
+      },
+      {
+        "id": "edge-proj-area",
+        "from": "info-public-project-type",
+        "to": "proc-area-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-area-reduction",
+        "from": "proc-area-check",
+        "to": "info-area-reduction",
+        "role": "output"
+      },
+      {
+        "id": "edge-building-status",
+        "from": "proc-building-status",
+        "to": "info-building-status",
+        "role": "output"
+      },
+      {
+        "id": "edge-status-before",
+        "from": "info-building-status",
+        "to": "proc-compliance-check-before",
+        "role": "input"
+      },
+      {
+        "id": "edge-compliance-before",
+        "from": "proc-compliance-check-before",
+        "to": "info-compliance-before",
+        "role": "output"
+      },
+      {
+        "id": "edge-area-after",
+        "from": "info-area-reduction",
+        "to": "proc-compliance-check-after",
+        "role": "input"
+      },
+      {
+        "id": "edge-noncomp-status",
+        "from": "proc-compliance-check-after",
+        "to": "info-noncompliance-status",
+        "role": "output"
+      },
+      {
+        "id": "edge-noncomp-part",
+        "from": "proc-compliance-check-after",
+        "to": "info-noncompliance-part",
+        "role": "output"
+      },
+      {
+        "id": "edge-proj-final",
+        "from": "info-public-project-type",
+        "to": "proc-article3-applicability",
+        "role": "input"
+      },
+      {
+        "id": "edge-area-final",
+        "from": "info-area-reduction",
+        "to": "proc-article3-applicability",
+        "role": "input"
+      },
+      {
+        "id": "edge-comp-before-final",
+        "from": "info-compliance-before",
+        "to": "proc-article3-applicability",
+        "role": "input"
+      },
+      {
+        "id": "edge-noncomp-status-final",
+        "from": "info-noncompliance-status",
+        "to": "proc-article3-applicability",
+        "role": "input"
+      },
+      {
+        "id": "edge-noncomp-part-final",
+        "from": "info-noncompliance-part",
+        "to": "proc-article3-applicability",
+        "role": "input"
+      },
+      {
+        "id": "edge-final-output",
+        "from": "proc-article3-applicability",
+        "to": "info-article3-application",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A3:P2", "A3:P3"],
+      "description": "第3条第2項及び第3項（第1号及び第2号を除く）の規定が準用される"
+    },
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A86-9:P2"],
+      "description": "敷地面積最低限度に関する第2項の準用規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-24T00:00:00Z",
+    "created_by": "Claude Code",
+    "last_modified_at": "2025-12-24T00:00:00Z",
+    "status": "draft",
+    "remarks": "第86条の9第1項に基づく公共事業施行時の敷地面積減少による法令適合性評価機序図"
+  }
+}

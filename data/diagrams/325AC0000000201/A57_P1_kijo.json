@@ -1,0 +1,398 @@
+{
+  "id": "CHK-BSL-A57-P1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "高架工作物内建築物の適用除外",
+    "target_subject": "建築物",
+    "description": "高架の工作物内に設ける建築物について、前三条（第54条・第55条・第56条）の規定の適用除外に該当するかを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "57",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "集団規定",
+    "適用除外"
+  ],
+  "text_raw": "高架の工作物内に設ける建築物で特定行政庁が周囲の状況により交通上、安全上、防火上及び衛生上支障がないと認めるものについては、前三条の規定は、適用しない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "ALWAYS",
+      "value": true,
+      "note": "全建築物に適用される一般的規定"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "note": "高架工作物内建築物の適用除外",
+          "operator": "AND",
+          "conditions": [
+            {
+              "ref": "info-elevated-location",
+              "operator": "==",
+              "value": true
+            },
+            {
+              "ref": "info-admin-approval",
+              "operator": "==",
+              "value": true
+            }
+          ]
+        },
+        {
+          "note": "適用除外に該当しない場合は前三条の規定を適用",
+          "ref": "info-articles-54-56-compliance",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-building-identify",
+        "type": "process",
+        "title": "建築物の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から判定対象となる建築物を特定する"
+      },
+      {
+        "id": "info-building",
+        "type": "information",
+        "title": "建築物",
+        "subject": "建築物",
+        "property": "存在",
+        "property_type": "set_definition",
+        "description": "判定対象となる建築物",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-location-check",
+        "type": "process",
+        "title": "高架工作物内の設置確認",
+        "process_type": "human_judgment",
+        "description": "設計図書等から建築物が高架の工作物内に設けられているか確認する"
+      },
+      {
+        "id": "info-elevated-location",
+        "type": "information",
+        "title": "高架工作物内の配置",
+        "symbol": "L",
+        "subject": "建築物",
+        "property": "高架工作物内への設置",
+        "property_type": "proposition",
+        "description": "建築物が高架の工作物内に設けられているか",
+        "plurality": "single",
+        "remarks": "高架の工作物とは、高架鉄道、高架道路等を指す"
+      },
+      {
+        "id": "proc-admin-review",
+        "type": "process",
+        "title": "特定行政庁の認定確認",
+        "process_type": "human_judgment",
+        "description": "特定行政庁による交通上、安全上、防火上及び衛生上支障がないとの認定の有無を確認"
+      },
+      {
+        "id": "info-admin-approval",
+        "type": "information",
+        "title": "特定行政庁の認定",
+        "symbol": "A",
+        "subject": "建築物",
+        "property": "特定行政庁による支障なし認定",
+        "property_type": "proposition",
+        "description": "周囲の状況により交通上、安全上、防火上及び衛生上支障がないと特定行政庁が認めたか",
+        "plurality": "single",
+        "remarks": "交通上、安全上、防火上及び衛生上の4要素全てについて支障がないことの認定"
+      },
+      {
+        "id": "proc-exemption-judgment",
+        "type": "process",
+        "title": "適用除外該当判定",
+        "process_type": "mechanical",
+        "description": "高架工作物内の配置かつ特定行政庁の認定があることを確認",
+        "logic_expression": "L AND A"
+      },
+      {
+        "id": "info-exemption",
+        "type": "information",
+        "title": "前三条の適用除外該当",
+        "symbol": "E",
+        "subject": "建築物",
+        "property": "法57条1項適用除外該当",
+        "property_type": "proposition",
+        "description": "第54条・第55条・第56条の規定が適用除外となるか",
+        "plurality": "single",
+        "remarks": "前三条とは、第54条（第一種低層住居専用地域等内における外壁の後退距離）、第55条（第一種低層住居専用地域等内における建築物の高さの限度）、第56条（建築物の各部分の高さ）を指す"
+      },
+      {
+        "id": "proc-articles-54-check",
+        "type": "process",
+        "title": "第54条適合確認",
+        "process_type": "sub_diagram_reference",
+        "description": "第54条（外壁後退距離）の規定への適合を確認",
+        "related_articles": [
+          "法::A54"
+        ],
+        "sub_diagram_ref": "CHK-BSL-A54-P1"
+      },
+      {
+        "id": "info-article-54-compliance",
+        "type": "information",
+        "title": "第54条適合",
+        "symbol": "C54",
+        "subject": "建築物",
+        "property": "第54条適合",
+        "property_type": "proposition",
+        "description": "第54条（外壁後退距離）の規定に適合するか",
+        "related_articles": [
+          "法::A54"
+        ],
+        "plurality": "single"
+      },
+      {
+        "id": "proc-articles-55-check",
+        "type": "process",
+        "title": "第55条適合確認",
+        "process_type": "sub_diagram_reference",
+        "description": "第55条（建築物の高さの限度）の規定への適合を確認",
+        "related_articles": [
+          "法::A55"
+        ],
+        "sub_diagram_ref": "CHK-BSL-A55-P1"
+      },
+      {
+        "id": "info-article-55-compliance",
+        "type": "information",
+        "title": "第55条適合",
+        "symbol": "C55",
+        "subject": "建築物",
+        "property": "第55条適合",
+        "property_type": "proposition",
+        "description": "第55条（建築物の高さの限度）の規定に適合するか",
+        "related_articles": [
+          "法::A55"
+        ],
+        "plurality": "single"
+      },
+      {
+        "id": "proc-articles-56-check",
+        "type": "process",
+        "title": "第56条適合確認",
+        "process_type": "sub_diagram_reference",
+        "description": "第56条（建築物の各部分の高さ）の規定への適合を確認",
+        "related_articles": [
+          "法::A56"
+        ],
+        "sub_diagram_ref": "CHK-BSL-A56-P1"
+      },
+      {
+        "id": "info-article-56-compliance",
+        "type": "information",
+        "title": "第56条適合",
+        "symbol": "C56",
+        "subject": "建築物",
+        "property": "第56条適合",
+        "property_type": "proposition",
+        "description": "第56条（建築物の各部分の高さ）の規定に適合するか",
+        "related_articles": [
+          "法::A56"
+        ],
+        "plurality": "single"
+      },
+      {
+        "id": "proc-articles-54-56-and",
+        "type": "process",
+        "title": "前三条全適合判定",
+        "process_type": "mechanical",
+        "description": "第54条、第55条、第56条の全ての規定に適合することを確認（適用除外に該当しない場合）",
+        "logic_expression": "C54 AND C55 AND C56"
+      },
+      {
+        "id": "info-articles-54-56-compliance",
+        "type": "information",
+        "title": "前三条適合",
+        "symbol": "C",
+        "subject": "建築物",
+        "property": "前三条適合",
+        "property_type": "proposition",
+        "description": "第54条・第55条・第56条の全ての規定に適合するか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-final-judgment",
+        "type": "process",
+        "title": "最終適合判定",
+        "process_type": "mechanical",
+        "description": "適用除外に該当するか、または前三条に適合することを確認",
+        "logic_expression": "E OR C"
+      },
+      {
+        "id": "info-compliance",
+        "type": "information",
+        "title": "法57条1項適合",
+        "subject": "建築物",
+        "property": "法57条1項適合",
+        "property_type": "proposition",
+        "description": "法57条1項の規定に適合するか（適用除外該当または前三条適合）",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-building-identify",
+        "to": "info-building",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "info-building",
+        "to": "proc-location-check",
+        "role": "input"
+      },
+      {
+        "id": "e03",
+        "from": "proc-location-check",
+        "to": "info-elevated-location",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "info-building",
+        "to": "proc-admin-review",
+        "role": "input"
+      },
+      {
+        "id": "e05",
+        "from": "proc-admin-review",
+        "to": "info-admin-approval",
+        "role": "output"
+      },
+      {
+        "id": "e06",
+        "from": "info-elevated-location",
+        "to": "proc-exemption-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e07",
+        "from": "info-admin-approval",
+        "to": "proc-exemption-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e08",
+        "from": "proc-exemption-judgment",
+        "to": "info-exemption",
+        "role": "output"
+      },
+      {
+        "id": "e09",
+        "from": "info-building",
+        "to": "proc-articles-54-check",
+        "role": "input"
+      },
+      {
+        "id": "e10",
+        "from": "proc-articles-54-check",
+        "to": "info-article-54-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e11",
+        "from": "info-building",
+        "to": "proc-articles-55-check",
+        "role": "input"
+      },
+      {
+        "id": "e12",
+        "from": "proc-articles-55-check",
+        "to": "info-article-55-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e13",
+        "from": "info-building",
+        "to": "proc-articles-56-check",
+        "role": "input"
+      },
+      {
+        "id": "e14",
+        "from": "proc-articles-56-check",
+        "to": "info-article-56-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e15",
+        "from": "info-article-54-compliance",
+        "to": "proc-articles-54-56-and",
+        "role": "input"
+      },
+      {
+        "id": "e16",
+        "from": "info-article-55-compliance",
+        "to": "proc-articles-54-56-and",
+        "role": "input"
+      },
+      {
+        "id": "e17",
+        "from": "info-article-56-compliance",
+        "to": "proc-articles-54-56-and",
+        "role": "input"
+      },
+      {
+        "id": "e18",
+        "from": "proc-articles-54-56-and",
+        "to": "info-articles-54-56-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e19",
+        "from": "info-exemption",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e20",
+        "from": "info-articles-54-56-compliance",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e21",
+        "from": "proc-final-judgment",
+        "to": "info-compliance",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": [
+        "A54",
+        "A55",
+        "A56"
+      ],
+      "description": "前三条（第54条・第55条・第56条）を参照"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-23T10:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

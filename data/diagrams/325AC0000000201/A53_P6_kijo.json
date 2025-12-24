@@ -1,0 +1,321 @@
+{
+  "id": "CHK-BSL-A53-P6",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "建蔽率規定の適用除外判定",
+    "target_subject": "建築物",
+    "description": "建築物が建蔽率規制の適用除外となる3つの類型（防火地域内耐火建築物等、公益施設、公共空間内建築物）のいずれかに該当するかを判定し、該当する場合は第53条第1項から第5項までの建蔽率規制を適用しない"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "53",
+    "paragraph": "6"
+  },
+  "labels": [
+    "集団規定",
+    "建蔽率",
+    "適用除外"
+  ],
+  "text_raw": "前各項の規定は、次の各号のいずれかに該当する建築物については、適用しない。\n一　防火地域（第一項第二号から第四号までの規定により建蔽率の限度が十分の八とされている地域に限る。）内にある耐火建築物等\n二　巡査派出所、公衆便所、公共用歩廊その他これらに類するもの\n三　公園、広場、道路、川その他これらに類するものの内にある建築物で特定行政庁が安全上、防火上及び衛生上支障がないと認めて許可したもの",
+  "compliance_logic": {
+    "scope_condition": {
+      "value": true,
+      "note": "建築物全般に適用される適用除外規定"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "type": "exemption",
+          "ref": "第6項第1号",
+          "description": "防火地域（建蔽率限度8/10の地域）内の耐火建築物等"
+        },
+        {
+          "type": "exemption",
+          "ref": "第6項第2号",
+          "description": "巡査派出所、公衆便所、公共用歩廊等の公益施設"
+        },
+        {
+          "type": "exemption",
+          "ref": "第6項第3号",
+          "description": "公共空間内で特定行政庁の許可を受けた建築物"
+        }
+      ]
+    },
+    "exceptions": {
+      "effect": "EXEMPT",
+      "operator": "OR",
+      "conditions": [
+        {
+          "description": "いずれかの号に該当する場合、第1項から第5項までの建蔽率規制を適用しない"
+        }
+      ]
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-building-type",
+        "type": "process",
+        "title": "建築物種別の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の用途・種別を読み取る"
+      },
+      {
+        "id": "info-building-type",
+        "type": "information",
+        "title": "建築物の種別",
+        "symbol": "T",
+        "subject": "建築物",
+        "property": "用途・種別",
+        "property_type": "classification",
+        "plurality": "single",
+        "description": "巡査派出所、公衆便所、公共用歩廊、その他これらに類するもの等の区分"
+      },
+      {
+        "id": "proc-structure-type",
+        "type": "process",
+        "title": "構造種別の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の構造種別を読み取る"
+      },
+      {
+        "id": "info-structure-type",
+        "type": "information",
+        "title": "建築物の構造種別",
+        "symbol": "S",
+        "subject": "建築物",
+        "property": "構造種別",
+        "property_type": "classification",
+        "plurality": "single",
+        "description": "耐火建築物等、準耐火建築物等、その他の区分"
+      },
+      {
+        "id": "proc-site-location",
+        "type": "process",
+        "title": "敷地の位置の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から敷地の位置（公園内、広場内、道路内、川内等）を読み取る"
+      },
+      {
+        "id": "info-site-location",
+        "type": "information",
+        "title": "敷地の位置",
+        "symbol": "L",
+        "subject": "敷地",
+        "property": "位置特性",
+        "property_type": "classification",
+        "plurality": "single",
+        "description": "公園、広場、道路、川、その他これらに類するものの内にあるか否か"
+      },
+      {
+        "id": "proc-exemption-type1",
+        "type": "process",
+        "title": "第1号該当判定（防火地域内耐火建築物等）",
+        "process_type": "mechanical",
+        "description": "防火地域（建蔽率限度8/10の地域）内にあり、かつ耐火建築物等であるかを判定",
+        "logic_expression": "(敷地 ∈ {防火地域}) AND (地域の建蔽率限度 = 8/10) AND (S = 耐火建築物等)",
+        "remarks": "都市計画情報（防火地域指定）および第1項第2号から第4号の建蔽率限度の確認を含む"
+      },
+      {
+        "id": "info-exemption-type1",
+        "type": "information",
+        "title": "第1号該当",
+        "symbol": "E1",
+        "subject": "建築物",
+        "property": "第6項第1号該当",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "防火地域（建蔽率限度8/10）内の耐火建築物等に該当するか"
+      },
+      {
+        "id": "proc-exemption-type2",
+        "type": "process",
+        "title": "第2号該当判定（公益施設）",
+        "process_type": "mechanical",
+        "description": "巡査派出所、公衆便所、公共用歩廊その他これらに類するものに該当するかを判定",
+        "logic_expression": "T ∈ {巡査派出所, 公衆便所, 公共用歩廊, これらに類するもの}"
+      },
+      {
+        "id": "info-exemption-type2",
+        "type": "information",
+        "title": "第2号該当",
+        "symbol": "E2",
+        "subject": "建築物",
+        "property": "第6項第2号該当",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "巡査派出所、公衆便所、公共用歩廊等に該当するか"
+      },
+      {
+        "id": "proc-permit-check",
+        "type": "process",
+        "title": "特定行政庁許可の確認",
+        "process_type": "undefined_input",
+        "description": "特定行政庁による安全上、防火上及び衛生上支障がないとの許可の有無を確認"
+      },
+      {
+        "id": "info-permit",
+        "type": "information",
+        "title": "特定行政庁の許可",
+        "symbol": "P",
+        "subject": "建築物",
+        "property": "許可の有無",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "安全上、防火上及び衛生上支障がないとの許可を受けているか"
+      },
+      {
+        "id": "proc-exemption-type3",
+        "type": "process",
+        "title": "第3号該当判定（公共空間内建築物）",
+        "process_type": "mechanical",
+        "description": "公園、広場、道路、川等の内にあり、かつ特定行政庁の許可を受けているかを判定",
+        "logic_expression": "(L ∈ {公園, 広場, 道路, 川, これらに類するもの}) AND (P = 真)"
+      },
+      {
+        "id": "info-exemption-type3",
+        "type": "information",
+        "title": "第3号該当",
+        "symbol": "E3",
+        "subject": "建築物",
+        "property": "第6項第3号該当",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "公共空間内で許可を受けた建築物に該当するか"
+      },
+      {
+        "id": "proc-exemption-judgment",
+        "type": "process",
+        "title": "適用除外判定",
+        "process_type": "mechanical",
+        "description": "3つの類型のいずれかに該当する場合、建蔽率規制の適用を除外する",
+        "logic_expression": "E1 OR E2 OR E3"
+      },
+      {
+        "id": "info-exemption-result",
+        "type": "information",
+        "title": "建蔽率規制の適用除外",
+        "symbol": "R",
+        "subject": "建築物",
+        "property": "第53条第1項から第5項までの適用除外",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "いずれかの号に該当する場合、建蔽率規制を適用しない（真＝適用除外）"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e1",
+        "from": "proc-building-type",
+        "to": "info-building-type",
+        "role": "output"
+      },
+      {
+        "id": "e2",
+        "from": "proc-structure-type",
+        "to": "info-structure-type",
+        "role": "output"
+      },
+      {
+        "id": "e3",
+        "from": "proc-site-location",
+        "to": "info-site-location",
+        "role": "output"
+      },
+      {
+        "id": "e4",
+        "from": "info-structure-type",
+        "to": "proc-exemption-type1",
+        "role": "input"
+      },
+      {
+        "id": "e5",
+        "from": "proc-exemption-type1",
+        "to": "info-exemption-type1",
+        "role": "output"
+      },
+      {
+        "id": "e6",
+        "from": "info-building-type",
+        "to": "proc-exemption-type2",
+        "role": "input"
+      },
+      {
+        "id": "e7",
+        "from": "proc-exemption-type2",
+        "to": "info-exemption-type2",
+        "role": "output"
+      },
+      {
+        "id": "e8",
+        "from": "proc-permit-check",
+        "to": "info-permit",
+        "role": "output"
+      },
+      {
+        "id": "e9",
+        "from": "info-site-location",
+        "to": "proc-exemption-type3",
+        "role": "input"
+      },
+      {
+        "id": "e10",
+        "from": "info-permit",
+        "to": "proc-exemption-type3",
+        "role": "input"
+      },
+      {
+        "id": "e11",
+        "from": "proc-exemption-type3",
+        "to": "info-exemption-type3",
+        "role": "output"
+      },
+      {
+        "id": "e12",
+        "from": "info-exemption-type1",
+        "to": "proc-exemption-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e13",
+        "from": "info-exemption-type2",
+        "to": "proc-exemption-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e14",
+        "from": "info-exemption-type3",
+        "to": "proc-exemption-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e15",
+        "from": "proc-exemption-judgment",
+        "to": "info-exemption-result",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A53:P1", "A53:P3"],
+      "description": "第1項（建蔽率の基準値）、第3項（耐火建築物等の定義）を参照"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-24T07:00:00Z",
+    "author": "Claude Sonnet 4.5",
+    "generator": "kijo-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法",
+    "source": "e-Gov法令API"
+  }
+}

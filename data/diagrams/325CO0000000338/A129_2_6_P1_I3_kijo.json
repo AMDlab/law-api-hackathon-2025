@@ -1,0 +1,231 @@
+{
+  "id": "CHK-BSL-ORDER-A129_2_6-P1-I3",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "冷却塔設備の国土交通大臣認定（温度上昇防止）",
+    "target_subject": "冷却塔設備",
+    "description": "冷却塔設備が国土交通大臣の認定を受けたものかを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "129_2_6",
+    "paragraph": "1",
+    "item": "3"
+  },
+  "labels": [
+    "単体規定",
+    "設備",
+    "冷却塔設備",
+    "大臣認定"
+  ],
+  "text_raw": "第百二十九条の二の六　地階を除く階数が十一以上である建築物の屋上に設ける冷房のための冷却塔設備の設置及び構造は、次の各号のいずれかに掲げるものとしなければならない。（中略）三　冷却塔設備の内部が燃焼した場合においても建築物の他の部分を国土交通大臣が定める温度以上に上昇させないものとして国土交通大臣の認定を受けたものとすること。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "building_attribute",
+          "value": "地階を除く階数が11以上"
+        },
+        {
+          "type": "equipment_location",
+          "value": "屋上設置の冷房用冷却塔設備"
+        }
+      ],
+      "note": "地階を除く階数が11以上である建築物の屋上に設ける冷房のための冷却塔設備"
+    },
+    "judgment_rule": {
+      "operator": "==",
+      "lhs": {
+        "ref": "info-certification-status"
+      },
+      "rhs": {
+        "value": true
+      }
+    },
+    "exceptions": null
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-building-floors-identify",
+        "type": "process",
+        "title": "階数の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の地階を除く階数を特定"
+      },
+      {
+        "id": "info-building-floors",
+        "type": "information",
+        "title": "建築物の階数（地階除く）",
+        "symbol": "F",
+        "subject": "建築物",
+        "property": "地階を除く階数",
+        "property_type": "numeric",
+        "unit": "階",
+        "plurality": "single",
+        "description": "地階を除いた建築物の階数"
+      },
+      {
+        "id": "proc-scope-check",
+        "type": "process",
+        "title": "適用範囲判定",
+        "process_type": "mechanical",
+        "description": "地階を除く階数が11以上かを判定",
+        "logic_expression": "F >= 11"
+      },
+      {
+        "id": "info-scope-applicable",
+        "type": "information",
+        "title": "適用対象",
+        "symbol": "S",
+        "subject": "建築物",
+        "property": "本規定の適用対象",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "地階を除く階数が11以上であり本条の適用対象となるか"
+      },
+      {
+        "id": "proc-cooling-tower-identify",
+        "type": "process",
+        "title": "冷却塔設備の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から屋上に設ける冷房のための冷却塔設備を特定"
+      },
+      {
+        "id": "info-cooling-tower-set",
+        "type": "information",
+        "title": "屋上の冷却塔設備",
+        "symbol": "CT",
+        "subject": "建築物",
+        "property": "屋上に設ける冷却塔設備の集合",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "判定対象となる建築物の屋上に設ける冷房のための冷却塔設備を特定"
+      },
+      {
+        "id": "proc-certification-check",
+        "type": "process",
+        "title": "大臣認定の確認",
+        "process_type": "undefined_input",
+        "description": "冷却塔設備が国土交通大臣の認定を受けたものであることを確認。認定基準: 内部が燃焼した場合においても建築物の他の部分を国土交通大臣が定める温度以上に上昇させないこと"
+      },
+      {
+        "id": "info-certification-status",
+        "type": "information",
+        "title": "大臣認定の有無",
+        "symbol": "C",
+        "subject": "冷却塔設備",
+        "property": "国土交通大臣認定の有無",
+        "property_type": "proposition",
+        "plurality": "multiple",
+        "description": "冷却塔設備の内部が燃焼した場合においても建築物の他の部分を国土交通大臣が定める温度以上に上昇させないものとして国土交通大臣の認定を受けているか",
+        "remarks": "認定を受けた冷却塔設備であれば第3号に適合"
+      },
+      {
+        "id": "proc-compliance-judgment",
+        "type": "process",
+        "title": "第3号適合判定",
+        "process_type": "mechanical",
+        "iteration": "iterative",
+        "description": "各冷却塔設備について第3号基準への適合を判定",
+        "logic_expression": "∀ct ∈ CT: C(ct) = true"
+      },
+      {
+        "id": "info-item3-compliance",
+        "type": "information",
+        "title": "第3号適合",
+        "symbol": "R",
+        "subject": "冷却塔設備",
+        "property": "第3号基準適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "令第129条の2の6第1項第3号の基準（大臣認定）に適合するか"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-building-floors-identify",
+        "to": "info-building-floors",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "info-building-floors",
+        "to": "proc-scope-check",
+        "role": "input"
+      },
+      {
+        "id": "e03",
+        "from": "proc-scope-check",
+        "to": "info-scope-applicable",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "proc-cooling-tower-identify",
+        "to": "info-cooling-tower-set",
+        "role": "output"
+      },
+      {
+        "id": "e05",
+        "from": "info-cooling-tower-set",
+        "to": "proc-certification-check",
+        "role": "input"
+      },
+      {
+        "id": "e06",
+        "from": "proc-certification-check",
+        "to": "info-certification-status",
+        "role": "output"
+      },
+      {
+        "id": "e07",
+        "from": "info-scope-applicable",
+        "to": "proc-compliance-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e08",
+        "from": "info-cooling-tower-set",
+        "to": "proc-compliance-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e09",
+        "from": "info-certification-status",
+        "to": "proc-compliance-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e10",
+        "from": "proc-compliance-judgment",
+        "to": "info-item3-compliance",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": [
+        "A36"
+      ],
+      "description": "法第36条による政令への委任（設備等の構造規定）"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-25T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

@@ -1,0 +1,403 @@
+{
+  "id": "CHK-BSL-A37-P1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "指定建築材料の品質基準適合確認",
+    "target_subject": "建築物",
+    "description": "建築物の基礎・主要構造部等の重要部分に使用する指定建築材料が、JIS/JAS規格適合又は大臣認定を受けていることを確認する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "37",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "建築材料",
+    "品質"
+  ],
+  "text_raw": "建築物の基礎、主要構造部その他安全上、防火上又は衛生上重要である政令で定める部分に使用する木材、鋼材、コンクリートその他の建築材料として国土交通大臣が定めるもの（以下この条において「指定建築材料」という。）は、次の各号のいずれかに該当するものでなければならない。一 その品質が、指定建築材料ごとに国土交通大臣の指定する日本産業規格又は日本農林規格に適合するもの 二 前号に掲げるもののほか、指定建築材料ごとに国土交通大臣が定める安全上、防火上又は衛生上必要な品質に関する技術的基準に適合するものであることについて国土交通大臣の認定を受けたもの",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "building_component",
+          "value": "基礎、主要構造部その他安全上・防火上・衛生上重要な政令で定める部分"
+        }
+      ],
+      "note": "令144条の3で定める部分（基礎、主要構造部、屋根、外壁、軒裏等）が対象"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "ref": "info-jis-jas-compliance",
+          "operator": "==",
+          "value": true,
+          "note": "第1号：JIS/JAS規格適合"
+        },
+        {
+          "ref": "info-minister-certification",
+          "operator": "==",
+          "value": true,
+          "note": "第2号：国土交通大臣の認定取得"
+        }
+      ]
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-important-parts",
+        "type": "process",
+        "title": "重要部分の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から基礎、主要構造部、その他安全上・防火上・衛生上重要な部分（令144条の3で定める部分）を特定する"
+      },
+      {
+        "id": "info-important-parts",
+        "type": "information",
+        "title": "建築物の重要部分",
+        "subject": "建築物",
+        "property": "重要部分の集合",
+        "property_type": "set_definition",
+        "description": "基礎、主要構造部その他安全上、防火上又は衛生上重要な政令で定める部分の集合",
+        "plurality": "single",
+        "related_articles": [
+          "令::A144_3"
+        ],
+        "remarks": "基礎、主要構造部（壁、柱、床、はり、屋根、階段）、屋根、外壁、軒裏等"
+      },
+      {
+        "id": "proc-materials-set",
+        "type": "process",
+        "title": "使用建築材料の特定",
+        "process_type": "human_judgment",
+        "target_subject": "重要部分",
+        "iteration": "iterative",
+        "description": "設計図書等から各重要部分で使用される建築材料（木材、鋼材、コンクリート等）を特定する"
+      },
+      {
+        "id": "info-materials-set",
+        "type": "information",
+        "title": "重要部分の建築材料",
+        "subject": "重要部分",
+        "property": "建築材料の集合",
+        "property_type": "set_definition",
+        "description": "各重要部分で使用される建築材料の集合",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-material-type",
+        "type": "process",
+        "title": "建築材料の種類の特定",
+        "process_type": "human_judgment",
+        "target_subject": "建築材料",
+        "iteration": "iterative",
+        "description": "各建築材料の種類（木材、鋼材、コンクリート、ガラス、接着剤等）を特定する"
+      },
+      {
+        "id": "info-material-type",
+        "type": "information",
+        "title": "建築材料の種類",
+        "symbol": "Mt",
+        "subject": "建築材料",
+        "property": "材料種類",
+        "property_type": "classification",
+        "description": "建築材料の種類（木材、鋼材、コンクリート、ガラス、接着剤等）",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-designated-check",
+        "type": "process",
+        "title": "指定建築材料該当判定",
+        "process_type": "mechanical",
+        "target_subject": "建築材料",
+        "iteration": "iterative",
+        "description": "当該建築材料が国土交通大臣告示で定められた指定建築材料に該当するかを判定する",
+        "related_articles": [
+          "法::A37:P1"
+        ],
+        "remarks": "告示で指定された木材、鋼材、コンクリート等の建築材料が対象"
+      },
+      {
+        "id": "info-designated-material",
+        "type": "information",
+        "title": "指定建築材料該当",
+        "symbol": "Dm",
+        "subject": "建築材料",
+        "property": "指定建築材料への該当",
+        "property_type": "proposition",
+        "description": "当該建築材料が国土交通大臣告示で定める指定建築材料に該当するか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-material-spec",
+        "type": "process",
+        "title": "建築材料の仕様・品質情報の特定",
+        "process_type": "human_judgment",
+        "target_subject": "建築材料",
+        "iteration": "iterative",
+        "description": "各指定建築材料の仕様、品質、規格適合状況、認定番号等を設計図書・製品仕様書等から特定する"
+      },
+      {
+        "id": "info-material-spec",
+        "type": "information",
+        "title": "建築材料の仕様・品質情報",
+        "symbol": "Ms",
+        "subject": "建築材料",
+        "property": "仕様・品質情報",
+        "property_type": "classification",
+        "description": "建築材料の仕様、品質、規格番号、認定番号等の情報",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-jis-jas-check",
+        "type": "process",
+        "title": "JIS/JAS規格適合判定",
+        "process_type": "mechanical",
+        "target_subject": "建築材料",
+        "iteration": "iterative",
+        "description": "指定建築材料ごとに国土交通大臣の指定する日本産業規格（JIS）又は日本農林規格（JAS）に適合するかを判定する（第1号該当性）",
+        "related_articles": [
+          "法::A37:P1:I1"
+        ],
+        "logic_expression": "Ms に含まれる規格番号が指定JIS/JAS規格リストに該当"
+      },
+      {
+        "id": "info-jis-jas-compliance",
+        "type": "information",
+        "title": "JIS/JAS規格適合（第1号）",
+        "symbol": "Js",
+        "subject": "建築材料",
+        "property": "JIS/JAS規格適合",
+        "property_type": "proposition",
+        "description": "指定建築材料ごとに大臣が指定するJIS又はJAS規格に適合するか（法37条1項第1号）",
+        "related_articles": [
+          "法::A37:P1:I1"
+        ],
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-minister-cert-check",
+        "type": "process",
+        "title": "国土交通大臣認定取得確認",
+        "process_type": "mechanical",
+        "target_subject": "建築材料",
+        "iteration": "iterative",
+        "description": "指定建築材料ごとに国土交通大臣が定める技術的基準に適合することについて国土交通大臣の認定を受けているかを確認する（第2号該当性）",
+        "related_articles": [
+          "法::A37:P1:I2"
+        ],
+        "logic_expression": "Ms に含まれる認定番号が有効な大臣認定リストに該当"
+      },
+      {
+        "id": "info-minister-certification",
+        "type": "information",
+        "title": "国土交通大臣認定取得（第2号）",
+        "symbol": "Mc",
+        "subject": "建築材料",
+        "property": "国土交通大臣認定取得",
+        "property_type": "proposition",
+        "description": "指定建築材料ごとに大臣が定める技術的基準に適合することについて大臣の認定を受けているか（法37条1項第2号）",
+        "related_articles": [
+          "法::A37:P1:I2"
+        ],
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-material-compliance",
+        "type": "process",
+        "title": "建築材料の法37条1項適合判定",
+        "process_type": "mechanical",
+        "target_subject": "建築材料",
+        "iteration": "iterative",
+        "description": "各指定建築材料について、JIS/JAS規格適合（第1号）又は大臣認定取得（第2号）のいずれかに該当することを確認",
+        "logic_expression": "(Dm = false) OR (Js = true) OR (Mc = true)",
+        "remarks": "指定建築材料に該当しない場合は適用除外。該当する場合は第1号又は第2号のいずれかを満たす必要がある"
+      },
+      {
+        "id": "info-material-compliance",
+        "type": "information",
+        "title": "建築材料の法37条1項適合",
+        "symbol": "Cm",
+        "subject": "建築材料",
+        "property": "法37条1項適合",
+        "property_type": "proposition",
+        "description": "当該建築材料が法37条1項の規定に適合するか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-all-materials-check",
+        "type": "process",
+        "title": "全建築材料適合確認",
+        "process_type": "mechanical",
+        "description": "重要部分に使用される全ての建築材料が法37条1項に適合することを確認",
+        "logic_expression": "∀material ∈ Materials: Cm(material) = true"
+      },
+      {
+        "id": "info-final-compliance",
+        "type": "information",
+        "title": "建築物の法37条1項適合",
+        "subject": "建築物",
+        "property": "法37条1項適合",
+        "property_type": "proposition",
+        "description": "建築物全体として法37条1項の規定に適合するか（重要部分の全指定建築材料が品質基準を満たす）",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-important-parts",
+        "to": "info-important-parts",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "info-important-parts",
+        "to": "proc-materials-set",
+        "role": "input"
+      },
+      {
+        "id": "e03",
+        "from": "proc-materials-set",
+        "to": "info-materials-set",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "info-materials-set",
+        "to": "proc-material-type",
+        "role": "input"
+      },
+      {
+        "id": "e05",
+        "from": "proc-material-type",
+        "to": "info-material-type",
+        "role": "output"
+      },
+      {
+        "id": "e06",
+        "from": "info-material-type",
+        "to": "proc-designated-check",
+        "role": "input"
+      },
+      {
+        "id": "e07",
+        "from": "proc-designated-check",
+        "to": "info-designated-material",
+        "role": "output"
+      },
+      {
+        "id": "e08",
+        "from": "info-materials-set",
+        "to": "proc-material-spec",
+        "role": "input"
+      },
+      {
+        "id": "e09",
+        "from": "proc-material-spec",
+        "to": "info-material-spec",
+        "role": "output"
+      },
+      {
+        "id": "e10",
+        "from": "info-material-spec",
+        "to": "proc-jis-jas-check",
+        "role": "input"
+      },
+      {
+        "id": "e11",
+        "from": "proc-jis-jas-check",
+        "to": "info-jis-jas-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e12",
+        "from": "info-material-spec",
+        "to": "proc-minister-cert-check",
+        "role": "input"
+      },
+      {
+        "id": "e13",
+        "from": "proc-minister-cert-check",
+        "to": "info-minister-certification",
+        "role": "output"
+      },
+      {
+        "id": "e14",
+        "from": "info-designated-material",
+        "to": "proc-material-compliance",
+        "role": "input"
+      },
+      {
+        "id": "e15",
+        "from": "info-jis-jas-compliance",
+        "to": "proc-material-compliance",
+        "role": "input"
+      },
+      {
+        "id": "e16",
+        "from": "info-minister-certification",
+        "to": "proc-material-compliance",
+        "role": "input"
+      },
+      {
+        "id": "e17",
+        "from": "proc-material-compliance",
+        "to": "info-material-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e18",
+        "from": "info-material-compliance",
+        "to": "proc-all-materials-check",
+        "role": "input"
+      },
+      {
+        "id": "e19",
+        "from": "proc-all-materials-check",
+        "to": "info-final-compliance",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "delegates_to",
+      "articles": [
+        "A144_3"
+      ],
+      "description": "法37条の「安全上、防火上又は衛生上重要である政令で定める部分」を定める。令144条の3では、基礎、主要構造部、屋根、外壁、軒裏等を規定。"
+    },
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": [
+        "A37:P2",
+        "A37:P3"
+      ],
+      "description": "第37条第2項（現場調合コンクリート等の基準）、第3項（特殊な構造方法の認定）も関連"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-23T18:45:00+09:00",
+    "updated_at": "2025-12-23T18:45:00+09:00",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法",
+    "source": "e-Gov法令API v2"
+  }
+}

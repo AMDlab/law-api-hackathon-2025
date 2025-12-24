@@ -1,0 +1,61 @@
+{
+  "id": "CHK-BSL-A22-P2",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "法22条区域指定時の審議会意見聴取",
+    "target_subject": "特定行政庁",
+    "description": "法22条区域を指定する際に都市計画地方審議会または建築審査会の意見を聴取する手続き"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "22",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": ["手続規定", "行政手続"],
+  "text_raw": "特定行政庁は、前項の規定による指定をする場合においては、あらかじめ、都市計画区域内にある区域については都市計画地方審議会の、都市計画区域外にある区域については建築審査会の意見を聴かなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "==",
+      "conditions": [
+        {"type": "action", "value": "法22条1項による区域指定を行う場合"}
+      ]
+    },
+    "judgment_rule": {
+      "operator": "==",
+      "conditions": [
+        {"ref": "info-opinion-heard", "operator": "==", "value": true}
+      ]
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {"id": "proc-designation-action", "type": "process", "title": "指定行為の特定", "process_type": "undefined_input", "description": "法22条1項の区域指定行為を特定"},
+      {"id": "info-designation", "type": "information", "title": "区域指定行為", "subject": "行政行為", "property": "法22条区域指定", "property_type": "set_definition", "plurality": "single"},
+      {"id": "proc-area-type", "type": "process", "title": "区域種別の判定", "process_type": "undefined_input", "description": "指定する区域が都市計画区域内か外かを判定"},
+      {"id": "info-area-type", "type": "information", "title": "区域の種別", "subject": "指定区域", "property": "都市計画区域内外区分", "property_type": "classification", "plurality": "single"},
+      {"id": "proc-council-select", "type": "process", "title": "審議会選択", "process_type": "mechanical", "logic_expression": "IF 都計区域内 THEN 都計審 ELSE 建審", "description": "区域種別に応じて意見聴取先の審議会を選択"},
+      {"id": "info-council", "type": "information", "title": "意見聴取先審議会", "subject": "審議会", "property": "審議会種別", "property_type": "classification", "plurality": "single", "description": "都市計画地方審議会または建築審査会"},
+      {"id": "proc-hear-opinion", "type": "process", "title": "意見聴取の実施", "process_type": "undefined_input", "description": "審議会の意見を聴取する"},
+      {"id": "info-opinion-heard", "type": "information", "title": "意見聴取の実施", "symbol": "PASS", "subject": "行政行為", "property": "審議会意見聴取済", "property_type": "proposition", "plurality": "single"}
+    ],
+    "edges": [
+      {"id": "e001", "from": "proc-designation-action", "to": "info-designation", "role": "output"},
+      {"id": "e002", "from": "proc-area-type", "to": "info-area-type", "role": "output"},
+      {"id": "e003", "from": "info-area-type", "to": "proc-council-select", "role": "input"},
+      {"id": "e004", "from": "proc-council-select", "to": "info-council", "role": "output"},
+      {"id": "e005", "from": "info-council", "to": "proc-hear-opinion", "role": "input"},
+      {"id": "e006", "from": "info-designation", "to": "proc-hear-opinion", "role": "input"},
+      {"id": "e007", "from": "proc-hear-opinion", "to": "info-opinion-heard", "role": "output"}
+    ]
+  },
+  "metadata": {
+    "created_at": "2025-12-24T00:00:00Z",
+    "generator": "claude-code-kijo-generator",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

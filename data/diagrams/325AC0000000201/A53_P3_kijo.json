@@ -1,0 +1,366 @@
+{
+  "id": "CHK-BSL-A53-P3",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "建蔽率の緩和判定",
+    "target_subject": "建築物",
+    "description": "防火性能と敷地条件による建蔽率の緩和値(+1/10又は+2/10)の判定"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "53",
+    "paragraph": "3",
+    "item": null
+  },
+  "labels": [
+    "集団規定",
+    "建蔽率",
+    "形態規制"
+  ],
+  "text_raw": "前二項の規定の適用については、第一号又は第二号のいずれかに該当する建築物にあつては第一項各号に定める数値に十分の一を加えたものをもつて当該各号に定める数値とし、第一号及び第二号に該当する建築物にあつては同項各号に定める数値に十分の二を加えたものをもつて当該各号に定める数値とする。\n一　防火地域（第一項第二号から第四号までの規定により建蔽率の限度が十分の八とされている地域を除く。）内にあるイに該当する建築物又は準防火地域内にあるイ若しくはロのいずれかに該当する建築物\nイ　耐火建築物又はこれと同等以上の延焼防止性能（通常の火災による周囲への延焼を防止するために壁、柱、床その他の建築物の部分及び防火戸その他の政令で定める防火設備に必要とされる性能をいう。ロにおいて同じ。）を有するものとして政令で定める建築物（以下この条及び第六十七条第一項において「耐火建築物等」という。）\nロ　準耐火建築物又はこれと同等以上の延焼防止性能を有するものとして政令で定める建築物（耐火建築物等を除く。第八項及び第六十七条第一項において「準耐火建築物等」という。）\n二　街区の角にある敷地又はこれに準ずる敷地で特定行政庁が指定するものの内にある建築物",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "第53条第1項・第2項の適用対象区域内"
+        }
+      ],
+      "note": "第1項・第2項の建蔽率制限の適用を受ける建築物"
+    },
+    "judgment_rule": {
+      "operator": "CASE",
+      "conditions": [
+        {
+          "case": "第1号AND第2号該当",
+          "result": "基準建蔽率 + 2/10",
+          "description": "防火性能要件と敷地条件の両方を満たす"
+        },
+        {
+          "case": "第1号OR第2号該当",
+          "result": "基準建蔽率 + 1/10",
+          "description": "防火性能要件または敷地条件のいずれかを満たす"
+        },
+        {
+          "case": "いずれも非該当",
+          "result": "基準建蔽率（緩和なし）",
+          "description": "緩和要件を満たさない"
+        }
+      ]
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-base-bcr",
+        "type": "process",
+        "title": "基準建蔽率の特定",
+        "process_type": "sub_diagram_reference",
+        "target_subject": "敷地",
+        "description": "第53条第1項・第2項の規定による建蔽率の限度を取得",
+        "related_articles": ["法::A53:P1", "法::A53:P2"],
+        "sub_diagram_ref": "CHK-BSL-A53-P1"
+      },
+      {
+        "id": "info-base-bcr",
+        "type": "information",
+        "title": "基準建蔽率",
+        "symbol": "BCR0",
+        "subject": "敷地",
+        "plurality": "single",
+        "property": "第1項・第2項による建蔽率の限度",
+        "property_type": "numeric",
+        "unit": "無次元(比率)",
+        "description": "第53条第1項各号又は第2項による建蔽率の基準値"
+      },
+      {
+        "id": "proc-site-location",
+        "type": "process",
+        "title": "敷地所在地の特定",
+        "process_type": "undefined_input",
+        "target_subject": "敷地",
+        "description": "設計図書等から敷地の所在地(住所・地番)を読み取る"
+      },
+      {
+        "id": "info-site-location",
+        "type": "information",
+        "title": "敷地の所在地情報",
+        "subject": "敷地",
+        "plurality": "single",
+        "property": "所在地の住所・地番",
+        "property_type": "classification",
+        "description": "敷地がどの区域に属するかを特定するための位置情報"
+      },
+      {
+        "id": "proc-structure",
+        "type": "process",
+        "title": "構造種別の特定",
+        "process_type": "undefined_input",
+        "target_subject": "建築物",
+        "description": "設計図書等から建築物の構造種別(耐火建築物等、準耐火建築物等、その他)を読み取る"
+      },
+      {
+        "id": "info-building-structure",
+        "type": "information",
+        "title": "建築物の構造種別",
+        "symbol": "S",
+        "subject": "建築物",
+        "plurality": "single",
+        "property": "構造種別",
+        "property_type": "classification",
+        "description": "耐火建築物等、準耐火建築物等、その他の分類"
+      },
+      {
+        "id": "proc-corner-lot",
+        "type": "process",
+        "title": "角地等該当の特定",
+        "process_type": "undefined_input",
+        "target_subject": "敷地",
+        "description": "敷地が街区の角又はこれに準ずる敷地(特定行政庁指定)に該当するかを確認"
+      },
+      {
+        "id": "info-corner-lot",
+        "type": "information",
+        "title": "角地等該当",
+        "symbol": "C",
+        "subject": "敷地",
+        "plurality": "single",
+        "property": "街区の角又はこれに準ずる敷地該当性",
+        "property_type": "proposition",
+        "description": "街区の角にある敷地又はこれに準ずる敷地で特定行政庁が指定するものに該当するか"
+      },
+      {
+        "id": "proc-fire-zone",
+        "type": "process",
+        "title": "防火地域区分の判定",
+        "process_type": "mechanical",
+        "target_subject": "敷地",
+        "description": "敷地の所在地から都市計画情報を参照し、防火地域・準防火地域の区分を判定",
+        "logic_expression": "都市計画情報照合"
+      },
+      {
+        "id": "info-fire-zone-type",
+        "type": "information",
+        "title": "防火地域区分",
+        "symbol": "FZ",
+        "subject": "敷地",
+        "plurality": "single",
+        "property": "防火地域・準防火地域の区分",
+        "property_type": "classification",
+        "description": "防火地域、準防火地域、無指定のいずれに該当するか（第1項2〜4号で8/10の地域を除く防火地域を含む）"
+      },
+      {
+        "id": "proc-item1-check",
+        "type": "process",
+        "title": "第1号該当判定",
+        "process_type": "mechanical",
+        "target_subject": "建築物",
+        "description": "防火地域区分と構造種別から第3項第1号該当性を判定",
+        "logic_expression": "(FZ=防火地域 AND S=耐火建築物等) OR (FZ=準防火地域 AND (S=耐火建築物等 OR S=準耐火建築物等))",
+        "related_articles": ["法::A53:P3:I1"]
+      },
+      {
+        "id": "info-item1-match",
+        "type": "information",
+        "title": "第1号該当",
+        "symbol": "M1",
+        "subject": "建築物",
+        "plurality": "single",
+        "property": "第3項第1号該当性",
+        "property_type": "proposition",
+        "description": "防火地域内の耐火建築物等、又は準防火地域内の耐火建築物等若しくは準耐火建築物等に該当"
+      },
+      {
+        "id": "info-item2-match",
+        "type": "information",
+        "title": "第2号該当",
+        "symbol": "M2",
+        "subject": "建築物",
+        "plurality": "single",
+        "property": "第3項第2号該当性",
+        "property_type": "proposition",
+        "description": "街区の角にある敷地等の内にある建築物に該当"
+      },
+      {
+        "id": "proc-item2-check",
+        "type": "process",
+        "title": "第2号該当判定",
+        "process_type": "mechanical",
+        "target_subject": "建築物",
+        "description": "角地等該当性から第3項第2号該当性を判定",
+        "logic_expression": "M2 = C",
+        "related_articles": ["法::A53:P3:I2"]
+      },
+      {
+        "id": "proc-relaxation",
+        "type": "process",
+        "title": "緩和値の決定",
+        "process_type": "mechanical",
+        "target_subject": "建築物",
+        "description": "第1号・第2号該当性から建蔽率の緩和値を決定",
+        "logic_expression": "IF (M1 AND M2) THEN R=2/10 ELSE IF (M1 OR M2) THEN R=1/10 ELSE R=0",
+        "related_articles": ["法::A53:P3"]
+      },
+      {
+        "id": "info-relaxation-value",
+        "type": "information",
+        "title": "建蔽率緩和値",
+        "symbol": "R",
+        "subject": "建築物",
+        "plurality": "single",
+        "property": "建蔽率の加算値",
+        "property_type": "numeric",
+        "unit": "無次元(比率)",
+        "description": "基準建蔽率に加算する緩和値(0, 1/10, 2/10のいずれか)"
+      },
+      {
+        "id": "info-adjusted-bcr",
+        "type": "information",
+        "title": "緩和後建蔽率",
+        "symbol": "BCR",
+        "subject": "建築物",
+        "plurality": "single",
+        "property": "建蔽率の限度",
+        "property_type": "numeric",
+        "unit": "無次元(比率)",
+        "description": "第3項による緩和を適用した後の建蔽率の限度"
+      },
+      {
+        "id": "proc-calculation",
+        "type": "process",
+        "title": "緩和後建蔽率の算出",
+        "process_type": "mechanical",
+        "target_subject": "建築物",
+        "description": "基準建蔽率に緩和値を加算",
+        "logic_expression": "BCR = BCR0 + R",
+        "related_articles": ["法::A53:P3"]
+      }
+    ],
+    "edges": [
+      {
+        "id": "e1",
+        "from": "proc-base-bcr",
+        "to": "info-base-bcr",
+        "role": "output"
+      },
+      {
+        "id": "e2",
+        "from": "proc-site-location",
+        "to": "info-site-location",
+        "role": "output"
+      },
+      {
+        "id": "e3",
+        "from": "proc-structure",
+        "to": "info-building-structure",
+        "role": "output"
+      },
+      {
+        "id": "e4",
+        "from": "proc-corner-lot",
+        "to": "info-corner-lot",
+        "role": "output"
+      },
+      {
+        "id": "e5",
+        "from": "info-site-location",
+        "to": "proc-fire-zone",
+        "role": "input"
+      },
+      {
+        "id": "e6",
+        "from": "proc-fire-zone",
+        "to": "info-fire-zone-type",
+        "role": "output"
+      },
+      {
+        "id": "e7",
+        "from": "info-fire-zone-type",
+        "to": "proc-item1-check",
+        "role": "input"
+      },
+      {
+        "id": "e8",
+        "from": "info-building-structure",
+        "to": "proc-item1-check",
+        "role": "input"
+      },
+      {
+        "id": "e9",
+        "from": "proc-item1-check",
+        "to": "info-item1-match",
+        "role": "output"
+      },
+      {
+        "id": "e10",
+        "from": "info-corner-lot",
+        "to": "proc-item2-check",
+        "role": "input"
+      },
+      {
+        "id": "e11",
+        "from": "proc-item2-check",
+        "to": "info-item2-match",
+        "role": "output"
+      },
+      {
+        "id": "e12",
+        "from": "info-item1-match",
+        "to": "proc-relaxation",
+        "role": "input"
+      },
+      {
+        "id": "e13",
+        "from": "info-item2-match",
+        "to": "proc-relaxation",
+        "role": "input"
+      },
+      {
+        "id": "e14",
+        "from": "proc-relaxation",
+        "to": "info-relaxation-value",
+        "role": "output"
+      },
+      {
+        "id": "e15",
+        "from": "info-base-bcr",
+        "to": "proc-calculation",
+        "role": "input"
+      },
+      {
+        "id": "e16",
+        "from": "info-relaxation-value",
+        "to": "proc-calculation",
+        "role": "input"
+      },
+      {
+        "id": "e17",
+        "from": "proc-calculation",
+        "to": "info-adjusted-bcr",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A53:P1", "A53:P2", "A67:P1"],
+      "description": "第1項・第2項の基準建蔽率を参照、第67条で耐火建築物等の定義を参照"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-24T08:00:00.000Z",
+    "author": "Claude Code (Sonnet 4.5)",
+    "generator": "kijo-generator-skill-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法",
+    "source": "e-Gov法令API v2"
+  }
+}

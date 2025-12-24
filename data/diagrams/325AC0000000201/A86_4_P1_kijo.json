@@ -1,0 +1,224 @@
+{
+  "id": "CHK-BSL-A86-4-P1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "一の敷地内にあるとみなされる建築物に対する外壁開口部制限の特例（みなし規定）",
+    "target_subject": "建築物",
+    "description": "第86条の認定・許可を受けた建築物について、第27条または第67条を適用する際に、建築物の耐火性能をみなす判定"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "86-4",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": ["単体規定", "特例規定", "みなし規定"],
+  "text_raw": "（一の敷地内にあるとみなされる建築物に対する外壁の開口部に対する制限の特例）\n第八十六条の四\n次の各号のいずれかに該当する建築物について第二十七条第二項若しくは第三項又は第六十七条第一項の規定を適用する場合においては、第一号イに該当する建築物は耐火建築物と、同号ロに該当する建築物は準耐火建築物とみなす。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "reference",
+          "value": "第27条第2項・3項または第67条第1項を適用"
+        },
+        {
+          "type": "certification",
+          "value": "第86条の認定・許可を受けた建築物"
+        }
+      ],
+      "note": "適用対象は第86条第1項・3項、第2項・4項、または第86条の2第1項～3項の認定・許可を受けた建築物"
+    },
+    "judgment_rule": {
+      "operator": "IF",
+      "conditions": [
+        {
+          "type": "article_reference",
+          "article": "A86_1 or A86_3",
+          "description": "第86条第1項または第3項の認定・許可を受けた建築物で、以下のいずれか"
+        },
+        {
+          "type": "classification",
+          "value": "第2条第9号の2イ（一定規模以上）",
+          "interpretation": "該当 → 耐火建築物とみなす"
+        },
+        {
+          "type": "classification",
+          "value": "第2条第9号の3イ・ロ（公共施設等）",
+          "interpretation": "該当 → 準耐火建築物とみなす"
+        }
+      ],
+      "effect": "第27条・第67条の規制を適用する際に、建築物を耐火建築物または準耐火建築物とみなす"
+    },
+    "exceptions": null
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "info-target-building",
+        "type": "information",
+        "title": "審査対象建築物",
+        "subject": "建築物",
+        "property": "第86条認定・許可の対象",
+        "property_type": "classification",
+        "plurality": "single",
+        "description": "第86条第1項・3項、第2項・4項、または第86条の2第1項～3項の認定・許可を受けた建築物"
+      },
+      {
+        "id": "info-article-ref",
+        "type": "information",
+        "title": "適用する規定",
+        "subject": "法令規定",
+        "property": "参照条項",
+        "property_type": "classification",
+        "plurality": "single",
+        "description": "第27条第2項・第3項または第67条第1項のいずれか"
+      },
+      {
+        "id": "info-building-category",
+        "type": "information",
+        "title": "建築物の種別",
+        "subject": "建築物",
+        "property": "分類区分",
+        "property_type": "classification",
+        "plurality": "single",
+        "description": "第2条第9号の2イまたは第9号の3イ・ロに該当するか判定"
+      },
+      {
+        "id": "proc-identify-building",
+        "type": "process",
+        "title": "審査対象建築物の特定",
+        "process_type": "undefined_input",
+        "target_subject": "建築物",
+        "description": "設計図書により、審査対象建築物が第86条の認定・許可を受けているか確認"
+      },
+      {
+        "id": "proc-identify-regulation",
+        "type": "process",
+        "title": "適用規定の確認",
+        "process_type": "undefined_input",
+        "description": "第27条または第67条のいずれの規定が適用対象か確認"
+      },
+      {
+        "id": "proc-classify-building",
+        "type": "process",
+        "title": "建築物種別の判定",
+        "process_type": "mechanical",
+        "iteration": "single",
+        "logic_expression": "第2条第9号の2イ OR 第9号の3イ OR 第9号の3ロ",
+        "description": "建築物が第2条第9号の2イ（大規模建築物等）か第9号の3イ・ロ（特定用途等）かを判定",
+        "software_functions": [
+          {
+            "category": "program_processing",
+            "description": "建築物の用途・規模から判定"
+          }
+        ]
+      },
+      {
+        "id": "info-deemed-fire-rating",
+        "type": "information",
+        "title": "みなされる耐火性能",
+        "subject": "建築物",
+        "property": "耐火性能の判定結果",
+        "property_type": "classification",
+        "plurality": "single",
+        "description": "第86条認定・許可対象の建築物は耐火建築物または準耐火建築物とみなされる"
+      },
+      {
+        "id": "proc-deem-fire-rating",
+        "type": "process",
+        "title": "耐火性能のみなし判定",
+        "process_type": "mechanical",
+        "iteration": "single",
+        "logic_expression": "IF (建築物種別 = 第9号の2イ) THEN 耐火建築物 ELSE IF (建築物種別 = 第9号の3イまたはロ) THEN 準耐火建築物",
+        "description": "建築物種別に応じて、耐火建築物または準耐火建築物とみなす",
+        "software_functions": [
+          {
+            "category": "program_processing",
+            "description": "建築物種別から耐火性能を決定"
+          },
+          {
+            "category": "text_display",
+            "description": "みなし判定結果を表示"
+          }
+        ]
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge-1",
+        "from": "proc-identify-building",
+        "to": "info-target-building",
+        "role": "output"
+      },
+      {
+        "id": "edge-2",
+        "from": "info-target-building",
+        "to": "proc-classify-building",
+        "role": "input"
+      },
+      {
+        "id": "edge-3",
+        "from": "proc-identify-regulation",
+        "to": "info-article-ref",
+        "role": "output"
+      },
+      {
+        "id": "edge-4",
+        "from": "proc-classify-building",
+        "to": "info-building-category",
+        "role": "output"
+      },
+      {
+        "id": "edge-5",
+        "from": "info-building-category",
+        "to": "proc-deem-fire-rating",
+        "role": "input"
+      },
+      {
+        "id": "edge-6",
+        "from": "proc-deem-fire-rating",
+        "to": "info-deemed-fire-rating",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["27:2", "27:3", "67:1"],
+      "description": "第27条第2項・3項（耐火建築物等の規制）、第67条第1項（特定防災街区整備地区）の適用対象建築物をみなす"
+    },
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": ["86:1", "86:2", "86:3", "86:4", "86-2:1"],
+      "description": "第86条の認定・許可を受けた建築物が対象"
+    },
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["2:9-2", "2:9-3"],
+      "description": "第2条第9号の2イ・第9号の3イ・ロの定義に基づき建築物を分類"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-24T00:00:00Z",
+    "updated_at": "2025-12-24T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "kijo-generator-manual",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法",
+    "source": "e-Gov法令API v2"
+  }
+}

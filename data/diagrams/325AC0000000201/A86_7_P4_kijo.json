@@ -1,0 +1,190 @@
+{
+  "id": "CHK-BSL-A86-7-P4",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "既存不適格建築物の移転における規制適用除外",
+    "target_subject": "既存不適格建築物",
+    "description": "第三条第二項の規定により建築基準法令の規定の適用を受けない建築物について政令で定める範囲内において移転をする場合の規制文適用の判定"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "86の7",
+    "paragraph": "4",
+    "item": null
+  },
+  "labels": [
+    "既存不適格",
+    "移転"
+  ],
+  "text_raw": "第三条第二項の規定により建築基準法令の規定の適用を受けない建築物について政令で定める範囲内において移転をする場合においては、同条第三項の規定にかかわらず、建築基準法令の規定は、適用しない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "building_status",
+          "value": "第三条第二項により建築基準法令の規定の適用を受けない建築物"
+        }
+      ],
+      "note": "既存不適格建築物（昭和25年11月23日以前に建築の開始があった建築物等）"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-non-compliant-building",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "ref": "info-relocation-scope",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "info-non-compliant-building",
+        "type": "information",
+        "title": "第三条第二項該当建築物",
+        "symbol": "B1",
+        "subject": "建築物",
+        "plurality": "single",
+        "property": "建築基準法令の適用除外該当性",
+        "property_type": "proposition",
+        "description": "昭和25年11月23日以前に建築の開始があった建築物等、第三条第二項の規定により建築基準法令の規定の適用を受けない建築物であるか否か"
+      },
+      {
+        "id": "proc-building-status-check",
+        "type": "process",
+        "title": "既存不適格建築物の判定",
+        "process_type": "mechanical",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "当該建築物が第三条第二項に規定する既存不適格建築物に該当するか判定。建築年を確認し、昭和25年11月23日以前の建築開始であるかを確認する",
+        "related_articles": [
+          "法::A3:P2"
+        ]
+      },
+      {
+        "id": "info-relocation-scope",
+        "type": "information",
+        "title": "政令で定める移転範囲内か",
+        "symbol": "B2",
+        "subject": "移転",
+        "plurality": "single",
+        "property": "移転の範囲が政令基準適合性",
+        "property_type": "proposition",
+        "description": "建設令第150条の8で定める移転の範囲内の移転であるか否か（敷地内での移転、同一敷地内での位置変更等）"
+      },
+      {
+        "id": "proc-relocation-check",
+        "type": "process",
+        "title": "移転の範囲判定",
+        "process_type": "mechanical",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "当該移転が政令第150条の8で定める移転の範囲内であるか判定。移転後の位置、敷地との関係等を確認する",
+        "related_articles": [
+          "令::A150_8"
+        ]
+      },
+      {
+        "id": "info-exemption-judgment",
+        "type": "information",
+        "title": "建築基準法令の規定適用除外",
+        "symbol": "C1",
+        "subject": "建築物",
+        "plurality": "single",
+        "property": "規制文適用の適否判定",
+        "property_type": "proposition",
+        "description": "当該建築物の移転により建築基準法令の規定が適用されないか（適用除外であるか）"
+      },
+      {
+        "id": "proc-exemption-judgment",
+        "type": "process",
+        "title": "規制文適用除外の判定",
+        "process_type": "mechanical",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "既存不適格建築物について政令で定める範囲内の移転の場合、建築基準法令の規定は適用されない（第三条第三項の規定は適用されない）",
+        "logic_expression": "C1 = B1 AND B2",
+        "related_articles": [
+          "法::A86_7:P4"
+        ]
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge-001",
+        "from": "proc-building-status-check",
+        "to": "info-non-compliant-building",
+        "role": "output"
+      },
+      {
+        "id": "edge-002",
+        "from": "info-non-compliant-building",
+        "to": "proc-exemption-judgment",
+        "role": "input"
+      },
+      {
+        "id": "edge-003",
+        "from": "proc-relocation-check",
+        "to": "info-relocation-scope",
+        "role": "output"
+      },
+      {
+        "id": "edge-004",
+        "from": "info-relocation-scope",
+        "to": "proc-exemption-judgment",
+        "role": "input"
+      },
+      {
+        "id": "edge-005",
+        "from": "proc-exemption-judgment",
+        "to": "info-exemption-judgment",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "defines_detail",
+      "articles": [
+        "A3:P2",
+        "A3:P3",
+        "A86_7"
+      ],
+      "description": "本規定の適用対象となる既存不適格建築物の定義及び規制緩和の根拠"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "delegates_to",
+      "articles": [
+        "A150_8"
+      ],
+      "description": "移転の範囲に関する具体的基準を規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-24T00:00:00Z",
+    "updated_at": "2025-12-24T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法",
+    "source": "e-Gov法令API v2"
+  }
+}

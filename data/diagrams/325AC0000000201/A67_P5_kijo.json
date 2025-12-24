@@ -1,0 +1,450 @@
+{
+  "id": "CHK-BSL-A67-P5",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "特定防災街区整備地区内の壁・柱の配置制限",
+    "target_subject": "建築物",
+    "description": "特定防災街区整備地区内における建築物の壁又は柱の壁面位置制限への適合判定"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "67",
+    "paragraph": "5",
+    "item": null
+  },
+  "labels": [
+    "集団規定",
+    "防火",
+    "都市計画関連"
+  ],
+  "text_raw": "特定防災街区整備地区内においては、建築物の壁又はこれに代わる柱は、特定防災街区整備地区に関する都市計画において壁面の位置の制限が定められたときは、建築物の地盤面下の部分を除き、当該壁面の位置の制限に反して建築してはならない。ただし、次の各号のいずれかに該当する建築物については、この限りでない。一第三項第一号に掲げる建築物二学校、駅舎、卸売市場その他これらに類する公益上必要な建築物で、特定行政庁が用途上又は構造上やむを得ないと認めて許可したもの",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "特定防災街区整備地区内"
+        },
+        {
+          "type": "urban_plan_condition",
+          "value": "壁面の位置の制限が定められている"
+        }
+      ],
+      "note": "特定防災街区整備地区に関する都市計画において壁面の位置の制限が定められた場合に適用"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-wall-or-pillar-position",
+          "operator": "satisfies",
+          "value": "壁面位置の制限"
+        },
+        {
+          "operator": "OR",
+          "conditions": [
+            {
+              "ref": "info-ground-level-exclusion",
+              "operator": "==",
+              "value": true
+            },
+            {
+              "ref": "info-exception-match",
+              "operator": "==",
+              "value": false
+            }
+          ]
+        }
+      ]
+    },
+    "exceptions": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "type": "building_category",
+          "ref_article": "法::A67:P3:I1",
+          "description": "第3項第1号に掲げる建築物（公衆便所、巡査派出所等公益上必要な建築物）"
+        },
+        {
+          "type": "special_permission",
+          "description": "学校、駅舎、卸売市場その他これらに類する公益上必要な建築物で、特定行政庁が用途上又は構造上やむを得ないと認めて許可したもの"
+        }
+      ],
+      "effect": "EXEMPT"
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-location-check",
+        "type": "process",
+        "title": "敷地位置の確認",
+        "process_type": "mechanical",
+        "description": "敷地が特定防災街区整備地区内に位置するか確認",
+        "logic_expression": "敷地 ∈ 特定防災街区整備地区"
+      },
+      {
+        "id": "info-location-in-zone",
+        "type": "information",
+        "title": "特定防災街区整備地区内判定",
+        "symbol": "L",
+        "subject": "敷地",
+        "property": "特定防災街区整備地区内位置",
+        "property_type": "proposition",
+        "description": "敷地が特定防災街区整備地区内に位置するか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-restriction-check",
+        "type": "process",
+        "title": "壁面位置制限確認",
+        "process_type": "mechanical",
+        "description": "当該区域の都市計画において壁面の位置の制限が定められているか確認",
+        "logic_expression": "壁面位置制限が定められている"
+      },
+      {
+        "id": "info-restriction-defined",
+        "type": "information",
+        "title": "壁面位置制限存在",
+        "symbol": "R",
+        "subject": "敷地",
+        "property": "都市計画による壁面位置制限",
+        "property_type": "proposition",
+        "description": "都市計画において壁面の位置の制限が定められているか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-building-identify",
+        "type": "process",
+        "title": "建築物の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書から対象建築物を特定する"
+      },
+      {
+        "id": "info-building",
+        "type": "information",
+        "title": "対象建築物",
+        "subject": "建築物",
+        "property": "対象建築物の特定",
+        "property_type": "set_definition",
+        "description": "敷地内の対象となる建築物",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-exception-check",
+        "type": "process",
+        "title": "例外該当性判定",
+        "process_type": "human_judgment",
+        "description": "建築物が第5項各号の例外に該当するか判定",
+        "remarks": "例外1: 法67条3項1号の建築物、例外2: 学校等公益施設で特定行政庁の許可を取得"
+      },
+      {
+        "id": "info-exception-match",
+        "type": "information",
+        "title": "例外該当",
+        "symbol": "E",
+        "subject": "建築物",
+        "property": "法67条5項例外該当",
+        "property_type": "proposition",
+        "description": "建築物が法67条5項の例外に該当するか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-wall-identify",
+        "type": "process",
+        "title": "壁・柱の特定",
+        "process_type": "human_judgment",
+        "description": "建築物に属する壁又はこれに代わる柱を特定する",
+        "remarks": "建築物の地盤面下の部分は除く"
+      },
+      {
+        "id": "info-walls-pillars-set",
+        "type": "information",
+        "title": "建築物の壁・柱",
+        "subject": "建築物",
+        "property": "壁又はこれに代わる柱の集合",
+        "property_type": "set_definition",
+        "description": "対象建築物に属する壁又はこれに代わる柱（地盤面下を除く）",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-restriction-detail-identify",
+        "type": "process",
+        "title": "壁面位置制限の詳細確認",
+        "process_type": "mechanical",
+        "description": "都市計画において定められた具体的な壁面の位置制限を確認",
+        "logic_expression": "壁面位置の制限条件（距離、位置等）を特定"
+      },
+      {
+        "id": "info-restriction-detail",
+        "type": "information",
+        "title": "壁面位置制限内容",
+        "symbol": "RD",
+        "subject": "敷地",
+        "property": "壁面の位置制限基準",
+        "property_type": "numeric",
+        "description": "都市計画で定められた壁面の位置に関する具体的基準（敷地境界からの距離等）",
+        "unit": "m",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-wall-position-check",
+        "type": "process",
+        "title": "壁・柱位置の確認",
+        "process_type": "human_judgment",
+        "target_subject": "壁又は柱",
+        "iteration": "iterative",
+        "description": "設計図書から各壁又は柱の位置を確認する"
+      },
+      {
+        "id": "info-wall-position",
+        "type": "information",
+        "title": "壁・柱の位置",
+        "symbol": "P",
+        "subject": "壁又は柱",
+        "property": "敷地における位置",
+        "property_type": "geometric_surface",
+        "description": "各壁又は柱が敷地内で占める位置（地盤面下を除く）",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-position-compliance-check",
+        "type": "process",
+        "title": "壁面位置適合判定",
+        "process_type": "mechanical",
+        "target_subject": "壁又は柱",
+        "iteration": "iterative",
+        "description": "各壁又は柱が都市計画の壁面位置制限に適合するか判定",
+        "logic_expression": "P が都市計画の壁面位置制限条件を満たす"
+      },
+      {
+        "id": "info-position-compliant",
+        "type": "information",
+        "title": "壁面位置適合",
+        "symbol": "PC",
+        "subject": "壁又は柱",
+        "property": "壁面位置制限適合",
+        "property_type": "proposition",
+        "description": "当該壁又は柱が壁面位置制限に適合するか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-all-wall-compliance",
+        "type": "process",
+        "title": "全壁・柱適合確認",
+        "process_type": "mechanical",
+        "description": "全ての壁又は柱が壁面位置制限に適合することを確認",
+        "logic_expression": "∀壁又は柱 ∈ 壁・柱集合: PC(壁又は柱) = true"
+      },
+      {
+        "id": "info-wall-or-pillar-position",
+        "type": "information",
+        "title": "建築物壁面位置適合",
+        "symbol": "WP",
+        "subject": "建築物",
+        "property": "壁面位置制限適合",
+        "property_type": "proposition",
+        "description": "建築物全体の壁又は柱が壁面位置制限に適合するか",
+        "plurality": "single"
+      },
+      {
+        "id": "info-ground-level-exclusion",
+        "type": "information",
+        "title": "地盤面下部分の除外",
+        "symbol": "GE",
+        "subject": "建築物",
+        "property": "地盤面下部分の除外適用",
+        "property_type": "proposition",
+        "description": "地盤面下の部分について制限が除外されるか（常に適用）",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-final-judgment",
+        "type": "process",
+        "title": "法67条5項適合判定",
+        "process_type": "mechanical",
+        "description": "建築物全体が法67条5項の規定に適合するか総合判定",
+        "logic_expression": "(NOT R) OR (WP AND GE) OR E"
+      },
+      {
+        "id": "info-final",
+        "type": "information",
+        "title": "法67条5項適合",
+        "subject": "建築物",
+        "property": "法67条5項の壁面位置制限適合",
+        "property_type": "proposition",
+        "description": "建築物が法67条5項の規定に適合するか",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-location-check",
+        "to": "info-location-in-zone",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "info-location-in-zone",
+        "to": "proc-restriction-check",
+        "role": "input"
+      },
+      {
+        "id": "e03",
+        "from": "proc-restriction-check",
+        "to": "info-restriction-defined",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "info-restriction-defined",
+        "to": "proc-building-identify",
+        "role": "input"
+      },
+      {
+        "id": "e05",
+        "from": "proc-building-identify",
+        "to": "info-building",
+        "role": "output"
+      },
+      {
+        "id": "e06",
+        "from": "info-building",
+        "to": "proc-exception-check",
+        "role": "input"
+      },
+      {
+        "id": "e07",
+        "from": "proc-exception-check",
+        "to": "info-exception-match",
+        "role": "output"
+      },
+      {
+        "id": "e08",
+        "from": "info-building",
+        "to": "proc-wall-identify",
+        "role": "input"
+      },
+      {
+        "id": "e09",
+        "from": "proc-wall-identify",
+        "to": "info-walls-pillars-set",
+        "role": "output"
+      },
+      {
+        "id": "e10",
+        "from": "info-restriction-defined",
+        "to": "proc-restriction-detail-identify",
+        "role": "input"
+      },
+      {
+        "id": "e11",
+        "from": "proc-restriction-detail-identify",
+        "to": "info-restriction-detail",
+        "role": "output"
+      },
+      {
+        "id": "e12",
+        "from": "info-walls-pillars-set",
+        "to": "proc-wall-position-check",
+        "role": "input"
+      },
+      {
+        "id": "e13",
+        "from": "proc-wall-position-check",
+        "to": "info-wall-position",
+        "role": "output"
+      },
+      {
+        "id": "e14",
+        "from": "info-wall-position",
+        "to": "proc-position-compliance-check",
+        "role": "input"
+      },
+      {
+        "id": "e15",
+        "from": "info-restriction-detail",
+        "to": "proc-position-compliance-check",
+        "role": "input"
+      },
+      {
+        "id": "e16",
+        "from": "proc-position-compliance-check",
+        "to": "info-position-compliant",
+        "role": "output"
+      },
+      {
+        "id": "e17",
+        "from": "info-position-compliant",
+        "to": "proc-all-wall-compliance",
+        "role": "input"
+      },
+      {
+        "id": "e18",
+        "from": "proc-all-wall-compliance",
+        "to": "info-wall-or-pillar-position",
+        "role": "output"
+      },
+      {
+        "id": "e19",
+        "from": "proc-building-identify",
+        "to": "info-ground-level-exclusion",
+        "role": "output"
+      },
+      {
+        "id": "e20",
+        "from": "info-wall-or-pillar-position",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e21",
+        "from": "info-exception-match",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e22",
+        "from": "info-ground-level-exclusion",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e23",
+        "from": "info-restriction-defined",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e24",
+        "from": "proc-final-judgment",
+        "to": "info-final",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": [
+        "A67:P3:I1"
+      ],
+      "description": "法67条5項の例外要件として法67条3項1号を参照"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-24T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

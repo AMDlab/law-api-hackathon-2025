@@ -1,0 +1,248 @@
+{
+  "id": "CHK-BSL-A44-P1-I4",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "道路内建築制限の適用除外（第4号）",
+    "target_subject": "建築物",
+    "description": "公共用歩廊等で特定行政庁の許可を受けたものが適用除外に該当することを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "44",
+    "paragraph": "1",
+    "item": "4"
+  },
+  "labels": ["集団規定", "道路", "適用除外"],
+  "text_raw": "公共用歩廊その他政令で定める建築物で特定行政庁が安全上、防火上及び衛生上他の建築物の利便を妨げ、その他周囲の環境を害するおそれがないと認めて許可したもの",
+  "compliance_logic": {
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "note": "公共用歩廊等の該当",
+          "ref": "info-building-type-match"
+        },
+        {
+          "note": "特定行政庁の許可",
+          "ref": "info-permission"
+        }
+      ]
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-building-use",
+        "type": "process",
+        "title": "建築物用途の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の用途を特定する"
+      },
+      {
+        "id": "info-building-use",
+        "type": "information",
+        "title": "建築物の用途",
+        "symbol": "U",
+        "subject": "建築物",
+        "property": "用途種別",
+        "property_type": "classification",
+        "description": "建築物の用途",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-building-type-check",
+        "type": "process",
+        "title": "公共用歩廊等該当判定",
+        "process_type": "mechanical",
+        "description": "公共用歩廊その他政令で定める建築物に該当するかを判定",
+        "logic_expression": "U ∈ {公共用歩廊} OR U ∈ {政令で定める建築物}",
+        "related_articles": ["令::A145"],
+        "remarks": "政令第145条で定める建築物を参照"
+      },
+      {
+        "id": "info-building-type-match",
+        "type": "information",
+        "title": "公共用歩廊等該当",
+        "symbol": "T",
+        "subject": "建築物",
+        "property": "公共用歩廊等への該当",
+        "property_type": "proposition",
+        "description": "公共用歩廊その他政令で定める建築物に該当するか",
+        "related_articles": ["法::A44:P1:I4", "令::A145"],
+        "plurality": "single"
+      },
+      {
+        "id": "proc-safety-assessment",
+        "type": "process",
+        "title": "安全性等判断書類確認",
+        "process_type": "undefined_input",
+        "description": "特定行政庁による安全上、防火上及び衛生上他の建築物の利便を妨げず、周囲の環境を害するおそれがないとの判断を示す書類を確認"
+      },
+      {
+        "id": "info-safety-judgment",
+        "type": "information",
+        "title": "安全性等の判断",
+        "symbol": "S",
+        "subject": "建築物",
+        "property": "安全性等に関する判断",
+        "property_type": "proposition",
+        "description": "特定行政庁が安全上、防火上及び衛生上他の建築物の利便を妨げ、その他周囲の環境を害するおそれがないと認めたか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-permission-check",
+        "type": "process",
+        "title": "許可書確認",
+        "process_type": "undefined_input",
+        "description": "特定行政庁の許可書の有無を確認（法第44条第2項により建築審査会の同意が必要）",
+        "related_articles": ["法::A44:P2"]
+      },
+      {
+        "id": "info-permission-doc",
+        "type": "information",
+        "title": "許可書の有無",
+        "symbol": "P",
+        "subject": "建築物",
+        "property": "特定行政庁の許可書",
+        "property_type": "proposition",
+        "description": "特定行政庁の許可書が存在するか",
+        "related_articles": ["法::A44:P1:I4", "法::A44:P2"],
+        "plurality": "single"
+      },
+      {
+        "id": "proc-permission-judgment",
+        "type": "process",
+        "title": "許可要件判定",
+        "process_type": "mechanical",
+        "description": "安全性等の判断と許可書の両方が揃っているか確認",
+        "logic_expression": "S AND P"
+      },
+      {
+        "id": "info-permission",
+        "type": "information",
+        "title": "特定行政庁許可",
+        "symbol": "A",
+        "subject": "建築物",
+        "property": "特定行政庁の許可",
+        "property_type": "proposition",
+        "description": "特定行政庁が安全上、防火上及び衛生上支障がないと認めて許可したものか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-exempt-judgment",
+        "type": "process",
+        "title": "第4号適用除外判定",
+        "process_type": "mechanical",
+        "description": "公共用歩廊等に該当し、かつ特定行政庁の許可を受けていることを確認",
+        "logic_expression": "T AND A"
+      },
+      {
+        "id": "info-item4-exempt",
+        "type": "information",
+        "title": "第4号適用除外該当",
+        "symbol": "E",
+        "subject": "建築物",
+        "property": "第4号適用除外への該当",
+        "property_type": "proposition",
+        "description": "法第44条第1項第4号の適用除外に該当するか",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-building-use",
+        "to": "info-building-use",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "info-building-use",
+        "to": "proc-building-type-check",
+        "role": "input"
+      },
+      {
+        "id": "e03",
+        "from": "proc-building-type-check",
+        "to": "info-building-type-match",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "proc-safety-assessment",
+        "to": "info-safety-judgment",
+        "role": "output"
+      },
+      {
+        "id": "e05",
+        "from": "proc-permission-check",
+        "to": "info-permission-doc",
+        "role": "output"
+      },
+      {
+        "id": "e06",
+        "from": "info-safety-judgment",
+        "to": "proc-permission-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e07",
+        "from": "info-permission-doc",
+        "to": "proc-permission-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e08",
+        "from": "proc-permission-judgment",
+        "to": "info-permission",
+        "role": "output"
+      },
+      {
+        "id": "e09",
+        "from": "info-building-type-match",
+        "to": "proc-exempt-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e10",
+        "from": "info-permission",
+        "to": "proc-exempt-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e11",
+        "from": "proc-exempt-judgment",
+        "to": "info-item4-exempt",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A44:P2"],
+      "description": "第4号の許可には建築審査会の同意が必要（第2項）"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "delegates_to",
+      "articles": ["A145"],
+      "description": "道路内に建築できる建築物を規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-24T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

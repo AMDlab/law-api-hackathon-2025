@@ -1,0 +1,317 @@
+{
+  "id": "CHK-BSL-A53-P1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "建蔽率の上限値適合判定",
+    "target_subject": "建築物",
+    "description": "建築物の建築面積の敷地面積に対する割合（建蔽率）が、用途地域等に応じて定められた数値を超えないことを確認する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "53",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "集団規定",
+    "形態規制",
+    "建蔽率"
+  ],
+  "text_raw": "建築物の建築面積（同一敷地内に二以上の建築物がある場合においては、その建築面積の合計）の敷地面積に対する割合（以下「建蔽率」という。）は、次の各号に掲げる区分に従い、当該各号に定める数値を超えてはならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "用途地域内又は用途地域の指定のない区域内"
+        }
+      ],
+      "note": "全ての建築物に適用（第6項の適用除外を除く）"
+    },
+    "judgment_rule": {
+      "operator": "<=",
+      "lhs": {
+        "variable": "BCR",
+        "description": "実際の建蔽率",
+        "unit": "無次元"
+      },
+      "rhs": {
+        "variable": "BCR_limit",
+        "description": "用途地域等に応じた建蔽率の上限値",
+        "unit": "無次元"
+      }
+    },
+    "exceptions": null
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "info-buildings-set",
+        "type": "information",
+        "title": "敷地内の建築物",
+        "symbol": "Buildings",
+        "subject": "敷地",
+        "property": "建築物の集合",
+        "property_type": "set_definition",
+        "property_type_description": "集合定義 - 主体と特定の関係にある他の主体がどれであるかを示す情報（例: 階に属する外壁の集合）【必須ケース: 建築物⇔屋根、建築物⇔外壁、敷地⇔建築物など親子関係がある場合】",
+        "plurality": "single",
+        "description": "当該敷地に属する全ての建築物（既存建築物を含む）を特定",
+        "remarks": "同一敷地内に複数の建築物がある場合、その全てを対象とする"
+      },
+      {
+        "id": "info-building-area-sum",
+        "type": "information",
+        "title": "建築面積の合計",
+        "symbol": "A_total",
+        "subject": "建築物",
+        "property": "建築面積の合計",
+        "property_type": "numeric",
+        "property_type_description": "数値 - 大小関係に位置づけられる整数値または実数値（例: 延べ面積、高さ）",
+        "unit": "m2",
+        "plurality": "single",
+        "description": "同一敷地内の全ての建築物の建築面積の合計値",
+        "remarks": "単独の建築物の場合はその建築面積、複数ある場合は合計"
+      },
+      {
+        "id": "info-site-area",
+        "type": "information",
+        "title": "敷地面積",
+        "symbol": "S",
+        "subject": "敷地",
+        "property": "面積",
+        "property_type": "numeric",
+        "property_type_description": "数値 - 大小関係に位置づけられる整数値または実数値（例: 延べ面積、高さ）",
+        "unit": "m2",
+        "plurality": "single",
+        "description": "当該建築物が立地する敷地の面積"
+      },
+      {
+        "id": "info-use-district",
+        "type": "information",
+        "title": "敷地の用途地域区分",
+        "symbol": "Z",
+        "subject": "敷地",
+        "property": "用途地域区分",
+        "property_type": "classification",
+        "property_type_description": "区分情報 - 既定のいくつかの区分の中のいずれかを示すもの（例: 用途地域、建物用途コード）",
+        "plurality": "single",
+        "description": "敷地が属する用途地域（第一種低層住居専用地域、第二種低層住居専用地域、第一種中高層住居専用地域、第二種中高層住居専用地域、田園住居地域、工業専用地域、第一種住居地域、第二種住居地域、準住居地域、準工業地域、近隣商業地域、商業地域、工業地域、用途地域の指定のない区域）",
+        "remarks": "用途地域は都市計画により指定される。第2項で複数地域にわたる場合の規定あり"
+      },
+      {
+        "id": "info-bcr-actual",
+        "type": "information",
+        "title": "建蔽率",
+        "symbol": "BCR",
+        "subject": "建築物",
+        "property": "建蔽率",
+        "property_type": "numeric",
+        "property_type_description": "数値 - 大小関係に位置づけられる整数値または実数値（例: 延べ面積、高さ）",
+        "unit": "無次元",
+        "plurality": "single",
+        "description": "建築面積の合計を敷地面積で除した割合",
+        "remarks": "BCR = A_total / S"
+      },
+      {
+        "id": "info-bcr-limit",
+        "type": "information",
+        "title": "建蔽率の上限値",
+        "symbol": "BCR_limit",
+        "subject": "敷地",
+        "property": "建蔽率の上限値",
+        "property_type": "numeric",
+        "property_type_description": "数値 - 大小関係に位置づけられる整数値または実数値（例: 延べ面積、高さ）",
+        "unit": "無次元",
+        "plurality": "single",
+        "description": "用途地域の区分に応じて定められた建蔽率の上限値",
+        "remarks": "都市計画で定められた数値。用途地域により 3/10, 4/10, 5/10, 6/10, 7/10, 8/10 のいずれか"
+      },
+      {
+        "id": "info-compliance",
+        "type": "information",
+        "title": "建蔽率の適否",
+        "symbol": "J",
+        "subject": "建築物",
+        "property": "建蔽率の上限値への適合",
+        "property_type": "proposition",
+        "property_type_description": "命題真偽 - 真か偽かが判定可能な事実（例: 技術基準を満たすか否か）",
+        "plurality": "single",
+        "description": "建蔽率が上限値以下であるか否かの判定結果",
+        "remarks": "J = (BCR ≤ BCR_limit)"
+      },
+      {
+        "id": "proc-buildings-identify",
+        "type": "process",
+        "title": "敷地内建築物の特定",
+        "process_type": "undefined_input",
+        "process_type_description": "入力情報不定処理 - 導出されるアウトプット情報を得るための情報源の所在や手続きのメカニズムも含めて人が判断する処理。インプット情報を繋がない。左側の辺を消した状態で表示。",
+        "description": "設計図書等から、当該敷地に属する全ての建築物（既存を含む）を特定する",
+        "iteration": "single"
+      },
+      {
+        "id": "proc-building-area-get",
+        "type": "process",
+        "title": "建築面積の取得",
+        "process_type": "undefined_input",
+        "process_type_description": "入力情報不定処理 - 導出されるアウトプット情報を得るための情報源の所在や手続きのメカニズムも含めて人が判断する処理。インプット情報を繋がない。左側の辺を消した状態で表示。",
+        "description": "設計図書等から建築面積の合計値を取得する。複数の建築物がある場合はその合計",
+        "iteration": "single",
+        "remarks": "建築面積の算定方法は令第2条第1項第2号に規定"
+      },
+      {
+        "id": "proc-site-area-get",
+        "type": "process",
+        "title": "敷地面積の取得",
+        "process_type": "undefined_input",
+        "process_type_description": "入力情報不定処理 - 導出されるアウトプット情報を得るための情報源の所在や手続きのメカニズムも含めて人が判断する処理。インプット情報を繋がない。左側の辺を消した状態で表示。",
+        "description": "設計図書等から敷地面積を取得する",
+        "iteration": "single"
+      },
+      {
+        "id": "proc-use-district-get",
+        "type": "process",
+        "title": "用途地域区分の取得",
+        "process_type": "undefined_input",
+        "process_type_description": "入力情報不定処理 - 導出されるアウトプット情報を得るための情報源の所在や手続きのメカニズムも含めて人が判断する処理。インプット情報を繋がない。左側の辺を消した状態で表示。",
+        "description": "設計図書及び都市計画情報から敷地の用途地域区分を特定する",
+        "iteration": "single",
+        "remarks": "都市計画情報との照合を含む"
+      },
+      {
+        "id": "proc-bcr-calc",
+        "type": "process",
+        "title": "建蔽率の算定",
+        "process_type": "mechanical",
+        "process_type_description": "機械的処理 - 自動化可能な論理演算や計算。視認情報をこれに繋ぐことはできない。水色で表示。",
+        "description": "建築面積の合計を敷地面積で除して建蔽率を算定する",
+        "logic_expression": "BCR = A_total / S",
+        "iteration": "single"
+      },
+      {
+        "id": "proc-bcr-limit-determine",
+        "type": "process",
+        "title": "建蔽率上限値の決定",
+        "process_type": "mechanical",
+        "process_type_description": "機械的処理 - 自動化可能な論理演算や計算。視認情報をこれに繋ぐことはできない。水色で表示。",
+        "description": "用途地域区分に応じた建蔽率の上限値を決定する",
+        "iteration": "single",
+        "remarks": "第1項各号の規定に基づく。都市計画で定められた数値を参照"
+      },
+      {
+        "id": "proc-compliance-judge",
+        "type": "process",
+        "title": "建蔽率の適否判定",
+        "process_type": "mechanical",
+        "process_type_description": "機械的処理 - 自動化可能な論理演算や計算。視認情報をこれに繋ぐことはできない。水色で表示。",
+        "description": "建蔽率が上限値以下であるか否かを判定する",
+        "logic_expression": "J = (BCR ≤ BCR_limit)",
+        "iteration": "single"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-buildings-identify",
+        "to": "info-buildings-set",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "info-buildings-set",
+        "to": "proc-building-area-get",
+        "role": "input"
+      },
+      {
+        "id": "e03",
+        "from": "proc-building-area-get",
+        "to": "info-building-area-sum",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "proc-site-area-get",
+        "to": "info-site-area",
+        "role": "output"
+      },
+      {
+        "id": "e05",
+        "from": "info-building-area-sum",
+        "to": "proc-bcr-calc",
+        "role": "input"
+      },
+      {
+        "id": "e06",
+        "from": "info-site-area",
+        "to": "proc-bcr-calc",
+        "role": "input"
+      },
+      {
+        "id": "e07",
+        "from": "proc-bcr-calc",
+        "to": "info-bcr-actual",
+        "role": "output"
+      },
+      {
+        "id": "e08",
+        "from": "proc-use-district-get",
+        "to": "info-use-district",
+        "role": "output"
+      },
+      {
+        "id": "e09",
+        "from": "info-use-district",
+        "to": "proc-bcr-limit-determine",
+        "role": "input"
+      },
+      {
+        "id": "e10",
+        "from": "proc-bcr-limit-determine",
+        "to": "info-bcr-limit",
+        "role": "output"
+      },
+      {
+        "id": "e11",
+        "from": "info-bcr-actual",
+        "to": "proc-compliance-judge",
+        "role": "input"
+      },
+      {
+        "id": "e12",
+        "from": "info-bcr-limit",
+        "to": "proc-compliance-judge",
+        "role": "input"
+      },
+      {
+        "id": "e13",
+        "from": "proc-compliance-judge",
+        "to": "info-compliance",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "defines_detail",
+      "articles": [
+        "A2:P1:I2"
+      ],
+      "description": "建築面積の算定方法を規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-24T00:00:00.000Z",
+    "updated_at": "2025-12-24T00:00:00.000Z",
+    "author": "Claude Sonnet 4.5",
+    "generator": "kijo-generator-manual-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法",
+    "source": "e-Gov法令API"
+  }
+}

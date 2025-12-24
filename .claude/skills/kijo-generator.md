@@ -24,6 +24,16 @@
 - 個別の建築計画の設計内容を規制する条文（「規制文」）
 - 「〜ならない。」で終わる文のうち、建築計画の立地条件や設計内容に関わるもの
 
+## 重要な制約
+
+**一時ファイルの作成禁止**
+
+機序図生成中に**一時的なJavaScript/Python/JSONファイルを作成してはいけません**。
+必要な処理は全てRead/Write/Bashツールを使って直接実行すること。
+
+- ❌ 禁止: `fetch-article-*.js`, `temp-*.json`, `validate-*.mjs` 等の作成
+- ✅ 許可: 最終出力ファイル `data/diagrams/{法令ID}/A{条}_P{項}_kijo.json` のみ
+
 ## 作業フロー
 
 ### STEP 1: スキーマ読み込み
@@ -32,11 +42,40 @@ schemas/kijo-diagram.schema.json を読む
 ```
 
 ### STEP 2: 条文取得
-法令MCP（`law`）を使用して対象条文の全文を取得。
 
+**まずキャッシュファイルを確認:**
 ```
-law.get_article(law_id="325AC0000000201", article="43", paragraph="1")
+data/law-articles/{法令ID}/A{条}.json
 ```
+
+キャッシュが存在する場合はそれを使用。存在しない場合のみAPIから取得。
+
+```bash
+# キャッシュファイル例
+# 建築基準法
+data/law-articles/325AC0000000201/A43.json
+
+# 建築基準法施行令
+data/law-articles/325CO0000000338/A108.json
+```
+
+**キャッシュファイルの構造:**
+```json
+{
+  "law_id": "325AC0000000201",
+  "law_name": "建築基準法",
+  "article": "43",
+  "text": "（接道義務）\n第四十三条\n建築物の敷地は...",
+  "raw_node": { ... },
+  "fetched_at": "2025-12-24T..."
+}
+```
+
+**利用可能なキャッシュ:**
+- 建築基準法: 48件（第19条〜第87条）
+- 建築基準法施行令: 6件（第108条、第112条、第114条、第115条、第128条、第129条）
+
+キャッシュにない場合は `scripts/fetch-articles-from-checklist.mjs` を実行して追加取得できる。
 
 ### STEP 3: 法文構造分析
 
@@ -55,6 +94,27 @@ law.get_article(law_id="325AC0000000201", article="43", paragraph="1")
 **ファイル命名規則:**
 - 機序図: `A{条}_P{項}_kijo.json`（例: `A22_P1_kijo.json`）
 - 枝番あり: `A{条}_{枝番}_P{項}_kijo.json`（例: `A20_3_P2_kijo.json`）
+
+### STEP 5: バリデーション（必須）
+
+JSONファイル生成後、**必ず**以下のコマンドでスキーマ検証を実行すること:
+
+```bash
+npm run validate:kijo {ファイルパス}
+```
+
+例:
+```bash
+npm run validate:kijo data/diagrams/325AC0000000201/A22_P1_kijo.json
+```
+
+**バリデーションエラーがある場合:**
+1. エラーメッセージを確認
+2. JSONファイルを修正
+3. 再度バリデーション実行
+4. エラーがなくなるまで繰り返す
+
+**バリデーションが通るまで作業完了とはしない**
 
 ## 構成要素
 

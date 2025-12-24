@@ -1,0 +1,485 @@
+{
+  "id": "CHK-BSL-A52-P3",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "容積率算定における地階住宅部分不算入",
+    "target_subject": "建築物",
+    "description": "容積率算定時に、天井高さ1m以下の地階の住宅・老人ホーム等部分の床面積を不算入とする規定"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "52",
+    "paragraph": "3"
+  },
+  "labels": [
+    "集団規定",
+    "容積率",
+    "床面積算定"
+  ],
+  "text_raw": "第一項（ただし書を除く。）、前項、第七項、第十二項及び第十四項、第五十七条の二第三項第二号、第五十七条の三第二項、第五十九条第一項及び第三項、第五十九条の二第一項、第六十条第一項、第六十条の二第一項及び第四項、第六十八条の三第一項、第六十八条の四、第六十八条の五（第二号イを除く。第六項において同じ。）、第六十八条の五の二（第二号イを除く。第六項において同じ。）、第六十八条の五の三第一項（第一号ロを除く。第六項において同じ。）、第六十八条の五の四（ただし書及び第一号ロを除く。）、第六十八条の五の五第一項第一号ロ、第六十八条の八、第六十八条の九第一項、第八十六条第三項及び第四項、第八十六条の二第二項及び第三項、第八十六条の五第三項並びに第八十六条の六第一項に規定する建築物の容積率（第五十九条第一項、第六十条の二第一項及び第六十八条の九第一項に規定するものについては、建築物の容積率の最高限度に係る場合に限る。第六項において同じ。）の算定の基礎となる延べ面積には、建築物の地階でその天井が地盤面からの高さ一メートル以下にあるものの住宅又は老人ホーム、福祉ホームその他これらに類するもの（以下この項並びに第六項第二号及び第三号において「老人ホーム等」という。）の用途に供する部分（第六項各号に掲げる建築物の部分を除く。以下この項において同じ。）の床面積（当該床面積が当該建築物の住宅及び老人ホーム等の用途に供する部分の床面積の合計の三分の一を超える場合においては、当該建築物の住宅及び老人ホーム等の用途に供する部分の床面積の合計の三分の一）は、算入しないものとする。",
+  "compliance_logic": {
+    "scope_condition": {
+      "value": true,
+      "note": "容積率算定を行う全ての建築物に適用される一般規定"
+    },
+    "judgment_rule": {
+      "operator": "EXCLUSION",
+      "conditions": [
+        {
+          "ref": "info-final-exclusion-area",
+          "description": "容積率算定時に不算入とする床面積A_exc"
+        }
+      ],
+      "note": "容積率算定用の延べ面積から対象地階部分の床面積を除外する"
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "info-basement-floors-set",
+        "type": "information",
+        "title": "建築物の地階",
+        "symbol": "S_b",
+        "subject": "建築物",
+        "plurality": "single",
+        "property": "地階の集合",
+        "property_type": "set_definition",
+        "description": "建築物に属する地階を特定"
+      },
+      {
+        "id": "proc-basement-identification",
+        "type": "process",
+        "title": "地階の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書から建築物の地階を読み取る",
+        "target_subject": "建築物"
+      },
+      {
+        "id": "info-ceiling-height",
+        "type": "information",
+        "title": "地階天井高さ",
+        "symbol": "H_c",
+        "subject": "地階",
+        "plurality": "multiple",
+        "property": "天井の地盤面からの高さ",
+        "property_type": "numeric",
+        "unit": "m",
+        "description": "各地階の天井が地盤面からどの高さにあるか"
+      },
+      {
+        "id": "proc-ceiling-height-check",
+        "type": "process",
+        "title": "天井高さ測定",
+        "process_type": "mechanical",
+        "description": "地盤面から地階天井までの高さを計測",
+        "target_subject": "地階",
+        "iteration": "iterative"
+      },
+      {
+        "id": "info-ceiling-height-judgment",
+        "type": "information",
+        "title": "天井高さ1m以下判定",
+        "symbol": "J_h",
+        "subject": "地階",
+        "plurality": "multiple",
+        "property": "天井高さ1m以下であるか",
+        "property_type": "proposition",
+        "description": "地盤面からの天井高さが1m以下である"
+      },
+      {
+        "id": "proc-1m-judgment",
+        "type": "process",
+        "title": "1m以下判定",
+        "process_type": "mechanical",
+        "description": "天井高さが1m以下かを判定",
+        "logic_expression": "H_c ≤ 1.0",
+        "target_subject": "地階",
+        "iteration": "iterative"
+      },
+      {
+        "id": "info-eligible-basements-set",
+        "type": "information",
+        "title": "対象地階",
+        "symbol": "S_be",
+        "subject": "建築物",
+        "plurality": "single",
+        "property": "天井高さ1m以下の地階の集合",
+        "property_type": "set_definition",
+        "description": "容積率緩和対象となる地階（天井高さ1m以下）を特定"
+      },
+      {
+        "id": "proc-eligible-basement-selection",
+        "type": "process",
+        "title": "対象地階抽出",
+        "process_type": "mechanical",
+        "description": "天井高さ1m以下の地階を抽出",
+        "logic_expression": "S_be = {x ∈ S_b | J_h(x) = true}",
+        "target_subject": "建築物"
+      },
+      {
+        "id": "info-basement-use",
+        "type": "information",
+        "title": "地階の用途",
+        "symbol": "U_b",
+        "subject": "地階",
+        "plurality": "multiple",
+        "property": "用途種別",
+        "property_type": "classification",
+        "description": "住宅、老人ホーム等、その他"
+      },
+      {
+        "id": "proc-use-check",
+        "type": "process",
+        "title": "用途の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書から地階の用途を読み取る",
+        "target_subject": "地階"
+      },
+      {
+        "id": "info-residential-use-judgment",
+        "type": "information",
+        "title": "住宅・老人ホーム等用途判定",
+        "symbol": "J_r",
+        "subject": "地階",
+        "plurality": "multiple",
+        "property": "住宅又は老人ホーム等に供するか",
+        "property_type": "proposition",
+        "description": "住宅又は老人ホーム、福祉ホームその他これらに類する用途に供する"
+      },
+      {
+        "id": "proc-residential-judgment",
+        "type": "process",
+        "title": "住宅・老人ホーム等該当判定",
+        "process_type": "mechanical",
+        "description": "用途が住宅又は老人ホーム等に該当するかを判定",
+        "logic_expression": "U_b ∈ {住宅, 老人ホーム, 福祉ホーム, これらに類するもの}",
+        "target_subject": "地階",
+        "iteration": "iterative"
+      },
+      {
+        "id": "info-exclusion-target-basements-set",
+        "type": "information",
+        "title": "不算入対象地階",
+        "symbol": "S_ex",
+        "subject": "建築物",
+        "plurality": "single",
+        "property": "不算入対象となる地階の集合",
+        "property_type": "set_definition",
+        "description": "容積率算定時に床面積を不算入とする地階を特定（天井高さ1m以下かつ住宅・老人ホーム等用途）"
+      },
+      {
+        "id": "proc-exclusion-target-selection",
+        "type": "process",
+        "title": "不算入対象地階抽出",
+        "process_type": "mechanical",
+        "description": "天井高さ1m以下かつ住宅・老人ホーム等用途の地階を抽出",
+        "logic_expression": "S_ex = {x ∈ S_be | J_r(x) = true}",
+        "target_subject": "建築物"
+      },
+      {
+        "id": "info-basement-floor-area",
+        "type": "information",
+        "title": "対象地階部分の床面積",
+        "symbol": "A_ex",
+        "subject": "地階",
+        "plurality": "multiple",
+        "property": "床面積",
+        "property_type": "numeric",
+        "unit": "m2",
+        "description": "不算入対象となる各地階の住宅・老人ホーム等用途部分の床面積"
+      },
+      {
+        "id": "proc-floor-area-check",
+        "type": "process",
+        "title": "床面積の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書から対象地階部分の床面積を読み取る",
+        "target_subject": "地階"
+      },
+      {
+        "id": "info-total-residential-area",
+        "type": "information",
+        "title": "建築物全体の住宅・老人ホーム等床面積",
+        "symbol": "A_res_total",
+        "subject": "建築物",
+        "plurality": "single",
+        "property": "住宅及び老人ホーム等の用途に供する部分の床面積の合計",
+        "property_type": "numeric",
+        "unit": "m2",
+        "description": "建築物全体（地階含む全階）の住宅・老人ホーム等用途の床面積合計"
+      },
+      {
+        "id": "proc-total-residential-area-calc",
+        "type": "process",
+        "title": "全体住宅・老人ホーム等床面積の算出",
+        "process_type": "mechanical",
+        "description": "建築物全体の住宅・老人ホーム等用途の床面積を合計",
+        "target_subject": "建築物"
+      },
+      {
+        "id": "info-one-third-limit",
+        "type": "information",
+        "title": "1/3上限値",
+        "symbol": "A_limit",
+        "subject": "建築物",
+        "plurality": "single",
+        "property": "不算入上限床面積",
+        "property_type": "numeric",
+        "unit": "m2",
+        "description": "全体住宅・老人ホーム等床面積の1/3",
+        "remarks": "不算入できる床面積の上限"
+      },
+      {
+        "id": "proc-one-third-calc",
+        "type": "process",
+        "title": "1/3上限値算出",
+        "process_type": "mechanical",
+        "description": "全体住宅・老人ホーム等床面積の1/3を計算",
+        "logic_expression": "A_limit = A_res_total × (1/3)",
+        "target_subject": "建築物"
+      },
+      {
+        "id": "info-basement-total-area",
+        "type": "information",
+        "title": "対象地階部分床面積合計",
+        "symbol": "A_ex_sum",
+        "subject": "建築物",
+        "plurality": "single",
+        "property": "不算入対象地階部分の床面積合計",
+        "property_type": "numeric",
+        "unit": "m2",
+        "description": "天井高さ1m以下の地階の住宅・老人ホーム等用途部分の床面積合計"
+      },
+      {
+        "id": "proc-basement-total-calc",
+        "type": "process",
+        "title": "対象地階部分床面積合計算出",
+        "process_type": "mechanical",
+        "description": "不算入対象となる地階部分の床面積を合計",
+        "logic_expression": "A_ex_sum = Σ(A_ex)",
+        "target_subject": "建築物"
+      },
+      {
+        "id": "info-final-exclusion-area",
+        "type": "information",
+        "title": "実際の不算入床面積",
+        "symbol": "A_exc",
+        "subject": "建築物",
+        "plurality": "single",
+        "property": "容積率算定時に不算入とする床面積",
+        "property_type": "numeric",
+        "unit": "m2",
+        "description": "対象地階部分床面積合計と1/3上限値のいずれか小さい方"
+      },
+      {
+        "id": "proc-final-exclusion-calc",
+        "type": "process",
+        "title": "実際の不算入床面積決定",
+        "process_type": "mechanical",
+        "description": "対象地階床面積合計と1/3上限値を比較し、小さい方を不算入床面積とする",
+        "logic_expression": "A_exc = min(A_ex_sum, A_limit)",
+        "target_subject": "建築物"
+      },
+      {
+        "id": "info-compliance",
+        "type": "information",
+        "title": "容積率算定時の床面積不算入適合",
+        "symbol": "C",
+        "subject": "建築物",
+        "plurality": "single",
+        "property": "第52条第3項適合",
+        "property_type": "proposition",
+        "description": "容積率算定において、対象地階部分の床面積A_excを延べ面積から不算入とする"
+      },
+      {
+        "id": "proc-compliance-judgment",
+        "type": "process",
+        "title": "不算入適用判定",
+        "process_type": "mechanical",
+        "description": "容積率算定用延べ面積から不算入床面積を除外できることを確認",
+        "logic_expression": "C = (A_exc が容積率算定用延べ面積から除外される)",
+        "target_subject": "建築物"
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge-001",
+        "from": "proc-basement-identification",
+        "to": "info-basement-floors-set",
+        "role": "output"
+      },
+      {
+        "id": "edge-002",
+        "from": "info-basement-floors-set",
+        "to": "proc-ceiling-height-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-003",
+        "from": "proc-ceiling-height-check",
+        "to": "info-ceiling-height",
+        "role": "output"
+      },
+      {
+        "id": "edge-004",
+        "from": "info-ceiling-height",
+        "to": "proc-1m-judgment",
+        "role": "input"
+      },
+      {
+        "id": "edge-005",
+        "from": "proc-1m-judgment",
+        "to": "info-ceiling-height-judgment",
+        "role": "output"
+      },
+      {
+        "id": "edge-006",
+        "from": "info-basement-floors-set",
+        "to": "proc-eligible-basement-selection",
+        "role": "input"
+      },
+      {
+        "id": "edge-007",
+        "from": "info-ceiling-height-judgment",
+        "to": "proc-eligible-basement-selection",
+        "role": "input"
+      },
+      {
+        "id": "edge-008",
+        "from": "proc-eligible-basement-selection",
+        "to": "info-eligible-basements-set",
+        "role": "output"
+      },
+      {
+        "id": "edge-009",
+        "from": "proc-use-check",
+        "to": "info-basement-use",
+        "role": "output"
+      },
+      {
+        "id": "edge-010",
+        "from": "info-basement-use",
+        "to": "proc-residential-judgment",
+        "role": "input"
+      },
+      {
+        "id": "edge-011",
+        "from": "proc-residential-judgment",
+        "to": "info-residential-use-judgment",
+        "role": "output"
+      },
+      {
+        "id": "edge-012",
+        "from": "info-eligible-basements-set",
+        "to": "proc-exclusion-target-selection",
+        "role": "input"
+      },
+      {
+        "id": "edge-013",
+        "from": "info-residential-use-judgment",
+        "to": "proc-exclusion-target-selection",
+        "role": "input"
+      },
+      {
+        "id": "edge-014",
+        "from": "proc-exclusion-target-selection",
+        "to": "info-exclusion-target-basements-set",
+        "role": "output"
+      },
+      {
+        "id": "edge-015",
+        "from": "info-exclusion-target-basements-set",
+        "to": "proc-floor-area-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-016",
+        "from": "proc-floor-area-check",
+        "to": "info-basement-floor-area",
+        "role": "output"
+      },
+      {
+        "id": "edge-017",
+        "from": "info-basement-floor-area",
+        "to": "proc-basement-total-calc",
+        "role": "input"
+      },
+      {
+        "id": "edge-018",
+        "from": "proc-basement-total-calc",
+        "to": "info-basement-total-area",
+        "role": "output"
+      },
+      {
+        "id": "edge-019",
+        "from": "proc-total-residential-area-calc",
+        "to": "info-total-residential-area",
+        "role": "output"
+      },
+      {
+        "id": "edge-020",
+        "from": "info-total-residential-area",
+        "to": "proc-one-third-calc",
+        "role": "input"
+      },
+      {
+        "id": "edge-021",
+        "from": "proc-one-third-calc",
+        "to": "info-one-third-limit",
+        "role": "output"
+      },
+      {
+        "id": "edge-022",
+        "from": "info-basement-total-area",
+        "to": "proc-final-exclusion-calc",
+        "role": "input"
+      },
+      {
+        "id": "edge-023",
+        "from": "info-one-third-limit",
+        "to": "proc-final-exclusion-calc",
+        "role": "input"
+      },
+      {
+        "id": "edge-024",
+        "from": "proc-final-exclusion-calc",
+        "to": "info-final-exclusion-area",
+        "role": "output"
+      },
+      {
+        "id": "edge-025",
+        "from": "info-final-exclusion-area",
+        "to": "proc-compliance-judgment",
+        "role": "input"
+      },
+      {
+        "id": "edge-026",
+        "from": "proc-compliance-judgment",
+        "to": "info-compliance",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A52:P1", "A52:P2", "A52:P6", "A52:P7", "A52:P12", "A52:P14"],
+      "description": "第3項は第1項等が規定する容積率算定の基礎となる延べ面積の特例を定める"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-24T08:00:00.000Z",
+    "author": "Claude Sonnet 4.5",
+    "generator": "kijo-generator-skill",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法",
+    "checklist_ref": "確認審査報告書チェックリスト 行100",
+    "source": "e-Gov法令API"
+  }
+}

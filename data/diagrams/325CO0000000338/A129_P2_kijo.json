@@ -1,0 +1,262 @@
+{
+  "id": "CHK-BSL-KIJO-A129-P2",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "階避難安全性能の定義",
+    "target_subject": "建築物の階",
+    "description": "火災発生時に階からの避難完了まで煙が降下しないこと"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "129",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "避難安全検証"
+  ],
+  "text_raw": "前項の「階避難安全性能」とは、当該階のいずれの火災室で火災が発生した場合においても、当該階に存する者（当該階を通らなければ避難することができない者を含む。次項第一号ニにおいて「階に存する者」という。）の全てが当該階から直通階段の一までの避難（避難階にあつては、地上までの避難）を終了するまでの間、当該階の各居室及び各居室から直通階段（避難階にあつては、地上。以下この条において同じ。）に通ずる主たる廊下その他の建築物の部分において、避難上支障がある高さまで煙又はガスが降下しないものであることとする。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "building_part",
+          "value": "建築物の階"
+        }
+      ],
+      "note": "階避難安全性能の定義"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "performance",
+          "value": "避難完了までの煙降下防止",
+          "description": "火災発生から避難完了まで避難上支障のある高さまで煙が降下しない"
+        }
+      ]
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-fire-room-set",
+        "type": "process",
+        "title": "火災室の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から当該階の火災室を特定"
+      },
+      {
+        "id": "info-fire-room-set",
+        "type": "information",
+        "title": "階の火災室",
+        "symbol": "FR",
+        "subject": "階",
+        "property": "火災室の集合",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "当該階における火災室"
+      },
+      {
+        "id": "proc-occupants",
+        "type": "process",
+        "title": "在館者の特定",
+        "process_type": "undefined_input",
+        "description": "当該階に存する者を特定"
+      },
+      {
+        "id": "info-occupants",
+        "type": "information",
+        "title": "階に存する者",
+        "symbol": "O",
+        "subject": "階",
+        "property": "在館者の集合",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "当該階に存する者（当該階を通らなければ避難できない者を含む）"
+      },
+      {
+        "id": "proc-evacuation-route",
+        "type": "process",
+        "title": "避難経路の特定",
+        "process_type": "undefined_input",
+        "description": "直通階段または地上への避難経路を特定"
+      },
+      {
+        "id": "info-evacuation-route",
+        "type": "information",
+        "title": "避難経路",
+        "symbol": "ER",
+        "subject": "階",
+        "property": "避難経路",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "各居室から直通階段（避難階では地上）に通ずる主たる廊下等"
+      },
+      {
+        "id": "proc-evacuation-time-calc",
+        "type": "process",
+        "title": "避難完了時間の算定",
+        "process_type": "mechanical",
+        "target_subject": "火災室",
+        "iteration": "iterative",
+        "description": "火災発生から避難完了までに要する時間を算定"
+      },
+      {
+        "id": "info-evacuation-time",
+        "type": "information",
+        "title": "避難完了時間",
+        "symbol": "Te",
+        "subject": "火災室",
+        "property": "避難完了時間",
+        "property_type": "numeric",
+        "unit": "min",
+        "plurality": "multiple",
+        "description": "火災発生から階からの避難を終了するまでに要する時間"
+      },
+      {
+        "id": "proc-smoke-descent-calc",
+        "type": "process",
+        "title": "煙降下時間の算定",
+        "process_type": "mechanical",
+        "target_subject": "火災室",
+        "iteration": "iterative",
+        "description": "煙が避難上支障のある高さまで降下する時間を算定"
+      },
+      {
+        "id": "info-smoke-descent-time",
+        "type": "information",
+        "title": "煙降下時間",
+        "symbol": "Ts",
+        "subject": "火災室",
+        "property": "煙降下所要時間",
+        "property_type": "numeric",
+        "unit": "min",
+        "plurality": "multiple",
+        "description": "煙が避難上支障のある高さまで降下するために要する時間"
+      },
+      {
+        "id": "proc-safety-check",
+        "type": "process",
+        "title": "階避難安全性能判定",
+        "process_type": "mechanical",
+        "target_subject": "火災室",
+        "iteration": "iterative",
+        "description": "避難完了時間が煙降下時間を超えないか判定",
+        "logic_expression": "Te <= Ts"
+      },
+      {
+        "id": "info-safety-result",
+        "type": "information",
+        "title": "階避難安全性能",
+        "symbol": "R",
+        "subject": "階",
+        "property": "階避難安全性能",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "当該階が階避難安全性能を有するか"
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge-001",
+        "from": "proc-fire-room-set",
+        "to": "info-fire-room-set",
+        "role": "output"
+      },
+      {
+        "id": "edge-002",
+        "from": "proc-occupants",
+        "to": "info-occupants",
+        "role": "output"
+      },
+      {
+        "id": "edge-003",
+        "from": "proc-evacuation-route",
+        "to": "info-evacuation-route",
+        "role": "output"
+      },
+      {
+        "id": "edge-004",
+        "from": "info-fire-room-set",
+        "to": "proc-evacuation-time-calc",
+        "role": "input"
+      },
+      {
+        "id": "edge-005",
+        "from": "info-occupants",
+        "to": "proc-evacuation-time-calc",
+        "role": "input"
+      },
+      {
+        "id": "edge-006",
+        "from": "info-evacuation-route",
+        "to": "proc-evacuation-time-calc",
+        "role": "input"
+      },
+      {
+        "id": "edge-007",
+        "from": "proc-evacuation-time-calc",
+        "to": "info-evacuation-time",
+        "role": "output"
+      },
+      {
+        "id": "edge-008",
+        "from": "info-fire-room-set",
+        "to": "proc-smoke-descent-calc",
+        "role": "input"
+      },
+      {
+        "id": "edge-009",
+        "from": "proc-smoke-descent-calc",
+        "to": "info-smoke-descent-time",
+        "role": "output"
+      },
+      {
+        "id": "edge-010",
+        "from": "info-evacuation-time",
+        "to": "proc-safety-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-011",
+        "from": "info-smoke-descent-time",
+        "to": "proc-safety-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-012",
+        "from": "proc-safety-check",
+        "to": "info-safety-result",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": [
+        "A129:P1",
+        "A129:P3"
+      ],
+      "description": "階避難安全性能の定義および検証法"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-24T00:00:00Z",
+    "updated_at": "2025-12-24T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "kijo-generator",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令",
+    "source": "e-Gov法令API"
+  }
+}

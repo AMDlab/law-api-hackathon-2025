@@ -1,0 +1,314 @@
+{
+  "id": "CHK-BSL-A85-P3",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "応急仮設建築物の存続期間制限と許可要件",
+    "target_subject": "応急仮設建築物",
+    "description": "応急仮設建築物の建築工事完了後の存続期間管理と許可要件の判定"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "85",
+    "paragraph": "3",
+    "full_ref": "法::A85:P3"
+  },
+  "labels": [
+    "応急仮設建築物",
+    "存続期間制限",
+    "許可制度"
+  ],
+  "text_raw": "前二項の応急仮設建築物を建築した者は、その建築工事を完了した後三月を超えて当該建築物を存続させようとする場合においては、その超えることとなる日前に、特定行政庁の許可を受けなければならない。ただし、当該許可の申請をした場合において、その超えることとなる日前に当該申請に対する処分がされないときは、当該処分がされるまでの間は、なお当該建築物を存続させることができる。",
+  "compliance_logic": {
+    "regulatory_text": "応急仮設建築物を建築工事完了後3月を超えて存続させるには、その期間超過日前に特定行政庁の許可を受けなければならない。",
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "building_type",
+          "value": "応急仮設建築物"
+        },
+        {
+          "type": "temporal",
+          "value": "建築工事完了後"
+        }
+      ],
+      "note": "前2項（第1項・第2項）に該当する応急仮設建築物が対象"
+    },
+    "compliance_proposition": {
+      "primary": "3月超過日前に許可を受けた OR (許可申請日から処分日まで建築物を存続させる)",
+      "conditions": [
+        {
+          "condition": "3月超過前に許可を受けた",
+          "complies": true
+        },
+        {
+          "condition": "許可申請後、処分待機期間中",
+          "complies": true
+        },
+        {
+          "condition": "3月超過後も許可なく存続させた",
+          "complies": false
+        }
+      ]
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "info-001",
+        "type": "information",
+        "title": "応急仮設建築物",
+        "subject": "建築物",
+        "property": "建築物用途区分",
+        "property_type": "classification",
+        "description": "建築基準法第85条第1項又は第2項に該当する応急仮設建築物",
+        "remarks": "災害救助用途や公益用途等の仮設建築物",
+        "plurality": "single"
+      },
+      {
+        "id": "info-002",
+        "type": "information",
+        "title": "建築工事完了日",
+        "subject": "応急仮設建築物",
+        "property": "工事完了日時",
+        "property_type": "numeric",
+        "description": "応急仮設建築物の建築工事が完了した日",
+        "unit": "年月日",
+        "plurality": "single"
+      },
+      {
+        "id": "info-003",
+        "type": "information",
+        "title": "建築物存続意図",
+        "subject": "応急仮設建築物",
+        "property": "3月超過存続の有無",
+        "property_type": "proposition",
+        "description": "建築工事完了後3月を超えて建築物を存続させようとしているか否か",
+        "plurality": "single"
+      },
+      {
+        "id": "info-004",
+        "type": "information",
+        "title": "存続期間制限判定期日",
+        "subject": "応急仮設建築物",
+        "property": "3月超過日",
+        "property_type": "numeric",
+        "description": "建築工事完了日から3月を経過した日",
+        "unit": "年月日",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-001",
+        "type": "process",
+        "title": "3月超過判定",
+        "process_type": "mechanical",
+        "description": "建築工事完了後、3月を超えて存続させる意図があるかを判定",
+        "logic_expression": "建築物存続意図 AND (現在日 > 工事完了日 + 3月)"
+      },
+      {
+        "id": "info-005",
+        "type": "information",
+        "title": "許可申請期日",
+        "subject": "応急仮設建築物",
+        "property": "許可申請日時",
+        "property_type": "numeric",
+        "description": "特定行政庁に対して存続期間超過許可の申請を行った日",
+        "unit": "年月日",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-002",
+        "type": "process",
+        "title": "期限内許可申請確認",
+        "process_type": "mechanical",
+        "description": "3月超過日前に許可申請が提出されたかを確認",
+        "logic_expression": "許可申請日 <= 3月超過日"
+      },
+      {
+        "id": "info-006",
+        "type": "information",
+        "title": "許可申請に対する処分",
+        "subject": "特定行政庁",
+        "property": "許可処分の有無・内容",
+        "property_type": "classification",
+        "description": "許可申請に対する特定行政庁の処分（許可・不許可・審査中）",
+        "remarks": "処分は第4項に基づき最大2年の期間制限付き",
+        "plurality": "single"
+      },
+      {
+        "id": "info-007",
+        "type": "information",
+        "title": "許可処分日時",
+        "subject": "特定行政庁",
+        "property": "処分日時",
+        "property_type": "numeric",
+        "description": "特定行政庁が許可申請に対して処分を行った日",
+        "unit": "年月日",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-003",
+        "type": "process",
+        "title": "許可取得確認",
+        "process_type": "mechanical",
+        "description": "3月超過日前に許可を取得しているかを判定",
+        "logic_expression": "処分内容 = 許可 AND 処分日 <= 3月超過日"
+      },
+      {
+        "id": "proc-004",
+        "type": "process",
+        "title": "処分待機状況判定",
+        "process_type": "mechanical",
+        "description": "許可申請後、処分がまだ行われていない期間を判定",
+        "logic_expression": "許可申請日 <= 3月超過日 AND 現在日 < 処分日"
+      },
+      {
+        "id": "info-008",
+        "type": "information",
+        "title": "法適合状況",
+        "subject": "応急仮設建築物",
+        "property": "法85条3項適合性",
+        "property_type": "proposition",
+        "description": "応急仮設建築物が法第85条第3項の要件を満たしているか否か",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge-001",
+        "from": "info-001",
+        "to": "proc-001",
+        "role": "input"
+      },
+      {
+        "id": "edge-002",
+        "from": "info-002",
+        "to": "proc-001",
+        "role": "input"
+      },
+      {
+        "id": "edge-003",
+        "from": "info-003",
+        "to": "proc-001",
+        "role": "input"
+      },
+      {
+        "id": "edge-004",
+        "from": "proc-001",
+        "to": "info-004",
+        "role": "output"
+      },
+      {
+        "id": "edge-005",
+        "from": "info-004",
+        "to": "proc-002",
+        "role": "input"
+      },
+      {
+        "id": "edge-006",
+        "from": "info-005",
+        "to": "proc-002",
+        "role": "input"
+      },
+      {
+        "id": "edge-007",
+        "from": "proc-002",
+        "to": "info-006",
+        "role": "output"
+      },
+      {
+        "id": "edge-008",
+        "from": "info-006",
+        "to": "proc-003",
+        "role": "input"
+      },
+      {
+        "id": "edge-009",
+        "from": "info-007",
+        "to": "proc-003",
+        "role": "input"
+      },
+      {
+        "id": "edge-010",
+        "from": "info-004",
+        "to": "proc-003",
+        "role": "input"
+      },
+      {
+        "id": "edge-011",
+        "from": "proc-003",
+        "to": "info-008",
+        "role": "output"
+      },
+      {
+        "id": "edge-012",
+        "from": "info-005",
+        "to": "proc-004",
+        "role": "input"
+      },
+      {
+        "id": "edge-013",
+        "from": "info-004",
+        "to": "proc-004",
+        "role": "input"
+      },
+      {
+        "id": "edge-014",
+        "from": "info-007",
+        "to": "proc-004",
+        "role": "input"
+      },
+      {
+        "id": "edge-015",
+        "from": "proc-004",
+        "to": "info-008",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A85:P1"],
+      "description": "第1項 災害区域内の応急仮設建築物について建築基準法令不適用（防火地域内除外）"
+    },
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A85:P2"],
+      "description": "第2項 災害時の公益用途仮設建築物に対する建築基準法令不適用（防火・準防火地域内で面積要件あり）"
+    },
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A85:P4"],
+      "description": "第4項 許可期間は最大2年以内（許可判定基準は安全上、防火上及び衛生上支障がないこと）"
+    },
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A85:P5"],
+      "description": "第5項 被災者の需要等の理由により期間延長可能（最大1年の追加延長）"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-24T00:00:00Z",
+    "updated_at": "2025-12-24T00:00:00Z",
+    "created_by": "Claude Code",
+    "revision": "1.0",
+    "status": "draft",
+    "notes": "応急仮設建築物の存続期間制限に関する許可制度。ただし書きで処分待機期間中の存続を認める。"
+  }
+}

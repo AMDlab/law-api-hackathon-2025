@@ -1,0 +1,379 @@
+{
+  "id": "CHK-BSL-A34-P1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "外壁の構造",
+    "target_subject": "外壁",
+    "description": "建築物の外壁が防火構造等の所定の基準を満たすことを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "34",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "防火"
+  ],
+  "text_raw": "建築物の外壁は、延焼のおそれのある部分(木造建築物等の外壁及び軒裏で延焼のおそれのある部分以外の部分を除く。)について、防火構造とし、又は政令で定める構造としなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "application",
+          "value": "延焼のおそれのある部分を有する外壁"
+        }
+      ],
+      "note": "木造建築物等の外壁及び軒裏で延焼のおそれのある部分以外の部分を除く"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "ref": "info-bouka-compliance",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "ref": "info-ordinance-compliance",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-building-type",
+        "type": "process",
+        "title": "建築物構造種別の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の構造種別（木造建築物等、その他）を特定する"
+      },
+      {
+        "id": "info-building-type",
+        "type": "information",
+        "title": "建築物の構造種別",
+        "symbol": "BT",
+        "subject": "建築物",
+        "property": "構造種別",
+        "property_type": "classification",
+        "description": "木造建築物等、その他の構造種別",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-walls-set",
+        "type": "process",
+        "title": "外壁の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から判定対象となる外壁を特定する"
+      },
+      {
+        "id": "info-walls-set",
+        "type": "information",
+        "title": "建築物の外壁",
+        "subject": "建築物",
+        "property": "外壁の集合",
+        "property_type": "set_definition",
+        "description": "判定対象となる建築物に属する外壁を特定",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-ensho-check",
+        "type": "process",
+        "title": "延焼のおそれのある部分の判定",
+        "process_type": "mechanical",
+        "target_subject": "外壁",
+        "iteration": "iterative",
+        "description": "隣地境界線等からの距離に基づき、外壁の各部分が延焼のおそれのある部分に該当するかを判定",
+        "related_articles": [
+          "法::A2:I6"
+        ]
+      },
+      {
+        "id": "info-ensho-area",
+        "type": "information",
+        "title": "延焼のおそれのある部分の有無",
+        "symbol": "E",
+        "subject": "外壁",
+        "property": "延焼のおそれのある部分への該当",
+        "property_type": "proposition",
+        "description": "当該外壁の部分が延焼のおそれのある部分に該当するか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-mokuzou-exempt-check",
+        "type": "process",
+        "title": "木造建築物等の適用除外判定",
+        "process_type": "mechanical",
+        "target_subject": "外壁",
+        "iteration": "iterative",
+        "description": "木造建築物等の外壁で延焼のおそれのある部分以外の部分は適用除外",
+        "logic_expression": "(BT = '木造建築物等') AND (E = false)"
+      },
+      {
+        "id": "info-exempt",
+        "type": "information",
+        "title": "適用除外該当",
+        "symbol": "X",
+        "subject": "外壁",
+        "property": "適用除外への該当",
+        "property_type": "proposition",
+        "description": "適用除外条件（木造建築物等の延焼のおそれのある部分以外）に該当するか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-wall-structure",
+        "type": "process",
+        "title": "外壁構造の特定",
+        "process_type": "human_judgment",
+        "target_subject": "外壁",
+        "iteration": "iterative",
+        "description": "設計図書等から外壁の構造方法を特定する"
+      },
+      {
+        "id": "info-wall-structure",
+        "type": "information",
+        "title": "外壁の構造",
+        "symbol": "S",
+        "subject": "外壁",
+        "property": "構造方法",
+        "property_type": "classification",
+        "description": "外壁の構造方法（防火構造、政令で定める構造、その他）",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-bouka-check",
+        "type": "process",
+        "title": "防火構造該当判定",
+        "process_type": "mechanical",
+        "target_subject": "外壁",
+        "iteration": "iterative",
+        "description": "外壁が防火構造に該当するかを判定",
+        "related_articles": [
+          "法::A2:I8"
+        ]
+      },
+      {
+        "id": "info-bouka-compliance",
+        "type": "information",
+        "title": "防火構造への該当",
+        "symbol": "B",
+        "subject": "外壁",
+        "property": "防火構造該当",
+        "property_type": "proposition",
+        "description": "外壁が防火構造に該当するか",
+        "related_articles": [
+          "法::A2:I8"
+        ],
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-ordinance-check",
+        "type": "process",
+        "title": "政令で定める構造該当判定",
+        "process_type": "mechanical",
+        "target_subject": "外壁",
+        "iteration": "iterative",
+        "description": "外壁が政令で定める構造に該当するかを判定",
+        "related_articles": [
+          "令::A109_5"
+        ]
+      },
+      {
+        "id": "info-ordinance-compliance",
+        "type": "information",
+        "title": "政令で定める構造への該当",
+        "symbol": "O",
+        "subject": "外壁",
+        "property": "政令で定める構造該当",
+        "property_type": "proposition",
+        "description": "外壁が政令で定める構造に該当するか",
+        "related_articles": [
+          "令::A109_5"
+        ],
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-wall-judgment",
+        "type": "process",
+        "title": "外壁適合判定",
+        "process_type": "mechanical",
+        "target_subject": "外壁",
+        "iteration": "iterative",
+        "description": "各外壁について、適用除外または基準適合のいずれかを満たすことを確認",
+        "logic_expression": "X OR (B OR O)"
+      },
+      {
+        "id": "info-wall-compliance",
+        "type": "information",
+        "title": "法34条1項適合",
+        "symbol": "C",
+        "subject": "外壁",
+        "property": "法34条1項適合",
+        "property_type": "proposition",
+        "description": "法34条1項の規定に適合するか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-all-walls-check",
+        "type": "process",
+        "title": "全外壁適合確認",
+        "process_type": "mechanical",
+        "description": "全ての外壁が法34条1項に適合することを確認",
+        "logic_expression": "∀wall ∈ Walls: C(wall) = true"
+      },
+      {
+        "id": "info-final",
+        "type": "information",
+        "title": "建築物の法34条1項適合",
+        "subject": "建築物",
+        "property": "法34条1項適合",
+        "property_type": "proposition",
+        "description": "建築物全体として法34条1項の規定に適合するか",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-building-type",
+        "to": "info-building-type",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "proc-walls-set",
+        "to": "info-walls-set",
+        "role": "output"
+      },
+      {
+        "id": "e03",
+        "from": "info-walls-set",
+        "to": "proc-ensho-check",
+        "role": "input"
+      },
+      {
+        "id": "e04",
+        "from": "proc-ensho-check",
+        "to": "info-ensho-area",
+        "role": "output"
+      },
+      {
+        "id": "e05",
+        "from": "info-building-type",
+        "to": "proc-mokuzou-exempt-check",
+        "role": "input"
+      },
+      {
+        "id": "e06",
+        "from": "info-ensho-area",
+        "to": "proc-mokuzou-exempt-check",
+        "role": "input"
+      },
+      {
+        "id": "e07",
+        "from": "proc-mokuzou-exempt-check",
+        "to": "info-exempt",
+        "role": "output"
+      },
+      {
+        "id": "e08",
+        "from": "info-walls-set",
+        "to": "proc-wall-structure",
+        "role": "input"
+      },
+      {
+        "id": "e09",
+        "from": "proc-wall-structure",
+        "to": "info-wall-structure",
+        "role": "output"
+      },
+      {
+        "id": "e10",
+        "from": "info-wall-structure",
+        "to": "proc-bouka-check",
+        "role": "input"
+      },
+      {
+        "id": "e11",
+        "from": "proc-bouka-check",
+        "to": "info-bouka-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e12",
+        "from": "info-wall-structure",
+        "to": "proc-ordinance-check",
+        "role": "input"
+      },
+      {
+        "id": "e13",
+        "from": "proc-ordinance-check",
+        "to": "info-ordinance-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e14",
+        "from": "info-exempt",
+        "to": "proc-wall-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e15",
+        "from": "info-bouka-compliance",
+        "to": "proc-wall-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e16",
+        "from": "info-ordinance-compliance",
+        "to": "proc-wall-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e17",
+        "from": "proc-wall-judgment",
+        "to": "info-wall-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e18",
+        "from": "info-wall-compliance",
+        "to": "proc-all-walls-check",
+        "role": "input"
+      },
+      {
+        "id": "e19",
+        "from": "proc-all-walls-check",
+        "to": "info-final",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "delegates_to",
+      "articles": [
+        "A109_5"
+      ],
+      "description": "法34条1項の政令で定める構造を規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-23T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

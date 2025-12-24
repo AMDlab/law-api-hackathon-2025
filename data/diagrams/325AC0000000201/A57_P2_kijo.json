@@ -1,0 +1,172 @@
+{
+  "id": "CHK-BSL-A57-P2",
+  "version": "3.1.0",
+  "page_title": {
+    "title": "道路内の建築物に対する高さ制限の適用除外",
+    "target_subject": "道路内の建築物",
+    "description": "道路内に設ける建築物（高架の道路の路面下に設けるものを除く）に関する高さ制限の適用判定"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "57",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "高さ制限の適用除外"
+  ],
+  "text_raw": "道路内にある建築物（高架の道路の路面下に設けるものを除く。）については、第五十六条第一項第一号及び第二項から第四項までの規定は、適用しない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "applicability",
+          "value": "建築物が道路内に位置すること"
+        }
+      ],
+      "note": "高架の道路の路面下に設けられるものは除外"
+    },
+    "judgment_rule": {
+      "operator": "IF",
+      "lhs": {
+        "type": "condition",
+        "description": "建築物が道路内に位置し、かつ高架の道路の路面下ではない"
+      },
+      "rhs": {
+        "type": "result",
+        "description": "第56条の高さ制限規定は適用しない"
+      }
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "info-building-location",
+        "type": "information",
+        "title": "建築物の位置",
+        "subject": "建築物",
+        "property": "敷地の位置（道路との関係）",
+        "property_type": "classification",
+        "plurality": "single",
+        "description": "建築物が設ける敷地が道路内にあるか否かを判定するための位置情報"
+      },
+      {
+        "id": "info-elevated-condition",
+        "type": "information",
+        "title": "高架下設置の有無",
+        "subject": "建築物",
+        "property": "高架の道路の路面下に設置されているか否か",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "建築物が高架の道路の路面下に設ける建築物であるか否かの判定情報"
+      },
+      {
+        "id": "proc-road-location-check",
+        "type": "process",
+        "title": "道路内の位置判定",
+        "process_type": "mechanical",
+        "target_subject": "建築物",
+        "description": "敷地が道路内に含まれるか否かを都市計画情報により判定",
+        "logic_expression": "敷地境界 ∩ 道路区域 ≠ ∅",
+        "software_functions": [
+          {
+            "category": "program_processing",
+            "description": "GIS分析により敷地と道路区域の交差判定を実施"
+          }
+        ]
+      },
+      {
+        "id": "proc-elevated-road-exemption",
+        "type": "process",
+        "title": "高架下除外判定",
+        "process_type": "human_judgment",
+        "target_subject": "建築物",
+        "description": "高架の道路の路面下に設けられるものであるか否かを確認",
+        "remarks": "設計図書により建築物が高架の道路の路面下に位置するか判定"
+      },
+      {
+        "id": "proc-article56-exemption",
+        "type": "process",
+        "title": "第56条適用除外判定",
+        "process_type": "mechanical",
+        "target_subject": "建築物",
+        "description": "道路内に設ける建築物（高架の道路の路面下を除く）であれば、第56条第1項第1号及び第2項～第4項は適用しない",
+        "logic_expression": "（道路内に位置） AND NOT（高架の道路の路面下）→ 第56条は適用除外",
+        "related_articles": [
+          "法::A56"
+        ]
+      },
+      {
+        "id": "info-article56-exemption-result",
+        "type": "information",
+        "title": "第56条の適用除外",
+        "subject": "建築物",
+        "property": "第56条（高さ制限）の適用除外判定結果",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "当該建築物に対して第56条第1項第1号及び第2項～第4項が適用されるか否かの判定結果"
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge-001",
+        "from": "info-building-location",
+        "to": "proc-road-location-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-002",
+        "from": "proc-road-location-check",
+        "to": "proc-article56-exemption",
+        "role": "input"
+      },
+      {
+        "id": "edge-003",
+        "from": "info-elevated-condition",
+        "to": "proc-elevated-road-exemption",
+        "role": "input"
+      },
+      {
+        "id": "edge-004",
+        "from": "proc-elevated-road-exemption",
+        "to": "proc-article56-exemption",
+        "role": "input"
+      },
+      {
+        "id": "edge-005",
+        "from": "proc-article56-exemption",
+        "to": "info-article56-exemption-result",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": [
+        "A56:P1:I1",
+        "A56:P2",
+        "A56:P3",
+        "A56:P4"
+      ],
+      "description": "第57条第2項は第56条の高さ制限規定の適用を除外する例外規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-24T00:00:00Z",
+    "updated_at": "2025-12-24T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法",
+    "source": "e-Gov法令API v2"
+  }
+}

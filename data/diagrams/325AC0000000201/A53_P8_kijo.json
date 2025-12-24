@@ -1,0 +1,277 @@
+{
+  "id": "CHK-BSL-A53-P8",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "準防火地域みなし規定適用判定",
+    "target_subject": "敷地",
+    "description": "敷地が準防火地域と非防火・非準防火区域とにわたる場合に、耐火・準耐火建築物であれば全て準防火地域とみなす"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "53",
+    "paragraph": "8",
+    "item": null
+  },
+  "labels": [
+    "集団規定",
+    "建蔽率",
+    "防火地域",
+    "みなし規定"
+  ],
+  "text_raw": "建築物の敷地が準防火地域と防火地域及び準防火地域以外の区域とにわたる場合において、その敷地内の建築物の全部が耐火建築物等又は準耐火建築物等であるときは、その敷地は、全て準防火地域内にあるものとみなして、第三項第一号の規定を適用する。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "敷地が準防火地域と非防火・非準防火区域とにわたる"
+        }
+      ],
+      "note": "敷地が準防火地域と、防火地域及び準防火地域以外の区域の両方にわたる場合に適用"
+    },
+    "judgment_rule": {
+      "operator": "IF_THEN",
+      "conditions": [
+        {
+          "type": "proposition",
+          "symbol": "C1",
+          "description": "敷地が準防火地域と非防火・非準防火区域にわたる"
+        },
+        {
+          "type": "proposition",
+          "symbol": "C2",
+          "description": "敷地内の建築物の全部が耐火建築物等又は準耐火建築物等である"
+        }
+      ],
+      "conclusion": {
+        "type": "proposition",
+        "description": "敷地は全て準防火地域内にあるものとみなす（第53条第3項第1号適用）"
+      }
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "info-site-location",
+        "type": "information",
+        "title": "敷地の区域跨がり状況",
+        "symbol": "S1",
+        "subject": "敷地",
+        "plurality": "single",
+        "property": "準防火地域と非防火・非準防火区域への跨がり",
+        "property_type": "proposition",
+        "property_type_description": "命題真偽 - 真か偽かが判定可能な事実（例: 技術基準を満たすか否か）",
+        "description": "敷地が準防火地域と、防火地域及び準防火地域以外の区域とにわたるか"
+      },
+      {
+        "id": "proc-site-location",
+        "type": "process",
+        "title": "敷地の区域跨がり判定",
+        "process_type": "mechanical",
+        "process_type_description": "機械的処理 - 自動化可能な論理演算や計算。視認情報をこれに繋ぐことはできない。水色で表示。",
+        "target_subject": "敷地",
+        "iteration": "single",
+        "description": "敷地境界と都市計画区域データ（準防火地域、防火地域、その他区域）を照合し、準防火地域と非防火・非準防火区域にわたるかを判定",
+        "related_articles": [
+          "法::A53:P8"
+        ]
+      },
+      {
+        "id": "info-buildings-set",
+        "type": "information",
+        "title": "敷地内の建築物",
+        "symbol": "B",
+        "subject": "敷地",
+        "plurality": "single",
+        "property": "建築物の集合",
+        "property_type": "set_definition",
+        "property_type_description": "集合定義 - 主体と特定の関係にある他の主体がどれであるかを示す情報（例: 階に属する外壁の集合）【必須ケース: 建築物⇔屋根、建築物⇔外壁、敷地⇔建築物など親子関係がある場合】",
+        "description": "当該敷地に属する建築物の全体を特定"
+      },
+      {
+        "id": "proc-buildings-set",
+        "type": "process",
+        "title": "敷地内建築物の特定",
+        "process_type": "undefined_input",
+        "process_type_description": "入力情報不定処理 - 導出されるアウトプット情報を得るための情報源の所在や手続きのメカニズムも含めて人が判断する処理。インプット情報を繋がない。左側の辺を消した状態で表示。",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "設計図書等から敷地内に存在する建築物の全体を特定",
+        "related_articles": [
+          "法::A53:P8"
+        ]
+      },
+      {
+        "id": "info-building-fireproof-type",
+        "type": "information",
+        "title": "建築物の耐火・準耐火区分",
+        "symbol": "T",
+        "subject": "建築物",
+        "plurality": "multiple",
+        "property": "耐火・準耐火性能の区分",
+        "property_type": "classification",
+        "property_type_description": "区分情報 - 既定のいくつかの区分の中のいずれかを示すもの（例: 用途地域、建物用途コード）",
+        "description": "各建築物が耐火建築物等、準耐火建築物等、又はそれ以外のいずれに該当するか",
+        "related_articles": [
+          "法::A53:P3:I1"
+        ],
+        "remarks": "耐火建築物等は第53条第3項第1号イ、準耐火建築物等は同号ロで定義"
+      },
+      {
+        "id": "proc-building-fireproof-type",
+        "type": "process",
+        "title": "耐火・準耐火性能の判定",
+        "process_type": "sub_diagram_reference",
+        "process_type_description": "部分審査機序図への参照 - 別途作成された部分審査機序図の情報処理全体をひとつの[処理]として表現。+記号を付加。",
+        "target_subject": "建築物",
+        "iteration": "iterative",
+        "description": "各建築物について、法第53条第3項第1号イロの基準（耐火建築物等又は準耐火建築物等）に該当するかを判定",
+        "related_articles": [
+          "法::A53:P3:I1"
+        ],
+        "remarks": "耐火建築物等・準耐火建築物等の判定は別途機序図を参照"
+      },
+      {
+        "id": "info-all-fireproof",
+        "type": "information",
+        "title": "全棟の耐火等該当性",
+        "symbol": "A",
+        "subject": "敷地",
+        "plurality": "single",
+        "property": "全建築物が耐火建築物等又は準耐火建築物等であるか",
+        "property_type": "proposition",
+        "property_type_description": "命題真偽 - 真か偽かが判定可能な事実（例: 技術基準を満たすか否か）",
+        "description": "敷地内の建築物の全部が耐火建築物等又は準耐火建築物等であるか（全称命題）"
+      },
+      {
+        "id": "proc-all-fireproof",
+        "type": "process",
+        "title": "全棟耐火等判定",
+        "process_type": "mechanical",
+        "process_type_description": "機械的処理 - 自動化可能な論理演算や計算。視認情報をこれに繋ぐことはできない。水色で表示。",
+        "target_subject": "敷地",
+        "iteration": "single",
+        "description": "敷地内の建築物の全部が耐火建築物等又は準耐火建築物等であるかを判定（全称命題の評価）",
+        "logic_expression": "∀b ∈ B, T(b) ∈ {耐火建築物等, 準耐火建築物等}",
+        "related_articles": [
+          "法::A53:P8"
+        ]
+      },
+      {
+        "id": "info-deemed-quasi-fire-prevention",
+        "type": "information",
+        "title": "準防火地域みなし適用",
+        "symbol": "D",
+        "subject": "敷地",
+        "plurality": "single",
+        "property": "全て準防火地域内にあるとみなす",
+        "property_type": "proposition",
+        "property_type_description": "命題真偽 - 真か偽かが判定可能な事実（例: 技術基準を満たすか否か）",
+        "description": "敷地は全て準防火地域内にあるものとみなし、第53条第3項第1号の規定（建蔽率+1/10）を適用する"
+      },
+      {
+        "id": "proc-deemed-application",
+        "type": "process",
+        "title": "みなし規定適用判定",
+        "process_type": "mechanical",
+        "process_type_description": "機械的処理 - 自動化可能な論理演算や計算。視認情報をこれに繋ぐことはできない。水色で表示。",
+        "target_subject": "敷地",
+        "iteration": "single",
+        "description": "敷地の区域跨がり状況と全棟の耐火等該当性から、準防火地域とみなす規定の適用可否を判定",
+        "logic_expression": "(S1 = TRUE) AND (A = TRUE) → D = TRUE",
+        "related_articles": [
+          "法::A53:P8",
+          "法::A53:P3:I1"
+        ],
+        "remarks": "みなし規定が適用されると、第53条第3項第1号により建蔽率が+1/10される"
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge-01",
+        "from": "proc-site-location",
+        "to": "info-site-location",
+        "role": "output"
+      },
+      {
+        "id": "edge-02",
+        "from": "proc-buildings-set",
+        "to": "info-buildings-set",
+        "role": "output"
+      },
+      {
+        "id": "edge-03",
+        "from": "info-buildings-set",
+        "to": "proc-building-fireproof-type",
+        "role": "input"
+      },
+      {
+        "id": "edge-04",
+        "from": "proc-building-fireproof-type",
+        "to": "info-building-fireproof-type",
+        "role": "output"
+      },
+      {
+        "id": "edge-05",
+        "from": "info-buildings-set",
+        "to": "proc-all-fireproof",
+        "role": "input"
+      },
+      {
+        "id": "edge-06",
+        "from": "info-building-fireproof-type",
+        "to": "proc-all-fireproof",
+        "role": "input"
+      },
+      {
+        "id": "edge-07",
+        "from": "proc-all-fireproof",
+        "to": "info-all-fireproof",
+        "role": "output"
+      },
+      {
+        "id": "edge-08",
+        "from": "info-site-location",
+        "to": "proc-deemed-application",
+        "role": "input"
+      },
+      {
+        "id": "edge-09",
+        "from": "info-all-fireproof",
+        "to": "proc-deemed-application",
+        "role": "input"
+      },
+      {
+        "id": "edge-10",
+        "from": "proc-deemed-application",
+        "to": "info-deemed-quasi-fire-prevention",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": [
+        "A53:P3:I1"
+      ],
+      "description": "みなし適用される第53条第3項第1号（建蔽率の緩和規定）"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-24T07:00:00.000Z",
+    "updated_at": "2025-12-24T07:00:00.000Z",
+    "author": "Claude Code - kijo-generator skill",
+    "generator": "kijo-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法",
+    "source": "e-Gov法令API"
+  }
+}

@@ -1,0 +1,471 @@
+{
+  "id": "CHK-BSL-A68-9-P2",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "準景観地区内の建築物規制",
+    "target_subject": "建築物",
+    "description": "準景観地区内において市町村が定めた建築物の高さ・壁面位置等の制限に適合することを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "68_9",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": [
+    "集団規定",
+    "景観"
+  ],
+  "text_raw": "景観法第七十四条第一項の準景観地区内においては、市町村は、良好な景観の保全を図るため必要があると認めるときは、政令で定める基準に従い、条例で、建築物の高さ、壁面の位置その他の建築物の構造又は敷地に関して必要な制限を定めることができる。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "準景観地区内"
+        }
+      ],
+      "note": "景観法第74条第1項に基づく準景観地区内に限定"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-landscape-necessity",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "operator": "AND",
+          "conditions": [
+            {
+              "ref": "info-height-compliance",
+              "operator": "==",
+              "value": true
+            },
+            {
+              "ref": "info-wallface-compliance",
+              "operator": "==",
+              "value": true
+            },
+            {
+              "ref": "info-structure-compliance",
+              "operator": "==",
+              "value": true
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-location-check",
+        "type": "process",
+        "title": "準景観地区の確認",
+        "process_type": "mechanical",
+        "description": "敷地が景観法第74条第1項に基づく準景観地区内に位置することを確認",
+        "related_articles": ["景観法::A74"]
+      },
+      {
+        "id": "info-location-in-area",
+        "type": "information",
+        "title": "準景観地区内の位置",
+        "symbol": "L",
+        "subject": "敷地",
+        "property": "準景観地区内の位置",
+        "property_type": "proposition",
+        "description": "敷地が準景観地区内に位置するか",
+        "plurality": "single",
+        "related_articles": ["景観法::A74"]
+      },
+      {
+        "id": "proc-necessity-judgment",
+        "type": "process",
+        "title": "景観保全の必要性判断",
+        "process_type": "human_judgment",
+        "description": "市町村が良好な景観の保全を図るため必要があると認めるかを判断"
+      },
+      {
+        "id": "info-landscape-necessity",
+        "type": "information",
+        "title": "景観保全の必要性",
+        "symbol": "N",
+        "subject": "市町村",
+        "property": "景観保全の必要性の判断",
+        "property_type": "proposition",
+        "description": "良好な景観の保全を図るため必要であると認められるか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-building-identify",
+        "type": "process",
+        "title": "建築物の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から判定対象となる建築物を特定する"
+      },
+      {
+        "id": "info-building",
+        "type": "information",
+        "title": "敷地上の建築物",
+        "subject": "敷地",
+        "property": "建築物の有無",
+        "property_type": "set_definition",
+        "description": "当該敷地に計画される建築物",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-height-identify",
+        "type": "process",
+        "title": "建築物高さの特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の高さを読み取る"
+      },
+      {
+        "id": "info-building-height",
+        "type": "information",
+        "title": "建築物の高さ",
+        "symbol": "H",
+        "subject": "建築物",
+        "property": "高さ",
+        "property_type": "numeric",
+        "unit": "m",
+        "description": "建築物の高さ",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-height-limit",
+        "type": "process",
+        "title": "高さ制限値の取得",
+        "process_type": "mechanical",
+        "description": "条例で定められた高さ制限値を取得",
+        "related_articles": ["条例"]
+      },
+      {
+        "id": "info-height-limit",
+        "type": "information",
+        "title": "高さ制限値",
+        "symbol": "HL",
+        "subject": "敷地",
+        "property": "条例で定められた高さ制限値",
+        "property_type": "numeric",
+        "unit": "m",
+        "description": "準景観地区内の敷地に適用される高さ制限値",
+        "plurality": "single",
+        "related_articles": ["条例"]
+      },
+      {
+        "id": "proc-height-check",
+        "type": "process",
+        "title": "高さ基準判定",
+        "process_type": "mechanical",
+        "description": "建築物の高さが制限値以下であるか判定",
+        "logic_expression": "H <= HL"
+      },
+      {
+        "id": "info-height-compliance",
+        "type": "information",
+        "title": "高さ基準適合",
+        "symbol": "HC",
+        "subject": "建築物",
+        "property": "高さ基準への適合",
+        "property_type": "proposition",
+        "description": "建築物の高さが制限値以下であるか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-wallface-identify",
+        "type": "process",
+        "title": "壁面位置の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の壁面位置を特定する"
+      },
+      {
+        "id": "info-wallface-position",
+        "type": "information",
+        "title": "建築物の壁面位置",
+        "symbol": "WP",
+        "subject": "建築物",
+        "property": "壁面の位置",
+        "property_type": "geometric_line",
+        "description": "建築物の壁面が位置する敷地内の位置",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-wallface-limit",
+        "type": "process",
+        "title": "壁面位置制限値の取得",
+        "process_type": "mechanical",
+        "description": "条例で定められた壁面位置制限値を取得",
+        "related_articles": ["条例"]
+      },
+      {
+        "id": "info-wallface-limit",
+        "type": "information",
+        "title": "壁面位置制限値",
+        "symbol": "WL",
+        "subject": "敷地",
+        "property": "条例で定められた壁面位置制限値",
+        "property_type": "geometric_line",
+        "description": "準景観地区内の敷地に適用される壁面位置の制限",
+        "plurality": "single",
+        "related_articles": ["条例"]
+      },
+      {
+        "id": "proc-wallface-check",
+        "type": "process",
+        "title": "壁面位置基準判定",
+        "process_type": "mechanical",
+        "description": "建築物の壁面位置が制限値を満たすか判定"
+      },
+      {
+        "id": "info-wallface-compliance",
+        "type": "information",
+        "title": "壁面位置基準適合",
+        "symbol": "WC",
+        "subject": "建築物",
+        "property": "壁面位置基準への適合",
+        "property_type": "proposition",
+        "description": "建築物の壁面位置が制限値を満たすか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-structure-identify",
+        "type": "process",
+        "title": "建築物の構造・敷地の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の構造及び敷地に関する情報を特定する"
+      },
+      {
+        "id": "info-structure-site",
+        "type": "information",
+        "title": "建築物の構造及び敷地",
+        "symbol": "S",
+        "subject": "建築物",
+        "property": "構造及び敷地の特性",
+        "property_type": "classification",
+        "description": "建築物の構造種別及び敷地の特性",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-structure-limit",
+        "type": "process",
+        "title": "構造・敷地制限値の取得",
+        "process_type": "mechanical",
+        "description": "条例で定められた構造及び敷地に関する制限値を取得",
+        "related_articles": ["条例"]
+      },
+      {
+        "id": "info-structure-limit",
+        "type": "information",
+        "title": "構造・敷地制限値",
+        "symbol": "SL",
+        "subject": "敷地",
+        "property": "条例で定められた構造・敷地制限",
+        "property_type": "classification",
+        "description": "準景観地区内の敷地に適用される構造・敷地に関する制限",
+        "plurality": "single",
+        "related_articles": ["条例"]
+      },
+      {
+        "id": "proc-structure-check",
+        "type": "process",
+        "title": "構造・敷地基準判定",
+        "process_type": "mechanical",
+        "description": "建築物の構造及び敷地が条例の制限を満たすか判定"
+      },
+      {
+        "id": "info-structure-compliance",
+        "type": "information",
+        "title": "構造・敷地基準適合",
+        "symbol": "SC",
+        "subject": "建築物",
+        "property": "構造・敷地基準への適合",
+        "property_type": "proposition",
+        "description": "建築物の構造及び敷地が条例の制限を満たすか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-final-judgment",
+        "type": "process",
+        "title": "適合判定",
+        "process_type": "mechanical",
+        "description": "景観保全の必要性を踏まえて条例制限のいずれかに適合することを確認",
+        "logic_expression": "N AND (HC OR WC OR SC)"
+      },
+      {
+        "id": "info-compliance",
+        "type": "information",
+        "title": "法68条の9第2項適合",
+        "symbol": "C",
+        "subject": "建築物",
+        "property": "法68条の9第2項適合",
+        "property_type": "proposition",
+        "description": "法68条の9第2項の規定に適合するか",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-location-check",
+        "to": "info-location-in-area",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "proc-necessity-judgment",
+        "to": "info-landscape-necessity",
+        "role": "output"
+      },
+      {
+        "id": "e03",
+        "from": "proc-building-identify",
+        "to": "info-building",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "proc-height-identify",
+        "to": "info-building-height",
+        "role": "output"
+      },
+      {
+        "id": "e05",
+        "from": "proc-height-limit",
+        "to": "info-height-limit",
+        "role": "output"
+      },
+      {
+        "id": "e06",
+        "from": "info-building-height",
+        "to": "proc-height-check",
+        "role": "input"
+      },
+      {
+        "id": "e07",
+        "from": "info-height-limit",
+        "to": "proc-height-check",
+        "role": "input"
+      },
+      {
+        "id": "e08",
+        "from": "proc-height-check",
+        "to": "info-height-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e09",
+        "from": "proc-wallface-identify",
+        "to": "info-wallface-position",
+        "role": "output"
+      },
+      {
+        "id": "e10",
+        "from": "proc-wallface-limit",
+        "to": "info-wallface-limit",
+        "role": "output"
+      },
+      {
+        "id": "e11",
+        "from": "info-wallface-position",
+        "to": "proc-wallface-check",
+        "role": "input"
+      },
+      {
+        "id": "e12",
+        "from": "info-wallface-limit",
+        "to": "proc-wallface-check",
+        "role": "input"
+      },
+      {
+        "id": "e13",
+        "from": "proc-wallface-check",
+        "to": "info-wallface-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e14",
+        "from": "proc-structure-identify",
+        "to": "info-structure-site",
+        "role": "output"
+      },
+      {
+        "id": "e15",
+        "from": "proc-structure-limit",
+        "to": "info-structure-limit",
+        "role": "output"
+      },
+      {
+        "id": "e16",
+        "from": "info-structure-site",
+        "to": "proc-structure-check",
+        "role": "input"
+      },
+      {
+        "id": "e17",
+        "from": "info-structure-limit",
+        "to": "proc-structure-check",
+        "role": "input"
+      },
+      {
+        "id": "e18",
+        "from": "proc-structure-check",
+        "to": "info-structure-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e19",
+        "from": "info-landscape-necessity",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e20",
+        "from": "info-height-compliance",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e21",
+        "from": "info-wallface-compliance",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e22",
+        "from": "info-structure-compliance",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e23",
+        "from": "proc-final-judgment",
+        "to": "info-compliance",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "法",
+      "law_name": "景観法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A74"],
+      "description": "準景観地区の定義(景観法第74条第1項)を参照"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-24T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}

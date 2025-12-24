@@ -1,0 +1,368 @@
+{
+  "id": "CHK-BSL-A53-P3-I1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "建蔽率の緩和(防火地域内の耐火建築物等)",
+    "target_subject": "建築物",
+    "description": "防火地域内の耐火建築物等または準防火地域内の耐火建築物等・準耐火建築物等について、建蔽率の緩和適用を判定する"
+  },
+  "legal_ref": {
+    "law_id": "325AC0000000201",
+    "law_type": "act",
+    "law_name": "建築基準法",
+    "law_abbrev": "法",
+    "article": "53",
+    "paragraph": "3",
+    "item": "1"
+  },
+  "labels": [
+    "集団規定",
+    "建蔽率"
+  ],
+  "text_raw": "防火地域（第一項第二号から第四号までの規定により建蔽率の限度が十分の八とされている地域を除く。）内にあるイに該当する建築物又は準防火地域内にあるイ若しくはロのいずれかに該当する建築物\nイ 耐火建築物又はこれと同等以上の延焼防止性能（通常の火災による周囲への延焼を防止するために壁、柱、床その他の建築物の部分及び防火戸その他の政令で定める防火設備に必要とされる性能をいう。ロにおいて同じ。）を有するものとして政令で定める建築物（以下この条及び第六十七条第一項において「耐火建築物等」という。）\nロ 準耐火建築物又はこれと同等以上の延焼防止性能を有するものとして政令で定める建築物（耐火建築物等を除く。第八項及び第六十七条第一項において「準耐火建築物等」という。）",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "type": "location",
+          "operator": "AND",
+          "conditions": [
+            {
+              "value": "防火地域内"
+            },
+            {
+              "operator": "NOT",
+              "value": "建蔽率の限度が十分の八とされている地域(第一項第二号から第四号)"
+            }
+          ]
+        },
+        {
+          "type": "location",
+          "value": "準防火地域内"
+        }
+      ],
+      "note": "防火地域(8/10区域を除く)または準防火地域"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "note": "防火地域内の耐火建築物等",
+          "operator": "AND",
+          "conditions": [
+            {
+              "ref": "info-fire-district-type",
+              "value": "防火地域"
+            },
+            {
+              "ref": "info-is-fire-resistant-etc",
+              "operator": "==",
+              "value": true
+            }
+          ]
+        },
+        {
+          "note": "準防火地域内の耐火建築物等",
+          "operator": "AND",
+          "conditions": [
+            {
+              "ref": "info-fire-district-type",
+              "value": "準防火地域"
+            },
+            {
+              "ref": "info-is-fire-resistant-etc",
+              "operator": "==",
+              "value": true
+            }
+          ]
+        },
+        {
+          "note": "準防火地域内の準耐火建築物等",
+          "operator": "AND",
+          "conditions": [
+            {
+              "ref": "info-fire-district-type",
+              "value": "準防火地域"
+            },
+            {
+              "ref": "info-is-semi-fire-resistant-etc",
+              "operator": "==",
+              "value": true
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-structure-type",
+        "type": "process",
+        "title": "構造種別の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の構造種別(耐火建築物、準耐火建築物等)を読み取る"
+      },
+      {
+        "id": "info-structure-type",
+        "type": "information",
+        "title": "建築物の構造種別",
+        "symbol": "S",
+        "subject": "建築物",
+        "property": "構造種別",
+        "property_type": "classification",
+        "description": "耐火建築物、準耐火建築物、その他のいずれか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-fire-prevention-performance",
+        "type": "process",
+        "title": "延焼防止性能の判定",
+        "process_type": "mechanical",
+        "description": "政令で定める同等以上の延焼防止性能を有するか判定",
+        "related_articles": [
+          "令::A108:P1",
+          "令::A108:P3"
+        ]
+      },
+      {
+        "id": "info-fire-prevention-performance",
+        "type": "information",
+        "title": "延焼防止性能の有無",
+        "symbol": "P",
+        "subject": "建築物",
+        "property": "延焼防止性能",
+        "property_type": "proposition",
+        "description": "耐火建築物または準耐火建築物と同等以上の延焼防止性能を有するか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-is-fire-resistant-etc",
+        "type": "process",
+        "title": "耐火建築物等該当判定",
+        "process_type": "mechanical",
+        "description": "耐火建築物または同等以上の延焼防止性能を有する建築物(耐火建築物等)に該当するか判定",
+        "logic_expression": "(S = '耐火建築物') OR (P = true AND 耐火建築物同等)"
+      },
+      {
+        "id": "info-is-fire-resistant-etc",
+        "type": "information",
+        "title": "耐火建築物等該当",
+        "symbol": "F1",
+        "subject": "建築物",
+        "property": "耐火建築物等への該当",
+        "property_type": "proposition",
+        "description": "耐火建築物または同等以上の延焼防止性能を有する建築物(法53条における耐火建築物等)に該当するか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-is-semi-fire-resistant-etc",
+        "type": "process",
+        "title": "準耐火建築物等該当判定",
+        "process_type": "mechanical",
+        "description": "準耐火建築物または同等以上の延焼防止性能を有する建築物(準耐火建築物等、耐火建築物等を除く)に該当するか判定",
+        "logic_expression": "((S = '準耐火建築物') OR (P = true AND 準耐火建築物同等)) AND (F1 = false)"
+      },
+      {
+        "id": "info-is-semi-fire-resistant-etc",
+        "type": "information",
+        "title": "準耐火建築物等該当",
+        "symbol": "F2",
+        "subject": "建築物",
+        "property": "準耐火建築物等への該当",
+        "property_type": "proposition",
+        "description": "準耐火建築物または同等以上の延焼防止性能を有する建築物(法53条における準耐火建築物等、耐火建築物等を除く)に該当するか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-base-coverage-ratio",
+        "type": "process",
+        "title": "基準建蔽率の特定",
+        "process_type": "mechanical",
+        "description": "第1項各号に定める数値(基準建蔽率)を特定する",
+        "related_articles": [
+          "法::A53:P1",
+          "法::A53:P2"
+        ]
+      },
+      {
+        "id": "info-base-coverage-ratio",
+        "type": "information",
+        "title": "基準建蔽率",
+        "symbol": "R0",
+        "subject": "建築物",
+        "property": "基準建蔽率",
+        "property_type": "numeric",
+        "unit": "なし(十分率)",
+        "description": "法53条第1項各号に定める数値(3/10, 4/10, 5/10, 6/10, 7/10, 8/10のいずれか)",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-relaxation-applicable",
+        "type": "process",
+        "title": "緩和適用判定",
+        "process_type": "mechanical",
+        "description": "防火地域内の耐火建築物等、または準防火地域内の耐火建築物等・準耐火建築物等に該当し、+1/10の緩和が適用されるか判定",
+        "logic_expression": "F1 OR F2",
+        "remarks": "防火地域では耐火建築物等のみ、準防火地域では耐火建築物等または準耐火建築物等が対象"
+      },
+      {
+        "id": "info-relaxation-applicable",
+        "type": "information",
+        "title": "第3項第1号緩和適用",
+        "symbol": "R",
+        "subject": "建築物",
+        "property": "第3項第1号該当",
+        "property_type": "proposition",
+        "description": "法53条第3項第1号による+1/10の緩和が適用されるか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-adjusted-ratio",
+        "type": "process",
+        "title": "緩和後建蔽率の算出",
+        "process_type": "mechanical",
+        "description": "第3項第1号による緩和適用時の建蔽率を算出(基準建蔽率+1/10)",
+        "logic_expression": "R_adj = R0 + 1/10 (Rがtrueの場合)",
+        "remarks": "第3項第2号も該当する場合は+2/10となるが、本図では第1号のみを扱う"
+      },
+      {
+        "id": "info-adjusted-ratio",
+        "type": "information",
+        "title": "緩和後建蔽率",
+        "symbol": "R_adj",
+        "subject": "建築物",
+        "property": "緩和後建蔽率",
+        "property_type": "numeric",
+        "unit": "なし(十分率)",
+        "description": "第3項第1号による緩和を適用した後の建蔽率(基準建蔽率+1/10)",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-structure-type",
+        "to": "info-structure-type",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "info-structure-type",
+        "to": "proc-fire-prevention-performance",
+        "role": "input"
+      },
+      {
+        "id": "e03",
+        "from": "proc-fire-prevention-performance",
+        "to": "info-fire-prevention-performance",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "info-structure-type",
+        "to": "proc-is-fire-resistant-etc",
+        "role": "input"
+      },
+      {
+        "id": "e05",
+        "from": "info-fire-prevention-performance",
+        "to": "proc-is-fire-resistant-etc",
+        "role": "input"
+      },
+      {
+        "id": "e06",
+        "from": "proc-is-fire-resistant-etc",
+        "to": "info-is-fire-resistant-etc",
+        "role": "output"
+      },
+      {
+        "id": "e07",
+        "from": "info-structure-type",
+        "to": "proc-is-semi-fire-resistant-etc",
+        "role": "input"
+      },
+      {
+        "id": "e08",
+        "from": "info-fire-prevention-performance",
+        "to": "proc-is-semi-fire-resistant-etc",
+        "role": "input"
+      },
+      {
+        "id": "e09",
+        "from": "info-is-fire-resistant-etc",
+        "to": "proc-is-semi-fire-resistant-etc",
+        "role": "input"
+      },
+      {
+        "id": "e10",
+        "from": "proc-is-semi-fire-resistant-etc",
+        "to": "info-is-semi-fire-resistant-etc",
+        "role": "output"
+      },
+      {
+        "id": "e11",
+        "from": "proc-base-coverage-ratio",
+        "to": "info-base-coverage-ratio",
+        "role": "output"
+      },
+      {
+        "id": "e12",
+        "from": "info-is-fire-resistant-etc",
+        "to": "proc-relaxation-applicable",
+        "role": "input"
+      },
+      {
+        "id": "e13",
+        "from": "info-is-semi-fire-resistant-etc",
+        "to": "proc-relaxation-applicable",
+        "role": "input"
+      },
+      {
+        "id": "e14",
+        "from": "proc-relaxation-applicable",
+        "to": "info-relaxation-applicable",
+        "role": "output"
+      },
+      {
+        "id": "e15",
+        "from": "info-base-coverage-ratio",
+        "to": "proc-adjusted-ratio",
+        "role": "input"
+      },
+      {
+        "id": "e16",
+        "from": "info-relaxation-applicable",
+        "to": "proc-adjusted-ratio",
+        "role": "input"
+      },
+      {
+        "id": "e17",
+        "from": "proc-adjusted-ratio",
+        "to": "info-adjusted-ratio",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "defines_detail",
+      "articles": [
+        "A108:P1",
+        "A108:P3"
+      ],
+      "description": "耐火建築物等および準耐火建築物等と同等以上の延焼防止性能を有する建築物を定める"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-24T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325AC0000000201",
+    "law_name": "建築基準法"
+  }
+}
