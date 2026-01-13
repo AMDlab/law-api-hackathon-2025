@@ -351,6 +351,8 @@ function KijoDiagramViewerInner({ diagram, flowDiagram, className, articleConten
           <HelpButton />
           <ExportButton
             diagram={diagram}
+            flowDiagram={flowDiagram}
+            isFlowMode={isFlowDiagram}
             articleContent={articleContent}
             articleTitle={articleTitle}
             flowRef={flowRef}

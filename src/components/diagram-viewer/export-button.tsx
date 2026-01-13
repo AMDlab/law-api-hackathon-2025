@@ -1,46 +1,139 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { toPng } from "html-to-image";
 import { jsPDF } from "jspdf";
 import { Download } from "lucide-react";
-import type { KijoDiagram } from "@/types/diagram";
+import type { KijoDiagram, FlowDiagram, PageTitle } from "@/types/diagram";
 
 interface ExportButtonProps {
   diagram: KijoDiagram;
+  flowDiagram?: FlowDiagram;
+  isFlowMode?: boolean;
   articleContent?: string;
   articleTitle?: string;
   flowRef: React.RefObject<HTMLDivElement | null>;
   onFitView?: () => void;
 }
 
-export function ExportButton({ diagram, articleContent, articleTitle, flowRef, onFitView }: ExportButtonProps) {
+/**
+ * ヘッダー要素を構築するヘルパー関数
+ */
+function buildHeaderElement(
+  pageTitle: PageTitle,
+  articleContent?: string,
+  articleTitle?: string,
+  width?: string
+): HTMLDivElement {
+  const container = document.createElement('div');
+  container.style.cssText = `
+    background: white;
+    padding: 8px 12px;
+    font-family: system-ui, -apple-system, sans-serif;
+    ${width ? `width: ${width};` : ''}
+  `;
+
+  // 条文
+  if (articleContent) {
+    const articleWrapper = document.createElement('div');
+    articleWrapper.style.cssText = 'margin-bottom: 6px; padding-bottom: 6px; border-bottom: 1px solid #e5e7eb;';
+
+    const articleLabel = document.createElement('div');
+    articleLabel.style.cssText = 'font-size: 12px; font-weight: bold; color: #111827; margin-bottom: 4px;';
+    articleLabel.textContent = articleTitle ? `【${articleTitle}】` : '【条文】';
+    articleWrapper.appendChild(articleLabel);
+
+    const article = document.createElement('div');
+    article.style.cssText = 'font-size: 9px; color: #374151; white-space: pre-wrap; line-height: 1.4;';
+    const shortContent = articleContent.length > 300 ? articleContent.substring(0, 300) + '...' : articleContent;
+    article.textContent = shortContent;
+    articleWrapper.appendChild(article);
+
+    container.appendChild(articleWrapper);
+  }
+
+  // タイトル
+  const title = document.createElement('div');
+  title.style.cssText = 'font-size: 14px; font-weight: bold; margin-bottom: 4px;';
+  title.textContent = pageTitle.title;
+  container.appendChild(title);
+
+  // 対象主体
+  if (pageTitle.target_subject) {
+    const subject = document.createElement('div');
+    subject.style.cssText = 'font-size: 10px; color: #6b7280; margin-bottom: 2px;';
+    subject.textContent = `対象主体: ${pageTitle.target_subject}`;
+    container.appendChild(subject);
+  }
+
+  // 説明
+  if (pageTitle.description) {
+    const desc = document.createElement('div');
+    desc.style.cssText = 'font-size: 10px; color: #6b7280;';
+    desc.textContent = pageTitle.description;
+    container.appendChild(desc);
+  }
+
+  return container;
+}
+
+/**
+ * 画像のロードをPromiseでラップ（タイムアウト付き）
+ */
+function loadImage(src: string, timeoutMs = 5000): Promise<HTMLImageElement> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const timeout = setTimeout(() => {
+      reject(new Error('Image load timeout'));
+    }, timeoutMs);
+
+    img.onload = () => {
+      clearTimeout(timeout);
+      resolve(img);
+    };
+    img.onerror = () => {
+      clearTimeout(timeout);
+      reject(new Error('Image load failed'));
+    };
+    img.src = src;
+  });
+}
+
+export function ExportButton({ diagram, flowDiagram, isFlowMode, articleContent, articleTitle, flowRef, onFitView }: ExportButtonProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [exporting, setExporting] = useState(false);
 
-  // ファイル名を生成
-  const getFileName = (ext: string) => {
-    const id = diagram.id || "diagram";
-    return `${id}.${ext}`;
-  };
+  // 現在表示中の図を取得
+  const currentDiagram = useMemo(
+    () => (isFlowMode && flowDiagram ? flowDiagram : diagram),
+    [isFlowMode, flowDiagram, diagram]
+  );
+  const currentPageTitle = currentDiagram.page_title;
 
-  // 書き出しボタンを非表示にしてキャプチャを取得
-  const captureWithoutUI = async (): Promise<string | null> => {
+  // ファイル名を生成
+  const getFileName = useCallback((ext: string) => {
+    const id = currentDiagram.id || "diagram";
+    return `${id}.${ext}`;
+  }, [currentDiagram.id]);
+
+  // 現在の表示状態でキャプチャ（PNG用）
+  const captureCurrentView = useCallback(async (): Promise<string | null> => {
     if (!flowRef.current) return null;
 
     // fitViewを実行してグラフ全体を表示
     if (onFitView) {
       onFitView();
       // fitViewアニメーション完了を待つ
-      await new Promise(resolve => setTimeout(resolve, 300));
+      await new Promise(resolve => setTimeout(resolve, 500));
     }
 
-    // エクスポートボタンとコントロールを一時的に非表示
+    // UIを非表示
     const exportBtn = flowRef.current.querySelector('.absolute.top-2.right-2') as HTMLElement;
     const controls = flowRef.current.querySelector('.react-flow__controls') as HTMLElement;
-
+    const tabs = flowRef.current.querySelector('.absolute.top-2.left-2') as HTMLElement;
     if (exportBtn) exportBtn.style.display = 'none';
     if (controls) controls.style.display = 'none';
+    if (tabs) tabs.style.display = 'none';
 
     try {
       const dataUrl = await toPng(flowRef.current, {
@@ -52,14 +145,47 @@ export function ExportButton({ diagram, articleContent, articleTitle, flowRef, o
       // 元に戻す
       if (exportBtn) exportBtn.style.display = '';
       if (controls) controls.style.display = '';
+      if (tabs) tabs.style.display = '';
     }
-  };
+  }, [flowRef, onFitView]);
+
+  // ヘッダーのみを画像化
+  const captureHeaderOnly = useCallback(async (): Promise<string | null> => {
+    // ヘッダー用の一時的なコンテナを作成（画面内に配置、視覚的に隠す）
+    const container = buildHeaderElement(currentPageTitle, articleContent, articleTitle, '800px');
+    container.style.cssText += `
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 9999;
+      opacity: 0;
+      pointer-events: none;
+    `;
+
+    document.body.appendChild(container);
+
+    // レンダリング完了を待つ
+    await new Promise(resolve => setTimeout(resolve, 100));
+
+    // キャプチャ前にopacityを戻す
+    container.style.opacity = '1';
+
+    try {
+      const dataUrl = await toPng(container, {
+        backgroundColor: "#ffffff",
+        pixelRatio: 2,
+      });
+      return dataUrl;
+    } finally {
+      container.remove();
+    }
+  }, [currentPageTitle, articleContent, articleTitle]);
 
   // PNG書き出し
   const exportPng = useCallback(async () => {
     setExporting(true);
     try {
-      const dataUrl = await captureWithoutUI();
+      const dataUrl = await captureCurrentView();
       if (!dataUrl) return;
 
       const link = document.createElement("a");
@@ -73,12 +199,12 @@ export function ExportButton({ diagram, articleContent, articleTitle, flowRef, o
       setExporting(false);
       setIsOpen(false);
     }
-  }, [flowRef, diagram.id]);
+  }, [captureCurrentView, getFileName]);
 
   // JSON書き出し（条文含む）
   const exportJson = useCallback(() => {
     const exportData = {
-      ...diagram,
+      ...currentDiagram,
       articleContent: articleContent || null,
       exportedAt: new Date().toISOString(),
     };
@@ -91,114 +217,18 @@ export function ExportButton({ diagram, articleContent, articleTitle, flowRef, o
     link.click();
     URL.revokeObjectURL(url);
     setIsOpen(false);
-  }, [diagram, articleContent]);
+  }, [currentDiagram, articleContent, getFileName]);
 
-  // PDF用: ヘッダー付きでキャプチャ
-  const captureWithHeader = async (): Promise<string | null> => {
-    if (!flowRef.current) return null;
-
-    // fitViewを実行してグラフ全体を表示
-    if (onFitView) {
-      onFitView();
-      await new Promise(resolve => setTimeout(resolve, 300));
-    }
-
-    // ヘッダー要素を作成
-    const header = document.createElement('div');
-    header.style.cssText = `
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      background: white;
-      padding: 16px;
-      border-bottom: 1px solid #e5e7eb;
-      z-index: 100;
-      font-family: system-ui, -apple-system, sans-serif;
-    `;
-
-    // 条文（一番上に配置）
-    if (articleContent) {
-      const articleWrapper = document.createElement('div');
-      articleWrapper.style.cssText = 'margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid #e5e7eb;';
-
-      const articleLabel = document.createElement('div');
-      articleLabel.style.cssText = 'font-size: 18px; font-weight: bold; color: #111827; margin-bottom: 8px;';
-      articleLabel.textContent = articleTitle ? `【${articleTitle}】` : '【条文】';
-      articleWrapper.appendChild(articleLabel);
-
-      const article = document.createElement('div');
-      article.style.cssText = 'font-size: 11px; color: #374151; white-space: pre-wrap; line-height: 1.5;';
-      // 条文を短縮
-      const shortContent = articleContent.length > 400 ? articleContent.substring(0, 400) + '...' : articleContent;
-      article.textContent = shortContent;
-      articleWrapper.appendChild(article);
-
-      header.appendChild(articleWrapper);
-    }
-
-    // タイトル
-    const title = document.createElement('div');
-    title.style.cssText = 'font-size: 18px; font-weight: bold; margin-bottom: 8px;';
-    title.textContent = diagram.page_title.title;
-    header.appendChild(title);
-
-    // 対象主体
-    if (diagram.page_title.target_subject) {
-      const subject = document.createElement('div');
-      subject.style.cssText = 'font-size: 12px; color: #6b7280; margin-bottom: 4px;';
-      subject.textContent = `対象主体: ${diagram.page_title.target_subject}`;
-      header.appendChild(subject);
-    }
-
-    // 説明
-    if (diagram.page_title.description) {
-      const desc = document.createElement('div');
-      desc.style.cssText = 'font-size: 12px; color: #6b7280;';
-      desc.textContent = diagram.page_title.description;
-      header.appendChild(desc);
-    }
-
-    // エクスポートボタンとコントロールを非表示
-    const exportBtn = flowRef.current.querySelector('.absolute.top-2.right-2') as HTMLElement;
-    const controls = flowRef.current.querySelector('.react-flow__controls') as HTMLElement;
-    if (exportBtn) exportBtn.style.display = 'none';
-    if (controls) controls.style.display = 'none';
-
-    // ヘッダーを追加
-    flowRef.current.insertBefore(header, flowRef.current.firstChild);
-
-    // React Flowのコンテンツを下にずらす
-    const reactFlowWrapper = flowRef.current.querySelector('.react-flow') as HTMLElement;
-    const headerHeight = header.offsetHeight;
-    if (reactFlowWrapper) {
-      reactFlowWrapper.style.marginTop = `${headerHeight}px`;
-    }
-
-    try {
-      const dataUrl = await toPng(flowRef.current, {
-        backgroundColor: "#ffffff",
-        pixelRatio: 2,
-      });
-      return dataUrl;
-    } finally {
-      // 元に戻す
-      header.remove();
-      if (reactFlowWrapper) {
-        reactFlowWrapper.style.marginTop = '';
-      }
-      if (exportBtn) exportBtn.style.display = '';
-      if (controls) controls.style.display = '';
-    }
-  };
-
-  // PDF書き出し（条文・タイトル付き、A4縦）
+  // PDF書き出し（ヘッダー画像 + グラフ画像をA4縦に配置）
   const exportPdf = useCallback(async () => {
     setExporting(true);
     try {
-      // ヘッダー付きでキャプチャ
-      const dataUrl = await captureWithHeader();
-      if (!dataUrl) return;
+      // まずグラフをキャプチャ
+      const graphDataUrl = await captureCurrentView();
+      if (!graphDataUrl) return;
+
+      // 次にヘッダーをキャプチャ
+      const headerDataUrl = await captureHeaderOnly();
 
       // PDF作成（A4縦）
       const pdf = new jsPDF({
@@ -209,32 +239,38 @@ export function ExportButton({ diagram, articleContent, articleTitle, flowRef, o
 
       const pageWidth = pdf.internal.pageSize.getWidth();
       const pageHeight = pdf.internal.pageSize.getHeight();
-      const margin = 10;
+      const margin = 5;
+      let currentY = margin;
 
-      // 画像のアスペクト比を維持して配置
-      const img = new Image();
-      img.src = dataUrl;
-      await new Promise((resolve) => {
-        img.onload = resolve;
-      });
+      // ヘッダー画像を配置
+      if (headerDataUrl) {
+        const headerImg = await loadImage(headerDataUrl);
+        const headerAspect = headerImg.width / headerImg.height;
+        const headerWidth = pageWidth - margin * 2;
+        const headerHeight = headerWidth / headerAspect;
 
-      const aspectRatio = img.width / img.height;
-      const maxWidth = pageWidth - margin * 2;
-      const maxHeight = pageHeight - margin * 2;
-
-      let finalWidth = maxWidth;
-      let finalHeight = maxWidth / aspectRatio;
-
-      if (finalHeight > maxHeight) {
-        finalHeight = maxHeight;
-        finalWidth = maxHeight * aspectRatio;
+        pdf.addImage(headerDataUrl, "PNG", margin, currentY, headerWidth, headerHeight);
+        currentY += headerHeight + 2;
       }
 
-      // 上寄せで配置
-      const x = (pageWidth - finalWidth) / 2;
-      const y = margin;
+      // グラフ画像を配置
+      const graphImg = await loadImage(graphDataUrl);
+      const graphAspect = graphImg.width / graphImg.height;
+      const maxGraphWidth = pageWidth - margin * 2;
+      const maxGraphHeight = pageHeight - currentY - margin;
 
-      pdf.addImage(dataUrl, "PNG", x, y, finalWidth, finalHeight);
+      let graphWidth = maxGraphWidth;
+      let graphHeight = maxGraphWidth / graphAspect;
+
+      if (graphHeight > maxGraphHeight) {
+        graphHeight = maxGraphHeight;
+        graphWidth = maxGraphHeight * graphAspect;
+      }
+
+      // グラフを左右中央に配置
+      const graphX = (pageWidth - graphWidth) / 2;
+      pdf.addImage(graphDataUrl, "PNG", graphX, currentY, graphWidth, graphHeight);
+
       pdf.save(getFileName("pdf"));
     } catch (err) {
       console.error("PDF export failed:", err);
@@ -243,7 +279,7 @@ export function ExportButton({ diagram, articleContent, articleTitle, flowRef, o
       setExporting(false);
       setIsOpen(false);
     }
-  }, [flowRef, diagram, articleContent, onFitView]);
+  }, [captureCurrentView, captureHeaderOnly, getFileName]);
 
   return (
     <div className="relative">
