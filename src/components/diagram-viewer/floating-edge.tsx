@@ -51,6 +51,7 @@ export function FloatingEdge({
         id={id}
         className="react-flow__edge-path"
         d={edgePath}
+        fill="none"
         markerEnd={markerEnd}
         style={style}
       />
