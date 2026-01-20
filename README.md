@@ -21,6 +21,7 @@
 
 - Node.js (v18以上推奨)
 - npm
+- Docker / Docker Compose
 
 ### インストール
 
@@ -28,6 +29,33 @@
 
 ```bash
 npm install
+```
+
+### 環境変数の設定
+
+ローカル用の環境変数を作成します。
+
+```bash
+cp env.example .env
+```
+
+必要に応じて `.env` の `DATABASE_URL` を調整してください。
+
+### データベースの起動
+
+PostgreSQL を起動します。
+
+```bash
+docker compose up -d
+```
+
+### マイグレーションとシード
+
+初回はマイグレーションとシードを実行します。
+
+```bash
+npm run db:migrate
+npm run db:seed
 ```
 
 ### 開発サーバーの起動
@@ -65,7 +93,7 @@ npm run dev
   - `schema-validator.ts`: JSON Schemaによるバリデーション（ajv使用）
 - `src/types`: TypeScript型定義
   - `diagram.ts`: 審査機序図・フロー図の型定義
-- `data/diagrams`: 審査機序図JSONファイル
+- `data/diagrams`: 審査機序図JSONファイル（DBへの初期取り込み用）
 - `schemas`: JSONスキーマ定義
   - `kijo-diagram.schema.json`: 機序図スキーマ
   - `flow-diagram.schema.json`: フロー図スキーマ
