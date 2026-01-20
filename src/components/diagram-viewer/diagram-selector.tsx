@@ -86,7 +86,7 @@ export function DiagramSelector({ onSelect, selectedPath }: DiagramSelectorProps
       <div className="p-4 text-gray-500 text-sm">
         機序図ファイルがありません。
         <br />
-        <code className="text-xs">data/diagrams/</code> にJSONファイルを配置してください。
+        データベースに機序図データを読み込んでください。
       </div>
     );
   }
