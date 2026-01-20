@@ -1,0 +1,133 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum DiagramType {
+  kijo
+  flow
+}
+
+enum LawType {
+  act
+  order
+  regulation
+  notice
+}
+
+enum DiagramNodeType {
+  information
+  process
+  decision
+  terminal
+}
+
+enum EdgeRole {
+  input
+  output
+  primary
+  supporting
+  yes
+  no
+  option
+  flow
+}
+
+enum RelatedLawRelationship {
+  delegates_to
+  delegated_from
+  defines_detail
+  references
+  supersedes
+}
+
+model Diagram {
+  diagramKey            String                @id
+  baseId                String
+  diagramType           DiagramType
+  lawId                 String
+  schemaId              String?
+  version               String
+  pageTitleTitle        String
+  pageTitleTargetSubject String?
+  pageTitleDescription  String?
+  lawType               LawType
+  lawName               String
+  lawAbbrev             String
+  article               String
+  paragraph             String?
+  item                  String?
+  textRaw               String?
+  complianceLogic       Json?
+  diagramTitle          String?
+  diagramDescription    String?
+  kijoDiagramRef        String?
+  metadata              Json?
+
+  labels                DiagramLabel[]
+  relatedLaws            RelatedLaw[]
+  nodes                 DiagramNode[]
+  edges                 DiagramEdge[]
+
+  @@index([lawId])
+  @@index([baseId])
+  @@index([diagramType])
+}
+
+model DiagramLabel {
+  id         String  @id @default(cuid())
+  diagramKey String
+  label      String
+
+  diagram    Diagram @relation(fields: [diagramKey], references: [diagramKey], onDelete: Cascade)
+
+  @@index([diagramKey])
+}
+
+model RelatedLaw {
+  id           String                 @id @default(cuid())
+  diagramKey   String
+  lawId        String
+  lawName      String
+  lawType      LawType
+  relationship RelatedLawRelationship
+  articles     String[]               @default([])
+  description  String?
+
+  diagram      Diagram @relation(fields: [diagramKey], references: [diagramKey], onDelete: Cascade)
+
+  @@index([diagramKey])
+}
+
+model DiagramNode {
+  id         String          @id @default(cuid())
+  diagramKey String
+  nodeId     String
+  type       DiagramNodeType
+  title      String
+  data       Json?
+
+  diagram    Diagram         @relation(fields: [diagramKey], references: [diagramKey], onDelete: Cascade)
+
+  @@unique([diagramKey, nodeId])
+  @@index([diagramKey])
+}
+
+model DiagramEdge {
+  id         String   @id @default(cuid())
+  diagramKey String
+  edgeId     String
+  fromId     String
+  toId       String
+  role       EdgeRole?
+  label      String?
+
+  diagram    Diagram  @relation(fields: [diagramKey], references: [diagramKey], onDelete: Cascade)
+
+  @@unique([diagramKey, edgeId])
+  @@index([diagramKey])
+}

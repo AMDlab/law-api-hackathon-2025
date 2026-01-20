@@ -1,6 +1,4 @@
 import { NextResponse } from "next/server";
-import * as fs from "fs";
-import * as path from "path";
 import {
   isValidLawId,
   isValidArticleId,
@@ -9,8 +7,7 @@ import {
   validateFlowDiagram,
   formatErrors,
 } from "@/lib/validation";
-
-const DIAGRAMS_DIR = path.join(process.cwd(), "data", "diagrams");
+import { prisma } from "@/lib/prisma";
 
 interface RouteParams {
   params: Promise<{
@@ -52,44 +49,90 @@ export async function GET(request: Request, { params }: RouteParams) {
       );
     }
 
-    const filePath = path.join(DIAGRAMS_DIR, lawId, `${articleId}.json`);
+    const diagram = await prisma.diagram.findUnique({
+      where: {
+        diagramKey: articleId,
+      },
+      include: {
+        labels: true,
+        relatedLaws: true,
+        nodes: { orderBy: { nodeId: "asc" } },
+        edges: { orderBy: { edgeId: "asc" } },
+      },
+    });
 
-    // パスがDIAGRAMS_DIR内に収まっているか確認（追加のセキュリティ）
-    const resolvedPath = path.resolve(filePath);
-    const resolvedBase = path.resolve(DIAGRAMS_DIR);
-    if (!resolvedPath.startsWith(resolvedBase)) {
-      return NextResponse.json(
-        { error: "Invalid path" },
-        { status: 400 }
-      );
-    }
-
-    // ファイルが存在するか確認
-    if (!fs.existsSync(filePath)) {
+    if (!diagram || diagram.lawId !== lawId) {
       return NextResponse.json(
         { error: "Diagram not found" },
         { status: 404 }
       );
     }
 
-    // JSONファイルを読み込み
-    const content = fs.readFileSync(filePath, "utf-8");
+    const nodes = diagram.nodes.map((node) => ({
+      id: node.nodeId,
+      type: node.type,
+      title: node.title,
+      ...(node.data && typeof node.data === "object" ? node.data : {}),
+    }));
 
-    // JSONパース
-    let jsonData: unknown;
-    try {
-      jsonData = JSON.parse(content);
-    } catch {
-      return NextResponse.json(
-        { error: "Invalid JSON format" },
-        { status: 500 }
-      );
+    const edges = diagram.edges.map((edge) => ({
+      id: edge.edgeId,
+      from: edge.fromId,
+      to: edge.toId,
+      ...(edge.role ? { role: edge.role } : {}),
+      ...(edge.label ? { label: edge.label } : {}),
+    }));
+
+    const jsonData: Record<string, unknown> = {
+      id: diagram.schemaId ?? diagram.diagramKey,
+      version: diagram.version,
+      page_title: {
+        title: diagram.pageTitleTitle,
+        target_subject: diagram.pageTitleTargetSubject ?? undefined,
+        description: diagram.pageTitleDescription ?? undefined,
+      },
+      legal_ref: {
+        law_id: diagram.lawId,
+        law_type: diagram.lawType,
+        law_name: diagram.lawName,
+        law_abbrev: diagram.lawAbbrev,
+        article: diagram.article,
+        paragraph: diagram.paragraph ?? null,
+        item: diagram.item ?? null,
+      },
+      labels: diagram.labels.map((label) => label.label),
+      text_raw: diagram.textRaw ?? undefined,
+      compliance_logic: diagram.complianceLogic ?? undefined,
+      related_laws: diagram.relatedLaws.map((law) => ({
+        law_id: law.lawId,
+        law_name: law.lawName,
+        law_type: law.lawType,
+        relationship: law.relationship,
+        articles: law.articles,
+        description: law.description ?? undefined,
+      })),
+      metadata: diagram.metadata ?? undefined,
+    };
+
+    if (diagramType === "kijo") {
+      jsonData.kijo_diagram = { nodes, edges };
+    } else {
+      jsonData.flow_diagram = {
+        title: diagram.diagramTitle ?? "",
+        description: diagram.diagramDescription ?? undefined,
+        nodes,
+        edges,
+      };
+      if (diagram.kijoDiagramRef) {
+        jsonData.kijo_diagram_ref = diagram.kijoDiagramRef;
+      }
     }
 
     // スキーマバリデーション（図の種類に応じて）
-    const validationResult = diagramType === "kijo"
-      ? validateKijoDiagram(jsonData)
-      : validateFlowDiagram(jsonData);
+    const validationResult =
+      diagramType === "kijo"
+        ? validateKijoDiagram(jsonData)
+        : validateFlowDiagram(jsonData);
     if (!validationResult.valid) {
       return NextResponse.json(
         {

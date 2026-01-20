@@ -38,6 +38,7 @@ export type EdgeRole =
   | "supporting" // 整合確認の裏付け情報
   | "yes" // 条件分岐: Yes
   | "no" // 条件分岐: No
+  | "option" // 条件分岐: 選択肢（multi）
   | "flow"; // 単純なフロー接続
 
 /** 結果ノードの判定結果 */
