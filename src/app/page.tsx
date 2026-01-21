@@ -2,6 +2,7 @@
 
 import { Suspense, useEffect, useState, useCallback } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
+import { signOut, useSession } from "next-auth/react";
 import { LawTree } from "@/components/law-tree";
 import { KijoDiagramViewer } from "@/components/diagram-viewer";
 import { LawNode, parseLawData } from "@/lib/parser";
@@ -15,6 +16,12 @@ import {
 } from "@/components/ui/resizable";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import type { KijoDiagram, FlowDiagram } from "@/types/diagram";
 
 interface DiagramFile {
@@ -45,9 +52,32 @@ const LAW_TABS = [
   { id: LAW_IDS.BUILDING_STANDARDS_ORDER, label: "令" },
 ];
 
+const ROLE_LABELS: Record<string, string> = {
+  designer: "設計者",
+  bim_specialist: "BIM専門家",
+  ifc_specialist: "IFC専門家",
+  bim_software_programmer: "BIMソフトプログラマ",
+  reviewer: "審査者",
+  review_software_programmer: "審査ソフトプログラマ",
+};
+
+const ROLE_BADGE_CLASSES: Record<string, string> = {
+  designer: "bg-blue-100 text-blue-700",
+  bim_specialist: "bg-emerald-100 text-emerald-700",
+  ifc_specialist: "bg-indigo-100 text-indigo-700",
+  bim_software_programmer: "bg-purple-100 text-purple-700",
+  reviewer: "bg-amber-100 text-amber-800",
+  review_software_programmer: "bg-rose-100 text-rose-700",
+};
+
+function getRoleBadgeClass(role?: string) {
+  return ROLE_BADGE_CLASSES[role ?? ""] ?? "bg-muted text-muted-foreground";
+}
+
 function HomeContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const { data: session } = useSession();
 
   const [currentLawId, setCurrentLawId] = useState<string>(
     LAW_IDS.BUILDING_STANDARDS_ACT,
@@ -71,6 +101,10 @@ function HomeContent() {
 
   // 現在の法令情報
   const currentLawInfo = LAW_INFO[currentLawId];
+  const displayName = session?.user?.name?.trim() ?? "";
+  const roleLabel = session?.user?.role
+    ? (ROLE_LABELS[session.user.role] ?? session.user.role)
+    : "";
 
   // URLパラメータから初期値を取得
   useEffect(() => {
@@ -302,9 +336,38 @@ function HomeContent() {
 
   return (
     <div className="h-screen w-full flex flex-col overflow-hidden bg-background">
-      <header className="p-4 border-b flex items-center justify-between">
-        <h1 className="text-xl font-bold">審査要件モデル協創プラットフォーム</h1>
-        <ThemeToggle />
+      <header className="border-b">
+        <div className="flex items-center justify-between gap-4 p-4">
+          <h1 className="text-xl font-bold">
+            審査要件モデル協創プラットフォーム
+          </h1>
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            {displayName ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger className="flex items-center gap-2 rounded-md border border-input bg-background px-3 py-2 text-sm hover:bg-accent">
+                  {roleLabel ? (
+                    <span
+                      className={`rounded-full px-2 py-0.5 text-xs font-medium ${getRoleBadgeClass(
+                        session?.user?.role,
+                      )}`}
+                    >
+                      {roleLabel}
+                    </span>
+                  ) : null}
+                  <span className="font-medium">{displayName}</span>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem
+                    onClick={() => signOut({ callbackUrl: "/auth/signin" })}
+                  >
+                    ログアウト
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : null}
+          </div>
+        </div>
       </header>
 
       <main className="flex-1 overflow-hidden">

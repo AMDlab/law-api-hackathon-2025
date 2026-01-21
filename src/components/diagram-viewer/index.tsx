@@ -2,8 +2,11 @@
 
 import { useCallback, useMemo, useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
-import { Plus } from "lucide-react";
+import { MessageCircle, Plus } from "lucide-react";
+import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,6 +21,7 @@ import {
   useNodesState,
   useEdgesState,
   useReactFlow,
+  useStore,
   type Node,
   type Edge,
   type OnSelectionChangeFunc,
@@ -44,6 +48,7 @@ import { ExportButton } from "./export-button";
 import { HelpButton } from "./help-button";
 import { FloatingEdge } from "./floating-edge";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import type { DiagramCommentThread, CommentTargetType } from "@/types/comments";
 
 // 機序図用カスタムノードタイプ
 const kijoNodeTypes = {
@@ -65,6 +70,32 @@ const flowNodeTypes = {
 const edgeTypes = {
   floating: FloatingEdge,
 };
+
+const ROLE_LABELS: Record<string, string> = {
+  designer: "設計者",
+  bim_specialist: "BIM専門家",
+  ifc_specialist: "IFC専門家",
+  bim_software_programmer: "BIMソフトプログラマ",
+  reviewer: "審査者",
+  review_software_programmer: "審査ソフトプログラマ",
+};
+
+const ROLE_BADGE_CLASSES: Record<string, string> = {
+  designer: "bg-blue-100 text-blue-700",
+  bim_specialist: "bg-emerald-100 text-emerald-700",
+  ifc_specialist: "bg-indigo-100 text-indigo-700",
+  bim_software_programmer: "bg-purple-100 text-purple-700",
+  reviewer: "bg-amber-100 text-amber-800",
+  review_software_programmer: "bg-rose-100 text-rose-700",
+};
+
+function getRoleBadgeClass(role?: string) {
+  return ROLE_BADGE_CLASSES[role ?? ""] ?? "bg-muted text-muted-foreground";
+}
+
+function getDisplayName(name?: string | null) {
+  return (name ?? "").trim();
+}
 
 interface KijoDiagramViewerProps {
   diagram: KijoDiagram;
@@ -293,6 +324,7 @@ function convertToFlowElements(
         to: edge.to,
         role: edge.role,
         label: edge.label,
+        targetHandle: isFlowDiagram ? undefined : "target-left",
       },
       isFlowDiagram,
     ),
@@ -349,12 +381,32 @@ function KijoDiagramViewerInner({
   flowPath,
   onReload,
 }: KijoDiagramViewerProps) {
+  const { data: session } = useSession();
   const [selectedNode, setSelectedNode] = useState<DiagramNode | null>(null);
   const [selectedEdge, setSelectedEdge] = useState<
     import("@/types/diagram").Edge | null
   >(null);
   const [activeTab, setActiveTab] = useState<"kijo" | "flow">("kijo");
   const [isEdgeSelected, setIsEdgeSelected] = useState(false);
+  const [commentMode, setCommentMode] = useState(false);
+  const [commentThreads, setCommentThreads] = useState<DiagramCommentThread[]>(
+    [],
+  );
+  const [selectedThreadId, setSelectedThreadId] = useState<string | null>(null);
+  const [draftThread, setDraftThread] = useState<{
+    targetType: CommentTargetType;
+    targetId: string;
+    offsetX: number;
+    offsetY: number;
+    flowPoint: { x: number; y: number };
+  } | null>(null);
+  const [draftBody, setDraftBody] = useState("");
+  const [replyBody, setReplyBody] = useState("");
+  const [commentSaving, setCommentSaving] = useState(false);
+  const [commentError, setCommentError] = useState<string | null>(null);
+  const currentUserName = getDisplayName(session?.user?.name);
+  const currentUserRole = session?.user?.role;
+  const isCommentOverlayOpen = Boolean(draftThread || selectedThreadId);
   const [isDirty, setIsDirty] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
@@ -367,6 +419,7 @@ function KijoDiagramViewerInner({
   );
   const flowRef = useRef<HTMLDivElement>(null);
   const { fitView, screenToFlowPosition } = useReactFlow();
+  const transform = useStore((state) => state.transform);
 
   // フロー図の有無を判定（統合形式または分離形式）
   const hasFlowDiagram =
@@ -377,6 +430,48 @@ function KijoDiagramViewerInner({
 
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
+
+  const [translateX, translateY, zoom] = transform;
+
+  const nodeMap = useMemo(() => {
+    const map = new Map<string, Node>();
+    nodes.forEach((node) => {
+      map.set(node.id, node);
+    });
+    return map;
+  }, [nodes]);
+
+  const getNodeCenter = useCallback((node: Node) => {
+    const width = node.width ?? MIN_NODE_WIDTH;
+    const height = node.height ?? NODE_HEIGHT;
+    return {
+      x: node.position.x + width / 2,
+      y: node.position.y + height / 2,
+    };
+  }, []);
+
+  const getEdgeCenter = useCallback(
+    (edge: Edge) => {
+      const sourceNode = nodeMap.get(edge.source);
+      const targetNode = nodeMap.get(edge.target);
+      if (!sourceNode || !targetNode) return null;
+      const sourceCenter = getNodeCenter(sourceNode);
+      const targetCenter = getNodeCenter(targetNode);
+      return {
+        x: (sourceCenter.x + targetCenter.x) / 2,
+        y: (sourceCenter.y + targetCenter.y) / 2,
+      };
+    },
+    [getNodeCenter, nodeMap],
+  );
+
+  const toScreenPoint = useCallback(
+    (point: { x: number; y: number }) => ({
+      x: point.x * zoom + translateX,
+      y: point.y * zoom + translateY,
+    }),
+    [translateX, translateY, zoom],
+  );
 
   const currentDiagramStructure = useMemo(() => {
     if (isFlowDiagram) {
@@ -718,6 +813,282 @@ function KijoDiagramViewerInner({
 
   const activePath = isFlowDiagram ? flowPath : kijoPath;
 
+  const findNearestTarget = useCallback(
+    (point: { x: number; y: number }) => {
+      let nearestType: CommentTargetType = "node";
+      let nearestId = "";
+      let nearestCenter = { x: point.x, y: point.y };
+      let minDistance = Number.POSITIVE_INFINITY;
+
+      nodes.forEach((node) => {
+        const center = getNodeCenter(node);
+        const dx = point.x - center.x;
+        const dy = point.y - center.y;
+        const dist = dx * dx + dy * dy;
+        if (dist < minDistance) {
+          minDistance = dist;
+          nearestType = "node";
+          nearestId = node.id;
+          nearestCenter = center;
+        }
+      });
+
+      edges.forEach((edge) => {
+        const center = getEdgeCenter(edge);
+        if (!center) return;
+        const dx = point.x - center.x;
+        const dy = point.y - center.y;
+        const dist = dx * dx + dy * dy;
+        if (dist < minDistance) {
+          minDistance = dist;
+          nearestType = "edge";
+          nearestId = edge.id;
+          nearestCenter = center;
+        }
+      });
+
+      return { nearestType, nearestId, nearestCenter };
+    },
+    [edges, getEdgeCenter, getNodeCenter, nodes],
+  );
+
+  const fetchComments = useCallback(async () => {
+    if (!activePath) {
+      setCommentThreads([]);
+      return;
+    }
+    try {
+      const res = await fetch(`${activePath}/comments`);
+      if (!res.ok) {
+        setCommentThreads([]);
+        return;
+      }
+      const data = await res.json();
+      setCommentThreads(data.threads ?? []);
+    } catch {
+      setCommentThreads([]);
+    }
+  }, [activePath]);
+
+  useEffect(() => {
+    fetchComments();
+    setSelectedThreadId(null);
+    setDraftThread(null);
+    setDraftBody("");
+    setReplyBody("");
+  }, [fetchComments]);
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") return;
+      setCommentMode(false);
+      setDraftThread(null);
+      setDraftBody("");
+      setReplyBody("");
+      setSelectedThreadId(null);
+      setCommentError(null);
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
+  const handlePaneClick = useCallback(
+    (event: React.MouseEvent) => {
+      if (!commentMode) return;
+      const point = screenToFlowPosition({
+        x: event.clientX,
+        y: event.clientY,
+      });
+      const { nearestType, nearestId, nearestCenter } =
+        findNearestTarget(point);
+      if (!nearestId) {
+        return;
+      }
+      const offsetX = point.x - nearestCenter.x;
+      const offsetY = point.y - nearestCenter.y;
+      setDraftThread({
+        targetType: nearestType,
+        targetId: nearestId,
+        offsetX,
+        offsetY,
+        flowPoint: {
+          x: nearestCenter.x + offsetX,
+          y: nearestCenter.y + offsetY,
+        },
+      });
+      setDraftBody("");
+      setSelectedThreadId(null);
+      setCommentError(null);
+    },
+    [commentMode, findNearestTarget, screenToFlowPosition],
+  );
+
+  const handleCreateThread = useCallback(async () => {
+    if (!activePath || !draftThread || !draftBody.trim()) return;
+    setCommentSaving(true);
+    setCommentError(null);
+    try {
+      const res = await fetch(`${activePath}/comments`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          targetType: draftThread.targetType,
+          targetId: draftThread.targetId,
+          offsetX: draftThread.offsetX,
+          offsetY: draftThread.offsetY,
+          body: draftBody.trim(),
+        }),
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || "コメントの作成に失敗しました");
+      }
+      const data = await res.json();
+      if (data.thread) {
+        setCommentThreads((prev) => [...prev, data.thread]);
+        setSelectedThreadId(data.thread.id);
+      }
+      setDraftThread(null);
+      setDraftBody("");
+    } catch (error) {
+      setCommentError(
+        error instanceof Error ? error.message : "コメントの作成に失敗しました",
+      );
+    } finally {
+      setCommentSaving(false);
+    }
+  }, [activePath, draftBody, draftThread]);
+
+  const handleReply = useCallback(async () => {
+    if (!activePath || !selectedThreadId || !replyBody.trim()) return;
+    setCommentSaving(true);
+    setCommentError(null);
+    try {
+      const res = await fetch(`${activePath}/comments/${selectedThreadId}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ body: replyBody.trim() }),
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || "コメントの送信に失敗しました");
+      }
+      const data = await res.json();
+      if (data.comment) {
+        setCommentThreads((prev) =>
+          prev.map((thread) =>
+            thread.id === selectedThreadId
+              ? {
+                  ...thread,
+                  comments: [...thread.comments, data.comment],
+                  updatedAt: new Date().toISOString(),
+                }
+              : thread,
+          ),
+        );
+      }
+      setReplyBody("");
+    } catch (error) {
+      setCommentError(
+        error instanceof Error ? error.message : "コメントの送信に失敗しました",
+      );
+    } finally {
+      setCommentSaving(false);
+    }
+  }, [activePath, replyBody, selectedThreadId]);
+
+  const handleResolveThread = useCallback(
+    async (action: "resolve" | "reopen" | "delete") => {
+      if (!activePath || !selectedThreadId) return;
+      setCommentSaving(true);
+      setCommentError(null);
+      try {
+        const res = await fetch(`${activePath}/comments/${selectedThreadId}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action }),
+        });
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          throw new Error(err.error || "コメントの更新に失敗しました");
+        }
+        const data = await res.json();
+        if (data.thread) {
+          setCommentThreads((prev) =>
+            prev.map((thread) => {
+              if (thread.id !== selectedThreadId) return thread;
+              return {
+                ...thread,
+                ...data.thread,
+                comments: data.thread.comments ?? thread.comments,
+              };
+            }),
+          );
+          if (action === "delete") {
+            setSelectedThreadId(null);
+          }
+        }
+      } catch (error) {
+        setCommentError(
+          error instanceof Error
+            ? error.message
+            : "コメントの更新に失敗しました",
+        );
+      } finally {
+        setCommentSaving(false);
+      }
+    },
+    [activePath, selectedThreadId],
+  );
+
+  const commentPins = useMemo(() => {
+    return commentThreads
+      .filter((thread) => !thread.isDeleted && !thread.isResolved)
+      .map((thread) => {
+        const center =
+          thread.targetType === "node"
+            ? (() => {
+                const node = nodeMap.get(thread.targetId);
+                return node ? getNodeCenter(node) : null;
+              })()
+            : (() => {
+                const edge = edges.find((item) => item.id === thread.targetId);
+                return edge ? getEdgeCenter(edge) : null;
+              })();
+        if (!center) return null;
+        const flowPoint = {
+          x: center.x + thread.offsetX,
+          y: center.y + thread.offsetY,
+        };
+        const screenPoint = toScreenPoint(flowPoint);
+        return { thread, flowPoint, screenPoint };
+      })
+      .filter(
+        (
+          item,
+        ): item is {
+          thread: DiagramCommentThread;
+          flowPoint: { x: number; y: number };
+          screenPoint: { x: number; y: number };
+        } => Boolean(item),
+      );
+  }, [
+    commentThreads,
+    edges,
+    getEdgeCenter,
+    getNodeCenter,
+    nodeMap,
+    toScreenPoint,
+  ]);
+
+  const selectedThread = commentThreads.find(
+    (thread) => thread.id === selectedThreadId && !thread.isDeleted,
+  );
+  const selectedPin = commentPins.find(
+    (pin) => pin.thread.id === selectedThreadId,
+  );
+
   const refreshSnapshots = useCallback(async () => {
     if (!activePath) {
       setSnapshots([]);
@@ -837,7 +1208,7 @@ function KijoDiagramViewerInner({
   return (
     <div className={`flex h-full ${className || ""}`}>
       {/* メイン図 */}
-      <div className="flex-1 h-full relative" ref={flowRef}>
+      <div className="flex-1 h-full relative overflow-hidden" ref={flowRef}>
         {/* 左上のタブ切り替え（フロー図がある場合のみ表示） */}
         {hasFlowDiagram && (
           <div className="absolute top-2 left-2 z-10">
@@ -883,6 +1254,19 @@ function KijoDiagramViewerInner({
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
+          <Button
+            size="icon-sm"
+            variant={commentMode ? "default" : "secondary"}
+            aria-label="コメントモード"
+            onClick={() => {
+              setCommentMode((prev) => !prev);
+              setDraftThread(null);
+              setDraftBody("");
+              setCommentError(null);
+            }}
+          >
+            <MessageCircle />
+          </Button>
           <HelpButton />
           <ExportButton
             diagram={diagram}
@@ -951,6 +1335,10 @@ function KijoDiagramViewerInner({
           onSelectionChange={onSelectionChange}
           onConnect={handleConnect}
           onReconnect={handleReconnect}
+          onPaneClick={handlePaneClick}
+          className={
+            commentMode && !isCommentOverlayOpen ? "comment-mode" : undefined
+          }
           edgesReconnectable={false}
           elementsSelectable
           edgesFocusable
@@ -966,6 +1354,218 @@ function KijoDiagramViewerInner({
           <Background />
           <Controls />
         </ReactFlow>
+        <div className="absolute inset-0 z-20 pointer-events-none">
+          {commentPins.map((pin) => (
+            <Button
+              key={pin.thread.id}
+              type="button"
+              size="icon"
+              variant={
+                pin.thread.id === selectedThreadId ? "default" : "outline"
+              }
+              className="pointer-events-auto h-6 w-6 rounded-full text-[11px] font-semibold shadow"
+              style={{
+                left: pin.screenPoint.x,
+                top: pin.screenPoint.y,
+                position: "absolute",
+                transform: "translate(-50%, -50%)",
+              }}
+              onClick={() => {
+                setSelectedThreadId(pin.thread.id);
+                setDraftThread(null);
+                setDraftBody("");
+                setCommentError(null);
+              }}
+            >
+              {pin.thread.comments?.length ?? 0}
+            </Button>
+          ))}
+          {draftThread &&
+            (() => {
+              const screenPoint = toScreenPoint(draftThread.flowPoint);
+              return (
+                <div
+                  className="pointer-events-auto"
+                  style={{
+                    position: "absolute",
+                    left: screenPoint.x,
+                    top: screenPoint.y,
+                    transform: "translate(12px, 12px)",
+                  }}
+                >
+                  <Card className="w-64 shadow-lg">
+                    <CardContent className="space-y-2">
+                      {currentUserName && currentUserRole ? (
+                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                          <span
+                            className={`rounded-full px-2 py-0.5 text-[10px] ${getRoleBadgeClass(
+                              currentUserRole,
+                            )}`}
+                          >
+                            {ROLE_LABELS[currentUserRole] ?? currentUserRole}
+                          </span>
+                          <span className="font-medium">{currentUserName}</span>
+                        </div>
+                      ) : null}
+                      <Textarea
+                        className="h-20 text-sm"
+                        value={draftBody}
+                        onChange={(e) => setDraftBody(e.target.value)}
+                        placeholder="コメントを入力"
+                      />
+                      {commentError && (
+                        <div className="text-xs text-red-500">
+                          {commentError}
+                        </div>
+                      )}
+                      <div className="flex justify-between gap-2">
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            setDraftThread(null);
+                            setDraftBody("");
+                            setCommentError(null);
+                          }}
+                        >
+                          キャンセル
+                        </Button>
+                        <Button
+                          type="button"
+                          size="sm"
+                          disabled={commentSaving || !draftBody.trim()}
+                          onClick={handleCreateThread}
+                        >
+                          {commentSaving ? "送信中..." : "作成"}
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              );
+            })()}
+          {selectedThread &&
+            selectedPin &&
+            (() => {
+              const screenPoint = selectedPin.screenPoint;
+              return (
+                <div
+                  className="pointer-events-auto"
+                  style={{
+                    position: "absolute",
+                    left: screenPoint.x,
+                    top: screenPoint.y,
+                    transform: "translate(12px, 12px)",
+                  }}
+                >
+                  <Card className="w-72 shadow-lg">
+                    <CardContent className="space-y-3">
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="text-muted-foreground">
+                          {selectedThread.isResolved ? "解決済み" : "未解決"}
+                        </span>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            disabled={commentSaving}
+                            onClick={() =>
+                              handleResolveThread(
+                                selectedThread.isResolved
+                                  ? "reopen"
+                                  : "resolve",
+                              )
+                            }
+                          >
+                            {selectedThread.isResolved ? "復活" : "解決"}
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            disabled={commentSaving}
+                            onClick={() => handleResolveThread("delete")}
+                          >
+                            削除
+                          </Button>
+                        </div>
+                      </div>
+                      <div className="max-h-40 space-y-3 overflow-auto">
+                        {selectedThread.comments.map((comment) => (
+                          <div key={comment.id} className="space-y-2 text-xs">
+                            <div className="space-y-1 text-muted-foreground">
+                              <div className="flex flex-wrap items-center gap-1.5">
+                                <span
+                                  className={`rounded-full px-2 py-0.5 text-[10px] ${getRoleBadgeClass(
+                                    comment.authorRole,
+                                  )}`}
+                                >
+                                  {ROLE_LABELS[comment.authorRole] ??
+                                    comment.authorRole}
+                                </span>
+                                <span className="font-medium">
+                                  {comment.authorName}
+                                </span>
+                              </div>
+                              <div className="text-[10px] text-muted-foreground/70">
+                                {new Date(comment.createdAt).toLocaleString()}
+                              </div>
+                            </div>
+                            <div className="text-foreground">
+                              {comment.body}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                      {currentUserName && currentUserRole ? (
+                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                          <span
+                            className={`rounded-full px-2 py-0.5 text-[10px] ${getRoleBadgeClass(
+                              currentUserRole,
+                            )}`}
+                          >
+                            {ROLE_LABELS[currentUserRole] ?? currentUserRole}
+                          </span>
+                          <span className="font-medium">{currentUserName}</span>
+                        </div>
+                      ) : null}
+                      <Textarea
+                        className="h-16 text-sm"
+                        value={replyBody}
+                        onChange={(e) => setReplyBody(e.target.value)}
+                        placeholder="返信を入力"
+                      />
+                      {commentError && (
+                        <div className="text-xs text-red-500">
+                          {commentError}
+                        </div>
+                      )}
+                      <div className="flex justify-between">
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setSelectedThreadId(null)}
+                        >
+                          閉じる
+                        </Button>
+                        <Button
+                          type="button"
+                          size="sm"
+                          disabled={commentSaving || !replyBody.trim()}
+                          onClick={handleReply}
+                        >
+                          {commentSaving ? "送信中..." : "返信"}
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              );
+            })()}
+        </div>
       </div>
 
       {/* 詳細パネル */}

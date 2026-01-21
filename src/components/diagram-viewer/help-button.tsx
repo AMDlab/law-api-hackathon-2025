@@ -45,7 +45,9 @@ export function HelpButton() {
                 <h3 className="font-semibold mb-2">審査機序図とは</h3>
                 <p className="text-sm text-muted-foreground">
                   審査機序図は、建築確認申請における計画案件の
-                  <strong className="text-foreground">法適合判定における情報処理のメカニズム</strong>
+                  <strong className="text-foreground">
+                    法適合判定における情報処理のメカニズム
+                  </strong>
                   を表現するための図式です。
                   左から右へ[情報]と[処理]が流れ、最終的に規制文への適否が判定されます。
                 </p>
@@ -64,8 +66,10 @@ export function HelpButton() {
                       <div className="font-medium">[情報] - 長方形</div>
                       <div className="text-muted-foreground">
                         審査に必要なデータや判定結果を表します。
-                        <strong className="text-foreground">主体</strong>（建築物、室、敷地など）と
-                        <strong className="text-foreground">性質</strong>（高さ、面積など）で構成されます。
+                        <strong className="text-foreground">主体</strong>
+                        （建築物、室、敷地など）と
+                        <strong className="text-foreground">性質</strong>
+                        （高さ、面積など）で構成されます。
                       </div>
                     </div>
                   </div>
@@ -250,7 +254,8 @@ export function HelpButton() {
                 <h3 className="font-semibold mb-3">複数主体と反復処理</h3>
                 <p className="text-sm text-muted-foreground mb-2">
                   複数の主体についての情報や、複数の主体を対象とする反復処理は
-                  <strong className="text-foreground">二重線</strong>で表示されます。
+                  <strong className="text-foreground">二重線</strong>
+                  で表示されます。
                 </p>
                 <div className="flex items-center gap-4">
                   <div className="relative w-10 h-8 border-2 border-border rounded">
@@ -266,7 +271,8 @@ export function HelpButton() {
               <section>
                 <h3 className="font-semibold mb-3">主体と性質</h3>
                 <p className="text-sm text-muted-foreground mb-2">
-                  [情報]は「<strong className="text-foreground">主体</strong>」が持つ「<strong className="text-foreground">性質</strong>
+                  [情報]は「<strong className="text-foreground">主体</strong>
+                  」が持つ「<strong className="text-foreground">性質</strong>
                   」を表します。
                 </p>
                 <div className="bg-muted p-3 rounded text-sm">
@@ -283,7 +289,10 @@ export function HelpButton() {
                       高さ（主体の属性）
                     </div>
                     <div>
-                      <span className="font-medium text-foreground">性質の型:</span> 数値
+                      <span className="font-medium text-foreground">
+                        性質の型:
+                      </span>{" "}
+                      数値
                     </div>
                   </div>
                 </div>
@@ -355,13 +364,13 @@ export function HelpButton() {
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">性質の型</span>
-                      <span className="bg-green-500/20 text-green-400 px-1 rounded">数値</span>
+                      <span className="bg-green-500/20 text-green-400 px-1 rounded">
+                        数値
+                      </span>
                     </div>
                     <div className="border-t border-border pt-2 mt-2">
                       <div className="text-muted-foreground mb-1">説明</div>
-                      <div>
-                        地盤面からの建築物の高さ
-                      </div>
+                      <div>地盤面からの建築物の高さ</div>
                     </div>
                   </div>
                 </div>

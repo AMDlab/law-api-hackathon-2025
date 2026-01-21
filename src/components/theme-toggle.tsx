@@ -12,7 +12,9 @@ export function ThemeToggle() {
       variant="ghost"
       size="icon"
       onClick={toggleTheme}
-      aria-label={theme === "dark" ? "ライトモードに切り替え" : "ダークモードに切り替え"}
+      aria-label={
+        theme === "dark" ? "ライトモードに切り替え" : "ダークモードに切り替え"
+      }
     >
       {theme === "dark" ? (
         <Sun className="h-5 w-5" />
