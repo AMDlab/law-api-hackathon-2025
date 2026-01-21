@@ -1,5 +1,9 @@
 import { NextResponse } from "next/server";
-import { isValidLawId, isValidArticleId, getDiagramType } from "@/lib/validation";
+import {
+  isValidLawId,
+  isValidArticleId,
+  getDiagramType,
+} from "@/lib/validation";
 import { prisma } from "@/lib/prisma";
 
 interface RouteParams {
@@ -20,14 +24,14 @@ export async function GET(request: Request, { params }: RouteParams) {
     if (!isValidLawId(lawId)) {
       return NextResponse.json(
         { error: "Invalid law ID format" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     if (!isValidArticleId(articleId)) {
       return NextResponse.json(
         { error: "Invalid article ID format" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -35,7 +39,7 @@ export async function GET(request: Request, { params }: RouteParams) {
     if (!diagramType) {
       return NextResponse.json(
         { error: "Article ID must end with _kijo or _flow" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -45,10 +49,7 @@ export async function GET(request: Request, { params }: RouteParams) {
     });
 
     if (!diagram || diagram.lawId !== lawId) {
-      return NextResponse.json(
-        { error: "Diagram not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Diagram not found" }, { status: 404 });
     }
 
     const snapshots = await prisma.diagramSnapshot.findMany({
@@ -69,7 +70,7 @@ export async function GET(request: Request, { params }: RouteParams) {
     console.error("Failed to list snapshots:", error);
     return NextResponse.json(
       { error: "Failed to list snapshots" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

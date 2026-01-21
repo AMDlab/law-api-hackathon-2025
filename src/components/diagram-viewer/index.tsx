@@ -28,7 +28,12 @@ import {
 import "@xyflow/react/dist/style.css";
 import Dagre from "@dagrejs/dagre";
 
-import type { KijoDiagram, FlowDiagram, DiagramNode, EdgeRole } from "@/types/diagram";
+import type {
+  KijoDiagram,
+  FlowDiagram,
+  DiagramNode,
+  EdgeRole,
+} from "@/types/diagram";
 import { detectCycle, validateEdgeReferences } from "@/lib/validation";
 import { InformationNode } from "./information-node";
 import { ProcessNode } from "./process-node";
@@ -70,7 +75,6 @@ interface KijoDiagramViewerProps {
   articleTitle?: string;
   kijoPath?: string;
   flowPath?: string;
-  onNavigate?: (lawId: string, diagramId: string) => void;
   onReload?: () => void | Promise<void>;
 }
 
@@ -85,12 +89,12 @@ const PADDING = 40; // 左右のパディング
  */
 function calculateNodeWidth(node: DiagramNode): number {
   let titleLength = node.title.length;
-  
+
   // 情報ノードの場合、シンボルの分を追加
   if (node.type === "information" && node.symbol) {
     titleLength += node.symbol.length + 3; // "[X] " の分
   }
-  
+
   const calculatedWidth = titleLength * CHAR_WIDTH + PADDING;
   return Math.max(MIN_NODE_WIDTH, calculatedWidth);
 }
@@ -131,11 +135,12 @@ function createFlowEdge(
     sourceHandle?: string | null;
     targetHandle?: string | null;
   },
-  isFlowDiagram: boolean
+  isFlowDiagram: boolean,
 ): Edge {
   const flowEdgeColor = "#6b7280";
   const label =
-    edge.label || (edge.role === "yes" ? "はい" : edge.role === "no" ? "いいえ" : undefined);
+    edge.label ||
+    (edge.role === "yes" ? "はい" : edge.role === "no" ? "いいえ" : undefined);
   return {
     id: edge.id,
     source: edge.from,
@@ -171,7 +176,7 @@ function createFlowEdge(
 function getLayoutedElements(
   nodes: Node[],
   edges: Edge[],
-  direction: "LR" | "TB" = "LR"
+  direction: "LR" | "TB" = "LR",
 ): { nodes: Node[]; edges: Edge[] } {
   const g = new Dagre.graphlib.Graph().setDefaultEdgeLabel(() => ({}));
 
@@ -222,7 +227,10 @@ interface DiagramStructureLocal {
   edges: import("@/types/diagram").Edge[];
 }
 
-function buildDiagramStructureFromState(nodes: Node[], edges: Edge[]): DiagramStructureLocal {
+function buildDiagramStructureFromState(
+  nodes: Node[],
+  edges: Edge[],
+): DiagramStructureLocal {
   const diagramNodes: DiagramNode[] = nodes
     .map((node) => (node.data as { node?: DiagramNode } | undefined)?.node)
     .filter((node): node is DiagramNode => Boolean(node));
@@ -245,7 +253,7 @@ function buildDiagramStructureFromState(nodes: Node[], edges: Edge[]): DiagramSt
  */
 function convertToFlowElements(
   diagramStructure: DiagramStructureLocal,
-  isFlowDiagram: boolean = false
+  isFlowDiagram: boolean = false,
 ): {
   nodes: Node[];
   edges: Edge[];
@@ -286,8 +294,8 @@ function convertToFlowElements(
         role: edge.role,
         label: edge.label,
       },
-      isFlowDiagram
-    )
+      isFlowDiagram,
+    ),
   );
 
   // レイアウト方向: 機序図はLR、フロー図はTB
@@ -299,7 +307,10 @@ function convertToFlowElements(
  * グラフの整合性を検証
  * @param isFlowDiagram フロー図の場合はtrue（フロー図ではループが許可される）
  */
-function validateGraph(diagramStructure: DiagramStructureLocal, isFlowDiagram: boolean = false): { valid: boolean; warnings: string[] } {
+function validateGraph(
+  diagramStructure: DiagramStructureLocal,
+  isFlowDiagram: boolean = false,
+): { valid: boolean; warnings: string[] } {
   const warnings: string[] = [];
   const nodes = diagramStructure.nodes;
   const edges = diagramStructure.edges;
@@ -310,7 +321,7 @@ function validateGraph(diagramStructure: DiagramStructureLocal, isFlowDiagram: b
     warnings.push(
       `存在しないノードへの参照があります: ${edgeValidation.invalidEdges
         .map((e) => `${e.from} → ${e.to}`)
-        .join(", ")}`
+        .join(", ")}`,
     );
   }
 
@@ -336,25 +347,31 @@ function KijoDiagramViewerInner({
   articleTitle,
   kijoPath,
   flowPath,
-  onNavigate,
   onReload,
 }: KijoDiagramViewerProps) {
   const [selectedNode, setSelectedNode] = useState<DiagramNode | null>(null);
-  const [selectedEdge, setSelectedEdge] = useState<import("@/types/diagram").Edge | null>(null);
+  const [selectedEdge, setSelectedEdge] = useState<
+    import("@/types/diagram").Edge | null
+  >(null);
   const [activeTab, setActiveTab] = useState<"kijo" | "flow">("kijo");
   const [isEdgeSelected, setIsEdgeSelected] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
-  const [snapshots, setSnapshots] = useState<Array<{ id: string; createdAt: string; note?: string | null }>>([]);
+  const [snapshots, setSnapshots] = useState<
+    Array<{ id: string; createdAt: string; note?: string | null }>
+  >([]);
   const [selectedSnapshotId, setSelectedSnapshotId] = useState<string>("");
-  const [actionContainer, setActionContainer] = useState<HTMLElement | null>(null);
+  const [actionContainer, setActionContainer] = useState<HTMLElement | null>(
+    null,
+  );
   const flowRef = useRef<HTMLDivElement>(null);
   const { fitView, screenToFlowPosition } = useReactFlow();
 
   // フロー図の有無を判定（統合形式または分離形式）
-  const hasFlowDiagram = diagram.flow_diagram !== undefined || flowDiagram !== undefined;
-  
+  const hasFlowDiagram =
+    diagram.flow_diagram !== undefined || flowDiagram !== undefined;
+
   // 現在表示中の図のノード・エッジを取得
   const isFlowDiagram = activeTab === "flow" && hasFlowDiagram;
 
@@ -364,10 +381,16 @@ function KijoDiagramViewerInner({
   const currentDiagramStructure = useMemo(() => {
     if (isFlowDiagram) {
       if (flowDiagram?.flow_diagram) {
-        return { nodes: flowDiagram.flow_diagram.nodes, edges: flowDiagram.flow_diagram.edges };
+        return {
+          nodes: flowDiagram.flow_diagram.nodes,
+          edges: flowDiagram.flow_diagram.edges,
+        };
       }
       if (diagram.flow_diagram) {
-        return { nodes: diagram.flow_diagram.nodes, edges: diagram.flow_diagram.edges };
+        return {
+          nodes: diagram.flow_diagram.nodes,
+          edges: diagram.flow_diagram.edges,
+        };
       }
     }
     return diagram.kijo_diagram;
@@ -375,15 +398,19 @@ function KijoDiagramViewerInner({
 
   // グラフの検証（フロー図ではループが許可される）
   const validation = useMemo(
-    () => validateGraph(buildDiagramStructureFromState(nodes, edges), isFlowDiagram),
-    [nodes, edges, isFlowDiagram]
+    () =>
+      validateGraph(
+        buildDiagramStructureFromState(nodes, edges),
+        isFlowDiagram,
+      ),
+    [nodes, edges, isFlowDiagram],
   );
 
   // タブ切り替え/データ更新時にノード・エッジを初期化
   useEffect(() => {
     const elements = convertToFlowElements(
       currentDiagramStructure,
-      isFlowDiagram
+      isFlowDiagram,
     );
     setNodes(elements.nodes);
     setEdges(elements.edges);
@@ -401,22 +428,29 @@ function KijoDiagramViewerInner({
     setNodes((prev) => {
       let didChange = false;
       const nextNodes = prev.map((node) => {
-        const data = node.data as { isEdgeSelected?: boolean; hasOutgoing?: boolean } | undefined;
+        const data = node.data as
+          | { isEdgeSelected?: boolean; hasOutgoing?: boolean }
+          | undefined;
         const hasOutgoing = edges.some((edge) => edge.source === node.id);
-        if (data?.isEdgeSelected === isEdgeSelected && data?.hasOutgoing === hasOutgoing) {
+        if (
+          data?.isEdgeSelected === isEdgeSelected &&
+          data?.hasOutgoing === hasOutgoing
+        ) {
           return node;
         }
         didChange = true;
         return {
           ...node,
-          data: { ...(node.data as Record<string, unknown>), isEdgeSelected, hasOutgoing },
+          data: {
+            ...(node.data as Record<string, unknown>),
+            isEdgeSelected,
+            hasOutgoing,
+          },
         };
       });
       return didChange ? nextNodes : prev;
     });
   }, [edges, isEdgeSelected, setNodes]);
-
-
 
   // 選択変更時のハンドラ
   const onSelectionChange: OnSelectionChangeFunc = useCallback(
@@ -427,7 +461,7 @@ function KijoDiagramViewerInner({
         setSelectedEdge(null);
         setIsEdgeSelected(false);
         setEdges((prev) =>
-          prev.map((edge) => ({ ...edge, reconnectable: false }))
+          prev.map((edge) => ({ ...edge, reconnectable: false })),
         );
         return;
       }
@@ -448,16 +482,18 @@ function KijoDiagramViewerInner({
           prev.map((edge) => ({
             ...edge,
             reconnectable: edge.id === selected.id,
-          }))
+          })),
         );
         return;
       }
       setSelectedNode(null);
       setSelectedEdge(null);
       setIsEdgeSelected(false);
-      setEdges((prev) => prev.map((edge) => ({ ...edge, reconnectable: false })));
+      setEdges((prev) =>
+        prev.map((edge) => ({ ...edge, reconnectable: false })),
+      );
     },
-    []
+    [setEdges, setSelectedEdge, setSelectedNode, setIsEdgeSelected],
   );
 
   const handleNodesChange = useCallback(
@@ -467,7 +503,7 @@ function KijoDiagramViewerInner({
         setIsDirty(true);
       }
     },
-    [onNodesChange]
+    [onNodesChange],
   );
 
   const handleEdgesChange = useCallback(
@@ -477,7 +513,7 @@ function KijoDiagramViewerInner({
         setIsDirty(true);
       }
     },
-    [onEdgesChange]
+    [onEdgesChange],
   );
 
   const handleConnect = useCallback(
@@ -492,12 +528,12 @@ function KijoDiagramViewerInner({
           sourceHandle: connection.sourceHandle,
           targetHandle: connection.targetHandle,
         },
-        isFlowDiagram
+        isFlowDiagram,
       );
       setEdges((eds) => addEdge(newEdge, eds));
       setIsDirty(true);
     },
-    [isFlowDiagram, setEdges]
+    [isFlowDiagram, setEdges],
   );
 
   const handleReconnect = useCallback(
@@ -518,13 +554,13 @@ function KijoDiagramViewerInner({
               sourceHandle: connection.sourceHandle,
               targetHandle: connection.targetHandle,
             },
-            isFlowDiagram
+            isFlowDiagram,
           );
-        })
+        }),
       );
       setIsDirty(true);
     },
-    [isFlowDiagram, setEdges]
+    [isFlowDiagram, setEdges],
   );
 
   // fitViewをトリガーする関数
@@ -543,14 +579,14 @@ function KijoDiagramViewerInner({
             ...node,
             data: { ...(node.data as Record<string, unknown>), node: next },
           };
-        })
+        }),
       );
       setSelectedNode((prev) =>
-        prev?.id === nodeId ? ({ ...prev, ...updates } as DiagramNode) : prev
+        prev?.id === nodeId ? ({ ...prev, ...updates } as DiagramNode) : prev,
       );
       setIsDirty(true);
     },
-    [setNodes]
+    [setNodes],
   );
 
   const handleEdgeChange = useCallback(
@@ -558,8 +594,11 @@ function KijoDiagramViewerInner({
       setEdges((prev) =>
         prev.map((edge) => {
           if (edge.id !== edgeId) return edge;
-          const nextRole = updates.role ?? (edge.data as { role?: string } | undefined)?.role;
-          const nextLabel = updates.label ?? (edge.data as { label?: string } | undefined)?.label;
+          const nextRole =
+            updates.role ?? (edge.data as { role?: string } | undefined)?.role;
+          const nextLabel =
+            updates.label ??
+            (edge.data as { label?: string } | undefined)?.label;
           const next = createFlowEdge(
             {
               id: edge.id,
@@ -570,18 +609,20 @@ function KijoDiagramViewerInner({
               sourceHandle: edge.sourceHandle,
               targetHandle: edge.targetHandle,
             },
-            isFlowDiagram
+            isFlowDiagram,
           );
           return {
             ...next,
             selected: edge.selected,
           };
-        })
+        }),
       );
-      setSelectedEdge((prev) => (prev?.id === edgeId ? { ...prev, ...updates } : prev));
+      setSelectedEdge((prev) =>
+        prev?.id === edgeId ? { ...prev, ...updates } : prev,
+      );
       setIsDirty(true);
     },
-    [isFlowDiagram, setEdges]
+    [isFlowDiagram, setEdges],
   );
 
   const handleAddNode = useCallback(
@@ -608,7 +649,9 @@ function KijoDiagramViewerInner({
         : screenToFlowPosition({ x: 200, y: 200 });
       const nodeWidth = calculateNodeWidth(newNode);
       const isDecisionInFlow = isFlowDiagram && newNode.type === "decision";
-      const finalWidth = isDecisionInFlow ? Math.max(180, nodeWidth) : nodeWidth;
+      const finalWidth = isDecisionInFlow
+        ? Math.max(180, nodeWidth)
+        : nodeWidth;
 
       setNodes((prev) => [
         ...prev,
@@ -629,17 +672,19 @@ function KijoDiagramViewerInner({
       ]);
       setIsDirty(true);
     },
-    [isFlowDiagram, screenToFlowPosition, setNodes]
+    [isEdgeSelected, isFlowDiagram, screenToFlowPosition, setNodes],
   );
 
   const handleDeleteNode = useCallback(
     (nodeId: string) => {
       setNodes((prev) => prev.filter((node) => node.id !== nodeId));
-      setEdges((prev) => prev.filter((edge) => edge.source !== nodeId && edge.target !== nodeId));
+      setEdges((prev) =>
+        prev.filter((edge) => edge.source !== nodeId && edge.target !== nodeId),
+      );
       setSelectedNode(null);
       setIsDirty(true);
     },
-    [setEdges, setNodes]
+    [setEdges, setNodes],
   );
 
   const handleDeleteEdge = useCallback(
@@ -648,7 +693,7 @@ function KijoDiagramViewerInner({
       setSelectedEdge(null);
       setIsDirty(true);
     },
-    [setEdges]
+    [setEdges],
   );
 
   const activePath = isFlowDiagram ? flowPath : kijoPath;
@@ -677,7 +722,7 @@ function KijoDiagramViewerInner({
     if (typeof document === "undefined") return;
     const container = document.getElementById("diagram-card-actions");
     setActionContainer(container);
-  });
+  }, []);
 
   const buildPayloadForSave = useCallback(() => {
     const structure = buildDiagramStructureFromState(nodes, edges);
@@ -732,7 +777,9 @@ function KijoDiagramViewerInner({
         await onReload();
       }
     } catch (error) {
-      setSaveError(error instanceof Error ? error.message : "保存に失敗しました");
+      setSaveError(
+        error instanceof Error ? error.message : "保存に失敗しました",
+      );
     } finally {
       setSaving(false);
     }
@@ -756,7 +803,9 @@ function KijoDiagramViewerInner({
       }
       setIsDirty(false);
     } catch (error) {
-      setSaveError(error instanceof Error ? error.message : "復元に失敗しました");
+      setSaveError(
+        error instanceof Error ? error.message : "復元に失敗しました",
+      );
     } finally {
       setSaving(false);
     }
@@ -772,7 +821,10 @@ function KijoDiagramViewerInner({
         {/* 左上のタブ切り替え（フロー図がある場合のみ表示） */}
         {hasFlowDiagram && (
           <div className="absolute top-2 left-2 z-10">
-            <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "kijo" | "flow")}>
+            <Tabs
+              value={activeTab}
+              onValueChange={(v) => setActiveTab(v as "kijo" | "flow")}
+            >
               <TabsList className="h-8">
                 <TabsTrigger value="kijo" className="text-xs px-3 h-7">
                   機序図
@@ -788,7 +840,11 @@ function KijoDiagramViewerInner({
         <div className="absolute top-2 right-2 z-10 flex items-center gap-1">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button size="icon-sm" variant="secondary" aria-label="ノード追加">
+              <Button
+                size="icon-sm"
+                variant="secondary"
+                aria-label="ノード追加"
+              >
                 <Plus />
               </Button>
             </DropdownMenuTrigger>
@@ -852,12 +908,14 @@ function KijoDiagramViewerInner({
                 復元
               </button>
             </div>,
-            actionContainer
+            actionContainer,
           )}
         {/* 警告表示 */}
         {!validation.valid && (
           <div className="absolute top-2 left-2 z-10 bg-yellow-50 border border-yellow-300 rounded-md p-3 max-w-md shadow-sm">
-            <div className="font-medium text-yellow-800 text-sm mb-1">⚠️ グラフ検証警告</div>
+            <div className="font-medium text-yellow-800 text-sm mb-1">
+              ⚠️ グラフ検証警告
+            </div>
             <ul className="text-xs text-yellow-700 list-disc list-inside">
               {validation.warnings.map((w, i) => (
                 <li key={i}>{w}</li>
@@ -895,17 +953,13 @@ function KijoDiagramViewerInner({
         <DiagramInspector
           node={selectedNode}
           edge={selectedEdge}
-          nodeIds={nodes.map((node) => node.id)}
           onNodeChange={handleNodeChange}
           onNodeDelete={handleDeleteNode}
-          onAddNode={handleAddNode}
           onEdgeChange={handleEdgeChange}
           onEdgeDelete={handleDeleteEdge}
         />
         {saveError && (
-          <div className="px-4 pb-4 text-xs text-red-600">
-            {saveError}
-          </div>
+          <div className="px-4 pb-4 text-xs text-red-600">{saveError}</div>
         )}
       </div>
     </div>

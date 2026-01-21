@@ -1,4 +1,11 @@
-import { PrismaClient, DiagramType, DiagramNodeType, EdgeRole, LawType, RelatedLawRelationship } from "@prisma/client";
+import {
+  PrismaClient,
+  DiagramType,
+  DiagramNodeType,
+  EdgeRole,
+  LawType,
+  RelatedLawRelationship,
+} from "@prisma/client";
 import * as fs from "fs/promises";
 import * as path from "path";
 
@@ -57,9 +64,15 @@ function getBaseArticleId(diagramKey: string): string {
   return diagramKey.replace(/_(kijo|flow)$/, "");
 }
 
-async function listDiagramFiles(): Promise<Array<{ lawId: string; diagramKey: string; filePath: string }>> {
+async function listDiagramFiles(): Promise<
+  Array<{ lawId: string; diagramKey: string; filePath: string }>
+> {
   const entries = await fs.readdir(DIAGRAMS_DIR, { withFileTypes: true });
-  const results: Array<{ lawId: string; diagramKey: string; filePath: string }> = [];
+  const results: Array<{
+    lawId: string;
+    diagramKey: string;
+    filePath: string;
+  }> = [];
 
   for (const entry of entries) {
     if (!entry.isDirectory()) continue;
@@ -138,12 +151,14 @@ async function main() {
 
     const pageTitle = json.page_title ?? {};
     const legalRef = json.legal_ref ?? {};
-    const diagramNodes = diagramType === DiagramType.kijo
-      ? json.kijo_diagram?.nodes ?? []
-      : json.flow_diagram?.nodes ?? [];
-    const diagramEdges = diagramType === DiagramType.kijo
-      ? json.kijo_diagram?.edges ?? []
-      : json.flow_diagram?.edges ?? [];
+    const diagramNodes =
+      diagramType === DiagramType.kijo
+        ? (json.kijo_diagram?.nodes ?? [])
+        : (json.flow_diagram?.nodes ?? []);
+    const diagramEdges =
+      diagramType === DiagramType.kijo
+        ? (json.kijo_diagram?.edges ?? [])
+        : (json.flow_diagram?.edges ?? []);
 
     const lawId = legalRef.law_id ?? file.lawId;
 
@@ -166,8 +181,14 @@ async function main() {
         item: legalRef.item ?? null,
         textRaw: json.text_raw ?? null,
         complianceLogic: json.compliance_logic ?? undefined,
-        diagramTitle: diagramType === DiagramType.flow ? json.flow_diagram?.title ?? null : null,
-        diagramDescription: diagramType === DiagramType.flow ? json.flow_diagram?.description ?? null : null,
+        diagramTitle:
+          diagramType === DiagramType.flow
+            ? (json.flow_diagram?.title ?? null)
+            : null,
+        diagramDescription:
+          diagramType === DiagramType.flow
+            ? (json.flow_diagram?.description ?? null)
+            : null,
         kijoDiagramRef: json.kijo_diagram_ref ?? null,
         metadata: json.metadata ?? undefined,
       },
@@ -186,7 +207,8 @@ async function main() {
       lawId: law.law_id ?? "",
       lawName: law.law_name ?? "",
       lawType: (law.law_type ?? "act") as LawType,
-      relationship: (law.relationship ?? "references") as RelatedLawRelationship,
+      relationship: (law.relationship ??
+        "references") as RelatedLawRelationship,
       articles: law.articles ?? [],
       description: law.description ?? null,
     }));
@@ -195,10 +217,14 @@ async function main() {
     }
 
     if (diagramNodes.length > 0) {
-      await prisma.diagramNode.createMany({ data: parseNodes(diagramNodes, file.diagramKey) });
+      await prisma.diagramNode.createMany({
+        data: parseNodes(diagramNodes, file.diagramKey),
+      });
     }
     if (diagramEdges.length > 0) {
-      await prisma.diagramEdge.createMany({ data: parseEdges(diagramEdges, file.diagramKey) });
+      await prisma.diagramEdge.createMany({
+        data: parseEdges(diagramEdges, file.diagramKey),
+      });
     }
   }
 }

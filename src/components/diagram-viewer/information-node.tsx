@@ -52,7 +52,9 @@ export const InformationNode = memo(function InformationNode({
 }: InformationNodeProps) {
   const { node } = data;
   const colorClass = getInformationTailwindClass(node.property_type);
-  const connectionInProgress = useConnection((connection) => connection.inProgress);
+  const connectionInProgress = useConnection(
+    (connection) => connection.inProgress,
+  );
   const showButton =
     !connectionInProgress && !data.isEdgeSelected && !data.hasOutgoing;
 
@@ -84,16 +86,40 @@ export const InformationNode = memo(function InformationNode({
           ${selected ? "ring-2 ring-blue-500 ring-offset-2" : ""}
         `}
       >
-        <Handle type="target" id="target-top" position={Position.Top} className="opacity-0" />
-        <Handle type="target" id="target-left" position={Position.Left} className="opacity-0" />
-        <Handle type="target" id="target-bottom" position={Position.Bottom} className="opacity-0" />
-        <Handle type="target" id="target-right" position={Position.Right} className="opacity-0" />
+        <Handle
+          type="target"
+          id="target-top"
+          position={Position.Top}
+          className="opacity-0"
+        />
+        <Handle
+          type="target"
+          id="target-left"
+          position={Position.Left}
+          className="opacity-0"
+        />
+        <Handle
+          type="target"
+          id="target-bottom"
+          position={Position.Bottom}
+          className="opacity-0"
+        />
+        <Handle
+          type="target"
+          id="target-right"
+          position={Position.Right}
+          className="opacity-0"
+        />
         <ButtonHandle
           type="source"
           position={data.isFlowDiagram ? Position.Bottom : Position.Right}
           showButton={showButton}
         >
-          <Button size="sm" variant="secondary" className="h-6 w-6 rounded-full p-0 border-2 border-gray-300">
+          <Button
+            size="sm"
+            variant="secondary"
+            className="h-6 w-6 rounded-full p-0 border-2 border-gray-300"
+          >
             <Plus size={8} />
           </Button>
         </ButtonHandle>
@@ -114,7 +140,6 @@ export const InformationNode = memo(function InformationNode({
             ))}
           </div>
         )}
-
       </div>
     </div>
   );

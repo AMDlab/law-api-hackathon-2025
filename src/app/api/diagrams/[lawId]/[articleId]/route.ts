@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { Prisma } from "@prisma/client";
 import {
   isValidLawId,
   isValidArticleId,
@@ -30,14 +31,14 @@ export async function GET(request: Request, { params }: RouteParams) {
     if (!isValidLawId(lawId)) {
       return NextResponse.json(
         { error: "Invalid law ID format" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     if (!isValidArticleId(articleId)) {
       return NextResponse.json(
         { error: "Invalid article ID format" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -46,7 +47,7 @@ export async function GET(request: Request, { params }: RouteParams) {
     if (!diagramType) {
       return NextResponse.json(
         { error: "Article ID must end with _kijo or _flow" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -63,10 +64,7 @@ export async function GET(request: Request, { params }: RouteParams) {
     });
 
     if (!diagram || diagram.lawId !== lawId) {
-      return NextResponse.json(
-        { error: "Diagram not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Diagram not found" }, { status: 404 });
     }
 
     const jsonData = buildDiagramJson(diagram, diagramType);
@@ -82,7 +80,7 @@ export async function GET(request: Request, { params }: RouteParams) {
           error: "Invalid diagram schema",
           details: formatErrors(validationResult),
         },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -91,7 +89,7 @@ export async function GET(request: Request, { params }: RouteParams) {
     console.error("Failed to load diagram:", error);
     return NextResponse.json(
       { error: "Failed to load diagram" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -107,14 +105,14 @@ export async function PUT(request: Request, { params }: RouteParams) {
     if (!isValidLawId(lawId)) {
       return NextResponse.json(
         { error: "Invalid law ID format" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     if (!isValidArticleId(articleId)) {
       return NextResponse.json(
         { error: "Invalid article ID format" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -122,13 +120,15 @@ export async function PUT(request: Request, { params }: RouteParams) {
     if (!diagramType) {
       return NextResponse.json(
         { error: "Article ID must end with _kijo or _flow" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     const body = (await request.json()) as Record<string, unknown>;
     const payload =
-      body && typeof body === "object" && "diagram" in body ? body.diagram : body;
+      body && typeof body === "object" && "diagram" in body
+        ? body.diagram
+        : body;
     const note =
       body && typeof body === "object" && "note" in body
         ? (body.note as string | undefined)
@@ -144,7 +144,7 @@ export async function PUT(request: Request, { params }: RouteParams) {
           error: "Invalid diagram schema",
           details: formatErrors(validationResult),
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -159,15 +159,21 @@ export async function PUT(request: Request, { params }: RouteParams) {
     });
 
     if (!diagram || diagram.lawId !== lawId) {
-      return NextResponse.json(
-        { error: "Diagram not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Diagram not found" }, { status: 404 });
     }
 
-    const snapshot = buildDiagramJson(diagram, diagramType);
-    const { updateData, labels, relatedLaws, nodes, edges } =
-      extractDiagramUpdate(payload as Record<string, unknown>, diagramType);
+    const snapshot: Prisma.InputJsonValue = buildDiagramJson(
+      diagram,
+      diagramType,
+    );
+    const {
+      updateData: rawUpdateData,
+      labels,
+      relatedLaws,
+      nodes,
+      edges,
+    } = extractDiagramUpdate(payload as Record<string, unknown>, diagramType);
+    const updateData = rawUpdateData as Prisma.DiagramUpdateInput;
 
     await prisma.$transaction(async (tx) => {
       await tx.diagramSnapshot.create({
@@ -184,7 +190,9 @@ export async function PUT(request: Request, { params }: RouteParams) {
         data: updateData,
       });
 
-      await tx.diagramLabel.deleteMany({ where: { diagramKey: diagram.diagramKey } });
+      await tx.diagramLabel.deleteMany({
+        where: { diagramKey: diagram.diagramKey },
+      });
       if (labels.length > 0) {
         await tx.diagramLabel.createMany({
           data: labels.map((label) => ({
@@ -194,7 +202,9 @@ export async function PUT(request: Request, { params }: RouteParams) {
         });
       }
 
-      await tx.relatedLaw.deleteMany({ where: { diagramKey: diagram.diagramKey } });
+      await tx.relatedLaw.deleteMany({
+        where: { diagramKey: diagram.diagramKey },
+      });
       if (relatedLaws.length > 0) {
         await tx.relatedLaw.createMany({
           data: relatedLaws.map((law) => ({
@@ -209,7 +219,9 @@ export async function PUT(request: Request, { params }: RouteParams) {
         });
       }
 
-      await tx.diagramNode.deleteMany({ where: { diagramKey: diagram.diagramKey } });
+      await tx.diagramNode.deleteMany({
+        where: { diagramKey: diagram.diagramKey },
+      });
       if (nodes.length > 0) {
         await tx.diagramNode.createMany({
           data: nodes.map((node) => ({
@@ -222,7 +234,9 @@ export async function PUT(request: Request, { params }: RouteParams) {
         });
       }
 
-      await tx.diagramEdge.deleteMany({ where: { diagramKey: diagram.diagramKey } });
+      await tx.diagramEdge.deleteMany({
+        where: { diagramKey: diagram.diagramKey },
+      });
       if (edges.length > 0) {
         await tx.diagramEdge.createMany({
           data: edges.map((edge) => ({
@@ -242,7 +256,7 @@ export async function PUT(request: Request, { params }: RouteParams) {
     console.error("Failed to update diagram:", error);
     return NextResponse.json(
       { error: "Failed to update diagram" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

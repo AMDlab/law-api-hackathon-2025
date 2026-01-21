@@ -44,7 +44,9 @@ export function HelpButton() {
               <section>
                 <h3 className="font-semibold mb-2">審査機序図とは</h3>
                 <p className="text-sm text-gray-700">
-                  審査機序図は、建築確認申請における計画案件の<strong>法適合判定における情報処理のメカニズム</strong>を表現するための図式です。
+                  審査機序図は、建築確認申請における計画案件の
+                  <strong>法適合判定における情報処理のメカニズム</strong>
+                  を表現するための図式です。
                   左から右へ[情報]と[処理]が流れ、最終的に規制文への適否が判定されます。
                 </p>
               </section>
@@ -62,7 +64,8 @@ export function HelpButton() {
                       <div className="font-medium">[情報] - 長方形</div>
                       <div className="text-gray-600">
                         審査に必要なデータや判定結果を表します。
-                        <strong>主体</strong>（建築物、室、敷地など）と<strong>性質</strong>（高さ、面積など）で構成されます。
+                        <strong>主体</strong>（建築物、室、敷地など）と
+                        <strong>性質</strong>（高さ、面積など）で構成されます。
                       </div>
                     </div>
                   </div>
@@ -89,28 +92,54 @@ export function HelpButton() {
                 <div className="space-y-2 text-sm">
                   <div className="grid grid-cols-1 gap-2">
                     <div className="flex items-start gap-2 bg-gray-50 p-2 rounded">
-                      <span className="font-mono text-xs bg-blue-100 px-1.5 py-0.5 rounded flex-shrink-0">命題真偽</span>
-                      <span className="text-gray-600">真か偽かが判定可能な事実（例: 技術基準を満たすか否か）</span>
+                      <span className="font-mono text-xs bg-blue-100 px-1.5 py-0.5 rounded flex-shrink-0">
+                        命題真偽
+                      </span>
+                      <span className="text-gray-600">
+                        真か偽かが判定可能な事実（例: 技術基準を満たすか否か）
+                      </span>
                     </div>
                     <div className="flex items-start gap-2 bg-gray-50 p-2 rounded">
-                      <span className="font-mono text-xs bg-purple-100 px-1.5 py-0.5 rounded flex-shrink-0">区分情報</span>
-                      <span className="text-gray-600">既定の区分のいずれか（例: 用途地域、建物用途コード）</span>
+                      <span className="font-mono text-xs bg-purple-100 px-1.5 py-0.5 rounded flex-shrink-0">
+                        区分情報
+                      </span>
+                      <span className="text-gray-600">
+                        既定の区分のいずれか（例: 用途地域、建物用途コード）
+                      </span>
                     </div>
                     <div className="flex items-start gap-2 bg-gray-50 p-2 rounded">
-                      <span className="font-mono text-xs bg-green-100 px-1.5 py-0.5 rounded flex-shrink-0">数値</span>
-                      <span className="text-gray-600">整数値または実数値（例: 延べ面積、高さ）</span>
+                      <span className="font-mono text-xs bg-green-100 px-1.5 py-0.5 rounded flex-shrink-0">
+                        数値
+                      </span>
+                      <span className="text-gray-600">
+                        整数値または実数値（例: 延べ面積、高さ）
+                      </span>
                     </div>
                     <div className="flex items-start gap-2 bg-gray-50 p-2 rounded">
-                      <span className="font-mono text-xs bg-cyan-100 px-1.5 py-0.5 rounded flex-shrink-0">幾何学概念</span>
-                      <span className="text-gray-600">点/方向/線形状/面形状/ソリッド（例: 敷地境界線、延焼のおそれのある部分）</span>
+                      <span className="font-mono text-xs bg-cyan-100 px-1.5 py-0.5 rounded flex-shrink-0">
+                        幾何学概念
+                      </span>
+                      <span className="text-gray-600">
+                        点/方向/線形状/面形状/ソリッド（例:
+                        敷地境界線、延焼のおそれのある部分）
+                      </span>
                     </div>
                     <div className="flex items-start gap-2 bg-gray-50 p-2 rounded">
-                      <span className="font-mono text-xs bg-yellow-100 px-1.5 py-0.5 rounded flex-shrink-0">集合定義</span>
-                      <span className="text-gray-600">特定の関係にある主体の集合（例: 階に属する外壁の集合）</span>
+                      <span className="font-mono text-xs bg-yellow-100 px-1.5 py-0.5 rounded flex-shrink-0">
+                        集合定義
+                      </span>
+                      <span className="text-gray-600">
+                        特定の関係にある主体の集合（例: 階に属する外壁の集合）
+                      </span>
                     </div>
                     <div className="flex items-start gap-2 bg-orange-50 p-2 rounded border border-orange-200">
-                      <span className="font-mono text-xs bg-orange-100 px-1.5 py-0.5 rounded flex-shrink-0">視認情報</span>
-                      <span className="text-gray-600">人による総合的認識・判断が必要（例: 告示仕様適合判断のための断面詳細図）</span>
+                      <span className="font-mono text-xs bg-orange-100 px-1.5 py-0.5 rounded flex-shrink-0">
+                        視認情報
+                      </span>
+                      <span className="text-gray-600">
+                        人による総合的認識・判断が必要（例:
+                        告示仕様適合判断のための断面詳細図）
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -124,14 +153,18 @@ export function HelpButton() {
                     <div className="w-6 h-6 border-2 border-cyan-400 bg-cyan-50 rounded-lg flex-shrink-0"></div>
                     <div className="text-sm">
                       <span className="font-medium">機械的処理</span>
-                      <span className="text-gray-500 ml-1">- 自動化可能な論理演算や計算（視認情報は接続不可）</span>
+                      <span className="text-gray-500 ml-1">
+                        - 自動化可能な論理演算や計算（視認情報は接続不可）
+                      </span>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
                     <div className="w-6 h-6 border-2 border-orange-300 bg-orange-50 rounded-lg flex-shrink-0"></div>
                     <div className="text-sm">
                       <span className="font-medium">人の認識・判断</span>
-                      <span className="text-gray-500 ml-1">- 人の認識/判断を要する処理</span>
+                      <span className="text-gray-500 ml-1">
+                        - 人の認識/判断を要する処理
+                      </span>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
@@ -140,7 +173,9 @@ export function HelpButton() {
                     </div>
                     <div className="text-sm">
                       <span className="font-medium">整合確認</span>
-                      <span className="text-gray-500 ml-1">- 異なる情報源からの複数情報を比較・整合確認</span>
+                      <span className="text-gray-500 ml-1">
+                        - 異なる情報源からの複数情報を比較・整合確認
+                      </span>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
@@ -149,14 +184,18 @@ export function HelpButton() {
                     </div>
                     <div className="text-sm">
                       <span className="font-medium">部分機序図参照</span>
-                      <span className="text-gray-500 ml-1">- 別の機序図の処理全体を参照</span>
+                      <span className="text-gray-500 ml-1">
+                        - 別の機序図の処理全体を参照
+                      </span>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
                     <div className="w-6 h-6 border-2 border-amber-400 bg-amber-50 rounded-lg border-l-0 flex-shrink-0"></div>
                     <div className="text-sm">
                       <span className="font-medium">入力情報不定</span>
-                      <span className="text-gray-500 ml-1">- 情報源の所在や手続きも含め人が判断（インプットなし）</span>
+                      <span className="text-gray-500 ml-1">
+                        - 情報源の所在や手続きも含め人が判断（インプットなし）
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -191,13 +230,17 @@ export function HelpButton() {
                     <div className="w-16 h-0.5 bg-red-500 relative">
                       <div className="absolute right-0 top-1/2 -translate-y-1/2 w-0 h-0 border-l-4 border-l-red-500 border-y-4 border-y-transparent"></div>
                     </div>
-                    <span className="text-sm">[処理]→[情報]へのアウトプット</span>
+                    <span className="text-sm">
+                      [処理]→[情報]へのアウトプット
+                    </span>
                   </div>
                   <div className="flex items-center gap-3">
                     <div className="w-16 h-0.5 bg-green-500 relative">
                       <div className="absolute right-0 top-1/2 -translate-y-1/2 w-0 h-0 border-l-4 border-l-green-500 border-y-4 border-y-transparent"></div>
                     </div>
-                    <span className="text-sm">裏付け情報（整合確認の補助入力）</span>
+                    <span className="text-sm">
+                      裏付け情報（整合確認の補助入力）
+                    </span>
                   </div>
                 </div>
               </section>
@@ -206,13 +249,16 @@ export function HelpButton() {
               <section>
                 <h3 className="font-semibold mb-3">複数主体と反復処理</h3>
                 <p className="text-sm text-gray-700 mb-2">
-                  複数の主体についての情報や、複数の主体を対象とする反復処理は<strong>二重線</strong>で表示されます。
+                  複数の主体についての情報や、複数の主体を対象とする反復処理は
+                  <strong>二重線</strong>で表示されます。
                 </p>
                 <div className="flex items-center gap-4">
                   <div className="relative w-10 h-8 border-2 border-gray-300 rounded">
                     <div className="absolute -top-1 -right-1 w-full h-full border-2 border-gray-300 rounded bg-white"></div>
                   </div>
-                  <span className="text-sm text-gray-600">複数の対象に対する情報/反復処理</span>
+                  <span className="text-sm text-gray-600">
+                    複数の対象に対する情報/反復処理
+                  </span>
                 </div>
               </section>
 
@@ -220,14 +266,25 @@ export function HelpButton() {
               <section>
                 <h3 className="font-semibold mb-3">主体と性質</h3>
                 <p className="text-sm text-gray-700 mb-2">
-                  [情報]は「<strong>主体</strong>」が持つ「<strong>性質</strong>」を表します。
+                  [情報]は「<strong>主体</strong>」が持つ「<strong>性質</strong>
+                  」を表します。
                 </p>
                 <div className="bg-gray-50 p-3 rounded text-sm">
-                  <div className="mb-2"><span className="font-medium">例:</span> 「建築物の高さ」</div>
+                  <div className="mb-2">
+                    <span className="font-medium">例:</span> 「建築物の高さ」
+                  </div>
                   <div className="text-gray-600 text-xs space-y-1">
-                    <div><span className="font-medium">主体:</span> 建築物（数えることができるもの）</div>
-                    <div><span className="font-medium">性質:</span> 高さ（主体の属性）</div>
-                    <div><span className="font-medium">性質の型:</span> 数値</div>
+                    <div>
+                      <span className="font-medium">主体:</span>{" "}
+                      建築物（数えることができるもの）
+                    </div>
+                    <div>
+                      <span className="font-medium">性質:</span>{" "}
+                      高さ（主体の属性）
+                    </div>
+                    <div>
+                      <span className="font-medium">性質の型:</span> 数値
+                    </div>
                   </div>
                 </div>
                 <p className="text-xs text-gray-500 mt-2">
@@ -239,16 +296,20 @@ export function HelpButton() {
               <section>
                 <h3 className="font-semibold mb-3">記号（シンボル）</h3>
                 <p className="text-sm text-gray-700 mb-2">
-                  [情報]ノードには論理式で使用する記号（A, B, X1など）が付与されることがあります。
+                  [情報]ノードには論理式で使用する記号（A, B,
+                  X1など）が付与されることがあります。
                 </p>
                 <div className="flex items-center gap-2 mb-2">
                   <div className="px-2 py-1 border-2 border-gray-300 bg-white rounded text-xs">
                     <span className="text-blue-600 mr-1">[A]</span>敷地面積
                   </div>
-                  <span className="text-sm text-gray-600">← 記号Aが付与された情報</span>
+                  <span className="text-sm text-gray-600">
+                    ← 記号Aが付与された情報
+                  </span>
                 </div>
                 <p className="text-xs text-gray-500">
-                  処理ノードの「論理式」では、これらの記号を用いて処理内容を表現します（例: A ≧ B）
+                  処理ノードの「論理式」では、これらの記号を用いて処理内容を表現します（例:
+                  A ≧ B）
                 </p>
               </section>
 
@@ -270,7 +331,9 @@ export function HelpButton() {
                 </p>
                 <div className="border rounded-lg overflow-hidden">
                   <div className="bg-gray-50 px-3 py-2 border-b">
-                    <span className="text-xs text-gray-500">詳細パネルの例</span>
+                    <span className="text-xs text-gray-500">
+                      詳細パネルの例
+                    </span>
                   </div>
                   <div className="p-3 space-y-2 text-xs">
                     <div className="font-bold text-sm mb-2">建築物の高さ</div>
@@ -296,7 +359,9 @@ export function HelpButton() {
                     </div>
                     <div className="border-t pt-2 mt-2">
                       <div className="text-gray-500 mb-1">説明</div>
-                      <div className="text-gray-700">地盤面からの建築物の高さ</div>
+                      <div className="text-gray-700">
+                        地盤面からの建築物の高さ
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -310,14 +375,20 @@ export function HelpButton() {
                 </p>
                 <div className="space-y-2">
                   <div className="flex items-center gap-2">
-                    <div className="w-8 h-6 border-2 border-blue-400 bg-blue-50 rounded-full flex items-center justify-center text-[8px]">開始</div>
-                    <span className="text-sm text-gray-600">開始/終了ノード</span>
+                    <div className="w-8 h-6 border-2 border-blue-400 bg-blue-50 rounded-full flex items-center justify-center text-[8px]">
+                      開始
+                    </div>
+                    <span className="text-sm text-gray-600">
+                      開始/終了ノード
+                    </span>
                   </div>
                   <div className="flex items-center gap-2">
                     <div className="w-8 h-8 border-2 border-yellow-400 bg-yellow-50 rotate-45 flex items-center justify-center">
                       <span className="text-[8px] -rotate-45">?</span>
                     </div>
-                    <span className="text-sm text-gray-600">判定ノード（Yes/Noで分岐）</span>
+                    <span className="text-sm text-gray-600">
+                      判定ノード（Yes/Noで分岐）
+                    </span>
                   </div>
                 </div>
               </section>

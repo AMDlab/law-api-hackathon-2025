@@ -1,5 +1,9 @@
 import { NextResponse } from "next/server";
-import { getBaseArticleId, isValidArticleId, isValidLawId } from "@/lib/validation";
+import {
+  getBaseArticleId,
+  isValidArticleId,
+  isValidLawId,
+} from "@/lib/validation";
 import { LAW_INFO } from "@/lib/api";
 import { prisma } from "@/lib/prisma";
 
@@ -37,7 +41,9 @@ function parseDisplayTitle(diagramId: string): string {
   // A43_P1_kijo -> 第43条第1項（機序図）
   // A43_P1_flow -> 第43条第1項（フロー図）
   // A20_3_P2_kijo -> 第20条の3第2項（機序図）
-  const match = diagramId.match(/^A(\d+(?:_\d+)?)(?:_P(\d+))?(?:_I(\d+))?(?:_(kijo|flow))?$/);
+  const match = diagramId.match(
+    /^A(\d+(?:_\d+)?)(?:_P(\d+))?(?:_I(\d+))?(?:_(kijo|flow))?$/,
+  );
   if (!match) return diagramId;
 
   const article = match[1].replace(/_/g, "の");
@@ -106,7 +112,7 @@ export async function GET() {
     console.error("Failed to list diagrams:", error);
     return NextResponse.json(
       { error: "Failed to list diagrams" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

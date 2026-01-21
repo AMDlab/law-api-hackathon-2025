@@ -14,7 +14,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "審査機序図ビューアー",
-  description: "buildingSMART Japan仕様に基づく審査機序図を表示するWebアプリケーション",
+  description:
+    "buildingSMART Japan仕様に基づく審査機序図を表示するWebアプリケーション",
   robots: {
     index: false,
     follow: false,
