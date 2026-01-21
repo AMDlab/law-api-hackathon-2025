@@ -88,6 +88,20 @@ const processTypeLabels: Record<string, string> = {
   undefined_input: "入力情報不定処理",
 };
 
+const softwareFunctionCategories = [
+  "user_input",
+  "graphic_display",
+  "text_display",
+  "program_processing",
+];
+
+const softwareFunctionCategoryLabels: Record<string, string> = {
+  user_input: "ユーザー入力",
+  graphic_display: "グラフィック表示",
+  text_display: "文字表示",
+  program_processing: "プログラム処理",
+};
+
 const pluralityLabels: Record<string, string> = {
   single: "単数",
   multiple: "複数",
@@ -554,18 +568,90 @@ export function DiagramInspector({
               </div>
 
               <div className="border-t pt-2 mt-2 space-y-1">
-                <JsonField
-                  key={toJsonKey(node.software_functions)}
-                  label="ソフトウェア機能"
-                  value={node.software_functions}
-                  onChange={(next) =>
+                <Label className="text-xs text-gray-500">
+                  ソフトウェア機能
+                </Label>
+                {(node.software_functions ?? []).length === 0 && (
+                  <div className="text-xs text-gray-400">
+                    まだソフトウェア機能がありません
+                  </div>
+                )}
+                <div className="space-y-2">
+                  {(node.software_functions ?? []).map((item, index) => (
+                    <div
+                      key={`software-${index}`}
+                      className="rounded border border-gray-200 p-2 space-y-2"
+                    >
+                      <RowSelect
+                        label="分類"
+                        value={item.category}
+                        onValueChange={(value) => {
+                          const next = [...(node.software_functions ?? [])];
+                          next[index] = {
+                            ...next[index],
+                            category: value as SoftwareFunction["category"],
+                          };
+                          onNodeChange(node.id, {
+                            software_functions: next,
+                          });
+                        }}
+                        options={softwareFunctionCategories}
+                        optionLabels={softwareFunctionCategoryLabels}
+                      />
+                      <div className="space-y-1">
+                        <Label className="text-xs text-gray-500">説明</Label>
+                        <Textarea
+                          value={item.description ?? ""}
+                          onChange={(e) => {
+                            const next = [...(node.software_functions ?? [])];
+                            next[index] = {
+                              ...next[index],
+                              description: e.target.value,
+                            };
+                            onNodeChange(node.id, {
+                              software_functions: next,
+                            });
+                          }}
+                          className="text-sm h-16"
+                        />
+                      </div>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          const next = [...(node.software_functions ?? [])];
+                          next.splice(index, 1);
+                          onNodeChange(node.id, {
+                            software_functions:
+                              next.length > 0 ? next : undefined,
+                          });
+                        }}
+                      >
+                        削除
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => {
+                    const next = [
+                      ...(node.software_functions ?? []),
+                      {
+                        category: "user_input",
+                        description: "",
+                      } satisfies SoftwareFunction,
+                    ];
                     onNodeChange(node.id, {
-                      software_functions: next as
-                        | SoftwareFunction[]
-                        | undefined,
-                    })
-                  }
-                />
+                      software_functions: next,
+                    });
+                  }}
+                >
+                  追加
+                </Button>
               </div>
             </div>
           )}
