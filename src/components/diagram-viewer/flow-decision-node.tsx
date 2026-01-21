@@ -1,13 +1,18 @@
 "use client";
 
 import { memo } from "react";
-import { Handle, Position, type NodeProps, type Node } from "@xyflow/react";
+import { Handle, Position, useConnection, type NodeProps, type Node } from "@xyflow/react";
+import { Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { ButtonHandle } from "@/components/button-handle";
 import type { DecisionNode as DecisionNodeType } from "@/types/diagram";
 
 interface FlowDecisionNodeData extends Record<string, unknown> {
   node: DecisionNodeType;
   isFlowDiagram?: boolean;
   nodeWidth?: number;
+  isEdgeSelected?: boolean;
+  hasOutgoing?: boolean;
 }
 
 type FlowDecisionNodeProps = NodeProps<Node<FlowDecisionNodeData>>;
@@ -38,6 +43,8 @@ function FlowDecisionNodeComponent({ data, selected }: FlowDecisionNodeProps) {
   const node = data.node;
   const isFlowDiagram = data.isFlowDiagram;
   const nodeWidth = data.nodeWidth;
+  const connectionInProgress = useConnection((connection) => connection.inProgress);
+  const showButton = !connectionInProgress && !data.isEdgeSelected;
 
   if (isFlowDiagram) {
     // フローチャート用：六角形（hexagon）- SVGで描画
@@ -83,11 +90,16 @@ function FlowDecisionNodeComponent({ data, selected }: FlowDecisionNodeProps) {
           )}
         </svg>
 
-        {/* ハンドル（非表示だが接続用） */}
-        <Handle type="target" position={Position.Top} className="!opacity-0 !w-0 !h-0" style={{ top: 0 }} />
-        <Handle type="target" position={Position.Left} className="!opacity-0 !w-0 !h-0" style={{ left: 0 }} />
-        <Handle type="source" position={Position.Bottom} className="!opacity-0 !w-0 !h-0" style={{ bottom: 0 }} />
-        <Handle type="source" position={Position.Right} className="!opacity-0 !w-0 !h-0" style={{ right: 0 }} />
+        {/* ハンドル（ReactFlow標準表示） */}
+        <Handle type="target" id="target-top" position={Position.Top} style={{ top: 0 }} className="opacity-0" />
+        <Handle type="target" id="target-left" position={Position.Left} style={{ left: 0 }} className="opacity-0" />
+        <Handle type="target" id="target-bottom" position={Position.Bottom} style={{ bottom: 0 }} className="opacity-0" />
+        <Handle type="target" id="target-right" position={Position.Right} style={{ right: 0 }} className="opacity-0" />
+        <ButtonHandle type="source" position={Position.Bottom} showButton={showButton}>
+          <Button size="sm" variant="secondary" className="h-6 w-6 rounded-full p-0 border-2 border-gray-300">
+            <Plus size={8} />
+          </Button>
+        </ButtonHandle>
 
         {/* コンテンツ - 折り返しなし */}
         <div
@@ -121,10 +133,15 @@ function FlowDecisionNodeComponent({ data, selected }: FlowDecisionNodeProps) {
       `}
     >
       {/* ハンドル */}
-      <Handle type="target" position={Position.Top} className="!bg-amber-500 !w-2 !h-2" />
-      <Handle type="target" position={Position.Left} className="!bg-amber-500 !w-2 !h-2" />
-      <Handle type="source" position={Position.Bottom} className="!bg-amber-500 !w-2 !h-2" />
-      <Handle type="source" position={Position.Right} className="!bg-amber-500 !w-2 !h-2" />
+      <Handle type="target" id="target-top" position={Position.Top} className="opacity-0" />
+      <Handle type="target" id="target-left" position={Position.Left} className="opacity-0" />
+      <Handle type="target" id="target-bottom" position={Position.Bottom} className="opacity-0" />
+      <Handle type="target" id="target-right" position={Position.Right} className="opacity-0" />
+      <ButtonHandle type="source" position={Position.Right} showButton={showButton}>
+        <Button size="sm" variant="secondary" className="h-6 w-6 rounded-full p-0 border-2 border-gray-300">
+          <Plus size={8} />
+        </Button>
+      </ButtonHandle>
 
       {/* アイコン */}
       <div className="absolute -left-1 -top-1 w-5 h-5 bg-amber-500 rounded-full flex items-center justify-center">

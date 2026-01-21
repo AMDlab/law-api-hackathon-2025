@@ -1,12 +1,17 @@
 "use client";
 
 import { memo } from "react";
-import { Handle, Position, type NodeProps, type Node } from "@xyflow/react";
+import { Handle, Position, useConnection, type NodeProps, type Node } from "@xyflow/react";
+import { Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { ButtonHandle } from "@/components/button-handle";
 import type { TerminalNode as TerminalNodeType } from "@/types/diagram";
 
 interface FlowTerminalNodeData extends Record<string, unknown> {
   node: TerminalNodeType;
   isFlowDiagram?: boolean;
+  isEdgeSelected?: boolean;
+  hasOutgoing?: boolean;
 }
 
 type FlowTerminalNodeProps = NodeProps<Node<FlowTerminalNodeData>>;
@@ -77,6 +82,9 @@ function FlowTerminalNodeComponent({ data, selected }: FlowTerminalNodeProps) {
   const isStart = node.result === "start";
   const isEnd = node.result === "end" || node.result === "pass" || node.result === "fail";
   const style = getStyle(node.result);
+  const connectionInProgress = useConnection((connection) => connection.inProgress);
+  const showButton =
+    !connectionInProgress && !data.isEdgeSelected && !data.hasOutgoing;
 
   // フローチャート用：シンプルな角丸ボックス（ハンドル非表示）
   if (isFlowDiagram) {
@@ -92,17 +100,22 @@ function FlowTerminalNodeComponent({ data, selected }: FlowTerminalNodeProps) {
           ${selected ? "ring-2 ring-blue-500 ring-offset-2" : ""}
         `}
       >
-        {/* ハンドル（非表示） */}
+        {/* ハンドル（ReactFlow標準表示） */}
         {!isStart && (
           <>
-            <Handle type="target" position={Position.Top} className="!opacity-0 !w-0 !h-0" />
-            <Handle type="target" position={Position.Left} className="!opacity-0 !w-0 !h-0" />
+          <Handle type="target" id="target-top" position={Position.Top} className="opacity-0" />
+          <Handle type="target" id="target-left" position={Position.Left} className="opacity-0" />
+          <Handle type="target" id="target-bottom" position={Position.Bottom} className="opacity-0" />
+          <Handle type="target" id="target-right" position={Position.Right} className="opacity-0" />
           </>
         )}
         {(isStart || !isEnd) && (
           <>
-            <Handle type="source" position={Position.Bottom} className="!opacity-0 !w-0 !h-0" />
-            <Handle type="source" position={Position.Right} className="!opacity-0 !w-0 !h-0" />
+            <ButtonHandle type="source" position={Position.Bottom} showButton={showButton}>
+              <Button size="sm" variant="secondary" className="h-6 w-6 rounded-full p-0 border-2 border-gray-300">
+                <Plus size={8} />
+              </Button>
+            </ButtonHandle>
           </>
         )}
 
@@ -137,15 +150,18 @@ function FlowTerminalNodeComponent({ data, selected }: FlowTerminalNodeProps) {
       {/* ハンドル - インラインスタイルで色指定 */}
       {!isStart && (
         <>
-          <Handle type="target" position={Position.Top} className="!w-2 !h-2" style={{ backgroundColor: style.iconBg }} />
-          <Handle type="target" position={Position.Left} className="!w-2 !h-2" style={{ backgroundColor: style.iconBg }} />
+          <Handle type="target" id="target-top" position={Position.Top} className="opacity-0" style={{ backgroundColor: style.iconBg }} />
+          <Handle type="target" id="target-left" position={Position.Left} className="opacity-0" style={{ backgroundColor: style.iconBg }} />
+          <Handle type="target" id="target-bottom" position={Position.Bottom} className="opacity-0" style={{ backgroundColor: style.iconBg }} />
+          <Handle type="target" id="target-right" position={Position.Right} className="opacity-0" style={{ backgroundColor: style.iconBg }} />
         </>
       )}
       {(isStart || !isEnd) && (
-        <>
-          <Handle type="source" position={Position.Bottom} className="!w-2 !h-2" style={{ backgroundColor: style.iconBg }} />
-          <Handle type="source" position={Position.Right} className="!w-2 !h-2" style={{ backgroundColor: style.iconBg }} />
-        </>
+        <ButtonHandle type="source" position={Position.Right} showButton={showButton}>
+          <Button size="sm" variant="secondary" className="h-6 w-6 rounded-full p-0 border-2 border-gray-300">
+            <Plus size={8} />
+          </Button>
+        </ButtonHandle>
       )}
 
       {/* アイコン */}

@@ -72,6 +72,7 @@ model Diagram {
   relatedLaws            RelatedLaw[]
   nodes                 DiagramNode[]
   edges                 DiagramEdge[]
+  snapshots             DiagramSnapshot[]
 
   @@index([lawId])
   @@index([baseId])
@@ -130,4 +131,19 @@ model DiagramEdge {
 
   @@unique([diagramKey, edgeId])
   @@index([diagramKey])
+}
+
+model DiagramSnapshot {
+  id         String      @id @default(cuid())
+  diagramKey String
+  diagramType DiagramType
+  snapshot   Json
+  note       String?
+  createdAt  DateTime    @default(now())
+
+  diagram    Diagram     @relation(fields: [diagramKey], references: [diagramKey], onDelete: Cascade)
+
+  @@index([diagramKey])
+  @@index([diagramType])
+  @@index([createdAt])
 }

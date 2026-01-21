@@ -55,6 +55,8 @@ function HomeContent() {
   const [diagramLoading, setDiagramLoading] = useState(false);
   const [availableDiagrams, setAvailableDiagrams] = useState<DiagramFile[]>([]);
   const [availableDiagramIds, setAvailableDiagramIds] = useState<Set<string>>(new Set());
+  const [kijoPath, setKijoPath] = useState<string | null>(null);
+  const [flowPath, setFlowPath] = useState<string | null>(null);
   const [showOnlyWithDiagram, setShowOnlyWithDiagram] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -97,6 +99,8 @@ function HomeContent() {
       setSelectedNode(null);
       setDiagram(null);
       setFlowDiagram(null);
+      setKijoPath(null);
+      setFlowPath(null);
 
       try {
         // 法令データ取得
@@ -155,6 +159,8 @@ function HomeContent() {
             const targetNode = findNodeByDiagramId(nodes, diagramIdParam);
             if (targetNode) {
               setSelectedNode(targetNode);
+              setKijoPath(kijoFile.path);
+              setFlowPath(flowFile?.path ?? null);
               // 機序図をロード
               try {
                 const diagramRes = await fetch(kijoFile.path);
@@ -209,6 +215,8 @@ function HomeContent() {
     if (kijoFile) {
       setDiagramLoading(true);
       try {
+        setKijoPath(kijoFile.path);
+        setFlowPath(flowFile?.path ?? null);
         // 機序図をロード
         const res = await fetch(kijoFile.path);
         if (res.ok) {
@@ -240,8 +248,31 @@ function HomeContent() {
     } else {
       setDiagram(null);
       setFlowDiagram(null);
+      setKijoPath(null);
+      setFlowPath(null);
     }
   }, [availableDiagrams, currentLawId, updateUrl]);
+
+  const reloadCurrentDiagram = useCallback(async () => {
+    try {
+      if (kijoPath) {
+        const res = await fetch(kijoPath);
+        if (res.ok) {
+          const data: KijoDiagram = await res.json();
+          setDiagram(data);
+        }
+      }
+      if (flowPath) {
+        const res = await fetch(flowPath);
+        if (res.ok) {
+          const data: FlowDiagram = await res.json();
+          setFlowDiagram(data);
+        }
+      }
+    } catch (err) {
+      console.error('Failed to reload diagram:', err);
+    }
+  }, [flowPath, kijoPath]);
 
   return (
     <div className="h-screen w-full flex flex-col overflow-hidden bg-background">
@@ -326,7 +357,7 @@ function HomeContent() {
                   </Card>
 
                   <Card className="flex-1 min-h-[400px]">
-                    <CardHeader className="pb-2">
+                    <CardHeader className="pb-2 flex flex-row items-start justify-between gap-4">
                       {diagram ? (
                         <div>
                           <CardTitle>{diagram.page_title.title}</CardTitle>
@@ -339,6 +370,7 @@ function HomeContent() {
                       ) : (
                         <CardTitle>審査機序図</CardTitle>
                       )}
+                      <div id="diagram-card-actions" className="flex items-center gap-2" />
                     </CardHeader>
                     <CardContent className="h-[calc(100%-80px)]">
                       {diagramLoading ? (
@@ -352,6 +384,9 @@ function HomeContent() {
                           articleContent={selectedNode?.content}
                           articleTitle={selectedNode ? formatArticleTitle(selectedNode) : undefined}
                           onNavigate={navigateToDiagram}
+                          kijoPath={kijoPath ?? undefined}
+                          flowPath={flowPath ?? undefined}
+                          onReload={reloadCurrentDiagram}
                         />
                       ) : (
                         <div className="flex items-center justify-center h-64 text-muted-foreground">
