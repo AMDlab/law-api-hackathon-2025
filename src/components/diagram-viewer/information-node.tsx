@@ -55,8 +55,7 @@ export const InformationNode = memo(function InformationNode({
   const connectionInProgress = useConnection(
     (connection) => connection.inProgress,
   );
-  const showButton =
-    !connectionInProgress && !data.isEdgeSelected && !data.hasOutgoing;
+  const showButton = !connectionInProgress && !data.isEdgeSelected;
 
   const isMultiple = node.plurality === "multiple";
 
