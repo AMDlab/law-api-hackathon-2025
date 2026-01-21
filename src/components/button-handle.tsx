@@ -17,11 +17,17 @@ export function ButtonHandle({
   ...props
 }: HandleProps & { showButton?: boolean }) {
   const wrapperClassName = wrapperClassNames[position || Position.Bottom];
-  const vertical = position === Position.Top || position === Position.Bottom;
-  const handleClassName = showButton ? undefined : "opacity-0 pointer-events-none";
+  const handleClassName = showButton
+    ? undefined
+    : "opacity-0 pointer-events-none";
 
   return (
-    <BaseHandle position={position} id={props.id} className={handleClassName} {...props}>
+    <BaseHandle
+      position={position}
+      id={props.id}
+      className={handleClassName}
+      {...props}
+    >
       {showButton && (
         <div
           className={`absolute flex items-center ${wrapperClassName} pointer-events-none`}

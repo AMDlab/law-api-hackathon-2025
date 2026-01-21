@@ -10,7 +10,10 @@ interface RouteParams {
 
 // 法令IDからe-Gov法令APIのリビジョンIDを取得するためのマップ
 // 実際の運用では、laws APIで検索して取得する
-const LAW_REVISION_MAP: Record<string, { revisionId: string; lawName: string }> = {
+const LAW_REVISION_MAP: Record<
+  string,
+  { revisionId: string; lawName: string }
+> = {
   "325AC0000000201": {
     revisionId: "325AC0000000201_20250401_506AC0000000053",
     lawName: "建築基準法",
@@ -33,7 +36,7 @@ export async function GET(request: Request, { params }: RouteParams) {
     if (!isValidLawId(lawId)) {
       return NextResponse.json(
         { error: "Invalid law ID format" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -42,7 +45,7 @@ export async function GET(request: Request, { params }: RouteParams) {
     if (!lawInfo) {
       return NextResponse.json(
         { error: "Law not found in registry" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -60,7 +63,7 @@ export async function GET(request: Request, { params }: RouteParams) {
       console.error(`e-Gov API error: ${response.status}`);
       return NextResponse.json(
         { error: "Failed to fetch law data from e-Gov" },
-        { status: 502 }
+        { status: 502 },
       );
     }
 
@@ -71,7 +74,7 @@ export async function GET(request: Request, { params }: RouteParams) {
     if (!lawFullText) {
       return NextResponse.json(
         { error: "No law_full_text in response" },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -87,7 +90,7 @@ export async function GET(request: Request, { params }: RouteParams) {
     console.error("Failed to load law data:", error);
     return NextResponse.json(
       { error: "Failed to load law data" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

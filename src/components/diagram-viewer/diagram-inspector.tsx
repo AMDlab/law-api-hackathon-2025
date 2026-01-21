@@ -1,20 +1,36 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import type { DiagramNode, Edge } from "@/types/diagram";
+import { useState } from "react";
+import type {
+  DiagramNode,
+  Edge,
+  PropertyType,
+  ProcessType,
+  Plurality,
+  Iteration,
+  EdgeRole,
+  TerminalResult,
+  DelegatedRequirement,
+  SoftwareFunction,
+  DecisionNode,
+} from "@/types/diagram";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface DiagramInspectorProps {
   node: DiagramNode | null;
   edge: Edge | null;
-  nodeIds: string[];
   onNodeChange: (nodeId: string, updates: Partial<DiagramNode>) => void;
   onNodeDelete: (nodeId: string) => void;
-  onAddNode: (type: DiagramNode["type"]) => void;
   onEdgeChange: (edgeId: string, updates: Partial<Edge>) => void;
   onEdgeDelete: (edgeId: string) => void;
 }
@@ -106,6 +122,13 @@ const terminalResultLabels: Record<string, string> = {
 };
 
 const UNSET_VALUE = "__unset__";
+const toJsonKey = (value: unknown) => {
+  try {
+    return JSON.stringify(value ?? null);
+  } catch {
+    return "invalid-json";
+  }
+};
 
 function JsonField({
   label,
@@ -118,13 +141,10 @@ function JsonField({
   onChange: (next: unknown) => void;
   placeholder?: string;
 }) {
-  const [text, setText] = useState<string>(value ? JSON.stringify(value, null, 2) : "");
+  const [text, setText] = useState<string>(
+    value ? JSON.stringify(value, null, 2) : "",
+  );
   const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    setText(value ? JSON.stringify(value, null, 2) : "");
-    setError(null);
-  }, [value]);
 
   const handleBlur = () => {
     if (!text.trim()) {
@@ -196,12 +216,13 @@ function RowSelect({
   triggerClassName?: string;
   optionLabels?: Record<string, string>;
 }) {
-  const fallbackValue = allowUnset || options.length === 0 ? UNSET_VALUE : options[0];
+  const fallbackValue =
+    allowUnset || options.length === 0 ? UNSET_VALUE : options[0];
   const currentValue = value ?? fallbackValue;
   const displayValue =
     currentValue === UNSET_VALUE
       ? "未設定"
-      : optionLabels?.[currentValue] ?? currentValue;
+      : (optionLabels?.[currentValue] ?? currentValue);
   return (
     <div className="space-y-1">
       <Label className="text-xs text-gray-500">{label}</Label>
@@ -235,22 +256,13 @@ function RowSelect({
 export function DiagramInspector({
   node,
   edge,
-  nodeIds,
   onNodeChange,
   onNodeDelete,
-  onAddNode,
   onEdgeChange,
   onEdgeDelete,
 }: DiagramInspectorProps) {
   const hasSelection = Boolean(node || edge);
-
-  const relatedArticlesValue = useMemo(() => {
-    if (!node?.related_articles) return "";
-    return node.related_articles.join("\n");
-  }, [node?.related_articles]);
-
-  useEffect(() => {
-  }, [node, edge]);
+  const relatedArticlesValue = node?.related_articles?.join("\n") ?? "";
 
   return (
     <div className="p-4 space-y-4">
@@ -265,7 +277,9 @@ export function DiagramInspector({
               <Label className="text-xs text-gray-500">タイトル</Label>
               <Input
                 value={node.title}
-                onChange={(e) => onNodeChange(node.id, { title: e.target.value })}
+                onChange={(e) =>
+                  onNodeChange(node.id, { title: e.target.value })
+                }
                 className="h-8 text-sm"
               />
             </div>
@@ -306,7 +320,11 @@ export function DiagramInspector({
               <RowSelect
                 label="性質の型"
                 value={node.property_type}
-                onValueChange={(value) => onNodeChange(node.id, { property_type: value as any })}
+                onValueChange={(value) =>
+                  onNodeChange(node.id, {
+                    property_type: value ? (value as PropertyType) : undefined,
+                  })
+                }
                 options={propertyTypes}
                 allowUnset
                 optionLabels={propertyTypeLabels}
@@ -314,7 +332,11 @@ export function DiagramInspector({
               <RowSelect
                 label="単数/複数"
                 value={node.plurality}
-                onValueChange={(value) => onNodeChange(node.id, { plurality: value as any })}
+                onValueChange={(value) =>
+                  onNodeChange(node.id, {
+                    plurality: value ? (value as Plurality) : undefined,
+                  })
+                }
                 options={["single", "multiple"]}
                 allowUnset
                 optionLabels={pluralityLabels}
@@ -329,7 +351,9 @@ export function DiagramInspector({
                 <Label className="text-xs text-gray-500">説明</Label>
                 <Textarea
                   value={node.description ?? ""}
-                  onChange={(e) => onNodeChange(node.id, { description: e.target.value })}
+                  onChange={(e) =>
+                    onNodeChange(node.id, { description: e.target.value })
+                  }
                   className="text-sm h-20"
                 />
               </div>
@@ -352,10 +376,15 @@ export function DiagramInspector({
 
               <div className="border-t pt-2 mt-2 space-y-1">
                 <JsonField
+                  key={toJsonKey(node.delegated_requirements)}
                   label="委任先法令の要件"
                   value={node.delegated_requirements}
                   onChange={(next) =>
-                    onNodeChange(node.id, { delegated_requirements: next as any })
+                    onNodeChange(node.id, {
+                      delegated_requirements: next as
+                        | DelegatedRequirement[]
+                        | undefined,
+                    })
                   }
                   placeholder='[{"article_ref":"法::A1:P1","requirement":"..."}]'
                 />
@@ -365,7 +394,9 @@ export function DiagramInspector({
                 <Label className="text-xs text-gray-500">備考</Label>
                 <Textarea
                   value={node.remarks ?? ""}
-                  onChange={(e) => onNodeChange(node.id, { remarks: e.target.value })}
+                  onChange={(e) =>
+                    onNodeChange(node.id, { remarks: e.target.value })
+                  }
                   className="text-sm h-16"
                 />
               </div>
@@ -378,7 +409,7 @@ export function DiagramInspector({
                 label="処理の種類"
                 value={node.process_type}
                 onValueChange={(value) =>
-                  onNodeChange(node.id, { process_type: value as any })
+                  onNodeChange(node.id, { process_type: value as ProcessType })
                 }
                 options={processTypes}
                 optionLabels={processTypeLabels}
@@ -386,12 +417,18 @@ export function DiagramInspector({
               <RowInput
                 label="対象主体"
                 value={node.target_subject ?? ""}
-                onChange={(value) => onNodeChange(node.id, { target_subject: value })}
+                onChange={(value) =>
+                  onNodeChange(node.id, { target_subject: value })
+                }
               />
               <RowSelect
                 label="単体/反復"
                 value={node.iteration}
-                onValueChange={(value) => onNodeChange(node.id, { iteration: value as any })}
+                onValueChange={(value) =>
+                  onNodeChange(node.id, {
+                    iteration: value ? (value as Iteration) : undefined,
+                  })
+                }
                 options={["single", "iterative"]}
                 allowUnset
                 optionLabels={iterationLabels}
@@ -401,7 +438,9 @@ export function DiagramInspector({
                 <Label className="text-xs text-gray-500">説明</Label>
                 <Textarea
                   value={node.description ?? ""}
-                  onChange={(e) => onNodeChange(node.id, { description: e.target.value })}
+                  onChange={(e) =>
+                    onNodeChange(node.id, { description: e.target.value })
+                  }
                   className="text-sm h-20"
                 />
               </div>
@@ -410,7 +449,9 @@ export function DiagramInspector({
                 <Label className="text-xs text-gray-500">論理式等</Label>
                 <Input
                   value={node.logic_expression ?? ""}
-                  onChange={(e) => onNodeChange(node.id, { logic_expression: e.target.value })}
+                  onChange={(e) =>
+                    onNodeChange(node.id, { logic_expression: e.target.value })
+                  }
                   className="h-8 text-sm font-mono"
                 />
               </div>
@@ -433,10 +474,15 @@ export function DiagramInspector({
 
               <div className="border-t pt-2 mt-2 space-y-1">
                 <JsonField
+                  key={toJsonKey(node.software_functions)}
                   label="ソフトウェア機能"
                   value={node.software_functions}
                   onChange={(next) =>
-                    onNodeChange(node.id, { software_functions: next as any })
+                    onNodeChange(node.id, {
+                      software_functions: next as
+                        | SoftwareFunction[]
+                        | undefined,
+                    })
                   }
                 />
               </div>
@@ -445,25 +491,49 @@ export function DiagramInspector({
 
           {node.type === "decision" && (
             <div className="space-y-3">
-              <RowSelect
-                label="分岐タイプ"
-                value={(node as any).decision_type ?? "binary"}
-                onValueChange={(value) =>
-                  onNodeChange(node.id, { decision_type: value } as any)
-                }
-                options={["binary", "multi"]}
-                optionLabels={decisionTypeLabels}
-              />
-              <JsonField
-                label="分岐条件 (condition)"
-                value={(node as any).condition}
-                onChange={(next) => onNodeChange(node.id, { condition: next as any })}
-              />
-              <JsonField
-                label="選択肢 (options)"
-                value={(node as any).options}
-                onChange={(next) => onNodeChange(node.id, { options: next } as any)}
-              />
+              {(() => {
+                const decisionNode = node as DecisionNode & {
+                  decision_type?: "binary" | "multi";
+                  options?: unknown;
+                };
+                return (
+                  <>
+                    <RowSelect
+                      label="分岐タイプ"
+                      value={decisionNode.decision_type ?? "binary"}
+                      onValueChange={(value) =>
+                        onNodeChange(node.id, {
+                          decision_type: (value ?? "binary") as
+                            | "binary"
+                            | "multi",
+                        })
+                      }
+                      options={["binary", "multi"]}
+                      optionLabels={decisionTypeLabels}
+                    />
+                    <JsonField
+                      key={toJsonKey(decisionNode.condition)}
+                      label="分岐条件 (condition)"
+                      value={decisionNode.condition}
+                      onChange={(next) =>
+                        onNodeChange(node.id, {
+                          condition: next as DecisionNode["condition"],
+                        })
+                      }
+                    />
+                    <JsonField
+                      key={toJsonKey(decisionNode.options)}
+                      label="選択肢 (options)"
+                      value={decisionNode.options}
+                      onChange={(next) =>
+                        onNodeChange(node.id, {
+                          options: next as DecisionNode["options"],
+                        })
+                      }
+                    />
+                  </>
+                );
+              })()}
             </div>
           )}
 
@@ -471,8 +541,10 @@ export function DiagramInspector({
             <div className="space-y-3">
               <RowSelect
                 label="結果"
-                value={(node as any).result ?? "pass"}
-                onValueChange={(value) => onNodeChange(node.id, { result: value as any })}
+                value={node.result ?? "pass"}
+                onValueChange={(value) =>
+                  onNodeChange(node.id, { result: value as TerminalResult })
+                }
                 options={["start", "end", "pass", "fail"]}
                 optionLabels={terminalResultLabels}
               />
@@ -497,8 +569,8 @@ export function DiagramInspector({
             label="役割"
             value={edge.role}
             onValueChange={(value) => {
-              const next = value || undefined;
-              onEdgeChange(edge.id, { role: next as any });
+              const next = value ? (value as EdgeRole) : undefined;
+              onEdgeChange(edge.id, { role: next });
             }}
             options={edgeRoles}
             allowUnset
@@ -524,9 +596,10 @@ export function DiagramInspector({
       )}
 
       {!hasSelection && (
-        <div className="text-xs text-gray-500">ノードまたはエッジを選択してください</div>
+        <div className="text-xs text-gray-500">
+          ノードまたはエッジを選択してください
+        </div>
       )}
-
     </div>
   );
 }

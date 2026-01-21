@@ -1,3 +1,4 @@
+import { Prisma } from "@prisma/client";
 import type {
   Diagram,
   DiagramLabel,
@@ -18,12 +19,29 @@ type DiagramWithRelations = Diagram & {
   edges: DiagramEdge[];
 };
 
-type DiagramPayload = Record<string, any>;
+type DiagramPayload = Record<string, unknown>;
+type UnknownRecord = Record<string, unknown>;
+type JsonInput = Prisma.InputJsonValue;
+type NullableJsonInput = Prisma.NullableJsonNullValueInput | JsonInput;
+
+const asRecord = (value: unknown): UnknownRecord =>
+  typeof value === "object" && value !== null ? (value as UnknownRecord) : {};
+
+const asString = (value: unknown): string =>
+  typeof value === "string" ? value : "";
+
+const asStringOrNull = (value: unknown): string | null =>
+  typeof value === "string" ? value : null;
+
+const asStringArray = (value: unknown): string[] =>
+  Array.isArray(value)
+    ? value.filter((item): item is string => typeof item === "string")
+    : [];
 
 export function buildDiagramJson(
   diagram: DiagramWithRelations,
-  diagramType: DiagramType
-): Record<string, unknown> {
+  diagramType: DiagramType,
+): JsonInput {
   const nodes = diagram.nodes.map((node) => ({
     id: node.nodeId,
     type: node.type,
@@ -84,12 +102,12 @@ export function buildDiagramJson(
     }
   }
 
-  return jsonData;
+  return jsonData as JsonInput;
 }
 
 export function extractDiagramUpdate(
   payload: DiagramPayload,
-  diagramType: DiagramType
+  diagramType: DiagramType,
 ): {
   updateData: {
     schemaId: string | null;
@@ -104,11 +122,11 @@ export function extractDiagramUpdate(
     paragraph: string | null;
     item: string | null;
     textRaw: string | null;
-    complianceLogic: unknown | null;
+    complianceLogic: NullableJsonInput;
     diagramTitle: string | null;
     diagramDescription: string | null;
     kijoDiagramRef: string | null;
-    metadata: unknown | null;
+    metadata: NullableJsonInput;
   };
   labels: Array<{ label: string }>;
   relatedLaws: Array<{
@@ -123,7 +141,7 @@ export function extractDiagramUpdate(
     nodeId: string;
     type: DiagramNodeType;
     title: string;
-    data?: Record<string, unknown>;
+    data?: NullableJsonInput;
   }>;
   edges: Array<{
     edgeId: string;
@@ -133,62 +151,85 @@ export function extractDiagramUpdate(
     label?: string | null;
   }>;
 } {
-  const pageTitle = payload.page_title ?? {};
-  const legalRef = payload.legal_ref ?? {};
-  const labels = (payload.labels ?? []).map((label: string) => ({ label }));
-  const relatedLaws = (payload.related_laws ?? []).map((law: any) => ({
-    lawId: law.law_id ?? "",
-    lawName: law.law_name ?? "",
-    lawType: (law.law_type ?? "act") as LawType,
-    relationship: (law.relationship ?? "references") as RelatedLawRelationship,
-    articles: law.articles ?? [],
-    description: law.description ?? null,
-  }));
-
-  const diagramStructure =
-    diagramType === "kijo" ? payload.kijo_diagram : payload.flow_diagram;
-
-  const nodes = (diagramStructure?.nodes ?? []).map((node: any) => {
-    const { id, type, title, ...rest } = node ?? {};
-    const data = Object.keys(rest ?? {}).length > 0 ? rest : undefined;
+  const pageTitle = asRecord(payload.page_title);
+  const legalRef = asRecord(payload.legal_ref);
+  const labels = asStringArray(payload.labels).map((label) => ({ label }));
+  const relatedLaws = (
+    Array.isArray(payload.related_laws) ? payload.related_laws : []
+  ).map((law) => {
+    const lawRecord = asRecord(law);
     return {
-      nodeId: id,
-      type: type as DiagramNodeType,
-      title: title ?? "",
+      lawId: asString(lawRecord.law_id),
+      lawName: asString(lawRecord.law_name),
+      lawType: (asString(lawRecord.law_type) || "act") as LawType,
+      relationship: (asString(lawRecord.relationship) ||
+        "references") as RelatedLawRelationship,
+      articles: asStringArray(lawRecord.articles),
+      description: asStringOrNull(lawRecord.description),
+    };
+  });
+
+  const diagramStructure = asRecord(
+    diagramType === "kijo" ? payload.kijo_diagram : payload.flow_diagram,
+  );
+
+  const nodes = (
+    Array.isArray(diagramStructure.nodes) ? diagramStructure.nodes : []
+  ).map((node) => {
+    const nodeRecord = asRecord(node);
+    const { id, type, title, ...rest } = nodeRecord;
+    const data = Object.keys(rest).length > 0 ? (rest as JsonInput) : undefined;
+    return {
+      nodeId: asString(id),
+      type: (asString(type) || "information") as DiagramNodeType,
+      title: asString(title),
       data,
     };
   });
 
-  const edges = (diagramStructure?.edges ?? []).map((edge: any) => {
-    const { id, from, to, role, label } = edge ?? {};
+  const edges = (
+    Array.isArray(diagramStructure.edges) ? diagramStructure.edges : []
+  ).map((edge) => {
+    const edgeRecord = asRecord(edge);
+    const role = asString(edgeRecord.role);
     return {
-      edgeId: id,
-      fromId: from,
-      toId: to,
-      role: role ?? null,
-      label: label ?? null,
+      edgeId: asString(edgeRecord.id),
+      fromId: asString(edgeRecord.from),
+      toId: asString(edgeRecord.to),
+      role: role ? (role as EdgeRole) : null,
+      label: asStringOrNull(edgeRecord.label),
     };
   });
 
   const updateData = {
-    schemaId: payload.id ?? null,
-    version: payload.version ?? "3.0.0",
-    pageTitleTitle: pageTitle.title ?? "",
-    pageTitleTargetSubject: pageTitle.target_subject ?? null,
-    pageTitleDescription: pageTitle.description ?? null,
-    lawType: (legalRef.law_type ?? "act") as LawType,
-    lawName: legalRef.law_name ?? "",
-    lawAbbrev: legalRef.law_abbrev ?? "",
-    article: legalRef.article ?? "",
-    paragraph: legalRef.paragraph ?? null,
-    item: legalRef.item ?? null,
-    textRaw: payload.text_raw ?? null,
-    complianceLogic: payload.compliance_logic ?? null,
-    diagramTitle: diagramType === "flow" ? diagramStructure?.title ?? "" : null,
+    schemaId: asStringOrNull(payload.id),
+    version: asString(payload.version) || "3.0.0",
+    pageTitleTitle: asString(pageTitle.title),
+    pageTitleTargetSubject: asStringOrNull(pageTitle.target_subject),
+    pageTitleDescription: asStringOrNull(pageTitle.description),
+    lawType: (asString(legalRef.law_type) || "act") as LawType,
+    lawName: asString(legalRef.law_name),
+    lawAbbrev: asString(legalRef.law_abbrev),
+    article: asString(legalRef.article),
+    paragraph: asStringOrNull(legalRef.paragraph),
+    item: asStringOrNull(legalRef.item),
+    textRaw: asStringOrNull(payload.text_raw),
+    complianceLogic:
+      payload.compliance_logic !== undefined
+        ? (payload.compliance_logic as JsonInput)
+        : Prisma.DbNull,
+    diagramTitle:
+      diagramType === "flow" ? asString(diagramStructure.title) : null,
     diagramDescription:
-      diagramType === "flow" ? diagramStructure?.description ?? null : null,
-    kijoDiagramRef: diagramType === "flow" ? payload.kijo_diagram_ref ?? null : null,
-    metadata: payload.metadata ?? null,
+      diagramType === "flow"
+        ? asStringOrNull(diagramStructure.description)
+        : null,
+    kijoDiagramRef:
+      diagramType === "flow" ? asStringOrNull(payload.kijo_diagram_ref) : null,
+    metadata:
+      payload.metadata !== undefined
+        ? (payload.metadata as JsonInput)
+        : Prisma.DbNull,
   };
 
   return { updateData, labels, relatedLaws, nodes, edges };

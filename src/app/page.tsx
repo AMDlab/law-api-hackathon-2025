@@ -1,21 +1,25 @@
-'use client';
+"use client";
 
-import { Suspense, useEffect, useState, useCallback } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
-import { LawTree } from '@/components/law-tree';
-import { KijoDiagramViewer } from '@/components/diagram-viewer';
-import { LawNode, parseLawData } from '@/lib/parser';
-import { getLawData, LAW_IDS, LAW_INFO, LawInfo } from '@/lib/api';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/components/ui/resizable';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Skeleton } from '@/components/ui/skeleton';
-import type { KijoDiagram, FlowDiagram } from '@/types/diagram';
+import { Suspense, useEffect, useState, useCallback } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
+import { LawTree } from "@/components/law-tree";
+import { KijoDiagramViewer } from "@/components/diagram-viewer";
+import { LawNode, parseLawData } from "@/lib/parser";
+import { getLawData, LAW_IDS, LAW_INFO } from "@/lib/api";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  ResizablePanelGroup,
+  ResizablePanel,
+  ResizableHandle,
+} from "@/components/ui/resizable";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import type { KijoDiagram, FlowDiagram } from "@/types/diagram";
 
 interface DiagramFile {
   diagramId: string;
   baseId: string;
-  type: 'kijo' | 'flow';
+  type: "kijo" | "flow";
   path: string;
 }
 
@@ -31,20 +35,22 @@ function formatArticleTitle(node: LawNode): string {
   if (node.itemNum) {
     parts.push(`第${node.itemNum}号`);
   }
-  return parts.join('');
+  return parts.join("");
 }
 
 // 法令タブ定義
 const LAW_TABS = [
-  { id: LAW_IDS.BUILDING_STANDARDS_ACT, label: '法' },
-  { id: LAW_IDS.BUILDING_STANDARDS_ORDER, label: '令' },
+  { id: LAW_IDS.BUILDING_STANDARDS_ACT, label: "法" },
+  { id: LAW_IDS.BUILDING_STANDARDS_ORDER, label: "令" },
 ];
 
 function HomeContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  const [currentLawId, setCurrentLawId] = useState<string>(LAW_IDS.BUILDING_STANDARDS_ACT);
+  const [currentLawId, setCurrentLawId] = useState<string>(
+    LAW_IDS.BUILDING_STANDARDS_ACT,
+  );
   const [treeData, setTreeData] = useState<LawNode[]>([]);
   const [selectedNode, setSelectedNode] = useState<LawNode | null>(null);
   const [loading, setLoading] = useState(true);
@@ -54,43 +60,37 @@ function HomeContent() {
   const [flowDiagram, setFlowDiagram] = useState<FlowDiagram | null>(null);
   const [diagramLoading, setDiagramLoading] = useState(false);
   const [availableDiagrams, setAvailableDiagrams] = useState<DiagramFile[]>([]);
-  const [availableDiagramIds, setAvailableDiagramIds] = useState<Set<string>>(new Set());
+  const [availableDiagramIds, setAvailableDiagramIds] = useState<Set<string>>(
+    new Set(),
+  );
   const [kijoPath, setKijoPath] = useState<string | null>(null);
   const [flowPath, setFlowPath] = useState<string | null>(null);
   const [showOnlyWithDiagram, setShowOnlyWithDiagram] = useState(true);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
 
   // 現在の法令情報
   const currentLawInfo = LAW_INFO[currentLawId];
 
   // URLパラメータから初期値を取得
   useEffect(() => {
-    const lawIdParam = searchParams.get('lawId');
-    const diagramIdParam = searchParams.get('diagramId');
-
+    const lawIdParam = searchParams.get("lawId");
     if (lawIdParam && LAW_INFO[lawIdParam]) {
       setCurrentLawId(lawIdParam);
     }
   }, [searchParams]);
 
   // URLを更新する関数
-  const updateUrl = useCallback((lawId: string, diagramId?: string) => {
-    const params = new URLSearchParams();
-    params.set('lawId', lawId);
-    if (diagramId) {
-      params.set('diagramId', diagramId);
-    }
-    router.push(`?${params.toString()}`, { scroll: false });
-  }, [router]);
-
-  // 機序図を指定のdiagramIdにナビゲート（関連条項リンク用）
-  const navigateToDiagram = useCallback((targetLawId: string, targetDiagramId: string) => {
-    // 法令を切り替え
-    if (targetLawId !== currentLawId) {
-      setCurrentLawId(targetLawId);
-    }
-    updateUrl(targetLawId, targetDiagramId);
-  }, [currentLawId, updateUrl]);
+  const updateUrl = useCallback(
+    (lawId: string, diagramId?: string) => {
+      const params = new URLSearchParams();
+      params.set("lawId", lawId);
+      if (diagramId) {
+        params.set("diagramId", diagramId);
+      }
+      router.push(`?${params.toString()}`, { scroll: false });
+    },
+    [router],
+  );
 
   // 法令データと機序図一覧を読み込む（法令ID変更時のみ）
   useEffect(() => {
@@ -109,27 +109,32 @@ function HomeContent() {
         setTreeData(nodes);
 
         // 機序図一覧取得
-        const res = await fetch('/api/diagrams');
+        const res = await fetch("/api/diagrams");
         let diagrams: DiagramFile[] = [];
         if (res.ok) {
           const diagramData = await res.json();
           const lawDiagrams = diagramData.diagrams.find(
-            (d: { lawId: string }) => d.lawId === currentLawId
+            (d: { lawId: string }) => d.lawId === currentLawId,
           );
           if (lawDiagrams) {
             diagrams = lawDiagrams.files.map(
-              (f: { diagramId: string; baseId: string; type: 'kijo' | 'flow'; path: string }) => ({
+              (f: {
+                diagramId: string;
+                baseId: string;
+                type: "kijo" | "flow";
+                path: string;
+              }) => ({
                 diagramId: f.diagramId,
                 baseId: f.baseId,
                 type: f.type,
                 path: f.path,
-              })
+              }),
             );
             setAvailableDiagrams(diagrams);
             // baseIdのセットを作成（機序図があるものだけ）
             const kijoBaseIds = diagrams
-              .filter(d => d.type === 'kijo')
-              .map(d => d.baseId);
+              .filter((d) => d.type === "kijo")
+              .map((d) => d.baseId);
             setAvailableDiagramIds(new Set(kijoBaseIds));
           } else {
             setAvailableDiagrams([]);
@@ -138,15 +143,22 @@ function HomeContent() {
         }
 
         // URLパラメータからdiagramIdを取得してロード（初期ロード時のみ）
-        const diagramIdParam = searchParams.get('diagramId');
+        const diagramIdParam = searchParams.get("diagramId");
         if (diagramIdParam && diagrams.length > 0) {
           // diagramIdParamはbaseId（例: A43_P1）として扱う
-          const kijoFile = diagrams.find(d => d.baseId === diagramIdParam && d.type === 'kijo');
-          const flowFile = diagrams.find(d => d.baseId === diagramIdParam && d.type === 'flow');
+          const kijoFile = diagrams.find(
+            (d) => d.baseId === diagramIdParam && d.type === "kijo",
+          );
+          const flowFile = diagrams.find(
+            (d) => d.baseId === diagramIdParam && d.type === "flow",
+          );
 
           if (kijoFile) {
             // 対応するノードを探して選択
-            const findNodeByDiagramId = (nodes: LawNode[], id: string): LawNode | null => {
+            const findNodeByDiagramId = (
+              nodes: LawNode[],
+              id: string,
+            ): LawNode | null => {
               for (const node of nodes) {
                 if (node.diagramId === id) return node;
                 if (node.children) {
@@ -169,7 +181,10 @@ function HomeContent() {
                   setDiagram(diagramJson);
                 }
               } catch (err) {
-                console.error('Failed to load kijo diagram from URL param:', err);
+                console.error(
+                  "Failed to load kijo diagram from URL param:",
+                  err,
+                );
               }
               // フロー図もあればロード
               if (flowFile) {
@@ -180,78 +195,88 @@ function HomeContent() {
                     setFlowDiagram(flowJson);
                   }
                 } catch (err) {
-                  console.error('Failed to load flow diagram from URL param:', err);
+                  console.error(
+                    "Failed to load flow diagram from URL param:",
+                    err,
+                  );
                 }
               }
             }
           }
         }
       } catch (err) {
-        console.error('Failed to load law data:', err);
+        console.error("Failed to load law data:", err);
       } finally {
         setLoading(false);
       }
     }
     loadLawData();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentLawId]);
 
   // ノード選択時の処理
-  const handleSelect = useCallback(async (node: LawNode) => {
-    setSelectedNode(node);
+  const handleSelect = useCallback(
+    async (node: LawNode) => {
+      setSelectedNode(node);
 
-    // 機序図があるか確認（baseIdで検索）
-    const baseId = node.diagramId;
-    const kijoFile = baseId
-      ? availableDiagrams.find(d => d.baseId === baseId && d.type === 'kijo')
-      : undefined;
-    const flowFile = baseId
-      ? availableDiagrams.find(d => d.baseId === baseId && d.type === 'flow')
-      : undefined;
+      // 機序図があるか確認（baseIdで検索）
+      const baseId = node.diagramId;
+      const kijoFile = baseId
+        ? availableDiagrams.find(
+            (d) => d.baseId === baseId && d.type === "kijo",
+          )
+        : undefined;
+      const flowFile = baseId
+        ? availableDiagrams.find(
+            (d) => d.baseId === baseId && d.type === "flow",
+          )
+        : undefined;
 
-    // URLを更新（機序図がある場合のみdiagramIdを設定）
-    updateUrl(currentLawId, kijoFile ? baseId : undefined);
+      // URLを更新（機序図がある場合のみdiagramIdを設定）
+      updateUrl(currentLawId, kijoFile ? baseId : undefined);
 
-    if (kijoFile) {
-      setDiagramLoading(true);
-      try {
-        setKijoPath(kijoFile.path);
-        setFlowPath(flowFile?.path ?? null);
-        // 機序図をロード
-        const res = await fetch(kijoFile.path);
-        if (res.ok) {
-          const data: KijoDiagram = await res.json();
-          setDiagram(data);
-        } else {
-          setDiagram(null);
-        }
+      if (kijoFile) {
+        setDiagramLoading(true);
+        try {
+          setKijoPath(kijoFile.path);
+          setFlowPath(flowFile?.path ?? null);
+          // 機序図をロード
+          const res = await fetch(kijoFile.path);
+          if (res.ok) {
+            const data: KijoDiagram = await res.json();
+            setDiagram(data);
+          } else {
+            setDiagram(null);
+          }
 
-        // フロー図もあればロード
-        if (flowFile) {
-          const flowRes = await fetch(flowFile.path);
-          if (flowRes.ok) {
-            const flowData: FlowDiagram = await flowRes.json();
-            setFlowDiagram(flowData);
+          // フロー図もあればロード
+          if (flowFile) {
+            const flowRes = await fetch(flowFile.path);
+            if (flowRes.ok) {
+              const flowData: FlowDiagram = await flowRes.json();
+              setFlowDiagram(flowData);
+            } else {
+              setFlowDiagram(null);
+            }
           } else {
             setFlowDiagram(null);
           }
-        } else {
+        } catch (err) {
+          console.error("Failed to load diagram:", err);
+          setDiagram(null);
           setFlowDiagram(null);
+        } finally {
+          setDiagramLoading(false);
         }
-      } catch (err) {
-        console.error('Failed to load diagram:', err);
+      } else {
         setDiagram(null);
         setFlowDiagram(null);
-      } finally {
-        setDiagramLoading(false);
+        setKijoPath(null);
+        setFlowPath(null);
       }
-    } else {
-      setDiagram(null);
-      setFlowDiagram(null);
-      setKijoPath(null);
-      setFlowPath(null);
-    }
-  }, [availableDiagrams, currentLawId, updateUrl]);
+    },
+    [availableDiagrams, currentLawId, updateUrl],
+  );
 
   const reloadCurrentDiagram = useCallback(async () => {
     try {
@@ -270,7 +295,7 @@ function HomeContent() {
         }
       }
     } catch (err) {
-      console.error('Failed to reload diagram:', err);
+      console.error("Failed to reload diagram:", err);
     }
   }, [flowPath, kijoPath]);
 
@@ -289,7 +314,11 @@ function HomeContent() {
                 <Tabs value={currentLawId} onValueChange={setCurrentLawId}>
                   <TabsList className="w-full grid grid-cols-2">
                     {LAW_TABS.map((tab) => (
-                      <TabsTrigger key={tab.id} value={tab.id} className="text-xs">
+                      <TabsTrigger
+                        key={tab.id}
+                        value={tab.id}
+                        className="text-xs"
+                      >
                         {tab.label}
                       </TabsTrigger>
                     ))}
@@ -315,7 +344,9 @@ function HomeContent() {
                     onChange={(e) => setShowOnlyWithDiagram(e.target.checked)}
                     className="w-3 h-3"
                   />
-                  <span className="text-muted-foreground">審査機序図ありのみ表示</span>
+                  <span className="text-muted-foreground">
+                    審査機序図ありのみ表示
+                  </span>
                 </label>
               </div>
               <div className="flex-1 min-h-0 overflow-hidden">
@@ -370,7 +401,10 @@ function HomeContent() {
                       ) : (
                         <CardTitle>審査機序図</CardTitle>
                       )}
-                      <div id="diagram-card-actions" className="flex items-center gap-2" />
+                      <div
+                        id="diagram-card-actions"
+                        className="flex items-center gap-2"
+                      />
                     </CardHeader>
                     <CardContent className="h-[calc(100%-80px)]">
                       {diagramLoading ? (
@@ -382,8 +416,11 @@ function HomeContent() {
                           diagram={diagram}
                           flowDiagram={flowDiagram ?? undefined}
                           articleContent={selectedNode?.content}
-                          articleTitle={selectedNode ? formatArticleTitle(selectedNode) : undefined}
-                          onNavigate={navigateToDiagram}
+                          articleTitle={
+                            selectedNode
+                              ? formatArticleTitle(selectedNode)
+                              : undefined
+                          }
                           kijoPath={kijoPath ?? undefined}
                           flowPath={flowPath ?? undefined}
                           onReload={reloadCurrentDiagram}
@@ -411,11 +448,13 @@ function HomeContent() {
 
 export default function Home() {
   return (
-    <Suspense fallback={
-      <div className="h-screen w-full flex items-center justify-center bg-background">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-      </div>
-    }>
+    <Suspense
+      fallback={
+        <div className="h-screen w-full flex items-center justify-center bg-background">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        </div>
+      }
+    >
       <HomeContent />
     </Suspense>
   );

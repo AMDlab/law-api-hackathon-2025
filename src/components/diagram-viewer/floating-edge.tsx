@@ -51,8 +51,10 @@ export function FloatingEdge({
 
   // ラベル位置を分岐ノードの直後（sourceから20%の位置）に配置
   const labelOffset = 0.2;
-  const nearSourceX = edgeCoords.sx + (edgeCoords.tx - edgeCoords.sx) * labelOffset;
-  const nearSourceY = edgeCoords.sy + (edgeCoords.ty - edgeCoords.sy) * labelOffset;
+  const nearSourceX =
+    edgeCoords.sx + (edgeCoords.tx - edgeCoords.sx) * labelOffset;
+  const nearSourceY =
+    edgeCoords.sy + (edgeCoords.ty - edgeCoords.sy) * labelOffset;
 
   return (
     <>

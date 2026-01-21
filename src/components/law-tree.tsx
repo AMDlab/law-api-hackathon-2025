@@ -1,9 +1,16 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { ChevronRight, ChevronDown, FileText, Folder, CheckCircle, AlertCircle } from 'lucide-react';
-import type { LawNode } from '@/lib/parser';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { useState } from "react";
+import {
+  ChevronRight,
+  ChevronDown,
+  FileText,
+  Folder,
+  CheckCircle,
+  AlertCircle,
+} from "lucide-react";
+import type { LawNode } from "@/lib/parser";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface LawTreeProps {
   nodes: LawNode[];
@@ -36,12 +43,21 @@ function hasDescendantMatchingSearch(node: LawNode, query: string): boolean {
   if (!query) return true;
   if (nodeMatchesSearch(node, query)) return true;
   if (node.children) {
-    return node.children.some(child => hasDescendantMatchingSearch(child, query));
+    return node.children.some((child) =>
+      hasDescendantMatchingSearch(child, query),
+    );
   }
   return false;
 }
 
-export function LawTree({ nodes, onSelect, selectedDiagramId, availableDiagramIds, showOnlyWithDiagram, searchQuery }: LawTreeProps) {
+export function LawTree({
+  nodes,
+  onSelect,
+  selectedDiagramId,
+  availableDiagramIds,
+  showOnlyWithDiagram,
+  searchQuery,
+}: LawTreeProps) {
   return (
     <ScrollArea className="h-full">
       <div className="p-2">
@@ -73,30 +89,44 @@ interface TreeNodeProps {
 }
 
 // ノードまたはその子孫に機序図があるかを再帰的にチェック
-function hasDescendantWithDiagram(node: LawNode, availableDiagramIds?: Set<string>): boolean {
+function hasDescendantWithDiagram(
+  node: LawNode,
+  availableDiagramIds?: Set<string>,
+): boolean {
   if (!availableDiagramIds) return false;
   if (node.diagramId && availableDiagramIds.has(node.diagramId)) return true;
   if (node.children) {
-    return node.children.some(child => hasDescendantWithDiagram(child, availableDiagramIds));
+    return node.children.some((child) =>
+      hasDescendantWithDiagram(child, availableDiagramIds),
+    );
   }
   return false;
 }
 
-function TreeNode({ node, depth, onSelect, selectedDiagramId, availableDiagramIds, showOnlyWithDiagram, searchQuery }: TreeNodeProps) {
+function TreeNode({
+  node,
+  depth,
+  onSelect,
+  selectedDiagramId,
+  availableDiagramIds,
+  showOnlyWithDiagram,
+  searchQuery,
+}: TreeNodeProps) {
   const hasSearchQuery = searchQuery && searchQuery.length > 0;
   const [isExpanded, setIsExpanded] = useState(depth < 1);
   const hasChildren = node.children && node.children.length > 0;
-  const isSelectable = node.type === 'Paragraph' || node.type === 'Item';
+  const isSelectable = node.type === "Paragraph" || node.type === "Item";
   const isSelected = selectedDiagramId && node.diagramId === selectedDiagramId;
-  const hasDiagram = availableDiagramIds && node.diagramId && availableDiagramIds.has(node.diagramId);
-  const hasChildWithDiagram = hasDescendantWithDiagram(node, availableDiagramIds);
+  const hasDiagram =
+    availableDiagramIds &&
+    node.diagramId &&
+    availableDiagramIds.has(node.diagramId);
+  const hasChildWithDiagram = hasDescendantWithDiagram(
+    node,
+    availableDiagramIds,
+  );
 
-  // 検索時は自動展開
-  useEffect(() => {
-    if (hasSearchQuery) {
-      setIsExpanded(true);
-    }
-  }, [hasSearchQuery]);
+  const effectiveExpanded = hasSearchQuery ? true : isExpanded;
 
   // 検索フィルタリング
   if (hasSearchQuery) {
@@ -120,19 +150,23 @@ function TreeNode({ node, depth, onSelect, selectedDiagramId, availableDiagramId
     if (isSelectable) {
       onSelect(node);
     } else if (hasChildren) {
-      setIsExpanded(!isExpanded);
+      setIsExpanded(!effectiveExpanded);
     }
   };
 
   const getIcon = () => {
-    if (node.type === 'Chapter' || node.type === 'Section' || node.type === 'Part') {
+    if (
+      node.type === "Chapter" ||
+      node.type === "Section" ||
+      node.type === "Part"
+    ) {
       // 子孫に機序図があれば緑、なければ黄色
-      const color = hasChildWithDiagram ? 'text-green-600' : 'text-yellow-600';
+      const color = hasChildWithDiagram ? "text-green-600" : "text-yellow-600";
       return <Folder className={`w-4 h-4 ${color} flex-shrink-0`} />;
     }
-    if (node.type === 'Article') {
+    if (node.type === "Article") {
       // 子孫に機序図があれば緑、なければグレー
-      const color = hasChildWithDiagram ? 'text-green-600' : 'text-gray-500';
+      const color = hasChildWithDiagram ? "text-green-600" : "text-gray-500";
       return <FileText className={`w-4 h-4 ${color} flex-shrink-0`} />;
     }
     if (hasDiagram) {
@@ -145,7 +179,7 @@ function TreeNode({ node, depth, onSelect, selectedDiagramId, availableDiagramId
   };
 
   const getTitle = () => {
-    if (node.type === 'Article' && node.caption) {
+    if (node.type === "Article" && node.caption) {
       return `${node.title} ${node.caption}`;
     }
     return node.title;
@@ -157,8 +191,8 @@ function TreeNode({ node, depth, onSelect, selectedDiagramId, availableDiagramId
         className={`
           flex items-center gap-1 py-1 px-1 rounded cursor-pointer text-sm
           hover:bg-gray-100
-          ${isSelected ? 'bg-blue-100 text-blue-700' : ''}
-          ${isSelectable ? 'hover:bg-blue-50' : ''}
+          ${isSelected ? "bg-blue-100 text-blue-700" : ""}
+          ${isSelectable ? "hover:bg-blue-50" : ""}
         `}
         style={{ paddingLeft: `${depth * 12 + 4}px` }}
         onClick={handleClick}
@@ -168,11 +202,11 @@ function TreeNode({ node, depth, onSelect, selectedDiagramId, availableDiagramId
           <button
             onClick={(e) => {
               e.stopPropagation();
-              setIsExpanded(!isExpanded);
+              setIsExpanded(!effectiveExpanded);
             }}
             className="p-0.5 hover:bg-gray-200 rounded flex-shrink-0"
           >
-            {isExpanded ? (
+            {effectiveExpanded ? (
               <ChevronDown className="w-3 h-3" />
             ) : (
               <ChevronRight className="w-3 h-3" />
@@ -206,7 +240,7 @@ function TreeNode({ node, depth, onSelect, selectedDiagramId, availableDiagramId
       </div>
 
       {/* 子ノード */}
-      {isExpanded && hasChildren && (
+      {effectiveExpanded && hasChildren && (
         <div>
           {node.children.map((child, index) => (
             <TreeNode

@@ -24,9 +24,10 @@ export function validateKijoDiagram(data: unknown): ValidationResult {
   if (valid) {
     return { valid: true, errors: [] };
   }
-  const errors = validateKijo.errors?.map(
-    (e) => `${e.instancePath || "root"}: ${e.message}`
-  ) || [];
+  const errors =
+    validateKijo.errors?.map(
+      (e) => `${e.instancePath || "root"}: ${e.message}`,
+    ) || [];
   return { valid: false, errors };
 }
 
@@ -38,9 +39,10 @@ export function validateFlowDiagram(data: unknown): ValidationResult {
   if (valid) {
     return { valid: true, errors: [] };
   }
-  const errors = validateFlow.errors?.map(
-    (e) => `${e.instancePath || "root"}: ${e.message}`
-  ) || [];
+  const errors =
+    validateFlow.errors?.map(
+      (e) => `${e.instancePath || "root"}: ${e.message}`,
+    ) || [];
   return { valid: false, errors };
 }
 

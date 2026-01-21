@@ -1,7 +1,13 @@
 "use client";
 
 import { memo } from "react";
-import { Handle, Position, useConnection, type NodeProps, type Node } from "@xyflow/react";
+import {
+  Handle,
+  Position,
+  useConnection,
+  type NodeProps,
+  type Node,
+} from "@xyflow/react";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ButtonHandle } from "@/components/button-handle";
@@ -43,18 +49,21 @@ function FlowDecisionNodeComponent({ data, selected }: FlowDecisionNodeProps) {
   const node = data.node;
   const isFlowDiagram = data.isFlowDiagram;
   const nodeWidth = data.nodeWidth;
-  const connectionInProgress = useConnection((connection) => connection.inProgress);
+  const connectionInProgress = useConnection(
+    (connection) => connection.inProgress,
+  );
   const showButton = !connectionInProgress && !data.isEdgeSelected;
 
   if (isFlowDiagram) {
     // フローチャート用：六角形（hexagon）- SVGで描画
     // 幅はpropsから取得、デフォルトは180
     const width = nodeWidth || 180;
-    const hasRelatedArticles = node.related_articles && node.related_articles.length > 0;
+    const hasRelatedArticles =
+      node.related_articles && node.related_articles.length > 0;
     const baseHeight = 50;
     const articleLineHeight = 12;
     const height = hasRelatedArticles
-      ? baseHeight + (node.related_articles!.length * articleLineHeight)
+      ? baseHeight + node.related_articles!.length * articleLineHeight
       : baseHeight;
     const inset = 15; // 左右の尖り具合
 
@@ -91,12 +100,44 @@ function FlowDecisionNodeComponent({ data, selected }: FlowDecisionNodeProps) {
         </svg>
 
         {/* ハンドル（ReactFlow標準表示） */}
-        <Handle type="target" id="target-top" position={Position.Top} style={{ top: 0 }} className="opacity-0" />
-        <Handle type="target" id="target-left" position={Position.Left} style={{ left: 0 }} className="opacity-0" />
-        <Handle type="target" id="target-bottom" position={Position.Bottom} style={{ bottom: 0 }} className="opacity-0" />
-        <Handle type="target" id="target-right" position={Position.Right} style={{ right: 0 }} className="opacity-0" />
-        <ButtonHandle type="source" position={Position.Bottom} showButton={showButton}>
-          <Button size="sm" variant="secondary" className="h-6 w-6 rounded-full p-0 border-2 border-gray-300">
+        <Handle
+          type="target"
+          id="target-top"
+          position={Position.Top}
+          style={{ top: 0 }}
+          className="opacity-0"
+        />
+        <Handle
+          type="target"
+          id="target-left"
+          position={Position.Left}
+          style={{ left: 0 }}
+          className="opacity-0"
+        />
+        <Handle
+          type="target"
+          id="target-bottom"
+          position={Position.Bottom}
+          style={{ bottom: 0 }}
+          className="opacity-0"
+        />
+        <Handle
+          type="target"
+          id="target-right"
+          position={Position.Right}
+          style={{ right: 0 }}
+          className="opacity-0"
+        />
+        <ButtonHandle
+          type="source"
+          position={Position.Bottom}
+          showButton={showButton}
+        >
+          <Button
+            size="sm"
+            variant="secondary"
+            className="h-6 w-6 rounded-full p-0 border-2 border-gray-300"
+          >
             <Plus size={8} />
           </Button>
         </ButtonHandle>
@@ -133,12 +174,40 @@ function FlowDecisionNodeComponent({ data, selected }: FlowDecisionNodeProps) {
       `}
     >
       {/* ハンドル */}
-      <Handle type="target" id="target-top" position={Position.Top} className="opacity-0" />
-      <Handle type="target" id="target-left" position={Position.Left} className="opacity-0" />
-      <Handle type="target" id="target-bottom" position={Position.Bottom} className="opacity-0" />
-      <Handle type="target" id="target-right" position={Position.Right} className="opacity-0" />
-      <ButtonHandle type="source" position={Position.Right} showButton={showButton}>
-        <Button size="sm" variant="secondary" className="h-6 w-6 rounded-full p-0 border-2 border-gray-300">
+      <Handle
+        type="target"
+        id="target-top"
+        position={Position.Top}
+        className="opacity-0"
+      />
+      <Handle
+        type="target"
+        id="target-left"
+        position={Position.Left}
+        className="opacity-0"
+      />
+      <Handle
+        type="target"
+        id="target-bottom"
+        position={Position.Bottom}
+        className="opacity-0"
+      />
+      <Handle
+        type="target"
+        id="target-right"
+        position={Position.Right}
+        className="opacity-0"
+      />
+      <ButtonHandle
+        type="source"
+        position={Position.Right}
+        showButton={showButton}
+      >
+        <Button
+          size="sm"
+          variant="secondary"
+          className="h-6 w-6 rounded-full p-0 border-2 border-gray-300"
+        >
           <Plus size={8} />
         </Button>
       </ButtonHandle>

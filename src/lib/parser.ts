@@ -1,4 +1,3 @@
-
 export interface LawNode {
   type: string;
   title: string;
@@ -20,100 +19,112 @@ export interface LawNode {
 }
 
 interface XmlNode {
-    tag: string;
-    attr?: Record<string, string>;
-    children?: (XmlNode | string)[];
+  tag: string;
+  attr?: Record<string, string>;
+  children?: (XmlNode | string)[];
 }
 
 // Helper to get text content from a node (recursively)
 function getText(node: XmlNode | string): string {
-    if (typeof node === 'string') return node;
-    if (!node.children) return '';
-    return node.children.map(child => getText(child)).join('');
+  if (typeof node === "string") return node;
+  if (!node.children) return "";
+  return node.children.map((child) => getText(child)).join("");
 }
 
 // Helper to find first child by tag
 function findChild(node: XmlNode, tagName: string): XmlNode | undefined {
-    if (!node.children) return undefined;
-    return node.children.find(c => typeof c !== 'string' && c.tag === tagName) as XmlNode | undefined;
+  if (!node.children) return undefined;
+  return node.children.find(
+    (c) => typeof c !== "string" && c.tag === tagName,
+  ) as XmlNode | undefined;
 }
 
 // Helper to find all children by tag
 function findChildren(node: XmlNode, tagName: string): XmlNode[] {
-    if (!node.children) return [];
-    return node.children.filter(c => typeof c !== 'string' && c.tag === tagName) as XmlNode[];
+  if (!node.children) return [];
+  return node.children.filter(
+    (c) => typeof c !== "string" && c.tag === tagName,
+  ) as XmlNode[];
 }
 
 export function parseLawData(lawData: unknown): LawNode[] {
   // Check if it's the new XML-JSON structure
-  if (!lawData || typeof lawData !== 'object') return [];
-  
+  if (!lawData || typeof lawData !== "object") return [];
+
   // lawData should be the root 'Law' node or have 'Law' property?
   // The API returns { law_full_text: { tag: 'Law', ... } }
   // Our fetch returns law_full_text directly.
-  
+
   const rootNode = lawData as XmlNode;
-  
-  if (rootNode.tag !== 'Law') {
-      console.warn('Root node is not Law', rootNode);
-      return [];
+
+  if (rootNode.tag !== "Law") {
+    console.warn("Root node is not Law", rootNode);
+    return [];
   }
 
-  const lawBody = findChild(rootNode, 'LawBody');
+  const lawBody = findChild(rootNode, "LawBody");
   if (!lawBody) return [];
 
-  const mainProvision = findChild(lawBody, 'MainProvision');
+  const mainProvision = findChild(lawBody, "MainProvision");
   if (!mainProvision) return [];
 
   return traverse(mainProvision);
 }
 
 function traverse(node: XmlNode): LawNode[] {
-    const nodes: LawNode[] = [];
-    if (!node.children) return nodes;
+  const nodes: LawNode[] = [];
+  if (!node.children) return nodes;
 
-    const containerTags = ['Part', 'Chapter', 'Section', 'Subsection', 'Division', 'Article'];
+  const containerTags = [
+    "Part",
+    "Chapter",
+    "Section",
+    "Subsection",
+    "Division",
+    "Article",
+  ];
 
-    node.children.forEach(child => {
-        if (typeof child === 'string') return;
+  node.children.forEach((child) => {
+    if (typeof child === "string") return;
 
-        if (containerTags.includes(child.tag)) {
-            // Find title
-            // e.g. Chapter -> ChapterTitle
-            const titleTag = child.tag === 'Article' ? 'ArticleTitle' : `${child.tag}Title`;
-            const titleNode = findChild(child, titleTag);
-            const title = titleNode ? getText(titleNode) : '';
+    if (containerTags.includes(child.tag)) {
+      // Find title
+      // e.g. Chapter -> ChapterTitle
+      const titleTag =
+        child.tag === "Article" ? "ArticleTitle" : `${child.tag}Title`;
+      const titleNode = findChild(child, titleTag);
+      const title = titleNode ? getText(titleNode) : "";
 
-            const newNode: LawNode = {
-                type: child.tag,
-                title: title,
-                children: []
-            };
+      const newNode: LawNode = {
+        type: child.tag,
+        title: title,
+        children: [],
+      };
 
-            if (child.tag === 'Article') {
-                newNode.articleTitle = title;
-                // 条番号を取得 (例: "1", "20" など Num属性から)
-                const articleNum = child.attr?.Num || '';
-                newNode.articleNum = articleNum;
+      if (child.tag === "Article") {
+        newNode.articleTitle = title;
+        // 条番号を取得 (例: "1", "20" など Num属性から)
+        const articleNum = child.attr?.Num || "";
+        newNode.articleNum = articleNum;
 
-                // 見出し取得
-                const captionNode = findChild(child, 'ArticleCaption');
-                if (captionNode) {
-                    newNode.caption = getText(captionNode);
-                }
-
-                // 条の下に項を展開
-                newNode.children = extractParagraphs(child, articleNum);
-                newNode.content = extractArticleContent(child);
-            } else {
-                newNode.children = traverse(child);
-            }
-
-            nodes.push(newNode);
+        // 見出し取得
+        const captionNode = findChild(child, "ArticleCaption");
+        if (captionNode) {
+          newNode.caption = getText(captionNode);
         }
-    });
 
-    return nodes;
+        // 条の下に項を展開
+        newNode.children = extractParagraphs(child, articleNum);
+        newNode.content = extractArticleContent(child);
+      } else {
+        newNode.children = traverse(child);
+      }
+
+      nodes.push(newNode);
+    }
+  });
+
+  return nodes;
 }
 
 /**
@@ -121,149 +132,151 @@ function traverse(node: XmlNode): LawNode[] {
  * 「〜しなければならない」「〜してはならない」で終わる文を規制文とする
  */
 function isRegulationText(text: string): boolean {
-    const patterns = [
-        /しなければならない[。]?$/,
-        /してはならない[。]?$/,
-        /することができない[。]?$/,
-        /ものとする[。]?$/,
-    ];
-    return patterns.some(p => p.test(text.trim()));
+  const patterns = [
+    /しなければならない[。]?$/,
+    /してはならない[。]?$/,
+    /することができない[。]?$/,
+    /ものとする[。]?$/,
+  ];
+  return patterns.some((p) => p.test(text.trim()));
 }
 
 /**
  * 条から項を抽出
  */
 function extractParagraphs(article: XmlNode, articleNum: string): LawNode[] {
-    const paragraphs = findChildren(article, 'Paragraph');
-    const nodes: LawNode[] = [];
+  const paragraphs = findChildren(article, "Paragraph");
+  const nodes: LawNode[] = [];
 
-    paragraphs.forEach(p => {
-        const pNumAttr = p.attr?.Num || '1';
-        const pNumNode = findChild(p, 'ParagraphNum');
-        const pNumText = pNumNode ? getText(pNumNode) : '';
+  paragraphs.forEach((p) => {
+    const pNumAttr = p.attr?.Num || "1";
+    const pNumNode = findChild(p, "ParagraphNum");
+    const pNumText = pNumNode ? getText(pNumNode) : "";
 
-        // 項の本文を取得
-        const pSentence = findChild(p, 'ParagraphSentence');
-        const sentenceText = pSentence ? extractSentenceText(pSentence) : '';
+    // 項の本文を取得
+    const pSentence = findChild(p, "ParagraphSentence");
+    const sentenceText = pSentence ? extractSentenceText(pSentence) : "";
 
-        // diagramId生成 (例: A43_P1)
-        const diagramId = `A${articleNum.replace(/の/g, '_')}_P${pNumAttr}`;
+    // diagramId生成 (例: A43_P1)
+    const diagramId = `A${articleNum.replace(/の/g, "_")}_P${pNumAttr}`;
 
-        // 規制文判定
-        const isRegulation = isRegulationText(sentenceText);
+    // 規制文判定
+    const isRegulation = isRegulationText(sentenceText);
 
-        const paragraphNode: LawNode = {
-            type: 'Paragraph',
-            title: pNumText ? `第${pNumText}項` : '第1項',
-            paragraphNum: pNumAttr,
-            articleNum: articleNum,
-            diagramId: diagramId,
-            isRegulation: isRegulation,
-            content: sentenceText,
-            children: extractItems(p, articleNum, pNumAttr)
-        };
+    const paragraphNode: LawNode = {
+      type: "Paragraph",
+      title: pNumText ? `第${pNumText}項` : "第1項",
+      paragraphNum: pNumAttr,
+      articleNum: articleNum,
+      diagramId: diagramId,
+      isRegulation: isRegulation,
+      content: sentenceText,
+      children: extractItems(p, articleNum, pNumAttr),
+    };
 
-        nodes.push(paragraphNode);
-    });
+    nodes.push(paragraphNode);
+  });
 
-    return nodes;
+  return nodes;
 }
 
 /**
  * 項から号を抽出
  */
-function extractItems(paragraph: XmlNode, articleNum: string, paragraphNum: string): LawNode[] {
-    const items = findChildren(paragraph, 'Item');
-    const nodes: LawNode[] = [];
+function extractItems(
+  paragraph: XmlNode,
+  articleNum: string,
+  paragraphNum: string,
+): LawNode[] {
+  const items = findChildren(paragraph, "Item");
+  const nodes: LawNode[] = [];
 
-    items.forEach(item => {
-        const itemNumAttr = item.attr?.Num || '';
-        const itemTitleNode = findChild(item, 'ItemTitle');
-        const itemTitle = itemTitleNode ? getText(itemTitleNode) : '';
+  items.forEach((item) => {
+    const itemNumAttr = item.attr?.Num || "";
+    const itemTitleNode = findChild(item, "ItemTitle");
+    const itemTitle = itemTitleNode ? getText(itemTitleNode) : "";
 
-        // 号の本文を取得
-        const itemSentence = findChild(item, 'ItemSentence');
-        const sentenceText = itemSentence ? extractSentenceText(itemSentence) : '';
+    // 号の本文を取得
+    const itemSentence = findChild(item, "ItemSentence");
+    const sentenceText = itemSentence ? extractSentenceText(itemSentence) : "";
 
-        // diagramId生成 (例: A43_P1_I1)
-        const diagramId = `A${articleNum.replace(/の/g, '_')}_P${paragraphNum}_I${itemNumAttr}`;
+    // diagramId生成 (例: A43_P1_I1)
+    const diagramId = `A${articleNum.replace(/の/g, "_")}_P${paragraphNum}_I${itemNumAttr}`;
 
-        // 規制文判定
-        const isRegulation = isRegulationText(sentenceText);
+    // 規制文判定
+    const isRegulation = isRegulationText(sentenceText);
 
-        const itemNode: LawNode = {
-            type: 'Item',
-            title: itemTitle,
-            itemNum: itemNumAttr,
-            paragraphNum: paragraphNum,
-            articleNum: articleNum,
-            diagramId: diagramId,
-            isRegulation: isRegulation,
-            content: sentenceText,
-            children: [] // Subitem1などはここでは展開しない
-        };
+    const itemNode: LawNode = {
+      type: "Item",
+      title: itemTitle,
+      itemNum: itemNumAttr,
+      paragraphNum: paragraphNum,
+      articleNum: articleNum,
+      diagramId: diagramId,
+      isRegulation: isRegulation,
+      content: sentenceText,
+      children: [], // Subitem1などはここでは展開しない
+    };
 
-        nodes.push(itemNode);
-    });
+    nodes.push(itemNode);
+  });
 
-    return nodes;
+  return nodes;
 }
 
 /**
  * Sentence要素からテキストを抽出
  */
 function extractSentenceText(sentenceContainer: XmlNode): string {
-    const sentences: string[] = [];
+  const sentences: string[] = [];
 
-    // Sentence子要素から
-    const sentNodes = findChildren(sentenceContainer, 'Sentence');
-    sentNodes.forEach(s => {
-        sentences.push(getText(s));
-    });
+  // Sentence子要素から
+  const sentNodes = findChildren(sentenceContainer, "Sentence");
+  sentNodes.forEach((s) => {
+    sentences.push(getText(s));
+  });
 
-    // Column子要素から（定義文などで使用）
-    const columnNodes = findChildren(sentenceContainer, 'Column');
-    columnNodes.forEach(col => {
-        sentences.push(getText(col));
-    });
+  // Column子要素から（定義文などで使用）
+  const columnNodes = findChildren(sentenceContainer, "Column");
+  columnNodes.forEach((col) => {
+    sentences.push(getText(col));
+  });
 
-    // 直接のテキストも
-    if (sentences.length === 0) {
-        sentences.push(getText(sentenceContainer));
-    }
+  // 直接のテキストも
+  if (sentences.length === 0) {
+    sentences.push(getText(sentenceContainer));
+  }
 
-    return sentences.join('');
+  return sentences.join("");
 }
-
 
 function extractArticleContent(article: XmlNode): string {
-  let content = '';
-  
+  let content = "";
+
   // ArticleCaption
-  const caption = findChild(article, 'ArticleCaption');
+  const caption = findChild(article, "ArticleCaption");
   if (caption) {
-      content += `【${getText(caption)}】\n`;
+    content += `【${getText(caption)}】\n`;
   }
-  
-  const paragraphs = findChildren(article, 'Paragraph');
-  paragraphs.forEach(p => {
-      const pNumNode = findChild(p, 'ParagraphNum');
-      const pNum = pNumNode ? getText(pNumNode) : '';
-      
-      const sentences: string[] = [];
-      const pSentence = findChild(p, 'ParagraphSentence');
-      if (pSentence) {
-          const sentNodes = findChildren(pSentence, 'Sentence');
-          sentNodes.forEach(s => {
-              sentences.push(getText(s));
-          });
-          // Sometimes ParagraphSentence has text directly or mixed?
-          // Usually it has Sentence children.
-      }
-      
-      content += `${pNum} ${sentences.join('')}\n`;
+
+  const paragraphs = findChildren(article, "Paragraph");
+  paragraphs.forEach((p) => {
+    const pNumNode = findChild(p, "ParagraphNum");
+    const pNum = pNumNode ? getText(pNumNode) : "";
+
+    const sentences: string[] = [];
+    const pSentence = findChild(p, "ParagraphSentence");
+    if (pSentence) {
+      const sentNodes = findChildren(pSentence, "Sentence");
+      sentNodes.forEach((s) => {
+        sentences.push(getText(s));
+      });
+      // Sometimes ParagraphSentence has text directly or mixed?
+      // Usually it has Sentence children.
+    }
+
+    content += `${pNum} ${sentences.join("")}\n`;
   });
-  
+
   return content;
 }
-

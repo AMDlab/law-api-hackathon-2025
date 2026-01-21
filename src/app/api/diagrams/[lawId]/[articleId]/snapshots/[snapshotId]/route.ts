@@ -29,14 +29,14 @@ export async function POST(request: Request, { params }: RouteParams) {
     if (!isValidLawId(lawId)) {
       return NextResponse.json(
         { error: "Invalid law ID format" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     if (!isValidArticleId(articleId)) {
       return NextResponse.json(
         { error: "Invalid article ID format" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -44,7 +44,7 @@ export async function POST(request: Request, { params }: RouteParams) {
     if (!diagramType) {
       return NextResponse.json(
         { error: "Article ID must end with _kijo or _flow" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -59,10 +59,7 @@ export async function POST(request: Request, { params }: RouteParams) {
     });
 
     if (!diagram || diagram.lawId !== lawId) {
-      return NextResponse.json(
-        { error: "Diagram not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Diagram not found" }, { status: 404 });
     }
 
     const snapshot = await prisma.diagramSnapshot.findFirst({
@@ -72,7 +69,7 @@ export async function POST(request: Request, { params }: RouteParams) {
     if (!snapshot) {
       return NextResponse.json(
         { error: "Snapshot not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -87,7 +84,7 @@ export async function POST(request: Request, { params }: RouteParams) {
           error: "Invalid snapshot schema",
           details: formatErrors(validationResult),
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -110,7 +107,9 @@ export async function POST(request: Request, { params }: RouteParams) {
         data: updateData,
       });
 
-      await tx.diagramLabel.deleteMany({ where: { diagramKey: diagram.diagramKey } });
+      await tx.diagramLabel.deleteMany({
+        where: { diagramKey: diagram.diagramKey },
+      });
       if (labels.length > 0) {
         await tx.diagramLabel.createMany({
           data: labels.map((label) => ({
@@ -120,7 +119,9 @@ export async function POST(request: Request, { params }: RouteParams) {
         });
       }
 
-      await tx.relatedLaw.deleteMany({ where: { diagramKey: diagram.diagramKey } });
+      await tx.relatedLaw.deleteMany({
+        where: { diagramKey: diagram.diagramKey },
+      });
       if (relatedLaws.length > 0) {
         await tx.relatedLaw.createMany({
           data: relatedLaws.map((law) => ({
@@ -135,7 +136,9 @@ export async function POST(request: Request, { params }: RouteParams) {
         });
       }
 
-      await tx.diagramNode.deleteMany({ where: { diagramKey: diagram.diagramKey } });
+      await tx.diagramNode.deleteMany({
+        where: { diagramKey: diagram.diagramKey },
+      });
       if (nodes.length > 0) {
         await tx.diagramNode.createMany({
           data: nodes.map((node) => ({
@@ -148,7 +151,9 @@ export async function POST(request: Request, { params }: RouteParams) {
         });
       }
 
-      await tx.diagramEdge.deleteMany({ where: { diagramKey: diagram.diagramKey } });
+      await tx.diagramEdge.deleteMany({
+        where: { diagramKey: diagram.diagramKey },
+      });
       if (edges.length > 0) {
         await tx.diagramEdge.createMany({
           data: edges.map((edge) => ({
@@ -168,7 +173,7 @@ export async function POST(request: Request, { params }: RouteParams) {
     console.error("Failed to restore snapshot:", error);
     return NextResponse.json(
       { error: "Failed to restore snapshot" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
