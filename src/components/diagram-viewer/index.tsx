@@ -1218,10 +1218,10 @@ function KijoDiagramViewerInner({
             >
               <TabsList className="h-8">
                 <TabsTrigger value="kijo" className="text-xs px-3 h-7">
-                  機序図
+                  機能構造
                 </TabsTrigger>
                 <TabsTrigger value="flow" className="text-xs px-3 h-7">
-                  適合判定フロー図
+                  判定フロー
                 </TabsTrigger>
               </TabsList>
             </Tabs>
@@ -1287,7 +1287,7 @@ function KijoDiagramViewerInner({
                 className={`text-sm px-3 py-1.5 rounded ${
                   isDirty
                     ? "bg-blue-600 text-white hover:bg-blue-700"
-                    : "bg-gray-200 text-gray-500"
+                    : "bg-muted text-muted-foreground"
                 }`}
               >
                 {saving ? "保存中..." : "保存"}
@@ -1295,7 +1295,7 @@ function KijoDiagramViewerInner({
               <select
                 value={selectedSnapshotId}
                 onChange={(e) => setSelectedSnapshotId(e.target.value)}
-                className="text-sm border rounded px-3 py-1.5"
+                className="text-sm border border-border rounded px-3 py-1.5 bg-background text-foreground"
               >
                 <option value="">変更履歴を選択</option>
                 {snapshots.map((snapshot) => (
@@ -1307,7 +1307,7 @@ function KijoDiagramViewerInner({
               <button
                 onClick={handleRestore}
                 disabled={!selectedSnapshotId || saving}
-                className="text-sm px-3 py-1.5 rounded border border-gray-300 hover:bg-gray-100 disabled:opacity-50"
+                className="text-sm px-3 py-1.5 rounded border border-border bg-background text-foreground hover:bg-accent disabled:opacity-50"
               >
                 復元
               </button>
@@ -1565,7 +1565,7 @@ function KijoDiagramViewerInner({
       </div>
 
       {/* 詳細パネル */}
-      <div className="w-80 border-l bg-white overflow-y-auto">
+      <div className="w-80 border-l bg-background overflow-y-auto">
         <DiagramInspector
           node={selectedNode}
           edge={selectedEdge}

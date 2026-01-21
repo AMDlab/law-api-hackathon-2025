@@ -8,6 +8,7 @@ import { KijoDiagramViewer } from "@/components/diagram-viewer";
 import { LawNode, parseLawData } from "@/lib/parser";
 import { getLawData, LAW_IDS, LAW_INFO } from "@/lib/api";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ThemeToggle } from "@/components/theme-toggle";
 import {
   ResizablePanelGroup,
   ResizablePanel,
@@ -337,30 +338,33 @@ function HomeContent() {
     <div className="h-screen w-full flex flex-col overflow-hidden bg-background">
       <header className="border-b">
         <div className="flex items-center justify-between gap-4 p-4">
-          <h1 className="text-xl font-bold">審査機序図自動生成システム</h1>
-          {displayName ? (
-            <DropdownMenu>
-              <DropdownMenuTrigger className="flex items-center gap-2 rounded-md border border-input bg-background px-3 py-2 text-sm hover:bg-accent">
-                {roleLabel ? (
-                  <span
-                    className={`rounded-full px-2 py-0.5 text-xs font-medium ${getRoleBadgeClass(
-                      session?.user?.role,
-                    )}`}
+          <h1 className="text-xl font-bold">審査要件モデル協創プラットフォーム</h1>
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            {displayName ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger className="flex items-center gap-2 rounded-md border border-input bg-background px-3 py-2 text-sm hover:bg-accent">
+                  {roleLabel ? (
+                    <span
+                      className={`rounded-full px-2 py-0.5 text-xs font-medium ${getRoleBadgeClass(
+                        session?.user?.role,
+                      )}`}
+                    >
+                      {roleLabel}
+                    </span>
+                  ) : null}
+                  <span className="font-medium">{displayName}</span>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem
+                    onClick={() => signOut({ callbackUrl: "/auth/signin" })}
                   >
-                    {roleLabel}
-                  </span>
-                ) : null}
-                <span className="font-medium">{displayName}</span>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem
-                  onClick={() => signOut({ callbackUrl: "/auth/signin" })}
-                >
-                  ログアウト
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          ) : null}
+                    ログアウト
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : null}
+          </div>
         </div>
       </header>
 
