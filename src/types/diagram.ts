@@ -166,7 +166,7 @@ export interface DecisionNode {
   /** 判定条件の論理式 */
   condition?: {
     operator: string;
-    lhs?: { var: string; desc: string };
+    lhs?: { var?: string; desc?: string };
     rhs?: {
       value?: number | boolean | string;
       var?: string;
@@ -174,7 +174,10 @@ export interface DecisionNode {
       unit?: string;
     };
   };
-  options?: unknown;
+  options?: Array<{
+    value: string;
+    description?: string;
+  }>;
   related_articles?: string[];
 }
 
