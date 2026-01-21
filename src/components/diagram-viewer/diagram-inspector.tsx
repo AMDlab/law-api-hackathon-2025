@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import type {
   DiagramNode,
   Edge,
@@ -146,59 +145,6 @@ const CONDITION_OPERATORS = [
   "IN",
   "NOT_IN",
 ] as const;
-const toJsonKey = (value: unknown) => {
-  try {
-    return JSON.stringify(value ?? null);
-  } catch {
-    return "invalid-json";
-  }
-};
-
-function JsonField({
-  label,
-  value,
-  onChange,
-  placeholder,
-}: {
-  label: string;
-  value: unknown;
-  onChange: (next: unknown) => void;
-  placeholder?: string;
-}) {
-  const [text, setText] = useState<string>(
-    value ? JSON.stringify(value, null, 2) : "",
-  );
-  const [error, setError] = useState<string | null>(null);
-
-  const handleBlur = () => {
-    if (!text.trim()) {
-      onChange(undefined);
-      setError(null);
-      return;
-    }
-    try {
-      const parsed = JSON.parse(text);
-      onChange(parsed);
-      setError(null);
-    } catch {
-      setError("JSON形式が不正です");
-    }
-  };
-
-  return (
-    <div className="space-y-1">
-      <Label className="text-xs text-gray-500">{label}</Label>
-      <Textarea
-        value={text}
-        onChange={(e) => setText(e.target.value)}
-        onBlur={handleBlur}
-        placeholder={placeholder}
-        className="w-full border rounded px-2 py-1 text-xs font-mono h-24"
-      />
-      {error && <div className="text-xs text-red-500">{error}</div>}
-    </div>
-  );
-}
 
 function RowInput({
   label,
