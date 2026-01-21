@@ -10,7 +10,7 @@ export function HelpButton() {
     <>
       <button
         onClick={() => setIsOpen(true)}
-        className="p-1.5 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
+        className="p-1.5 bg-secondary hover:bg-secondary/80 rounded-md transition-colors"
         title="機序図の読み方"
       >
         <HelpCircle className="w-4 h-4" />

@@ -332,29 +332,29 @@ export function ExportButton({
       <button
         onClick={() => setIsOpen(!isOpen)}
         disabled={exporting}
-        className="p-1.5 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors disabled:opacity-50"
+        className="p-1.5 bg-secondary hover:bg-secondary/80 rounded-md transition-colors disabled:opacity-50"
         title="書き出し"
       >
         <Download className={`w-4 h-4 ${exporting ? "animate-pulse" : ""}`} />
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 top-full mt-1 bg-white border rounded-md shadow-lg z-50 min-w-[80px]">
+        <div className="absolute right-0 top-full mt-1 bg-popover border rounded-md shadow-lg z-50 min-w-[80px]">
           <button
             onClick={exportPng}
-            className="w-full px-3 py-2 text-sm hover:bg-gray-100 text-left"
+            className="w-full px-3 py-2 text-sm hover:bg-accent text-left"
           >
             PNG
           </button>
           <button
             onClick={exportPdf}
-            className="w-full px-3 py-2 text-sm hover:bg-gray-100 text-left"
+            className="w-full px-3 py-2 text-sm hover:bg-accent text-left"
           >
             PDF
           </button>
           <button
             onClick={exportJson}
-            className="w-full px-3 py-2 text-sm hover:bg-gray-100 text-left"
+            className="w-full px-3 py-2 text-sm hover:bg-accent text-left"
           >
             JSON
           </button>
