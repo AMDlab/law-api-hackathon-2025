@@ -24,32 +24,45 @@ function buildHeaderElement(
   articleContent?: string,
   articleTitle?: string,
   width?: string,
+  darkMode?: boolean,
 ): HTMLDivElement {
+  const colors = darkMode
+    ? {
+        background: "#0a0a0a",
+        text: "#fafafa",
+        textMuted: "#a1a1aa",
+        border: "#27272a",
+      }
+    : {
+        background: "white",
+        text: "#111827",
+        textMuted: "#6b7280",
+        border: "#e5e7eb",
+      };
+
   const container = document.createElement("div");
   container.style.cssText = `
-    background: white;
+    background: ${colors.background};
     padding: 8px 12px;
     font-family: system-ui, -apple-system, sans-serif;
+    color: ${colors.text};
     ${width ? `width: ${width};` : ""}
   `;
 
   // 条文
   if (articleContent) {
     const articleWrapper = document.createElement("div");
-    articleWrapper.style.cssText =
-      "margin-bottom: 6px; padding-bottom: 6px; border-bottom: 1px solid #e5e7eb;";
+    articleWrapper.style.cssText = `margin-bottom: 6px; padding-bottom: 6px; border-bottom: 1px solid ${colors.border};`;
 
     const articleLabel = document.createElement("div");
-    articleLabel.style.cssText =
-      "font-size: 12px; font-weight: bold; color: #111827; margin-bottom: 4px;";
+    articleLabel.style.cssText = `font-size: 12px; font-weight: bold; color: ${colors.text}; margin-bottom: 4px;`;
     articleLabel.textContent = articleTitle
       ? `【${articleTitle}】`
       : "【条文】";
     articleWrapper.appendChild(articleLabel);
 
     const article = document.createElement("div");
-    article.style.cssText =
-      "font-size: 9px; color: #374151; white-space: pre-wrap; line-height: 1.4;";
+    article.style.cssText = `font-size: 9px; color: ${colors.textMuted}; white-space: pre-wrap; line-height: 1.4;`;
     const shortContent =
       articleContent.length > 300
         ? articleContent.substring(0, 300) + "..."
@@ -62,16 +75,14 @@ function buildHeaderElement(
 
   // タイトル
   const title = document.createElement("div");
-  title.style.cssText =
-    "font-size: 14px; font-weight: bold; margin-bottom: 4px;";
+  title.style.cssText = `font-size: 14px; font-weight: bold; margin-bottom: 4px; color: ${colors.text};`;
   title.textContent = pageTitle.title;
   container.appendChild(title);
 
   // 対象主体
   if (pageTitle.target_subject) {
     const subject = document.createElement("div");
-    subject.style.cssText =
-      "font-size: 10px; color: #6b7280; margin-bottom: 2px;";
+    subject.style.cssText = `font-size: 10px; color: ${colors.textMuted}; margin-bottom: 2px;`;
     subject.textContent = `対象主体: ${pageTitle.target_subject}`;
     container.appendChild(subject);
   }
@@ -79,7 +90,7 @@ function buildHeaderElement(
   // 説明
   if (pageTitle.description) {
     const desc = document.createElement("div");
-    desc.style.cssText = "font-size: 10px; color: #6b7280;";
+    desc.style.cssText = `font-size: 10px; color: ${colors.textMuted};`;
     desc.textContent = pageTitle.description;
     container.appendChild(desc);
   }
@@ -137,6 +148,11 @@ export function ExportButton({
     [currentDiagram.id],
   );
 
+  // ダークモードかどうかを判定
+  const isDarkMode = useCallback(() => {
+    return document.documentElement.classList.contains("dark");
+  }, []);
+
   // 現在の表示状態でキャプチャ（PNG用）
   const captureCurrentView = useCallback(async (): Promise<string | null> => {
     if (!flowRef.current) return null;
@@ -162,9 +178,11 @@ export function ExportButton({
     if (controls) controls.style.display = "none";
     if (tabs) tabs.style.display = "none";
 
+    const backgroundColor = isDarkMode() ? "#0a0a0a" : "#ffffff";
+
     try {
       const dataUrl = await toPng(flowRef.current, {
-        backgroundColor: "#ffffff",
+        backgroundColor,
         pixelRatio: 4,
       });
       return dataUrl;
@@ -174,16 +192,20 @@ export function ExportButton({
       if (controls) controls.style.display = "";
       if (tabs) tabs.style.display = "";
     }
-  }, [flowRef, onFitView]);
+  }, [flowRef, onFitView, isDarkMode]);
 
   // ヘッダーのみを画像化
   const captureHeaderOnly = useCallback(async (): Promise<string | null> => {
+    const darkMode = isDarkMode();
+    const backgroundColor = darkMode ? "#0a0a0a" : "#ffffff";
+
     // ヘッダー用の一時的なコンテナを作成（画面内に配置、視覚的に隠す）
     const container = buildHeaderElement(
       currentPageTitle,
       articleContent,
       articleTitle,
       "800px",
+      darkMode,
     );
     container.style.cssText += `
       position: absolute;
@@ -204,14 +226,14 @@ export function ExportButton({
 
     try {
       const dataUrl = await toPng(container, {
-        backgroundColor: "#ffffff",
+        backgroundColor,
         pixelRatio: 4,
       });
       return dataUrl;
     } finally {
       container.remove();
     }
-  }, [currentPageTitle, articleContent, articleTitle]);
+  }, [currentPageTitle, articleContent, articleTitle, isDarkMode]);
 
   // PNG書き出し
   const exportPng = useCallback(async () => {
