@@ -194,18 +194,16 @@ export function ExportButton({
     }
   }, [flowRef, onFitView, isDarkMode]);
 
-  // ヘッダーのみを画像化
+  // ヘッダーのみを画像化（PDF用：常にライトモード）
   const captureHeaderOnly = useCallback(async (): Promise<string | null> => {
-    const darkMode = isDarkMode();
-    const backgroundColor = darkMode ? "#0a0a0a" : "#ffffff";
-
     // ヘッダー用の一時的なコンテナを作成（画面内に配置、視覚的に隠す）
+    // PDF用なので常にライトモード（白背景）で出力
     const container = buildHeaderElement(
       currentPageTitle,
       articleContent,
       articleTitle,
       "800px",
-      darkMode,
+      false, // 常にライトモード
     );
     container.style.cssText += `
       position: absolute;
@@ -226,14 +224,14 @@ export function ExportButton({
 
     try {
       const dataUrl = await toPng(container, {
-        backgroundColor,
+        backgroundColor: "#ffffff",
         pixelRatio: 4,
       });
       return dataUrl;
     } finally {
       container.remove();
     }
-  }, [currentPageTitle, articleContent, articleTitle, isDarkMode]);
+  }, [currentPageTitle, articleContent, articleTitle]);
 
   // PNG書き出し
   const exportPng = useCallback(async () => {
