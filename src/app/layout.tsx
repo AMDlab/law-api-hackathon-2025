@@ -14,9 +14,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "審査機序図ビューアー",
+  title: "審査要件モデル協創プラットフォーム",
   description:
-    "buildingSMART Japan仕様に基づく審査機序図を表示するWebアプリケーション",
+    "buildingSMART Japan仕様に基づく審査要件モデルを表示・編集するWebアプリケーション",
   robots: {
     index: false,
     follow: false,
