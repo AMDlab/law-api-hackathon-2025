@@ -293,6 +293,7 @@ function convertToFlowElements(
         to: edge.to,
         role: edge.role,
         label: edge.label,
+        targetHandle: isFlowDiagram ? undefined : "target-left",
       },
       isFlowDiagram,
     ),
