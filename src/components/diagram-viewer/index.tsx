@@ -827,10 +827,10 @@ function KijoDiagramViewerInner({
             >
               <TabsList className="h-8">
                 <TabsTrigger value="kijo" className="text-xs px-3 h-7">
-                  機序図
+                  機能構造
                 </TabsTrigger>
                 <TabsTrigger value="flow" className="text-xs px-3 h-7">
-                  適合判定フロー図
+                  判定フロー
                 </TabsTrigger>
               </TabsList>
             </Tabs>
@@ -949,7 +949,7 @@ function KijoDiagramViewerInner({
       </div>
 
       {/* 詳細パネル */}
-      <div className="w-80 border-l bg-white overflow-y-auto">
+      <div className="w-80 border-l bg-background overflow-y-auto">
         <DiagramInspector
           node={selectedNode}
           edge={selectedEdge}

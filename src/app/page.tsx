@@ -7,6 +7,7 @@ import { KijoDiagramViewer } from "@/components/diagram-viewer";
 import { LawNode, parseLawData } from "@/lib/parser";
 import { getLawData, LAW_IDS, LAW_INFO } from "@/lib/api";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ThemeToggle } from "@/components/theme-toggle";
 import {
   ResizablePanelGroup,
   ResizablePanel,
@@ -301,8 +302,9 @@ function HomeContent() {
 
   return (
     <div className="h-screen w-full flex flex-col overflow-hidden bg-background">
-      <header className="p-4 border-b">
-        <h1 className="text-xl font-bold">審査機序図自動生成システム</h1>
+      <header className="p-4 border-b flex items-center justify-between">
+        <h1 className="text-xl font-bold">審査要件モデル協創プラットフォーム</h1>
+        <ThemeToggle />
       </header>
 
       <main className="flex-1 overflow-hidden">
