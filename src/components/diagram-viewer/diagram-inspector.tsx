@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import type {
   DiagramNode,
   Edge,
@@ -88,6 +87,20 @@ const processTypeLabels: Record<string, string> = {
   undefined_input: "入力情報不定処理",
 };
 
+const softwareFunctionCategories = [
+  "user_input",
+  "graphic_display",
+  "text_display",
+  "program_processing",
+];
+
+const softwareFunctionCategoryLabels: Record<string, string> = {
+  user_input: "ユーザー入力",
+  graphic_display: "グラフィック表示",
+  text_display: "文字表示",
+  program_processing: "プログラム処理",
+};
+
 const pluralityLabels: Record<string, string> = {
   single: "単数",
   multiple: "複数",
@@ -122,59 +135,16 @@ const terminalResultLabels: Record<string, string> = {
 };
 
 const UNSET_VALUE = "__unset__";
-const toJsonKey = (value: unknown) => {
-  try {
-    return JSON.stringify(value ?? null);
-  } catch {
-    return "invalid-json";
-  }
-};
-
-function JsonField({
-  label,
-  value,
-  onChange,
-  placeholder,
-}: {
-  label: string;
-  value: unknown;
-  onChange: (next: unknown) => void;
-  placeholder?: string;
-}) {
-  const [text, setText] = useState<string>(
-    value ? JSON.stringify(value, null, 2) : "",
-  );
-  const [error, setError] = useState<string | null>(null);
-
-  const handleBlur = () => {
-    if (!text.trim()) {
-      onChange(undefined);
-      setError(null);
-      return;
-    }
-    try {
-      const parsed = JSON.parse(text);
-      onChange(parsed);
-      setError(null);
-    } catch {
-      setError("JSON形式が不正です");
-    }
-  };
-
-  return (
-    <div className="space-y-1">
-      <Label className="text-xs text-gray-500">{label}</Label>
-      <Textarea
-        value={text}
-        onChange={(e) => setText(e.target.value)}
-        onBlur={handleBlur}
-        placeholder={placeholder}
-        className="w-full border rounded px-2 py-1 text-xs font-mono h-24"
-      />
-      {error && <div className="text-xs text-red-500">{error}</div>}
-    </div>
-  );
-}
+const CONDITION_OPERATORS = [
+  "EQ",
+  "NE",
+  "GT",
+  "GTE",
+  "LT",
+  "LTE",
+  "IN",
+  "NOT_IN",
+] as const;
 
 function RowInput({
   label,
@@ -374,20 +344,91 @@ export function DiagramInspector({
                 />
               </div>
 
-              <div className="border-t pt-2 mt-2 space-y-1">
-                <JsonField
-                  key={toJsonKey(node.delegated_requirements)}
-                  label="委任先法令の要件"
-                  value={node.delegated_requirements}
-                  onChange={(next) =>
+              <div className="border-t pt-2 mt-2 space-y-2">
+                <Label className="text-xs text-gray-500">
+                  委任先法令の要件
+                </Label>
+                {(node.delegated_requirements ?? []).length === 0 && (
+                  <div className="text-xs text-gray-400">
+                    まだ要件がありません
+                  </div>
+                )}
+                <div className="space-y-2">
+                  {(node.delegated_requirements ?? []).map((item, index) => (
+                    <div
+                      key={`delegated-${index}`}
+                      className="rounded border border-gray-200 p-2 space-y-2"
+                    >
+                      <RowInput
+                        label="条文参照"
+                        value={item.article_ref ?? ""}
+                        onChange={(value) => {
+                          const next = [...(node.delegated_requirements ?? [])];
+                          next[index] = {
+                            ...next[index],
+                            article_ref: value,
+                          };
+                          onNodeChange(node.id, {
+                            delegated_requirements: next,
+                          });
+                        }}
+                      />
+                      <div className="space-y-1">
+                        <Label className="text-xs text-gray-500">要件</Label>
+                        <Textarea
+                          value={item.requirement ?? ""}
+                          onChange={(e) => {
+                            const next = [
+                              ...(node.delegated_requirements ?? []),
+                            ];
+                            next[index] = {
+                              ...next[index],
+                              requirement: e.target.value,
+                            };
+                            onNodeChange(node.id, {
+                              delegated_requirements: next,
+                            });
+                          }}
+                          className="text-sm h-16"
+                        />
+                      </div>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          const next = [...(node.delegated_requirements ?? [])];
+                          next.splice(index, 1);
+                          onNodeChange(node.id, {
+                            delegated_requirements:
+                              next.length > 0 ? next : undefined,
+                          });
+                        }}
+                      >
+                        削除
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => {
+                    const next = [
+                      ...(node.delegated_requirements ?? []),
+                      {
+                        article_ref: "",
+                        requirement: "",
+                      } as DelegatedRequirement,
+                    ];
                     onNodeChange(node.id, {
-                      delegated_requirements: next as
-                        | DelegatedRequirement[]
-                        | undefined,
-                    })
-                  }
-                  placeholder='[{"article_ref":"法::A1:P1","requirement":"..."}]'
-                />
+                      delegated_requirements: next,
+                    });
+                  }}
+                >
+                  追加
+                </Button>
               </div>
 
               <div className="border-t pt-2 mt-2 space-y-1">
@@ -473,18 +514,90 @@ export function DiagramInspector({
               </div>
 
               <div className="border-t pt-2 mt-2 space-y-1">
-                <JsonField
-                  key={toJsonKey(node.software_functions)}
-                  label="ソフトウェア機能"
-                  value={node.software_functions}
-                  onChange={(next) =>
+                <Label className="text-xs text-gray-500">
+                  ソフトウェア機能
+                </Label>
+                {(node.software_functions ?? []).length === 0 && (
+                  <div className="text-xs text-gray-400">
+                    まだソフトウェア機能がありません
+                  </div>
+                )}
+                <div className="space-y-2">
+                  {(node.software_functions ?? []).map((item, index) => (
+                    <div
+                      key={`software-${index}`}
+                      className="rounded border border-gray-200 p-2 space-y-2"
+                    >
+                      <RowSelect
+                        label="分類"
+                        value={item.category}
+                        onValueChange={(value) => {
+                          const next = [...(node.software_functions ?? [])];
+                          next[index] = {
+                            ...next[index],
+                            category: value as SoftwareFunction["category"],
+                          };
+                          onNodeChange(node.id, {
+                            software_functions: next,
+                          });
+                        }}
+                        options={softwareFunctionCategories}
+                        optionLabels={softwareFunctionCategoryLabels}
+                      />
+                      <div className="space-y-1">
+                        <Label className="text-xs text-gray-500">説明</Label>
+                        <Textarea
+                          value={item.description ?? ""}
+                          onChange={(e) => {
+                            const next = [...(node.software_functions ?? [])];
+                            next[index] = {
+                              ...next[index],
+                              description: e.target.value,
+                            };
+                            onNodeChange(node.id, {
+                              software_functions: next,
+                            });
+                          }}
+                          className="text-sm h-16"
+                        />
+                      </div>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          const next = [...(node.software_functions ?? [])];
+                          next.splice(index, 1);
+                          onNodeChange(node.id, {
+                            software_functions:
+                              next.length > 0 ? next : undefined,
+                          });
+                        }}
+                      >
+                        削除
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => {
+                    const next = [
+                      ...(node.software_functions ?? []),
+                      {
+                        category: "user_input",
+                        description: "",
+                      } satisfies SoftwareFunction,
+                    ];
                     onNodeChange(node.id, {
-                      software_functions: next as
-                        | SoftwareFunction[]
-                        | undefined,
-                    })
-                  }
-                />
+                      software_functions: next,
+                    });
+                  }}
+                >
+                  追加
+                </Button>
               </div>
             </div>
           )}
@@ -494,7 +607,49 @@ export function DiagramInspector({
               {(() => {
                 const decisionNode = node as DecisionNode & {
                   decision_type?: "binary" | "multi";
-                  options?: unknown;
+                };
+                type ConditionDraft = Partial<
+                  NonNullable<DecisionNode["condition"]>
+                >;
+                const condition: ConditionDraft = decisionNode.condition ?? {};
+                const lhs: NonNullable<DecisionNode["condition"]>["lhs"] =
+                  condition.lhs ?? {};
+                const rhs: NonNullable<DecisionNode["condition"]>["rhs"] =
+                  condition.rhs ?? {};
+                const rhsValue = rhs.value;
+                const rhsValueType =
+                  rhsValue === undefined
+                    ? "unset"
+                    : typeof rhsValue === "boolean"
+                      ? "boolean"
+                      : typeof rhsValue === "number"
+                        ? "number"
+                        : "string";
+
+                const updateCondition = (updates: ConditionDraft) => {
+                  const nextCondition: ConditionDraft = {
+                    ...condition,
+                    ...updates,
+                    lhs: { ...(condition.lhs ?? {}), ...(updates.lhs ?? {}) },
+                    rhs: { ...(condition.rhs ?? {}), ...(updates.rhs ?? {}) },
+                  };
+
+                  const hasOperator = Boolean(nextCondition.operator);
+                  const hasLhs =
+                    Boolean(nextCondition.lhs?.var) ||
+                    Boolean(nextCondition.lhs?.desc);
+                  const hasRhs =
+                    nextCondition.rhs?.value !== undefined ||
+                    Boolean(nextCondition.rhs?.var) ||
+                    Boolean(nextCondition.rhs?.desc) ||
+                    Boolean(nextCondition.rhs?.unit);
+
+                  onNodeChange(node.id, {
+                    condition:
+                      hasOperator || hasLhs || hasRhs
+                        ? (nextCondition as DecisionNode["condition"])
+                        : undefined,
+                  });
                 };
                 return (
                   <>
@@ -511,26 +666,221 @@ export function DiagramInspector({
                       options={["binary", "multi"]}
                       optionLabels={decisionTypeLabels}
                     />
-                    <JsonField
-                      key={toJsonKey(decisionNode.condition)}
-                      label="分岐条件 (condition)"
-                      value={decisionNode.condition}
-                      onChange={(next) =>
-                        onNodeChange(node.id, {
-                          condition: next as DecisionNode["condition"],
-                        })
-                      }
-                    />
-                    <JsonField
-                      key={toJsonKey(decisionNode.options)}
-                      label="選択肢 (options)"
-                      value={decisionNode.options}
-                      onChange={(next) =>
-                        onNodeChange(node.id, {
-                          options: next as DecisionNode["options"],
-                        })
-                      }
-                    />
+                    <div className="border-t pt-2 mt-2 space-y-2">
+                      <Label className="text-xs text-gray-500">
+                        分岐条件 (condition)
+                      </Label>
+                      <RowSelect
+                        label="演算子"
+                        value={condition.operator}
+                        onValueChange={(value) =>
+                          updateCondition({
+                            operator: value
+                              ? (value as NonNullable<
+                                  DecisionNode["condition"]
+                                >["operator"])
+                              : undefined,
+                          })
+                        }
+                        options={[...CONDITION_OPERATORS]}
+                        allowUnset
+                      />
+                      <RowInput
+                        label="左辺: 変数 (lhs.var)"
+                        value={lhs.var ?? ""}
+                        onChange={(value) =>
+                          updateCondition({
+                            lhs: { ...lhs, var: value || undefined },
+                          })
+                        }
+                      />
+                      <RowInput
+                        label="左辺: 説明 (lhs.desc)"
+                        value={lhs.desc ?? ""}
+                        onChange={(value) =>
+                          updateCondition({
+                            lhs: { ...lhs, desc: value || undefined },
+                          })
+                        }
+                      />
+                      <RowSelect
+                        label="右辺: 値の種類"
+                        value={rhsValueType}
+                        onValueChange={(value) => {
+                          const type = value ?? "unset";
+                          const nextValue =
+                            type === "unset"
+                              ? undefined
+                              : type === "boolean"
+                                ? false
+                                : type === "number"
+                                  ? 0
+                                  : "";
+                          updateCondition({
+                            rhs: { ...rhs, value: nextValue },
+                          });
+                        }}
+                        options={["unset", "string", "number", "boolean"]}
+                        allowUnset={false}
+                        optionLabels={{
+                          unset: "未設定",
+                          string: "文字列",
+                          number: "数値",
+                          boolean: "真偽値",
+                        }}
+                      />
+                      {rhsValueType !== "unset" &&
+                        rhsValueType !== "boolean" && (
+                          <RowInput
+                            label="右辺: 値 (rhs.value)"
+                            value={
+                              rhsValue === undefined ? "" : String(rhsValue)
+                            }
+                            onChange={(value) => {
+                              const nextValue =
+                                rhsValueType === "number"
+                                  ? value === ""
+                                    ? undefined
+                                    : Number(value)
+                                  : value;
+                              updateCondition({
+                                rhs: { ...rhs, value: nextValue },
+                              });
+                            }}
+                          />
+                        )}
+                      {rhsValueType === "boolean" && (
+                        <RowSelect
+                          label="右辺: 値 (rhs.value)"
+                          value={String(rhsValue ?? false)}
+                          onValueChange={(value) =>
+                            updateCondition({
+                              rhs: {
+                                ...rhs,
+                                value: value === "true",
+                              },
+                            })
+                          }
+                          options={["true", "false"]}
+                          allowUnset={false}
+                          optionLabels={{
+                            true: "true",
+                            false: "false",
+                          }}
+                        />
+                      )}
+                      <RowInput
+                        label="右辺: 変数 (rhs.var)"
+                        value={rhs.var ?? ""}
+                        onChange={(value) =>
+                          updateCondition({
+                            rhs: { ...rhs, var: value || undefined },
+                          })
+                        }
+                      />
+                      <RowInput
+                        label="右辺: 説明 (rhs.desc)"
+                        value={rhs.desc ?? ""}
+                        onChange={(value) =>
+                          updateCondition({
+                            rhs: { ...rhs, desc: value || undefined },
+                          })
+                        }
+                      />
+                      <RowInput
+                        label="右辺: 単位 (rhs.unit)"
+                        value={rhs.unit ?? ""}
+                        onChange={(value) =>
+                          updateCondition({
+                            rhs: { ...rhs, unit: value || undefined },
+                          })
+                        }
+                      />
+                    </div>
+                    <div className="border-t pt-2 mt-2 space-y-2">
+                      <Label className="text-xs text-gray-500">
+                        選択肢 (options)
+                      </Label>
+                      {(decisionNode.options ?? []).length === 0 && (
+                        <div className="text-xs text-gray-400">
+                          まだ選択肢がありません
+                        </div>
+                      )}
+                      <div className="space-y-2">
+                        {(decisionNode.options ?? []).map((option, index) => (
+                          <div
+                            key={`option-${index}`}
+                            className="rounded border border-gray-200 p-2 space-y-2"
+                          >
+                            <RowInput
+                              label="値 (value)"
+                              value={option.value ?? ""}
+                              onChange={(value) => {
+                                const next = [...(decisionNode.options ?? [])];
+                                next[index] = {
+                                  ...next[index],
+                                  value,
+                                };
+                                onNodeChange(node.id, {
+                                  options: next,
+                                });
+                              }}
+                            />
+                            <div className="space-y-1">
+                              <Label className="text-xs text-gray-500">
+                                説明 (description)
+                              </Label>
+                              <Textarea
+                                value={option.description ?? ""}
+                                onChange={(e) => {
+                                  const next = [
+                                    ...(decisionNode.options ?? []),
+                                  ];
+                                  next[index] = {
+                                    ...next[index],
+                                    description: e.target.value,
+                                  };
+                                  onNodeChange(node.id, {
+                                    options: next,
+                                  });
+                                }}
+                                className="text-sm h-16"
+                              />
+                            </div>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              onClick={() => {
+                                const next = [...(decisionNode.options ?? [])];
+                                next.splice(index, 1);
+                                onNodeChange(node.id, {
+                                  options: next.length > 0 ? next : undefined,
+                                });
+                              }}
+                            >
+                              削除
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => {
+                          const next = [
+                            ...(decisionNode.options ?? []),
+                            { value: "", description: "" },
+                          ];
+                          onNodeChange(node.id, {
+                            options: next,
+                          });
+                        }}
+                      >
+                        追加
+                      </Button>
+                    </div>
                   </>
                 );
               })()}

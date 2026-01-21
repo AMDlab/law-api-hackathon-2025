@@ -880,7 +880,7 @@ function KijoDiagramViewerInner({
               <button
                 onClick={handleSave}
                 disabled={saving || !isDirty}
-                className={`text-xs px-2 py-1 rounded ${
+                className={`text-sm px-3 py-1.5 rounded ${
                   isDirty
                     ? "bg-blue-600 text-white hover:bg-blue-700"
                     : "bg-gray-200 text-gray-500"
@@ -891,7 +891,7 @@ function KijoDiagramViewerInner({
               <select
                 value={selectedSnapshotId}
                 onChange={(e) => setSelectedSnapshotId(e.target.value)}
-                className="text-xs border rounded px-2 py-1"
+                className="text-sm border rounded px-3 py-1.5"
               >
                 <option value="">変更履歴を選択</option>
                 {snapshots.map((snapshot) => (
@@ -903,7 +903,7 @@ function KijoDiagramViewerInner({
               <button
                 onClick={handleRestore}
                 disabled={!selectedSnapshotId || saving}
-                className="text-xs px-2 py-1 rounded border border-gray-300 hover:bg-gray-100 disabled:opacity-50"
+                className="text-sm px-3 py-1.5 rounded border border-gray-300 hover:bg-gray-100 disabled:opacity-50"
               >
                 復元
               </button>
