@@ -80,11 +80,9 @@ export function FloatingEdge({
               position: "absolute",
               transform: `translate(-50%, -50%) translate(${nearSourceX}px,${nearSourceY}px)`,
               pointerEvents: "all",
-              backgroundColor: "rgba(255, 255, 255, 0.9)",
-              border: "1px solid #e5e7eb",
               ...labelBgStyle,
             }}
-            className="px-2 py-0.5 rounded shadow-sm text-xs nodrag nopan"
+            className="px-2 py-0.5 rounded shadow-sm text-xs nodrag nopan bg-popover/95 border border-border text-popover-foreground"
           >
             <span style={labelStyle}>{label}</span>
           </div>
