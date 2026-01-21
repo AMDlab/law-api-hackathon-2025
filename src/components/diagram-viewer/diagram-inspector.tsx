@@ -374,20 +374,90 @@ export function DiagramInspector({
                 />
               </div>
 
-              <div className="border-t pt-2 mt-2 space-y-1">
-                <JsonField
-                  key={toJsonKey(node.delegated_requirements)}
-                  label="委任先法令の要件"
-                  value={node.delegated_requirements}
-                  onChange={(next) =>
+              <div className="border-t pt-2 mt-2 space-y-2">
+                <Label className="text-xs text-gray-500">委任先法令の要件</Label>
+                {(node.delegated_requirements ?? []).length === 0 && (
+                  <div className="text-xs text-gray-400">
+                    まだ要件がありません
+                  </div>
+                )}
+                <div className="space-y-2">
+                  {(node.delegated_requirements ?? []).map((item, index) => (
+                    <div
+                      key={`${item.article_ref}-${index}`}
+                      className="rounded border border-gray-200 p-2 space-y-2"
+                    >
+                      <RowInput
+                        label="条文参照"
+                        value={item.article_ref ?? ""}
+                        onChange={(value) => {
+                          const next = [
+                            ...(node.delegated_requirements ?? []),
+                          ];
+                          next[index] = {
+                            ...next[index],
+                            article_ref: value,
+                          };
+                          onNodeChange(node.id, {
+                            delegated_requirements: next,
+                          });
+                        }}
+                      />
+                      <div className="space-y-1">
+                        <Label className="text-xs text-gray-500">要件</Label>
+                        <Textarea
+                          value={item.requirement ?? ""}
+                          onChange={(e) => {
+                            const next = [
+                              ...(node.delegated_requirements ?? []),
+                            ];
+                            next[index] = {
+                              ...next[index],
+                              requirement: e.target.value,
+                            };
+                            onNodeChange(node.id, {
+                              delegated_requirements: next,
+                            });
+                          }}
+                          className="text-sm h-16"
+                        />
+                      </div>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          const next = [
+                            ...(node.delegated_requirements ?? []),
+                          ];
+                          next.splice(index, 1);
+                          onNodeChange(node.id, {
+                            delegated_requirements:
+                              next.length > 0 ? next : undefined,
+                          });
+                        }}
+                      >
+                        削除
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => {
+                    const next = [
+                      ...(node.delegated_requirements ?? []),
+                      { article_ref: "", requirement: "" } as DelegatedRequirement,
+                    ];
                     onNodeChange(node.id, {
-                      delegated_requirements: next as
-                        | DelegatedRequirement[]
-                        | undefined,
-                    })
-                  }
-                  placeholder='[{"article_ref":"法::A1:P1","requirement":"..."}]'
-                />
+                      delegated_requirements: next,
+                    });
+                  }}
+                >
+                  追加
+                </Button>
               </div>
 
               <div className="border-t pt-2 mt-2 space-y-1">
@@ -511,8 +581,8 @@ export function DiagramInspector({
                       options={["binary", "multi"]}
                       optionLabels={decisionTypeLabels}
                     />
-                    <JsonField
-                      key={toJsonKey(decisionNode.condition)}
+              <JsonField
+                key={`condition-${toJsonKey(decisionNode.condition)}`}
                       label="分岐条件 (condition)"
                       value={decisionNode.condition}
                       onChange={(next) =>
@@ -522,7 +592,7 @@ export function DiagramInspector({
                       }
                     />
                     <JsonField
-                      key={toJsonKey(decisionNode.options)}
+                key={`options-${toJsonKey(decisionNode.options)}`}
                       label="選択肢 (options)"
                       value={decisionNode.options}
                       onChange={(next) =>
