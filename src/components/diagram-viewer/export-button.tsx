@@ -165,7 +165,7 @@ export function ExportButton({
     try {
       const dataUrl = await toPng(flowRef.current, {
         backgroundColor: "#ffffff",
-        pixelRatio: 2,
+        pixelRatio: 4,
       });
       return dataUrl;
     } finally {
@@ -205,7 +205,7 @@ export function ExportButton({
     try {
       const dataUrl = await toPng(container, {
         backgroundColor: "#ffffff",
-        pixelRatio: 2,
+        pixelRatio: 4,
       });
       return dataUrl;
     } finally {
