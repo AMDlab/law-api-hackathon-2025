@@ -60,6 +60,19 @@ const ROLE_LABELS: Record<string, string> = {
   review_software_programmer: "審査ソフトプログラマ",
 };
 
+const ROLE_BADGE_CLASSES: Record<string, string> = {
+  designer: "bg-blue-100 text-blue-700",
+  bim_specialist: "bg-emerald-100 text-emerald-700",
+  ifc_specialist: "bg-indigo-100 text-indigo-700",
+  bim_software_programmer: "bg-purple-100 text-purple-700",
+  reviewer: "bg-amber-100 text-amber-800",
+  review_software_programmer: "bg-rose-100 text-rose-700",
+};
+
+function getRoleBadgeClass(role?: string) {
+  return ROLE_BADGE_CLASSES[role ?? ""] ?? "bg-gray-100 text-gray-600";
+}
+
 function HomeContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -89,7 +102,7 @@ function HomeContent() {
   const currentLawInfo = LAW_INFO[currentLawId];
   const displayName = session?.user?.name?.trim() ?? "";
   const roleLabel = session?.user?.role
-    ? ROLE_LABELS[session.user.role] ?? session.user.role
+    ? (ROLE_LABELS[session.user.role] ?? session.user.role)
     : "";
 
   // URLパラメータから初期値を取得
@@ -329,7 +342,11 @@ function HomeContent() {
             <DropdownMenu>
               <DropdownMenuTrigger className="flex items-center gap-2 rounded-md border border-input bg-background px-3 py-2 text-sm hover:bg-accent">
                 {roleLabel ? (
-                  <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
+                  <span
+                    className={`rounded-full px-2 py-0.5 text-xs font-medium ${getRoleBadgeClass(
+                      session?.user?.role,
+                    )}`}
+                  >
                     {roleLabel}
                   </span>
                 ) : null}

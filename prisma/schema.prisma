@@ -46,6 +46,11 @@ enum UserRole {
   review_software_programmer
 }
 
+enum CommentTargetType {
+  node
+  edge
+}
+
 enum RelatedLawRelationship {
   delegates_to
   delegated_from
@@ -82,6 +87,7 @@ model Diagram {
   nodes                 DiagramNode[]
   edges                 DiagramEdge[]
   snapshots             DiagramSnapshot[]
+  commentThreads        DiagramCommentThread[]
 
   @@index([lawId])
   @@index([baseId])
@@ -169,6 +175,7 @@ model User {
   passwordHash  String?
   accounts      Account[]
   sessions      Session[]
+  comments      DiagramComment[]
 }
 
 model Account {
@@ -203,4 +210,44 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+model DiagramCommentThread {
+  id         String           @id @default(cuid())
+  diagramKey String
+  diagramType DiagramType
+  targetType CommentTargetType
+  targetId   String
+  offsetX    Float
+  offsetY    Float
+  isResolved Boolean          @default(false)
+  resolvedAt DateTime?
+  isDeleted  Boolean          @default(false)
+  deletedAt  DateTime?
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
+
+  diagram    Diagram          @relation(fields: [diagramKey], references: [diagramKey], onDelete: Cascade)
+  comments   DiagramComment[]
+
+  @@index([diagramKey, diagramType])
+  @@index([targetType, targetId])
+}
+
+model DiagramComment {
+  id         String             @id @default(cuid())
+  threadId   String
+  userId     String
+  authorName String
+  authorRole UserRole
+  body       String
+  isDeleted  Boolean            @default(false)
+  deletedAt  DateTime?
+  createdAt  DateTime           @default(now())
+
+  thread     DiagramCommentThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  user       User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([threadId])
+  @@index([userId])
 }

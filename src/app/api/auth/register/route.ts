@@ -27,14 +27,14 @@ export async function POST(request: Request) {
     ) {
       return NextResponse.json(
         { error: "Invalid registration payload." },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     if (password.length < 8) {
       return NextResponse.json(
         { error: "Password must be at least 8 characters." },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -42,7 +42,7 @@ export async function POST(request: Request) {
     if (existingUser) {
       return NextResponse.json(
         { error: "User already exists." },
-        { status: 409 }
+        { status: 409 },
       );
     }
 
@@ -69,7 +69,7 @@ export async function POST(request: Request) {
     console.error(error);
     return NextResponse.json(
       { error: "Failed to register user." },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
