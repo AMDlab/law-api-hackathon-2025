@@ -519,19 +519,29 @@ function KijoDiagramViewerInner({
   const handleConnect = useCallback(
     (connection: Connection) => {
       if (!connection.source || !connection.target) return;
-      const newEdge = createFlowEdge(
-        {
-          id: `edge-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
-          from: connection.source,
-          to: connection.target,
-          role: isFlowDiagram ? "flow" : "input",
-          sourceHandle: connection.sourceHandle,
-          targetHandle: connection.targetHandle,
-        },
-        isFlowDiagram,
-      );
-      setEdges((eds) => addEdge(newEdge, eds));
-      setIsDirty(true);
+      setEdges((eds) => {
+        const isDuplicate = eds.some(
+          (edge) =>
+            edge.source === connection.source &&
+            edge.target === connection.target,
+        );
+        if (isDuplicate) {
+          return eds;
+        }
+        const newEdge = createFlowEdge(
+          {
+            id: `edge-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+            from: connection.source,
+            to: connection.target,
+            role: isFlowDiagram ? "flow" : "input",
+            sourceHandle: connection.sourceHandle,
+            targetHandle: connection.targetHandle,
+          },
+          isFlowDiagram,
+        );
+        setIsDirty(true);
+        return addEdge(newEdge, eds);
+      });
     },
     [isFlowDiagram, setEdges],
   );
@@ -539,8 +549,17 @@ function KijoDiagramViewerInner({
   const handleReconnect = useCallback(
     (oldEdge: Edge, connection: Connection) => {
       if (!connection.source || !connection.target) return;
-      setEdges((eds) =>
-        eds.map((edge) => {
+      setEdges((eds) => {
+        const isDuplicate = eds.some(
+          (edge) =>
+            edge.id !== oldEdge.id &&
+            edge.source === connection.source &&
+            edge.target === connection.target,
+        );
+        if (isDuplicate) {
+          return eds;
+        }
+        const next = eds.map((edge) => {
           if (edge.id !== oldEdge.id) return edge;
           return createFlowEdge(
             {
@@ -556,9 +575,10 @@ function KijoDiagramViewerInner({
             },
             isFlowDiagram,
           );
-        }),
-      );
-      setIsDirty(true);
+        });
+        setIsDirty(true);
+        return next;
+      });
     },
     [isFlowDiagram, setEdges],
   );
