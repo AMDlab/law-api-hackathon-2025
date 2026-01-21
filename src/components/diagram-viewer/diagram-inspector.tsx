@@ -329,7 +329,9 @@ export function DiagramInspector({
               </div>
 
               <div className="border-t pt-2 mt-2 space-y-1">
-                <Label className="text-xs text-muted-foreground">関連条項</Label>
+                <Label className="text-xs text-muted-foreground">
+                  関連条項
+                </Label>
                 <Textarea
                   value={relatedArticlesValue}
                   onChange={(e) =>
@@ -374,7 +376,9 @@ export function DiagramInspector({
                         }}
                       />
                       <div className="space-y-1">
-                        <Label className="text-xs text-muted-foreground">要件</Label>
+                        <Label className="text-xs text-muted-foreground">
+                          要件
+                        </Label>
                         <Textarea
                           value={item.requirement ?? ""}
                           onChange={(e) => {
@@ -487,7 +491,9 @@ export function DiagramInspector({
               </div>
 
               <div className="border-t pt-2 mt-2 space-y-1">
-                <Label className="text-xs text-muted-foreground">論理式等</Label>
+                <Label className="text-xs text-muted-foreground">
+                  論理式等
+                </Label>
                 <Input
                   value={node.logic_expression ?? ""}
                   onChange={(e) =>
@@ -498,7 +504,9 @@ export function DiagramInspector({
               </div>
 
               <div className="border-t pt-2 mt-2 space-y-1">
-                <Label className="text-xs text-muted-foreground">関連条項</Label>
+                <Label className="text-xs text-muted-foreground">
+                  関連条項
+                </Label>
                 <Textarea
                   value={relatedArticlesValue}
                   onChange={(e) =>
@@ -545,7 +553,9 @@ export function DiagramInspector({
                         optionLabels={softwareFunctionCategoryLabels}
                       />
                       <div className="space-y-1">
-                        <Label className="text-xs text-muted-foreground">説明</Label>
+                        <Label className="text-xs text-muted-foreground">
+                          説明
+                        </Label>
                         <Textarea
                           value={item.description ?? ""}
                           onChange={(e) => {
@@ -914,7 +924,9 @@ export function DiagramInspector({
 
       {edge && (
         <div className="space-y-3">
-          <div className="text-xs text-muted-foreground">選択エッジ: {edge.id}</div>
+          <div className="text-xs text-muted-foreground">
+            選択エッジ: {edge.id}
+          </div>
           <RowSelect
             label="役割"
             value={edge.role}

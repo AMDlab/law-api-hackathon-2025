@@ -71,7 +71,7 @@ const ROLE_BADGE_CLASSES: Record<string, string> = {
 };
 
 function getRoleBadgeClass(role?: string) {
-  return ROLE_BADGE_CLASSES[role ?? ""] ?? "bg-gray-100 text-gray-600";
+  return ROLE_BADGE_CLASSES[role ?? ""] ?? "bg-muted text-muted-foreground";
 }
 
 function HomeContent() {
@@ -338,7 +338,9 @@ function HomeContent() {
     <div className="h-screen w-full flex flex-col overflow-hidden bg-background">
       <header className="border-b">
         <div className="flex items-center justify-between gap-4 p-4">
-          <h1 className="text-xl font-bold">審査要件モデル協創プラットフォーム</h1>
+          <h1 className="text-xl font-bold">
+            審査要件モデル協創プラットフォーム
+          </h1>
           <div className="flex items-center gap-2">
             <ThemeToggle />
             {displayName ? (

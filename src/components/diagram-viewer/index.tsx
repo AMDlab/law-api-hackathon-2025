@@ -90,7 +90,7 @@ const ROLE_BADGE_CLASSES: Record<string, string> = {
 };
 
 function getRoleBadgeClass(role?: string) {
-  return ROLE_BADGE_CLASSES[role ?? ""] ?? "bg-gray-100 text-gray-600";
+  return ROLE_BADGE_CLASSES[role ?? ""] ?? "bg-muted text-muted-foreground";
 }
 
 function getDisplayName(name?: string | null) {
@@ -1396,7 +1396,7 @@ function KijoDiagramViewerInner({
                   <Card className="w-64 shadow-lg">
                     <CardContent className="space-y-2">
                       {currentUserName && currentUserRole ? (
-                        <div className="flex items-center gap-2 text-xs text-gray-600">
+                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
                           <span
                             className={`rounded-full px-2 py-0.5 text-[10px] ${getRoleBadgeClass(
                               currentUserRole,
@@ -1495,7 +1495,7 @@ function KijoDiagramViewerInner({
                       <div className="max-h-40 space-y-3 overflow-auto">
                         {selectedThread.comments.map((comment) => (
                           <div key={comment.id} className="space-y-2 text-xs">
-                            <div className="flex items-center gap-1.5 text-gray-600">
+                            <div className="flex items-center gap-1.5 text-muted-foreground">
                               <span
                                 className={`rounded-full px-2 py-0.5 text-[10px] ${getRoleBadgeClass(
                                   comment.authorRole,
@@ -1507,16 +1507,18 @@ function KijoDiagramViewerInner({
                               <span className="font-medium">
                                 {comment.authorName}
                               </span>
-                              <span className="text-[10px] text-gray-400">
+                              <span className="text-[10px] text-muted-foreground/70">
                                 {new Date(comment.createdAt).toLocaleString()}
                               </span>
                             </div>
-                            <div className="text-gray-800">{comment.body}</div>
+                            <div className="text-foreground">
+                              {comment.body}
+                            </div>
                           </div>
                         ))}
                       </div>
                       {currentUserName && currentUserRole ? (
-                        <div className="flex items-center gap-2 text-xs text-gray-600">
+                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
                           <span
                             className={`rounded-full px-2 py-0.5 text-[10px] ${getRoleBadgeClass(
                               currentUserRole,
