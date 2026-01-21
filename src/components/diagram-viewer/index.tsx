@@ -1495,21 +1495,23 @@ function KijoDiagramViewerInner({
                       <div className="max-h-40 space-y-3 overflow-auto">
                         {selectedThread.comments.map((comment) => (
                           <div key={comment.id} className="space-y-2 text-xs">
-                            <div className="flex items-center gap-1.5 text-muted-foreground">
-                              <span
-                                className={`rounded-full px-2 py-0.5 text-[10px] ${getRoleBadgeClass(
-                                  comment.authorRole,
-                                )}`}
-                              >
-                                {ROLE_LABELS[comment.authorRole] ??
-                                  comment.authorRole}
-                              </span>
-                              <span className="font-medium">
-                                {comment.authorName}
-                              </span>
-                              <span className="text-[10px] text-muted-foreground/70">
+                            <div className="space-y-1 text-muted-foreground">
+                              <div className="flex flex-wrap items-center gap-1.5">
+                                <span
+                                  className={`rounded-full px-2 py-0.5 text-[10px] ${getRoleBadgeClass(
+                                    comment.authorRole,
+                                  )}`}
+                                >
+                                  {ROLE_LABELS[comment.authorRole] ??
+                                    comment.authorRole}
+                                </span>
+                                <span className="font-medium">
+                                  {comment.authorName}
+                                </span>
+                              </div>
+                              <div className="text-[10px] text-muted-foreground/70">
                                 {new Date(comment.createdAt).toLocaleString()}
-                              </span>
+                              </div>
                             </div>
                             <div className="text-foreground">
                               {comment.body}
