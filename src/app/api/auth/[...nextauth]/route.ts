@@ -4,6 +4,7 @@ import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { authSecret } from "@/lib/auth-secret";
+import { UserRole } from "@prisma/client";
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
@@ -45,8 +46,8 @@ export const authOptions: NextAuthOptions = {
   ],
   callbacks: {
     async jwt({ token, user }) {
-      if (user && "role" in user) {
-        token.role = user.role;
+      if (user && "role" in user && typeof user.role === "string") {
+        token.role = user.role as UserRole;
       }
       return token;
     },

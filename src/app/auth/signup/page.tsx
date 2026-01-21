@@ -14,13 +14,15 @@ const roleOptions = [
   { value: "review_software_programmer", label: "審査ソフトプログラマ" },
 ] as const;
 
+type RoleValue = (typeof roleOptions)[number]["value"];
+
 export default function SignUpPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [familyName, setFamilyName] = useState("");
   const [givenName, setGivenName] = useState("");
-  const [role, setRole] = useState(roleOptions[0].value);
+  const [role, setRole] = useState<RoleValue>(roleOptions[0].value);
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -132,7 +134,7 @@ export default function SignUpPage() {
             id="role"
             className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
             value={role}
-            onChange={(event) => setRole(event.target.value)}
+            onChange={(event) => setRole(event.target.value as RoleValue)}
           >
             {roleOptions.map((option) => (
               <option key={option.value} value={option.value}>
