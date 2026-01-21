@@ -949,7 +949,7 @@ function KijoDiagramViewerInner({
       </div>
 
       {/* 詳細パネル */}
-      <div className="w-80 border-l bg-white overflow-y-auto">
+      <div className="w-80 border-l bg-background overflow-y-auto">
         <DiagramInspector
           node={selectedNode}
           edge={selectedEdge}

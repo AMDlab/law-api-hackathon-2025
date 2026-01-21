@@ -159,7 +159,7 @@ function RowInput({
 }) {
   return (
     <div className="space-y-1">
-      <Label className="text-xs text-gray-500">{label}</Label>
+      <Label className="text-xs text-muted-foreground">{label}</Label>
       <Input
         value={value}
         onChange={(e) => onChange(e.target.value)}
@@ -195,7 +195,7 @@ function RowSelect({
       : (optionLabels?.[currentValue] ?? currentValue);
   return (
     <div className="space-y-1">
-      <Label className="text-xs text-gray-500">{label}</Label>
+      <Label className="text-xs text-muted-foreground">{label}</Label>
       <Select
         value={currentValue ?? ""}
         onValueChange={(next) => {
@@ -244,7 +244,7 @@ export function DiagramInspector({
         <div className="space-y-4">
           <div className="border-b pb-3 space-y-2">
             <div className="space-y-1">
-              <Label className="text-xs text-gray-500">タイトル</Label>
+              <Label className="text-xs text-muted-foreground">タイトル</Label>
               <Input
                 value={node.title}
                 onChange={(e) =>
@@ -254,7 +254,7 @@ export function DiagramInspector({
               />
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-gray-500">タイプ</span>
+              <span className="text-muted-foreground">タイプ</span>
               <span>
                 {node.type === "information"
                   ? "情報"
@@ -318,7 +318,7 @@ export function DiagramInspector({
               />
 
               <div className="border-t pt-2 mt-2 space-y-1">
-                <Label className="text-xs text-gray-500">説明</Label>
+                <Label className="text-xs text-muted-foreground">説明</Label>
                 <Textarea
                   value={node.description ?? ""}
                   onChange={(e) =>
@@ -329,7 +329,7 @@ export function DiagramInspector({
               </div>
 
               <div className="border-t pt-2 mt-2 space-y-1">
-                <Label className="text-xs text-gray-500">関連条項</Label>
+                <Label className="text-xs text-muted-foreground">関連条項</Label>
                 <Textarea
                   value={relatedArticlesValue}
                   onChange={(e) =>
@@ -345,11 +345,11 @@ export function DiagramInspector({
               </div>
 
               <div className="border-t pt-2 mt-2 space-y-2">
-                <Label className="text-xs text-gray-500">
+                <Label className="text-xs text-muted-foreground">
                   委任先法令の要件
                 </Label>
                 {(node.delegated_requirements ?? []).length === 0 && (
-                  <div className="text-xs text-gray-400">
+                  <div className="text-xs text-muted-foreground/70">
                     まだ要件がありません
                   </div>
                 )}
@@ -357,7 +357,7 @@ export function DiagramInspector({
                   {(node.delegated_requirements ?? []).map((item, index) => (
                     <div
                       key={`delegated-${index}`}
-                      className="rounded border border-gray-200 p-2 space-y-2"
+                      className="rounded border border-border p-2 space-y-2"
                     >
                       <RowInput
                         label="条文参照"
@@ -374,7 +374,7 @@ export function DiagramInspector({
                         }}
                       />
                       <div className="space-y-1">
-                        <Label className="text-xs text-gray-500">要件</Label>
+                        <Label className="text-xs text-muted-foreground">要件</Label>
                         <Textarea
                           value={item.requirement ?? ""}
                           onChange={(e) => {
@@ -432,7 +432,7 @@ export function DiagramInspector({
               </div>
 
               <div className="border-t pt-2 mt-2 space-y-1">
-                <Label className="text-xs text-gray-500">備考</Label>
+                <Label className="text-xs text-muted-foreground">備考</Label>
                 <Textarea
                   value={node.remarks ?? ""}
                   onChange={(e) =>
@@ -476,7 +476,7 @@ export function DiagramInspector({
               />
 
               <div className="border-t pt-2 mt-2 space-y-1">
-                <Label className="text-xs text-gray-500">説明</Label>
+                <Label className="text-xs text-muted-foreground">説明</Label>
                 <Textarea
                   value={node.description ?? ""}
                   onChange={(e) =>
@@ -487,7 +487,7 @@ export function DiagramInspector({
               </div>
 
               <div className="border-t pt-2 mt-2 space-y-1">
-                <Label className="text-xs text-gray-500">論理式等</Label>
+                <Label className="text-xs text-muted-foreground">論理式等</Label>
                 <Input
                   value={node.logic_expression ?? ""}
                   onChange={(e) =>
@@ -498,7 +498,7 @@ export function DiagramInspector({
               </div>
 
               <div className="border-t pt-2 mt-2 space-y-1">
-                <Label className="text-xs text-gray-500">関連条項</Label>
+                <Label className="text-xs text-muted-foreground">関連条項</Label>
                 <Textarea
                   value={relatedArticlesValue}
                   onChange={(e) =>
@@ -514,11 +514,11 @@ export function DiagramInspector({
               </div>
 
               <div className="border-t pt-2 mt-2 space-y-1">
-                <Label className="text-xs text-gray-500">
+                <Label className="text-xs text-muted-foreground">
                   ソフトウェア機能
                 </Label>
                 {(node.software_functions ?? []).length === 0 && (
-                  <div className="text-xs text-gray-400">
+                  <div className="text-xs text-muted-foreground/70">
                     まだソフトウェア機能がありません
                   </div>
                 )}
@@ -526,7 +526,7 @@ export function DiagramInspector({
                   {(node.software_functions ?? []).map((item, index) => (
                     <div
                       key={`software-${index}`}
-                      className="rounded border border-gray-200 p-2 space-y-2"
+                      className="rounded border border-border p-2 space-y-2"
                     >
                       <RowSelect
                         label="分類"
@@ -545,7 +545,7 @@ export function DiagramInspector({
                         optionLabels={softwareFunctionCategoryLabels}
                       />
                       <div className="space-y-1">
-                        <Label className="text-xs text-gray-500">説明</Label>
+                        <Label className="text-xs text-muted-foreground">説明</Label>
                         <Textarea
                           value={item.description ?? ""}
                           onChange={(e) => {
@@ -667,7 +667,7 @@ export function DiagramInspector({
                       optionLabels={decisionTypeLabels}
                     />
                     <div className="border-t pt-2 mt-2 space-y-2">
-                      <Label className="text-xs text-gray-500">
+                      <Label className="text-xs text-muted-foreground">
                         分岐条件 (condition)
                       </Label>
                       <RowSelect
@@ -798,11 +798,11 @@ export function DiagramInspector({
                       />
                     </div>
                     <div className="border-t pt-2 mt-2 space-y-2">
-                      <Label className="text-xs text-gray-500">
+                      <Label className="text-xs text-muted-foreground">
                         選択肢 (options)
                       </Label>
                       {(decisionNode.options ?? []).length === 0 && (
-                        <div className="text-xs text-gray-400">
+                        <div className="text-xs text-muted-foreground/70">
                           まだ選択肢がありません
                         </div>
                       )}
@@ -810,7 +810,7 @@ export function DiagramInspector({
                         {(decisionNode.options ?? []).map((option, index) => (
                           <div
                             key={`option-${index}`}
-                            className="rounded border border-gray-200 p-2 space-y-2"
+                            className="rounded border border-border p-2 space-y-2"
                           >
                             <RowInput
                               label="値 (value)"
@@ -827,7 +827,7 @@ export function DiagramInspector({
                               }}
                             />
                             <div className="space-y-1">
-                              <Label className="text-xs text-gray-500">
+                              <Label className="text-xs text-muted-foreground">
                                 説明 (description)
                               </Label>
                               <Textarea
@@ -914,7 +914,7 @@ export function DiagramInspector({
 
       {edge && (
         <div className="space-y-3">
-          <div className="text-xs text-gray-500">選択エッジ: {edge.id}</div>
+          <div className="text-xs text-muted-foreground">選択エッジ: {edge.id}</div>
           <RowSelect
             label="役割"
             value={edge.role}
@@ -927,7 +927,7 @@ export function DiagramInspector({
             optionLabels={edgeRoleLabels}
           />
           <div className="space-y-1">
-            <Label className="text-xs text-gray-500">ラベル</Label>
+            <Label className="text-xs text-muted-foreground">ラベル</Label>
             <Input
               value={edge.label ?? ""}
               onChange={(e) => onEdgeChange(edge.id, { label: e.target.value })}
@@ -946,7 +946,7 @@ export function DiagramInspector({
       )}
 
       {!hasSelection && (
-        <div className="text-xs text-gray-500">
+        <div className="text-xs text-muted-foreground">
           ノードまたはエッジを選択してください
         </div>
       )}
