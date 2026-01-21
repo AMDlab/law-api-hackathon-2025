@@ -1,18 +1,25 @@
-import { type Node, Position, type InternalNode } from "@xyflow/react";
+import { Position, type InternalNode } from "@xyflow/react";
 
 // ノードの端からエッジが出る位置を計算するユーティリティ
 
 function getNodeIntersection(
   intersectionNode: InternalNode,
-  targetNode: InternalNode
+  targetNode: InternalNode,
 ): { x: number; y: number } {
   const {
     width: intersectionNodeWidth,
     height: intersectionNodeHeight,
     positionAbsolute: intersectionNodePosition,
   } = intersectionNode.measured
-    ? { ...intersectionNode.measured, positionAbsolute: intersectionNode.internals.positionAbsolute }
-    : { width: 150, height: 60, positionAbsolute: intersectionNode.internals.positionAbsolute };
+    ? {
+        ...intersectionNode.measured,
+        positionAbsolute: intersectionNode.internals.positionAbsolute,
+      }
+    : {
+        width: 150,
+        height: 60,
+        positionAbsolute: intersectionNode.internals.positionAbsolute,
+      };
 
   const targetPosition = targetNode.internals.positionAbsolute;
   const targetWidth = targetNode.measured?.width ?? 150;
@@ -39,7 +46,7 @@ function getNodeIntersection(
 
 function getEdgePosition(
   node: InternalNode,
-  intersectionPoint: { x: number; y: number }
+  intersectionPoint: { x: number; y: number },
 ): Position {
   const n = node.internals.positionAbsolute;
   const nx = n?.x ?? 0;
@@ -49,9 +56,6 @@ function getEdgePosition(
 
   const px = Math.round(intersectionPoint.x);
   const py = Math.round(intersectionPoint.y);
-  const centerX = Math.round(nx + nw / 2);
-  const centerY = Math.round(ny + nh / 2);
-
   if (px <= Math.round(nx)) return Position.Left;
   if (px >= Math.round(nx + nw)) return Position.Right;
   if (py <= Math.round(ny)) return Position.Top;
@@ -65,7 +69,7 @@ const ARROW_OFFSET = 5;
 
 export function getEdgeParams(
   source: InternalNode,
-  target: InternalNode
+  target: InternalNode,
 ): {
   sx: number;
   sy: number;

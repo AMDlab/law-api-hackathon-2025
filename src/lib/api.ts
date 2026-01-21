@@ -33,19 +33,19 @@ export interface LawDataResponse {
   law_full_text: LawXmlNode;
 }
 
-const API_BASE_URL = 'https://laws.e-gov.go.jp/api/2';
+const API_BASE_URL = "https://laws.e-gov.go.jp/api/2";
 
 // 法令ID定義
 export const LAW_IDS = {
   // 法律（Act）
-  BUILDING_STANDARDS_ACT: '325AC0000000201',
+  BUILDING_STANDARDS_ACT: "325AC0000000201",
   // 政令（CabinetOrder）- 施行令
-  BUILDING_STANDARDS_ORDER: '325CO0000000338',
+  BUILDING_STANDARDS_ORDER: "325CO0000000338",
   // 省令（MinisterialOrdinance）- 施行規則
-  BUILDING_STANDARDS_REGULATION: '325M50004000040',
+  BUILDING_STANDARDS_REGULATION: "325M50004000040",
 } as const;
 
-export type LawType = 'act' | 'order' | 'regulation';
+export type LawType = "act" | "order" | "regulation";
 
 export interface LawInfo {
   id: string;
@@ -57,21 +57,21 @@ export interface LawInfo {
 export const LAW_INFO: Record<string, LawInfo> = {
   [LAW_IDS.BUILDING_STANDARDS_ACT]: {
     id: LAW_IDS.BUILDING_STANDARDS_ACT,
-    name: '建築基準法',
-    shortName: '法',
-    type: 'act',
+    name: "建築基準法",
+    shortName: "法",
+    type: "act",
   },
   [LAW_IDS.BUILDING_STANDARDS_ORDER]: {
     id: LAW_IDS.BUILDING_STANDARDS_ORDER,
-    name: '建築基準法施行令',
-    shortName: '令',
-    type: 'order',
+    name: "建築基準法施行令",
+    shortName: "令",
+    type: "order",
   },
   [LAW_IDS.BUILDING_STANDARDS_REGULATION]: {
     id: LAW_IDS.BUILDING_STANDARDS_REGULATION,
-    name: '建築基準法施行規則',
-    shortName: '規則',
-    type: 'regulation',
+    name: "建築基準法施行規則",
+    shortName: "規則",
+    type: "regulation",
   },
 };
 
@@ -102,7 +102,9 @@ export async function getLawData(lawId: string): Promise<LawXmlNode> {
     throw new Error(`Law not found: ${lawId}`);
   }
   const latestRevision = revisions[0];
-  const lawData = await fetchLawData(latestRevision.revision_info.law_revision_id);
+  const lawData = await fetchLawData(
+    latestRevision.revision_info.law_revision_id,
+  );
   return lawData;
 }
 
@@ -111,17 +113,21 @@ export async function getBuildingStandardsAct() {
   return getLawData(BUILDING_STANDARDS_ACT_ID);
 }
 
-export async function searchLawIdByName(lawName: string): Promise<string | null> {
-  const response = await fetch(`${API_BASE_URL}/laws?law_title=${encodeURIComponent(lawName)}`);
+export async function searchLawIdByName(
+  lawName: string,
+): Promise<string | null> {
+  const response = await fetch(
+    `${API_BASE_URL}/laws?law_title=${encodeURIComponent(lawName)}`,
+  );
   if (!response.ok) {
-    console.error('Failed to search law');
+    console.error("Failed to search law");
     return null;
   }
   const data: LawListResponse = await response.json();
   if (!data.laws || data.laws.length === 0) return null;
 
   // Try exact match first
-  const exact = data.laws.find(l => l.revision_info.law_title === lawName);
+  const exact = data.laws.find((l) => l.revision_info.law_title === lawName);
   if (exact?.law_info?.law_id) {
     return exact.law_info.law_id;
   }
@@ -137,18 +143,21 @@ export async function searchLawIdByName(lawName: string): Promise<string | null>
  * XMLノードからテキストを再帰的に取得
  */
 function getTextFromNode(node: LawXmlNode | string): string {
-  if (typeof node === 'string') return node;
-  if (!node.children) return '';
-  return node.children.map(child => getTextFromNode(child)).join('');
+  if (typeof node === "string") return node;
+  if (!node.children) return "";
+  return node.children.map((child) => getTextFromNode(child)).join("");
 }
 
 /**
  * 指定した条番号のArticleノードを検索
  */
-function findArticleNode(node: LawXmlNode | string, targetNum: string): LawXmlNode | null {
-  if (typeof node === 'string') return null;
+function findArticleNode(
+  node: LawXmlNode | string,
+  targetNum: string,
+): LawXmlNode | null {
+  if (typeof node === "string") return null;
 
-  if (node.tag === 'Article') {
+  if (node.tag === "Article") {
     const numAttr = node.attr?.Num;
     if (numAttr === targetNum) {
       return node;
@@ -172,7 +181,7 @@ function extractArticleText(article: LawXmlNode): string {
 
   // ArticleCaption（見出し）
   const caption = article.children?.find(
-    c => typeof c !== 'string' && c.tag === 'ArticleCaption'
+    (c) => typeof c !== "string" && c.tag === "ArticleCaption",
   ) as LawXmlNode | undefined;
   if (caption) {
     parts.push(getTextFromNode(caption));
@@ -180,22 +189,23 @@ function extractArticleText(article: LawXmlNode): string {
 
   // ArticleTitle（条番号）
   const title = article.children?.find(
-    c => typeof c !== 'string' && c.tag === 'ArticleTitle'
+    (c) => typeof c !== "string" && c.tag === "ArticleTitle",
   ) as LawXmlNode | undefined;
   if (title) {
     parts.push(getTextFromNode(title));
   }
 
   // Paragraph（項）
-  const paragraphs = article.children?.filter(
-    c => typeof c !== 'string' && c.tag === 'Paragraph'
-  ) as LawXmlNode[] || [];
+  const paragraphs =
+    (article.children?.filter(
+      (c) => typeof c !== "string" && c.tag === "Paragraph",
+    ) as LawXmlNode[]) || [];
 
-  paragraphs.forEach(p => {
+  paragraphs.forEach((p) => {
     parts.push(getTextFromNode(p));
   });
 
-  return parts.join('');
+  return parts.join("");
 }
 
 export interface ArticleContent {
@@ -220,12 +230,15 @@ export interface ArticleContent {
  * console.log(article.text);
  * ```
  */
-export async function fetchArticle(lawId: string, articleNum: string): Promise<ArticleContent> {
+export async function fetchArticle(
+  lawId: string,
+  articleNum: string,
+): Promise<ArticleContent> {
   // 法令データ全体を取得
   const lawData = await getLawData(lawId);
 
   // 条番号の「_」を数値形式に変換（API内部では「_」なし）
-  const normalizedNum = articleNum.replace(/_/g, '');
+  const normalizedNum = articleNum.replace(/_/g, "");
 
   // 指定条を検索
   const articleNode = findArticleNode(lawData, normalizedNum);
@@ -239,7 +252,7 @@ export async function fetchArticle(lawId: string, articleNum: string): Promise<A
 
   // 法令名を取得
   const lawInfo = LAW_INFO[lawId];
-  const lawName = lawInfo?.name || '不明';
+  const lawName = lawInfo?.name || "不明";
 
   return {
     lawId,
@@ -253,14 +266,17 @@ export async function fetchArticle(lawId: string, articleNum: string): Promise<A
 /**
  * 建築基準法から特定の条文を取得するショートカット
  */
-export async function fetchBuildingStandardsArticle(articleNum: string): Promise<ArticleContent> {
+export async function fetchBuildingStandardsArticle(
+  articleNum: string,
+): Promise<ArticleContent> {
   return fetchArticle(LAW_IDS.BUILDING_STANDARDS_ACT, articleNum);
 }
 
 /**
  * 建築基準法施行令から特定の条文を取得するショートカット
  */
-export async function fetchBuildingStandardsOrderArticle(articleNum: string): Promise<ArticleContent> {
+export async function fetchBuildingStandardsOrderArticle(
+  articleNum: string,
+): Promise<ArticleContent> {
   return fetchArticle(LAW_IDS.BUILDING_STANDARDS_ORDER, articleNum);
 }
-

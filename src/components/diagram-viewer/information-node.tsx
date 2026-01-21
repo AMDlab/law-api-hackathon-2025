@@ -1,12 +1,18 @@
 "use client";
 
 import { memo } from "react";
-import { Handle, Position } from "@xyflow/react";
+import { Handle, Position, useConnection } from "@xyflow/react";
+import { Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { ButtonHandle } from "@/components/button-handle";
 import type { InformationNode as InformationNodeType } from "@/types/diagram";
 import { getInformationTailwindClass } from "@/types/diagram";
 
 interface InformationNodeData {
   node: InformationNodeType;
+  isEdgeSelected?: boolean;
+  hasOutgoing?: boolean;
+  isFlowDiagram?: boolean;
 }
 
 interface InformationNodeProps {
@@ -46,6 +52,11 @@ export const InformationNode = memo(function InformationNode({
 }: InformationNodeProps) {
   const { node } = data;
   const colorClass = getInformationTailwindClass(node.property_type);
+  const connectionInProgress = useConnection(
+    (connection) => connection.inProgress,
+  );
+  const showButton =
+    !connectionInProgress && !data.isEdgeSelected && !data.hasOutgoing;
 
   const isMultiple = node.plurality === "multiple";
 
@@ -75,7 +86,43 @@ export const InformationNode = memo(function InformationNode({
           ${selected ? "ring-2 ring-blue-500 ring-offset-2" : ""}
         `}
       >
-        <Handle type="target" position={Position.Left} className="!opacity-0" />
+        <Handle
+          type="target"
+          id="target-top"
+          position={Position.Top}
+          className="opacity-0"
+        />
+        <Handle
+          type="target"
+          id="target-left"
+          position={Position.Left}
+          className="opacity-0"
+        />
+        <Handle
+          type="target"
+          id="target-bottom"
+          position={Position.Bottom}
+          className="opacity-0"
+        />
+        <Handle
+          type="target"
+          id="target-right"
+          position={Position.Right}
+          className="opacity-0"
+        />
+        <ButtonHandle
+          type="source"
+          position={data.isFlowDiagram ? Position.Bottom : Position.Right}
+          showButton={showButton}
+        >
+          <Button
+            size="sm"
+            variant="secondary"
+            className="h-6 w-6 rounded-full p-0 border-2 border-gray-300"
+          >
+            <Plus size={8} />
+          </Button>
+        </ButtonHandle>
 
         {/* タイトル */}
         <div className="font-medium text-sm text-center text-gray-800">
@@ -93,8 +140,6 @@ export const InformationNode = memo(function InformationNode({
             ))}
           </div>
         )}
-
-        <Handle type="source" position={Position.Right} className="!opacity-0" />
       </div>
     </div>
   );

@@ -1,9 +1,9 @@
 "use client";
 
 import {
-  useInternalNode,
   getBezierPath,
   EdgeLabelRenderer,
+  useInternalNode,
   type EdgeProps,
   type Edge,
 } from "@xyflow/react";
@@ -11,8 +11,15 @@ import { getEdgeParams } from "./floating-edge-utils";
 
 export function FloatingEdge({
   id,
+  sourceX,
+  sourceY,
+  targetX,
+  targetY,
+  sourcePosition,
+  targetPosition,
   source,
   target,
+  selected,
   markerEnd,
   style,
   label,
@@ -21,29 +28,33 @@ export function FloatingEdge({
 }: EdgeProps<Edge>) {
   const sourceNode = useInternalNode(source);
   const targetNode = useInternalNode(target);
-
-  if (!sourceNode || !targetNode) {
-    return null;
-  }
-
-  const { sx, sy, tx, ty, sourcePos, targetPos } = getEdgeParams(
-    sourceNode,
-    targetNode
-  );
+  const useFlowPositions = selected || !sourceNode || !targetNode;
+  const edgeCoords = useFlowPositions
+    ? {
+        sx: sourceX,
+        sy: sourceY,
+        tx: targetX,
+        ty: targetY,
+        sourcePos: sourcePosition,
+        targetPos: targetPosition,
+      }
+    : getEdgeParams(sourceNode, targetNode);
 
   const [edgePath] = getBezierPath({
-    sourceX: sx,
-    sourceY: sy,
-    sourcePosition: sourcePos,
-    targetPosition: targetPos,
-    targetX: tx,
-    targetY: ty,
+    sourceX: edgeCoords.sx,
+    sourceY: edgeCoords.sy,
+    sourcePosition: edgeCoords.sourcePos,
+    targetPosition: edgeCoords.targetPos,
+    targetX: edgeCoords.tx,
+    targetY: edgeCoords.ty,
   });
 
   // ラベル位置を分岐ノードの直後（sourceから20%の位置）に配置
   const labelOffset = 0.2;
-  const nearSourceX = sx + (tx - sx) * labelOffset;
-  const nearSourceY = sy + (ty - sy) * labelOffset;
+  const nearSourceX =
+    edgeCoords.sx + (edgeCoords.tx - edgeCoords.sx) * labelOffset;
+  const nearSourceY =
+    edgeCoords.sy + (edgeCoords.ty - edgeCoords.sy) * labelOffset;
 
   return (
     <>
@@ -54,6 +65,13 @@ export function FloatingEdge({
         fill="none"
         markerEnd={markerEnd}
         style={style}
+      />
+      <path
+        className="react-flow__edge-interaction"
+        d={edgePath}
+        fill="none"
+        stroke="transparent"
+        strokeWidth={20}
       />
       {label && (
         <EdgeLabelRenderer>

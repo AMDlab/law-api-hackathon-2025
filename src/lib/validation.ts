@@ -74,7 +74,7 @@ interface EdgeWithRole {
  */
 export function detectInformationToInformationEdges(
   nodes: NodeWithType[],
-  edges: EdgeWithRole[]
+  edges: EdgeWithRole[],
 ): EdgeWithRole[] {
   const nodeTypeMap = new Map<string, string>();
   for (const node of nodes) {
@@ -105,7 +105,7 @@ export function detectInformationToInformationEdges(
  */
 export function validateKijoStructure(
   nodes: NodeWithType[],
-  edges: EdgeWithRole[]
+  edges: EdgeWithRole[],
 ): {
   valid: boolean;
   errors: string[];
@@ -113,11 +113,14 @@ export function validateKijoStructure(
   const errors: string[] = [];
 
   // 1. [情報]→[情報]直接接続チェック
-  const infoToInfoViolations = detectInformationToInformationEdges(nodes, edges);
+  const infoToInfoViolations = detectInformationToInformationEdges(
+    nodes,
+    edges,
+  );
   if (infoToInfoViolations.length > 0) {
     for (const edge of infoToInfoViolations) {
       errors.push(
-        `[情報]→[情報]直接接続: ${edge.from} → ${edge.to} （[処理]を経由してください）`
+        `[情報]→[情報]直接接続: ${edge.from} → ${edge.to} （[処理]を経由してください）`,
       );
     }
   }
@@ -151,7 +154,7 @@ export function validateKijoStructure(
  */
 export function detectCycle(
   nodes: Array<{ id: string }>,
-  edges: Array<{ from: string; to: string }>
+  edges: Array<{ from: string; to: string }>,
 ): boolean {
   const nodeIds = new Set(nodes.map((n) => n.id));
   const adjacencyList = new Map<string, string[]>();
@@ -199,7 +202,7 @@ export function detectCycle(
  */
 export function validateEdgeReferences(
   nodes: Array<{ id: string }>,
-  edges: Array<{ from: string; to: string }>
+  edges: Array<{ from: string; to: string }>,
 ): { valid: boolean; invalidEdges: Array<{ from: string; to: string }> } {
   const nodeIds = new Set(nodes.map((n) => n.id));
   const invalidEdges: Array<{ from: string; to: string }> = [];

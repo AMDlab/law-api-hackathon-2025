@@ -74,7 +74,12 @@ export interface RelatedLaw {
   law_id: string;
   law_name: string;
   law_type: "act" | "order" | "regulation" | "notice";
-  relationship: "delegates_to" | "delegated_from" | "defines_detail" | "references" | "supersedes";
+  relationship:
+    | "delegates_to"
+    | "delegated_from"
+    | "defines_detail"
+    | "references"
+    | "supersedes";
   articles?: string[];
   description?: string;
 }
@@ -90,7 +95,12 @@ export interface ComplianceLogic {
   judgment_rule?: {
     operator: string;
     lhs?: { var: string; desc: string; property_type?: string; unit?: string };
-    rhs?: { val?: number | boolean; var?: string; desc?: string; unit?: string };
+    rhs?: {
+      val?: number | boolean;
+      var?: string;
+      desc?: string;
+      unit?: string;
+    };
     conditions?: unknown[];
   };
   exceptions?: {
@@ -152,12 +162,19 @@ export interface DecisionNode {
   type: "decision";
   title: string;
   description?: string;
+  decision_type?: "binary" | "multi";
   /** 判定条件の論理式 */
   condition?: {
     operator: string;
     lhs?: { var: string; desc: string };
-    rhs?: { value?: number | boolean | string; var?: string; desc?: string; unit?: string };
+    rhs?: {
+      value?: number | boolean | string;
+      var?: string;
+      desc?: string;
+      unit?: string;
+    };
   };
+  options?: unknown;
   related_articles?: string[];
 }
 
@@ -173,7 +190,11 @@ export interface TerminalNode {
 }
 
 /** ノード (情報・処理・判定・端子) */
-export type DiagramNode = InformationNode | ProcessNode | DecisionNode | TerminalNode;
+export type DiagramNode =
+  | InformationNode
+  | ProcessNode
+  | DecisionNode
+  | TerminalNode;
 
 /** エッジ (ノード間の接続) */
 export interface Edge {
@@ -319,7 +340,9 @@ export function getProcessTailwindClass(processType: ProcessType): string {
 /**
  * 情報ノードのTailwind CSSクラスを取得（UIコンポーネント用）
  */
-export function getInformationTailwindClass(propertyType?: PropertyType): string {
+export function getInformationTailwindClass(
+  propertyType?: PropertyType,
+): string {
   return propertyType === "visual"
     ? "bg-orange-50 border-orange-200"
     : "bg-white border-gray-300";
