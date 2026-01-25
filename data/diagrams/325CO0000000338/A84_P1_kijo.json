@@ -1,0 +1,413 @@
+{
+  "id": "CHK-BSL-ORD-A84-P1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "固定荷重の計算",
+    "target_subject": "建築物",
+    "description": "建築物の各部の固定荷重が実況に応じて適切に計算されていることを確認する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "84",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造"
+  ],
+  "text_raw": "建築物の各部の固定荷重は、当該建築物の実況に応じて計算しなければならない。ただし、次の表に掲げる建築物の部分の固定荷重については、それぞれ同表の単位面積当たり荷重の欄に定める数値に面積を乗じて計算することができる。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "building",
+          "value": "構造計算を要する建築物"
+        }
+      ],
+      "note": "構造計算において固定荷重を算定する必要がある建築物"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "ref": "info-actual-calc-compliance",
+          "operator": "==",
+          "value": true,
+          "note": "実況に応じた計算による場合"
+        },
+        {
+          "ref": "info-table-calc-compliance",
+          "operator": "==",
+          "value": true,
+          "note": "表の数値を用いた計算による場合（ただし書き）"
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-parts-set",
+        "type": "process",
+        "title": "建築物の部分の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から固定荷重算定対象となる建築物の部分（屋根、天井、床、壁等）を特定する"
+      },
+      {
+        "id": "info-parts-set",
+        "type": "information",
+        "title": "建築物の部分",
+        "subject": "建築物",
+        "property": "固定荷重算定対象部分の集合",
+        "property_type": "set_definition",
+        "description": "固定荷重を算定する対象となる建築物の各部分（屋根、天井、床、壁等）を特定",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-part-type",
+        "type": "process",
+        "title": "部分種別の特定",
+        "process_type": "undefined_input",
+        "target_subject": "建築物の部分",
+        "iteration": "iterative",
+        "description": "各部分の種別（屋根、天井、床、壁）と詳細仕様（瓦ぶき、板張等）を特定する"
+      },
+      {
+        "id": "info-part-type",
+        "type": "information",
+        "title": "部分の種別",
+        "symbol": "T",
+        "subject": "建築物の部分",
+        "property": "種別",
+        "property_type": "classification",
+        "description": "建築物の部分の種別と詳細仕様（例: 屋根-瓦ぶき-ふき土なし）",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-part-area",
+        "type": "process",
+        "title": "部分の面積の特定",
+        "process_type": "undefined_input",
+        "target_subject": "建築物の部分",
+        "iteration": "iterative",
+        "description": "各部分の面積（屋根面積、天井面積、床面積、壁面積）を特定する"
+      },
+      {
+        "id": "info-part-area",
+        "type": "information",
+        "title": "部分の面積",
+        "symbol": "S",
+        "subject": "建築物の部分",
+        "property": "面積",
+        "property_type": "numeric",
+        "unit": "m2",
+        "description": "建築物の部分の面積（屋根面、天井面、床面、壁面につき）",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-table-check",
+        "type": "process",
+        "title": "表該当判定",
+        "process_type": "mechanical",
+        "target_subject": "建築物の部分",
+        "iteration": "iterative",
+        "description": "各部分が令84条の表に掲げる種別に該当するかを判定する",
+        "logic_expression": "T ∈ {表に定める種別}"
+      },
+      {
+        "id": "info-table-applicable",
+        "type": "information",
+        "title": "表の適用可否",
+        "symbol": "TA",
+        "subject": "建築物の部分",
+        "property": "表の適用可否",
+        "property_type": "proposition",
+        "description": "当該部分が令84条の表に定める種別に該当し、表の数値を用いることができるか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-table-load",
+        "type": "process",
+        "title": "表の単位荷重取得",
+        "process_type": "mechanical",
+        "target_subject": "建築物の部分",
+        "iteration": "iterative",
+        "description": "表に該当する部分について、表から単位面積当たり荷重の数値を取得する",
+        "remarks": "屋根: 瓦ぶき（ふき土なし640N/m2、ふき土あり980N/m2）、波形鉄板ぶき50N/m2、薄鉄板ぶき200N/m2、ガラス屋根290N/m2、厚形スレートぶき440N/m2等"
+      },
+      {
+        "id": "info-unit-load",
+        "type": "information",
+        "title": "単位面積当たり荷重",
+        "symbol": "W",
+        "subject": "建築物の部分",
+        "property": "単位面積当たり荷重",
+        "property_type": "numeric",
+        "unit": "N/m2",
+        "description": "表に定める単位面積当たり荷重の数値",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-table-calc",
+        "type": "process",
+        "title": "表による固定荷重計算",
+        "process_type": "mechanical",
+        "target_subject": "建築物の部分",
+        "iteration": "iterative",
+        "description": "表の単位面積当たり荷重に面積を乗じて固定荷重を計算する",
+        "logic_expression": "FL = W × S"
+      },
+      {
+        "id": "info-table-fixed-load",
+        "type": "information",
+        "title": "表による固定荷重",
+        "symbol": "FL1",
+        "subject": "建築物の部分",
+        "property": "固定荷重（表による計算）",
+        "property_type": "numeric",
+        "unit": "N",
+        "description": "表の数値を用いて計算した固定荷重",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-actual-method",
+        "type": "process",
+        "title": "実況計算方法の確認",
+        "process_type": "human_judgment",
+        "target_subject": "建築物の部分",
+        "iteration": "iterative",
+        "description": "表に該当しない部分または実況に応じた計算を行う部分について、計算方法が建築物の実況に応じた適切なものであるかを確認する"
+      },
+      {
+        "id": "info-actual-method",
+        "type": "information",
+        "title": "実況に応じた計算方法",
+        "symbol": "AM",
+        "subject": "建築物の部分",
+        "property": "実況計算方法の適切性",
+        "property_type": "proposition",
+        "description": "実況に応じた計算方法が適切であるか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-actual-load",
+        "type": "process",
+        "title": "実況による固定荷重の特定",
+        "process_type": "undefined_input",
+        "target_subject": "建築物の部分",
+        "iteration": "iterative",
+        "description": "設計図書等から実況に応じて計算された固定荷重の値を特定する"
+      },
+      {
+        "id": "info-actual-fixed-load",
+        "type": "information",
+        "title": "実況による固定荷重",
+        "symbol": "FL2",
+        "subject": "建築物の部分",
+        "property": "固定荷重（実況による計算）",
+        "property_type": "numeric",
+        "unit": "N",
+        "description": "実況に応じて計算された固定荷重",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-part-judgment",
+        "type": "process",
+        "title": "部分ごとの適合判定",
+        "process_type": "mechanical",
+        "target_subject": "建築物の部分",
+        "iteration": "iterative",
+        "description": "各部分について、実況計算または表計算のいずれかにより固定荷重が適切に算定されているかを判定",
+        "logic_expression": "(TA AND (FL1が適切)) OR (AM AND (FL2が算定済))"
+      },
+      {
+        "id": "info-part-compliance",
+        "type": "information",
+        "title": "部分の固定荷重適合",
+        "symbol": "PC",
+        "subject": "建築物の部分",
+        "property": "固定荷重算定の適合",
+        "property_type": "proposition",
+        "description": "当該部分の固定荷重が適切に算定されているか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-all-check",
+        "type": "process",
+        "title": "全部分適合確認",
+        "process_type": "mechanical",
+        "description": "全ての部分について固定荷重が適切に算定されていることを確認",
+        "logic_expression": "∀part ∈ Parts: PC(part) = true"
+      },
+      {
+        "id": "info-final",
+        "type": "information",
+        "title": "令84条1項適合",
+        "subject": "建築物",
+        "property": "令84条1項適合",
+        "property_type": "proposition",
+        "description": "建築物全体として令84条1項の固定荷重規定に適合するか",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-parts-set",
+        "to": "info-parts-set",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "info-parts-set",
+        "to": "proc-part-type",
+        "role": "input"
+      },
+      {
+        "id": "e03",
+        "from": "proc-part-type",
+        "to": "info-part-type",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "info-parts-set",
+        "to": "proc-part-area",
+        "role": "input"
+      },
+      {
+        "id": "e05",
+        "from": "proc-part-area",
+        "to": "info-part-area",
+        "role": "output"
+      },
+      {
+        "id": "e06",
+        "from": "info-part-type",
+        "to": "proc-table-check",
+        "role": "input"
+      },
+      {
+        "id": "e07",
+        "from": "proc-table-check",
+        "to": "info-table-applicable",
+        "role": "output"
+      },
+      {
+        "id": "e08",
+        "from": "info-part-type",
+        "to": "proc-table-load",
+        "role": "input"
+      },
+      {
+        "id": "e09",
+        "from": "info-table-applicable",
+        "to": "proc-table-load",
+        "role": "input"
+      },
+      {
+        "id": "e10",
+        "from": "proc-table-load",
+        "to": "info-unit-load",
+        "role": "output"
+      },
+      {
+        "id": "e11",
+        "from": "info-unit-load",
+        "to": "proc-table-calc",
+        "role": "input"
+      },
+      {
+        "id": "e12",
+        "from": "info-part-area",
+        "to": "proc-table-calc",
+        "role": "input"
+      },
+      {
+        "id": "e13",
+        "from": "proc-table-calc",
+        "to": "info-table-fixed-load",
+        "role": "output"
+      },
+      {
+        "id": "e14",
+        "from": "info-part-type",
+        "to": "proc-actual-method",
+        "role": "input"
+      },
+      {
+        "id": "e15",
+        "from": "proc-actual-method",
+        "to": "info-actual-method",
+        "role": "output"
+      },
+      {
+        "id": "e16",
+        "from": "info-actual-method",
+        "to": "proc-actual-load",
+        "role": "input"
+      },
+      {
+        "id": "e17",
+        "from": "proc-actual-load",
+        "to": "info-actual-fixed-load",
+        "role": "output"
+      },
+      {
+        "id": "e18",
+        "from": "info-table-applicable",
+        "to": "proc-part-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e19",
+        "from": "info-table-fixed-load",
+        "to": "proc-part-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e20",
+        "from": "info-actual-method",
+        "to": "proc-part-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e21",
+        "from": "info-actual-fixed-load",
+        "to": "proc-part-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e22",
+        "from": "proc-part-judgment",
+        "to": "info-part-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e23",
+        "from": "info-part-compliance",
+        "to": "proc-all-check",
+        "role": "input"
+      },
+      {
+        "id": "e24",
+        "from": "proc-all-check",
+        "to": "info-final",
+        "role": "output"
+      }
+    ]
+  },
+  "metadata": {
+    "created_at": "2026-01-23T18:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

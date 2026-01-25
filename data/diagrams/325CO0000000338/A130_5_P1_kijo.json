@@ -1,0 +1,592 @@
+{
+  "id": "CHK-BSL-ORD-A130_5-P1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "第一種低層住居専用地域等内に建築してはならない附属建築物の判定",
+    "target_subject": "附属建築物",
+    "description": "自動車車庫・畜舎等の附属建築物が禁止対象に該当するか判定"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "130_5",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "集団規定",
+    "用途制限",
+    "附属建築物"
+  ],
+  "text_raw": "法別表第二（い）項第十号、（ろ）項第三号及び（ち）項第六号（法第八十七条第二項又は第三項において法第四十八条第一項、第二項及び第八項の規定を準用する場合を含む。）の規定により政令で定める建築物は、次に掲げるものとする。\n一 自動車車庫で当該自動車車庫の床面積の合計に同一敷地内にある建築物に附属する自動車車庫の用途に供する工作物の築造面積（当該築造面積が五十平方メートル以下である場合には、その値を減じた値）を加えた値が六百平方メートル（同一敷地内にある建築物（自動車車庫の用途に供する部分を除く。）の延べ面積の合計が六百平方メートル以下の場合においては、当該延べ面積の合計）を超えるもの（次号に掲げるものを除く。）\n二 公告対象区域内の建築物に附属する自動車車庫で次のイ又はロのいずれかに該当するもの\n三 自動車車庫で二階以上の部分にあるもの\n四 床面積の合計が十五平方メートルを超える畜舎\n五 法別表第二（と）項第四号に掲げるもの",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "第一種低層住居専用地域",
+          "description": "法別表第二（い）項第十号"
+        },
+        {
+          "type": "location",
+          "value": "第二種低層住居専用地域",
+          "description": "法別表第二（ろ）項第三号"
+        },
+        {
+          "type": "location",
+          "value": "田園住居地域",
+          "description": "法別表第二（ち）項第六号"
+        }
+      ],
+      "note": "用途地域情報は公共データとして処理内に含まれる"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "type": "requirement",
+          "value": "一号：自動車車庫面積600㎡超（条件付き）",
+          "description": "床面積+工作物築造面積が上限を超える場合"
+        },
+        {
+          "type": "requirement",
+          "value": "二号：公告対象区域内自動車車庫（イ・ロ該当）",
+          "description": "公告対象区域内で特定条件を満たす場合"
+        },
+        {
+          "type": "requirement",
+          "value": "三号：二階以上の自動車車庫",
+          "description": "二階以上の部分にある自動車車庫"
+        },
+        {
+          "type": "requirement",
+          "value": "四号：畜舎15㎡超",
+          "description": "床面積合計15㎡超の畜舎"
+        },
+        {
+          "type": "requirement",
+          "value": "五号：法別表第二（と）項第四号",
+          "description": "危険物貯蔵等"
+        }
+      ]
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-use-identify",
+        "type": "process",
+        "title": "建築物用途の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の用途（自動車車庫、畜舎等）を読み取る"
+      },
+      {
+        "id": "info-use",
+        "type": "information",
+        "title": "建築物の用途",
+        "symbol": "U",
+        "subject": "建築物",
+        "property": "用途",
+        "property_type": "classification",
+        "plurality": "single",
+        "description": "自動車車庫、畜舎、危険物貯蔵施設等の用途区分"
+      },
+      {
+        "id": "proc-garage-area-check",
+        "type": "process",
+        "title": "自動車車庫床面積の確認",
+        "process_type": "undefined_input",
+        "description": "設計図書から自動車車庫の床面積を読み取る"
+      },
+      {
+        "id": "info-garage-area",
+        "type": "information",
+        "title": "自動車車庫の床面積合計",
+        "symbol": "AG",
+        "subject": "自動車車庫",
+        "property": "床面積合計",
+        "property_type": "numeric",
+        "unit": "㎡",
+        "plurality": "single",
+        "description": "当該自動車車庫の床面積の合計"
+      },
+      {
+        "id": "proc-structure-area-check",
+        "type": "process",
+        "title": "工作物築造面積の確認",
+        "process_type": "undefined_input",
+        "description": "同一敷地内にある自動車車庫用途の工作物の築造面積を読み取る"
+      },
+      {
+        "id": "info-structure-area",
+        "type": "information",
+        "title": "工作物築造面積",
+        "symbol": "AS",
+        "subject": "工作物",
+        "property": "築造面積",
+        "property_type": "numeric",
+        "unit": "㎡",
+        "plurality": "single",
+        "description": "同一敷地内の自動車車庫用途に供する工作物の築造面積"
+      },
+      {
+        "id": "proc-building-area-check",
+        "type": "process",
+        "title": "敷地内建築物延べ面積の確認",
+        "process_type": "undefined_input",
+        "description": "同一敷地内にある建築物（自動車車庫部分除く）の延べ面積合計を読み取る"
+      },
+      {
+        "id": "info-building-area",
+        "type": "information",
+        "title": "敷地内建築物延べ面積",
+        "symbol": "AB",
+        "subject": "建築物",
+        "property": "延べ面積合計",
+        "property_type": "numeric",
+        "unit": "㎡",
+        "plurality": "single",
+        "description": "同一敷地内にある建築物（自動車車庫用途部分を除く）の延べ面積の合計"
+      },
+      {
+        "id": "proc-total-area-calc",
+        "type": "process",
+        "title": "自動車車庫面積合計の算定",
+        "process_type": "mechanical",
+        "description": "床面積と工作物築造面積（50㎡以下の場合は減じる）の合計を算定",
+        "logic_expression": "AG + (AS > 50 ? AS : 0)"
+      },
+      {
+        "id": "info-total-garage-area",
+        "type": "information",
+        "title": "自動車車庫面積合計",
+        "symbol": "AT",
+        "subject": "敷地",
+        "property": "自動車車庫面積合計",
+        "property_type": "numeric",
+        "unit": "㎡",
+        "plurality": "single",
+        "description": "床面積と工作物築造面積の合計値"
+      },
+      {
+        "id": "proc-limit-calc",
+        "type": "process",
+        "title": "上限値の決定",
+        "process_type": "mechanical",
+        "description": "敷地内建築物延べ面積が600㎡以下の場合はその値、それ以外は600㎡",
+        "logic_expression": "AB <= 600 ? AB : 600"
+      },
+      {
+        "id": "info-area-limit",
+        "type": "information",
+        "title": "面積上限値",
+        "symbol": "L",
+        "subject": "敷地",
+        "property": "自動車車庫面積上限",
+        "property_type": "numeric",
+        "unit": "㎡",
+        "plurality": "single",
+        "description": "600㎡または敷地内建築物延べ面積合計のいずれか小さい値"
+      },
+      {
+        "id": "proc-item1-judge",
+        "type": "process",
+        "title": "第一号該当判定",
+        "process_type": "mechanical",
+        "description": "自動車車庫面積合計が上限を超えるか判定（二号を除く）",
+        "logic_expression": "U = '自動車車庫' AND AT > L AND NOT(公告対象区域内)"
+      },
+      {
+        "id": "info-item1-result",
+        "type": "information",
+        "title": "第一号該当",
+        "symbol": "R1",
+        "subject": "建築物",
+        "property": "第一号該当性",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "床面積+工作物面積が上限超過か否か"
+      },
+      {
+        "id": "proc-public-area-check",
+        "type": "process",
+        "title": "公告対象区域該当確認",
+        "process_type": "undefined_input",
+        "description": "建築物が公告対象区域内にあるか確認"
+      },
+      {
+        "id": "info-public-area",
+        "type": "information",
+        "title": "公告対象区域該当",
+        "symbol": "PA",
+        "subject": "敷地",
+        "property": "公告対象区域該当性",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "敷地が公告対象区域内にあるか否か"
+      },
+      {
+        "id": "proc-item2-judge",
+        "type": "process",
+        "title": "第二号該当判定",
+        "process_type": "mechanical",
+        "description": "公告対象区域内の自動車車庫でイ又はロに該当するか判定",
+        "logic_expression": "PA AND U = '自動車車庫' AND (AT > 2000 OR 区域内合計超過)",
+        "remarks": "イ：2000㎡超、ロ：公告対象区域内での合算上限超過"
+      },
+      {
+        "id": "info-item2-result",
+        "type": "information",
+        "title": "第二号該当",
+        "symbol": "R2",
+        "subject": "建築物",
+        "property": "第二号該当性",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "公告対象区域内自動車車庫の制限該当性"
+      },
+      {
+        "id": "proc-floor-check",
+        "type": "process",
+        "title": "自動車車庫階数の確認",
+        "process_type": "undefined_input",
+        "description": "自動車車庫が何階にあるか確認"
+      },
+      {
+        "id": "info-garage-floor",
+        "type": "information",
+        "title": "自動車車庫の階数",
+        "symbol": "F",
+        "subject": "自動車車庫",
+        "property": "所在階",
+        "property_type": "numeric",
+        "unit": "階",
+        "plurality": "single",
+        "description": "自動車車庫が存在する階"
+      },
+      {
+        "id": "proc-item3-judge",
+        "type": "process",
+        "title": "第三号該当判定",
+        "process_type": "mechanical",
+        "description": "自動車車庫が二階以上にあるか判定",
+        "logic_expression": "U = '自動車車庫' AND F >= 2"
+      },
+      {
+        "id": "info-item3-result",
+        "type": "information",
+        "title": "第三号該当",
+        "symbol": "R3",
+        "subject": "建築物",
+        "property": "第三号該当性",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "二階以上の自動車車庫該当性"
+      },
+      {
+        "id": "proc-livestock-area-check",
+        "type": "process",
+        "title": "畜舎床面積の確認",
+        "process_type": "undefined_input",
+        "description": "畜舎の床面積合計を確認"
+      },
+      {
+        "id": "info-livestock-area",
+        "type": "information",
+        "title": "畜舎の床面積合計",
+        "symbol": "AL",
+        "subject": "畜舎",
+        "property": "床面積合計",
+        "property_type": "numeric",
+        "unit": "㎡",
+        "plurality": "single",
+        "description": "畜舎の床面積の合計"
+      },
+      {
+        "id": "proc-item4-judge",
+        "type": "process",
+        "title": "第四号該当判定",
+        "process_type": "mechanical",
+        "description": "畜舎の床面積合計が15㎡を超えるか判定",
+        "logic_expression": "U = '畜舎' AND AL > 15"
+      },
+      {
+        "id": "info-item4-result",
+        "type": "information",
+        "title": "第四号該当",
+        "symbol": "R4",
+        "subject": "建築物",
+        "property": "第四号該当性",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "15㎡超畜舎該当性"
+      },
+      {
+        "id": "proc-item5-check",
+        "type": "process",
+        "title": "第五号該当確認",
+        "process_type": "undefined_input",
+        "description": "法別表第二（と）項第四号（危険物貯蔵等）に該当するか確認",
+        "remarks": "危険物の貯蔵又は処理に供する建築物"
+      },
+      {
+        "id": "info-item5-result",
+        "type": "information",
+        "title": "第五号該当",
+        "symbol": "R5",
+        "subject": "建築物",
+        "property": "第五号該当性",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "法別表第二（と）項第四号該当性（危険物貯蔵等）"
+      },
+      {
+        "id": "proc-final-judge",
+        "type": "process",
+        "title": "禁止対象判定",
+        "process_type": "mechanical",
+        "description": "いずれかの号に該当すれば建築禁止対象",
+        "logic_expression": "R1 OR R2 OR R3 OR R4 OR R5"
+      },
+      {
+        "id": "info-final-result",
+        "type": "information",
+        "title": "建築禁止対象",
+        "symbol": "PROHIBITED",
+        "subject": "建築物",
+        "property": "令第130条の5第1項該当性",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "第一種低層住居専用地域等内で建築してはならない附属建築物に該当するか"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-use-identify",
+        "to": "info-use",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "proc-garage-area-check",
+        "to": "info-garage-area",
+        "role": "output"
+      },
+      {
+        "id": "e03",
+        "from": "proc-structure-area-check",
+        "to": "info-structure-area",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "proc-building-area-check",
+        "to": "info-building-area",
+        "role": "output"
+      },
+      {
+        "id": "e05",
+        "from": "info-garage-area",
+        "to": "proc-total-area-calc",
+        "role": "input"
+      },
+      {
+        "id": "e06",
+        "from": "info-structure-area",
+        "to": "proc-total-area-calc",
+        "role": "input"
+      },
+      {
+        "id": "e07",
+        "from": "proc-total-area-calc",
+        "to": "info-total-garage-area",
+        "role": "output"
+      },
+      {
+        "id": "e08",
+        "from": "info-building-area",
+        "to": "proc-limit-calc",
+        "role": "input"
+      },
+      {
+        "id": "e09",
+        "from": "proc-limit-calc",
+        "to": "info-area-limit",
+        "role": "output"
+      },
+      {
+        "id": "e10",
+        "from": "info-use",
+        "to": "proc-item1-judge",
+        "role": "input"
+      },
+      {
+        "id": "e11",
+        "from": "info-total-garage-area",
+        "to": "proc-item1-judge",
+        "role": "input"
+      },
+      {
+        "id": "e12",
+        "from": "info-area-limit",
+        "to": "proc-item1-judge",
+        "role": "input"
+      },
+      {
+        "id": "e13",
+        "from": "proc-item1-judge",
+        "to": "info-item1-result",
+        "role": "output"
+      },
+      {
+        "id": "e14",
+        "from": "proc-public-area-check",
+        "to": "info-public-area",
+        "role": "output"
+      },
+      {
+        "id": "e15",
+        "from": "info-use",
+        "to": "proc-item2-judge",
+        "role": "input"
+      },
+      {
+        "id": "e16",
+        "from": "info-public-area",
+        "to": "proc-item2-judge",
+        "role": "input"
+      },
+      {
+        "id": "e17",
+        "from": "info-total-garage-area",
+        "to": "proc-item2-judge",
+        "role": "input"
+      },
+      {
+        "id": "e18",
+        "from": "proc-item2-judge",
+        "to": "info-item2-result",
+        "role": "output"
+      },
+      {
+        "id": "e19",
+        "from": "proc-floor-check",
+        "to": "info-garage-floor",
+        "role": "output"
+      },
+      {
+        "id": "e20",
+        "from": "info-use",
+        "to": "proc-item3-judge",
+        "role": "input"
+      },
+      {
+        "id": "e21",
+        "from": "info-garage-floor",
+        "to": "proc-item3-judge",
+        "role": "input"
+      },
+      {
+        "id": "e22",
+        "from": "proc-item3-judge",
+        "to": "info-item3-result",
+        "role": "output"
+      },
+      {
+        "id": "e23",
+        "from": "proc-livestock-area-check",
+        "to": "info-livestock-area",
+        "role": "output"
+      },
+      {
+        "id": "e24",
+        "from": "info-use",
+        "to": "proc-item4-judge",
+        "role": "input"
+      },
+      {
+        "id": "e25",
+        "from": "info-livestock-area",
+        "to": "proc-item4-judge",
+        "role": "input"
+      },
+      {
+        "id": "e26",
+        "from": "proc-item4-judge",
+        "to": "info-item4-result",
+        "role": "output"
+      },
+      {
+        "id": "e27",
+        "from": "proc-item5-check",
+        "to": "info-item5-result",
+        "role": "output"
+      },
+      {
+        "id": "e28",
+        "from": "info-item1-result",
+        "to": "proc-final-judge",
+        "role": "input"
+      },
+      {
+        "id": "e29",
+        "from": "info-item2-result",
+        "to": "proc-final-judge",
+        "role": "input"
+      },
+      {
+        "id": "e30",
+        "from": "info-item3-result",
+        "to": "proc-final-judge",
+        "role": "input"
+      },
+      {
+        "id": "e31",
+        "from": "info-item4-result",
+        "to": "proc-final-judge",
+        "role": "input"
+      },
+      {
+        "id": "e32",
+        "from": "info-item5-result",
+        "to": "proc-final-judge",
+        "role": "input"
+      },
+      {
+        "id": "e33",
+        "from": "proc-final-judge",
+        "to": "info-final-result",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": ["別表第二"],
+      "description": "法別表第二（い）項第十号、（ろ）項第三号、（ち）項第六号からの委任規定"
+    },
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A48:P1", "A48:P2", "A48:P8", "A87:P2", "A87:P3"],
+      "description": "用途地域内建築物の用途制限、用途変更に関する規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-01-25T00:00:00+09:00",
+    "author": "Claude",
+    "generator": "kijo-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

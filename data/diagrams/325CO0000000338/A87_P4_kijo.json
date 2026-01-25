@@ -1,0 +1,256 @@
+{
+  "id": "CHK-BSL-ORDER-A87-P4",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "風力係数の決定方法",
+    "target_subject": "建築物又は工作物",
+    "description": "風力係数を風洞試験又は国土交通大臣が定める数値により決定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "87",
+    "paragraph": "4",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造関係",
+    "風圧力",
+    "風力係数"
+  ],
+  "text_raw": "第一項の風力係数は、風洞試験によつて定める場合のほか、建築物又は工作物の断面及び平面の形状に応じて国土交通大臣が定める数値によらなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "reference",
+          "value": "風圧力算定対象の建築物又は工作物"
+        }
+      ],
+      "note": "風圧力計算（令第87条第1項）に使用する風力係数の決定方法"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "ref": "info-wind-tunnel-used",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "ref": "info-minister-value-used",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-shape-identify",
+        "type": "process",
+        "title": "断面・平面形状の特定",
+        "process_type": "undefined_input",
+        "description": "建築物又は工作物の断面及び平面の形状を特定する"
+      },
+      {
+        "id": "info-cross-section-shape",
+        "type": "information",
+        "title": "建築物の断面形状",
+        "symbol": "S1",
+        "subject": "建築物又は工作物",
+        "property": "断面形状",
+        "property_type": "geometric_surface",
+        "plurality": "single",
+        "description": "風力係数算定に必要な断面形状"
+      },
+      {
+        "id": "info-plan-shape",
+        "type": "information",
+        "title": "建築物の平面形状",
+        "symbol": "S2",
+        "subject": "建築物又は工作物",
+        "property": "平面形状",
+        "property_type": "geometric_surface",
+        "plurality": "single",
+        "description": "風力係数算定に必要な平面形状"
+      },
+      {
+        "id": "proc-method-identify",
+        "type": "process",
+        "title": "算定方法の特定",
+        "process_type": "undefined_input",
+        "description": "風力係数の算定方法（風洞試験又は告示数値）を特定する"
+      },
+      {
+        "id": "info-method-type",
+        "type": "information",
+        "title": "風力係数算定方法",
+        "symbol": "M",
+        "subject": "建築物又は工作物",
+        "property": "風力係数算定方法",
+        "property_type": "classification",
+        "plurality": "single",
+        "description": "風洞試験又は国土交通大臣が定める数値のいずれを用いるか"
+      },
+      {
+        "id": "proc-wind-tunnel-check",
+        "type": "process",
+        "title": "風洞試験結果の確認",
+        "process_type": "human_judgment",
+        "description": "風洞試験により風力係数が適切に定められているか確認する"
+      },
+      {
+        "id": "info-wind-tunnel-used",
+        "type": "information",
+        "title": "風洞試験適合",
+        "symbol": "W",
+        "subject": "建築物又は工作物",
+        "property": "風洞試験適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "風洞試験により風力係数が適切に定められているか"
+      },
+      {
+        "id": "proc-minister-value-check",
+        "type": "process",
+        "title": "告示数値適合判定",
+        "process_type": "mechanical",
+        "description": "国土交通大臣が定める数値を断面・平面形状に応じて適用しているか判定",
+        "logic_expression": "Cf == f(S1, S2)",
+        "related_articles": [
+          "告示::平成12年建設省告示第1454号"
+        ]
+      },
+      {
+        "id": "info-minister-value-used",
+        "type": "information",
+        "title": "告示数値適合",
+        "symbol": "N",
+        "subject": "建築物又は工作物",
+        "property": "告示数値適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "国土交通大臣が定める数値を適用しているか"
+      },
+      {
+        "id": "proc-final-judgment",
+        "type": "process",
+        "title": "風力係数適合判定",
+        "process_type": "mechanical",
+        "description": "風洞試験又は告示数値のいずれかの方法により風力係数が適切に定められているか判定",
+        "logic_expression": "W OR N"
+      },
+      {
+        "id": "info-final",
+        "type": "information",
+        "title": "風力係数基準適合",
+        "symbol": "R",
+        "subject": "建築物又は工作物",
+        "property": "令第87条第4項適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "風力係数が令第87条第4項の基準に適合しているか"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-shape-identify",
+        "to": "info-cross-section-shape",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "proc-shape-identify",
+        "to": "info-plan-shape",
+        "role": "output"
+      },
+      {
+        "id": "e03",
+        "from": "proc-method-identify",
+        "to": "info-method-type",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "info-method-type",
+        "to": "proc-wind-tunnel-check",
+        "role": "input"
+      },
+      {
+        "id": "e05",
+        "from": "proc-wind-tunnel-check",
+        "to": "info-wind-tunnel-used",
+        "role": "output"
+      },
+      {
+        "id": "e06",
+        "from": "info-method-type",
+        "to": "proc-minister-value-check",
+        "role": "input"
+      },
+      {
+        "id": "e07",
+        "from": "info-cross-section-shape",
+        "to": "proc-minister-value-check",
+        "role": "input"
+      },
+      {
+        "id": "e08",
+        "from": "info-plan-shape",
+        "to": "proc-minister-value-check",
+        "role": "input"
+      },
+      {
+        "id": "e09",
+        "from": "proc-minister-value-check",
+        "to": "info-minister-value-used",
+        "role": "output"
+      },
+      {
+        "id": "e10",
+        "from": "info-wind-tunnel-used",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e11",
+        "from": "info-minister-value-used",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e12",
+        "from": "proc-final-judgment",
+        "to": "info-final",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": [
+        "A87:P1"
+      ],
+      "description": "風圧力算定の本則（風力係数の使用箇所）"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-23T12:00:00Z",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

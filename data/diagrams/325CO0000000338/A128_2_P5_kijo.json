@@ -1,0 +1,207 @@
+{
+  "id": "CHK-BSL-ORD-A128_2-P5",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "敷地内通路の道路接続要件",
+    "target_subject": "通路",
+    "description": "令第128条の2第1項から第4項の規定による通路が敷地の接する道まで達しているか判定"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "128の2",
+    "paragraph": "5",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "避難",
+    "敷地内通路"
+  ],
+  "text_raw": "前各項の規定による通路は、敷地の接する道まで達しなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        { "type": "precondition", "value": "令第128条の2第1項〜第4項の規定による通路が設けられている" }
+      ],
+      "note": "前各項の規定による通路が存在する場合に適用"
+    },
+    "judgment_rule": {
+      "operator": "ALL",
+      "conditions": [
+        { "type": "requirement", "value": "通路が敷地の接する道まで達している" }
+      ]
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-passage-identify",
+        "type": "process",
+        "title": "通路の特定",
+        "process_type": "undefined_input",
+        "description": "令第128条の2第1項〜第4項の規定により設けられた通路を特定"
+      },
+      {
+        "id": "info-passage-set",
+        "type": "information",
+        "title": "前各項規定通路",
+        "subject": "敷地",
+        "property": "前各項規定による通路の集合",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "令第128条の2第1項〜第4項の規定により設けられた通路"
+      },
+      {
+        "id": "proc-road-identify",
+        "type": "process",
+        "title": "接道の特定",
+        "process_type": "undefined_input",
+        "description": "敷地が接する道を特定"
+      },
+      {
+        "id": "info-road",
+        "type": "information",
+        "title": "敷地の接する道",
+        "subject": "敷地",
+        "property": "接する道",
+        "property_type": "geometric_line",
+        "plurality": "single",
+        "description": "敷地が接する道（道路）"
+      },
+      {
+        "id": "proc-passage-endpoint-check",
+        "type": "process",
+        "title": "通路終端確認",
+        "process_type": "undefined_input",
+        "description": "各通路の終端位置を確認",
+        "iteration": "iterative"
+      },
+      {
+        "id": "info-passage-endpoint",
+        "type": "information",
+        "title": "通路終端位置",
+        "symbol": "EP",
+        "subject": "通路",
+        "property": "終端位置",
+        "property_type": "geometric_point",
+        "plurality": "multiple",
+        "description": "各通路の終端位置"
+      },
+      {
+        "id": "proc-connection-judge",
+        "type": "process",
+        "title": "道路接続判定",
+        "process_type": "mechanical",
+        "description": "通路の終端が敷地の接する道に達しているか判定",
+        "logic_expression": "EP ∈ 敷地境界線上の道に面する部分",
+        "iteration": "iterative"
+      },
+      {
+        "id": "info-connection-result",
+        "type": "information",
+        "title": "道路接続適合",
+        "symbol": "RC",
+        "subject": "通路",
+        "property": "道路接続適合",
+        "property_type": "proposition",
+        "plurality": "multiple",
+        "description": "各通路が敷地の接する道まで達しているか"
+      },
+      {
+        "id": "proc-final-judge",
+        "type": "process",
+        "title": "最終適合判定",
+        "process_type": "mechanical",
+        "description": "すべての通路が道路に接続しているか判定",
+        "logic_expression": "ALL(RC)"
+      },
+      {
+        "id": "info-final-compliance",
+        "type": "information",
+        "title": "令第128条の2第5項適合",
+        "symbol": "COMPLIANT",
+        "subject": "敷地",
+        "property": "令第128条の2第5項適合性",
+        "property_type": "proposition",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-passage-identify",
+        "to": "info-passage-set",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "proc-road-identify",
+        "to": "info-road",
+        "role": "output"
+      },
+      {
+        "id": "e03",
+        "from": "info-passage-set",
+        "to": "proc-passage-endpoint-check",
+        "role": "input"
+      },
+      {
+        "id": "e04",
+        "from": "proc-passage-endpoint-check",
+        "to": "info-passage-endpoint",
+        "role": "output"
+      },
+      {
+        "id": "e05",
+        "from": "info-passage-endpoint",
+        "to": "proc-connection-judge",
+        "role": "input"
+      },
+      {
+        "id": "e06",
+        "from": "info-road",
+        "to": "proc-connection-judge",
+        "role": "input"
+      },
+      {
+        "id": "e07",
+        "from": "proc-connection-judge",
+        "to": "info-connection-result",
+        "role": "output"
+      },
+      {
+        "id": "e08",
+        "from": "info-connection-result",
+        "to": "proc-final-judge",
+        "role": "input"
+      },
+      {
+        "id": "e09",
+        "from": "proc-final-judge",
+        "to": "info-final-compliance",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": ["A128_2:P1", "A128_2:P2", "A128_2:P3", "A128_2:P4"],
+      "description": "前各項の規定による通路設置要件を参照"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-25T00:00:00+09:00",
+    "author": "Claude",
+    "generator": "kijo-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

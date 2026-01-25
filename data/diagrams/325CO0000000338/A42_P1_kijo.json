@@ -1,0 +1,545 @@
+{
+  "id": "CHK-BSO-A42-P1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "土台の設置",
+    "target_subject": "柱",
+    "description": "構造耐力上主要な部分である柱で最下階の部分に使用するものに土台を設けることを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "42",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造"
+  ],
+  "text_raw": "構造耐力上主要な部分である柱で最下階の部分に使用するものの下部には、土台を設けなければならない。ただし、次の各号のいずれかに該当する場合においては、この限りでない。一　当該柱を基礎に緊結した場合　二　平家建ての建築物（地盤が軟弱な区域として特定行政庁が国土交通大臣の定める基準に基づいて規則で指定する区域内にあるものを除く。次項において同じ。）で足固めを使用した場合　三　当該柱と基礎とをだぼ継ぎその他の国土交通大臣が定める構造方法により接合し、かつ、当該柱に構造耐力上支障のある引張応力が生じないことが国土交通大臣が定める方法によつて確かめられた場合",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "structural_member",
+          "value": "構造耐力上主要な部分である柱"
+        },
+        {
+          "type": "location",
+          "value": "最下階の部分に使用するもの"
+        }
+      ],
+      "note": "構造耐力上主要な部分である柱で最下階の部分に使用するもの"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "ref": "info-dodai-provided",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "ref": "info-exempt",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    },
+    "exceptions": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "note": "第1号: 当該柱を基礎に緊結した場合",
+          "ref": "info-kinketsu"
+        },
+        {
+          "note": "第2号: 平家建ての建築物で足固めを使用した場合（軟弱地盤区域除く）",
+          "operator": "AND",
+          "conditions": [
+            {
+              "ref": "info-stories",
+              "value": "平家建て"
+            },
+            {
+              "ref": "info-ashigatame",
+              "operator": "==",
+              "value": true
+            },
+            {
+              "ref": "info-soft-ground",
+              "operator": "==",
+              "value": false
+            }
+          ]
+        },
+        {
+          "note": "第3号: だぼ継ぎ等の構造方法で接合し、引張応力が生じないことを確認した場合",
+          "operator": "AND",
+          "conditions": [
+            {
+              "ref": "info-dabotsugi",
+              "operator": "==",
+              "value": true
+            },
+            {
+              "ref": "info-tensile-stress-check",
+              "operator": "==",
+              "value": true
+            }
+          ]
+        }
+      ],
+      "effect": "EXEMPT"
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-pillars-set",
+        "type": "process",
+        "title": "対象柱の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から構造耐力上主要な部分である柱で最下階の部分に使用するものを特定する"
+      },
+      {
+        "id": "info-pillars-set",
+        "type": "information",
+        "title": "対象柱の集合",
+        "subject": "建築物",
+        "property": "構造耐力上主要な部分である柱（最下階）の集合",
+        "property_type": "set_definition",
+        "description": "判定対象となる最下階の構造耐力上主要な柱を特定",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-dodai-check",
+        "type": "process",
+        "title": "土台設置の確認",
+        "process_type": "undefined_input",
+        "target_subject": "柱",
+        "iteration": "iterative",
+        "description": "設計図書等から各柱の下部に土台が設けられているかを確認する"
+      },
+      {
+        "id": "info-dodai-provided",
+        "type": "information",
+        "title": "土台の設置",
+        "symbol": "D",
+        "subject": "柱",
+        "property": "土台の設置の有無",
+        "property_type": "proposition",
+        "description": "当該柱の下部に土台が設けられているか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-kinketsu-check",
+        "type": "process",
+        "title": "基礎への緊結確認",
+        "process_type": "undefined_input",
+        "target_subject": "柱",
+        "iteration": "iterative",
+        "description": "設計図書等から当該柱が基礎に緊結されているかを確認する"
+      },
+      {
+        "id": "info-kinketsu",
+        "type": "information",
+        "title": "基礎への緊結",
+        "symbol": "K",
+        "subject": "柱",
+        "property": "基礎への緊結の有無",
+        "property_type": "proposition",
+        "description": "当該柱が基礎に緊結されているか（第1号）",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-stories-check",
+        "type": "process",
+        "title": "階数の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の階数を特定する"
+      },
+      {
+        "id": "info-stories",
+        "type": "information",
+        "title": "階数",
+        "symbol": "N",
+        "subject": "建築物",
+        "property": "階数",
+        "property_type": "numeric",
+        "unit": "階",
+        "description": "建築物の階数",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-soft-ground-check",
+        "type": "process",
+        "title": "軟弱地盤区域判定",
+        "process_type": "mechanical",
+        "description": "敷地が特定行政庁が規則で指定する軟弱地盤区域内にあるかを判定する"
+      },
+      {
+        "id": "info-soft-ground",
+        "type": "information",
+        "title": "軟弱地盤区域該当",
+        "symbol": "G",
+        "subject": "敷地",
+        "property": "軟弱地盤区域への該当",
+        "property_type": "proposition",
+        "description": "敷地が軟弱地盤区域内にあるか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-ashigatame-check",
+        "type": "process",
+        "title": "足固め使用の確認",
+        "process_type": "undefined_input",
+        "description": "設計図書等から足固めが使用されているかを確認する"
+      },
+      {
+        "id": "info-ashigatame",
+        "type": "information",
+        "title": "足固めの使用",
+        "symbol": "F",
+        "subject": "建築物",
+        "property": "足固めの使用の有無",
+        "property_type": "proposition",
+        "description": "建築物に足固めが使用されているか（第2号）",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-exempt2-check",
+        "type": "process",
+        "title": "第2号適用除外判定",
+        "process_type": "mechanical",
+        "description": "平家建てかつ軟弱地盤区域外かつ足固め使用により適用除外に該当するか判定",
+        "logic_expression": "(N = 1) AND (G = false) AND (F = true)"
+      },
+      {
+        "id": "info-exempt2",
+        "type": "information",
+        "title": "第2号適用除外",
+        "symbol": "X2",
+        "subject": "建築物",
+        "property": "第2号適用除外への該当",
+        "property_type": "proposition",
+        "description": "第2号（平家建て・足固め使用）による適用除外に該当するか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-dabotsugi-check",
+        "type": "process",
+        "title": "接合方法の確認",
+        "process_type": "human_judgment",
+        "target_subject": "柱",
+        "iteration": "iterative",
+        "description": "設計図書等から当該柱と基礎がだぼ継ぎその他の国土交通大臣が定める構造方法により接合されているかを確認する"
+      },
+      {
+        "id": "info-dabotsugi",
+        "type": "information",
+        "title": "だぼ継ぎ等の接合",
+        "symbol": "J",
+        "subject": "柱",
+        "property": "だぼ継ぎ等による接合の有無",
+        "property_type": "proposition",
+        "description": "当該柱と基礎がだぼ継ぎ等の構造方法により接合されているか（第3号）",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-tensile-stress-check",
+        "type": "process",
+        "title": "引張応力確認",
+        "process_type": "human_judgment",
+        "target_subject": "柱",
+        "iteration": "iterative",
+        "description": "国土交通大臣が定める方法によって構造耐力上支障のある引張応力が生じないことが確かめられているかを確認する"
+      },
+      {
+        "id": "info-tensile-stress-check",
+        "type": "information",
+        "title": "引張応力確認",
+        "symbol": "T",
+        "subject": "柱",
+        "property": "引張応力確認の有無",
+        "property_type": "proposition",
+        "description": "構造耐力上支障のある引張応力が生じないことが確かめられているか（第3号）",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-exempt3-check",
+        "type": "process",
+        "title": "第3号適用除外判定",
+        "process_type": "mechanical",
+        "target_subject": "柱",
+        "iteration": "iterative",
+        "description": "だぼ継ぎ等かつ引張応力確認により適用除外に該当するか判定",
+        "logic_expression": "(J = true) AND (T = true)"
+      },
+      {
+        "id": "info-exempt3",
+        "type": "information",
+        "title": "第3号適用除外",
+        "symbol": "X3",
+        "subject": "柱",
+        "property": "第3号適用除外への該当",
+        "property_type": "proposition",
+        "description": "第3号（だぼ継ぎ等・引張応力確認）による適用除外に該当するか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-exempt-judgment",
+        "type": "process",
+        "title": "適用除外総合判定",
+        "process_type": "mechanical",
+        "target_subject": "柱",
+        "iteration": "iterative",
+        "description": "各号のいずれかに該当するか判定",
+        "logic_expression": "(K = true) OR (X2 = true) OR (X3 = true)"
+      },
+      {
+        "id": "info-exempt",
+        "type": "information",
+        "title": "適用除外該当",
+        "symbol": "X",
+        "subject": "柱",
+        "property": "適用除外への該当",
+        "property_type": "proposition",
+        "description": "ただし書きによる適用除外（第1号〜第3号のいずれか）に該当するか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-pillar-judgment",
+        "type": "process",
+        "title": "各柱の適合判定",
+        "process_type": "mechanical",
+        "target_subject": "柱",
+        "iteration": "iterative",
+        "description": "各柱について、土台設置または適用除外のいずれかを満たすことを確認",
+        "logic_expression": "(D = true) OR (X = true)"
+      },
+      {
+        "id": "info-pillar-compliance",
+        "type": "information",
+        "title": "各柱の適合",
+        "symbol": "C",
+        "subject": "柱",
+        "property": "令42条1項適合",
+        "property_type": "proposition",
+        "description": "各柱が令42条1項の規定に適合するか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-all-check",
+        "type": "process",
+        "title": "全柱適合確認",
+        "process_type": "mechanical",
+        "description": "全ての対象柱が令42条1項に適合することを確認",
+        "logic_expression": "∀pillar ∈ Pillars: C(pillar) = true"
+      },
+      {
+        "id": "info-final",
+        "type": "information",
+        "title": "建築物の令42条1項適合",
+        "subject": "建築物",
+        "property": "令42条1項適合",
+        "property_type": "proposition",
+        "description": "建築物全体として令42条1項の規定に適合するか",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-pillars-set",
+        "to": "info-pillars-set",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "info-pillars-set",
+        "to": "proc-dodai-check",
+        "role": "input"
+      },
+      {
+        "id": "e03",
+        "from": "proc-dodai-check",
+        "to": "info-dodai-provided",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "info-pillars-set",
+        "to": "proc-kinketsu-check",
+        "role": "input"
+      },
+      {
+        "id": "e05",
+        "from": "proc-kinketsu-check",
+        "to": "info-kinketsu",
+        "role": "output"
+      },
+      {
+        "id": "e06",
+        "from": "proc-stories-check",
+        "to": "info-stories",
+        "role": "output"
+      },
+      {
+        "id": "e07",
+        "from": "proc-soft-ground-check",
+        "to": "info-soft-ground",
+        "role": "output"
+      },
+      {
+        "id": "e08",
+        "from": "proc-ashigatame-check",
+        "to": "info-ashigatame",
+        "role": "output"
+      },
+      {
+        "id": "e09",
+        "from": "info-stories",
+        "to": "proc-exempt2-check",
+        "role": "input"
+      },
+      {
+        "id": "e10",
+        "from": "info-soft-ground",
+        "to": "proc-exempt2-check",
+        "role": "input"
+      },
+      {
+        "id": "e11",
+        "from": "info-ashigatame",
+        "to": "proc-exempt2-check",
+        "role": "input"
+      },
+      {
+        "id": "e12",
+        "from": "proc-exempt2-check",
+        "to": "info-exempt2",
+        "role": "output"
+      },
+      {
+        "id": "e13",
+        "from": "info-pillars-set",
+        "to": "proc-dabotsugi-check",
+        "role": "input"
+      },
+      {
+        "id": "e14",
+        "from": "proc-dabotsugi-check",
+        "to": "info-dabotsugi",
+        "role": "output"
+      },
+      {
+        "id": "e15",
+        "from": "info-pillars-set",
+        "to": "proc-tensile-stress-check",
+        "role": "input"
+      },
+      {
+        "id": "e16",
+        "from": "proc-tensile-stress-check",
+        "to": "info-tensile-stress-check",
+        "role": "output"
+      },
+      {
+        "id": "e17",
+        "from": "info-dabotsugi",
+        "to": "proc-exempt3-check",
+        "role": "input"
+      },
+      {
+        "id": "e18",
+        "from": "info-tensile-stress-check",
+        "to": "proc-exempt3-check",
+        "role": "input"
+      },
+      {
+        "id": "e19",
+        "from": "proc-exempt3-check",
+        "to": "info-exempt3",
+        "role": "output"
+      },
+      {
+        "id": "e20",
+        "from": "info-kinketsu",
+        "to": "proc-exempt-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e21",
+        "from": "info-exempt2",
+        "to": "proc-exempt-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e22",
+        "from": "info-exempt3",
+        "to": "proc-exempt-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e23",
+        "from": "proc-exempt-judgment",
+        "to": "info-exempt",
+        "role": "output"
+      },
+      {
+        "id": "e24",
+        "from": "info-dodai-provided",
+        "to": "proc-pillar-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e25",
+        "from": "info-exempt",
+        "to": "proc-pillar-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e26",
+        "from": "proc-pillar-judgment",
+        "to": "info-pillar-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e27",
+        "from": "info-pillar-compliance",
+        "to": "proc-all-check",
+        "role": "input"
+      },
+      {
+        "id": "e28",
+        "from": "proc-all-check",
+        "to": "info-final",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": [
+        "A20"
+      ],
+      "description": "法第20条（構造耐力）の委任を受けた技術的基準"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-23T16:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

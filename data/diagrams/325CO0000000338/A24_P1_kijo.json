@@ -1,0 +1,282 @@
+{
+  "id": "CHK-BSL-ORDER-A24-P1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "踊場の位置",
+    "target_subject": "階段",
+    "description": "階段の高さに応じて踊場を設置する位置を判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "24",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "階段",
+    "踊場"
+  ],
+  "text_raw": "前条第一項の表の（一）又は（二）に該当する階段でその高さが三メートルをこえるものにあつては高さ三メートル以内ごとに、その他の階段でその高さが四メートルをこえるものにあつては高さ四メートル以内ごとに踊場を設けなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "reference",
+          "value": "令第23条第1項の表に該当する階段"
+        }
+      ]
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "note": "表(一)(二)該当階段: 高さ3m超→3m以内ごとに踊場"
+        },
+        {
+          "note": "その他の階段: 高さ4m超→4m以内ごとに踊場"
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "info-building-stairs-set",
+        "type": "information",
+        "title": "建築物の階段",
+        "symbol": "S",
+        "subject": "建築物",
+        "property": "階段の集合",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "判定対象となる建築物に属する階段を特定"
+      },
+      {
+        "id": "proc-stair-category-identify",
+        "type": "process",
+        "title": "階段種別の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から階段が令23条第1項の表のどの区分に該当するかを読み取る"
+      },
+      {
+        "id": "info-stair-category",
+        "type": "information",
+        "title": "階段の種別",
+        "symbol": "C",
+        "subject": "階段",
+        "property": "種別",
+        "property_type": "classification",
+        "plurality": "multiple",
+        "description": "令23条第1項の表(一)(二)(三)(四)のいずれに該当するか",
+        "related_articles": ["令::A23:P1"]
+      },
+      {
+        "id": "proc-stair-height-identify",
+        "type": "process",
+        "title": "階段高さの特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から階段の高さを読み取る"
+      },
+      {
+        "id": "info-stair-height",
+        "type": "information",
+        "title": "階段の高さ",
+        "symbol": "H",
+        "subject": "階段",
+        "property": "高さ",
+        "property_type": "numeric",
+        "unit": "m",
+        "plurality": "multiple",
+        "description": "各階段の高さ（階高）"
+      },
+      {
+        "id": "proc-landing-interval-identify",
+        "type": "process",
+        "title": "踊場設置間隔の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から踊場の設置間隔を読み取る"
+      },
+      {
+        "id": "info-landing-interval",
+        "type": "information",
+        "title": "踊場の設置間隔",
+        "symbol": "L",
+        "subject": "階段",
+        "property": "踊場設置間隔",
+        "property_type": "numeric",
+        "unit": "m",
+        "plurality": "multiple",
+        "description": "各階段における踊場の最大設置間隔（高さ方向）"
+      },
+      {
+        "id": "proc-required-interval-calc",
+        "type": "process",
+        "title": "必要間隔の判定",
+        "process_type": "mechanical",
+        "iteration": "iterative",
+        "description": "階段種別に応じて必要な踊場間隔を判定",
+        "logic_expression": "(C ∈ {(一),(二)} AND H > 3) → 必要間隔 = 3m, (C ∈ {(三),(四)} AND H > 4) → 必要間隔 = 4m"
+      },
+      {
+        "id": "info-required-interval",
+        "type": "information",
+        "title": "必要踊場間隔",
+        "symbol": "R",
+        "subject": "階段",
+        "property": "必要踊場間隔",
+        "property_type": "numeric",
+        "unit": "m",
+        "plurality": "multiple",
+        "description": "各階段に必要とされる踊場の最大設置間隔"
+      },
+      {
+        "id": "proc-compliance-check",
+        "type": "process",
+        "title": "踊場設置適合判定",
+        "process_type": "mechanical",
+        "iteration": "iterative",
+        "description": "各階段の踊場設置間隔が必要間隔以内かを判定",
+        "logic_expression": "L ≤ R"
+      },
+      {
+        "id": "info-each-stair-compliance",
+        "type": "information",
+        "title": "各階段の適合",
+        "symbol": "P",
+        "subject": "階段",
+        "property": "踊場設置適合",
+        "property_type": "proposition",
+        "plurality": "multiple",
+        "description": "各階段が必要な間隔で踊場を設置しているか"
+      },
+      {
+        "id": "proc-all-compliance",
+        "type": "process",
+        "title": "全体適合判定",
+        "process_type": "mechanical",
+        "description": "すべての階段が踊場設置基準に適合するかを判定",
+        "logic_expression": "∀s∈S: P(s)"
+      },
+      {
+        "id": "info-final",
+        "type": "information",
+        "title": "令24条第1項適合",
+        "symbol": "F",
+        "subject": "建築物",
+        "property": "令24条第1項適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "建築物のすべての階段が踊場設置基準に適合するか"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "info-building-stairs-set",
+        "to": "proc-stair-category-identify",
+        "role": "input"
+      },
+      {
+        "id": "e02",
+        "from": "proc-stair-category-identify",
+        "to": "info-stair-category",
+        "role": "output"
+      },
+      {
+        "id": "e03",
+        "from": "info-building-stairs-set",
+        "to": "proc-stair-height-identify",
+        "role": "input"
+      },
+      {
+        "id": "e04",
+        "from": "proc-stair-height-identify",
+        "to": "info-stair-height",
+        "role": "output"
+      },
+      {
+        "id": "e05",
+        "from": "info-building-stairs-set",
+        "to": "proc-landing-interval-identify",
+        "role": "input"
+      },
+      {
+        "id": "e06",
+        "from": "proc-landing-interval-identify",
+        "to": "info-landing-interval",
+        "role": "output"
+      },
+      {
+        "id": "e07",
+        "from": "info-stair-category",
+        "to": "proc-required-interval-calc",
+        "role": "input"
+      },
+      {
+        "id": "e08",
+        "from": "info-stair-height",
+        "to": "proc-required-interval-calc",
+        "role": "input"
+      },
+      {
+        "id": "e09",
+        "from": "proc-required-interval-calc",
+        "to": "info-required-interval",
+        "role": "output"
+      },
+      {
+        "id": "e10",
+        "from": "info-landing-interval",
+        "to": "proc-compliance-check",
+        "role": "input"
+      },
+      {
+        "id": "e11",
+        "from": "info-required-interval",
+        "to": "proc-compliance-check",
+        "role": "input"
+      },
+      {
+        "id": "e12",
+        "from": "proc-compliance-check",
+        "to": "info-each-stair-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e13",
+        "from": "info-each-stair-compliance",
+        "to": "proc-all-compliance",
+        "role": "input"
+      },
+      {
+        "id": "e14",
+        "from": "proc-all-compliance",
+        "to": "info-final",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": ["A23:P1"],
+      "description": "令第23条第1項の表で階段の種別を定義"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-23T12:00:00Z",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

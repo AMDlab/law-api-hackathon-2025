@@ -1,0 +1,320 @@
+{
+  "id": "CHK-BSL-A111-P1-I2",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "避難上有効な開口部の判定",
+    "target_subject": "開口部",
+    "description": "居室に設けられた開口部が、直接外気に接する避難上有効な構造で、かつ所定の大きさを満たすかを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "111",
+    "paragraph": "1",
+    "item": "2"
+  },
+  "labels": ["単体規定", "避難", "開口部"],
+  "text_raw": "直接外気に接する避難上有効な構造のもので、かつ、その大きさが直径一メートル以上の円が内接することができるもの又はその幅及び高さが、それぞれ、七十五センチメートル以上及び一・二メートル以上のもの",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {"type": "subject", "value": "居室の開口部"}
+      ],
+      "note": "居室に設けられた窓その他の開口部が対象"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {"ref": "info-direct-air", "operator": "==", "value": true, "note": "直接外気に接する"},
+        {"ref": "info-evacuation-effective", "operator": "==", "value": true, "note": "避難上有効な構造"},
+        {
+          "operator": "OR",
+          "conditions": [
+            {"ref": "info-circle-ok", "operator": "==", "value": true, "note": "直径1m以上の円が内接可能"},
+            {
+              "operator": "AND",
+              "conditions": [
+                {"ref": "info-width-ok", "operator": "==", "value": true, "note": "幅75cm以上"},
+                {"ref": "info-height-ok", "operator": "==", "value": true, "note": "高さ1.2m以上"}
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-rooms-set",
+        "type": "process",
+        "title": "居室の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書から建築物内の居室を特定する"
+      },
+      {
+        "id": "info-rooms-set",
+        "type": "information",
+        "title": "建築物の居室",
+        "subject": "建築物",
+        "property": "居室の集合",
+        "property_type": "set_definition",
+        "description": "判定対象となる建築物に属する居室を特定",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-openings-set",
+        "type": "process",
+        "title": "開口部の特定",
+        "process_type": "undefined_input",
+        "target_subject": "居室",
+        "iteration": "iterative",
+        "description": "各居室に設けられた窓その他の開口部を特定する"
+      },
+      {
+        "id": "info-openings-set",
+        "type": "information",
+        "title": "居室の開口部",
+        "subject": "居室",
+        "property": "開口部の集合",
+        "property_type": "set_definition",
+        "description": "各居室に属する窓その他の開口部を特定",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-direct-air",
+        "type": "process",
+        "title": "外気接続の確認",
+        "process_type": "human_judgment",
+        "target_subject": "開口部",
+        "iteration": "iterative",
+        "description": "各開口部が直接外気に接しているかを確認する"
+      },
+      {
+        "id": "info-direct-air",
+        "type": "information",
+        "title": "直接外気に接する",
+        "symbol": "D",
+        "subject": "開口部",
+        "property": "外気直接接続",
+        "property_type": "proposition",
+        "description": "開口部が直接外気に接しているか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-evacuation-effective",
+        "type": "process",
+        "title": "避難上有効構造の確認",
+        "process_type": "human_judgment",
+        "target_subject": "開口部",
+        "iteration": "iterative",
+        "description": "各開口部が避難上有効な構造であるかを確認する"
+      },
+      {
+        "id": "info-evacuation-effective",
+        "type": "information",
+        "title": "避難上有効な構造",
+        "symbol": "E",
+        "subject": "開口部",
+        "property": "避難上有効な構造",
+        "property_type": "proposition",
+        "description": "開口部が避難上有効な構造であるか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-opening-shape",
+        "type": "process",
+        "title": "開口部形状の特定",
+        "process_type": "undefined_input",
+        "target_subject": "開口部",
+        "iteration": "iterative",
+        "description": "各開口部の形状（幅・高さ）を設計図書から読み取る"
+      },
+      {
+        "id": "info-opening-shape",
+        "type": "information",
+        "title": "開口部の形状",
+        "symbol": "S",
+        "subject": "開口部",
+        "property": "形状",
+        "property_type": "geometric_surface",
+        "description": "開口部の幾何学的形状（幅・高さ・内接可能な円の直径を算定するための形状）",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-circle-check",
+        "type": "process",
+        "title": "内接円直径の判定",
+        "process_type": "mechanical",
+        "target_subject": "開口部",
+        "iteration": "iterative",
+        "description": "開口部に直径1m以上の円が内接できるかを判定する",
+        "logic_expression": "内接可能な円の直径 ≥ 1.0m"
+      },
+      {
+        "id": "info-circle-ok",
+        "type": "information",
+        "title": "直径1m以上の円が内接可能",
+        "symbol": "C",
+        "subject": "開口部",
+        "property": "内接円条件適合",
+        "property_type": "proposition",
+        "description": "直径1m以上の円が内接することができるか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-width-check",
+        "type": "process",
+        "title": "幅の判定",
+        "process_type": "mechanical",
+        "target_subject": "開口部",
+        "iteration": "iterative",
+        "description": "開口部の幅が75cm以上であるかを判定する",
+        "logic_expression": "幅 ≥ 0.75m"
+      },
+      {
+        "id": "info-width-ok",
+        "type": "information",
+        "title": "幅75cm以上",
+        "symbol": "W",
+        "subject": "開口部",
+        "property": "幅条件適合",
+        "property_type": "proposition",
+        "description": "幅が75cm以上であるか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-height-check",
+        "type": "process",
+        "title": "高さの判定",
+        "process_type": "mechanical",
+        "target_subject": "開口部",
+        "iteration": "iterative",
+        "description": "開口部の高さが1.2m以上であるかを判定する",
+        "logic_expression": "高さ ≥ 1.2m"
+      },
+      {
+        "id": "info-height-ok",
+        "type": "information",
+        "title": "高さ1.2m以上",
+        "symbol": "H",
+        "subject": "開口部",
+        "property": "高さ条件適合",
+        "property_type": "proposition",
+        "description": "高さが1.2m以上であるか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-size-check",
+        "type": "process",
+        "title": "大きさ条件の判定",
+        "process_type": "mechanical",
+        "target_subject": "開口部",
+        "iteration": "iterative",
+        "description": "大きさ条件（内接円条件または幅・高さ条件）を満たすかを判定する",
+        "logic_expression": "C OR (W AND H)"
+      },
+      {
+        "id": "info-size-ok",
+        "type": "information",
+        "title": "大きさ条件適合",
+        "symbol": "Z",
+        "subject": "開口部",
+        "property": "大きさ条件適合",
+        "property_type": "proposition",
+        "description": "大きさ条件を満たすか（内接円条件または幅・高さ条件）",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-item2-check",
+        "type": "process",
+        "title": "第2号該当判定",
+        "process_type": "mechanical",
+        "target_subject": "開口部",
+        "iteration": "iterative",
+        "description": "第2号の全条件（外気接続、避難有効、大きさ）を満たすかを判定する",
+        "logic_expression": "D AND E AND Z"
+      },
+      {
+        "id": "info-item2-ok",
+        "type": "information",
+        "title": "第2号開口部該当",
+        "symbol": "I2",
+        "subject": "開口部",
+        "property": "令111条1項2号該当",
+        "property_type": "proposition",
+        "description": "開口部が令第111条第1項第2号に該当するか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-room-has-item2",
+        "type": "process",
+        "title": "居室の第2号開口部有無判定",
+        "process_type": "mechanical",
+        "target_subject": "居室",
+        "iteration": "iterative",
+        "description": "各居室に第2号に該当する開口部があるかを判定する",
+        "logic_expression": "∃opening ∈ Openings(room): I2(opening) = true"
+      },
+      {
+        "id": "info-room-has-item2",
+        "type": "information",
+        "title": "第2号開口部を有する",
+        "symbol": "R2",
+        "subject": "居室",
+        "property": "第2号開口部の有無",
+        "property_type": "proposition",
+        "description": "居室が令第111条第1項第2号に該当する開口部を有するか",
+        "plurality": "multiple"
+      }
+    ],
+    "edges": [
+      {"id": "e01", "from": "proc-rooms-set", "to": "info-rooms-set", "role": "output"},
+      {"id": "e02", "from": "info-rooms-set", "to": "proc-openings-set", "role": "input"},
+      {"id": "e03", "from": "proc-openings-set", "to": "info-openings-set", "role": "output"},
+      {"id": "e04", "from": "info-openings-set", "to": "proc-direct-air", "role": "input"},
+      {"id": "e05", "from": "proc-direct-air", "to": "info-direct-air", "role": "output"},
+      {"id": "e06", "from": "info-openings-set", "to": "proc-evacuation-effective", "role": "input"},
+      {"id": "e07", "from": "proc-evacuation-effective", "to": "info-evacuation-effective", "role": "output"},
+      {"id": "e08", "from": "info-openings-set", "to": "proc-opening-shape", "role": "input"},
+      {"id": "e09", "from": "proc-opening-shape", "to": "info-opening-shape", "role": "output"},
+      {"id": "e10", "from": "info-opening-shape", "to": "proc-circle-check", "role": "input"},
+      {"id": "e11", "from": "proc-circle-check", "to": "info-circle-ok", "role": "output"},
+      {"id": "e12", "from": "info-opening-shape", "to": "proc-width-check", "role": "input"},
+      {"id": "e13", "from": "proc-width-check", "to": "info-width-ok", "role": "output"},
+      {"id": "e14", "from": "info-opening-shape", "to": "proc-height-check", "role": "input"},
+      {"id": "e15", "from": "proc-height-check", "to": "info-height-ok", "role": "output"},
+      {"id": "e16", "from": "info-circle-ok", "to": "proc-size-check", "role": "input"},
+      {"id": "e17", "from": "info-width-ok", "to": "proc-size-check", "role": "input"},
+      {"id": "e18", "from": "info-height-ok", "to": "proc-size-check", "role": "input"},
+      {"id": "e19", "from": "proc-size-check", "to": "info-size-ok", "role": "output"},
+      {"id": "e20", "from": "info-direct-air", "to": "proc-item2-check", "role": "input"},
+      {"id": "e21", "from": "info-evacuation-effective", "to": "proc-item2-check", "role": "input"},
+      {"id": "e22", "from": "info-size-ok", "to": "proc-item2-check", "role": "input"},
+      {"id": "e23", "from": "proc-item2-check", "to": "info-item2-ok", "role": "output"},
+      {"id": "e24", "from": "info-openings-set", "to": "proc-room-has-item2", "role": "input"},
+      {"id": "e25", "from": "info-item2-ok", "to": "proc-room-has-item2", "role": "input"},
+      {"id": "e26", "from": "proc-room-has-item2", "to": "info-room-has-item2", "role": "output"}
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": ["A35_3"],
+      "description": "法35条の3（無窓居室）から委任された政令規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-23T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

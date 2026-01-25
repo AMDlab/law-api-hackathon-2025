@@ -1,0 +1,307 @@
+{
+  "id": "CHK-ORD-A20-P2-I1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "住居系地域の採光補正係数算定",
+    "target_subject": "開口部",
+    "description": "第一種低層住居専用地域等の住居系地域における採光補正係数の算定"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "20",
+    "paragraph": "2",
+    "item": "1"
+  },
+  "labels": [
+    "単体規定",
+    "採光",
+    "居室"
+  ],
+  "text_raw": "第一種低層住居専用地域、第二種低層住居専用地域、第一種中高層住居専用地域、第二種中高層住居専用地域、第一種住居地域、第二種住居地域、準住居地域又は田園住居地域\n隣地境界線（中略）又は同一敷地内の他の建築物若しくは当該建築物の他の部分に面する開口部の部分で、（中略）採光関係比率に六・〇を乗じた数値から一・四を減じて得た算定値（次のイからハまでに掲げる場合にあつては、それぞれイからハまでに定める数値）\nイ 開口部が道に面する場合であつて、当該算定値が一・〇未満となる場合 一・〇\nロ 開口部が道に面しない場合であつて、水平距離が七メートル以上であり、かつ、当該算定値が一・〇未満となる場合 一・〇\nハ 開口部が道に面しない場合であつて、水平距離が七メートル未満であり、かつ、当該算定値が負数となる場合 零",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "第一種低層住居専用地域、第二種低層住居専用地域、第一種中高層住居専用地域、第二種中高層住居専用地域、第一種住居地域、第二種住居地域、準住居地域又は田園住居地域"
+        }
+      ],
+      "note": "住居系用途地域に立地する建築物の開口部"
+    },
+    "judgment_rule": {
+      "operator": "COMPUTE",
+      "conditions": [
+        {
+          "ref": "info-coefficient",
+          "description": "採光補正係数の算定結果"
+        }
+      ]
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "info-openings-set",
+        "type": "information",
+        "title": "居室の開口部",
+        "subject": "居室",
+        "property": "開口部の集合",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "採光補正係数算定の対象となる居室に属する開口部を特定"
+      },
+      {
+        "id": "proc-opening-position",
+        "type": "process",
+        "title": "開口部位置の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から開口部が道に面するか、隣地境界線・他の建築物等に面するかを特定する",
+        "target_subject": "開口部",
+        "iteration": "iterative"
+      },
+      {
+        "id": "info-faces-road",
+        "type": "information",
+        "title": "開口部の道路面する状況",
+        "symbol": "R",
+        "subject": "開口部",
+        "property": "道に面するか否か",
+        "property_type": "proposition",
+        "plurality": "multiple",
+        "description": "開口部が道に面するか否か"
+      },
+      {
+        "id": "proc-horizontal-distance",
+        "type": "process",
+        "title": "水平距離の測定",
+        "process_type": "undefined_input",
+        "description": "開口部直上の建築物各部分から隣地境界線等までの水平距離を設計図書から読み取る",
+        "target_subject": "開口部",
+        "iteration": "iterative"
+      },
+      {
+        "id": "info-horizontal-distance",
+        "type": "information",
+        "title": "水平距離",
+        "symbol": "D",
+        "subject": "開口部",
+        "property": "隣地境界線等までの水平距離",
+        "property_type": "numeric",
+        "unit": "m",
+        "plurality": "multiple",
+        "description": "開口部直上の建築物各部分から隣地境界線又は対向部までの水平距離"
+      },
+      {
+        "id": "proc-vertical-distance",
+        "type": "process",
+        "title": "垂直距離の測定",
+        "process_type": "undefined_input",
+        "description": "開口部直上の建築物各部分から開口部中心までの垂直距離を設計図書から読み取る",
+        "target_subject": "開口部",
+        "iteration": "iterative"
+      },
+      {
+        "id": "info-vertical-distance",
+        "type": "information",
+        "title": "垂直距離",
+        "symbol": "V",
+        "subject": "開口部",
+        "property": "開口部中心までの垂直距離",
+        "property_type": "numeric",
+        "unit": "m",
+        "plurality": "multiple",
+        "description": "開口部直上の建築物各部分から開口部中心までの垂直距離"
+      },
+      {
+        "id": "proc-ratio-calc",
+        "type": "process",
+        "title": "採光関係比率の算定",
+        "process_type": "mechanical",
+        "description": "水平距離を垂直距離で除して採光関係比率を算定（複数測定点のうち最小値を採用）",
+        "target_subject": "開口部",
+        "iteration": "iterative",
+        "logic_expression": "LR = min(D/V)"
+      },
+      {
+        "id": "info-light-ratio",
+        "type": "information",
+        "title": "採光関係比率",
+        "symbol": "LR",
+        "subject": "開口部",
+        "property": "採光関係比率",
+        "property_type": "numeric",
+        "plurality": "multiple",
+        "description": "水平距離を垂直距離で除した数値のうち最小値"
+      },
+      {
+        "id": "proc-base-calc",
+        "type": "process",
+        "title": "基本算定値の計算",
+        "process_type": "mechanical",
+        "description": "採光関係比率に6.0を乗じて1.4を減じる",
+        "target_subject": "開口部",
+        "iteration": "iterative",
+        "logic_expression": "C0 = LR * 6.0 - 1.4"
+      },
+      {
+        "id": "info-base-value",
+        "type": "information",
+        "title": "基本算定値",
+        "symbol": "C0",
+        "subject": "開口部",
+        "property": "採光補正係数基本算定値",
+        "property_type": "numeric",
+        "plurality": "multiple",
+        "description": "採光関係比率×6.0−1.4の計算結果"
+      },
+      {
+        "id": "proc-special-case-check",
+        "type": "process",
+        "title": "特例条件判定",
+        "process_type": "mechanical",
+        "description": "イ・ロ・ハの特例条件に該当するかを判定し、採光補正係数を確定",
+        "target_subject": "開口部",
+        "iteration": "iterative",
+        "logic_expression": "IF (R AND C0 < 1.0) THEN C = 1.0 ELSE IF (NOT R AND D >= 7 AND C0 < 1.0) THEN C = 1.0 ELSE IF (NOT R AND D < 7 AND C0 < 0) THEN C = 0 ELSE C = C0"
+      },
+      {
+        "id": "info-coefficient",
+        "type": "information",
+        "title": "採光補正係数",
+        "symbol": "C",
+        "subject": "開口部",
+        "property": "採光補正係数",
+        "property_type": "numeric",
+        "plurality": "multiple",
+        "description": "住居系地域における開口部ごとの採光補正係数（特例適用後）",
+        "remarks": "イ・ロ・ハの特例条件を反映した最終値"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "info-openings-set",
+        "to": "proc-opening-position",
+        "role": "input"
+      },
+      {
+        "id": "e02",
+        "from": "proc-opening-position",
+        "to": "info-faces-road",
+        "role": "output"
+      },
+      {
+        "id": "e03",
+        "from": "info-openings-set",
+        "to": "proc-horizontal-distance",
+        "role": "input"
+      },
+      {
+        "id": "e04",
+        "from": "proc-horizontal-distance",
+        "to": "info-horizontal-distance",
+        "role": "output"
+      },
+      {
+        "id": "e05",
+        "from": "info-openings-set",
+        "to": "proc-vertical-distance",
+        "role": "input"
+      },
+      {
+        "id": "e06",
+        "from": "proc-vertical-distance",
+        "to": "info-vertical-distance",
+        "role": "output"
+      },
+      {
+        "id": "e07",
+        "from": "info-horizontal-distance",
+        "to": "proc-ratio-calc",
+        "role": "input"
+      },
+      {
+        "id": "e08",
+        "from": "info-vertical-distance",
+        "to": "proc-ratio-calc",
+        "role": "input"
+      },
+      {
+        "id": "e09",
+        "from": "proc-ratio-calc",
+        "to": "info-light-ratio",
+        "role": "output"
+      },
+      {
+        "id": "e10",
+        "from": "info-light-ratio",
+        "to": "proc-base-calc",
+        "role": "input"
+      },
+      {
+        "id": "e11",
+        "from": "proc-base-calc",
+        "to": "info-base-value",
+        "role": "output"
+      },
+      {
+        "id": "e12",
+        "from": "info-base-value",
+        "to": "proc-special-case-check",
+        "role": "input"
+      },
+      {
+        "id": "e13",
+        "from": "info-faces-road",
+        "to": "proc-special-case-check",
+        "role": "input"
+      },
+      {
+        "id": "e14",
+        "from": "info-horizontal-distance",
+        "to": "proc-special-case-check",
+        "role": "input"
+      },
+      {
+        "id": "e15",
+        "from": "proc-special-case-check",
+        "to": "info-coefficient",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": [
+        "A28:P1"
+      ],
+      "description": "法第28条第1項の採光に有効な部分の面積算定のため、令第20条で採光補正係数を規定"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": [
+        "A20:P1"
+      ],
+      "description": "第1項で有効面積の算定方法の基本式（開口部面積×採光補正係数）を規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-23T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令",
+    "source": "e-Gov法令API v2"
+  }
+}

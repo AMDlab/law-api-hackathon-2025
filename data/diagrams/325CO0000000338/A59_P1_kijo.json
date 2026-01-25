@@ -1,0 +1,231 @@
+{
+  "id": "CHK-BSL-ORDER-A59-P1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "鉄骨組積造である壁の緊結",
+    "target_subject": "鉄骨組積造である壁",
+    "description": "鉄骨組積造である壁の組積造の部分が鉄骨の軸組に金物で緊結されているかを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "59",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造規定",
+    "鉄骨組積造"
+  ],
+  "text_raw": "鉄骨組積造である壁の組積造の部分は、鉄骨の軸組にボルト、かすがいその他の金物で緊結しなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "structure",
+          "value": "鉄骨組積造である壁を有する建築物"
+        }
+      ],
+      "note": "鉄骨組積造の壁を持つ建築物が対象"
+    },
+    "judgment_rule": {
+      "operator": "ALL",
+      "conditions": [
+        {
+          "ref": "info-fastening-compliance",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-wall-structure-identify",
+        "type": "process",
+        "title": "壁の構造種別の特定",
+        "process_type": "undefined_input",
+        "description": "建築物の壁が鉄骨組積造であるかを特定する"
+      },
+      {
+        "id": "info-wall-structure",
+        "type": "information",
+        "title": "壁の構造種別",
+        "symbol": "WS",
+        "subject": "壁",
+        "property": "構造種別",
+        "property_type": "classification",
+        "plurality": "single",
+        "description": "鉄骨組積造であるか否か"
+      },
+      {
+        "id": "info-walls-set",
+        "type": "information",
+        "title": "鉄骨組積造である壁の集合",
+        "symbol": "WALLS",
+        "subject": "建築物",
+        "property": "鉄骨組積造である壁の集合",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "判定対象となる建築物に属する鉄骨組積造の壁を特定"
+      },
+      {
+        "id": "proc-masonry-part-identify",
+        "type": "process",
+        "title": "組積造部分の特定",
+        "process_type": "undefined_input",
+        "description": "鉄骨組積造である壁における組積造の部分を特定する"
+      },
+      {
+        "id": "info-masonry-part",
+        "type": "information",
+        "title": "組積造の部分",
+        "symbol": "MP",
+        "subject": "鉄骨組積造である壁",
+        "property": "組積造の部分",
+        "property_type": "geometric_solid",
+        "plurality": "multiple",
+        "description": "各壁の組積造の部分"
+      },
+      {
+        "id": "proc-fastening-method-identify",
+        "type": "process",
+        "title": "緊結方法の特定",
+        "process_type": "undefined_input",
+        "description": "組積造の部分が鉄骨の軸組にどのように緊結されているかを特定する"
+      },
+      {
+        "id": "info-fastening-method",
+        "type": "information",
+        "title": "緊結方法",
+        "symbol": "FM",
+        "subject": "組積造の部分",
+        "property": "緊結方法",
+        "property_type": "classification",
+        "plurality": "multiple",
+        "description": "ボルト、かすがい、その他の金物による緊結か否か"
+      },
+      {
+        "id": "proc-fastening-check",
+        "type": "process",
+        "title": "緊結要件判定",
+        "process_type": "mechanical",
+        "iteration": "iterative",
+        "description": "各組積造の部分が鉄骨の軸組にボルト、かすがいその他の金物で緊結されているかを判定",
+        "logic_expression": "FM ∈ {ボルト, かすがい, その他の金物}"
+      },
+      {
+        "id": "info-fastening-compliance",
+        "type": "information",
+        "title": "緊結要件適合",
+        "symbol": "FC",
+        "subject": "組積造の部分",
+        "property": "緊結要件適合",
+        "property_type": "proposition",
+        "plurality": "multiple",
+        "description": "各組積造の部分が金物で緊結されているか"
+      },
+      {
+        "id": "proc-final-judgment",
+        "type": "process",
+        "title": "全体適合判定",
+        "process_type": "mechanical",
+        "description": "すべての組積造の部分が緊結要件を満たすかを判定",
+        "logic_expression": "∀x∈MP: FC(x) = true"
+      },
+      {
+        "id": "info-final",
+        "type": "information",
+        "title": "令第59条第1項適合",
+        "symbol": "R",
+        "subject": "鉄骨組積造である壁",
+        "property": "令第59条第1項適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "鉄骨組積造である壁の組積造の部分が鉄骨の軸組に金物で緊結されているか"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-wall-structure-identify",
+        "to": "info-wall-structure",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "info-wall-structure",
+        "to": "proc-masonry-part-identify",
+        "role": "input"
+      },
+      {
+        "id": "e03",
+        "from": "proc-wall-structure-identify",
+        "to": "info-walls-set",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "info-walls-set",
+        "to": "proc-masonry-part-identify",
+        "role": "input"
+      },
+      {
+        "id": "e05",
+        "from": "proc-masonry-part-identify",
+        "to": "info-masonry-part",
+        "role": "output"
+      },
+      {
+        "id": "e06",
+        "from": "info-masonry-part",
+        "to": "proc-fastening-method-identify",
+        "role": "input"
+      },
+      {
+        "id": "e07",
+        "from": "proc-fastening-method-identify",
+        "to": "info-fastening-method",
+        "role": "output"
+      },
+      {
+        "id": "e08",
+        "from": "info-fastening-method",
+        "to": "proc-fastening-check",
+        "role": "input"
+      },
+      {
+        "id": "e09",
+        "from": "proc-fastening-check",
+        "to": "info-fastening-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e10",
+        "from": "info-fastening-compliance",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e11",
+        "from": "proc-final-judgment",
+        "to": "info-final",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [],
+  "metadata": {
+    "created_at": "2026-01-23T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

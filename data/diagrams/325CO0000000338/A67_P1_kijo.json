@@ -1,0 +1,588 @@
+{
+  "id": "CHK-BSO-A67-P1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "鋼材の接合方法",
+    "target_subject": "鋼材の接合",
+    "description": "構造耐力上主要な部分である鋼材の接合が所定の接合方法によることを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "67",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造"
+  ],
+  "text_raw": "構造耐力上主要な部分である鋼材の接合は、接合される鋼材が炭素鋼であるときは高力ボルト接合、溶接接合若しくはリベット接合（構造耐力上主要な部分である継手又は仕口に係るリベット接合にあつては、添板リベット接合）又はこれらと同等以上の効力を有するものとして国土交通大臣の認定を受けた接合方法に、接合される鋼材がステンレス鋼であるときは高力ボルト接合若しくは溶接接合又はこれらと同等以上の効力を有するものとして国土交通大臣の認定を受けた接合方法に、それぞれよらなければならない。ただし、軒の高さが九メートル以下で、かつ、張り間が十三メートル以下の建築物（延べ面積が三千平方メートルを超えるものを除く。）その他その規模及び構造に関し安全上支障がないものとして国土交通大臣が定める基準に適合する建築物にあつては、ボルトが緩まないように次の各号のいずれかに該当する措置を講じたボルト接合によることができる。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "structure",
+          "value": "構造耐力上主要な部分である鋼材の接合がある建築物"
+        }
+      ],
+      "note": "構造耐力上主要な部分に鋼材の接合がある場合に適用"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "note": "原則：鋼材種別に応じた接合方法の採用",
+          "operator": "AND",
+          "conditions": [
+            {
+              "ref": "info-steel-type",
+              "note": "鋼材種別の特定"
+            },
+            {
+              "operator": "OR",
+              "conditions": [
+                {
+                  "ref": "info-joint-method-compliance",
+                  "operator": "==",
+                  "value": true
+                },
+                {
+                  "ref": "info-minister-approval",
+                  "operator": "==",
+                  "value": true
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "note": "例外：緩まない措置を講じたボルト接合",
+          "operator": "AND",
+          "conditions": [
+            {
+              "ref": "info-exception-applicable",
+              "operator": "==",
+              "value": true
+            },
+            {
+              "ref": "info-bolt-measure",
+              "operator": "==",
+              "value": true
+            }
+          ]
+        }
+      ]
+    },
+    "exceptions": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "operator": "OR",
+          "conditions": [
+            {
+              "note": "軒高9m以下かつ張り間13m以下で延べ面積3000m2以下",
+              "operator": "AND",
+              "conditions": [
+                {
+                  "ref": "info-eave-height",
+                  "operator": "<=",
+                  "value": 9
+                },
+                {
+                  "ref": "info-span",
+                  "operator": "<=",
+                  "value": 13
+                },
+                {
+                  "ref": "info-floor-area",
+                  "operator": "<=",
+                  "value": 3000
+                }
+              ]
+            },
+            {
+              "ref": "info-minister-standard",
+              "operator": "==",
+              "value": true
+            }
+          ]
+        },
+        {
+          "ref": "info-bolt-measure",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "effect": "ALTERNATIVE_COMPLIANCE"
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-joints-set",
+        "type": "process",
+        "title": "鋼材接合部の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から構造耐力上主要な部分における鋼材の接合部を特定する"
+      },
+      {
+        "id": "info-joints-set",
+        "type": "information",
+        "title": "構造耐力上主要な部分の鋼材接合部",
+        "subject": "建築物",
+        "property": "鋼材接合部の集合",
+        "property_type": "set_definition",
+        "description": "判定対象となる構造耐力上主要な部分の鋼材接合部を特定",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-steel-type",
+        "type": "process",
+        "title": "鋼材種別の特定",
+        "process_type": "undefined_input",
+        "target_subject": "鋼材接合部",
+        "iteration": "iterative",
+        "description": "設計図書等から各接合部における鋼材の種別（炭素鋼/ステンレス鋼）を特定する"
+      },
+      {
+        "id": "info-steel-type",
+        "type": "information",
+        "title": "鋼材の種別",
+        "symbol": "S",
+        "subject": "鋼材接合部",
+        "property": "鋼材種別",
+        "property_type": "classification",
+        "description": "接合される鋼材が炭素鋼かステンレス鋼かの区分",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-joint-method",
+        "type": "process",
+        "title": "接合方法の特定",
+        "process_type": "undefined_input",
+        "target_subject": "鋼材接合部",
+        "iteration": "iterative",
+        "description": "設計図書等から各接合部における接合方法を特定する"
+      },
+      {
+        "id": "info-joint-method",
+        "type": "information",
+        "title": "接合方法",
+        "symbol": "J",
+        "subject": "鋼材接合部",
+        "property": "接合方法",
+        "property_type": "classification",
+        "description": "採用されている接合方法（高力ボルト接合、溶接接合、リベット接合、添板リベット接合、ボルト接合等）",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-joint-location",
+        "type": "process",
+        "title": "接合部位置の特定",
+        "process_type": "undefined_input",
+        "target_subject": "鋼材接合部",
+        "iteration": "iterative",
+        "description": "各接合部が継手・仕口に該当するかを特定する"
+      },
+      {
+        "id": "info-joint-location",
+        "type": "information",
+        "title": "継手・仕口該当",
+        "symbol": "L",
+        "subject": "鋼材接合部",
+        "property": "継手・仕口への該当",
+        "property_type": "proposition",
+        "description": "構造耐力上主要な部分である継手又は仕口に該当するか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-joint-method-check",
+        "type": "process",
+        "title": "鋼材種別に応じた接合方法判定",
+        "process_type": "mechanical",
+        "target_subject": "鋼材接合部",
+        "iteration": "iterative",
+        "description": "鋼材種別に応じた所定の接合方法に該当するかを判定。炭素鋼：高力ボルト/溶接/リベット（継手・仕口は添板リベット）。ステンレス鋼：高力ボルト/溶接。",
+        "logic_expression": "(S = '炭素鋼' AND (J ∈ {高力ボルト, 溶接} OR (J = 'リベット' AND (L = false OR J = '添板リベット')))) OR (S = 'ステンレス鋼' AND J ∈ {高力ボルト, 溶接})"
+      },
+      {
+        "id": "info-joint-method-compliance",
+        "type": "information",
+        "title": "所定接合方法への適合",
+        "symbol": "JC",
+        "subject": "鋼材接合部",
+        "property": "所定接合方法への適合",
+        "property_type": "proposition",
+        "description": "鋼材種別に応じた所定の接合方法に適合するか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-minister-approval",
+        "type": "process",
+        "title": "大臣認定の確認",
+        "process_type": "undefined_input",
+        "target_subject": "鋼材接合部",
+        "iteration": "iterative",
+        "description": "国土交通大臣の認定を受けた接合方法であるか確認する"
+      },
+      {
+        "id": "info-minister-approval",
+        "type": "information",
+        "title": "大臣認定接合方法",
+        "symbol": "MA",
+        "subject": "鋼材接合部",
+        "property": "大臣認定の有無",
+        "property_type": "proposition",
+        "description": "同等以上の効力を有するものとして国土交通大臣の認定を受けた接合方法であるか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-eave-height",
+        "type": "process",
+        "title": "軒の高さの特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の軒の高さを読み取る"
+      },
+      {
+        "id": "info-eave-height",
+        "type": "information",
+        "title": "軒の高さ",
+        "symbol": "H",
+        "subject": "建築物",
+        "property": "軒の高さ",
+        "property_type": "numeric",
+        "unit": "m",
+        "description": "建築物の軒の高さ",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-span",
+        "type": "process",
+        "title": "張り間の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の張り間を読み取る"
+      },
+      {
+        "id": "info-span",
+        "type": "information",
+        "title": "張り間",
+        "symbol": "W",
+        "subject": "建築物",
+        "property": "張り間",
+        "property_type": "numeric",
+        "unit": "m",
+        "description": "建築物の張り間（スパン）",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-floor-area",
+        "type": "process",
+        "title": "延べ面積の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の延べ面積を読み取る"
+      },
+      {
+        "id": "info-floor-area",
+        "type": "information",
+        "title": "延べ面積",
+        "symbol": "A",
+        "subject": "建築物",
+        "property": "延べ面積",
+        "property_type": "numeric",
+        "unit": "m2",
+        "description": "建築物の延べ面積",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-minister-standard",
+        "type": "process",
+        "title": "大臣基準適合確認",
+        "process_type": "undefined_input",
+        "description": "国土交通大臣が定める基準（安全上支障がない規模・構造）に適合するか確認する"
+      },
+      {
+        "id": "info-minister-standard",
+        "type": "information",
+        "title": "大臣基準適合",
+        "symbol": "MS",
+        "subject": "建築物",
+        "property": "大臣基準への適合",
+        "property_type": "proposition",
+        "description": "その規模及び構造に関し安全上支障がないものとして国土交通大臣が定める基準に適合するか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-exception-check",
+        "type": "process",
+        "title": "ただし書き適用可否判定",
+        "process_type": "mechanical",
+        "description": "ただし書きの適用条件（軒高9m以下かつ張り間13m以下で延べ面積3000m2以下、又は大臣基準適合）に該当するかを判定",
+        "logic_expression": "((H ≤ 9) AND (W ≤ 13) AND (A ≤ 3000)) OR (MS = true)"
+      },
+      {
+        "id": "info-exception-applicable",
+        "type": "information",
+        "title": "ただし書き適用可否",
+        "symbol": "EX",
+        "subject": "建築物",
+        "property": "ただし書き適用可否",
+        "property_type": "proposition",
+        "description": "ただし書きの適用対象となる建築物に該当するか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-bolt-measure",
+        "type": "process",
+        "title": "ボルト緩み止め措置の確認",
+        "process_type": "human_judgment",
+        "target_subject": "鋼材接合部",
+        "iteration": "iterative",
+        "description": "ボルト接合において緩まない措置（コンクリート埋込み、ナット溶接、ダブルナット、同等の戻り止め）が講じられているか確認する",
+        "remarks": "一号：ボルトをコンクリートで埋め込む、二号：ナット部分を溶接、三号：ナット二重使用、四号：同等以上の戻り止め"
+      },
+      {
+        "id": "info-bolt-measure",
+        "type": "information",
+        "title": "ボルト緩み止め措置",
+        "symbol": "BM",
+        "subject": "鋼材接合部",
+        "property": "緩み止め措置の有無",
+        "property_type": "proposition",
+        "description": "各号のいずれかに該当する緩まない措置が講じられているか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-joint-judgment",
+        "type": "process",
+        "title": "各接合部の適合判定",
+        "process_type": "mechanical",
+        "target_subject": "鋼材接合部",
+        "iteration": "iterative",
+        "description": "各接合部について、原則の接合方法適合又はただし書きによる代替適合のいずれかを満たすことを確認",
+        "logic_expression": "(JC OR MA) OR (EX AND BM)"
+      },
+      {
+        "id": "info-joint-compliance",
+        "type": "information",
+        "title": "各接合部の適合",
+        "symbol": "C",
+        "subject": "鋼材接合部",
+        "property": "令67条1項適合",
+        "property_type": "proposition",
+        "description": "各鋼材接合部が令67条1項の規定に適合するか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-all-check",
+        "type": "process",
+        "title": "全接合部適合確認",
+        "process_type": "mechanical",
+        "description": "全ての鋼材接合部が令67条1項に適合することを確認",
+        "logic_expression": "∀joint ∈ Joints: C(joint) = true"
+      },
+      {
+        "id": "info-final",
+        "type": "information",
+        "title": "建築物の令67条1項適合",
+        "subject": "建築物",
+        "property": "令67条1項適合",
+        "property_type": "proposition",
+        "description": "建築物全体として令67条1項（鋼材の接合）の規定に適合するか",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-joints-set",
+        "to": "info-joints-set",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "info-joints-set",
+        "to": "proc-steel-type",
+        "role": "input"
+      },
+      {
+        "id": "e03",
+        "from": "proc-steel-type",
+        "to": "info-steel-type",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "info-joints-set",
+        "to": "proc-joint-method",
+        "role": "input"
+      },
+      {
+        "id": "e05",
+        "from": "proc-joint-method",
+        "to": "info-joint-method",
+        "role": "output"
+      },
+      {
+        "id": "e06",
+        "from": "info-joints-set",
+        "to": "proc-joint-location",
+        "role": "input"
+      },
+      {
+        "id": "e07",
+        "from": "proc-joint-location",
+        "to": "info-joint-location",
+        "role": "output"
+      },
+      {
+        "id": "e08",
+        "from": "info-steel-type",
+        "to": "proc-joint-method-check",
+        "role": "input"
+      },
+      {
+        "id": "e09",
+        "from": "info-joint-method",
+        "to": "proc-joint-method-check",
+        "role": "input"
+      },
+      {
+        "id": "e10",
+        "from": "info-joint-location",
+        "to": "proc-joint-method-check",
+        "role": "input"
+      },
+      {
+        "id": "e11",
+        "from": "proc-joint-method-check",
+        "to": "info-joint-method-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e12",
+        "from": "proc-minister-approval",
+        "to": "info-minister-approval",
+        "role": "output"
+      },
+      {
+        "id": "e13",
+        "from": "proc-eave-height",
+        "to": "info-eave-height",
+        "role": "output"
+      },
+      {
+        "id": "e14",
+        "from": "proc-span",
+        "to": "info-span",
+        "role": "output"
+      },
+      {
+        "id": "e15",
+        "from": "proc-floor-area",
+        "to": "info-floor-area",
+        "role": "output"
+      },
+      {
+        "id": "e16",
+        "from": "proc-minister-standard",
+        "to": "info-minister-standard",
+        "role": "output"
+      },
+      {
+        "id": "e17",
+        "from": "info-eave-height",
+        "to": "proc-exception-check",
+        "role": "input"
+      },
+      {
+        "id": "e18",
+        "from": "info-span",
+        "to": "proc-exception-check",
+        "role": "input"
+      },
+      {
+        "id": "e19",
+        "from": "info-floor-area",
+        "to": "proc-exception-check",
+        "role": "input"
+      },
+      {
+        "id": "e20",
+        "from": "info-minister-standard",
+        "to": "proc-exception-check",
+        "role": "input"
+      },
+      {
+        "id": "e21",
+        "from": "proc-exception-check",
+        "to": "info-exception-applicable",
+        "role": "output"
+      },
+      {
+        "id": "e22",
+        "from": "info-joints-set",
+        "to": "proc-bolt-measure",
+        "role": "input"
+      },
+      {
+        "id": "e23",
+        "from": "proc-bolt-measure",
+        "to": "info-bolt-measure",
+        "role": "output"
+      },
+      {
+        "id": "e24",
+        "from": "info-joint-method-compliance",
+        "to": "proc-joint-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e25",
+        "from": "info-minister-approval",
+        "to": "proc-joint-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e26",
+        "from": "info-exception-applicable",
+        "to": "proc-joint-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e27",
+        "from": "info-bolt-measure",
+        "to": "proc-joint-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e28",
+        "from": "proc-joint-judgment",
+        "to": "info-joint-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e29",
+        "from": "info-joint-compliance",
+        "to": "proc-all-check",
+        "role": "input"
+      },
+      {
+        "id": "e30",
+        "from": "proc-all-check",
+        "to": "info-final",
+        "role": "output"
+      }
+    ]
+  },
+  "metadata": {
+    "created_at": "2026-01-23T16:15:00+09:00",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

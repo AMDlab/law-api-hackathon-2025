@@ -1,0 +1,295 @@
+{
+  "id": "CHK-BSL-ORDER-A135_21-P1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "建蔽率の制限の緩和に当たり建築物から除かれる部分",
+    "target_subject": "建築物の部分",
+    "description": "法第53条第4項の建蔽率計算から除外される建築物の部分を判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "135_21",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "定義",
+    "建蔽率",
+    "除外部分"
+  ],
+  "text_raw": "法第五十三条第四項の政令で定める建築物の部分は、次に掲げるものとする。一 軒、ひさし、ぬれ縁及び国土交通省令で定める建築設備 二 建築物の地盤面下の部分 三 高さが二メートル以下の門又は塀",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "reference",
+          "value": "法第53条第4項の適用を受ける建築計画"
+        }
+      ],
+      "note": "建蔽率の制限の緩和を受ける際に除外される部分の判定"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "ref": "info-item1-result",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "ref": "info-item2-result",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "ref": "info-item3-result",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "info-building-parts",
+        "type": "information",
+        "title": "建築物の部分の集合",
+        "symbol": "P",
+        "subject": "建築物",
+        "property": "部分の集合",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "建蔽率計算の対象となる建築物の部分を特定"
+      },
+      {
+        "id": "proc-part-type-identify",
+        "type": "process",
+        "title": "部分の種別特定",
+        "process_type": "undefined_input",
+        "description": "設計図書から建築物の各部分の種別を読み取る"
+      },
+      {
+        "id": "info-part-type",
+        "type": "information",
+        "title": "部分の種別",
+        "symbol": "T",
+        "subject": "建築物の部分",
+        "property": "種別",
+        "property_type": "classification",
+        "plurality": "multiple",
+        "description": "軒、ひさし、ぬれ縁、建築設備、地盤面下部分、門、塀等の種別"
+      },
+      {
+        "id": "proc-item1-check",
+        "type": "process",
+        "title": "第1号該当判定",
+        "process_type": "mechanical",
+        "description": "軒、ひさし、ぬれ縁又は国土交通省令で定める建築設備に該当するか判定",
+        "logic_expression": "T ∈ {軒, ひさし, ぬれ縁, 国土交通省令で定める建築設備}"
+      },
+      {
+        "id": "info-item1-result",
+        "type": "information",
+        "title": "第1号該当",
+        "symbol": "I1",
+        "subject": "建築物の部分",
+        "property": "第1号該当",
+        "property_type": "proposition",
+        "plurality": "multiple",
+        "description": "軒、ひさし、ぬれ縁及び国土交通省令で定める建築設備に該当するか"
+      },
+      {
+        "id": "proc-underground-check",
+        "type": "process",
+        "title": "地盤面下判定",
+        "process_type": "undefined_input",
+        "description": "設計図書から部分が地盤面下にあるか読み取る"
+      },
+      {
+        "id": "info-item2-result",
+        "type": "information",
+        "title": "第2号該当",
+        "symbol": "I2",
+        "subject": "建築物の部分",
+        "property": "第2号該当",
+        "property_type": "proposition",
+        "plurality": "multiple",
+        "description": "建築物の地盤面下の部分に該当するか"
+      },
+      {
+        "id": "proc-height-identify",
+        "type": "process",
+        "title": "門・塀の高さ特定",
+        "process_type": "undefined_input",
+        "description": "設計図書から門又は塀の高さを読み取る"
+      },
+      {
+        "id": "info-height",
+        "type": "information",
+        "title": "門・塀の高さ",
+        "symbol": "H",
+        "subject": "門・塀",
+        "property": "高さ",
+        "property_type": "numeric",
+        "unit": "m",
+        "plurality": "multiple",
+        "description": "門又は塀の高さ"
+      },
+      {
+        "id": "proc-item3-check",
+        "type": "process",
+        "title": "第3号該当判定",
+        "process_type": "mechanical",
+        "description": "門又は塀で高さが2メートル以下かを判定",
+        "logic_expression": "(T ∈ {門, 塀}) AND (H ≤ 2)"
+      },
+      {
+        "id": "info-item3-result",
+        "type": "information",
+        "title": "第3号該当",
+        "symbol": "I3",
+        "subject": "建築物の部分",
+        "property": "第3号該当",
+        "property_type": "proposition",
+        "plurality": "multiple",
+        "description": "高さが2メートル以下の門又は塀に該当するか"
+      },
+      {
+        "id": "proc-final-judgment",
+        "type": "process",
+        "title": "除外部分該当判定",
+        "process_type": "mechanical",
+        "description": "第1号、第2号、第3号のいずれかに該当するか総合判定",
+        "logic_expression": "I1 OR I2 OR I3"
+      },
+      {
+        "id": "info-final",
+        "type": "information",
+        "title": "建蔽率計算除外部分該当",
+        "symbol": "R",
+        "subject": "建築物の部分",
+        "property": "建蔽率計算除外部分該当",
+        "property_type": "proposition",
+        "plurality": "multiple",
+        "description": "法第53条第4項に基づき建蔽率計算から除外される部分に該当するか"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "info-building-parts",
+        "to": "proc-part-type-identify",
+        "role": "input"
+      },
+      {
+        "id": "e02",
+        "from": "proc-part-type-identify",
+        "to": "info-part-type",
+        "role": "output"
+      },
+      {
+        "id": "e03",
+        "from": "info-part-type",
+        "to": "proc-item1-check",
+        "role": "input"
+      },
+      {
+        "id": "e04",
+        "from": "proc-item1-check",
+        "to": "info-item1-result",
+        "role": "output"
+      },
+      {
+        "id": "e05",
+        "from": "info-building-parts",
+        "to": "proc-underground-check",
+        "role": "input"
+      },
+      {
+        "id": "e06",
+        "from": "proc-underground-check",
+        "to": "info-item2-result",
+        "role": "output"
+      },
+      {
+        "id": "e07",
+        "from": "info-part-type",
+        "to": "proc-height-identify",
+        "role": "input"
+      },
+      {
+        "id": "e08",
+        "from": "proc-height-identify",
+        "to": "info-height",
+        "role": "output"
+      },
+      {
+        "id": "e09",
+        "from": "info-part-type",
+        "to": "proc-item3-check",
+        "role": "input"
+      },
+      {
+        "id": "e10",
+        "from": "info-height",
+        "to": "proc-item3-check",
+        "role": "input"
+      },
+      {
+        "id": "e11",
+        "from": "proc-item3-check",
+        "to": "info-item3-result",
+        "role": "output"
+      },
+      {
+        "id": "e12",
+        "from": "info-item1-result",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e13",
+        "from": "info-item2-result",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e14",
+        "from": "info-item3-result",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e15",
+        "from": "proc-final-judgment",
+        "to": "info-final",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": [
+        "A53:P4"
+      ],
+      "description": "法第53条第4項の建蔽率計算除外部分の委任"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

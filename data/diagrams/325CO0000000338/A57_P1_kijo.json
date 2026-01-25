@@ -1,0 +1,346 @@
+{
+  "id": "CHK-BSO-A57-P1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "組積造の壁における開口部の適合判定",
+    "target_subject": "組積造の壁の開口部",
+    "description": "組積造の壁における窓、出入口その他の開口部が各号に定める基準に適合することを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "57",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": ["単体規定", "構造", "組積造"],
+  "text_raw": "組積造の壁における窓、出入口その他の開口部は、次の各号に定めるところによらなければならない。\n一　各階の対隣壁によつて区画されたおのおのの壁における開口部の幅の総和は、その壁の長さの二分の一以下とすること。\n二　各階における開口部の幅の総和は、その階における壁の長さの総和の三分の一以下とすること。\n三　一の開口部とその直上にある開口部との垂直距離は、六十センチメートル以上とすること。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        { "type": "structure", "value": "組積造の壁" }
+      ],
+      "note": "組積造の壁における開口部が対象"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "note": "第1号：対隣壁区画ごとの開口部幅制限",
+          "ref": "info-item1-compliance",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "note": "第2号：階ごとの開口部幅制限",
+          "ref": "info-item2-compliance",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "note": "第3号：垂直距離制限",
+          "ref": "info-item3-compliance",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-structure-type",
+        "type": "process",
+        "title": "構造種別の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から壁の構造種別（組積造）を特定する"
+      },
+      {
+        "id": "info-structure-type",
+        "type": "information",
+        "title": "壁の構造種別",
+        "symbol": "ST",
+        "subject": "壁",
+        "property": "構造種別",
+        "property_type": "classification",
+        "description": "組積造、鉄筋コンクリート造等",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-masonry-wall-check",
+        "type": "process",
+        "title": "組積造壁該当判定",
+        "process_type": "mechanical",
+        "description": "壁が組積造であるかを判定",
+        "logic_expression": "ST = '組積造'"
+      },
+      {
+        "id": "info-is-masonry",
+        "type": "information",
+        "title": "組積造の壁",
+        "symbol": "M",
+        "subject": "壁",
+        "property": "組積造該当",
+        "property_type": "proposition",
+        "description": "対象の壁が組積造であるか",
+        "plurality": "single"
+      },
+      {
+        "id": "info-walls-set",
+        "type": "information",
+        "title": "対隣壁区画ごとの壁の集合",
+        "subject": "階",
+        "property": "対隣壁によって区画された壁の集合",
+        "property_type": "set_definition",
+        "description": "各階の対隣壁によって区画されたおのおのの壁を特定",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-wall-openings-width",
+        "type": "process",
+        "title": "壁ごとの開口部幅総和の特定",
+        "process_type": "undefined_input",
+        "target_subject": "壁",
+        "iteration": "iterative",
+        "description": "各壁における開口部（窓、出入口等）の幅の総和を読み取る"
+      },
+      {
+        "id": "info-wall-openings-width",
+        "type": "information",
+        "title": "壁の開口部幅総和",
+        "symbol": "WO",
+        "subject": "壁",
+        "property": "開口部の幅の総和",
+        "property_type": "numeric",
+        "unit": "m",
+        "description": "対隣壁によって区画されたおのおのの壁における開口部の幅の総和",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-wall-length",
+        "type": "process",
+        "title": "壁の長さの特定",
+        "process_type": "undefined_input",
+        "target_subject": "壁",
+        "iteration": "iterative",
+        "description": "各壁の長さを読み取る"
+      },
+      {
+        "id": "info-wall-length",
+        "type": "information",
+        "title": "壁の長さ",
+        "symbol": "WL",
+        "subject": "壁",
+        "property": "長さ",
+        "property_type": "numeric",
+        "unit": "m",
+        "description": "対隣壁によって区画されたおのおのの壁の長さ",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-item1-check",
+        "type": "process",
+        "title": "第1号判定",
+        "process_type": "mechanical",
+        "target_subject": "壁",
+        "iteration": "iterative",
+        "description": "各壁における開口部の幅の総和がその壁の長さの1/2以下であるかを判定",
+        "logic_expression": "∀壁: WO ≤ WL × 0.5"
+      },
+      {
+        "id": "info-item1-compliance",
+        "type": "information",
+        "title": "第1号適合",
+        "symbol": "J1",
+        "subject": "組積造の壁",
+        "property": "第1号適合",
+        "property_type": "proposition",
+        "description": "各階の対隣壁によって区画されたおのおのの壁における開口部の幅の総和が、その壁の長さの1/2以下であるか",
+        "related_articles": ["令::A57:P1:I1"],
+        "plurality": "single"
+      },
+      {
+        "id": "info-floors-set",
+        "type": "information",
+        "title": "階の集合",
+        "subject": "建築物",
+        "property": "階の集合",
+        "property_type": "set_definition",
+        "description": "建築物に属する各階を特定",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-floor-openings-width",
+        "type": "process",
+        "title": "階ごとの開口部幅総和の特定",
+        "process_type": "undefined_input",
+        "target_subject": "階",
+        "iteration": "iterative",
+        "description": "各階における開口部の幅の総和を読み取る"
+      },
+      {
+        "id": "info-floor-openings-width",
+        "type": "information",
+        "title": "階の開口部幅総和",
+        "symbol": "FO",
+        "subject": "階",
+        "property": "開口部の幅の総和",
+        "property_type": "numeric",
+        "unit": "m",
+        "description": "各階における開口部の幅の総和",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-floor-walls-length",
+        "type": "process",
+        "title": "階ごとの壁長さ総和の特定",
+        "process_type": "undefined_input",
+        "target_subject": "階",
+        "iteration": "iterative",
+        "description": "各階における壁の長さの総和を読み取る"
+      },
+      {
+        "id": "info-floor-walls-length",
+        "type": "information",
+        "title": "階の壁長さ総和",
+        "symbol": "FL",
+        "subject": "階",
+        "property": "壁の長さの総和",
+        "property_type": "numeric",
+        "unit": "m",
+        "description": "各階における壁の長さの総和",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-item2-check",
+        "type": "process",
+        "title": "第2号判定",
+        "process_type": "mechanical",
+        "target_subject": "階",
+        "iteration": "iterative",
+        "description": "各階における開口部の幅の総和がその階における壁の長さの総和の1/3以下であるかを判定",
+        "logic_expression": "∀階: FO ≤ FL × (1/3)"
+      },
+      {
+        "id": "info-item2-compliance",
+        "type": "information",
+        "title": "第2号適合",
+        "symbol": "J2",
+        "subject": "組積造の壁",
+        "property": "第2号適合",
+        "property_type": "proposition",
+        "description": "各階における開口部の幅の総和が、その階における壁の長さの総和の1/3以下であるか",
+        "related_articles": ["令::A57:P1:I2"],
+        "plurality": "single"
+      },
+      {
+        "id": "info-opening-pairs-set",
+        "type": "information",
+        "title": "垂直方向に隣接する開口部ペアの集合",
+        "subject": "建築物",
+        "property": "垂直方向に隣接する開口部ペアの集合",
+        "property_type": "set_definition",
+        "description": "一の開口部とその直上にある開口部のペアを特定",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-vertical-distance",
+        "type": "process",
+        "title": "開口部間垂直距離の特定",
+        "process_type": "undefined_input",
+        "target_subject": "開口部ペア",
+        "iteration": "iterative",
+        "description": "一の開口部とその直上にある開口部との垂直距離を読み取る"
+      },
+      {
+        "id": "info-vertical-distance",
+        "type": "information",
+        "title": "開口部間垂直距離",
+        "symbol": "VD",
+        "subject": "開口部ペア",
+        "property": "垂直距離",
+        "property_type": "numeric",
+        "unit": "cm",
+        "description": "一の開口部とその直上にある開口部との垂直距離",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-item3-check",
+        "type": "process",
+        "title": "第3号判定",
+        "process_type": "mechanical",
+        "target_subject": "開口部ペア",
+        "iteration": "iterative",
+        "description": "一の開口部とその直上にある開口部との垂直距離が60cm以上であるかを判定",
+        "logic_expression": "∀開口部ペア: VD ≥ 60"
+      },
+      {
+        "id": "info-item3-compliance",
+        "type": "information",
+        "title": "第3号適合",
+        "symbol": "J3",
+        "subject": "組積造の壁",
+        "property": "第3号適合",
+        "property_type": "proposition",
+        "description": "一の開口部とその直上にある開口部との垂直距離が60cm以上であるか",
+        "related_articles": ["令::A57:P1:I3"],
+        "plurality": "single"
+      },
+      {
+        "id": "proc-final-judgment",
+        "type": "process",
+        "title": "令57条1項適合判定",
+        "process_type": "mechanical",
+        "description": "第1号、第2号、第3号のすべてに適合することを判定",
+        "logic_expression": "J1 AND J2 AND J3"
+      },
+      {
+        "id": "info-final-compliance",
+        "type": "information",
+        "title": "令57条1項適合",
+        "subject": "組積造の壁の開口部",
+        "property": "令57条1項適合",
+        "property_type": "proposition",
+        "description": "組積造の壁における開口部が令57条1項の規定に適合するか",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "proc-structure-type", "to": "info-structure-type", "role": "output" },
+      { "id": "e02", "from": "info-structure-type", "to": "proc-masonry-wall-check", "role": "input" },
+      { "id": "e03", "from": "proc-masonry-wall-check", "to": "info-is-masonry", "role": "output" },
+      { "id": "e04", "from": "info-walls-set", "to": "proc-wall-openings-width", "role": "input" },
+      { "id": "e05", "from": "proc-wall-openings-width", "to": "info-wall-openings-width", "role": "output" },
+      { "id": "e06", "from": "info-walls-set", "to": "proc-wall-length", "role": "input" },
+      { "id": "e07", "from": "proc-wall-length", "to": "info-wall-length", "role": "output" },
+      { "id": "e08", "from": "info-wall-openings-width", "to": "proc-item1-check", "role": "input" },
+      { "id": "e09", "from": "info-wall-length", "to": "proc-item1-check", "role": "input" },
+      { "id": "e10", "from": "proc-item1-check", "to": "info-item1-compliance", "role": "output" },
+      { "id": "e11", "from": "info-floors-set", "to": "proc-floor-openings-width", "role": "input" },
+      { "id": "e12", "from": "proc-floor-openings-width", "to": "info-floor-openings-width", "role": "output" },
+      { "id": "e13", "from": "info-floors-set", "to": "proc-floor-walls-length", "role": "input" },
+      { "id": "e14", "from": "proc-floor-walls-length", "to": "info-floor-walls-length", "role": "output" },
+      { "id": "e15", "from": "info-floor-openings-width", "to": "proc-item2-check", "role": "input" },
+      { "id": "e16", "from": "info-floor-walls-length", "to": "proc-item2-check", "role": "input" },
+      { "id": "e17", "from": "proc-item2-check", "to": "info-item2-compliance", "role": "output" },
+      { "id": "e18", "from": "info-opening-pairs-set", "to": "proc-vertical-distance", "role": "input" },
+      { "id": "e19", "from": "proc-vertical-distance", "to": "info-vertical-distance", "role": "output" },
+      { "id": "e20", "from": "info-vertical-distance", "to": "proc-item3-check", "role": "input" },
+      { "id": "e21", "from": "proc-item3-check", "to": "info-item3-compliance", "role": "output" },
+      { "id": "e22", "from": "info-item1-compliance", "to": "proc-final-judgment", "role": "input" },
+      { "id": "e23", "from": "info-item2-compliance", "to": "proc-final-judgment", "role": "input" },
+      { "id": "e24", "from": "info-item3-compliance", "to": "proc-final-judgment", "role": "input" },
+      { "id": "e25", "from": "proc-final-judgment", "to": "info-final-compliance", "role": "output" }
+    ]
+  },
+  "metadata": {
+    "created_at": "2026-01-23T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

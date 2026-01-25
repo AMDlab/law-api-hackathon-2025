@@ -1,0 +1,357 @@
+{
+  "id": "CHK-BSL-KIJO-A129_13_3-P2",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "非常用エレベーターの設置数及び配置",
+    "target_subject": "非常用エレベーター",
+    "description": "高さ31mを超える部分の床面積が最大の階の床面積に応じた非常用エレベーターの必要設置数と、2基以上設置する場合の配置基準"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "129の13の3",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "昇降機",
+    "非常用エレベーター"
+  ],
+  "text_raw": "前項の非常用の昇降機であるエレベーター（以下「非常用エレベーター」という。）の数は、高さ三十一メートルを超える部分の床面積が最大の階における床面積に応じて、次の表に定める数以上とし、二以上の非常用エレベーターを設置する場合には、避難上及び消火上有効な間隔を保つて配置しなければならない。\n\n【表】高さ31mを超える部分の床面積が最大の階の床面積\n(一) 1500m2以下の場合 → 1基\n(二) 1500m2を超える場合 → 3000m2以内を増すごとに(一)の数に1を加えた数",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "building_standard",
+          "value": "法第34条第2項の規定により非常用の昇降機を設置すべき建築物"
+        }
+      ],
+      "note": "高さ31mを超える建築物で非常用エレベーターの設置が必要な場合に適用"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "quantity",
+          "operator": ">=",
+          "lhs": {
+            "variable": "設置する非常用エレベーターの数"
+          },
+          "rhs": {
+            "variable": "表に定める必要数"
+          },
+          "description": "非常用エレベーターの数が基準以上"
+        },
+        {
+          "type": "arrangement",
+          "condition": "2基以上設置する場合は避難上及び消火上有効な間隔を保って配置",
+          "description": "配置間隔の基準"
+        }
+      ]
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-building-identify",
+        "type": "process",
+        "title": "対象建築物の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から非常用エレベーターを設置すべき建築物を特定"
+      },
+      {
+        "id": "info-building",
+        "type": "information",
+        "title": "対象建築物",
+        "symbol": "B",
+        "subject": "建築物",
+        "property": "非常用エレベーター設置対象建築物",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "法第34条第2項の規定により非常用エレベーターを設置すべき建築物"
+      },
+      {
+        "id": "proc-floor-area-identify",
+        "type": "process",
+        "title": "基準階の床面積の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から高さ31mを超える部分の床面積が最大の階における床面積を読み取る"
+      },
+      {
+        "id": "info-floor-area",
+        "type": "information",
+        "title": "基準階床面積",
+        "symbol": "A",
+        "subject": "階",
+        "property": "床面積",
+        "property_type": "numeric",
+        "unit": "m2",
+        "plurality": "single",
+        "description": "高さ31mを超える部分の床面積が最大の階における床面積"
+      },
+      {
+        "id": "proc-required-count-calc",
+        "type": "process",
+        "title": "必要設置数の算定",
+        "process_type": "mechanical",
+        "target_subject": "非常用エレベーター",
+        "iteration": "single",
+        "description": "基準階の床面積から表に基づき必要な非常用エレベーターの数を算定",
+        "logic_expression": "A ≤ 1500 → N = 1; A > 1500 → N = 1 + ⌈(A - 1500) / 3000⌉"
+      },
+      {
+        "id": "info-required-count",
+        "type": "information",
+        "title": "必要設置数",
+        "symbol": "N",
+        "subject": "非常用エレベーター",
+        "property": "必要設置数",
+        "property_type": "numeric",
+        "unit": "基",
+        "plurality": "single",
+        "description": "表に定める非常用エレベーターの必要設置数"
+      },
+      {
+        "id": "proc-actual-count-identify",
+        "type": "process",
+        "title": "設置数の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から計画されている非常用エレベーターの設置数を読み取る"
+      },
+      {
+        "id": "info-actual-count",
+        "type": "information",
+        "title": "計画設置数",
+        "symbol": "M",
+        "subject": "非常用エレベーター",
+        "property": "計画設置数",
+        "property_type": "numeric",
+        "unit": "基",
+        "plurality": "single",
+        "description": "計画されている非常用エレベーターの設置数"
+      },
+      {
+        "id": "proc-count-judge",
+        "type": "process",
+        "title": "設置数判定",
+        "process_type": "mechanical",
+        "target_subject": "非常用エレベーター",
+        "iteration": "single",
+        "description": "計画設置数が必要設置数以上かを判定",
+        "logic_expression": "M ≥ N"
+      },
+      {
+        "id": "info-count-result",
+        "type": "information",
+        "title": "設置数適合",
+        "symbol": "C1",
+        "subject": "非常用エレベーター",
+        "property": "設置数適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "非常用エレベーターの設置数が必要数以上か"
+      },
+      {
+        "id": "proc-multiple-check",
+        "type": "process",
+        "title": "複数設置判定",
+        "process_type": "mechanical",
+        "target_subject": "非常用エレベーター",
+        "iteration": "single",
+        "description": "2基以上設置するかどうかを判定",
+        "logic_expression": "M ≥ 2"
+      },
+      {
+        "id": "info-multiple-flag",
+        "type": "information",
+        "title": "複数設置",
+        "symbol": "F",
+        "subject": "非常用エレベーター",
+        "property": "複数設置フラグ",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "2基以上の非常用エレベーターを設置するか"
+      },
+      {
+        "id": "proc-arrangement-check",
+        "type": "process",
+        "title": "配置間隔の確認",
+        "process_type": "human_judgment",
+        "target_subject": "非常用エレベーター",
+        "iteration": "single",
+        "description": "設計図書から各非常用エレベーターの配置が避難上及び消火上有効な間隔を保っているかを確認"
+      },
+      {
+        "id": "info-arrangement-result",
+        "type": "information",
+        "title": "配置間隔適合",
+        "symbol": "C2",
+        "subject": "非常用エレベーター",
+        "property": "配置間隔適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "避難上及び消火上有効な間隔を保った配置か"
+      },
+      {
+        "id": "proc-final-judge",
+        "type": "process",
+        "title": "総合判定",
+        "process_type": "mechanical",
+        "target_subject": "非常用エレベーター",
+        "iteration": "single",
+        "description": "設置数及び配置の総合適合判定",
+        "logic_expression": "C1 AND (NOT F OR C2)"
+      },
+      {
+        "id": "info-final-result",
+        "type": "information",
+        "title": "適合判定",
+        "symbol": "R",
+        "subject": "非常用エレベーター",
+        "property": "令第129条の13の3第2項適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "非常用エレベーターの設置数及び配置が基準に適合するか"
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge-001",
+        "from": "proc-building-identify",
+        "to": "info-building",
+        "role": "output"
+      },
+      {
+        "id": "edge-002",
+        "from": "info-building",
+        "to": "proc-floor-area-identify",
+        "role": "input"
+      },
+      {
+        "id": "edge-003",
+        "from": "proc-floor-area-identify",
+        "to": "info-floor-area",
+        "role": "output"
+      },
+      {
+        "id": "edge-004",
+        "from": "info-floor-area",
+        "to": "proc-required-count-calc",
+        "role": "input"
+      },
+      {
+        "id": "edge-005",
+        "from": "proc-required-count-calc",
+        "to": "info-required-count",
+        "role": "output"
+      },
+      {
+        "id": "edge-006",
+        "from": "proc-actual-count-identify",
+        "to": "info-actual-count",
+        "role": "output"
+      },
+      {
+        "id": "edge-007",
+        "from": "info-required-count",
+        "to": "proc-count-judge",
+        "role": "input"
+      },
+      {
+        "id": "edge-008",
+        "from": "info-actual-count",
+        "to": "proc-count-judge",
+        "role": "input"
+      },
+      {
+        "id": "edge-009",
+        "from": "proc-count-judge",
+        "to": "info-count-result",
+        "role": "output"
+      },
+      {
+        "id": "edge-010",
+        "from": "info-actual-count",
+        "to": "proc-multiple-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-011",
+        "from": "proc-multiple-check",
+        "to": "info-multiple-flag",
+        "role": "output"
+      },
+      {
+        "id": "edge-012",
+        "from": "info-multiple-flag",
+        "to": "proc-arrangement-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-013",
+        "from": "proc-arrangement-check",
+        "to": "info-arrangement-result",
+        "role": "output"
+      },
+      {
+        "id": "edge-014",
+        "from": "info-count-result",
+        "to": "proc-final-judge",
+        "role": "input"
+      },
+      {
+        "id": "edge-015",
+        "from": "info-multiple-flag",
+        "to": "proc-final-judge",
+        "role": "input"
+      },
+      {
+        "id": "edge-016",
+        "from": "info-arrangement-result",
+        "to": "proc-final-judge",
+        "role": "input"
+      },
+      {
+        "id": "edge-017",
+        "from": "proc-final-judge",
+        "to": "info-final-result",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": [
+        "A34:P2"
+      ],
+      "description": "非常用の昇降機の設置を定める上位規定"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": [
+        "A129_13_3:P1"
+      ],
+      "description": "非常用の昇降機はエレベーターとする旨の規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-01-25T00:00:00Z",
+    "updated_at": "2025-01-25T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "kijo-generator",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令",
+    "source": "e-Gov法令API"
+  }
+}

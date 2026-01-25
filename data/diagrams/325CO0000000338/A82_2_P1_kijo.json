@@ -1,0 +1,330 @@
+{
+  "id": "CHK-BSL-ORDER-A82_2-P1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "層間変形角",
+    "target_subject": "建築物の地上部分の各階",
+    "description": "地震力による各階の層間変形角が規定値以内であることを確認する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "82の2",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造",
+    "層間変形角"
+  ],
+  "text_raw": "建築物の地上部分については、第八十八条第一項に規定する地震力（以下この款において「地震力」という。）によつて各階に生ずる水平方向の層間変位を国土交通大臣が定める方法により計算し、当該層間変位の当該各階の高さに対する割合（第八十二条の六第二号イ及び第百九条の二の二第一項において「層間変形角」という。）が二百分の一（地震力による構造耐力上主要な部分の変形によつて建築物の部分に著しい損傷が生ずるおそれのない場合にあつては、百二十分の一）以内であることを確かめなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "building_part",
+          "value": "建築物の地上部分"
+        }
+      ],
+      "note": "建築物の地上部分の各階が対象"
+    },
+    "judgment_rule": {
+      "operator": "FORALL",
+      "conditions": [
+        {
+          "ref": "info-story-drift-angle-compliance",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    },
+    "exceptions": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "type": "condition",
+          "description": "地震力による構造耐力上主要な部分の変形によつて建築物の部分に著しい損傷が生ずるおそれのない場合"
+        }
+      ],
+      "effect": "閾値緩和（1/200→1/120）"
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "info-stories-set",
+        "type": "information",
+        "title": "建築物の地上部分の階",
+        "symbol": "S",
+        "subject": "建築物",
+        "property": "地上部分の階の集合",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "判定対象となる建築物の地上部分に属する階を特定"
+      },
+      {
+        "id": "proc-stories-identify",
+        "type": "process",
+        "title": "地上部分の階の特定",
+        "process_type": "undefined_input",
+        "description": "建築物の地上部分に属する各階を特定する"
+      },
+      {
+        "id": "proc-story-height-identify",
+        "type": "process",
+        "title": "各階の高さの特定",
+        "process_type": "undefined_input",
+        "target_subject": "階",
+        "iteration": "iterative",
+        "description": "各階の高さを特定する"
+      },
+      {
+        "id": "info-story-height",
+        "type": "information",
+        "title": "各階の高さ",
+        "symbol": "H",
+        "subject": "階",
+        "property": "高さ",
+        "property_type": "numeric",
+        "unit": "m",
+        "plurality": "multiple",
+        "description": "地上部分の各階の高さ"
+      },
+      {
+        "id": "proc-story-drift-calc",
+        "type": "process",
+        "title": "層間変位の計算",
+        "process_type": "mechanical",
+        "target_subject": "階",
+        "iteration": "iterative",
+        "description": "令第88条第1項に規定する地震力によって各階に生ずる水平方向の層間変位を国土交通大臣が定める方法により計算",
+        "related_articles": [
+          "令::A88:P1"
+        ]
+      },
+      {
+        "id": "info-story-drift",
+        "type": "information",
+        "title": "各階の層間変位",
+        "symbol": "D",
+        "subject": "階",
+        "property": "水平方向の層間変位",
+        "property_type": "numeric",
+        "unit": "m",
+        "plurality": "multiple",
+        "description": "地震力によって各階に生ずる水平方向の層間変位"
+      },
+      {
+        "id": "proc-drift-angle-calc",
+        "type": "process",
+        "title": "層間変形角の計算",
+        "process_type": "mechanical",
+        "target_subject": "階",
+        "iteration": "iterative",
+        "description": "層間変位を各階の高さで除して層間変形角を算出",
+        "logic_expression": "A = D / H"
+      },
+      {
+        "id": "info-story-drift-angle",
+        "type": "information",
+        "title": "各階の層間変形角",
+        "symbol": "A",
+        "subject": "階",
+        "property": "層間変形角",
+        "property_type": "numeric",
+        "unit": "rad",
+        "plurality": "multiple",
+        "description": "層間変位の各階の高さに対する割合"
+      },
+      {
+        "id": "proc-damage-risk-judgment",
+        "type": "process",
+        "title": "著しい損傷のおそれ判定",
+        "process_type": "human_judgment",
+        "target_subject": "建築物",
+        "description": "地震力による構造耐力上主要な部分の変形によつて建築物の部分に著しい損傷が生ずるおそれの有無を判定"
+      },
+      {
+        "id": "info-damage-risk",
+        "type": "information",
+        "title": "著しい損傷のおそれ",
+        "symbol": "R",
+        "subject": "建築物",
+        "property": "著しい損傷のおそれの有無",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "地震力による構造耐力上主要な部分の変形によつて建築物の部分に著しい損傷が生ずるおそれがあるか否か"
+      },
+      {
+        "id": "proc-threshold-determine",
+        "type": "process",
+        "title": "許容値の決定",
+        "process_type": "mechanical",
+        "description": "著しい損傷のおそれの有無に応じて層間変形角の許容値を決定（原則1/200、損傷のおそれなしの場合1/120）",
+        "logic_expression": "許容値 = R ? 1/200 : 1/120"
+      },
+      {
+        "id": "info-threshold",
+        "type": "information",
+        "title": "層間変形角の許容値",
+        "symbol": "T",
+        "subject": "建築物",
+        "property": "層間変形角の許容値",
+        "property_type": "numeric",
+        "unit": "rad",
+        "plurality": "single",
+        "description": "層間変形角の許容上限値（1/200または1/120）"
+      },
+      {
+        "id": "proc-drift-angle-judgment",
+        "type": "process",
+        "title": "層間変形角の判定",
+        "process_type": "mechanical",
+        "target_subject": "階",
+        "iteration": "iterative",
+        "description": "各階の層間変形角が許容値以内であることを判定",
+        "logic_expression": "FORALL i: Ai <= T"
+      },
+      {
+        "id": "info-story-drift-angle-compliance",
+        "type": "information",
+        "title": "層間変形角の適否",
+        "symbol": "C",
+        "subject": "建築物",
+        "property": "層間変形角の基準適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "すべての階の層間変形角が許容値以内であるか"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-stories-identify",
+        "to": "info-stories-set",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "info-stories-set",
+        "to": "proc-story-height-identify",
+        "role": "input"
+      },
+      {
+        "id": "e03",
+        "from": "proc-story-height-identify",
+        "to": "info-story-height",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "info-stories-set",
+        "to": "proc-story-drift-calc",
+        "role": "input"
+      },
+      {
+        "id": "e05",
+        "from": "proc-story-drift-calc",
+        "to": "info-story-drift",
+        "role": "output"
+      },
+      {
+        "id": "e06",
+        "from": "info-story-drift",
+        "to": "proc-drift-angle-calc",
+        "role": "input"
+      },
+      {
+        "id": "e07",
+        "from": "info-story-height",
+        "to": "proc-drift-angle-calc",
+        "role": "input"
+      },
+      {
+        "id": "e08",
+        "from": "proc-drift-angle-calc",
+        "to": "info-story-drift-angle",
+        "role": "output"
+      },
+      {
+        "id": "e09",
+        "from": "proc-damage-risk-judgment",
+        "to": "info-damage-risk",
+        "role": "output"
+      },
+      {
+        "id": "e10",
+        "from": "info-damage-risk",
+        "to": "proc-threshold-determine",
+        "role": "input"
+      },
+      {
+        "id": "e11",
+        "from": "proc-threshold-determine",
+        "to": "info-threshold",
+        "role": "output"
+      },
+      {
+        "id": "e12",
+        "from": "info-story-drift-angle",
+        "to": "proc-drift-angle-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e13",
+        "from": "info-threshold",
+        "to": "proc-drift-angle-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e14",
+        "from": "proc-drift-angle-judgment",
+        "to": "info-story-drift-angle-compliance",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": [
+        "A88:P1"
+      ],
+      "description": "地震力の規定"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": [
+        "A82_6:P1:I2"
+      ],
+      "description": "層間変形角の定義参照"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": [
+        "A109_2_2:P1"
+      ],
+      "description": "層間変形角の定義参照"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-23T12:00:00Z",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

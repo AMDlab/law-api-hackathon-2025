@@ -1,0 +1,288 @@
+{
+  "id": "CHK-BSL-ORDER-A83-P2",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "実況に応じた外力の採用",
+    "target_subject": "建築物",
+    "description": "建築物の実況に応じて土圧、水圧、震動及び衝撃による外力を採用するか判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "83",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造関係規定",
+    "荷重・外力"
+  ],
+  "text_raw": "前項に掲げるもののほか、建築物の実況に応じて、土圧、水圧、震動及び衝撃による外力を採用しなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "reference",
+          "value": "第1項の荷重・外力を採用する建築物"
+        }
+      ],
+      "note": "前項に掲げるもののほか"
+    },
+    "judgment_rule": {
+      "operator": "IMPLIES",
+      "conditions": [
+        {
+          "ref": "info-condition-applicable",
+          "operator": "==",
+          "value": true,
+          "description": "実況に応じた条件該当"
+        },
+        {
+          "ref": "info-additional-force-adopted",
+          "operator": "==",
+          "value": true,
+          "description": "追加外力の採用"
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-condition-check",
+        "type": "process",
+        "title": "建築物の実況の確認",
+        "process_type": "undefined_input",
+        "description": "建築物の実況（土圧・水圧・震動・衝撃を受ける状況）を確認する"
+      },
+      {
+        "id": "info-condition-applicable",
+        "type": "information",
+        "title": "追加外力の適用条件該当",
+        "symbol": "C",
+        "subject": "建築物",
+        "property": "追加外力の適用条件該当",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "土圧、水圧、震動又は衝撃による外力を受ける実況にあるか"
+      },
+      {
+        "id": "proc-earth-pressure-check",
+        "type": "process",
+        "title": "土圧の採用確認",
+        "process_type": "undefined_input",
+        "description": "土圧を受ける実況の場合、土圧を採用しているか確認"
+      },
+      {
+        "id": "info-earth-pressure-adopted",
+        "type": "information",
+        "title": "土圧の採用",
+        "symbol": "E1",
+        "subject": "構造計算",
+        "property": "土圧の採用",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "土圧を外力として採用しているか"
+      },
+      {
+        "id": "proc-water-pressure-check",
+        "type": "process",
+        "title": "水圧の採用確認",
+        "process_type": "undefined_input",
+        "description": "水圧を受ける実況の場合、水圧を採用しているか確認"
+      },
+      {
+        "id": "info-water-pressure-adopted",
+        "type": "information",
+        "title": "水圧の採用",
+        "symbol": "E2",
+        "subject": "構造計算",
+        "property": "水圧の採用",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "水圧を外力として採用しているか"
+      },
+      {
+        "id": "proc-vibration-check",
+        "type": "process",
+        "title": "震動の採用確認",
+        "process_type": "undefined_input",
+        "description": "震動を受ける実況の場合、震動を採用しているか確認"
+      },
+      {
+        "id": "info-vibration-adopted",
+        "type": "information",
+        "title": "震動の採用",
+        "symbol": "E3",
+        "subject": "構造計算",
+        "property": "震動の採用",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "震動による外力を採用しているか"
+      },
+      {
+        "id": "proc-impact-check",
+        "type": "process",
+        "title": "衝撃の採用確認",
+        "process_type": "undefined_input",
+        "description": "衝撃を受ける実況の場合、衝撃を採用しているか確認"
+      },
+      {
+        "id": "info-impact-adopted",
+        "type": "information",
+        "title": "衝撃の採用",
+        "symbol": "E4",
+        "subject": "構造計算",
+        "property": "衝撃の採用",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "衝撃による外力を採用しているか"
+      },
+      {
+        "id": "proc-final-judgment",
+        "type": "process",
+        "title": "追加外力採用適合判定",
+        "process_type": "mechanical",
+        "description": "実況に応じた追加外力が適切に採用されているか判定",
+        "logic_expression": "C → (E1 AND E2 AND E3 AND E4)"
+      },
+      {
+        "id": "info-additional-force-adopted",
+        "type": "information",
+        "title": "追加外力の採用適合",
+        "symbol": "R",
+        "subject": "構造計算",
+        "property": "追加外力の採用適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "実況に応じた追加外力が適切に採用されているか"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-condition-check",
+        "to": "info-condition-applicable",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "info-condition-applicable",
+        "to": "proc-earth-pressure-check",
+        "role": "input"
+      },
+      {
+        "id": "e03",
+        "from": "proc-earth-pressure-check",
+        "to": "info-earth-pressure-adopted",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "info-condition-applicable",
+        "to": "proc-water-pressure-check",
+        "role": "input"
+      },
+      {
+        "id": "e05",
+        "from": "proc-water-pressure-check",
+        "to": "info-water-pressure-adopted",
+        "role": "output"
+      },
+      {
+        "id": "e06",
+        "from": "info-condition-applicable",
+        "to": "proc-vibration-check",
+        "role": "input"
+      },
+      {
+        "id": "e07",
+        "from": "proc-vibration-check",
+        "to": "info-vibration-adopted",
+        "role": "output"
+      },
+      {
+        "id": "e08",
+        "from": "info-condition-applicable",
+        "to": "proc-impact-check",
+        "role": "input"
+      },
+      {
+        "id": "e09",
+        "from": "proc-impact-check",
+        "to": "info-impact-adopted",
+        "role": "output"
+      },
+      {
+        "id": "e10",
+        "from": "info-condition-applicable",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e11",
+        "from": "info-earth-pressure-adopted",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e12",
+        "from": "info-water-pressure-adopted",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e13",
+        "from": "info-vibration-adopted",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e14",
+        "from": "info-impact-adopted",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e15",
+        "from": "proc-final-judgment",
+        "to": "info-additional-force-adopted",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": [
+        "A20"
+      ],
+      "description": "法第20条の構造耐力に関する規定"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": [
+        "A83:P1"
+      ],
+      "description": "第1項の荷重及び外力（固定荷重、積載荷重、積雪荷重、風圧力、地震力）"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-23T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

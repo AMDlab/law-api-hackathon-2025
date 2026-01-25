@@ -1,0 +1,226 @@
+{
+  "id": "CHK-BSL-ORD-A128_3-P2",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "地下街の各構え相互間の区画",
+    "target_subject": "地下街の各構え",
+    "description": "地下街の各構えが他の各構えに接する場合における相互間の区画要件"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "128_3",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "地下街",
+    "防火区画"
+  ],
+  "text_raw": "地下街の各構えが当該地下街の他の各構えに接する場合においては、当該各構えと当該他の各構えとを耐火構造の床若しくは壁又は特定防火設備で第百十二条第十九項第二号に規定する構造であるもので区画しなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        { "type": "subject", "value": "地下街の各構え" },
+        { "type": "condition", "value": "当該地下街の他の各構えに接する場合" }
+      ],
+      "note": "他の各構えに接しない場合は本項の適用対象外"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        { "type": "structure", "value": "耐火構造の床又は壁で区画" },
+        { "type": "equipment", "value": "特定防火設備（令第112条第19項第2号に規定する構造）で区画" }
+      ]
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-adjacent-identify",
+        "type": "process",
+        "title": "隣接関係の特定",
+        "process_type": "undefined_input",
+        "description": "地下街の各構えが他の各構えに接するかどうかを特定"
+      },
+      {
+        "id": "info-adjacent-set",
+        "type": "information",
+        "title": "隣接する各構えの集合",
+        "subject": "地下街の各構え",
+        "property": "隣接する他の各構えとの境界の集合",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "当該各構えと他の各構えが接する境界部分を特定"
+      },
+      {
+        "id": "proc-partition-identify",
+        "type": "process",
+        "title": "区画方法の特定",
+        "process_type": "undefined_input",
+        "description": "各境界部分における区画の方法（床、壁、又は特定防火設備）を特定"
+      },
+      {
+        "id": "info-partition-type",
+        "type": "information",
+        "title": "区画の種類",
+        "symbol": "PT",
+        "subject": "区画",
+        "property": "区画の種類",
+        "property_type": "classification",
+        "plurality": "multiple",
+        "description": "床、壁、又は特定防火設備の別"
+      },
+      {
+        "id": "proc-floor-wall-check",
+        "type": "process",
+        "title": "床・壁の耐火構造確認",
+        "process_type": "undefined_input",
+        "description": "床又は壁が耐火構造であるか確認",
+        "iteration": "iterative"
+      },
+      {
+        "id": "info-floor-wall-fireproof",
+        "type": "information",
+        "title": "床・壁の耐火構造適合",
+        "symbol": "FW",
+        "subject": "区画（床・壁）",
+        "property": "耐火構造適合性",
+        "property_type": "proposition",
+        "plurality": "multiple",
+        "description": "耐火構造の床又は壁であるか"
+      },
+      {
+        "id": "proc-equipment-check",
+        "type": "process",
+        "title": "特定防火設備の構造確認",
+        "process_type": "sub_diagram_reference",
+        "sub_diagram_ref": "CHK-BSL-ORD-A112-P19-I2",
+        "description": "特定防火設備が令第112条第19項第2号に規定する構造であるか確認",
+        "iteration": "iterative",
+        "related_articles": ["令::A112:P19:I2"]
+      },
+      {
+        "id": "info-equipment-compliance",
+        "type": "information",
+        "title": "特定防火設備の構造適合",
+        "symbol": "EQ",
+        "subject": "区画（特定防火設備）",
+        "property": "令第112条第19項第2号適合性",
+        "property_type": "proposition",
+        "plurality": "multiple",
+        "description": "特定防火設備が令第112条第19項第2号の構造要件に適合するか",
+        "related_articles": ["令::A112:P19:I2"]
+      },
+      {
+        "id": "proc-final-judge",
+        "type": "process",
+        "title": "区画適合判定",
+        "process_type": "mechanical",
+        "description": "全ての境界部分が適切に区画されているか判定",
+        "logic_expression": "∀partition: (PT=床・壁 AND FW) OR (PT=特定防火設備 AND EQ)",
+        "iteration": "iterative"
+      },
+      {
+        "id": "info-final-compliance",
+        "type": "information",
+        "title": "令第128条の3第2項適合",
+        "symbol": "COMPLIANT",
+        "subject": "地下街の各構え",
+        "property": "令第128条の3第2項適合性",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "地下街の各構え相互間の区画要件への適合"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-adjacent-identify",
+        "to": "info-adjacent-set",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "info-adjacent-set",
+        "to": "proc-partition-identify",
+        "role": "input"
+      },
+      {
+        "id": "e03",
+        "from": "proc-partition-identify",
+        "to": "info-partition-type",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "info-adjacent-set",
+        "to": "proc-floor-wall-check",
+        "role": "input"
+      },
+      {
+        "id": "e05",
+        "from": "proc-floor-wall-check",
+        "to": "info-floor-wall-fireproof",
+        "role": "output"
+      },
+      {
+        "id": "e06",
+        "from": "info-adjacent-set",
+        "to": "proc-equipment-check",
+        "role": "input"
+      },
+      {
+        "id": "e07",
+        "from": "proc-equipment-check",
+        "to": "info-equipment-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e08",
+        "from": "info-partition-type",
+        "to": "proc-final-judge",
+        "role": "input"
+      },
+      {
+        "id": "e09",
+        "from": "info-floor-wall-fireproof",
+        "to": "proc-final-judge",
+        "role": "input"
+      },
+      {
+        "id": "e10",
+        "from": "info-equipment-compliance",
+        "to": "proc-final-judge",
+        "role": "input"
+      },
+      {
+        "id": "e11",
+        "from": "proc-final-judge",
+        "to": "info-final-compliance",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": ["A112:P19:I2"],
+      "description": "特定防火設備の構造要件を参照"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-25T00:00:00+09:00",
+    "author": "Claude",
+    "generator": "kijo-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

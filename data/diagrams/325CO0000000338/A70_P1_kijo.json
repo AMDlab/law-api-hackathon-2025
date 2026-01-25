@@ -1,0 +1,405 @@
+{
+  "id": "CHK-BSO-A70-P1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "柱の防火被覆",
+    "target_subject": "柱",
+    "description": "地階を除く階数が3以上の建築物で、一の柱のみの火熱による耐力低下で建築物全体が容易に倒壊するおそれがある場合における柱の構造基準への適合を判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "70",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造",
+    "防火"
+  ],
+  "text_raw": "地階を除く階数が三以上の建築物（法第二条第九号の二イに掲げる基準に適合する建築物及び同条第九号の三イに該当する建築物を除く。）にあつては、一の柱のみの火熱による耐力の低下によつて建築物全体が容易に倒壊するおそれがある場合として国土交通大臣が定める場合においては、当該柱の構造は、通常の火災による火熱が加えられた場合に、加熱開始後三十分間構造耐力上支障のある変形、溶融、破壊その他の損傷を生じないものとして国土交通大臣が定めた構造方法を用いるもの又は国土交通大臣の認定を受けたものとしなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "building_attribute",
+          "attribute": "階数（地階を除く）",
+          "operator": ">=",
+          "value": 3
+        },
+        {
+          "type": "building_classification",
+          "operator": "NOT_IN",
+          "value": ["耐火建築物（法2条9号の2イ）", "準耐火建築物（法2条9号の3イ）"]
+        },
+        {
+          "type": "structural_condition",
+          "value": "一の柱のみの火熱による耐力低下で建築物全体が容易に倒壊するおそれがある場合（国土交通大臣が定める場合）"
+        }
+      ],
+      "note": "地階を除く階数が3以上の建築物（耐火・準耐火建築物を除く）で、国土交通大臣が定める倒壊のおそれがある場合"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "ref": "info-minister-method",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "ref": "info-minister-approval",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-story-count",
+        "type": "process",
+        "title": "階数の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の階数（地階を除く）を読み取る"
+      },
+      {
+        "id": "info-story-count",
+        "type": "information",
+        "title": "階数（地階を除く）",
+        "symbol": "N",
+        "subject": "建築物",
+        "property": "階数（地階を除く）",
+        "property_type": "numeric",
+        "unit": "階",
+        "description": "地階を除いた建築物の階数",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-building-class",
+        "type": "process",
+        "title": "耐火・準耐火建築物の判定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物が耐火建築物（法2条9号の2イ）又は準耐火建築物（法2条9号の3イ）に該当するか判定する"
+      },
+      {
+        "id": "info-building-class",
+        "type": "information",
+        "title": "耐火・準耐火建築物への該当",
+        "symbol": "F",
+        "subject": "建築物",
+        "property": "耐火・準耐火建築物への該当",
+        "property_type": "proposition",
+        "description": "法2条9号の2イに掲げる基準に適合する建築物（耐火建築物）又は同条9号の3イに該当する建築物（準耐火建築物）であるか",
+        "related_articles": [
+          "法::A2:I9_2",
+          "法::A2:I9_3"
+        ],
+        "plurality": "single"
+      },
+      {
+        "id": "proc-scope-check",
+        "type": "process",
+        "title": "適用対象判定",
+        "process_type": "mechanical",
+        "description": "地階を除く階数が3以上かつ耐火・準耐火建築物でないかを判定",
+        "logic_expression": "(N >= 3) AND (F = false)"
+      },
+      {
+        "id": "info-scope-applicable",
+        "type": "information",
+        "title": "適用対象建築物への該当",
+        "symbol": "S",
+        "subject": "建築物",
+        "property": "適用対象への該当",
+        "property_type": "proposition",
+        "description": "地階を除く階数が3以上かつ耐火・準耐火建築物でない建築物に該当するか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-columns-set",
+        "type": "process",
+        "title": "柱の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から判定対象となる柱を特定する"
+      },
+      {
+        "id": "info-columns-set",
+        "type": "information",
+        "title": "建築物の柱",
+        "subject": "建築物",
+        "property": "柱の集合",
+        "property_type": "set_definition",
+        "description": "判定対象となる建築物に属する柱を特定",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-collapse-risk",
+        "type": "process",
+        "title": "倒壊のおそれの判定",
+        "process_type": "human_judgment",
+        "target_subject": "柱",
+        "iteration": "iterative",
+        "description": "一の柱のみの火熱による耐力低下によって建築物全体が容易に倒壊するおそれがある場合として国土交通大臣が定める場合に該当するか判定する"
+      },
+      {
+        "id": "info-collapse-risk",
+        "type": "information",
+        "title": "倒壊のおそれのある柱への該当",
+        "symbol": "R",
+        "subject": "柱",
+        "property": "倒壊のおそれの該当",
+        "property_type": "proposition",
+        "description": "当該柱のみの火熱による耐力低下で建築物全体が容易に倒壊するおそれがある場合（国土交通大臣が定める場合）に該当するか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-column-structure",
+        "type": "process",
+        "title": "柱構造の特定",
+        "process_type": "human_judgment",
+        "target_subject": "柱",
+        "iteration": "iterative",
+        "description": "設計図書等から柱の構造方法を特定する"
+      },
+      {
+        "id": "info-column-structure",
+        "type": "information",
+        "title": "柱の構造",
+        "symbol": "C",
+        "subject": "柱",
+        "property": "構造方法",
+        "property_type": "classification",
+        "description": "柱の構造方法（防火被覆の有無、材料、仕様等）",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-minister-method",
+        "type": "process",
+        "title": "大臣定め構造方法該当判定",
+        "process_type": "mechanical",
+        "target_subject": "柱",
+        "iteration": "iterative",
+        "description": "通常の火災による火熱が加えられた場合に加熱開始後30分間構造耐力上支障のある変形、溶融、破壊その他の損傷を生じないものとして国土交通大臣が定めた構造方法に該当するかを判定"
+      },
+      {
+        "id": "info-minister-method",
+        "type": "information",
+        "title": "大臣定め構造方法への該当",
+        "symbol": "M1",
+        "subject": "柱",
+        "property": "大臣定め構造方法該当",
+        "property_type": "proposition",
+        "description": "国土交通大臣が定めた構造方法（加熱開始後30分間耐力上支障のある損傷を生じないもの）に該当するか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-minister-approval",
+        "type": "process",
+        "title": "大臣認定確認",
+        "process_type": "undefined_input",
+        "target_subject": "柱",
+        "iteration": "iterative",
+        "description": "国土交通大臣の認定を受けた構造方法であるか確認"
+      },
+      {
+        "id": "info-minister-approval",
+        "type": "information",
+        "title": "大臣認定の有無",
+        "symbol": "M2",
+        "subject": "柱",
+        "property": "大臣認定の有無",
+        "property_type": "proposition",
+        "description": "国土交通大臣の認定を受けた構造方法であるか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-column-judgment",
+        "type": "process",
+        "title": "柱ごとの適合判定",
+        "process_type": "mechanical",
+        "target_subject": "柱",
+        "iteration": "iterative",
+        "description": "倒壊のおそれのある柱について、大臣定め構造方法又は大臣認定のいずれかを満たすことを確認",
+        "logic_expression": "(R = false) OR (M1 = true) OR (M2 = true)"
+      },
+      {
+        "id": "info-column-compliance",
+        "type": "information",
+        "title": "柱の令70条1項適合",
+        "symbol": "P",
+        "subject": "柱",
+        "property": "令70条1項適合",
+        "property_type": "proposition",
+        "description": "当該柱が令70条1項の規定に適合するか（倒壊のおそれなし、又は所定の構造方法若しくは大臣認定）",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-all-check",
+        "type": "process",
+        "title": "全柱適合確認",
+        "process_type": "mechanical",
+        "description": "全ての柱が令70条1項に適合することを確認",
+        "logic_expression": "∀column ∈ Columns: P(column) = true"
+      },
+      {
+        "id": "info-final",
+        "type": "information",
+        "title": "建築物の令70条1項適合",
+        "subject": "建築物",
+        "property": "令70条1項適合",
+        "property_type": "proposition",
+        "description": "建築物全体として令70条1項の規定に適合するか",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-story-count",
+        "to": "info-story-count",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "proc-building-class",
+        "to": "info-building-class",
+        "role": "output"
+      },
+      {
+        "id": "e03",
+        "from": "info-story-count",
+        "to": "proc-scope-check",
+        "role": "input"
+      },
+      {
+        "id": "e04",
+        "from": "info-building-class",
+        "to": "proc-scope-check",
+        "role": "input"
+      },
+      {
+        "id": "e05",
+        "from": "proc-scope-check",
+        "to": "info-scope-applicable",
+        "role": "output"
+      },
+      {
+        "id": "e06",
+        "from": "proc-columns-set",
+        "to": "info-columns-set",
+        "role": "output"
+      },
+      {
+        "id": "e07",
+        "from": "info-columns-set",
+        "to": "proc-collapse-risk",
+        "role": "input"
+      },
+      {
+        "id": "e08",
+        "from": "proc-collapse-risk",
+        "to": "info-collapse-risk",
+        "role": "output"
+      },
+      {
+        "id": "e09",
+        "from": "info-columns-set",
+        "to": "proc-column-structure",
+        "role": "input"
+      },
+      {
+        "id": "e10",
+        "from": "proc-column-structure",
+        "to": "info-column-structure",
+        "role": "output"
+      },
+      {
+        "id": "e11",
+        "from": "info-column-structure",
+        "to": "proc-minister-method",
+        "role": "input"
+      },
+      {
+        "id": "e12",
+        "from": "proc-minister-method",
+        "to": "info-minister-method",
+        "role": "output"
+      },
+      {
+        "id": "e13",
+        "from": "proc-minister-approval",
+        "to": "info-minister-approval",
+        "role": "output"
+      },
+      {
+        "id": "e14",
+        "from": "info-collapse-risk",
+        "to": "proc-column-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e15",
+        "from": "info-minister-method",
+        "to": "proc-column-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e16",
+        "from": "info-minister-approval",
+        "to": "proc-column-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e17",
+        "from": "proc-column-judgment",
+        "to": "info-column-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e18",
+        "from": "info-column-compliance",
+        "to": "proc-all-check",
+        "role": "input"
+      },
+      {
+        "id": "e19",
+        "from": "info-scope-applicable",
+        "to": "proc-all-check",
+        "role": "input"
+      },
+      {
+        "id": "e20",
+        "from": "proc-all-check",
+        "to": "info-final",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": [
+        "A2:I9_2",
+        "A2:I9_3"
+      ],
+      "description": "耐火建築物・準耐火建築物の定義を参照"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-23T12:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

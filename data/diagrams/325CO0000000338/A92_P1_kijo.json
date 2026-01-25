@@ -1,0 +1,294 @@
+{
+  "id": "CHK-BSL-ORDER-A92-P1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "溶接継目の許容応力度",
+    "target_subject": "溶接継目",
+    "description": "溶接継目ののど断面に対する許容応力度が基準値以下であることを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "92",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造",
+    "溶接",
+    "許容応力度"
+  ],
+  "text_raw": "溶接継目ののど断面に対する許容応力度は、次の表の数値によらなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "structure",
+          "value": "鋼構造建築物で溶接継目を有するもの"
+        }
+      ],
+      "note": "溶接継目を有する鋼構造建築物に適用"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-compliance",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "info-joints-set",
+        "type": "information",
+        "title": "建築物の溶接継目",
+        "symbol": "JS",
+        "subject": "建築物",
+        "property": "溶接継目の集合",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "判定対象となる建築物に属する溶接継目を特定"
+      },
+      {
+        "id": "proc-joint-type-identify",
+        "type": "process",
+        "title": "継目形式の特定",
+        "process_type": "undefined_input",
+        "target_subject": "溶接継目",
+        "iteration": "iterative",
+        "description": "各溶接継目の継目形式（突合せ/突合せ以外）を特定"
+      },
+      {
+        "id": "info-joint-type",
+        "type": "information",
+        "title": "継目の形式",
+        "symbol": "JT",
+        "subject": "溶接継目",
+        "property": "形式",
+        "property_type": "classification",
+        "plurality": "multiple",
+        "description": "突合せ、または突合せ以外のもの"
+      },
+      {
+        "id": "proc-steel-type-identify",
+        "type": "process",
+        "title": "鋼材種別の特定",
+        "process_type": "undefined_input",
+        "target_subject": "溶接継目",
+        "iteration": "iterative",
+        "description": "溶接される鋼材の種類及び品質を特定"
+      },
+      {
+        "id": "info-steel-type",
+        "type": "information",
+        "title": "鋼材の種類・品質",
+        "symbol": "ST",
+        "subject": "溶接継目",
+        "property": "鋼材の種類及び品質",
+        "property_type": "classification",
+        "plurality": "multiple",
+        "description": "溶接される鋼材の種類及び品質"
+      },
+      {
+        "id": "proc-base-strength-calc",
+        "type": "process",
+        "title": "基準強度Fの取得",
+        "process_type": "mechanical",
+        "target_subject": "溶接継目",
+        "iteration": "iterative",
+        "description": "鋼材の種類及び品質に応じて国土交通大臣が定める溶接部の基準強度Fを取得",
+        "logic_expression": "F = 大臣告示による基準強度(ST)"
+      },
+      {
+        "id": "info-base-strength",
+        "type": "information",
+        "title": "溶接部の基準強度F",
+        "symbol": "F",
+        "subject": "溶接継目",
+        "property": "基準強度",
+        "property_type": "numeric",
+        "unit": "N/mm2",
+        "plurality": "multiple",
+        "description": "国土交通大臣が定める溶接部の基準強度"
+      },
+      {
+        "id": "proc-allowable-stress-calc",
+        "type": "process",
+        "title": "許容応力度の算定",
+        "process_type": "mechanical",
+        "target_subject": "溶接継目",
+        "iteration": "iterative",
+        "description": "継目形式と基準強度から許容応力度を算定",
+        "logic_expression": "突合せの場合: 長期=F/1.5, 短期=長期x1.5; 突合せ以外: F/(1.5sqrt(3))"
+      },
+      {
+        "id": "info-allowable-stress",
+        "type": "information",
+        "title": "許容応力度",
+        "symbol": "AS",
+        "subject": "溶接継目",
+        "property": "許容応力度",
+        "property_type": "numeric",
+        "unit": "N/mm2",
+        "plurality": "multiple",
+        "description": "溶接継目ののど断面に対する許容応力度（圧縮・引張り・曲げ・せん断）"
+      },
+      {
+        "id": "proc-applied-stress-identify",
+        "type": "process",
+        "title": "設計応力度の特定",
+        "process_type": "undefined_input",
+        "target_subject": "溶接継目",
+        "iteration": "iterative",
+        "description": "構造計算で算定された溶接継目に生ずる応力度を特定"
+      },
+      {
+        "id": "info-applied-stress",
+        "type": "information",
+        "title": "設計応力度",
+        "symbol": "DS",
+        "subject": "溶接継目",
+        "property": "設計応力度",
+        "property_type": "numeric",
+        "unit": "N/mm2",
+        "plurality": "multiple",
+        "description": "構造計算で算定された溶接継目に生ずる応力度"
+      },
+      {
+        "id": "proc-compliance-check",
+        "type": "process",
+        "title": "許容応力度判定",
+        "process_type": "mechanical",
+        "target_subject": "溶接継目",
+        "iteration": "iterative",
+        "description": "各溶接継目について設計応力度が許容応力度以下であることを判定",
+        "logic_expression": "ALL(DS <= AS)"
+      },
+      {
+        "id": "info-compliance",
+        "type": "information",
+        "title": "許容応力度基準適合",
+        "symbol": "R",
+        "subject": "建築物",
+        "property": "令第92条適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "全ての溶接継目が許容応力度基準に適合しているか"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "info-joints-set",
+        "to": "proc-joint-type-identify",
+        "role": "input"
+      },
+      {
+        "id": "e02",
+        "from": "proc-joint-type-identify",
+        "to": "info-joint-type",
+        "role": "output"
+      },
+      {
+        "id": "e03",
+        "from": "info-joints-set",
+        "to": "proc-steel-type-identify",
+        "role": "input"
+      },
+      {
+        "id": "e04",
+        "from": "proc-steel-type-identify",
+        "to": "info-steel-type",
+        "role": "output"
+      },
+      {
+        "id": "e05",
+        "from": "info-steel-type",
+        "to": "proc-base-strength-calc",
+        "role": "input"
+      },
+      {
+        "id": "e06",
+        "from": "proc-base-strength-calc",
+        "to": "info-base-strength",
+        "role": "output"
+      },
+      {
+        "id": "e07",
+        "from": "info-joint-type",
+        "to": "proc-allowable-stress-calc",
+        "role": "input"
+      },
+      {
+        "id": "e08",
+        "from": "info-base-strength",
+        "to": "proc-allowable-stress-calc",
+        "role": "input"
+      },
+      {
+        "id": "e09",
+        "from": "proc-allowable-stress-calc",
+        "to": "info-allowable-stress",
+        "role": "output"
+      },
+      {
+        "id": "e10",
+        "from": "info-joints-set",
+        "to": "proc-applied-stress-identify",
+        "role": "input"
+      },
+      {
+        "id": "e11",
+        "from": "proc-applied-stress-identify",
+        "to": "info-applied-stress",
+        "role": "output"
+      },
+      {
+        "id": "e12",
+        "from": "info-allowable-stress",
+        "to": "proc-compliance-check",
+        "role": "input"
+      },
+      {
+        "id": "e13",
+        "from": "info-applied-stress",
+        "to": "proc-compliance-check",
+        "role": "input"
+      },
+      {
+        "id": "e14",
+        "from": "proc-compliance-check",
+        "to": "info-compliance",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": [
+        "A20"
+      ],
+      "description": "法第20条の構造計算規定の委任に基づく"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-23T12:00:00Z",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

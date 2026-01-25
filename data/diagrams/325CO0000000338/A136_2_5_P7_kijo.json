@@ -1,0 +1,302 @@
+{
+  "id": "CHK-BSL-ORD-A136_2_5-P7",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "特定建築物地区整備計画区域における制限適用除外の判定",
+    "target_subject": "建築物",
+    "description": "敷地地盤面が特定地区防災施設境界線より低い場合で、第2項の高さ最低限度5mの適用により2階建通常高さを超える場合の第6項制限の適用除外判定"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "136_2_5",
+    "paragraph": "7",
+    "item": null
+  },
+  "labels": [
+    "集団規定",
+    "地区計画",
+    "防災街区整備地区計画",
+    "特定建築物地区整備計画",
+    "適用除外"
+  ],
+  "text_raw": "前項の場合においては、当該条例に、建築物の敷地の地盤面が特定地区防災施設の当該敷地との境界線より低い建築物について第二項に規定する高さの最低限度が五メートルとされる制限を適用した結果、当該建築物の高さが地階を除く階数が二である建築物の通常の高さを超えるものとなる場合における前項に規定する制限（第一項第十三号の制限で同号イ（１）に掲げるものを除く。）の適用の除外に関する規定を定めるものとする。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        { "type": "location", "value": "特定建築物地区整備計画の区域内" },
+        { "type": "requirement", "value": "法第68条の2第1項に基づく条例で第1項第12号・第13号・第2項の制限を定める場合" }
+      ],
+      "note": "第6項により第1項第12号・第13号の制限および第2項の高さ最低限度5mの制限を全て定める場合が前提"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        { "variable": "GL_LOWER", "description": "敷地地盤面が特定地区防災施設境界線より低い" },
+        { "variable": "H_EXCEED", "description": "第2項の高さ最低限度5m適用で2階建通常高さを超える" }
+      ]
+    },
+    "exceptions": {
+      "operator": "NOT",
+      "conditions": [
+        { "ref": "令::A136_2_5:P1:I13:SI1:SS1", "description": "第1項第13号イ(1)の耐火建築物等又は準耐火建築物等とする制限は除外対象外" }
+      ],
+      "effect": "EXEMPT"
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-gl-identify",
+        "type": "process",
+        "title": "敷地地盤面の特定",
+        "process_type": "undefined_input",
+        "description": "建築物の敷地の地盤面の高さを図面から読み取る"
+      },
+      {
+        "id": "info-gl-level",
+        "type": "information",
+        "title": "敷地地盤面の高さ",
+        "symbol": "GL",
+        "subject": "敷地",
+        "property": "地盤面の高さ",
+        "property_type": "numeric",
+        "unit": "m",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-boundary-identify",
+        "type": "process",
+        "title": "特定地区防災施設境界線高さの特定",
+        "process_type": "undefined_input",
+        "description": "特定地区防災施設の敷地との境界線の高さを特定"
+      },
+      {
+        "id": "info-boundary-level",
+        "type": "information",
+        "title": "境界線の高さ",
+        "symbol": "BL",
+        "subject": "特定地区防災施設",
+        "property": "敷地境界線の高さ",
+        "property_type": "numeric",
+        "unit": "m",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-gl-compare",
+        "type": "process",
+        "title": "地盤面高さ比較",
+        "process_type": "mechanical",
+        "description": "敷地地盤面が特定地区防災施設境界線より低いか判定",
+        "logic_expression": "GL < BL"
+      },
+      {
+        "id": "info-gl-lower",
+        "type": "information",
+        "title": "地盤面が境界線より低い",
+        "symbol": "GL_LOWER",
+        "subject": "敷地",
+        "property": "地盤面が境界線より低いか",
+        "property_type": "proposition",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-required-height-calc",
+        "type": "process",
+        "title": "第2項適用後の必要高さ算定",
+        "process_type": "mechanical",
+        "description": "第2項の高さ最低限度5mの制限を適用した場合の建築物に必要な高さを算定"
+      },
+      {
+        "id": "info-required-height",
+        "type": "information",
+        "title": "第2項適用後の必要高さ",
+        "symbol": "H_REQ",
+        "subject": "建築物",
+        "property": "第2項適用後の必要高さ",
+        "property_type": "numeric",
+        "unit": "m",
+        "plurality": "single",
+        "description": "特定地区防災施設からの高さの最低限度5mを適用した結果、建築物に求められる高さ"
+      },
+      {
+        "id": "proc-normal-height-identify",
+        "type": "process",
+        "title": "2階建通常高さの特定",
+        "process_type": "mechanical",
+        "description": "地階を除く階数が2である建築物の通常の高さを算定（一般的に6〜7m程度）",
+        "remarks": "通常の高さの具体的数値は条例または解釈基準による"
+      },
+      {
+        "id": "info-normal-height",
+        "type": "information",
+        "title": "2階建通常高さ",
+        "symbol": "H_NORM",
+        "subject": "建築物",
+        "property": "2階建通常高さ",
+        "property_type": "numeric",
+        "unit": "m",
+        "plurality": "single",
+        "description": "地階を除く階数が2である建築物の通常の高さ"
+      },
+      {
+        "id": "proc-height-compare",
+        "type": "process",
+        "title": "高さ超過判定",
+        "process_type": "mechanical",
+        "description": "第2項適用後の必要高さが2階建通常高さを超えるか判定",
+        "logic_expression": "H_REQ > H_NORM"
+      },
+      {
+        "id": "info-height-exceed",
+        "type": "information",
+        "title": "2階建通常高さ超過",
+        "symbol": "H_EXCEED",
+        "subject": "建築物",
+        "property": "2階建通常高さを超える",
+        "property_type": "proposition",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-exemption-judge",
+        "type": "process",
+        "title": "適用除外該当判定",
+        "process_type": "mechanical",
+        "description": "敷地地盤面が境界線より低く、かつ第2項適用で2階建通常高さを超える場合に適用除外に該当",
+        "logic_expression": "GL_LOWER AND H_EXCEED"
+      },
+      {
+        "id": "info-exemption-eligible",
+        "type": "information",
+        "title": "適用除外該当",
+        "symbol": "EXEMPT",
+        "subject": "建築物",
+        "property": "第6項制限の適用除外該当性",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "第6項に規定する制限（第1項第13号の制限で同号イ(1)を除く）の適用除外に該当するか",
+        "remarks": "第1項第13号イ(1)の耐火建築物等又は準耐火建築物等とする制限は適用除外の対象外"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-gl-identify",
+        "to": "info-gl-level",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "proc-boundary-identify",
+        "to": "info-boundary-level",
+        "role": "output"
+      },
+      {
+        "id": "e03",
+        "from": "info-gl-level",
+        "to": "proc-gl-compare",
+        "role": "input"
+      },
+      {
+        "id": "e04",
+        "from": "info-boundary-level",
+        "to": "proc-gl-compare",
+        "role": "input"
+      },
+      {
+        "id": "e05",
+        "from": "proc-gl-compare",
+        "to": "info-gl-lower",
+        "role": "output"
+      },
+      {
+        "id": "e06",
+        "from": "info-gl-level",
+        "to": "proc-required-height-calc",
+        "role": "input"
+      },
+      {
+        "id": "e07",
+        "from": "info-boundary-level",
+        "to": "proc-required-height-calc",
+        "role": "input"
+      },
+      {
+        "id": "e08",
+        "from": "proc-required-height-calc",
+        "to": "info-required-height",
+        "role": "output"
+      },
+      {
+        "id": "e09",
+        "from": "proc-normal-height-identify",
+        "to": "info-normal-height",
+        "role": "output"
+      },
+      {
+        "id": "e10",
+        "from": "info-required-height",
+        "to": "proc-height-compare",
+        "role": "input"
+      },
+      {
+        "id": "e11",
+        "from": "info-normal-height",
+        "to": "proc-height-compare",
+        "role": "input"
+      },
+      {
+        "id": "e12",
+        "from": "proc-height-compare",
+        "to": "info-height-exceed",
+        "role": "output"
+      },
+      {
+        "id": "e13",
+        "from": "info-gl-lower",
+        "to": "proc-exemption-judge",
+        "role": "input"
+      },
+      {
+        "id": "e14",
+        "from": "info-height-exceed",
+        "to": "proc-exemption-judge",
+        "role": "input"
+      },
+      {
+        "id": "e15",
+        "from": "proc-exemption-judge",
+        "to": "info-exemption-eligible",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": ["A68_2:P1"],
+      "description": "法第68条の2第1項に基づく条例制定の根拠"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": ["A136_2_5:P1:I12", "A136_2_5:P1:I13", "A136_2_5:P2", "A136_2_5:P6"],
+      "description": "第1項第12号・第13号の制限、第2項の高さ最低限度5mの制限、第6項の規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-01-26T00:00:00+09:00",
+    "author": "Claude",
+    "generator": "kijo-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

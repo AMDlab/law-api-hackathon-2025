@@ -1,0 +1,275 @@
+{
+  "id": "CHK-BSL-ORD-A130_9_8-P1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "可燃性ガス製造の制限",
+    "target_subject": "建築物",
+    "description": "工業専用地域内で制限される可燃性ガス製造の判定"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "130の9の8",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "集団規定",
+    "用途制限",
+    "工業専用地域"
+  ],
+  "text_raw": "法別表第二（る）項第一号（十一）（法第八十七条第二項又は第三項において法第四十八条第十一項の規定を準用する場合を含む。）の規定により政令で定める可燃性ガスの製造は、次に掲げるものとする。一　アセチレンガスの製造　二　ガス事業法第二条第二項に規定するガス小売事業又は同条第九項に規定するガス製造事業として行われる可燃性ガスの製造",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "工業専用地域内",
+          "note": "法別表第二（る）項の適用区域"
+        },
+        {
+          "type": "use",
+          "value": "可燃性ガスの製造を行う建築物"
+        }
+      ],
+      "note": "本条は、工業専用地域内における可燃性ガス製造施設の用途制限を定めるもの"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "description": "アセチレンガスの製造に該当する",
+          "ref": "令::A130_9_8:P1:I1"
+        },
+        {
+          "description": "ガス事業法に基づくガス小売事業・ガス製造事業として行われる可燃性ガスの製造に該当する",
+          "ref": "令::A130_9_8:P1:I2"
+        }
+      ]
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-use-identify",
+        "type": "process",
+        "title": "用途の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の用途を読み取る"
+      },
+      {
+        "id": "info-building-use",
+        "type": "information",
+        "title": "建築物の用途",
+        "symbol": "U",
+        "subject": "建築物",
+        "property": "用途",
+        "property_type": "classification",
+        "plurality": "single",
+        "description": "建築物の主たる用途"
+      },
+      {
+        "id": "proc-gas-production-check",
+        "type": "process",
+        "title": "可燃性ガス製造該当判定",
+        "process_type": "mechanical",
+        "description": "可燃性ガスの製造を行う施設に該当するか判定",
+        "logic_expression": "U ∈ {可燃性ガス製造施設}"
+      },
+      {
+        "id": "info-gas-production",
+        "type": "information",
+        "title": "可燃性ガス製造該当",
+        "symbol": "GP",
+        "subject": "建築物",
+        "property": "可燃性ガス製造施設該当",
+        "property_type": "proposition",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-acetylene-check",
+        "type": "process",
+        "title": "アセチレンガス製造確認",
+        "process_type": "undefined_input",
+        "description": "アセチレンガスの製造を行うか確認"
+      },
+      {
+        "id": "info-acetylene",
+        "type": "information",
+        "title": "アセチレンガス製造",
+        "symbol": "AC",
+        "subject": "建築物",
+        "property": "アセチレンガス製造該当",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "第一号：アセチレンガスの製造"
+      },
+      {
+        "id": "proc-gas-business-check",
+        "type": "process",
+        "title": "ガス事業該当確認",
+        "process_type": "undefined_input",
+        "description": "ガス事業法に基づくガス小売事業又はガス製造事業として行われる可燃性ガスの製造か確認"
+      },
+      {
+        "id": "info-gas-business",
+        "type": "information",
+        "title": "ガス事業による製造",
+        "symbol": "GB",
+        "subject": "建築物",
+        "property": "ガス事業による可燃性ガス製造該当",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "第二号：ガス事業法第2条第2項（ガス小売事業）又は同条第9項（ガス製造事業）として行われる可燃性ガスの製造"
+      },
+      {
+        "id": "proc-restriction-judge",
+        "type": "process",
+        "title": "制限対象判定",
+        "process_type": "mechanical",
+        "description": "可燃性ガス製造に該当し、かつ第一号又は第二号のいずれかに該当する場合、政令で定める可燃性ガスの製造として制限対象",
+        "logic_expression": "GP AND (AC OR GB)"
+      },
+      {
+        "id": "info-restriction",
+        "type": "information",
+        "title": "制限対象該当",
+        "symbol": "R",
+        "subject": "建築物",
+        "property": "政令で定める可燃性ガス製造該当",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "法別表第二（る）項第一号（十一）の政令で定める可燃性ガスの製造に該当"
+      },
+      {
+        "id": "proc-final-judge",
+        "type": "process",
+        "title": "最終適合判定",
+        "process_type": "mechanical",
+        "description": "制限対象に該当するか否かの最終判定",
+        "logic_expression": "R"
+      },
+      {
+        "id": "info-final-compliance",
+        "type": "information",
+        "title": "令第130条の9の8第1項適合",
+        "symbol": "COMPLIANT",
+        "subject": "建築物",
+        "property": "令第130条の9の8第1項該当性",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "制限対象の可燃性ガス製造に該当する場合、工業専用地域内での建築が制限される"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-use-identify",
+        "to": "info-building-use",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "info-building-use",
+        "to": "proc-gas-production-check",
+        "role": "input"
+      },
+      {
+        "id": "e03",
+        "from": "proc-gas-production-check",
+        "to": "info-gas-production",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "info-gas-production",
+        "to": "proc-acetylene-check",
+        "role": "input"
+      },
+      {
+        "id": "e05",
+        "from": "proc-acetylene-check",
+        "to": "info-acetylene",
+        "role": "output"
+      },
+      {
+        "id": "e06",
+        "from": "info-gas-production",
+        "to": "proc-gas-business-check",
+        "role": "input"
+      },
+      {
+        "id": "e07",
+        "from": "proc-gas-business-check",
+        "to": "info-gas-business",
+        "role": "output"
+      },
+      {
+        "id": "e08",
+        "from": "info-gas-production",
+        "to": "proc-restriction-judge",
+        "role": "input"
+      },
+      {
+        "id": "e09",
+        "from": "info-acetylene",
+        "to": "proc-restriction-judge",
+        "role": "input"
+      },
+      {
+        "id": "e10",
+        "from": "info-gas-business",
+        "to": "proc-restriction-judge",
+        "role": "input"
+      },
+      {
+        "id": "e11",
+        "from": "proc-restriction-judge",
+        "to": "info-restriction",
+        "role": "output"
+      },
+      {
+        "id": "e12",
+        "from": "info-restriction",
+        "to": "proc-final-judge",
+        "role": "input"
+      },
+      {
+        "id": "e13",
+        "from": "proc-final-judge",
+        "to": "info-final-compliance",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": ["別表第二(る):I1:SubI11", "A48:P11", "A87:P2", "A87:P3"],
+      "description": "法別表第二（る）項第一号（十一）から委任された可燃性ガス製造の具体的内容を定める"
+    },
+    {
+      "law_id": "350AC0000000051",
+      "law_name": "ガス事業法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A2:P2", "A2:P9"],
+      "description": "ガス小売事業及びガス製造事業の定義を参照"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-01-26T00:00:00+09:00",
+    "author": "Claude",
+    "generator": "kijo-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令",
+    "checklist_ref": "令第130条の9の8第1項",
+    "source": "e-Gov法令API"
+  }
+}

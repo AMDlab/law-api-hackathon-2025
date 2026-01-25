@@ -1,0 +1,207 @@
+{
+  "id": "CHK-BSO-A52-P1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "組積材の水洗い",
+    "target_subject": "組積材",
+    "description": "組積造に使用する組積材が組積に当たって充分に水洗いをされていることを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "52",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造",
+    "組積造"
+  ],
+  "text_raw": "組積造に使用するれんが、石、コンクリートブロツクその他の組積材は、組積するに当たつて充分に水洗いをしなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "structure",
+          "value": "組積造"
+        }
+      ],
+      "note": "組積造の建築物に適用"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-wash-compliance",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-structure-type",
+        "type": "process",
+        "title": "構造種別の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の構造種別を特定する"
+      },
+      {
+        "id": "info-structure-type",
+        "type": "information",
+        "title": "建築物の構造種別",
+        "symbol": "S",
+        "subject": "建築物",
+        "property": "構造種別",
+        "property_type": "classification",
+        "description": "建築物の構造種別（組積造、その他）",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-masonry-check",
+        "type": "process",
+        "title": "組積造判定",
+        "process_type": "mechanical",
+        "description": "構造種別が組積造であるかを判定",
+        "logic_expression": "S = '組積造'"
+      },
+      {
+        "id": "info-is-masonry",
+        "type": "information",
+        "title": "組積造該当",
+        "symbol": "M",
+        "subject": "建築物",
+        "property": "組積造への該当",
+        "property_type": "proposition",
+        "description": "建築物が組積造に該当するか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-materials-set",
+        "type": "process",
+        "title": "組積材の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から組積造に使用する組積材（れんが、石、コンクリートブロック等）を特定する"
+      },
+      {
+        "id": "info-materials-set",
+        "type": "information",
+        "title": "建築物の組積材",
+        "subject": "建築物",
+        "property": "組積材の集合",
+        "property_type": "set_definition",
+        "description": "組積造に使用する組積材（れんが、石、コンクリートブロック等）を特定",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-wash-check",
+        "type": "process",
+        "title": "水洗い実施の確認",
+        "process_type": "human_judgment",
+        "target_subject": "組積材",
+        "iteration": "iterative",
+        "description": "各組積材が組積に当たって充分に水洗いをされているかを確認する。施工計画書、施工記録、現場写真等から判断する。"
+      },
+      {
+        "id": "info-wash-status",
+        "type": "information",
+        "title": "組積材の水洗い状況",
+        "symbol": "W",
+        "subject": "組積材",
+        "property": "水洗い実施状況",
+        "property_type": "proposition",
+        "description": "各組積材が組積に当たって充分に水洗いをされているか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-all-check",
+        "type": "process",
+        "title": "全組積材水洗い確認",
+        "process_type": "mechanical",
+        "description": "全ての組積材が充分に水洗いされていることを確認",
+        "logic_expression": "∀m ∈ Materials: W(m) = true"
+      },
+      {
+        "id": "info-wash-compliance",
+        "type": "information",
+        "title": "組積材水洗い適合",
+        "subject": "建築物",
+        "property": "令52条1項適合",
+        "property_type": "proposition",
+        "description": "建築物全体として令52条1項の規定（組積材の水洗い）に適合するか",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-structure-type",
+        "to": "info-structure-type",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "info-structure-type",
+        "to": "proc-masonry-check",
+        "role": "input"
+      },
+      {
+        "id": "e03",
+        "from": "proc-masonry-check",
+        "to": "info-is-masonry",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "info-is-masonry",
+        "to": "proc-materials-set",
+        "role": "input"
+      },
+      {
+        "id": "e05",
+        "from": "proc-materials-set",
+        "to": "info-materials-set",
+        "role": "output"
+      },
+      {
+        "id": "e06",
+        "from": "info-materials-set",
+        "to": "proc-wash-check",
+        "role": "input"
+      },
+      {
+        "id": "e07",
+        "from": "proc-wash-check",
+        "to": "info-wash-status",
+        "role": "output"
+      },
+      {
+        "id": "e08",
+        "from": "info-wash-status",
+        "to": "proc-all-check",
+        "role": "input"
+      },
+      {
+        "id": "e09",
+        "from": "proc-all-check",
+        "to": "info-wash-compliance",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [],
+  "metadata": {
+    "created_at": "2026-01-23T18:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

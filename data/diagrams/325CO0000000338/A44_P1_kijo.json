@@ -1,0 +1,241 @@
+{
+  "id": "CHK-BSO-A44-P1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "はり等の横架材の欠込み",
+    "target_subject": "横架材",
+    "description": "はり、けたその他の横架材の中央部附近の下側に耐力上支障のある欠込みがないことを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "44",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造"
+  ],
+  "text_raw": "はり、けたその他の横架材には、その中央部附近の下側に耐力上支障のある欠込みをしてはならない。",
+  "compliance_logic": {
+    "judgment_rule": {
+      "operator": "NOT",
+      "conditions": [
+        {
+          "ref": "info-notch-existence",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "note": "中央部附近の下側に耐力上支障のある欠込みが存在しないこと"
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-building-identify",
+        "type": "process",
+        "title": "建築物の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から審査対象の建築物を特定する"
+      },
+      {
+        "id": "info-building-set",
+        "type": "information",
+        "title": "建築物",
+        "subject": "建築物",
+        "property": "審査対象建築物",
+        "property_type": "set_definition",
+        "description": "審査対象となる建築物",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-yokazai-identify",
+        "type": "process",
+        "title": "横架材の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物内のはり、けたその他の横架材を特定する"
+      },
+      {
+        "id": "info-yokazai-set",
+        "type": "information",
+        "title": "建築物の横架材",
+        "symbol": "Y",
+        "subject": "建築物",
+        "property": "横架材の集合",
+        "property_type": "set_definition",
+        "description": "建築物に属するはり、けたその他の横架材を特定",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-notch-check",
+        "type": "process",
+        "title": "欠込みの有無確認",
+        "process_type": "human_judgment",
+        "target_subject": "横架材",
+        "iteration": "iterative",
+        "description": "各横架材について、中央部附近の下側に欠込みがあるか確認する"
+      },
+      {
+        "id": "info-notch-location",
+        "type": "information",
+        "title": "各横架材の中央部下側欠込みの有無",
+        "symbol": "N",
+        "subject": "横架材",
+        "property": "中央部附近下側の欠込みの有無",
+        "property_type": "proposition",
+        "description": "各横架材の中央部附近の下側に欠込みがあるか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-strength-impact-check",
+        "type": "process",
+        "title": "耐力上支障の判定",
+        "process_type": "human_judgment",
+        "target_subject": "横架材",
+        "iteration": "iterative",
+        "description": "欠込みがある横架材について、その欠込みが耐力上支障のあるものか判定する"
+      },
+      {
+        "id": "info-strength-impact",
+        "type": "information",
+        "title": "各横架材の欠込みの耐力上支障",
+        "symbol": "S",
+        "subject": "横架材",
+        "property": "欠込みが耐力上支障あり",
+        "property_type": "proposition",
+        "description": "各横架材の中央部附近下側の欠込みが耐力上支障のあるものか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-notch-existence-judge",
+        "type": "process",
+        "title": "耐力上支障のある欠込み存在判定",
+        "process_type": "mechanical",
+        "target_subject": "横架材",
+        "description": "中央部附近の下側に耐力上支障のある欠込みが存在する横架材があるか判定",
+        "logic_expression": "∃y∈Y: (N(y) = true) AND (S(y) = true)"
+      },
+      {
+        "id": "info-notch-existence",
+        "type": "information",
+        "title": "耐力上支障のある欠込みの存在",
+        "symbol": "E",
+        "subject": "建築物",
+        "property": "耐力上支障のある欠込みの存在",
+        "property_type": "proposition",
+        "description": "横架材の中央部附近の下側に耐力上支障のある欠込みが1つでも存在するか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-final-judgment",
+        "type": "process",
+        "title": "適合判定",
+        "process_type": "mechanical",
+        "description": "耐力上支障のある欠込みが存在しないことを確認",
+        "logic_expression": "NOT E"
+      },
+      {
+        "id": "info-compliance",
+        "type": "information",
+        "title": "令第44条第1項適合",
+        "subject": "建築物",
+        "property": "令第44条第1項適合",
+        "property_type": "proposition",
+        "description": "横架材の欠込みに関する規定に適合するか",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-building-identify",
+        "to": "info-building-set",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "info-building-set",
+        "to": "proc-yokazai-identify",
+        "role": "input"
+      },
+      {
+        "id": "e03",
+        "from": "proc-yokazai-identify",
+        "to": "info-yokazai-set",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "info-yokazai-set",
+        "to": "proc-notch-check",
+        "role": "input"
+      },
+      {
+        "id": "e05",
+        "from": "proc-notch-check",
+        "to": "info-notch-location",
+        "role": "output"
+      },
+      {
+        "id": "e06",
+        "from": "info-yokazai-set",
+        "to": "proc-strength-impact-check",
+        "role": "input"
+      },
+      {
+        "id": "e07",
+        "from": "info-notch-location",
+        "to": "proc-strength-impact-check",
+        "role": "input"
+      },
+      {
+        "id": "e08",
+        "from": "proc-strength-impact-check",
+        "to": "info-strength-impact",
+        "role": "output"
+      },
+      {
+        "id": "e09",
+        "from": "info-notch-location",
+        "to": "proc-notch-existence-judge",
+        "role": "input"
+      },
+      {
+        "id": "e10",
+        "from": "info-strength-impact",
+        "to": "proc-notch-existence-judge",
+        "role": "input"
+      },
+      {
+        "id": "e11",
+        "from": "proc-notch-existence-judge",
+        "to": "info-notch-existence",
+        "role": "output"
+      },
+      {
+        "id": "e12",
+        "from": "info-notch-existence",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e13",
+        "from": "proc-final-judgment",
+        "to": "info-compliance",
+        "role": "output"
+      }
+    ]
+  },
+  "metadata": {
+    "created_at": "2026-01-23T00:00:00+09:00",
+    "updated_at": "2026-01-23T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

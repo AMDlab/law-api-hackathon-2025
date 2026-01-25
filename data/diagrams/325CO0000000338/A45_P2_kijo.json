@@ -1,0 +1,374 @@
+{
+  "id": "CHK-BSL-ORD-A45-P2",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "圧縮力を負担する筋かいの材料",
+    "target_subject": "筋かい",
+    "description": "圧縮力を負担する筋かいが所定の木材又は大臣が定めた材料・認定材料を使用していることを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "45",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造"
+  ],
+  "text_raw": "圧縮力を負担する筋かいは、厚さ三センチメートル以上で幅九センチメートル以上の木材又はこれと同等以上に圧縮力を負担することができる材料として国土交通大臣が定めたもの若しくは国土交通大臣の認定を受けたものを使用したものとしなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "EXISTS",
+      "conditions": [
+        {
+          "type": "element",
+          "value": "圧縮力を負担する筋かい"
+        }
+      ],
+      "note": "建築物に圧縮力を負担する筋かいが存在する場合に適用"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "type": "wood_spec",
+          "operator": "AND",
+          "conditions": [
+            {
+              "property": "厚さ",
+              "operator": ">=",
+              "value": 3,
+              "unit": "cm"
+            },
+            {
+              "property": "幅",
+              "operator": ">=",
+              "value": 9,
+              "unit": "cm"
+            }
+          ]
+        },
+        {
+          "type": "minister_designation",
+          "value": "国土交通大臣が定めた同等以上の材料"
+        },
+        {
+          "type": "minister_approval",
+          "value": "国土交通大臣の認定を受けた同等以上の材料"
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-brace-set",
+        "type": "process",
+        "title": "圧縮力を負担する筋かいの特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物に設けられた圧縮力を負担する筋かいを特定する"
+      },
+      {
+        "id": "info-brace-set",
+        "type": "information",
+        "title": "建築物の圧縮力を負担する筋かい",
+        "subject": "建築物",
+        "property": "圧縮力を負担する筋かいの集合",
+        "property_type": "set_definition",
+        "description": "判定対象となる建築物に属する圧縮力を負担する筋かいを特定",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-material-type",
+        "type": "process",
+        "title": "筋かい材料の特定",
+        "process_type": "undefined_input",
+        "target_subject": "筋かい",
+        "iteration": "iterative",
+        "description": "設計図書等から各筋かいに使用されている材料の種類を特定する"
+      },
+      {
+        "id": "info-material-type",
+        "type": "information",
+        "title": "筋かいの材料種別",
+        "symbol": "M",
+        "subject": "筋かい",
+        "property": "材料種別",
+        "property_type": "classification",
+        "description": "筋かいに使用されている材料の種類（木材、その他の材料等）",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-wood-dimension",
+        "type": "process",
+        "title": "木材寸法の特定",
+        "process_type": "undefined_input",
+        "target_subject": "筋かい",
+        "iteration": "iterative",
+        "description": "木材を使用している筋かいについて、設計図書等から厚さと幅の寸法を特定する"
+      },
+      {
+        "id": "info-wood-thickness",
+        "type": "information",
+        "title": "木材の厚さ",
+        "symbol": "T",
+        "subject": "筋かい",
+        "property": "木材の厚さ",
+        "property_type": "numeric",
+        "unit": "cm",
+        "description": "筋かいに使用されている木材の厚さ寸法",
+        "plurality": "multiple"
+      },
+      {
+        "id": "info-wood-width",
+        "type": "information",
+        "title": "木材の幅",
+        "symbol": "W",
+        "subject": "筋かい",
+        "property": "木材の幅",
+        "property_type": "numeric",
+        "unit": "cm",
+        "description": "筋かいに使用されている木材の幅寸法",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-wood-spec-check",
+        "type": "process",
+        "title": "木材寸法基準判定",
+        "process_type": "mechanical",
+        "target_subject": "筋かい",
+        "iteration": "iterative",
+        "description": "木材が厚さ3cm以上×幅9cm以上の基準を満たすかを判定",
+        "logic_expression": "(T >= 3) AND (W >= 9)"
+      },
+      {
+        "id": "info-wood-spec-compliance",
+        "type": "information",
+        "title": "木材寸法基準適合",
+        "symbol": "A",
+        "subject": "筋かい",
+        "property": "木材寸法基準適合",
+        "property_type": "proposition",
+        "description": "厚さ3cm以上×幅9cm以上の木材であるか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-minister-designation",
+        "type": "process",
+        "title": "大臣定め材料該当判定",
+        "process_type": "mechanical",
+        "target_subject": "筋かい",
+        "iteration": "iterative",
+        "description": "国土交通大臣が定めた同等以上の材料に該当するかを判定"
+      },
+      {
+        "id": "info-minister-designation",
+        "type": "information",
+        "title": "大臣定め材料への該当",
+        "symbol": "B",
+        "subject": "筋かい",
+        "property": "大臣定め材料該当",
+        "property_type": "proposition",
+        "description": "国土交通大臣が定めた同等以上の材料に該当するか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-minister-approval",
+        "type": "process",
+        "title": "大臣認定確認",
+        "process_type": "undefined_input",
+        "target_subject": "筋かい",
+        "iteration": "iterative",
+        "description": "国土交通大臣の認定を受けた同等以上の材料であるかを確認する"
+      },
+      {
+        "id": "info-minister-approval",
+        "type": "information",
+        "title": "大臣認定の有無",
+        "symbol": "C",
+        "subject": "筋かい",
+        "property": "大臣認定の有無",
+        "property_type": "proposition",
+        "description": "国土交通大臣の認定を受けた同等以上の材料であるか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-each-brace-judgment",
+        "type": "process",
+        "title": "各筋かい適合判定",
+        "process_type": "mechanical",
+        "target_subject": "筋かい",
+        "iteration": "iterative",
+        "description": "各筋かいについて、木材寸法基準適合、大臣定め材料該当、大臣認定のいずれかを満たすことを確認",
+        "logic_expression": "A OR B OR C"
+      },
+      {
+        "id": "info-each-brace-compliance",
+        "type": "information",
+        "title": "各筋かいの令第45条第2項適合",
+        "symbol": "R",
+        "subject": "筋かい",
+        "property": "令第45条第2項適合",
+        "property_type": "proposition",
+        "description": "各筋かいが令第45条第2項の材料基準に適合するか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-all-check",
+        "type": "process",
+        "title": "全筋かい適合確認",
+        "process_type": "mechanical",
+        "description": "全ての圧縮力を負担する筋かいが令第45条第2項に適合することを確認",
+        "logic_expression": "forall brace in Braces: R(brace) = true"
+      },
+      {
+        "id": "info-final",
+        "type": "information",
+        "title": "建築物の令第45条第2項適合",
+        "subject": "建築物",
+        "property": "令第45条第2項適合",
+        "property_type": "proposition",
+        "description": "建築物全体として令第45条第2項（圧縮力を負担する筋かいの材料基準）に適合するか",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-brace-set",
+        "to": "info-brace-set",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "info-brace-set",
+        "to": "proc-material-type",
+        "role": "input"
+      },
+      {
+        "id": "e03",
+        "from": "proc-material-type",
+        "to": "info-material-type",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "info-brace-set",
+        "to": "proc-wood-dimension",
+        "role": "input"
+      },
+      {
+        "id": "e05",
+        "from": "info-material-type",
+        "to": "proc-wood-dimension",
+        "role": "input"
+      },
+      {
+        "id": "e06",
+        "from": "proc-wood-dimension",
+        "to": "info-wood-thickness",
+        "role": "output"
+      },
+      {
+        "id": "e07",
+        "from": "proc-wood-dimension",
+        "to": "info-wood-width",
+        "role": "output"
+      },
+      {
+        "id": "e08",
+        "from": "info-wood-thickness",
+        "to": "proc-wood-spec-check",
+        "role": "input"
+      },
+      {
+        "id": "e09",
+        "from": "info-wood-width",
+        "to": "proc-wood-spec-check",
+        "role": "input"
+      },
+      {
+        "id": "e10",
+        "from": "proc-wood-spec-check",
+        "to": "info-wood-spec-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e11",
+        "from": "info-material-type",
+        "to": "proc-minister-designation",
+        "role": "input"
+      },
+      {
+        "id": "e12",
+        "from": "proc-minister-designation",
+        "to": "info-minister-designation",
+        "role": "output"
+      },
+      {
+        "id": "e13",
+        "from": "proc-minister-approval",
+        "to": "info-minister-approval",
+        "role": "output"
+      },
+      {
+        "id": "e14",
+        "from": "info-wood-spec-compliance",
+        "to": "proc-each-brace-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e15",
+        "from": "info-minister-designation",
+        "to": "proc-each-brace-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e16",
+        "from": "info-minister-approval",
+        "to": "proc-each-brace-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e17",
+        "from": "proc-each-brace-judgment",
+        "to": "info-each-brace-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e18",
+        "from": "info-each-brace-compliance",
+        "to": "proc-all-check",
+        "role": "input"
+      },
+      {
+        "id": "e19",
+        "from": "proc-all-check",
+        "to": "info-final",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": [],
+      "description": "建築基準法の委任を受けて筋かいの構造基準を定める"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-23T12:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

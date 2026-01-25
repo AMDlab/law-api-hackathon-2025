@@ -1,0 +1,302 @@
+{
+  "id": "CHK-BSL-ORDER-A91-P1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "コンクリートの許容応力度",
+    "target_subject": "コンクリート",
+    "description": "コンクリートの許容応力度が法定の数値に適合するかを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "91",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造",
+    "材料強度",
+    "コンクリート"
+  ],
+  "text_raw": "コンクリートの許容応力度は、次の表の数値によらなければならない。ただし、異形鉄筋を用いた付着について、国土交通大臣が異形鉄筋の種類及び品質に応じて別に数値を定めた場合は、当該数値によることができる。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "material",
+          "value": "コンクリートを使用する建築物"
+        }
+      ],
+      "note": "コンクリートを構造材料として使用する場合に適用"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-allowable-stress-compliance",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    },
+    "exceptions": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "type": "ministerial_designation",
+          "description": "異形鉄筋の付着について国土交通大臣が別に数値を定めた場合"
+        }
+      ],
+      "effect": "ALTERNATIVE_VALUE"
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-design-strength-identify",
+        "type": "process",
+        "title": "設計基準強度の特定",
+        "process_type": "undefined_input",
+        "description": "構造計算書等からコンクリートの設計基準強度(F)を読み取る"
+      },
+      {
+        "id": "info-design-strength",
+        "type": "information",
+        "title": "コンクリートの設計基準強度(F)",
+        "symbol": "F",
+        "subject": "コンクリート",
+        "property": "設計基準強度",
+        "property_type": "numeric",
+        "unit": "N/mm2",
+        "plurality": "single",
+        "description": "設計基準強度（単位：1平方ミリメートルにつきニュートン）"
+      },
+      {
+        "id": "proc-aggregate-type-identify",
+        "type": "process",
+        "title": "骨材種別の特定",
+        "process_type": "undefined_input",
+        "description": "コンクリートに使用する骨材が軽量骨材か否かを特定"
+      },
+      {
+        "id": "info-aggregate-type",
+        "type": "information",
+        "title": "コンクリートの骨材種別",
+        "symbol": "A",
+        "subject": "コンクリート",
+        "property": "骨材種別",
+        "property_type": "classification",
+        "plurality": "single",
+        "description": "普通骨材または軽量骨材の区分"
+      },
+      {
+        "id": "proc-rebar-type-identify",
+        "type": "process",
+        "title": "鉄筋種別の特定",
+        "process_type": "undefined_input",
+        "description": "付着に用いる鉄筋が異形鉄筋か否かを特定"
+      },
+      {
+        "id": "info-rebar-type",
+        "type": "information",
+        "title": "鉄筋の種別",
+        "symbol": "B",
+        "subject": "鉄筋",
+        "property": "種別",
+        "property_type": "classification",
+        "plurality": "single",
+        "description": "異形鉄筋または丸鋼の区分"
+      },
+      {
+        "id": "proc-design-stress-identify",
+        "type": "process",
+        "title": "設計許容応力度の特定",
+        "process_type": "undefined_input",
+        "description": "構造計算書に記載されたコンクリートの許容応力度を読み取る"
+      },
+      {
+        "id": "info-design-stress",
+        "type": "information",
+        "title": "設計許容応力度",
+        "symbol": "S",
+        "subject": "コンクリート",
+        "property": "設計許容応力度",
+        "property_type": "numeric",
+        "unit": "N/mm2",
+        "plurality": "single",
+        "description": "構造計算に用いられた許容応力度（圧縮・引張り・せん断・付着）"
+      },
+      {
+        "id": "proc-allowable-stress-calc",
+        "type": "process",
+        "title": "法定許容応力度の算出",
+        "process_type": "mechanical",
+        "description": "設計基準強度Fと骨材種別から法定許容応力度を算出",
+        "logic_expression": "長期圧縮=F/3, 長期引張り・せん断=F/30, 長期付着=0.7(軽量骨材:0.6), 短期=長期×2"
+      },
+      {
+        "id": "info-allowable-stress-legal",
+        "type": "information",
+        "title": "法定許容応力度",
+        "symbol": "L",
+        "subject": "コンクリート",
+        "property": "法定許容応力度",
+        "property_type": "numeric",
+        "unit": "N/mm2",
+        "plurality": "single",
+        "description": "令91条の表に基づく許容応力度"
+      },
+      {
+        "id": "proc-minister-designation-check",
+        "type": "process",
+        "title": "大臣定め値の確認",
+        "process_type": "mechanical",
+        "description": "異形鉄筋の付着について国土交通大臣が別に定めた数値の有無を確認",
+        "logic_expression": "B=異形鉄筋 AND 大臣告示あり → 告示値を適用"
+      },
+      {
+        "id": "info-minister-value",
+        "type": "information",
+        "title": "大臣定め値の適用",
+        "symbol": "M",
+        "subject": "コンクリート",
+        "property": "大臣定め値適用",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "異形鉄筋の付着について大臣定め値を適用するか否か"
+      },
+      {
+        "id": "proc-stress-comparison",
+        "type": "process",
+        "title": "許容応力度の比較判定",
+        "process_type": "mechanical",
+        "description": "設計許容応力度が法定許容応力度以下であることを確認",
+        "logic_expression": "S ≤ L（大臣定め値適用時はその値）"
+      },
+      {
+        "id": "info-allowable-stress-compliance",
+        "type": "information",
+        "title": "許容応力度適合",
+        "symbol": "R",
+        "subject": "コンクリート",
+        "property": "許容応力度適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "コンクリートの許容応力度が法定値に適合するか"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-design-strength-identify",
+        "to": "info-design-strength",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "proc-aggregate-type-identify",
+        "to": "info-aggregate-type",
+        "role": "output"
+      },
+      {
+        "id": "e03",
+        "from": "proc-rebar-type-identify",
+        "to": "info-rebar-type",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "proc-design-stress-identify",
+        "to": "info-design-stress",
+        "role": "output"
+      },
+      {
+        "id": "e05",
+        "from": "info-design-strength",
+        "to": "proc-allowable-stress-calc",
+        "role": "input"
+      },
+      {
+        "id": "e06",
+        "from": "info-aggregate-type",
+        "to": "proc-allowable-stress-calc",
+        "role": "input"
+      },
+      {
+        "id": "e07",
+        "from": "proc-allowable-stress-calc",
+        "to": "info-allowable-stress-legal",
+        "role": "output"
+      },
+      {
+        "id": "e08",
+        "from": "info-rebar-type",
+        "to": "proc-minister-designation-check",
+        "role": "input"
+      },
+      {
+        "id": "e09",
+        "from": "proc-minister-designation-check",
+        "to": "info-minister-value",
+        "role": "output"
+      },
+      {
+        "id": "e10",
+        "from": "info-design-stress",
+        "to": "proc-stress-comparison",
+        "role": "input"
+      },
+      {
+        "id": "e11",
+        "from": "info-allowable-stress-legal",
+        "to": "proc-stress-comparison",
+        "role": "input"
+      },
+      {
+        "id": "e12",
+        "from": "info-minister-value",
+        "to": "proc-stress-comparison",
+        "role": "input"
+      },
+      {
+        "id": "e13",
+        "from": "proc-stress-comparison",
+        "to": "info-allowable-stress-compliance",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": [
+        "A20"
+      ],
+      "description": "構造耐力に関する規定"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": [
+        "A91:P2"
+      ],
+      "description": "特定行政庁が設計基準強度の上限を定めた場合の規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-23T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

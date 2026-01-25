@@ -1,0 +1,526 @@
+{
+  "id": "CHK-BSL-KIJO-A19-P2",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "採光が必要な居室の該当判定",
+    "target_subject": "居室",
+    "description": "法第28条第1項の政令で定める居室（採光が必要な居室）に該当するか否かを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "19",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "採光",
+    "居室"
+  ],
+  "text_raw": "法第二十八条第一項の政令で定める居室は、次に掲げるものとする。\n一 保育所及び幼保連携型認定こども園の保育室\n二 診療所の病室\n三 児童福祉施設等の寝室（入所する者の使用するものに限る。）\n四 児童福祉施設等（保育所を除く。）の居室のうちこれらに入所し、又は通う者に対する保育、訓練、日常生活に必要な便宜の供与その他これらに類する目的のために使用されるもの\n五 病院、診療所及び児童福祉施設等の居室のうち入院患者又は入所する者の談話、娯楽その他これらに類する目的のために使用されるもの",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "building_element",
+          "value": "建築物の居室"
+        }
+      ],
+      "note": "居室を有する建築物が対象"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "type": "room_type",
+          "value": "保育所または幼保連携型認定こども園の保育室",
+          "ref": "第一号"
+        },
+        {
+          "type": "room_type",
+          "value": "診療所の病室",
+          "ref": "第二号"
+        },
+        {
+          "type": "room_type",
+          "value": "児童福祉施設等の寝室（入所者使用）",
+          "ref": "第三号"
+        },
+        {
+          "type": "room_type",
+          "value": "児童福祉施設等の保育・訓練等の居室",
+          "ref": "第四号"
+        },
+        {
+          "type": "room_type",
+          "value": "病院等の談話・娯楽等の居室",
+          "ref": "第五号"
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "info-building",
+        "type": "information",
+        "title": "建築物",
+        "symbol": "B",
+        "subject": "建築物",
+        "property": "建築物の特定",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "審査対象となる建築物"
+      },
+      {
+        "id": "info-rooms-set",
+        "type": "information",
+        "title": "建築物の居室",
+        "symbol": "RS",
+        "subject": "建築物",
+        "property": "居室の集合",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "審査対象建築物に属する居室の集合を特定"
+      },
+      {
+        "id": "proc-rooms-identify",
+        "type": "process",
+        "title": "居室の特定",
+        "process_type": "undefined_input",
+        "target_subject": "居室",
+        "iteration": "single",
+        "description": "設計図書から建築物に属する居室を特定する"
+      },
+      {
+        "id": "info-room-use",
+        "type": "information",
+        "title": "居室の用途",
+        "symbol": "U",
+        "subject": "居室",
+        "property": "用途区分",
+        "property_type": "classification",
+        "plurality": "multiple",
+        "description": "各居室の用途（保育室、病室、寝室、談話室等）"
+      },
+      {
+        "id": "proc-use-identify",
+        "type": "process",
+        "title": "居室用途の特定",
+        "process_type": "undefined_input",
+        "target_subject": "居室",
+        "iteration": "iterative",
+        "description": "設計図書から各居室の用途を読み取る"
+      },
+      {
+        "id": "info-facility-type",
+        "type": "information",
+        "title": "所属施設の種別",
+        "symbol": "F",
+        "subject": "居室",
+        "property": "所属施設種別",
+        "property_type": "classification",
+        "plurality": "multiple",
+        "description": "居室が属する施設の種別（保育所、診療所、病院、児童福祉施設等）"
+      },
+      {
+        "id": "proc-facility-identify",
+        "type": "process",
+        "title": "所属施設種別の特定",
+        "process_type": "undefined_input",
+        "target_subject": "居室",
+        "iteration": "iterative",
+        "description": "設計図書から居室が属する施設の種別を読み取る"
+      },
+      {
+        "id": "info-user-type",
+        "type": "information",
+        "title": "居室の利用者区分",
+        "symbol": "P",
+        "subject": "居室",
+        "property": "利用者区分",
+        "property_type": "classification",
+        "plurality": "multiple",
+        "description": "居室の利用者（入所者、通所者、入院患者等）"
+      },
+      {
+        "id": "proc-user-identify",
+        "type": "process",
+        "title": "利用者区分の特定",
+        "process_type": "undefined_input",
+        "target_subject": "居室",
+        "iteration": "iterative",
+        "description": "設計図書から居室の利用者区分を読み取る"
+      },
+      {
+        "id": "proc-item1-check",
+        "type": "process",
+        "title": "第一号該当判定",
+        "process_type": "mechanical",
+        "target_subject": "居室",
+        "iteration": "iterative",
+        "description": "保育所または幼保連携型認定こども園の保育室に該当するか判定",
+        "logic_expression": "(F ∈ {保育所, 幼保連携型認定こども園}) AND (U = 保育室)",
+        "related_articles": [
+          "令::A19:P2:I1"
+        ]
+      },
+      {
+        "id": "proc-item2-check",
+        "type": "process",
+        "title": "第二号該当判定",
+        "process_type": "mechanical",
+        "target_subject": "居室",
+        "iteration": "iterative",
+        "description": "診療所の病室に該当するか判定",
+        "logic_expression": "(F = 診療所) AND (U = 病室)",
+        "related_articles": [
+          "令::A19:P2:I2"
+        ]
+      },
+      {
+        "id": "proc-item3-check",
+        "type": "process",
+        "title": "第三号該当判定",
+        "process_type": "mechanical",
+        "target_subject": "居室",
+        "iteration": "iterative",
+        "description": "児童福祉施設等の寝室（入所者使用）に該当するか判定",
+        "logic_expression": "(F ∈ {児童福祉施設等}) AND (U = 寝室) AND (P = 入所者)",
+        "related_articles": [
+          "令::A19:P2:I3"
+        ],
+        "remarks": "入所する者の使用するものに限る"
+      },
+      {
+        "id": "proc-item4-check",
+        "type": "process",
+        "title": "第四号該当判定",
+        "process_type": "mechanical",
+        "target_subject": "居室",
+        "iteration": "iterative",
+        "description": "児童福祉施設等（保育所除く）の保育・訓練等の居室に該当するか判定",
+        "logic_expression": "(F ∈ {児童福祉施設等} \\ {保育所}) AND (U ∈ {保育, 訓練, 日常生活便宜供与等})",
+        "related_articles": [
+          "令::A19:P2:I4"
+        ],
+        "remarks": "入所または通所する者に対する保育、訓練、日常生活に必要な便宜の供与その他これらに類する目的のために使用されるもの"
+      },
+      {
+        "id": "proc-item5-check",
+        "type": "process",
+        "title": "第五号該当判定",
+        "process_type": "mechanical",
+        "target_subject": "居室",
+        "iteration": "iterative",
+        "description": "病院・診療所・児童福祉施設等の談話・娯楽等の居室に該当するか判定",
+        "logic_expression": "(F ∈ {病院, 診療所, 児童福祉施設等}) AND (U ∈ {談話, 娯楽等}) AND (P ∈ {入院患者, 入所者})",
+        "related_articles": [
+          "令::A19:P2:I5"
+        ],
+        "remarks": "入院患者又は入所する者の談話、娯楽その他これらに類する目的のために使用されるもの"
+      },
+      {
+        "id": "proc-aggregate",
+        "type": "process",
+        "title": "採光必要居室該当の総合判定",
+        "process_type": "mechanical",
+        "target_subject": "居室",
+        "iteration": "iterative",
+        "description": "第一号から第五号のいずれかに該当するか総合判定",
+        "logic_expression": "R1 OR R2 OR R3 OR R4 OR R5"
+      },
+      {
+        "id": "info-item1-result",
+        "type": "information",
+        "title": "第一号該当性",
+        "symbol": "R1",
+        "subject": "居室",
+        "property": "第一号該当",
+        "property_type": "proposition",
+        "plurality": "multiple",
+        "description": "保育所・幼保連携型認定こども園の保育室に該当するか"
+      },
+      {
+        "id": "info-item2-result",
+        "type": "information",
+        "title": "第二号該当性",
+        "symbol": "R2",
+        "subject": "居室",
+        "property": "第二号該当",
+        "property_type": "proposition",
+        "plurality": "multiple",
+        "description": "診療所の病室に該当するか"
+      },
+      {
+        "id": "info-item3-result",
+        "type": "information",
+        "title": "第三号該当性",
+        "symbol": "R3",
+        "subject": "居室",
+        "property": "第三号該当",
+        "property_type": "proposition",
+        "plurality": "multiple",
+        "description": "児童福祉施設等の寝室（入所者使用）に該当するか"
+      },
+      {
+        "id": "info-item4-result",
+        "type": "information",
+        "title": "第四号該当性",
+        "symbol": "R4",
+        "subject": "居室",
+        "property": "第四号該当",
+        "property_type": "proposition",
+        "plurality": "multiple",
+        "description": "児童福祉施設等の保育・訓練等の居室に該当するか"
+      },
+      {
+        "id": "info-item5-result",
+        "type": "information",
+        "title": "第五号該当性",
+        "symbol": "R5",
+        "subject": "居室",
+        "property": "第五号該当",
+        "property_type": "proposition",
+        "plurality": "multiple",
+        "description": "病院等の談話・娯楽等の居室に該当するか"
+      },
+      {
+        "id": "info-final-result",
+        "type": "information",
+        "title": "採光必要居室該当判定",
+        "symbol": "C",
+        "subject": "居室",
+        "property": "採光必要居室該当",
+        "property_type": "proposition",
+        "plurality": "multiple",
+        "description": "法第28条第1項の政令で定める居室（採光が必要な居室）に該当するか否か"
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge-001",
+        "from": "info-building",
+        "to": "proc-rooms-identify",
+        "role": "input"
+      },
+      {
+        "id": "edge-002",
+        "from": "proc-rooms-identify",
+        "to": "info-rooms-set",
+        "role": "output"
+      },
+      {
+        "id": "edge-003",
+        "from": "info-rooms-set",
+        "to": "proc-use-identify",
+        "role": "input"
+      },
+      {
+        "id": "edge-004",
+        "from": "proc-use-identify",
+        "to": "info-room-use",
+        "role": "output"
+      },
+      {
+        "id": "edge-005",
+        "from": "info-rooms-set",
+        "to": "proc-facility-identify",
+        "role": "input"
+      },
+      {
+        "id": "edge-006",
+        "from": "proc-facility-identify",
+        "to": "info-facility-type",
+        "role": "output"
+      },
+      {
+        "id": "edge-007",
+        "from": "info-rooms-set",
+        "to": "proc-user-identify",
+        "role": "input"
+      },
+      {
+        "id": "edge-008",
+        "from": "proc-user-identify",
+        "to": "info-user-type",
+        "role": "output"
+      },
+      {
+        "id": "edge-009",
+        "from": "info-room-use",
+        "to": "proc-item1-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-010",
+        "from": "info-facility-type",
+        "to": "proc-item1-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-011",
+        "from": "proc-item1-check",
+        "to": "info-item1-result",
+        "role": "output"
+      },
+      {
+        "id": "edge-012",
+        "from": "info-room-use",
+        "to": "proc-item2-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-013",
+        "from": "info-facility-type",
+        "to": "proc-item2-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-014",
+        "from": "proc-item2-check",
+        "to": "info-item2-result",
+        "role": "output"
+      },
+      {
+        "id": "edge-015",
+        "from": "info-room-use",
+        "to": "proc-item3-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-016",
+        "from": "info-facility-type",
+        "to": "proc-item3-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-017",
+        "from": "info-user-type",
+        "to": "proc-item3-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-018",
+        "from": "proc-item3-check",
+        "to": "info-item3-result",
+        "role": "output"
+      },
+      {
+        "id": "edge-019",
+        "from": "info-room-use",
+        "to": "proc-item4-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-020",
+        "from": "info-facility-type",
+        "to": "proc-item4-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-021",
+        "from": "proc-item4-check",
+        "to": "info-item4-result",
+        "role": "output"
+      },
+      {
+        "id": "edge-022",
+        "from": "info-room-use",
+        "to": "proc-item5-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-023",
+        "from": "info-facility-type",
+        "to": "proc-item5-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-024",
+        "from": "info-user-type",
+        "to": "proc-item5-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-025",
+        "from": "proc-item5-check",
+        "to": "info-item5-result",
+        "role": "output"
+      },
+      {
+        "id": "edge-026",
+        "from": "info-item1-result",
+        "to": "proc-aggregate",
+        "role": "input"
+      },
+      {
+        "id": "edge-027",
+        "from": "info-item2-result",
+        "to": "proc-aggregate",
+        "role": "input"
+      },
+      {
+        "id": "edge-028",
+        "from": "info-item3-result",
+        "to": "proc-aggregate",
+        "role": "input"
+      },
+      {
+        "id": "edge-029",
+        "from": "info-item4-result",
+        "to": "proc-aggregate",
+        "role": "input"
+      },
+      {
+        "id": "edge-030",
+        "from": "info-item5-result",
+        "to": "proc-aggregate",
+        "role": "input"
+      },
+      {
+        "id": "edge-031",
+        "from": "proc-aggregate",
+        "to": "info-final-result",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": [
+        "A28:P1"
+      ],
+      "description": "法第28条第1項から委任を受けて、採光が必要な居室を定義"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": [
+        "A19:P1"
+      ],
+      "description": "第19条第1項で「児童福祉施設等」の定義を規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-23T00:00:00Z",
+    "updated_at": "2026-01-23T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "kijo-generator",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令",
+    "checklist_ref": "建築基準法施行令第19条第2項（採光が必要な居室）",
+    "source": "e-Gov法令API"
+  }
+}

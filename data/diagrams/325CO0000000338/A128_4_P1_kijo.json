@@ -1,0 +1,390 @@
+{
+  "id": "CHK-BSL-ORDER-A128_4-P1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "内装制限を受ける特殊建築物の判定",
+    "target_subject": "特殊建築物",
+    "description": "法第35条の2の内装制限を受ける特殊建築物を判定する（次に掲げるもの以外は制限を受けない）"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "128の4",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "防火",
+    "内装制限",
+    "特殊建築物"
+  ],
+  "text_raw": "法第三十五条の二の規定により政令で定める特殊建築物は、次に掲げるもの以外のものとする。一 次の表に掲げる特殊建築物 二 自動車車庫又は自動車修理工場の用途に供する特殊建築物 三 地階又は地下工作物内に設ける居室その他これらに類する居室で法別表第一（い）欄（一）項、（二）項又は（四）項に掲げる用途に供するものを有する特殊建築物",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "reference",
+          "value": "法第35条の2の特殊建築物（内装制限の対象）"
+        }
+      ],
+      "note": "本条は法第35条の2で政令に委任された特殊建築物の範囲を定める"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "ref": "info-item1-subject",
+          "description": "第1号：表に掲げる特殊建築物に該当"
+        },
+        {
+          "ref": "info-item2-subject",
+          "description": "第2号：自動車車庫・修理工場に該当"
+        },
+        {
+          "ref": "info-item3-subject",
+          "description": "第3号：地階等の特定用途居室を有する"
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-use-identify",
+        "type": "process",
+        "title": "用途の特定",
+        "process_type": "undefined_input",
+        "process_type_description": "入力情報不定処理 - 導出されるアウトプット情報を得るための情報源の所在や手続きのメカニズムも含めて人が判断する処理。インプット情報を繋がない。左側の辺を消した状態で表示。",
+        "description": "設計図書等から建築物の用途を読み取る"
+      },
+      {
+        "id": "info-use",
+        "type": "information",
+        "title": "建築物の用途",
+        "symbol": "U",
+        "subject": "建築物",
+        "property": "用途",
+        "property_type": "classification",
+        "property_type_description": "区分情報 - 既定のいくつかの区分の中のいずれかを示すもの（例: 用途地域、建物用途コード）",
+        "plurality": "single",
+        "description": "建築物がどの用途に供されるか"
+      },
+      {
+        "id": "proc-structure-identify",
+        "type": "process",
+        "title": "構造の特定",
+        "process_type": "undefined_input",
+        "process_type_description": "入力情報不定処理 - 導出されるアウトプット情報を得るための情報源の所在や手続きのメカニズムも含めて人が判断する処理。インプット情報を繋がない。左側の辺を消した状態で表示。",
+        "description": "設計図書等から建築物の構造種別を読み取る"
+      },
+      {
+        "id": "info-structure",
+        "type": "information",
+        "title": "建築物の構造種別",
+        "symbol": "ST",
+        "subject": "建築物",
+        "property": "構造種別",
+        "property_type": "classification",
+        "property_type_description": "区分情報 - 既定のいくつかの区分の中のいずれかを示すもの（例: 用途地域、建物用途コード）",
+        "plurality": "single",
+        "description": "耐火建築物（法2条9号の3イ該当で1時間準耐火基準適合）、準耐火建築物（法2条9号の3イ又はロ該当で1時間準耐火基準不適合）、その他の建築物"
+      },
+      {
+        "id": "proc-area-identify",
+        "type": "process",
+        "title": "床面積の特定",
+        "process_type": "undefined_input",
+        "process_type_description": "入力情報不定処理 - 導出されるアウトプット情報を得るための情報源の所在や手続きのメカニズムも含めて人が判断する処理。インプット情報を繋がない。左側の辺を消した状態で表示。",
+        "description": "設計図書等から用途に供する部分の床面積を読み取る"
+      },
+      {
+        "id": "info-area",
+        "type": "information",
+        "title": "用途部分の床面積",
+        "symbol": "A",
+        "subject": "建築物",
+        "property": "用途に供する部分の床面積",
+        "property_type": "numeric",
+        "property_type_description": "数値 - 大小関係に位置づけられる整数値または実数値（例: 延べ面積、高さ）",
+        "unit": "m2",
+        "plurality": "single",
+        "description": "当該用途に供する部分の床面積の合計（客席、特定階、全体等用途により異なる）"
+      },
+      {
+        "id": "proc-item1-check",
+        "type": "process",
+        "title": "第1号（表）該当判定",
+        "process_type": "mechanical",
+        "process_type_description": "機械的処理 - 自動化可能な論理演算や計算。視認情報をこれに繋ぐことはできない。水色で表示。",
+        "description": "用途・構造・床面積の組み合わせが表の条件に該当するか判定",
+        "logic_expression": "((U ∈ {(一)劇場等} AND ((ST=耐火1h AND A≥400) OR (ST=準耐火 AND A≥100) OR (ST=その他 AND A≥100))) OR ((U ∈ {(二)病院等} AND ((ST=耐火1h AND A3階以上≥300) OR (ST=準耐火 AND A2階≥300) OR (ST=その他 AND A≥200))) OR ((U ∈ {(四)百貨店等} AND ((ST=耐火1h AND A3階以上≥1000) OR (ST=準耐火 AND A2階≥500) OR (ST=その他 AND A≥200))))",
+        "remarks": "(一)劇場等:客席面積、(二)病院等:階別床面積、(四)百貨店等:階別床面積"
+      },
+      {
+        "id": "info-item1-subject",
+        "type": "information",
+        "title": "第1号（表）該当",
+        "symbol": "I1",
+        "subject": "建築物",
+        "property": "第1号（表に掲げる特殊建築物）該当",
+        "property_type": "proposition",
+        "property_type_description": "命題真偽 - 真か偽かが判定可能な事実（例: 技術基準を満たすか否か）",
+        "plurality": "single",
+        "description": "法別表第一（い）欄（一）項（劇場等）、（二）項（病院等）、（四）項（百貨店等）で構造・床面積条件を満たす特殊建築物に該当するか",
+        "remarks": "(一)劇場、映画館、演芸場、観覧場、公会堂、集会場 (二)病院、診療所、ホテル、旅館、下宿、共同住宅、寄宿舎、児童福祉施設等 (四)百貨店、マーケット、展示場、キャバレー、カフェー、ナイトクラブ、バー、ダンスホール、遊技場、公衆浴場、待合、料理店、飲食店、物品販売業を営む店舗"
+      },
+      {
+        "id": "proc-item2-check",
+        "type": "process",
+        "title": "第2号該当判定",
+        "process_type": "mechanical",
+        "process_type_description": "機械的処理 - 自動化可能な論理演算や計算。視認情報をこれに繋ぐことはできない。水色で表示。",
+        "description": "自動車車庫又は自動車修理工場の用途に該当するか判定",
+        "logic_expression": "U ∈ {自動車車庫, 自動車修理工場}"
+      },
+      {
+        "id": "info-item2-subject",
+        "type": "information",
+        "title": "第2号該当",
+        "symbol": "I2",
+        "subject": "建築物",
+        "property": "第2号（自動車車庫・修理工場）該当",
+        "property_type": "proposition",
+        "property_type_description": "命題真偽 - 真か偽かが判定可能な事実（例: 技術基準を満たすか否か）",
+        "plurality": "single",
+        "description": "自動車車庫又は自動車修理工場の用途に供する特殊建築物に該当するか"
+      },
+      {
+        "id": "proc-basement-rooms-identify",
+        "type": "process",
+        "title": "地階等居室の特定",
+        "process_type": "undefined_input",
+        "process_type_description": "入力情報不定処理 - 導出されるアウトプット情報を得るための情報源の所在や手続きのメカニズムも含めて人が判断する処理。インプット情報を繋がない。左側の辺を消した状態で表示。",
+        "description": "設計図書等から地階又は地下工作物内に設ける居室を特定"
+      },
+      {
+        "id": "info-basement-rooms-set",
+        "type": "information",
+        "title": "地階等の居室",
+        "symbol": "BR",
+        "subject": "建築物",
+        "property": "地階・地下工作物内の居室の集合",
+        "property_type": "set_definition",
+        "property_type_description": "集合定義 - 主体と特定の関係にある他の主体がどれであるかを示す情報（例: 階に属する外壁の集合）【必須ケース: 建築物⇔屋根、建築物⇔外壁、敷地⇔建築物など親子関係がある場合】",
+        "plurality": "single",
+        "description": "建築物に属する地階又は地下工作物内に設ける居室その他これらに類する居室"
+      },
+      {
+        "id": "proc-basement-rooms-use-identify",
+        "type": "process",
+        "title": "地階等居室の用途特定",
+        "process_type": "undefined_input",
+        "process_type_description": "入力情報不定処理 - 導出されるアウトプット情報を得るための情報源の所在や手続きのメカニズムも含めて人が判断する処理。インプット情報を繋がない。左側の辺を消した状態で表示。",
+        "description": "設計図書等から各地階等居室の用途を読み取る"
+      },
+      {
+        "id": "info-basement-rooms-use",
+        "type": "information",
+        "title": "地階等居室の用途",
+        "symbol": "BRU",
+        "subject": "居室",
+        "property": "用途",
+        "property_type": "classification",
+        "property_type_description": "区分情報 - 既定のいくつかの区分の中のいずれかを示すもの（例: 用途地域、建物用途コード）",
+        "plurality": "multiple",
+        "description": "各地階等居室がどの用途に供されるか"
+      },
+      {
+        "id": "proc-item3-check",
+        "type": "process",
+        "title": "第3号該当判定",
+        "process_type": "mechanical",
+        "process_type_description": "機械的処理 - 自動化可能な論理演算や計算。視認情報をこれに繋ぐことはできない。水色で表示。",
+        "description": "地階等居室が法別表第一（い）欄（一）、（二）、（四）項の用途に供されているか判定",
+        "logic_expression": "∃r ∈ BR: r.用途 ∈ {(一)劇場等, (二)病院等, (四)百貨店等}",
+        "iteration": "iterative",
+        "remarks": "(一)劇場、映画館、演芸場、観覧場、公会堂、集会場 (二)病院、診療所、ホテル、旅館、下宿、共同住宅、寄宿舎、児童福祉施設等 (四)百貨店、マーケット、展示場、キャバレー、カフェー、ナイトクラブ、バー、ダンスホール、遊技場、公衆浴場、待合、料理店、飲食店、物品販売業を営む店舗"
+      },
+      {
+        "id": "info-item3-subject",
+        "type": "information",
+        "title": "第3号該当",
+        "symbol": "I3",
+        "subject": "建築物",
+        "property": "第3号（地階等特定用途居室）該当",
+        "property_type": "proposition",
+        "property_type_description": "命題真偽 - 真か偽かが判定可能な事実（例: 技術基準を満たすか否か）",
+        "plurality": "single",
+        "description": "地階又は地下工作物内に法別表第一（い）欄（一）項、（二）項又は（四）項に掲げる用途に供する居室を有する特殊建築物に該当するか"
+      },
+      {
+        "id": "proc-final-judgment",
+        "type": "process",
+        "title": "内装制限対象特殊建築物判定",
+        "process_type": "mechanical",
+        "process_type_description": "機械的処理 - 自動化可能な論理演算や計算。視認情報をこれに繋ぐことはできない。水色で表示。",
+        "description": "第1号〜第3号のいずれかに該当すれば内装制限の対象となる特殊建築物",
+        "logic_expression": "I1 OR I2 OR I3"
+      },
+      {
+        "id": "info-final",
+        "type": "information",
+        "title": "内装制限対象特殊建築物",
+        "symbol": "R",
+        "subject": "建築物",
+        "property": "内装制限を受ける特殊建築物該当性",
+        "property_type": "proposition",
+        "property_type_description": "命題真偽 - 真か偽かが判定可能な事実（例: 技術基準を満たすか否か）",
+        "plurality": "single",
+        "description": "法第35条の2の内装制限を受ける特殊建築物に該当するか"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-use-identify",
+        "to": "info-use",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "proc-structure-identify",
+        "to": "info-structure",
+        "role": "output"
+      },
+      {
+        "id": "e03",
+        "from": "proc-area-identify",
+        "to": "info-area",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "info-use",
+        "to": "proc-item1-check",
+        "role": "input"
+      },
+      {
+        "id": "e05",
+        "from": "info-structure",
+        "to": "proc-item1-check",
+        "role": "input"
+      },
+      {
+        "id": "e06",
+        "from": "info-area",
+        "to": "proc-item1-check",
+        "role": "input"
+      },
+      {
+        "id": "e07",
+        "from": "proc-item1-check",
+        "to": "info-item1-subject",
+        "role": "output"
+      },
+      {
+        "id": "e08",
+        "from": "info-use",
+        "to": "proc-item2-check",
+        "role": "input"
+      },
+      {
+        "id": "e09",
+        "from": "proc-item2-check",
+        "to": "info-item2-subject",
+        "role": "output"
+      },
+      {
+        "id": "e10",
+        "from": "proc-basement-rooms-identify",
+        "to": "info-basement-rooms-set",
+        "role": "output"
+      },
+      {
+        "id": "e11",
+        "from": "info-basement-rooms-set",
+        "to": "proc-basement-rooms-use-identify",
+        "role": "input"
+      },
+      {
+        "id": "e12",
+        "from": "proc-basement-rooms-use-identify",
+        "to": "info-basement-rooms-use",
+        "role": "output"
+      },
+      {
+        "id": "e13",
+        "from": "info-basement-rooms-set",
+        "to": "proc-item3-check",
+        "role": "input"
+      },
+      {
+        "id": "e14",
+        "from": "info-basement-rooms-use",
+        "to": "proc-item3-check",
+        "role": "input"
+      },
+      {
+        "id": "e15",
+        "from": "proc-item3-check",
+        "to": "info-item3-subject",
+        "role": "output"
+      },
+      {
+        "id": "e16",
+        "from": "info-item1-subject",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e17",
+        "from": "info-item2-subject",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e18",
+        "from": "info-item3-subject",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e19",
+        "from": "proc-final-judgment",
+        "to": "info-final",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": ["A35_2"],
+      "description": "法第35条の2から内装制限を受ける特殊建築物の定義を委任"
+    },
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["別表第一"],
+      "description": "法別表第一（い）欄の用途を参照"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-25T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令",
+    "source": "e-Gov法令API v2"
+  }
+}

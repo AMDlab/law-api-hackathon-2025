@@ -1,0 +1,711 @@
+{
+  "id": "CHK-BSO-A107-P1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "耐火性能に関する技術的基準",
+    "target_subject": "主要構造部",
+    "description": "耐火建築物の主要構造部が法第2条第7号の耐火性能の技術的基準に適合することを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "107",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "防火",
+    "耐火構造"
+  ],
+  "text_raw": "法第二条第七号の政令で定める技術的基準は、次に掲げるものとする。\n一 次の表の上欄に掲げる建築物の部分にあつては、当該各部分に通常の火災による火熱が同表の下欄に掲げる当該部分の存する階の区分に応じそれぞれ同欄に掲げる時間加えられた場合に、構造耐力上支障のある変形、溶融、破壊その他の損傷を生じないものであること。\n二 前号に掲げるもののほか、壁及び床にあつては、これらに通常の火災による火熱が一時間（非耐力壁である外壁の延焼のおそれのある部分以外の部分にあつては、三十分間）加えられた場合に、当該加熱面以外の面（屋内に面するものに限る。）の温度が当該面に接する可燃物が燃焼するおそれのある温度として国土交通大臣が定める温度（以下「可燃物燃焼温度」という。）以上に上昇しないものであること。\n三 前二号に掲げるもののほか、外壁及び屋根にあつては、これらに屋内において発生する通常の火災による火熱が一時間（非耐力壁である外壁の延焼のおそれのある部分以外の部分及び屋根にあつては、三十分間）加えられた場合に、屋外に火炎を出す原因となる亀裂その他の損傷を生じないものであること。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "building_classification",
+          "value": "耐火建築物"
+        }
+      ],
+      "note": "法第2条第7号に定める耐火建築物の主要構造部に適用"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-structural-fire-resistance",
+          "note": "第1号：非損傷性",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "ref": "info-heat-insulation",
+          "note": "第2号：遮熱性",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "ref": "info-flame-prevention",
+          "note": "第3号：遮炎性",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-parts-set",
+        "type": "process",
+        "title": "主要構造部の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から耐火建築物の主要構造部（壁、柱、床、はり、屋根、階段）を特定する"
+      },
+      {
+        "id": "info-parts-set",
+        "type": "information",
+        "title": "建築物の主要構造部",
+        "subject": "建築物",
+        "property": "主要構造部の集合",
+        "property_type": "set_definition",
+        "description": "判定対象となる建築物の主要構造部（壁、柱、床、はり、屋根、階段）を特定",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-part-type",
+        "type": "process",
+        "title": "部分種別の特定",
+        "process_type": "undefined_input",
+        "target_subject": "主要構造部",
+        "iteration": "iterative",
+        "description": "各主要構造部の種別（間仕切壁、外壁、柱、床、はり、屋根、階段）を特定する"
+      },
+      {
+        "id": "info-part-type",
+        "type": "information",
+        "title": "部分の種別",
+        "symbol": "PT",
+        "subject": "主要構造部",
+        "property": "部分種別",
+        "property_type": "classification",
+        "description": "主要構造部の種別（間仕切壁（耐力壁）、外壁（耐力壁）、柱、床、はり、屋根、階段）",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-floor-count",
+        "type": "process",
+        "title": "階の特定",
+        "process_type": "undefined_input",
+        "target_subject": "主要構造部",
+        "iteration": "iterative",
+        "description": "各主要構造部が存する階を特定する（最上階からの階数）"
+      },
+      {
+        "id": "info-floor-count",
+        "type": "information",
+        "title": "最上階からの階数",
+        "symbol": "FC",
+        "subject": "主要構造部",
+        "property": "最上階からの階数",
+        "property_type": "numeric",
+        "unit": "階",
+        "description": "当該部分が存する階の区分（最上階から数えた階数）。地階も算入。",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-required-time",
+        "type": "process",
+        "title": "要求耐火時間の判定",
+        "process_type": "mechanical",
+        "target_subject": "主要構造部",
+        "iteration": "iterative",
+        "description": "部分種別と最上階からの階数に基づき、第1号の表から要求耐火時間を判定する",
+        "logic_expression": "部分種別と階区分から要求時間を表引き",
+        "remarks": "壁（間仕切壁・外壁）：1〜4階=1h、5〜9階=1.5h、10〜14階=2h、15〜19階=2h、20階以上=2h。柱・はり：1〜4階=1h、5〜9階=1.5h、10〜14階=2h、15〜19階=2.5h、20階以上=3h。床：1〜4階=1h、5〜9階=1.5h、10〜14階=2h、15〜19階=2h、20階以上=2h。屋根・階段：30分間。"
+      },
+      {
+        "id": "info-required-time",
+        "type": "information",
+        "title": "要求耐火時間",
+        "symbol": "RT",
+        "subject": "主要構造部",
+        "property": "要求耐火時間",
+        "property_type": "numeric",
+        "unit": "分",
+        "description": "当該部分に要求される耐火時間（第1号の表による）",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-structure-method",
+        "type": "process",
+        "title": "構造方法の特定",
+        "process_type": "human_judgment",
+        "target_subject": "主要構造部",
+        "iteration": "iterative",
+        "description": "設計図書等から各主要構造部の構造方法・仕様を特定する"
+      },
+      {
+        "id": "info-structure-method",
+        "type": "information",
+        "title": "構造方法",
+        "symbol": "SM",
+        "subject": "主要構造部",
+        "property": "構造方法・仕様",
+        "property_type": "visual",
+        "description": "各主要構造部の構造方法・仕様（材料、厚さ、被覆等）",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-structural-check",
+        "type": "process",
+        "title": "非損傷性の判定",
+        "process_type": "human_judgment",
+        "target_subject": "主要構造部",
+        "iteration": "iterative",
+        "description": "各主要構造部が要求耐火時間の火熱により構造耐力上支障のある変形、溶融、破壊その他の損傷を生じないことを判定（第1号）",
+        "related_articles": [
+          "令::A107:P1:I1"
+        ]
+      },
+      {
+        "id": "info-structural-fire-resistance",
+        "type": "information",
+        "title": "非損傷性適合",
+        "symbol": "S1",
+        "subject": "主要構造部",
+        "property": "非損傷性への適合",
+        "property_type": "proposition",
+        "description": "要求耐火時間の火熱に対し構造耐力上支障のある損傷を生じないか（第1号適合）",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-wall-floor-set",
+        "type": "process",
+        "title": "壁・床の特定",
+        "process_type": "mechanical",
+        "description": "主要構造部のうち壁及び床を抽出する"
+      },
+      {
+        "id": "info-wall-floor-set",
+        "type": "information",
+        "title": "壁及び床",
+        "subject": "建築物",
+        "property": "壁及び床の集合",
+        "property_type": "set_definition",
+        "description": "遮熱性判定の対象となる壁及び床を特定",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-bearing-check",
+        "type": "process",
+        "title": "耐力壁・非耐力壁の判定",
+        "process_type": "undefined_input",
+        "target_subject": "壁",
+        "iteration": "iterative",
+        "description": "各壁が耐力壁か非耐力壁かを特定する"
+      },
+      {
+        "id": "info-bearing-type",
+        "type": "information",
+        "title": "耐力壁区分",
+        "symbol": "BT",
+        "subject": "壁",
+        "property": "耐力壁・非耐力壁の区分",
+        "property_type": "classification",
+        "description": "耐力壁か非耐力壁かの区分",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-ensho-exterior",
+        "type": "process",
+        "title": "延焼のおそれのある部分の判定（外壁）",
+        "process_type": "mechanical",
+        "target_subject": "外壁",
+        "iteration": "iterative",
+        "description": "非耐力壁である外壁について、延焼のおそれのある部分に該当するかを判定",
+        "related_articles": [
+          "法::A2:I6"
+        ]
+      },
+      {
+        "id": "info-ensho-exterior",
+        "type": "information",
+        "title": "延焼のおそれのある部分該当（外壁）",
+        "symbol": "EX",
+        "subject": "外壁",
+        "property": "延焼のおそれのある部分への該当",
+        "property_type": "proposition",
+        "description": "当該外壁の部分が延焼のおそれのある部分に該当するか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-heat-insulation-time",
+        "type": "process",
+        "title": "遮熱性要求時間の判定",
+        "process_type": "mechanical",
+        "target_subject": "壁・床",
+        "iteration": "iterative",
+        "description": "壁・床の遮熱性に要求される加熱時間を判定（原則1時間、非耐力壁外壁の延焼部分以外は30分間）",
+        "logic_expression": "IF (非耐力壁 AND 外壁 AND NOT 延焼のおそれのある部分) THEN 30分 ELSE 60分"
+      },
+      {
+        "id": "info-heat-insulation-time",
+        "type": "information",
+        "title": "遮熱性要求時間",
+        "symbol": "HT",
+        "subject": "壁・床",
+        "property": "遮熱性要求時間",
+        "property_type": "numeric",
+        "unit": "分",
+        "description": "遮熱性に要求される加熱時間（1時間または30分間）",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-heat-insulation-check",
+        "type": "process",
+        "title": "遮熱性の判定",
+        "process_type": "human_judgment",
+        "target_subject": "壁・床",
+        "iteration": "iterative",
+        "description": "壁・床が要求時間の火熱により加熱面以外の面（屋内面）の温度が可燃物燃焼温度以上に上昇しないことを判定（第2号）",
+        "related_articles": [
+          "令::A107:P1:I2"
+        ]
+      },
+      {
+        "id": "info-heat-insulation",
+        "type": "information",
+        "title": "遮熱性適合",
+        "symbol": "S2",
+        "subject": "壁・床",
+        "property": "遮熱性への適合",
+        "property_type": "proposition",
+        "description": "要求時間の火熱に対し屋内面の温度が可燃物燃焼温度以上に上昇しないか（第2号適合）",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-exterior-roof-set",
+        "type": "process",
+        "title": "外壁・屋根の特定",
+        "process_type": "mechanical",
+        "description": "主要構造部のうち外壁及び屋根を抽出する"
+      },
+      {
+        "id": "info-exterior-roof-set",
+        "type": "information",
+        "title": "外壁及び屋根",
+        "subject": "建築物",
+        "property": "外壁及び屋根の集合",
+        "property_type": "set_definition",
+        "description": "遮炎性判定の対象となる外壁及び屋根を特定",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-flame-time",
+        "type": "process",
+        "title": "遮炎性要求時間の判定",
+        "process_type": "mechanical",
+        "target_subject": "外壁・屋根",
+        "iteration": "iterative",
+        "description": "外壁・屋根の遮炎性に要求される加熱時間を判定（原則1時間、非耐力壁外壁の延焼部分以外・屋根は30分間）",
+        "logic_expression": "IF (屋根) OR (非耐力壁 AND 外壁 AND NOT 延焼のおそれのある部分) THEN 30分 ELSE 60分"
+      },
+      {
+        "id": "info-flame-time",
+        "type": "information",
+        "title": "遮炎性要求時間",
+        "symbol": "FT",
+        "subject": "外壁・屋根",
+        "property": "遮炎性要求時間",
+        "property_type": "numeric",
+        "unit": "分",
+        "description": "遮炎性に要求される加熱時間（1時間または30分間）",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-flame-check",
+        "type": "process",
+        "title": "遮炎性の判定",
+        "process_type": "human_judgment",
+        "target_subject": "外壁・屋根",
+        "iteration": "iterative",
+        "description": "外壁・屋根が屋内火災による要求時間の火熱により屋外に火炎を出す原因となる亀裂等の損傷を生じないことを判定（第3号）",
+        "related_articles": [
+          "令::A107:P1:I3"
+        ]
+      },
+      {
+        "id": "info-flame-prevention",
+        "type": "information",
+        "title": "遮炎性適合",
+        "symbol": "S3",
+        "subject": "外壁・屋根",
+        "property": "遮炎性への適合",
+        "property_type": "proposition",
+        "description": "要求時間の火熱に対し屋外に火炎を出す損傷を生じないか（第3号適合）",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-all-structural-check",
+        "type": "process",
+        "title": "全主要構造部の非損傷性確認",
+        "process_type": "mechanical",
+        "description": "全ての主要構造部が第1号の非損傷性基準に適合することを確認",
+        "logic_expression": "forall part in Parts: S1(part) = true"
+      },
+      {
+        "id": "info-all-structural",
+        "type": "information",
+        "title": "第1号適合（全体）",
+        "subject": "建築物",
+        "property": "第1号適合",
+        "property_type": "proposition",
+        "description": "建築物の全主要構造部が第1号の非損傷性基準に適合するか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-all-heat-check",
+        "type": "process",
+        "title": "全壁・床の遮熱性確認",
+        "process_type": "mechanical",
+        "description": "全ての壁及び床が第2号の遮熱性基準に適合することを確認",
+        "logic_expression": "forall wf in WallsFloors: S2(wf) = true"
+      },
+      {
+        "id": "info-all-heat",
+        "type": "information",
+        "title": "第2号適合（全体）",
+        "subject": "建築物",
+        "property": "第2号適合",
+        "property_type": "proposition",
+        "description": "建築物の全ての壁及び床が第2号の遮熱性基準に適合するか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-all-flame-check",
+        "type": "process",
+        "title": "全外壁・屋根の遮炎性確認",
+        "process_type": "mechanical",
+        "description": "全ての外壁及び屋根が第3号の遮炎性基準に適合することを確認",
+        "logic_expression": "forall er in ExteriorsRoofs: S3(er) = true"
+      },
+      {
+        "id": "info-all-flame",
+        "type": "information",
+        "title": "第3号適合（全体）",
+        "subject": "建築物",
+        "property": "第3号適合",
+        "property_type": "proposition",
+        "description": "建築物の全ての外壁及び屋根が第3号の遮炎性基準に適合するか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-final-judgment",
+        "type": "process",
+        "title": "耐火性能適合判定",
+        "process_type": "mechanical",
+        "description": "第1号から第3号の全てに適合することを確認",
+        "logic_expression": "info-all-structural AND info-all-heat AND info-all-flame"
+      },
+      {
+        "id": "info-final",
+        "type": "information",
+        "title": "令第107条第1項適合",
+        "subject": "建築物",
+        "property": "耐火性能技術的基準適合",
+        "property_type": "proposition",
+        "description": "建築物が令第107条第1項の耐火性能に関する技術的基準に適合するか",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-parts-set",
+        "to": "info-parts-set",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "info-parts-set",
+        "to": "proc-part-type",
+        "role": "input"
+      },
+      {
+        "id": "e03",
+        "from": "proc-part-type",
+        "to": "info-part-type",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "info-parts-set",
+        "to": "proc-floor-count",
+        "role": "input"
+      },
+      {
+        "id": "e05",
+        "from": "proc-floor-count",
+        "to": "info-floor-count",
+        "role": "output"
+      },
+      {
+        "id": "e06",
+        "from": "info-part-type",
+        "to": "proc-required-time",
+        "role": "input"
+      },
+      {
+        "id": "e07",
+        "from": "info-floor-count",
+        "to": "proc-required-time",
+        "role": "input"
+      },
+      {
+        "id": "e08",
+        "from": "proc-required-time",
+        "to": "info-required-time",
+        "role": "output"
+      },
+      {
+        "id": "e09",
+        "from": "info-parts-set",
+        "to": "proc-structure-method",
+        "role": "input"
+      },
+      {
+        "id": "e10",
+        "from": "proc-structure-method",
+        "to": "info-structure-method",
+        "role": "output"
+      },
+      {
+        "id": "e11",
+        "from": "info-required-time",
+        "to": "proc-structural-check",
+        "role": "input"
+      },
+      {
+        "id": "e12",
+        "from": "info-structure-method",
+        "to": "proc-structural-check",
+        "role": "input"
+      },
+      {
+        "id": "e13",
+        "from": "proc-structural-check",
+        "to": "info-structural-fire-resistance",
+        "role": "output"
+      },
+      {
+        "id": "e14",
+        "from": "info-parts-set",
+        "to": "proc-wall-floor-set",
+        "role": "input"
+      },
+      {
+        "id": "e15",
+        "from": "proc-wall-floor-set",
+        "to": "info-wall-floor-set",
+        "role": "output"
+      },
+      {
+        "id": "e16",
+        "from": "info-wall-floor-set",
+        "to": "proc-bearing-check",
+        "role": "input"
+      },
+      {
+        "id": "e17",
+        "from": "proc-bearing-check",
+        "to": "info-bearing-type",
+        "role": "output"
+      },
+      {
+        "id": "e18",
+        "from": "info-bearing-type",
+        "to": "proc-ensho-exterior",
+        "role": "input"
+      },
+      {
+        "id": "e19",
+        "from": "proc-ensho-exterior",
+        "to": "info-ensho-exterior",
+        "role": "output"
+      },
+      {
+        "id": "e20",
+        "from": "info-bearing-type",
+        "to": "proc-heat-insulation-time",
+        "role": "input"
+      },
+      {
+        "id": "e21",
+        "from": "info-ensho-exterior",
+        "to": "proc-heat-insulation-time",
+        "role": "input"
+      },
+      {
+        "id": "e22",
+        "from": "proc-heat-insulation-time",
+        "to": "info-heat-insulation-time",
+        "role": "output"
+      },
+      {
+        "id": "e23",
+        "from": "info-heat-insulation-time",
+        "to": "proc-heat-insulation-check",
+        "role": "input"
+      },
+      {
+        "id": "e24",
+        "from": "info-structure-method",
+        "to": "proc-heat-insulation-check",
+        "role": "input"
+      },
+      {
+        "id": "e25",
+        "from": "proc-heat-insulation-check",
+        "to": "info-heat-insulation",
+        "role": "output"
+      },
+      {
+        "id": "e26",
+        "from": "info-parts-set",
+        "to": "proc-exterior-roof-set",
+        "role": "input"
+      },
+      {
+        "id": "e27",
+        "from": "proc-exterior-roof-set",
+        "to": "info-exterior-roof-set",
+        "role": "output"
+      },
+      {
+        "id": "e28",
+        "from": "info-bearing-type",
+        "to": "proc-flame-time",
+        "role": "input"
+      },
+      {
+        "id": "e29",
+        "from": "info-ensho-exterior",
+        "to": "proc-flame-time",
+        "role": "input"
+      },
+      {
+        "id": "e30",
+        "from": "info-part-type",
+        "to": "proc-flame-time",
+        "role": "input"
+      },
+      {
+        "id": "e31",
+        "from": "proc-flame-time",
+        "to": "info-flame-time",
+        "role": "output"
+      },
+      {
+        "id": "e32",
+        "from": "info-flame-time",
+        "to": "proc-flame-check",
+        "role": "input"
+      },
+      {
+        "id": "e33",
+        "from": "info-structure-method",
+        "to": "proc-flame-check",
+        "role": "input"
+      },
+      {
+        "id": "e34",
+        "from": "proc-flame-check",
+        "to": "info-flame-prevention",
+        "role": "output"
+      },
+      {
+        "id": "e35",
+        "from": "info-structural-fire-resistance",
+        "to": "proc-all-structural-check",
+        "role": "input"
+      },
+      {
+        "id": "e36",
+        "from": "proc-all-structural-check",
+        "to": "info-all-structural",
+        "role": "output"
+      },
+      {
+        "id": "e37",
+        "from": "info-heat-insulation",
+        "to": "proc-all-heat-check",
+        "role": "input"
+      },
+      {
+        "id": "e38",
+        "from": "proc-all-heat-check",
+        "to": "info-all-heat",
+        "role": "output"
+      },
+      {
+        "id": "e39",
+        "from": "info-flame-prevention",
+        "to": "proc-all-flame-check",
+        "role": "input"
+      },
+      {
+        "id": "e40",
+        "from": "proc-all-flame-check",
+        "to": "info-all-flame",
+        "role": "output"
+      },
+      {
+        "id": "e41",
+        "from": "info-all-structural",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e42",
+        "from": "info-all-heat",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e43",
+        "from": "info-all-flame",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e44",
+        "from": "proc-final-judgment",
+        "to": "info-final",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": [
+        "A2:I7"
+      ],
+      "description": "法第2条第7号の耐火建築物の定義における耐火性能の技術的基準"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-23T17:30:00+09:00",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

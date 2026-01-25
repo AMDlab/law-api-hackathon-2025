@@ -1,0 +1,471 @@
+{
+  "id": "CHK-BSL-ORDER-A82_3-P1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "保有水平耐力の確認",
+    "target_subject": "建築物の地上部分",
+    "description": "建築物の地上部分について保有水平耐力が必要保有水平耐力以上であることを確認する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "82の3",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造規定",
+    "保有水平耐力"
+  ],
+  "text_raw": "建築物の地上部分については、第一号の規定によつて計算した各階の水平力に対する耐力（以下この条及び第八十二条の五において「保有水平耐力」という。）が、第二号の規定によつて計算した必要保有水平耐力以上であることを確かめなければならない。一 第四款に規定する材料強度によつて国土交通大臣が定める方法により保有水平耐力を計算すること。二 地震力に対する各階の必要保有水平耐力を次の式によつて計算すること。Qun＝Ds×Fes×Qud",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "building_part",
+          "value": "地上部分"
+        }
+      ],
+      "note": "建築物の地上部分が対象"
+    },
+    "judgment_rule": {
+      "operator": "GE",
+      "lhs": {
+        "ref": "info-qu",
+        "description": "保有水平耐力"
+      },
+      "rhs": {
+        "ref": "info-qun",
+        "description": "必要保有水平耐力"
+      }
+    },
+    "exceptions": null
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "info-floors-set",
+        "type": "information",
+        "title": "建築物の階の集合",
+        "symbol": "S",
+        "subject": "建築物",
+        "property": "地上階の集合",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "判定対象となる建築物の地上部分に属する各階を特定"
+      },
+      {
+        "id": "proc-identify-floors",
+        "type": "process",
+        "title": "地上階の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の地上部分に属する各階を特定する"
+      },
+      {
+        "id": "proc-identify-structure",
+        "type": "process",
+        "title": "構造方法の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から構造耐力上主要な部分の構造方法を特定する"
+      },
+      {
+        "id": "info-structure-method",
+        "type": "information",
+        "title": "構造方法",
+        "symbol": "SM",
+        "subject": "構造耐力上主要な部分",
+        "property": "構造方法",
+        "property_type": "classification",
+        "plurality": "single",
+        "description": "建築物の構造耐力上主要な部分の構造方法"
+      },
+      {
+        "id": "proc-calc-ds",
+        "type": "process",
+        "title": "Dsの算出",
+        "process_type": "mechanical",
+        "iteration": "iterative",
+        "description": "構造方法に応じた減衰性及び各階の靱性を考慮して国土交通大臣が定める数値を算出",
+        "logic_expression": "Ds = f(構造方法, 減衰性, 靱性)",
+        "related_articles": ["令::A82_3:P1:I2"]
+      },
+      {
+        "id": "info-ds",
+        "type": "information",
+        "title": "各階の構造特性係数Ds",
+        "symbol": "Ds",
+        "subject": "階",
+        "property": "構造特性係数",
+        "property_type": "numeric",
+        "plurality": "multiple",
+        "description": "各階の構造特性を表す係数。構造方法に応じた減衰性及び靱性を考慮して算出"
+      },
+      {
+        "id": "proc-identify-rigidity",
+        "type": "process",
+        "title": "剛性率の特定",
+        "process_type": "undefined_input",
+        "iteration": "iterative",
+        "description": "設計図書等から各階の剛性率を特定する"
+      },
+      {
+        "id": "info-rigidity",
+        "type": "information",
+        "title": "各階の剛性率",
+        "symbol": "Rs",
+        "subject": "階",
+        "property": "剛性率",
+        "property_type": "numeric",
+        "plurality": "multiple",
+        "description": "各階の剛性率"
+      },
+      {
+        "id": "proc-identify-eccentricity",
+        "type": "process",
+        "title": "偏心率の特定",
+        "process_type": "undefined_input",
+        "iteration": "iterative",
+        "description": "設計図書等から各階の偏心率を特定する"
+      },
+      {
+        "id": "info-eccentricity",
+        "type": "information",
+        "title": "各階の偏心率",
+        "symbol": "Re",
+        "subject": "階",
+        "property": "偏心率",
+        "property_type": "numeric",
+        "plurality": "multiple",
+        "description": "各階の偏心率"
+      },
+      {
+        "id": "proc-calc-fes",
+        "type": "process",
+        "title": "Fesの算出",
+        "process_type": "mechanical",
+        "iteration": "iterative",
+        "description": "各階の剛性率及び偏心率に応じて国土交通大臣が定める方法によりFesを算出",
+        "logic_expression": "Fes = f(Rs, Re)",
+        "related_articles": ["令::A82_3:P1:I2"]
+      },
+      {
+        "id": "info-fes",
+        "type": "information",
+        "title": "各階の形状特性係数Fes",
+        "symbol": "Fes",
+        "subject": "階",
+        "property": "形状特性係数",
+        "property_type": "numeric",
+        "plurality": "multiple",
+        "description": "各階の形状特性を表す係数。剛性率及び偏心率に応じて算出"
+      },
+      {
+        "id": "proc-identify-qud",
+        "type": "process",
+        "title": "地震力の特定",
+        "process_type": "undefined_input",
+        "iteration": "iterative",
+        "description": "設計図書等から地震力によって各階に生ずる水平力を特定する"
+      },
+      {
+        "id": "info-qud",
+        "type": "information",
+        "title": "各階の地震力Qud",
+        "symbol": "Qud",
+        "subject": "階",
+        "property": "地震力による水平力",
+        "property_type": "numeric",
+        "unit": "kN",
+        "plurality": "multiple",
+        "description": "地震力によって各階に生ずる水平力"
+      },
+      {
+        "id": "proc-calc-qun",
+        "type": "process",
+        "title": "必要保有水平耐力の計算",
+        "process_type": "mechanical",
+        "iteration": "iterative",
+        "description": "第2号の式により各階の必要保有水平耐力を計算",
+        "logic_expression": "Qun = Ds × Fes × Qud",
+        "related_articles": ["令::A82_3:P1:I2"]
+      },
+      {
+        "id": "info-qun",
+        "type": "information",
+        "title": "各階の必要保有水平耐力Qun",
+        "symbol": "Qun",
+        "subject": "階",
+        "property": "必要保有水平耐力",
+        "property_type": "numeric",
+        "unit": "kN",
+        "plurality": "multiple",
+        "description": "各階の必要保有水平耐力"
+      },
+      {
+        "id": "proc-identify-material",
+        "type": "process",
+        "title": "材料強度の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から第四款に規定する材料強度を特定する",
+        "related_articles": ["令::A4款"]
+      },
+      {
+        "id": "info-material-strength",
+        "type": "information",
+        "title": "材料強度",
+        "symbol": "F",
+        "subject": "構造部材",
+        "property": "材料強度",
+        "property_type": "numeric",
+        "plurality": "single",
+        "description": "第四款に規定する材料強度"
+      },
+      {
+        "id": "proc-calc-qu",
+        "type": "process",
+        "title": "保有水平耐力の計算",
+        "process_type": "mechanical",
+        "iteration": "iterative",
+        "description": "材料強度によって国土交通大臣が定める方法により各階の保有水平耐力を計算",
+        "logic_expression": "Qu = f(F, 構造)",
+        "related_articles": ["令::A82_3:P1:I1"]
+      },
+      {
+        "id": "info-qu",
+        "type": "information",
+        "title": "各階の保有水平耐力Qu",
+        "symbol": "Qu",
+        "subject": "階",
+        "property": "保有水平耐力",
+        "property_type": "numeric",
+        "unit": "kN",
+        "plurality": "multiple",
+        "description": "各階の水平力に対する耐力（保有水平耐力）"
+      },
+      {
+        "id": "proc-compare",
+        "type": "process",
+        "title": "保有水平耐力と必要保有水平耐力の比較",
+        "process_type": "mechanical",
+        "iteration": "iterative",
+        "description": "各階について保有水平耐力が必要保有水平耐力以上であることを確認",
+        "logic_expression": "Qu ≥ Qun"
+      },
+      {
+        "id": "info-floor-compliance",
+        "type": "information",
+        "title": "各階の耐力適合",
+        "symbol": "Cf",
+        "subject": "階",
+        "property": "耐力適合",
+        "property_type": "proposition",
+        "plurality": "multiple",
+        "description": "各階について保有水平耐力が必要保有水平耐力以上か"
+      },
+      {
+        "id": "proc-all-floors-check",
+        "type": "process",
+        "title": "全階適合判定",
+        "process_type": "mechanical",
+        "description": "全ての階について耐力適合を確認",
+        "logic_expression": "∀i ∈ S: Cf[i] = true"
+      },
+      {
+        "id": "info-final",
+        "type": "information",
+        "title": "保有水平耐力適合",
+        "symbol": "R",
+        "subject": "建築物の地上部分",
+        "property": "保有水平耐力適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "建築物の地上部分が令第82条の3の保有水平耐力規定に適合するか"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-identify-floors",
+        "to": "info-floors-set",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "proc-identify-structure",
+        "to": "info-structure-method",
+        "role": "output"
+      },
+      {
+        "id": "e03",
+        "from": "info-structure-method",
+        "to": "proc-calc-ds",
+        "role": "input"
+      },
+      {
+        "id": "e04",
+        "from": "info-floors-set",
+        "to": "proc-calc-ds",
+        "role": "input"
+      },
+      {
+        "id": "e05",
+        "from": "proc-calc-ds",
+        "to": "info-ds",
+        "role": "output"
+      },
+      {
+        "id": "e06",
+        "from": "proc-identify-rigidity",
+        "to": "info-rigidity",
+        "role": "output"
+      },
+      {
+        "id": "e07",
+        "from": "proc-identify-eccentricity",
+        "to": "info-eccentricity",
+        "role": "output"
+      },
+      {
+        "id": "e08",
+        "from": "info-rigidity",
+        "to": "proc-calc-fes",
+        "role": "input"
+      },
+      {
+        "id": "e09",
+        "from": "info-eccentricity",
+        "to": "proc-calc-fes",
+        "role": "input"
+      },
+      {
+        "id": "e10",
+        "from": "info-floors-set",
+        "to": "proc-calc-fes",
+        "role": "input"
+      },
+      {
+        "id": "e11",
+        "from": "proc-calc-fes",
+        "to": "info-fes",
+        "role": "output"
+      },
+      {
+        "id": "e12",
+        "from": "proc-identify-qud",
+        "to": "info-qud",
+        "role": "output"
+      },
+      {
+        "id": "e13",
+        "from": "info-ds",
+        "to": "proc-calc-qun",
+        "role": "input"
+      },
+      {
+        "id": "e14",
+        "from": "info-fes",
+        "to": "proc-calc-qun",
+        "role": "input"
+      },
+      {
+        "id": "e15",
+        "from": "info-qud",
+        "to": "proc-calc-qun",
+        "role": "input"
+      },
+      {
+        "id": "e16",
+        "from": "proc-calc-qun",
+        "to": "info-qun",
+        "role": "output"
+      },
+      {
+        "id": "e17",
+        "from": "proc-identify-material",
+        "to": "info-material-strength",
+        "role": "output"
+      },
+      {
+        "id": "e18",
+        "from": "info-material-strength",
+        "to": "proc-calc-qu",
+        "role": "input"
+      },
+      {
+        "id": "e19",
+        "from": "info-structure-method",
+        "to": "proc-calc-qu",
+        "role": "input"
+      },
+      {
+        "id": "e20",
+        "from": "info-floors-set",
+        "to": "proc-calc-qu",
+        "role": "input"
+      },
+      {
+        "id": "e21",
+        "from": "proc-calc-qu",
+        "to": "info-qu",
+        "role": "output"
+      },
+      {
+        "id": "e22",
+        "from": "info-qu",
+        "to": "proc-compare",
+        "role": "input"
+      },
+      {
+        "id": "e23",
+        "from": "info-qun",
+        "to": "proc-compare",
+        "role": "input"
+      },
+      {
+        "id": "e24",
+        "from": "proc-compare",
+        "to": "info-floor-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e25",
+        "from": "info-floor-compliance",
+        "to": "proc-all-floors-check",
+        "role": "input"
+      },
+      {
+        "id": "e26",
+        "from": "info-floors-set",
+        "to": "proc-all-floors-check",
+        "role": "input"
+      },
+      {
+        "id": "e27",
+        "from": "proc-all-floors-check",
+        "to": "info-final",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": ["A20:P1:I2"],
+      "description": "法第20条第1項第2号の構造計算規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-23T12:00:00Z",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

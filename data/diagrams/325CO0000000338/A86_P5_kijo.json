@@ -1,0 +1,215 @@
+{
+  "id": "CHK-BSL-ORDER-A86-P5",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "積雪量不均等の影響考慮",
+    "target_subject": "建築物",
+    "description": "屋根面における積雪量が不均等となるおそれのある場合に、その影響を考慮して積雪荷重を計算する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "86",
+    "paragraph": "5",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造",
+    "積雪荷重"
+  ],
+  "text_raw": "屋根面における積雪量が不均等となるおそれのある場合においては、その影響を考慮して積雪荷重を計算しなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "building",
+          "value": "構造計算を要する建築物"
+        },
+        {
+          "type": "condition",
+          "value": "屋根面における積雪量が不均等となるおそれのある場合"
+        }
+      ],
+      "note": "積雪量が不均等となるおそれがある場合に適用（複雑な屋根形状、段違い屋根、L字型屋根等）"
+    },
+    "judgment_rule": {
+      "operator": "IF_THEN",
+      "lhs": {
+        "ref": "info-uneven-risk",
+        "condition": "積雪量不均等のおそれあり"
+      },
+      "rhs": {
+        "ref": "info-uneven-considered",
+        "condition": "不均等影響を考慮して計算"
+      }
+    },
+    "exceptions": null
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "info-roof-set",
+        "type": "information",
+        "title": "建築物の屋根",
+        "symbol": "RS",
+        "subject": "建築物",
+        "property": "屋根の集合",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "積雪荷重計算の対象となる建築物に属する屋根を特定"
+      },
+      {
+        "id": "proc-check-roof-shape",
+        "type": "process",
+        "title": "屋根形状の確認",
+        "process_type": "undefined_input",
+        "description": "設計図書から屋根形状を読み取り、積雪量が不均等となるおそれがあるか確認する"
+      },
+      {
+        "id": "info-roof-shape",
+        "type": "information",
+        "title": "屋根形状",
+        "symbol": "SH",
+        "subject": "屋根",
+        "property": "形状",
+        "property_type": "visual",
+        "plurality": "single",
+        "description": "屋根の形状（段違い、L字、複雑な形状等）"
+      },
+      {
+        "id": "proc-judge-uneven-risk",
+        "type": "process",
+        "title": "積雪量不均等のおそれ判定",
+        "process_type": "human_judgment",
+        "description": "屋根形状から積雪量が不均等となるおそれがあるか判断する（段違い屋根、L字型屋根、複雑な屋根形状等）"
+      },
+      {
+        "id": "info-uneven-risk",
+        "type": "information",
+        "title": "積雪量不均等のおそれ",
+        "symbol": "UR",
+        "subject": "屋根",
+        "property": "積雪量不均等のおそれ",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "屋根面における積雪量が不均等となるおそれがあるか否か"
+      },
+      {
+        "id": "proc-check-consideration",
+        "type": "process",
+        "title": "不均等影響考慮の確認",
+        "process_type": "undefined_input",
+        "description": "構造計算書から不均等影響を考慮した積雪荷重計算がなされているか確認する"
+      },
+      {
+        "id": "info-uneven-considered",
+        "type": "information",
+        "title": "不均等影響考慮",
+        "symbol": "UC",
+        "subject": "建築物",
+        "property": "不均等影響を考慮した積雪荷重計算",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "積雪量不均等の影響を考慮して積雪荷重が計算されているか否か"
+      },
+      {
+        "id": "proc-compliance-check",
+        "type": "process",
+        "title": "適合判定",
+        "process_type": "mechanical",
+        "description": "積雪量不均等のおそれがある場合に、不均等影響を考慮しているか判定",
+        "logic_expression": "NOT(UR) OR UC"
+      },
+      {
+        "id": "info-compliance",
+        "type": "information",
+        "title": "不均等影響考慮適合",
+        "symbol": "R",
+        "subject": "建築物",
+        "property": "不均等影響考慮適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "令第86条第5項の規定に適合するか"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "info-roof-set",
+        "to": "proc-check-roof-shape",
+        "role": "input"
+      },
+      {
+        "id": "e02",
+        "from": "proc-check-roof-shape",
+        "to": "info-roof-shape",
+        "role": "output"
+      },
+      {
+        "id": "e03",
+        "from": "info-roof-shape",
+        "to": "proc-judge-uneven-risk",
+        "role": "input"
+      },
+      {
+        "id": "e04",
+        "from": "proc-judge-uneven-risk",
+        "to": "info-uneven-risk",
+        "role": "output"
+      },
+      {
+        "id": "e05",
+        "from": "info-uneven-risk",
+        "to": "proc-check-consideration",
+        "role": "input"
+      },
+      {
+        "id": "e06",
+        "from": "proc-check-consideration",
+        "to": "info-uneven-considered",
+        "role": "output"
+      },
+      {
+        "id": "e07",
+        "from": "info-uneven-risk",
+        "to": "proc-compliance-check",
+        "role": "input"
+      },
+      {
+        "id": "e08",
+        "from": "info-uneven-considered",
+        "to": "proc-compliance-check",
+        "role": "input"
+      },
+      {
+        "id": "e09",
+        "from": "proc-compliance-check",
+        "to": "info-compliance",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": [
+        "A86:P1"
+      ],
+      "description": "積雪荷重の基本計算方法（第1項）"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-23T12:00:00Z",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

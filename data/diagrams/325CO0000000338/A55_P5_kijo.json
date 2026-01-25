@@ -1,0 +1,270 @@
+{
+  "id": "CHK-BSL-ORD-A55-P5",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "組積造の壁の厚さ（上下階関係）",
+    "target_subject": "組積造の壁",
+    "description": "組積造の各階の壁の厚さは、その上にある壁の厚さより薄くしてはならない"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "55",
+    "paragraph": "5",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造規定",
+    "組積造"
+  ],
+  "text_raw": "組積造の各階の壁の厚さは、その上にある壁の厚さより薄くしてはならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "structure",
+          "value": "組積造"
+        }
+      ],
+      "note": "組積造の建築物に適用"
+    },
+    "judgment_rule": {
+      "operator": "FORALL",
+      "conditions": [
+        {
+          "description": "各階の壁について、その厚さがその上にある壁の厚さ以上であること"
+        }
+      ]
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-structure-check",
+        "type": "process",
+        "title": "構造種別の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書から建築物の構造種別を読み取る"
+      },
+      {
+        "id": "info-structure-type",
+        "type": "information",
+        "title": "建築物の構造種別",
+        "subject": "建築物",
+        "property": "構造種別",
+        "property_type": "classification",
+        "plurality": "single",
+        "description": "組積造であるか否か"
+      },
+      {
+        "id": "proc-scope-judge",
+        "type": "process",
+        "title": "適用対象判定",
+        "process_type": "mechanical",
+        "description": "組積造の建築物であるか判定"
+      },
+      {
+        "id": "info-scope-applicable",
+        "type": "information",
+        "title": "本項適用対象",
+        "symbol": "SCOPE",
+        "subject": "建築物",
+        "property": "本項適用対象該当性",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "組積造の建築物として本項が適用されるか"
+      },
+      {
+        "id": "proc-floors-identify",
+        "type": "process",
+        "title": "階の特定",
+        "process_type": "undefined_input",
+        "description": "建築物の各階を特定する"
+      },
+      {
+        "id": "info-floors-set",
+        "type": "information",
+        "title": "建築物の階",
+        "subject": "建築物",
+        "property": "階の集合",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "判定対象となる建築物に属する階を特定"
+      },
+      {
+        "id": "proc-walls-identify",
+        "type": "process",
+        "title": "各階の壁の特定",
+        "process_type": "undefined_input",
+        "iteration": "iterative",
+        "description": "各階に属する組積造の壁を特定する"
+      },
+      {
+        "id": "info-walls-set",
+        "type": "information",
+        "title": "各階の壁",
+        "subject": "階",
+        "property": "壁の集合",
+        "property_type": "set_definition",
+        "plurality": "multiple",
+        "description": "各階に属する組積造の壁を特定"
+      },
+      {
+        "id": "proc-thickness-check",
+        "type": "process",
+        "title": "壁の厚さの特定",
+        "process_type": "undefined_input",
+        "iteration": "iterative",
+        "description": "各階の壁の厚さを設計図書から読み取る"
+      },
+      {
+        "id": "info-wall-thickness",
+        "type": "information",
+        "title": "各階の壁の厚さ",
+        "symbol": "T",
+        "subject": "壁",
+        "property": "厚さ",
+        "property_type": "numeric",
+        "unit": "cm",
+        "plurality": "multiple",
+        "description": "各階の壁の厚さ（仕上材料の厚さを含まない）"
+      },
+      {
+        "id": "proc-compare-thickness",
+        "type": "process",
+        "title": "上下階の壁厚さ比較",
+        "process_type": "mechanical",
+        "iteration": "iterative",
+        "logic_expression": "T(n) >= T(n+1)",
+        "description": "各階の壁の厚さが、その上にある壁の厚さ以上であるか比較"
+      },
+      {
+        "id": "info-thickness-compliance",
+        "type": "information",
+        "title": "壁厚さの適合性",
+        "symbol": "P",
+        "subject": "壁",
+        "property": "上階壁との厚さ関係適合性",
+        "property_type": "proposition",
+        "plurality": "multiple",
+        "description": "各階の壁の厚さが上階の壁の厚さより薄くないか"
+      },
+      {
+        "id": "proc-final-judge",
+        "type": "process",
+        "title": "最終適合判定",
+        "process_type": "mechanical",
+        "logic_expression": "SCOPE AND FORALL(P)",
+        "description": "全ての壁について厚さの条件を満たすか判定"
+      },
+      {
+        "id": "info-final-compliance",
+        "type": "information",
+        "title": "令第55条第5項適合",
+        "symbol": "COMPLIANT",
+        "subject": "建築物",
+        "property": "令第55条第5項適合性",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "組積造の各階の壁の厚さが上にある壁より薄くないこと"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-structure-check",
+        "to": "info-structure-type",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "info-structure-type",
+        "to": "proc-scope-judge",
+        "role": "input"
+      },
+      {
+        "id": "e03",
+        "from": "proc-scope-judge",
+        "to": "info-scope-applicable",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "proc-floors-identify",
+        "to": "info-floors-set",
+        "role": "output"
+      },
+      {
+        "id": "e05",
+        "from": "info-floors-set",
+        "to": "proc-walls-identify",
+        "role": "input"
+      },
+      {
+        "id": "e06",
+        "from": "proc-walls-identify",
+        "to": "info-walls-set",
+        "role": "output"
+      },
+      {
+        "id": "e07",
+        "from": "info-walls-set",
+        "to": "proc-thickness-check",
+        "role": "input"
+      },
+      {
+        "id": "e08",
+        "from": "proc-thickness-check",
+        "to": "info-wall-thickness",
+        "role": "output"
+      },
+      {
+        "id": "e09",
+        "from": "info-walls-set",
+        "to": "proc-compare-thickness",
+        "role": "input"
+      },
+      {
+        "id": "e10",
+        "from": "info-wall-thickness",
+        "to": "proc-compare-thickness",
+        "role": "input"
+      },
+      {
+        "id": "e11",
+        "from": "proc-compare-thickness",
+        "to": "info-thickness-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e12",
+        "from": "info-scope-applicable",
+        "to": "proc-final-judge",
+        "role": "input"
+      },
+      {
+        "id": "e13",
+        "from": "info-thickness-compliance",
+        "to": "proc-final-judge",
+        "role": "input"
+      },
+      {
+        "id": "e14",
+        "from": "proc-final-judge",
+        "to": "info-final-compliance",
+        "role": "output"
+      }
+    ]
+  },
+  "metadata": {
+    "created_at": "2026-01-23T00:00:00+09:00",
+    "author": "Claude",
+    "generator": "kijo-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

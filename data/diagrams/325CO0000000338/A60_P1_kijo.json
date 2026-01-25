@@ -1,0 +1,313 @@
+{
+  "id": "CHK-BSO-A60-P1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "手すり又は手すり壁の構造",
+    "target_subject": "手すり又は手すり壁",
+    "description": "手すり又は手すり壁が組積造でないこと、又は頂部に鉄筋コンクリート造の臥梁を設けていることを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "60",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造"
+  ],
+  "text_raw": "手すり又は手すり壁は、組積造としてはならない。ただし、これらの頂部に鉄筋コンクリート造の臥梁を設けた場合においては、この限りでない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "type": "building_element",
+          "value": "手すり"
+        },
+        {
+          "type": "building_element",
+          "value": "手すり壁"
+        }
+      ],
+      "note": "手すり又は手すり壁を有する建築物"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "ref": "info-not-masonry",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "ref": "info-exempt",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    },
+    "exceptions": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "note": "組積造であっても頂部に鉄筋コンクリート造の臥梁を設けた場合",
+          "ref": "info-has-rc-girder",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "effect": "EXEMPT"
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-handrail-set",
+        "type": "process",
+        "title": "手すり等の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から判定対象となる手すり又は手すり壁を特定する"
+      },
+      {
+        "id": "info-handrail-set",
+        "type": "information",
+        "title": "建築物の手すり等",
+        "subject": "建築物",
+        "property": "手すり又は手すり壁の集合",
+        "property_type": "set_definition",
+        "description": "判定対象となる建築物に属する手すり又は手すり壁を特定",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-structure-type",
+        "type": "process",
+        "title": "構造種別の特定",
+        "process_type": "undefined_input",
+        "target_subject": "手すり又は手すり壁",
+        "iteration": "iterative",
+        "description": "設計図書等から各手すり又は手すり壁の構造種別（組積造、その他）を読み取る"
+      },
+      {
+        "id": "info-structure-type",
+        "type": "information",
+        "title": "構造種別",
+        "symbol": "S",
+        "subject": "手すり又は手すり壁",
+        "property": "構造種別",
+        "property_type": "classification",
+        "description": "組積造、鉄筋コンクリート造、鉄骨造、木造等のいずれか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-masonry-check",
+        "type": "process",
+        "title": "組積造該当判定",
+        "process_type": "mechanical",
+        "target_subject": "手すり又は手すり壁",
+        "iteration": "iterative",
+        "description": "構造種別が組積造であるかを判定",
+        "logic_expression": "S ≠ '組積造'"
+      },
+      {
+        "id": "info-not-masonry",
+        "type": "information",
+        "title": "組積造でないこと",
+        "symbol": "NM",
+        "subject": "手すり又は手すり壁",
+        "property": "組積造でないこと",
+        "property_type": "proposition",
+        "description": "当該手すり又は手すり壁が組積造でないか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-rc-girder-check",
+        "type": "process",
+        "title": "臥梁の確認",
+        "process_type": "human_judgment",
+        "target_subject": "手すり又は手すり壁",
+        "iteration": "iterative",
+        "description": "頂部に鉄筋コンクリート造の臥梁を設けているかを設計図書等から確認する"
+      },
+      {
+        "id": "info-has-rc-girder",
+        "type": "information",
+        "title": "RC臥梁の有無",
+        "symbol": "G",
+        "subject": "手すり又は手すり壁",
+        "property": "頂部にRC臥梁を設けていること",
+        "property_type": "proposition",
+        "description": "頂部に鉄筋コンクリート造の臥梁を設けているか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-exempt-check",
+        "type": "process",
+        "title": "適用除外判定",
+        "process_type": "mechanical",
+        "target_subject": "手すり又は手すり壁",
+        "iteration": "iterative",
+        "description": "組積造であっても頂部にRC臥梁を設けている場合は適用除外となるか判定",
+        "logic_expression": "G = true"
+      },
+      {
+        "id": "info-exempt",
+        "type": "information",
+        "title": "適用除外該当",
+        "symbol": "X",
+        "subject": "手すり又は手すり壁",
+        "property": "適用除外への該当",
+        "property_type": "proposition",
+        "description": "ただし書きによる適用除外に該当するか（頂部にRC臥梁を設けている場合）",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-final-judgment",
+        "type": "process",
+        "title": "適合判定",
+        "process_type": "mechanical",
+        "target_subject": "手すり又は手すり壁",
+        "iteration": "iterative",
+        "description": "各手すり又は手すり壁について、組積造でないか、又は適用除外に該当することを確認",
+        "logic_expression": "NM OR X"
+      },
+      {
+        "id": "info-compliance",
+        "type": "information",
+        "title": "令60条1項適合",
+        "symbol": "C",
+        "subject": "手すり又は手すり壁",
+        "property": "令60条1項適合",
+        "property_type": "proposition",
+        "description": "令60条1項の規定に適合するか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-all-check",
+        "type": "process",
+        "title": "全手すり等適合確認",
+        "process_type": "mechanical",
+        "description": "全ての手すり又は手すり壁が令60条1項に適合することを確認",
+        "logic_expression": "∀h ∈ Handrails: C(h) = true"
+      },
+      {
+        "id": "info-final",
+        "type": "information",
+        "title": "建築物の令60条1項適合",
+        "subject": "建築物",
+        "property": "令60条1項適合",
+        "property_type": "proposition",
+        "description": "建築物全体として令60条1項の規定に適合するか",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-handrail-set",
+        "to": "info-handrail-set",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "info-handrail-set",
+        "to": "proc-structure-type",
+        "role": "input"
+      },
+      {
+        "id": "e03",
+        "from": "proc-structure-type",
+        "to": "info-structure-type",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "info-structure-type",
+        "to": "proc-masonry-check",
+        "role": "input"
+      },
+      {
+        "id": "e05",
+        "from": "proc-masonry-check",
+        "to": "info-not-masonry",
+        "role": "output"
+      },
+      {
+        "id": "e06",
+        "from": "info-handrail-set",
+        "to": "proc-rc-girder-check",
+        "role": "input"
+      },
+      {
+        "id": "e07",
+        "from": "proc-rc-girder-check",
+        "to": "info-has-rc-girder",
+        "role": "output"
+      },
+      {
+        "id": "e08",
+        "from": "info-has-rc-girder",
+        "to": "proc-exempt-check",
+        "role": "input"
+      },
+      {
+        "id": "e09",
+        "from": "proc-exempt-check",
+        "to": "info-exempt",
+        "role": "output"
+      },
+      {
+        "id": "e10",
+        "from": "info-not-masonry",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e11",
+        "from": "info-exempt",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e12",
+        "from": "proc-final-judgment",
+        "to": "info-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e13",
+        "from": "info-compliance",
+        "to": "proc-all-check",
+        "role": "input"
+      },
+      {
+        "id": "e14",
+        "from": "proc-all-check",
+        "to": "info-final",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": [
+        "A36"
+      ],
+      "description": "法36条により構造方法に関する技術的基準として委任"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-23T17:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

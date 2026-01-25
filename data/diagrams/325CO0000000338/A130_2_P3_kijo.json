@@ -1,0 +1,259 @@
+{
+  "id": "CHK-ORD-A130_2-P3",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "特定用途制限地域における許可による条例制限適用除外判定",
+    "target_subject": "建築物",
+    "description": "特定用途制限地域において、地方公共団体の長の許可を受けた建築物について、条例で定める用途制限の適用除外となるかを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "130の2",
+    "paragraph": "3",
+    "item": null
+  },
+  "labels": [
+    "集団規定",
+    "用途規制",
+    "特定用途制限地域",
+    "許可",
+    "適用除外"
+  ],
+  "text_raw": "法第四十九条の二の規定に基づく条例には、当該地方公共団体の長が、当該地域の良好な環境を害するおそれがないと認め、又は公益上やむを得ないと認めて許可したものについて、当該条例に定める制限の適用の除外に関する規定を定めるものとする。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "特定用途制限地域内"
+        },
+        {
+          "type": "applicability_condition",
+          "value": "条例による用途制限が適用される建築物"
+        }
+      ],
+      "note": "特定用途制限地域内で条例による用途制限の対象となる建築物について、許可による適用除外の有無を確認"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "ref": "info-permit-env",
+          "operator": "==",
+          "value": true,
+          "note": "良好な環境を害するおそれがないと認められて許可"
+        },
+        {
+          "ref": "info-permit-public",
+          "operator": "==",
+          "value": true,
+          "note": "公益上やむを得ないと認められて許可"
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-permit-check",
+        "type": "process",
+        "title": "許可の有無の確認",
+        "process_type": "undefined_input",
+        "description": "設計図書・許可書等から地方公共団体の長による許可の有無を確認する",
+        "remarks": "法第49条の2に基づく条例の適用除外のための許可"
+      },
+      {
+        "id": "info-permit-status",
+        "type": "information",
+        "title": "許可の有無",
+        "symbol": "P",
+        "subject": "建築物",
+        "property": "地方公共団体の長による許可の有無",
+        "property_type": "proposition",
+        "property_type_description": "命題真偽 - 真か偽かが判定可能な事実（例: 技術基準を満たすか否か）",
+        "plurality": "single",
+        "description": "当該建築計画について地方公共団体の長の許可を受けているか否か"
+      },
+      {
+        "id": "proc-permit-reason-check",
+        "type": "process",
+        "title": "許可理由の確認",
+        "process_type": "undefined_input",
+        "description": "許可書等から許可の理由を確認する",
+        "remarks": "許可がある場合のみ実施"
+      },
+      {
+        "id": "info-permit-reason",
+        "type": "information",
+        "title": "許可理由",
+        "symbol": "R",
+        "subject": "許可",
+        "property": "許可理由の区分",
+        "property_type": "classification",
+        "property_type_description": "区分情報 - 既定のいくつかの区分の中のいずれかを示すもの（例: 用途地域、建物用途コード）",
+        "plurality": "single",
+        "description": "許可の理由が「良好な環境を害するおそれがない」又は「公益上やむを得ない」のいずれか"
+      },
+      {
+        "id": "proc-env-check",
+        "type": "process",
+        "title": "環境配慮許可判定",
+        "process_type": "mechanical",
+        "description": "許可理由が「良好な環境を害するおそれがない」であるか判定",
+        "logic_expression": "P AND (R = 良好な環境を害するおそれがない)"
+      },
+      {
+        "id": "info-permit-env",
+        "type": "information",
+        "title": "環境配慮による許可",
+        "symbol": "E",
+        "subject": "建築物",
+        "property": "環境配慮による許可の有無",
+        "property_type": "proposition",
+        "property_type_description": "命題真偽 - 真か偽かが判定可能な事実（例: 技術基準を満たすか否か）",
+        "plurality": "single",
+        "description": "当該地域の良好な環境を害するおそれがないと認められて許可されたか"
+      },
+      {
+        "id": "proc-public-check",
+        "type": "process",
+        "title": "公益許可判定",
+        "process_type": "mechanical",
+        "description": "許可理由が「公益上やむを得ない」であるか判定",
+        "logic_expression": "P AND (R = 公益上やむを得ない)"
+      },
+      {
+        "id": "info-permit-public",
+        "type": "information",
+        "title": "公益上の許可",
+        "symbol": "B",
+        "subject": "建築物",
+        "property": "公益上やむを得ない許可の有無",
+        "property_type": "proposition",
+        "property_type_description": "命題真偽 - 真か偽かが判定可能な事実（例: 技術基準を満たすか否か）",
+        "plurality": "single",
+        "description": "公益上やむを得ないと認められて許可されたか"
+      },
+      {
+        "id": "proc-exemption-judgment",
+        "type": "process",
+        "title": "条例制限適用除外判定",
+        "process_type": "mechanical",
+        "description": "環境配慮許可又は公益許可のいずれかがある場合、条例で定める制限の適用除外となる",
+        "logic_expression": "E OR B"
+      },
+      {
+        "id": "info-exemption-result",
+        "type": "information",
+        "title": "条例制限適用除外",
+        "symbol": "X",
+        "subject": "建築物",
+        "property": "条例で定める制限の適用除外",
+        "property_type": "proposition",
+        "property_type_description": "命題真偽 - 真か偽かが判定可能な事実（例: 技術基準を満たすか否か）",
+        "plurality": "single",
+        "description": "地方公共団体の長の許可により、法第49条の2に基づく条例で定める用途制限の適用が除外されるか",
+        "remarks": "許可を受けた建築物は条例の用途制限に適合しなくても建築可能となる"
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge-001",
+        "from": "proc-permit-check",
+        "to": "info-permit-status",
+        "role": "output"
+      },
+      {
+        "id": "edge-002",
+        "from": "info-permit-status",
+        "to": "proc-permit-reason-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-003",
+        "from": "proc-permit-reason-check",
+        "to": "info-permit-reason",
+        "role": "output"
+      },
+      {
+        "id": "edge-004",
+        "from": "info-permit-status",
+        "to": "proc-env-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-005",
+        "from": "info-permit-reason",
+        "to": "proc-env-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-006",
+        "from": "proc-env-check",
+        "to": "info-permit-env",
+        "role": "output"
+      },
+      {
+        "id": "edge-007",
+        "from": "info-permit-status",
+        "to": "proc-public-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-008",
+        "from": "info-permit-reason",
+        "to": "proc-public-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-009",
+        "from": "proc-public-check",
+        "to": "info-permit-public",
+        "role": "output"
+      },
+      {
+        "id": "edge-010",
+        "from": "info-permit-env",
+        "to": "proc-exemption-judgment",
+        "role": "input"
+      },
+      {
+        "id": "edge-011",
+        "from": "info-permit-public",
+        "to": "proc-exemption-judgment",
+        "role": "input"
+      },
+      {
+        "id": "edge-012",
+        "from": "proc-exemption-judgment",
+        "to": "info-exemption-result",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": [
+        "A49_2"
+      ],
+      "description": "法第49条の2は特定用途制限地域における建築物の用途制限を条例で定めることを規定。本項は許可による条例制限の適用除外規定を条例で定めることを求める"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-25T15:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令",
+    "source": "e-Gov法令API"
+  }
+}

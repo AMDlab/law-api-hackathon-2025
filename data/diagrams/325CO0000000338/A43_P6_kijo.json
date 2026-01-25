@@ -1,0 +1,268 @@
+{
+  "id": "CHK-BSL-ORDER-A43-P6",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "柱の有効細長比",
+    "target_subject": "構造耐力上主要な部分である柱",
+    "description": "構造耐力上主要な部分である柱の有効細長比が150以下であることを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "43",
+    "paragraph": "6",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造関係規定",
+    "柱",
+    "有効細長比"
+  ],
+  "text_raw": "構造耐力上主要な部分である柱の有効細長比（断面の最小二次率半径に対する座屈長さの比をいう。以下同じ。）は、百五十以下としなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "structural_element",
+          "value": "構造耐力上主要な部分である柱"
+        }
+      ],
+      "note": "構造耐力上主要な部分である柱が対象"
+    },
+    "judgment_rule": {
+      "operator": "FOR_ALL",
+      "conditions": [
+        {
+          "ref": "info-slenderness-compliance",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "info-columns-set",
+        "type": "information",
+        "title": "建築物の柱",
+        "symbol": "CS",
+        "subject": "建築物",
+        "property": "構造耐力上主要な部分である柱の集合",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "判定対象となる建築物に属する構造耐力上主要な部分である柱を特定"
+      },
+      {
+        "id": "proc-column-identify",
+        "type": "process",
+        "title": "柱の特定",
+        "process_type": "undefined_input",
+        "target_subject": "柱",
+        "description": "設計図書から構造耐力上主要な部分である柱を特定する"
+      },
+      {
+        "id": "info-buckling-length",
+        "type": "information",
+        "title": "柱の座屈長さ",
+        "symbol": "Lk",
+        "subject": "柱",
+        "property": "座屈長さ",
+        "property_type": "numeric",
+        "unit": "mm",
+        "plurality": "multiple",
+        "description": "各柱の座屈長さ"
+      },
+      {
+        "id": "proc-buckling-length-read",
+        "type": "process",
+        "title": "座屈長さの読み取り",
+        "process_type": "undefined_input",
+        "target_subject": "柱",
+        "iteration": "iterative",
+        "description": "設計図書から各柱の座屈長さを読み取る"
+      },
+      {
+        "id": "info-min-radius",
+        "type": "information",
+        "title": "断面の最小二次率半径",
+        "symbol": "r",
+        "subject": "柱",
+        "property": "断面の最小二次率半径",
+        "property_type": "numeric",
+        "unit": "mm",
+        "plurality": "multiple",
+        "description": "各柱の断面における最小二次率半径"
+      },
+      {
+        "id": "proc-min-radius-read",
+        "type": "process",
+        "title": "最小二次率半径の読み取り",
+        "process_type": "undefined_input",
+        "target_subject": "柱",
+        "iteration": "iterative",
+        "description": "設計図書から各柱の断面の最小二次率半径を読み取る"
+      },
+      {
+        "id": "info-slenderness-ratio",
+        "type": "information",
+        "title": "有効細長比",
+        "symbol": "SR",
+        "subject": "柱",
+        "property": "有効細長比",
+        "property_type": "numeric",
+        "plurality": "multiple",
+        "description": "各柱の有効細長比（座屈長さ÷最小二次率半径）"
+      },
+      {
+        "id": "proc-slenderness-calc",
+        "type": "process",
+        "title": "有効細長比の計算",
+        "process_type": "mechanical",
+        "target_subject": "柱",
+        "iteration": "iterative",
+        "description": "座屈長さを最小二次率半径で除して有効細長比を計算する",
+        "logic_expression": "SR = Lk / r"
+      },
+      {
+        "id": "info-slenderness-compliance",
+        "type": "information",
+        "title": "有効細長比基準適合",
+        "symbol": "C",
+        "subject": "柱",
+        "property": "有効細長比基準適合",
+        "property_type": "proposition",
+        "plurality": "multiple",
+        "description": "各柱の有効細長比が150以下であるか"
+      },
+      {
+        "id": "proc-slenderness-check",
+        "type": "process",
+        "title": "有効細長比の判定",
+        "process_type": "mechanical",
+        "target_subject": "柱",
+        "iteration": "iterative",
+        "description": "各柱の有効細長比が150以下かを判定する",
+        "logic_expression": "SR <= 150"
+      },
+      {
+        "id": "info-final",
+        "type": "information",
+        "title": "令43条6項適合",
+        "symbol": "R",
+        "subject": "建築物",
+        "property": "令43条6項適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "すべての構造耐力上主要な部分である柱の有効細長比が150以下であるか"
+      },
+      {
+        "id": "proc-final-judgment",
+        "type": "process",
+        "title": "全柱適合判定",
+        "process_type": "mechanical",
+        "target_subject": "建築物",
+        "description": "すべての柱が有効細長比基準を満たすかを判定する",
+        "logic_expression": "∀c ∈ CS: C(c) = true"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-column-identify",
+        "to": "info-columns-set",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "info-columns-set",
+        "to": "proc-buckling-length-read",
+        "role": "input"
+      },
+      {
+        "id": "e03",
+        "from": "proc-buckling-length-read",
+        "to": "info-buckling-length",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "info-columns-set",
+        "to": "proc-min-radius-read",
+        "role": "input"
+      },
+      {
+        "id": "e05",
+        "from": "proc-min-radius-read",
+        "to": "info-min-radius",
+        "role": "output"
+      },
+      {
+        "id": "e06",
+        "from": "info-buckling-length",
+        "to": "proc-slenderness-calc",
+        "role": "input"
+      },
+      {
+        "id": "e07",
+        "from": "info-min-radius",
+        "to": "proc-slenderness-calc",
+        "role": "input"
+      },
+      {
+        "id": "e08",
+        "from": "proc-slenderness-calc",
+        "to": "info-slenderness-ratio",
+        "role": "output"
+      },
+      {
+        "id": "e09",
+        "from": "info-slenderness-ratio",
+        "to": "proc-slenderness-check",
+        "role": "input"
+      },
+      {
+        "id": "e10",
+        "from": "proc-slenderness-check",
+        "to": "info-slenderness-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e11",
+        "from": "info-slenderness-compliance",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e12",
+        "from": "proc-final-judgment",
+        "to": "info-final",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": [
+        "A20"
+      ],
+      "description": "法第20条の構造耐力に関する委任規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-23T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

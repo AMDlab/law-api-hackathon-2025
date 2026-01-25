@@ -1,0 +1,224 @@
+{
+  "id": "CHK-BSL-ORD-A130_7-P1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "第二種中高層住居専用地域内に建築してはならない畜舎の規模",
+    "target_subject": "畜舎",
+    "description": "床面積の合計が15㎡を超える畜舎の判定"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "130の7",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "集団規定",
+    "用途制限",
+    "第二種中高層住居専用地域"
+  ],
+  "text_raw": "法別表第二（に）項第六号（法第八十七条第二項又は第三項において法第四十八条第四項の規定を準用する場合を含む。）に規定する政令で定める規模の畜舎は、床面積の合計が十五平方メートルを超えるものとする。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        { "type": "location", "value": "第二種中高層住居専用地域内" },
+        { "type": "use", "value": "畜舎" }
+      ],
+      "note": "敷地が第二種中高層住居専用地域内にあり、畜舎を建築する場合に適用"
+    },
+    "judgment_rule": {
+      "operator": "<=",
+      "lhs": { "ref": "info-floor-area", "description": "畜舎の床面積の合計" },
+      "rhs": { "value": 15, "unit": "㎡" }
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-use-identify",
+        "type": "process",
+        "title": "用途の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の用途が畜舎であるか特定"
+      },
+      {
+        "id": "info-use",
+        "type": "information",
+        "title": "建築物の用途",
+        "symbol": "U",
+        "subject": "建築物",
+        "property": "用途",
+        "property_type": "classification",
+        "plurality": "single",
+        "description": "畜舎か否か"
+      },
+      {
+        "id": "proc-use-judge",
+        "type": "process",
+        "title": "畜舎該当判定",
+        "process_type": "mechanical",
+        "description": "建築物が畜舎に該当するか判定",
+        "logic_expression": "U = 畜舎"
+      },
+      {
+        "id": "info-is-livestock",
+        "type": "information",
+        "title": "畜舎該当",
+        "symbol": "L",
+        "subject": "建築物",
+        "property": "畜舎該当",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "建築物が畜舎に該当する"
+      },
+      {
+        "id": "proc-floor-area-read",
+        "type": "process",
+        "title": "床面積の読取り",
+        "process_type": "undefined_input",
+        "description": "設計図書等から畜舎の床面積の合計を読み取る"
+      },
+      {
+        "id": "info-floor-area",
+        "type": "information",
+        "title": "床面積の合計",
+        "symbol": "A",
+        "subject": "畜舎",
+        "property": "床面積の合計",
+        "property_type": "numeric",
+        "unit": "㎡",
+        "plurality": "single",
+        "description": "畜舎の床面積の合計"
+      },
+      {
+        "id": "proc-area-compare",
+        "type": "process",
+        "title": "規模判定",
+        "process_type": "mechanical",
+        "description": "床面積の合計が15㎡を超えるか判定",
+        "logic_expression": "A > 15"
+      },
+      {
+        "id": "info-exceeds-limit",
+        "type": "information",
+        "title": "規模超過",
+        "symbol": "E",
+        "subject": "畜舎",
+        "property": "床面積15㎡超過",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "床面積の合計が15㎡を超える"
+      },
+      {
+        "id": "proc-final-judge",
+        "type": "process",
+        "title": "建築可否判定",
+        "process_type": "mechanical",
+        "description": "畜舎該当かつ床面積超過の場合、第二種中高層住居専用地域では建築不可",
+        "logic_expression": "NOT(L AND E)"
+      },
+      {
+        "id": "info-final-compliance",
+        "type": "information",
+        "title": "令第130条の7第1項適合",
+        "symbol": "COMPLIANT",
+        "subject": "建築物",
+        "property": "令第130条の7第1項適合性",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "畜舎でない、又は畜舎であっても床面積の合計が15㎡以下であれば適合"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-use-identify",
+        "to": "info-use",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "info-use",
+        "to": "proc-use-judge",
+        "role": "input"
+      },
+      {
+        "id": "e03",
+        "from": "proc-use-judge",
+        "to": "info-is-livestock",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "info-is-livestock",
+        "to": "proc-floor-area-read",
+        "role": "input"
+      },
+      {
+        "id": "e05",
+        "from": "proc-floor-area-read",
+        "to": "info-floor-area",
+        "role": "output"
+      },
+      {
+        "id": "e06",
+        "from": "info-floor-area",
+        "to": "proc-area-compare",
+        "role": "input"
+      },
+      {
+        "id": "e07",
+        "from": "proc-area-compare",
+        "to": "info-exceeds-limit",
+        "role": "output"
+      },
+      {
+        "id": "e08",
+        "from": "info-is-livestock",
+        "to": "proc-final-judge",
+        "role": "input"
+      },
+      {
+        "id": "e09",
+        "from": "info-exceeds-limit",
+        "to": "proc-final-judge",
+        "role": "input"
+      },
+      {
+        "id": "e10",
+        "from": "proc-final-judge",
+        "to": "info-final-compliance",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": ["別表第二(に)項第六号"],
+      "description": "法別表第二（に）項第六号で委任された政令で定める規模を規定"
+    },
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A48:P4", "A87:P2", "A87:P3"],
+      "description": "第二種中高層住居専用地域の用途制限及び準用規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00+09:00",
+    "author": "Claude",
+    "generator": "kijo-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

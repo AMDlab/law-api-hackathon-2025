@@ -1,0 +1,340 @@
+{
+  "id": "CHK-BSO-A57-P3",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "幅1m超の開口部のまぐさ",
+    "target_subject": "開口部",
+    "description": "組積造の壁における幅1mを超える開口部の上部に鉄筋コンクリート造のまぐさが設けられていることを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "57",
+    "paragraph": "3",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造"
+  ],
+  "text_raw": "幅が一メートルをこえる開口部の上部には、鉄筋コンクリート造のまぐさを設けなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "structure",
+          "value": "組積造の壁"
+        },
+        {
+          "type": "element",
+          "value": "開口部"
+        },
+        {
+          "type": "dimension",
+          "ref": "info-opening-width",
+          "operator": ">",
+          "value": 1,
+          "unit": "m"
+        }
+      ],
+      "note": "組積造の壁における幅1mを超える開口部が対象"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-compliance",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-wall-structure",
+        "type": "process",
+        "title": "壁の構造種別の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から壁の構造種別（組積造か否か）を特定する"
+      },
+      {
+        "id": "info-wall-structure",
+        "type": "information",
+        "title": "壁の構造種別",
+        "symbol": "W",
+        "subject": "壁",
+        "property": "構造種別",
+        "property_type": "classification",
+        "description": "壁の構造種別（組積造、その他）",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-openings-set",
+        "type": "process",
+        "title": "開口部の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から組積造の壁における開口部を特定する"
+      },
+      {
+        "id": "info-openings-set",
+        "type": "information",
+        "title": "組積造の壁における開口部",
+        "subject": "壁",
+        "property": "開口部の集合",
+        "property_type": "set_definition",
+        "description": "判定対象となる組積造の壁に属する開口部を特定",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-opening-width",
+        "type": "process",
+        "title": "開口部の幅の特定",
+        "process_type": "undefined_input",
+        "target_subject": "開口部",
+        "iteration": "iterative",
+        "description": "設計図書等から各開口部の幅を読み取る"
+      },
+      {
+        "id": "info-opening-width",
+        "type": "information",
+        "title": "開口部の幅",
+        "symbol": "Ow",
+        "subject": "開口部",
+        "property": "幅",
+        "property_type": "numeric",
+        "unit": "m",
+        "description": "各開口部の幅寸法",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-width-check",
+        "type": "process",
+        "title": "幅1m超の判定",
+        "process_type": "mechanical",
+        "target_subject": "開口部",
+        "iteration": "iterative",
+        "description": "各開口部の幅が1mを超えるかを判定",
+        "logic_expression": "Ow > 1"
+      },
+      {
+        "id": "info-width-over-1m",
+        "type": "information",
+        "title": "幅1m超の該当",
+        "symbol": "O1",
+        "subject": "開口部",
+        "property": "幅1m超該当",
+        "property_type": "proposition",
+        "description": "当該開口部の幅が1mを超えるか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-lintel-check",
+        "type": "process",
+        "title": "まぐさの有無確認",
+        "process_type": "human_judgment",
+        "target_subject": "開口部",
+        "iteration": "iterative",
+        "description": "設計図書等から開口部上部にまぐさが設けられているかを確認"
+      },
+      {
+        "id": "info-lintel-exists",
+        "type": "information",
+        "title": "まぐさの有無",
+        "symbol": "L",
+        "subject": "開口部",
+        "property": "上部のまぐさの有無",
+        "property_type": "proposition",
+        "description": "開口部の上部にまぐさが設けられているか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-lintel-material",
+        "type": "process",
+        "title": "まぐさの構造確認",
+        "process_type": "human_judgment",
+        "target_subject": "まぐさ",
+        "iteration": "iterative",
+        "description": "設計図書等からまぐさが鉄筋コンクリート造であるかを確認"
+      },
+      {
+        "id": "info-lintel-rc",
+        "type": "information",
+        "title": "まぐさの構造",
+        "symbol": "Lrc",
+        "subject": "まぐさ",
+        "property": "鉄筋コンクリート造該当",
+        "property_type": "proposition",
+        "description": "まぐさが鉄筋コンクリート造であるか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-individual-judgment",
+        "type": "process",
+        "title": "各開口部の適合判定",
+        "process_type": "mechanical",
+        "target_subject": "開口部",
+        "iteration": "iterative",
+        "description": "各開口部について、幅1m以下か、または鉄筋コンクリート造のまぐさが設けられているかを判定",
+        "logic_expression": "(O1 = false) OR (L AND Lrc)"
+      },
+      {
+        "id": "info-individual-compliance",
+        "type": "information",
+        "title": "各開口部の適合",
+        "symbol": "C",
+        "subject": "開口部",
+        "property": "令57条3項適合",
+        "property_type": "proposition",
+        "description": "各開口部が令57条3項に適合するか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-all-check",
+        "type": "process",
+        "title": "全開口部適合確認",
+        "process_type": "mechanical",
+        "description": "全ての開口部が令57条3項に適合することを確認",
+        "logic_expression": "∀opening ∈ Openings: C(opening) = true"
+      },
+      {
+        "id": "info-compliance",
+        "type": "information",
+        "title": "令57条3項適合",
+        "subject": "建築物",
+        "property": "令57条3項適合",
+        "property_type": "proposition",
+        "description": "建築物全体として令57条3項の規定に適合するか",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-wall-structure",
+        "to": "info-wall-structure",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "info-wall-structure",
+        "to": "proc-openings-set",
+        "role": "input"
+      },
+      {
+        "id": "e03",
+        "from": "proc-openings-set",
+        "to": "info-openings-set",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "info-openings-set",
+        "to": "proc-opening-width",
+        "role": "input"
+      },
+      {
+        "id": "e05",
+        "from": "proc-opening-width",
+        "to": "info-opening-width",
+        "role": "output"
+      },
+      {
+        "id": "e06",
+        "from": "info-opening-width",
+        "to": "proc-width-check",
+        "role": "input"
+      },
+      {
+        "id": "e07",
+        "from": "proc-width-check",
+        "to": "info-width-over-1m",
+        "role": "output"
+      },
+      {
+        "id": "e08",
+        "from": "info-openings-set",
+        "to": "proc-lintel-check",
+        "role": "input"
+      },
+      {
+        "id": "e09",
+        "from": "proc-lintel-check",
+        "to": "info-lintel-exists",
+        "role": "output"
+      },
+      {
+        "id": "e10",
+        "from": "info-lintel-exists",
+        "to": "proc-lintel-material",
+        "role": "input"
+      },
+      {
+        "id": "e11",
+        "from": "proc-lintel-material",
+        "to": "info-lintel-rc",
+        "role": "output"
+      },
+      {
+        "id": "e12",
+        "from": "info-width-over-1m",
+        "to": "proc-individual-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e13",
+        "from": "info-lintel-exists",
+        "to": "proc-individual-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e14",
+        "from": "info-lintel-rc",
+        "to": "proc-individual-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e15",
+        "from": "proc-individual-judgment",
+        "to": "info-individual-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e16",
+        "from": "info-individual-compliance",
+        "to": "proc-all-check",
+        "role": "input"
+      },
+      {
+        "id": "e17",
+        "from": "proc-all-check",
+        "to": "info-compliance",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": [
+        "A20"
+      ],
+      "description": "法第20条（構造耐力）に基づく委任規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-23T18:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

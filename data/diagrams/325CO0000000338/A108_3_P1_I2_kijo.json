@@ -1,0 +1,283 @@
+{
+  "id": "CHK-BSL-KIJO-A108_3-P1-I2",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "防火上・避難上支障がない部分（避難通路要件）",
+    "target_subject": "主要構造部の防火上・避難上支障がない部分",
+    "description": "当該部分が避難通路の一部となっている場合の避難経路確保要件"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "108_3",
+    "paragraph": "1",
+    "item": "2"
+  },
+  "labels": [
+    "単体規定",
+    "主要構造部",
+    "耐火構造",
+    "避難安全"
+  ],
+  "text_raw": "当該部分が避難の用に供する廊下その他の通路の一部となつている場合にあつては、通常の火災時において、建築物に存する者の全てが当該通路を経由しないで地上までの避難を終了することができるものであること。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "building_part",
+          "value": "主要構造部のうち防火上・避難上支障がない部分として除外しようとする部分"
+        }
+      ],
+      "note": "法第2条第9号の2イの政令で定める部分の判定"
+    },
+    "judgment_rule": {
+      "operator": "IMPLIES",
+      "conditions": [
+        {
+          "type": "condition",
+          "value": "当該部分が避難通路の一部である場合"
+        },
+        {
+          "type": "requirement",
+          "value": "当該通路を経由せずに全員が地上まで避難可能"
+        }
+      ]
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-part-identify",
+        "type": "process",
+        "title": "対象部分の特定",
+        "process_type": "undefined_input",
+        "target_subject": "主要構造部",
+        "iteration": "single",
+        "description": "防火上・避難上支障がない部分として除外しようとする主要構造部の特定"
+      },
+      {
+        "id": "info-target-part",
+        "type": "information",
+        "title": "対象部分",
+        "symbol": "P",
+        "subject": "主要構造部",
+        "property": "対象部分の位置・範囲",
+        "property_type": "geometric_solid",
+        "plurality": "single",
+        "description": "防火上・避難上支障がない部分として除外しようとする部分"
+      },
+      {
+        "id": "proc-corridor-check",
+        "type": "process",
+        "title": "避難通路との関係確認",
+        "process_type": "undefined_input",
+        "target_subject": "対象部分",
+        "iteration": "single",
+        "description": "当該部分が避難の用に供する廊下その他の通路の一部となっているか確認"
+      },
+      {
+        "id": "info-is-corridor",
+        "type": "information",
+        "title": "避難通路該当性",
+        "symbol": "C",
+        "subject": "対象部分",
+        "property": "避難通路の一部か否か",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "当該部分が避難の用に供する廊下その他の通路の一部となっているか"
+      },
+      {
+        "id": "proc-occupant-identify",
+        "type": "process",
+        "title": "在館者の特定",
+        "process_type": "undefined_input",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "通常の火災時において建築物に存する者を想定"
+      },
+      {
+        "id": "info-occupants",
+        "type": "information",
+        "title": "在館者",
+        "symbol": "O",
+        "subject": "建築物",
+        "property": "在館者の集合",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "通常の火災時において建築物に存する者の全て"
+      },
+      {
+        "id": "proc-evac-route-check",
+        "type": "process",
+        "title": "代替避難経路の確認",
+        "process_type": "human_judgment",
+        "target_subject": "在館者",
+        "iteration": "iterative",
+        "description": "各在館者が当該通路を経由しないで地上まで避難できるか確認"
+      },
+      {
+        "id": "info-alt-evac-possible",
+        "type": "information",
+        "title": "代替避難可否",
+        "symbol": "AE",
+        "subject": "在館者",
+        "property": "代替経路での避難可否",
+        "property_type": "proposition",
+        "plurality": "multiple",
+        "description": "各在館者が当該通路を経由せずに地上まで避難終了可能か"
+      },
+      {
+        "id": "proc-all-evac-judge",
+        "type": "process",
+        "title": "全員避難可能判定",
+        "process_type": "mechanical",
+        "target_subject": "在館者",
+        "iteration": "single",
+        "description": "全ての在館者が代替経路で避難可能か判定",
+        "logic_expression": "∀o ∈ O: AE(o) = true"
+      },
+      {
+        "id": "info-all-evac-ok",
+        "type": "information",
+        "title": "全員避難可能",
+        "symbol": "ALL",
+        "subject": "建築物",
+        "property": "全員代替避難可否",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "建築物に存する者の全てが当該通路を経由しないで地上まで避難終了可能か"
+      },
+      {
+        "id": "proc-requirement-judge",
+        "type": "process",
+        "title": "第2号要件判定",
+        "process_type": "mechanical",
+        "target_subject": "対象部分",
+        "iteration": "single",
+        "description": "避難通路の場合の要件充足判定（避難通路でない場合は自動的に適合）",
+        "logic_expression": "¬C ∨ (C ∧ ALL)"
+      },
+      {
+        "id": "info-requirement-ok",
+        "type": "information",
+        "title": "第2号要件適合",
+        "symbol": "R2",
+        "subject": "対象部分",
+        "property": "第2号要件適合性",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "令第108条の3第1項第2号の要件を満たすか"
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge-001",
+        "from": "proc-part-identify",
+        "to": "info-target-part",
+        "role": "output"
+      },
+      {
+        "id": "edge-002",
+        "from": "info-target-part",
+        "to": "proc-corridor-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-003",
+        "from": "proc-corridor-check",
+        "to": "info-is-corridor",
+        "role": "output"
+      },
+      {
+        "id": "edge-004",
+        "from": "proc-occupant-identify",
+        "to": "info-occupants",
+        "role": "output"
+      },
+      {
+        "id": "edge-005",
+        "from": "info-target-part",
+        "to": "proc-evac-route-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-006",
+        "from": "info-occupants",
+        "to": "proc-evac-route-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-007",
+        "from": "proc-evac-route-check",
+        "to": "info-alt-evac-possible",
+        "role": "output"
+      },
+      {
+        "id": "edge-008",
+        "from": "info-alt-evac-possible",
+        "to": "proc-all-evac-judge",
+        "role": "input"
+      },
+      {
+        "id": "edge-009",
+        "from": "info-occupants",
+        "to": "proc-all-evac-judge",
+        "role": "input"
+      },
+      {
+        "id": "edge-010",
+        "from": "proc-all-evac-judge",
+        "to": "info-all-evac-ok",
+        "role": "output"
+      },
+      {
+        "id": "edge-011",
+        "from": "info-is-corridor",
+        "to": "proc-requirement-judge",
+        "role": "input"
+      },
+      {
+        "id": "edge-012",
+        "from": "info-all-evac-ok",
+        "to": "proc-requirement-judge",
+        "role": "input"
+      },
+      {
+        "id": "edge-013",
+        "from": "proc-requirement-judge",
+        "to": "info-requirement-ok",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "324AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": ["A2:I9_2"],
+      "description": "法第2条第9号の2イにおいて政令で定める部分として委任"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": ["A109"],
+      "description": "第1号で参照される防火設備の規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-23T00:00:00Z",
+    "updated_at": "2026-01-23T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "kijo-generator",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令",
+    "source": "e-Gov法令API"
+  }
+}

@@ -1,0 +1,501 @@
+{
+  "id": "CHK-BSL-ORDER-A61-P1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "組積造のへいの構造基準",
+    "target_subject": "組積造のへい",
+    "description": "組積造のへいが各号の基準に適合しているか判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "61",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造規定",
+    "組積造"
+  ],
+  "text_raw": "組積造のへいは、次の各号に定めるところによらなければならない。一 高さは、一・二メートル以下とすること。二 各部分の壁の厚さは、その部分から壁頂までの垂直距離の十分の一以上とすること。三 長さ四メートル以下ごとに、壁面からその部分における壁の厚さの一・五倍以上突出した控壁（木造のものを除く。）を設けること。ただし、その部分における壁の厚さが前号の規定による壁の厚さの一・五倍以上ある場合においては、この限りでない。四 基礎の根入れの深さは、二十センチメートル以上とすること。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "structure",
+          "value": "組積造のへい"
+        }
+      ]
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-item1-compliance",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "ref": "info-item2-compliance",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "ref": "info-item3-compliance",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "ref": "info-item4-compliance",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-height-read",
+        "type": "process",
+        "title": "へいの高さの読み取り",
+        "process_type": "undefined_input",
+        "description": "設計図書等から組積造のへいの高さを読み取る"
+      },
+      {
+        "id": "info-height",
+        "type": "information",
+        "title": "へいの高さ",
+        "symbol": "H",
+        "subject": "組積造のへい",
+        "property": "高さ",
+        "property_type": "numeric",
+        "unit": "m",
+        "plurality": "single",
+        "description": "組積造のへいの高さ"
+      },
+      {
+        "id": "proc-item1-check",
+        "type": "process",
+        "title": "第1号高さ基準判定",
+        "process_type": "mechanical",
+        "description": "へいの高さが1.2m以下であるか判定",
+        "logic_expression": "H <= 1.2"
+      },
+      {
+        "id": "info-item1-compliance",
+        "type": "information",
+        "title": "第1号基準適合",
+        "symbol": "C1",
+        "subject": "組積造のへい",
+        "property": "第1号基準適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "高さが1.2m以下であるか"
+      },
+      {
+        "id": "proc-wall-parts-identify",
+        "type": "process",
+        "title": "壁部分の特定",
+        "process_type": "undefined_input",
+        "description": "各部分の壁の厚さと壁頂までの垂直距離を読み取る"
+      },
+      {
+        "id": "info-wall-parts-set",
+        "type": "information",
+        "title": "へいの壁部分",
+        "symbol": "WP",
+        "subject": "組積造のへい",
+        "property": "壁部分の集合",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "判定対象となる壁の各部分を特定"
+      },
+      {
+        "id": "proc-thickness-read",
+        "type": "process",
+        "title": "壁厚と垂直距離の読み取り",
+        "process_type": "undefined_input",
+        "target_subject": "壁部分",
+        "iteration": "iterative",
+        "description": "各部分の壁の厚さと壁頂までの垂直距離を読み取る"
+      },
+      {
+        "id": "info-thickness",
+        "type": "information",
+        "title": "壁の厚さ",
+        "symbol": "T",
+        "subject": "壁部分",
+        "property": "厚さ",
+        "property_type": "numeric",
+        "unit": "m",
+        "plurality": "multiple",
+        "description": "各部分の壁の厚さ"
+      },
+      {
+        "id": "info-vertical-distance",
+        "type": "information",
+        "title": "壁頂までの垂直距離",
+        "symbol": "D",
+        "subject": "壁部分",
+        "property": "壁頂までの垂直距離",
+        "property_type": "numeric",
+        "unit": "m",
+        "plurality": "multiple",
+        "description": "各部分から壁頂までの垂直距離"
+      },
+      {
+        "id": "proc-item2-check",
+        "type": "process",
+        "title": "第2号壁厚基準判定",
+        "process_type": "mechanical",
+        "target_subject": "壁部分",
+        "iteration": "iterative",
+        "description": "各部分の壁の厚さが垂直距離の1/10以上であるか判定",
+        "logic_expression": "∀(T >= D / 10)"
+      },
+      {
+        "id": "info-item2-compliance",
+        "type": "information",
+        "title": "第2号基準適合",
+        "symbol": "C2",
+        "subject": "組積造のへい",
+        "property": "第2号基準適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "すべての部分で壁の厚さが垂直距離の1/10以上であるか"
+      },
+      {
+        "id": "proc-buttress-read",
+        "type": "process",
+        "title": "控壁の配置状況の読み取り",
+        "process_type": "undefined_input",
+        "description": "控壁の配置間隔、突出長さ、材料を読み取る"
+      },
+      {
+        "id": "info-buttress-spacing",
+        "type": "information",
+        "title": "控壁の配置間隔",
+        "symbol": "S",
+        "subject": "控壁",
+        "property": "配置間隔",
+        "property_type": "numeric",
+        "unit": "m",
+        "plurality": "multiple",
+        "description": "控壁の長さ方向の配置間隔"
+      },
+      {
+        "id": "info-buttress-projection",
+        "type": "information",
+        "title": "控壁の突出長さ",
+        "symbol": "P",
+        "subject": "控壁",
+        "property": "突出長さ",
+        "property_type": "numeric",
+        "unit": "m",
+        "plurality": "multiple",
+        "description": "壁面からの控壁の突出長さ"
+      },
+      {
+        "id": "info-buttress-material",
+        "type": "information",
+        "title": "控壁の材料",
+        "symbol": "M",
+        "subject": "控壁",
+        "property": "材料種別",
+        "property_type": "classification",
+        "plurality": "multiple",
+        "description": "控壁の材料（木造を除く）"
+      },
+      {
+        "id": "proc-thick-wall-read",
+        "type": "process",
+        "title": "壁厚確認",
+        "process_type": "undefined_input",
+        "description": "控壁設置位置における壁の厚さを確認"
+      },
+      {
+        "id": "info-local-thickness",
+        "type": "information",
+        "title": "控壁設置位置の壁厚",
+        "symbol": "TL",
+        "subject": "壁部分",
+        "property": "厚さ",
+        "property_type": "numeric",
+        "unit": "m",
+        "plurality": "multiple",
+        "description": "控壁を設けるべき位置における壁の厚さ"
+      },
+      {
+        "id": "proc-item3-check",
+        "type": "process",
+        "title": "第3号控壁基準判定",
+        "process_type": "mechanical",
+        "description": "控壁の配置基準を満たすか判定（ただし書き含む）",
+        "logic_expression": "∀((S <= 4 ∧ P >= T × 1.5 ∧ M != 木造) ∨ (TL >= T_required × 1.5))"
+      },
+      {
+        "id": "info-item3-compliance",
+        "type": "information",
+        "title": "第3号基準適合",
+        "symbol": "C3",
+        "subject": "組積造のへい",
+        "property": "第3号基準適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "控壁の配置基準を満たすか"
+      },
+      {
+        "id": "proc-foundation-read",
+        "type": "process",
+        "title": "基礎根入れ深さの読み取り",
+        "process_type": "undefined_input",
+        "description": "設計図書等から基礎の根入れ深さを読み取る"
+      },
+      {
+        "id": "info-foundation-depth",
+        "type": "information",
+        "title": "基礎の根入れ深さ",
+        "symbol": "FD",
+        "subject": "基礎",
+        "property": "根入れ深さ",
+        "property_type": "numeric",
+        "unit": "cm",
+        "plurality": "single",
+        "description": "基礎の根入れ深さ"
+      },
+      {
+        "id": "proc-item4-check",
+        "type": "process",
+        "title": "第4号基礎基準判定",
+        "process_type": "mechanical",
+        "description": "基礎の根入れ深さが20cm以上であるか判定",
+        "logic_expression": "FD >= 20"
+      },
+      {
+        "id": "info-item4-compliance",
+        "type": "information",
+        "title": "第4号基準適合",
+        "symbol": "C4",
+        "subject": "組積造のへい",
+        "property": "第4号基準適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "基礎の根入れ深さが20cm以上であるか"
+      },
+      {
+        "id": "proc-final-judgment",
+        "type": "process",
+        "title": "総合判定",
+        "process_type": "mechanical",
+        "description": "令61条第1項の全ての号の基準を満たすか判定",
+        "logic_expression": "C1 ∧ C2 ∧ C3 ∧ C4"
+      },
+      {
+        "id": "info-final",
+        "type": "information",
+        "title": "令61条第1項適合",
+        "symbol": "R",
+        "subject": "組積造のへい",
+        "property": "令61条第1項適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "令61条第1項の構造基準に適合するか"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-height-read",
+        "to": "info-height",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "info-height",
+        "to": "proc-item1-check",
+        "role": "input"
+      },
+      {
+        "id": "e03",
+        "from": "proc-item1-check",
+        "to": "info-item1-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "proc-wall-parts-identify",
+        "to": "info-wall-parts-set",
+        "role": "output"
+      },
+      {
+        "id": "e05",
+        "from": "info-wall-parts-set",
+        "to": "proc-thickness-read",
+        "role": "input"
+      },
+      {
+        "id": "e06",
+        "from": "proc-thickness-read",
+        "to": "info-thickness",
+        "role": "output"
+      },
+      {
+        "id": "e07",
+        "from": "proc-thickness-read",
+        "to": "info-vertical-distance",
+        "role": "output"
+      },
+      {
+        "id": "e08",
+        "from": "info-thickness",
+        "to": "proc-item2-check",
+        "role": "input"
+      },
+      {
+        "id": "e09",
+        "from": "info-vertical-distance",
+        "to": "proc-item2-check",
+        "role": "input"
+      },
+      {
+        "id": "e10",
+        "from": "proc-item2-check",
+        "to": "info-item2-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e11",
+        "from": "proc-buttress-read",
+        "to": "info-buttress-spacing",
+        "role": "output"
+      },
+      {
+        "id": "e12",
+        "from": "proc-buttress-read",
+        "to": "info-buttress-projection",
+        "role": "output"
+      },
+      {
+        "id": "e13",
+        "from": "proc-buttress-read",
+        "to": "info-buttress-material",
+        "role": "output"
+      },
+      {
+        "id": "e14",
+        "from": "proc-thick-wall-read",
+        "to": "info-local-thickness",
+        "role": "output"
+      },
+      {
+        "id": "e15",
+        "from": "info-buttress-spacing",
+        "to": "proc-item3-check",
+        "role": "input"
+      },
+      {
+        "id": "e16",
+        "from": "info-buttress-projection",
+        "to": "proc-item3-check",
+        "role": "input"
+      },
+      {
+        "id": "e17",
+        "from": "info-buttress-material",
+        "to": "proc-item3-check",
+        "role": "input"
+      },
+      {
+        "id": "e18",
+        "from": "info-thickness",
+        "to": "proc-item3-check",
+        "role": "input"
+      },
+      {
+        "id": "e19",
+        "from": "info-local-thickness",
+        "to": "proc-item3-check",
+        "role": "input"
+      },
+      {
+        "id": "e20",
+        "from": "proc-item3-check",
+        "to": "info-item3-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e21",
+        "from": "proc-foundation-read",
+        "to": "info-foundation-depth",
+        "role": "output"
+      },
+      {
+        "id": "e22",
+        "from": "info-foundation-depth",
+        "to": "proc-item4-check",
+        "role": "input"
+      },
+      {
+        "id": "e23",
+        "from": "proc-item4-check",
+        "to": "info-item4-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e24",
+        "from": "info-item1-compliance",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e25",
+        "from": "info-item2-compliance",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e26",
+        "from": "info-item3-compliance",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e27",
+        "from": "info-item4-compliance",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e28",
+        "from": "proc-final-judgment",
+        "to": "info-final",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": [
+        "A61"
+      ],
+      "description": "組積造に関する構造基準"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-23T12:00:00Z",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

@@ -1,0 +1,261 @@
+{
+  "id": "CHK-ORD-A130-P2",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "意見聴取等を要しない特例許可対象建築物の判定",
+    "target_subject": "建築物",
+    "description": "法48条16項2号で意見聴取等を要しない特例許可対象となる建築物に該当するか判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "130",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": [
+    "用途地域",
+    "特例許可",
+    "意見聴取",
+    "集団規定"
+  ],
+  "text_raw": "法第四十八条第十六項第二号の政令で定める建築物は、次に掲げるものとする。\n一　日用品の販売を主たる目的とする店舗で第一種低層住居専用地域又は第二種低層住居専用地域内にあるもの\n二　共同給食調理場（二以上の学校（法別表第二（い）項第四号に規定する学校に限る。）において給食を実施するために必要な施設をいう。）で第一種中高層住居専用地域、第二種中高層住居専用地域、第一種住居地域、第二種住居地域又は準住居地域内にあるもの\n三　自動車修理工場で第一種住居地域、第二種住居地域又は準住居地域内にあるもの",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "applicability_condition",
+          "value": "用途地域の制限に適合しない建築物で、法48条16項に基づく特例許可申請"
+        }
+      ],
+      "note": "法48条16項2号の特例許可対象建築物の定義規定"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "ref": "info-item1-result",
+          "operator": "==",
+          "value": true,
+          "note": "日用品販売店舗で第一種又は第二種低層住居専用地域内"
+        },
+        {
+          "ref": "info-item2-result",
+          "operator": "==",
+          "value": true,
+          "note": "共同給食調理場で第一種・第二種中高層住居専用地域、第一種・第二種住居地域又は準住居地域内"
+        },
+        {
+          "ref": "info-item3-result",
+          "operator": "==",
+          "value": true,
+          "note": "自動車修理工場で第一種・第二種住居地域又は準住居地域内"
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-use-identify",
+        "type": "process",
+        "title": "建築物用途の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書から建築物の用途を特定する"
+      },
+      {
+        "id": "info-building-use",
+        "type": "information",
+        "title": "建築物の用途",
+        "symbol": "U",
+        "subject": "建築物",
+        "property": "用途",
+        "property_type": "classification",
+        "description": "日用品販売店舗、共同給食調理場、自動車修理工場、その他のいずれか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-item1-check",
+        "type": "process",
+        "title": "第1号該当判定",
+        "process_type": "mechanical",
+        "description": "日用品販売店舗で第一種低層住居専用地域又は第二種低層住居専用地域内にあるか判定",
+        "logic_expression": "U = 日用品販売店舗 AND (用途地域 IN {第一種低層住居専用地域, 第二種低層住居専用地域})",
+        "remarks": "用途地域は都市計画情報（公共データ）として処理に内包"
+      },
+      {
+        "id": "info-item1-result",
+        "type": "information",
+        "title": "第1号該当性",
+        "symbol": "I1",
+        "subject": "建築物",
+        "property": "第1号建築物該当",
+        "property_type": "proposition",
+        "description": "日用品の販売を主たる目的とする店舗で第一種低層住居専用地域又は第二種低層住居専用地域内にあるか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-item2-check",
+        "type": "process",
+        "title": "第2号該当判定",
+        "process_type": "mechanical",
+        "description": "共同給食調理場で指定用途地域内にあるか判定",
+        "logic_expression": "U = 共同給食調理場 AND (用途地域 IN {第一種中高層住居専用地域, 第二種中高層住居専用地域, 第一種住居地域, 第二種住居地域, 準住居地域})",
+        "remarks": "共同給食調理場は二以上の学校（法別表第二（い）項第四号に規定する学校に限る）において給食を実施するために必要な施設。用途地域は公共データとして処理に内包"
+      },
+      {
+        "id": "info-item2-result",
+        "type": "information",
+        "title": "第2号該当性",
+        "symbol": "I2",
+        "subject": "建築物",
+        "property": "第2号建築物該当",
+        "property_type": "proposition",
+        "description": "共同給食調理場で第一種中高層住居専用地域、第二種中高層住居専用地域、第一種住居地域、第二種住居地域又は準住居地域内にあるか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-item3-check",
+        "type": "process",
+        "title": "第3号該当判定",
+        "process_type": "mechanical",
+        "description": "自動車修理工場で指定用途地域内にあるか判定",
+        "logic_expression": "U = 自動車修理工場 AND (用途地域 IN {第一種住居地域, 第二種住居地域, 準住居地域})",
+        "remarks": "用途地域は公共データとして処理に内包"
+      },
+      {
+        "id": "info-item3-result",
+        "type": "information",
+        "title": "第3号該当性",
+        "symbol": "I3",
+        "subject": "建築物",
+        "property": "第3号建築物該当",
+        "property_type": "proposition",
+        "description": "自動車修理工場で第一種住居地域、第二種住居地域又は準住居地域内にあるか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-final-judgment",
+        "type": "process",
+        "title": "政令で定める建築物の判定",
+        "process_type": "mechanical",
+        "description": "第1号から第3号のいずれかに該当するか判定",
+        "logic_expression": "I1 OR I2 OR I3"
+      },
+      {
+        "id": "info-final-result",
+        "type": "information",
+        "title": "政令で定める建築物該当性",
+        "symbol": "R",
+        "subject": "建築物",
+        "property": "法48条16項2号の政令で定める建築物該当",
+        "property_type": "proposition",
+        "description": "法第48条第16項第2号の政令で定める建築物に該当するか。該当する場合、意見聴取等を要しない特例許可対象となる",
+        "plurality": "single",
+        "remarks": "該当建築物は特例許可申請時に意見聴取等の手続きが省略される"
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge-001",
+        "from": "proc-use-identify",
+        "to": "info-building-use",
+        "role": "output"
+      },
+      {
+        "id": "edge-002",
+        "from": "info-building-use",
+        "to": "proc-item1-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-003",
+        "from": "proc-item1-check",
+        "to": "info-item1-result",
+        "role": "output"
+      },
+      {
+        "id": "edge-004",
+        "from": "info-building-use",
+        "to": "proc-item2-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-005",
+        "from": "proc-item2-check",
+        "to": "info-item2-result",
+        "role": "output"
+      },
+      {
+        "id": "edge-006",
+        "from": "info-building-use",
+        "to": "proc-item3-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-007",
+        "from": "proc-item3-check",
+        "to": "info-item3-result",
+        "role": "output"
+      },
+      {
+        "id": "edge-008",
+        "from": "info-item1-result",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "edge-009",
+        "from": "info-item2-result",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "edge-010",
+        "from": "info-item3-result",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "edge-011",
+        "from": "proc-final-judgment",
+        "to": "info-final-result",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": [
+        "A48:P16:I2"
+      ],
+      "description": "法48条16項2号で政令への委任。意見聴取等を要しない特例許可対象建築物を政令で定める"
+    },
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": [
+        "別表第二（い）項第四号"
+      ],
+      "description": "第2号の共同給食調理場における「学校」の定義（幼稚園、小学校、中学校、義務教育学校、高等学校、中等教育学校、特別支援学校、幼保連携型認定こども園、専修学校）"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-25T12:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令",
+    "source": "e-Gov法令API"
+  }
+}

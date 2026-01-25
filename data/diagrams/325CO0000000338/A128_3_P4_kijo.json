@@ -1,0 +1,242 @@
+{
+  "id": "CHK-BSL-ORD-A128_3-P4",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "地下街各構え居室の歩行距離",
+    "target_subject": "地下街の各構えの居室",
+    "description": "居室の各部分から地下道への出入口に至る歩行距離の制限"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "128_3",
+    "paragraph": "4",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "地下街",
+    "避難",
+    "歩行距離"
+  ],
+  "text_raw": "地下街の各構えの居室の各部分から地下道（当該居室の各部分から直接地上へ通ずる通路を含む。）への出入口の一に至る歩行距離は、三十メートル以下でなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "building_type",
+          "value": "地下街の各構え"
+        }
+      ],
+      "note": "地下街の各構えの居室に適用"
+    },
+    "judgment_rule": {
+      "operator": "<=",
+      "lhs": {
+        "type": "distance",
+        "description": "居室の各部分から地下道への出入口の一に至る歩行距離"
+      },
+      "rhs": {
+        "type": "numeric",
+        "value": 30,
+        "unit": "m"
+      }
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-kakamae-identify",
+        "type": "process",
+        "title": "各構えの特定",
+        "process_type": "undefined_input",
+        "description": "地下街の各構え（店舗等の区画）を特定"
+      },
+      {
+        "id": "info-kakamae-set",
+        "type": "information",
+        "title": "地下街の各構え",
+        "symbol": "K",
+        "subject": "地下街",
+        "property": "各構えの集合",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "判定対象となる地下街の各構え"
+      },
+      {
+        "id": "proc-room-identify",
+        "type": "process",
+        "title": "居室の特定",
+        "process_type": "undefined_input",
+        "description": "各構えに属する居室を特定",
+        "iteration": "iterative"
+      },
+      {
+        "id": "info-room-set",
+        "type": "information",
+        "title": "居室",
+        "symbol": "R",
+        "subject": "各構え",
+        "property": "居室の集合",
+        "property_type": "set_definition",
+        "plurality": "multiple",
+        "description": "各構えに属する居室"
+      },
+      {
+        "id": "proc-exit-identify",
+        "type": "process",
+        "title": "出入口の特定",
+        "process_type": "undefined_input",
+        "description": "地下道（直接地上へ通ずる通路を含む）への出入口を特定"
+      },
+      {
+        "id": "info-exit-set",
+        "type": "information",
+        "title": "地下道への出入口",
+        "symbol": "E",
+        "subject": "各構え",
+        "property": "地下道への出入口の集合",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "地下道または直接地上へ通ずる通路への出入口"
+      },
+      {
+        "id": "proc-distance-measure",
+        "type": "process",
+        "title": "歩行距離の計測",
+        "process_type": "undefined_input",
+        "description": "居室の各部分から出入口の一に至る最短歩行距離を計測",
+        "iteration": "iterative"
+      },
+      {
+        "id": "info-distance",
+        "type": "information",
+        "title": "歩行距離",
+        "symbol": "D",
+        "subject": "居室の各部分",
+        "property": "歩行距離",
+        "property_type": "numeric",
+        "unit": "m",
+        "plurality": "multiple",
+        "description": "居室の各部分から地下道への出入口の一に至る歩行距離"
+      },
+      {
+        "id": "proc-distance-judge",
+        "type": "process",
+        "title": "歩行距離判定",
+        "process_type": "mechanical",
+        "description": "歩行距離が30m以下か判定",
+        "logic_expression": "D <= 30",
+        "iteration": "iterative"
+      },
+      {
+        "id": "info-distance-compliance",
+        "type": "information",
+        "title": "歩行距離適合",
+        "symbol": "DC",
+        "subject": "居室の各部分",
+        "property": "歩行距離適合",
+        "property_type": "proposition",
+        "plurality": "multiple",
+        "description": "歩行距離が30m以下か"
+      },
+      {
+        "id": "proc-final-judge",
+        "type": "process",
+        "title": "最終適合判定",
+        "process_type": "mechanical",
+        "description": "全居室の全部分について歩行距離適合性を総合判定",
+        "logic_expression": "ALL(DC)"
+      },
+      {
+        "id": "info-final-compliance",
+        "type": "information",
+        "title": "令第128条の3第4項適合",
+        "symbol": "COMPLIANT",
+        "subject": "地下街の各構え",
+        "property": "令第128条の3第4項適合性",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "地下街各構え居室の歩行距離が基準に適合しているか"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-kakamae-identify",
+        "to": "info-kakamae-set",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "info-kakamae-set",
+        "to": "proc-room-identify",
+        "role": "input"
+      },
+      {
+        "id": "e03",
+        "from": "proc-room-identify",
+        "to": "info-room-set",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "proc-exit-identify",
+        "to": "info-exit-set",
+        "role": "output"
+      },
+      {
+        "id": "e05",
+        "from": "info-room-set",
+        "to": "proc-distance-measure",
+        "role": "input"
+      },
+      {
+        "id": "e06",
+        "from": "info-exit-set",
+        "to": "proc-distance-measure",
+        "role": "input"
+      },
+      {
+        "id": "e07",
+        "from": "proc-distance-measure",
+        "to": "info-distance",
+        "role": "output"
+      },
+      {
+        "id": "e08",
+        "from": "info-distance",
+        "to": "proc-distance-judge",
+        "role": "input"
+      },
+      {
+        "id": "e09",
+        "from": "proc-distance-judge",
+        "to": "info-distance-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e10",
+        "from": "info-distance-compliance",
+        "to": "proc-final-judge",
+        "role": "input"
+      },
+      {
+        "id": "e11",
+        "from": "proc-final-judge",
+        "to": "info-final-compliance",
+        "role": "output"
+      }
+    ]
+  },
+  "metadata": {
+    "created_at": "2026-01-25T00:00:00+09:00",
+    "author": "Claude",
+    "generator": "kijo-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

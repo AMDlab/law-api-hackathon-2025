@@ -1,0 +1,199 @@
+{
+  "id": "CHK-BSL-ORDER-A54-P1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "組積造の壁の長さ",
+    "target_subject": "組積造の壁",
+    "description": "組積造の壁の長さが10メートル以下であることを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "54",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造",
+    "組積造"
+  ],
+  "text_raw": "組積造の壁の長さは、十メートル以下としなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "structure",
+          "value": "組積造の壁を有する建築物"
+        }
+      ],
+      "note": "建築物に組積造の壁がある場合に適用"
+    },
+    "judgment_rule": {
+      "operator": "ALL",
+      "conditions": [
+        {
+          "ref": "info-each-wall-compliance",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-walls-identify",
+        "type": "process",
+        "title": "組積造の壁の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物に属する組積造の壁を特定する"
+      },
+      {
+        "id": "info-walls-set",
+        "type": "information",
+        "title": "組積造の壁の集合",
+        "symbol": "W",
+        "subject": "建築物",
+        "property": "組積造の壁の集合",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "判定対象となる建築物に属する組積造の壁を特定"
+      },
+      {
+        "id": "proc-wall-length-measure",
+        "type": "process",
+        "title": "壁の長さの測定",
+        "process_type": "mechanical",
+        "iteration": "iterative",
+        "description": "各壁について、対隣壁が接着する部分間の中心距離を測定する（令第54条第2項の定義に基づく）",
+        "related_articles": [
+          "令::A54:P2"
+        ],
+        "logic_expression": "壁の長さ = 対隣壁接着部分間の中心距離"
+      },
+      {
+        "id": "info-wall-lengths",
+        "type": "information",
+        "title": "各壁の長さ",
+        "symbol": "L",
+        "subject": "組積造の壁",
+        "property": "長さ",
+        "property_type": "numeric",
+        "unit": "m",
+        "plurality": "multiple",
+        "description": "対隣壁間の中心距離（令第54条第2項の定義による）",
+        "related_articles": [
+          "令::A54:P2"
+        ]
+      },
+      {
+        "id": "proc-length-check",
+        "type": "process",
+        "title": "長さ基準判定",
+        "process_type": "mechanical",
+        "iteration": "iterative",
+        "description": "各壁の長さが10メートル以下であるかを判定",
+        "logic_expression": "L ≤ 10"
+      },
+      {
+        "id": "info-each-wall-compliance",
+        "type": "information",
+        "title": "各壁の基準適合",
+        "symbol": "C",
+        "subject": "組積造の壁",
+        "property": "長さ基準適合",
+        "property_type": "proposition",
+        "plurality": "multiple",
+        "description": "各壁の長さが10メートル以下であるか"
+      },
+      {
+        "id": "proc-final-judgment",
+        "type": "process",
+        "title": "全壁適合判定",
+        "process_type": "mechanical",
+        "description": "すべての組積造の壁が長さ基準を満たすかを判定",
+        "logic_expression": "∀w∈W: C(w) = true"
+      },
+      {
+        "id": "info-final",
+        "type": "information",
+        "title": "令54条1項適合",
+        "symbol": "R",
+        "subject": "建築物",
+        "property": "令54条1項適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "建築物のすべての組積造の壁が令第54条第1項の長さ基準に適合するか"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-walls-identify",
+        "to": "info-walls-set",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "info-walls-set",
+        "to": "proc-wall-length-measure",
+        "role": "input"
+      },
+      {
+        "id": "e03",
+        "from": "proc-wall-length-measure",
+        "to": "info-wall-lengths",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "info-wall-lengths",
+        "to": "proc-length-check",
+        "role": "input"
+      },
+      {
+        "id": "e05",
+        "from": "proc-length-check",
+        "to": "info-each-wall-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e06",
+        "from": "info-each-wall-compliance",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e07",
+        "from": "proc-final-judgment",
+        "to": "info-final",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "defines_detail",
+      "articles": [
+        "A54:P2"
+      ],
+      "description": "壁の長さの定義（対隣壁間の中心距離）"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-23T00:00:00+09:00",
+    "updated_at": "2026-01-23T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

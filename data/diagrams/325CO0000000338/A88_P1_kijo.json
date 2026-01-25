@@ -1,0 +1,504 @@
+{
+  "id": "CHK-BSL-ORDER-A88-P1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "地上部分の地震力の計算",
+    "target_subject": "建築物の地上部分",
+    "description": "建築物の地上部分の各部分に作用する地震力を計算する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "88",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造規定",
+    "地震力"
+  ],
+  "text_raw": "建築物の地上部分の地震力については、当該建築物の各部分の高さに応じ、当該高さの部分が支える部分に作用する全体の地震力として計算するものとし、その数値は、当該部分の固定荷重と積載荷重との和（第八十六条第二項ただし書の規定により特定行政庁が指定する多雪区域においては、更に積雪荷重を加えるものとする。）に当該高さにおける地震層せん断力係数を乗じて計算しなければならない。この場合において、地震層せん断力係数は、次の式によつて計算するものとする。Ｃｉ＝ＺＲｔＡｉＣｏ",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "subject",
+          "value": "建築物の地上部分"
+        }
+      ],
+      "note": "多雪区域の場合は積雪荷重を加算（令第86条第2項ただし書）"
+    },
+    "judgment_rule": {
+      "operator": "EQ",
+      "lhs": {
+        "ref": "info-seismic-force",
+        "description": "計算された地震力"
+      },
+      "rhs": {
+        "formula": "(W + P + S) × Ci",
+        "description": "荷重の和に地震層せん断力係数を乗じた値"
+      }
+    },
+    "exceptions": null
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "info-building-parts-set",
+        "type": "information",
+        "title": "建築物の階の集合",
+        "symbol": "F",
+        "subject": "建築物",
+        "property": "階の集合",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "判定対象となる建築物の地上部分の各階を特定"
+      },
+      {
+        "id": "proc-height-identify",
+        "type": "process",
+        "title": "高さ位置の特定",
+        "process_type": "undefined_input",
+        "target_subject": "階",
+        "iteration": "iterative",
+        "description": "各階の高さ位置を設計図書等から読み取る"
+      },
+      {
+        "id": "info-height",
+        "type": "information",
+        "title": "各階の高さ位置",
+        "symbol": "H",
+        "subject": "階",
+        "property": "高さ位置",
+        "property_type": "numeric",
+        "unit": "m",
+        "plurality": "multiple",
+        "description": "各階の地盤面からの高さ"
+      },
+      {
+        "id": "proc-dead-load-identify",
+        "type": "process",
+        "title": "固定荷重の特定",
+        "process_type": "undefined_input",
+        "target_subject": "階",
+        "iteration": "iterative",
+        "description": "各階が支える部分の固定荷重を設計図書等から読み取る"
+      },
+      {
+        "id": "info-dead-load",
+        "type": "information",
+        "title": "固定荷重",
+        "symbol": "W",
+        "subject": "階",
+        "property": "固定荷重",
+        "property_type": "numeric",
+        "unit": "kN",
+        "plurality": "multiple",
+        "description": "各階が支える部分の固定荷重"
+      },
+      {
+        "id": "proc-live-load-identify",
+        "type": "process",
+        "title": "積載荷重の特定",
+        "process_type": "undefined_input",
+        "target_subject": "階",
+        "iteration": "iterative",
+        "description": "各階が支える部分の積載荷重を設計図書等から読み取る"
+      },
+      {
+        "id": "info-live-load",
+        "type": "information",
+        "title": "積載荷重",
+        "symbol": "P",
+        "subject": "階",
+        "property": "積載荷重",
+        "property_type": "numeric",
+        "unit": "kN",
+        "plurality": "multiple",
+        "description": "各階が支える部分の積載荷重"
+      },
+      {
+        "id": "proc-snow-load-identify",
+        "type": "process",
+        "title": "積雪荷重の特定",
+        "process_type": "undefined_input",
+        "target_subject": "階",
+        "iteration": "iterative",
+        "description": "多雪区域の場合、各階が支える部分の積雪荷重を設計図書等から読み取る",
+        "remarks": "令第86条第2項ただし書の多雪区域の場合のみ"
+      },
+      {
+        "id": "info-snow-load",
+        "type": "information",
+        "title": "積雪荷重",
+        "symbol": "S",
+        "subject": "階",
+        "property": "積雪荷重",
+        "property_type": "numeric",
+        "unit": "kN",
+        "plurality": "multiple",
+        "description": "多雪区域における各階が支える部分の積雪荷重",
+        "remarks": "多雪区域以外は0"
+      },
+      {
+        "id": "proc-z-identify",
+        "type": "process",
+        "title": "地震地域係数Zの特定",
+        "process_type": "mechanical",
+        "description": "建築物の所在地に応じた地震地域係数Zを国土交通大臣が定める数値から取得",
+        "remarks": "告示による1.0〜0.7の範囲"
+      },
+      {
+        "id": "info-z-coefficient",
+        "type": "information",
+        "title": "地震地域係数",
+        "symbol": "Z",
+        "subject": "建築物",
+        "property": "地震地域係数",
+        "property_type": "numeric",
+        "plurality": "single",
+        "description": "その地方における過去の地震記録等に応じて定まる係数（1.0〜0.7）"
+      },
+      {
+        "id": "proc-rt-identify",
+        "type": "process",
+        "title": "振動特性係数Rtの算出",
+        "process_type": "mechanical",
+        "description": "建築物の固有周期及び地盤種別に応じて振動特性係数Rtを国土交通大臣が定める方法により算出"
+      },
+      {
+        "id": "info-rt-coefficient",
+        "type": "information",
+        "title": "振動特性係数",
+        "symbol": "Rt",
+        "subject": "建築物",
+        "property": "振動特性係数",
+        "property_type": "numeric",
+        "plurality": "single",
+        "description": "建築物の弾性域における固有周期及び地盤の種類に応じて算出した数値"
+      },
+      {
+        "id": "proc-ai-identify",
+        "type": "process",
+        "title": "層せん断力分布係数Aiの算出",
+        "process_type": "mechanical",
+        "target_subject": "階",
+        "iteration": "iterative",
+        "description": "各高さにおける層せん断力分布係数Aiを国土交通大臣が定める方法により算出"
+      },
+      {
+        "id": "info-ai-coefficient",
+        "type": "information",
+        "title": "層せん断力分布係数",
+        "symbol": "Ai",
+        "subject": "階",
+        "property": "層せん断力分布係数",
+        "property_type": "numeric",
+        "plurality": "multiple",
+        "description": "建築物の振動特性に応じた地震層せん断力係数の高さ方向分布を表す数値"
+      },
+      {
+        "id": "proc-co-identify",
+        "type": "process",
+        "title": "標準せん断力係数Coの特定",
+        "process_type": "undefined_input",
+        "description": "標準せん断力係数Coを設計図書等から読み取る",
+        "remarks": "第2項により0.2以上（軟弱地盤の木造は0.3以上）"
+      },
+      {
+        "id": "info-co-coefficient",
+        "type": "information",
+        "title": "標準せん断力係数",
+        "symbol": "Co",
+        "subject": "建築物",
+        "property": "標準せん断力係数",
+        "property_type": "numeric",
+        "plurality": "single",
+        "description": "標準せん断力係数（0.2以上、軟弱地盤の木造は0.3以上）",
+        "related_articles": [
+          "令::A88:P2"
+        ]
+      },
+      {
+        "id": "proc-ci-calc",
+        "type": "process",
+        "title": "地震層せん断力係数の計算",
+        "process_type": "mechanical",
+        "target_subject": "階",
+        "iteration": "iterative",
+        "description": "各階の地震層せん断力係数を計算",
+        "logic_expression": "Ci = Z × Rt × Ai × Co"
+      },
+      {
+        "id": "info-ci-coefficient",
+        "type": "information",
+        "title": "地震層せん断力係数",
+        "symbol": "Ci",
+        "subject": "階",
+        "property": "地震層せん断力係数",
+        "property_type": "numeric",
+        "plurality": "multiple",
+        "description": "各階における地震層せん断力係数"
+      },
+      {
+        "id": "proc-load-sum-calc",
+        "type": "process",
+        "title": "荷重合計の計算",
+        "process_type": "mechanical",
+        "target_subject": "階",
+        "iteration": "iterative",
+        "description": "固定荷重と積載荷重の和（多雪区域では積雪荷重を加算）を計算",
+        "logic_expression": "Wi = W + P + S"
+      },
+      {
+        "id": "info-total-load",
+        "type": "information",
+        "title": "荷重合計",
+        "symbol": "Wi",
+        "subject": "階",
+        "property": "荷重合計",
+        "property_type": "numeric",
+        "unit": "kN",
+        "plurality": "multiple",
+        "description": "各階が支える部分の荷重合計"
+      },
+      {
+        "id": "proc-seismic-force-calc",
+        "type": "process",
+        "title": "地震力の計算",
+        "process_type": "mechanical",
+        "target_subject": "階",
+        "iteration": "iterative",
+        "description": "各階に作用する地震力を計算",
+        "logic_expression": "Qi = Wi × Ci"
+      },
+      {
+        "id": "info-seismic-force",
+        "type": "information",
+        "title": "地震力",
+        "symbol": "Qi",
+        "subject": "階",
+        "property": "地震力",
+        "property_type": "numeric",
+        "unit": "kN",
+        "plurality": "multiple",
+        "description": "各階に作用する地震力"
+      },
+      {
+        "id": "proc-compliance-check",
+        "type": "process",
+        "title": "計算方法適合判定",
+        "process_type": "mechanical",
+        "description": "地震力が条文の計算式に従って正しく計算されているか判定"
+      },
+      {
+        "id": "info-compliance",
+        "type": "information",
+        "title": "計算方法適合",
+        "symbol": "R",
+        "subject": "建築物",
+        "property": "地震力計算方法適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "令第88条第1項の地震力計算方法に適合するか否か"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "info-building-parts-set",
+        "to": "proc-height-identify",
+        "role": "input"
+      },
+      {
+        "id": "e02",
+        "from": "proc-height-identify",
+        "to": "info-height",
+        "role": "output"
+      },
+      {
+        "id": "e03",
+        "from": "info-building-parts-set",
+        "to": "proc-dead-load-identify",
+        "role": "input"
+      },
+      {
+        "id": "e04",
+        "from": "proc-dead-load-identify",
+        "to": "info-dead-load",
+        "role": "output"
+      },
+      {
+        "id": "e05",
+        "from": "info-building-parts-set",
+        "to": "proc-live-load-identify",
+        "role": "input"
+      },
+      {
+        "id": "e06",
+        "from": "proc-live-load-identify",
+        "to": "info-live-load",
+        "role": "output"
+      },
+      {
+        "id": "e07",
+        "from": "info-building-parts-set",
+        "to": "proc-snow-load-identify",
+        "role": "input"
+      },
+      {
+        "id": "e08",
+        "from": "proc-snow-load-identify",
+        "to": "info-snow-load",
+        "role": "output"
+      },
+      {
+        "id": "e09",
+        "from": "proc-z-identify",
+        "to": "info-z-coefficient",
+        "role": "output"
+      },
+      {
+        "id": "e10",
+        "from": "proc-rt-identify",
+        "to": "info-rt-coefficient",
+        "role": "output"
+      },
+      {
+        "id": "e11",
+        "from": "info-height",
+        "to": "proc-ai-identify",
+        "role": "input"
+      },
+      {
+        "id": "e12",
+        "from": "proc-ai-identify",
+        "to": "info-ai-coefficient",
+        "role": "output"
+      },
+      {
+        "id": "e13",
+        "from": "proc-co-identify",
+        "to": "info-co-coefficient",
+        "role": "output"
+      },
+      {
+        "id": "e14",
+        "from": "info-z-coefficient",
+        "to": "proc-ci-calc",
+        "role": "input"
+      },
+      {
+        "id": "e15",
+        "from": "info-rt-coefficient",
+        "to": "proc-ci-calc",
+        "role": "input"
+      },
+      {
+        "id": "e16",
+        "from": "info-ai-coefficient",
+        "to": "proc-ci-calc",
+        "role": "input"
+      },
+      {
+        "id": "e17",
+        "from": "info-co-coefficient",
+        "to": "proc-ci-calc",
+        "role": "input"
+      },
+      {
+        "id": "e18",
+        "from": "proc-ci-calc",
+        "to": "info-ci-coefficient",
+        "role": "output"
+      },
+      {
+        "id": "e19",
+        "from": "info-dead-load",
+        "to": "proc-load-sum-calc",
+        "role": "input"
+      },
+      {
+        "id": "e20",
+        "from": "info-live-load",
+        "to": "proc-load-sum-calc",
+        "role": "input"
+      },
+      {
+        "id": "e21",
+        "from": "info-snow-load",
+        "to": "proc-load-sum-calc",
+        "role": "input"
+      },
+      {
+        "id": "e22",
+        "from": "proc-load-sum-calc",
+        "to": "info-total-load",
+        "role": "output"
+      },
+      {
+        "id": "e23",
+        "from": "info-total-load",
+        "to": "proc-seismic-force-calc",
+        "role": "input"
+      },
+      {
+        "id": "e24",
+        "from": "info-ci-coefficient",
+        "to": "proc-seismic-force-calc",
+        "role": "input"
+      },
+      {
+        "id": "e25",
+        "from": "proc-seismic-force-calc",
+        "to": "info-seismic-force",
+        "role": "output"
+      },
+      {
+        "id": "e26",
+        "from": "info-seismic-force",
+        "to": "proc-compliance-check",
+        "role": "input"
+      },
+      {
+        "id": "e27",
+        "from": "proc-compliance-check",
+        "to": "info-compliance",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": [
+        "A86:P2"
+      ],
+      "description": "多雪区域における積雪荷重の規定"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": [
+        "A88:P2"
+      ],
+      "description": "標準せん断力係数Coの下限値"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-23T12:00:00Z",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

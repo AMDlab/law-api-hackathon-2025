@@ -1,0 +1,298 @@
+{
+  "id": "CHK-BSL-ORDER-A90-P1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "鋼材等の許容応力度",
+    "target_subject": "鋼材等",
+    "description": "鋼材等の許容応力度が表一又は表二の数値に適合するか判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "90",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "構造計算",
+    "許容応力度",
+    "鋼材"
+  ],
+  "text_raw": "鋼材等の許容応力度は、次の表一又は表二の数値によらなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "material",
+          "value": "鋼材等を使用する構造計算"
+        }
+      ],
+      "note": "構造計算において鋼材等を使用する場合に適用"
+    },
+    "judgment_rule": {
+      "operator": "==",
+      "lhs": {
+        "ref": "info-compliance"
+      },
+      "rhs": {
+        "value": true
+      }
+    },
+    "exceptions": null
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "info-steel-set",
+        "type": "information",
+        "title": "構造計算に用いる鋼材等",
+        "symbol": "S",
+        "subject": "建築物",
+        "property": "構造計算に用いる鋼材等の集合",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "構造計算において許容応力度を設定する鋼材等を特定"
+      },
+      {
+        "id": "proc-identify-type",
+        "type": "process",
+        "title": "鋼材等の種類の特定",
+        "process_type": "undefined_input",
+        "target_subject": "鋼材等",
+        "iteration": "iterative",
+        "description": "各鋼材等の種類（炭素鋼/ステンレス鋼/鋳鉄等）及び区分（構造用鋼材/ボルト/ケーブル等）を特定する"
+      },
+      {
+        "id": "info-steel-type",
+        "type": "information",
+        "title": "鋼材等の種類・区分",
+        "symbol": "T",
+        "subject": "鋼材等",
+        "property": "種類及び区分",
+        "property_type": "classification",
+        "plurality": "multiple",
+        "description": "表一適用の場合：炭素鋼（構造用鋼材、ボルト黒皮/仕上げ、構造用ケーブル、リベット鋼、鋳鋼）、ステンレス鋼（構造用鋼材、ボルト、構造用ケーブル、鋳鋼）、鋳鉄。表二適用の場合：丸鋼、異形鉄筋（径28mm以下/超）、溶接金網"
+      },
+      {
+        "id": "proc-identify-base-strength",
+        "type": "process",
+        "title": "基準強度Fの特定",
+        "process_type": "undefined_input",
+        "target_subject": "鋼材等",
+        "iteration": "iterative",
+        "description": "鋼材等の種類及び品質に応じて国土交通大臣が定める基準強度Fを特定する"
+      },
+      {
+        "id": "info-base-strength",
+        "type": "information",
+        "title": "基準強度F",
+        "symbol": "F",
+        "subject": "鋼材等",
+        "property": "基準強度",
+        "property_type": "numeric",
+        "unit": "N/mm2",
+        "plurality": "multiple",
+        "description": "鋼材等の種類及び品質に応じて国土交通大臣が定める基準強度"
+      },
+      {
+        "id": "proc-identify-stress-type",
+        "type": "process",
+        "title": "応力の種類の特定",
+        "process_type": "undefined_input",
+        "target_subject": "鋼材等",
+        "iteration": "iterative",
+        "description": "各鋼材等に対して判定する応力の種類（圧縮/引張り/曲げ/せん断）及び荷重の区分（長期/短期）を特定する"
+      },
+      {
+        "id": "info-stress-type",
+        "type": "information",
+        "title": "応力の種類と荷重区分",
+        "symbol": "ST",
+        "subject": "鋼材等",
+        "property": "応力の種類と荷重区分",
+        "property_type": "classification",
+        "plurality": "multiple",
+        "description": "圧縮、引張り、曲げ、せん断のいずれかと、長期又は短期の組合せ"
+      },
+      {
+        "id": "proc-identify-design-stress",
+        "type": "process",
+        "title": "設計許容応力度の特定",
+        "process_type": "undefined_input",
+        "target_subject": "鋼材等",
+        "iteration": "iterative",
+        "description": "構造計算書から各鋼材等に設定された設計許容応力度を読み取る"
+      },
+      {
+        "id": "info-design-stress",
+        "type": "information",
+        "title": "設計許容応力度",
+        "symbol": "AD",
+        "subject": "鋼材等",
+        "property": "設計許容応力度",
+        "property_type": "numeric",
+        "unit": "N/mm2",
+        "plurality": "multiple",
+        "description": "構造計算において設定された各鋼材等の許容応力度"
+      },
+      {
+        "id": "proc-calc-allowable-stress",
+        "type": "process",
+        "title": "規定許容応力度の算定",
+        "process_type": "mechanical",
+        "target_subject": "鋼材等",
+        "iteration": "iterative",
+        "description": "表一又は表二の算定式により規定の許容応力度を計算する",
+        "logic_expression": "表一：長期F/1.5（せん断はF/(1.5√3)）、短期は長期の1.5倍。表二：長期F/1.5（上限値あり）、短期F（上限値あり）",
+        "remarks": "鋳鉄は圧縮のみ。ボルト黒皮は引張りのみ。構造用ケーブルは引張りのみ"
+      },
+      {
+        "id": "info-allowable-stress",
+        "type": "information",
+        "title": "規定許容応力度",
+        "symbol": "AR",
+        "subject": "鋼材等",
+        "property": "規定許容応力度",
+        "property_type": "numeric",
+        "unit": "N/mm2",
+        "plurality": "multiple",
+        "description": "表一又は表二により算定された各鋼材等の許容応力度の上限値"
+      },
+      {
+        "id": "proc-compliance-check",
+        "type": "process",
+        "title": "許容応力度適合判定",
+        "process_type": "mechanical",
+        "target_subject": "鋼材等",
+        "iteration": "iterative",
+        "description": "設計許容応力度が規定許容応力度以下であることを判定する",
+        "logic_expression": "∀s∈S: AD(s) ≤ AR(s)"
+      },
+      {
+        "id": "info-compliance",
+        "type": "information",
+        "title": "許容応力度適合",
+        "symbol": "R",
+        "subject": "鋼材等",
+        "property": "許容応力度適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "全ての鋼材等について設計許容応力度が規定許容応力度以下であるか"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "info-steel-set",
+        "to": "proc-identify-type",
+        "role": "input"
+      },
+      {
+        "id": "e02",
+        "from": "proc-identify-type",
+        "to": "info-steel-type",
+        "role": "output"
+      },
+      {
+        "id": "e03",
+        "from": "info-steel-type",
+        "to": "proc-identify-base-strength",
+        "role": "input"
+      },
+      {
+        "id": "e04",
+        "from": "proc-identify-base-strength",
+        "to": "info-base-strength",
+        "role": "output"
+      },
+      {
+        "id": "e05",
+        "from": "info-steel-set",
+        "to": "proc-identify-stress-type",
+        "role": "input"
+      },
+      {
+        "id": "e06",
+        "from": "proc-identify-stress-type",
+        "to": "info-stress-type",
+        "role": "output"
+      },
+      {
+        "id": "e07",
+        "from": "info-steel-set",
+        "to": "proc-identify-design-stress",
+        "role": "input"
+      },
+      {
+        "id": "e08",
+        "from": "proc-identify-design-stress",
+        "to": "info-design-stress",
+        "role": "output"
+      },
+      {
+        "id": "e09",
+        "from": "info-steel-type",
+        "to": "proc-calc-allowable-stress",
+        "role": "input"
+      },
+      {
+        "id": "e10",
+        "from": "info-base-strength",
+        "to": "proc-calc-allowable-stress",
+        "role": "input"
+      },
+      {
+        "id": "e11",
+        "from": "info-stress-type",
+        "to": "proc-calc-allowable-stress",
+        "role": "input"
+      },
+      {
+        "id": "e12",
+        "from": "proc-calc-allowable-stress",
+        "to": "info-allowable-stress",
+        "role": "output"
+      },
+      {
+        "id": "e13",
+        "from": "info-design-stress",
+        "to": "proc-compliance-check",
+        "role": "input"
+      },
+      {
+        "id": "e14",
+        "from": "info-allowable-stress",
+        "to": "proc-compliance-check",
+        "role": "input"
+      },
+      {
+        "id": "e15",
+        "from": "proc-compliance-check",
+        "to": "info-compliance",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": [
+        "A20"
+      ],
+      "description": "法第20条に基づく構造耐力の規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-23T12:00:00Z",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

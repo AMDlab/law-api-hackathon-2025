@@ -1,0 +1,344 @@
+{
+  "id": "CHK-BSL-ORDER-A128_2-P1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "大規模な木造等の建築物の敷地内通路設置判定",
+    "target_subject": "建築物",
+    "description": "主要構造部が木造の大規模建築物について、敷地内における避難上及び消火上有効な通路の設置要否を判定"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "128_2",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "避難",
+    "消火",
+    "通路",
+    "木造建築物"
+  ],
+  "text_raw": "主要構造部の全部が木造の建築物（法第二条第九号の二イに掲げる基準に適合する建築物を除く。）でその延べ面積が千平方メートルを超える場合又は主要構造部の一部が木造の建築物でその延べ面積（主要構造部が耐火構造の部分を含む場合で、その部分とその他の部分とが耐火構造とした壁又は特定防火設備で区画されているときは、その部分の床面積を除く。以下この条において同じ。）が千平方メートルを超える場合においては、その周囲（道に接する部分その他避難上及び消火上支障がないものとして国土交通大臣が定める部分を除く。）に避難上及び消火上有効なものとして国土交通大臣が定める基準に適合する通路を設けなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "type": "building_structure",
+          "value": "主要構造部の全部が木造（法第2条第9号の2イ適合を除く）かつ延べ面積1000㎡超"
+        },
+        {
+          "type": "building_structure",
+          "value": "主要構造部の一部が木造かつ延べ面積（耐火区画部分除外後）1000㎡超"
+        }
+      ],
+      "note": "主要構造部が木造の大規模建築物に適用"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "requirement",
+          "value": "避難上及び消火上有効な通路の設置",
+          "description": "国土交通大臣が定める基準に適合する通路を建築物の周囲に設ける"
+        }
+      ]
+    },
+    "exceptions": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "道に接する部分"
+        },
+        {
+          "type": "location",
+          "value": "避難上及び消火上支障がないものとして国土交通大臣が定める部分"
+        }
+      ],
+      "effect": "EXEMPT",
+      "description": "通路設置不要部分"
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-structure-type",
+        "type": "process",
+        "title": "主要構造部の構造種別特定",
+        "process_type": "undefined_input",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "主要構造部が全部木造か、一部木造か、その他かを設計図書等から特定"
+      },
+      {
+        "id": "info-structure-type",
+        "type": "information",
+        "title": "主要構造部の構造種別",
+        "symbol": "S",
+        "subject": "建築物",
+        "property": "主要構造部の構造種別",
+        "property_type": "classification",
+        "plurality": "single",
+        "description": "全部木造、一部木造、その他の区分"
+      },
+      {
+        "id": "proc-fire-resistant-check",
+        "type": "process",
+        "title": "耐火建築物等該当確認",
+        "process_type": "undefined_input",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "法第2条第9号の2イに掲げる基準（耐火建築物の構造）に適合するか確認"
+      },
+      {
+        "id": "info-fire-resistant",
+        "type": "information",
+        "title": "耐火建築物等該当",
+        "symbol": "F",
+        "subject": "建築物",
+        "property": "法第2条第9号の2イ適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "法第2条第9号の2イに掲げる基準に適合するか否か",
+        "related_articles": [
+          "法::A2:I9_2"
+        ]
+      },
+      {
+        "id": "proc-area-calculation",
+        "type": "process",
+        "title": "延べ面積の算定",
+        "process_type": "undefined_input",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "延べ面積を算定（耐火構造部分が区画されている場合はその床面積を除外）"
+      },
+      {
+        "id": "info-gross-area",
+        "type": "information",
+        "title": "延べ面積",
+        "symbol": "A",
+        "subject": "建築物",
+        "property": "延べ面積",
+        "property_type": "numeric",
+        "unit": "㎡",
+        "plurality": "single",
+        "description": "主要構造部が耐火構造の部分が区画されている場合は、その部分の床面積を除いた延べ面積",
+        "remarks": "耐火構造とした壁又は特定防火設備で区画されている部分の床面積は除外"
+      },
+      {
+        "id": "proc-scope-judgment",
+        "type": "process",
+        "title": "通路設置義務の適用判定",
+        "process_type": "mechanical",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "本条第1項の適用対象となるか判定",
+        "logic_expression": "(S = '全部木造' AND NOT F AND A > 1000) OR (S = '一部木造' AND A > 1000)"
+      },
+      {
+        "id": "info-scope-applicable",
+        "type": "information",
+        "title": "通路設置義務適用",
+        "symbol": "P",
+        "subject": "建築物",
+        "property": "通路設置義務の適用有無",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "本条第1項による通路設置義務が適用されるか否か"
+      },
+      {
+        "id": "info-building-perimeter-set",
+        "type": "information",
+        "title": "建築物の周囲",
+        "symbol": "B",
+        "subject": "建築物",
+        "property": "周囲部分の集合",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "通路を設けるべき建築物の周囲部分を特定"
+      },
+      {
+        "id": "proc-exempt-check",
+        "type": "process",
+        "title": "通路設置除外部分の特定",
+        "process_type": "mechanical",
+        "target_subject": "建築物の周囲部分",
+        "iteration": "iterative",
+        "description": "道に接する部分、その他国土交通大臣が定める部分を除外",
+        "logic_expression": "周囲部分 - (道に接する部分 ∪ 大臣告示で定める除外部分)"
+      },
+      {
+        "id": "info-passage-required-area",
+        "type": "information",
+        "title": "通路設置必要範囲",
+        "symbol": "R",
+        "subject": "建築物の周囲",
+        "property": "通路設置必要部分",
+        "property_type": "geometric_line",
+        "plurality": "single",
+        "description": "通路を設けなければならない建築物の周囲の範囲"
+      },
+      {
+        "id": "proc-passage-standard-check",
+        "type": "process",
+        "title": "通路基準適合確認",
+        "process_type": "human_judgment",
+        "target_subject": "通路",
+        "iteration": "single",
+        "description": "避難上及び消火上有効なものとして国土交通大臣が定める基準に適合するか確認",
+        "remarks": "告示で定める通路の基準への適合性を判断"
+      },
+      {
+        "id": "info-passage-compliance",
+        "type": "information",
+        "title": "通路基準適合",
+        "symbol": "C",
+        "subject": "通路",
+        "property": "国土交通大臣基準適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "設けられた通路が国土交通大臣が定める基準に適合するか否か"
+      },
+      {
+        "id": "proc-final-judgment",
+        "type": "process",
+        "title": "令第128条の2第1項適合判定",
+        "process_type": "mechanical",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "敷地内通路の設置要件を満たすか総合判定",
+        "logic_expression": "NOT P OR (R に対して C)"
+      },
+      {
+        "id": "info-final",
+        "type": "information",
+        "title": "令第128条の2第1項適合",
+        "symbol": "J",
+        "subject": "建築物",
+        "property": "敷地内通路規定適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "令第128条の2第1項の敷地内通路設置規定に適合するか否か"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-structure-type",
+        "to": "info-structure-type",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "proc-fire-resistant-check",
+        "to": "info-fire-resistant",
+        "role": "output"
+      },
+      {
+        "id": "e03",
+        "from": "proc-area-calculation",
+        "to": "info-gross-area",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "info-structure-type",
+        "to": "proc-scope-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e05",
+        "from": "info-fire-resistant",
+        "to": "proc-scope-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e06",
+        "from": "info-gross-area",
+        "to": "proc-scope-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e07",
+        "from": "proc-scope-judgment",
+        "to": "info-scope-applicable",
+        "role": "output"
+      },
+      {
+        "id": "e08",
+        "from": "info-scope-applicable",
+        "to": "proc-exempt-check",
+        "role": "input"
+      },
+      {
+        "id": "e09",
+        "from": "info-building-perimeter-set",
+        "to": "proc-exempt-check",
+        "role": "input"
+      },
+      {
+        "id": "e10",
+        "from": "proc-exempt-check",
+        "to": "info-passage-required-area",
+        "role": "output"
+      },
+      {
+        "id": "e11",
+        "from": "info-passage-required-area",
+        "to": "proc-passage-standard-check",
+        "role": "input"
+      },
+      {
+        "id": "e12",
+        "from": "proc-passage-standard-check",
+        "to": "info-passage-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e13",
+        "from": "info-scope-applicable",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e14",
+        "from": "info-passage-compliance",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e15",
+        "from": "proc-final-judgment",
+        "to": "info-final",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": [
+        "A2:I9_2"
+      ],
+      "description": "法第2条第9号の2イの耐火建築物の構造基準（適用除外の判定に使用）"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-25T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令",
+    "checklist_ref": "建築基準法施行令第128条の2第1項（大規模な木造等の建築物の敷地内における通路）",
+    "source": "e-Gov法令API"
+  }
+}

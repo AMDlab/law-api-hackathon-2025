@@ -1,0 +1,424 @@
+{
+  "id": "CHK-BSLR-A73-P1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "鉄筋の定着",
+    "target_subject": "鉄筋",
+    "description": "鉄筋の末端がかぎ状に折り曲げられ、コンクリートから抜け出ないように定着されていることを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "73",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造"
+  ],
+  "text_raw": "鉄筋の末端は、かぎ状に折り曲げて、コンクリートから抜け出ないように定着しなければならない。ただし、次の各号に掲げる部分以外の部分に使用する異形鉄筋にあつては、その末端を折り曲げないことができる。一 柱及びはり（基礎ばりを除く。）の出すみ部分 二 煙突",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "structure",
+          "value": "鉄筋コンクリート造"
+        }
+      ],
+      "note": "鉄筋コンクリート造の建築物における鉄筋"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "note": "本文適用: かぎ状に折り曲げて定着",
+          "ref": "info-hook-anchored",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "note": "ただし書き適用: 異形鉄筋で指定部位以外",
+          "operator": "AND",
+          "conditions": [
+            {
+              "ref": "info-deformed-bar",
+              "operator": "==",
+              "value": true
+            },
+            {
+              "ref": "info-specified-location",
+              "operator": "==",
+              "value": false
+            }
+          ]
+        }
+      ]
+    },
+    "exceptions": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "note": "異形鉄筋であること",
+          "ref": "info-deformed-bar",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "note": "各号に掲げる部分以外の部分であること",
+          "ref": "info-specified-location",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "effect": "折り曲げ省略可"
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-rebar-set",
+        "type": "process",
+        "title": "鉄筋の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から判定対象となる鉄筋を特定する"
+      },
+      {
+        "id": "info-rebar-set",
+        "type": "information",
+        "title": "建築物の鉄筋",
+        "subject": "建築物",
+        "property": "鉄筋の集合",
+        "property_type": "set_definition",
+        "description": "判定対象となる建築物に属する鉄筋を特定",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-rebar-type",
+        "type": "process",
+        "title": "鉄筋種類の特定",
+        "process_type": "undefined_input",
+        "target_subject": "鉄筋",
+        "iteration": "iterative",
+        "description": "設計図書等から各鉄筋が異形鉄筋か丸鋼かを特定する"
+      },
+      {
+        "id": "info-deformed-bar",
+        "type": "information",
+        "title": "異形鉄筋該当",
+        "symbol": "D",
+        "subject": "鉄筋",
+        "property": "異形鉄筋への該当",
+        "property_type": "proposition",
+        "description": "当該鉄筋が異形鉄筋（表面に節のある鉄筋）に該当するか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-location-check",
+        "type": "process",
+        "title": "使用部位の特定",
+        "process_type": "undefined_input",
+        "target_subject": "鉄筋",
+        "iteration": "iterative",
+        "description": "設計図書等から各鉄筋の使用部位を特定する"
+      },
+      {
+        "id": "info-location",
+        "type": "information",
+        "title": "鉄筋の使用部位",
+        "symbol": "L",
+        "subject": "鉄筋",
+        "property": "使用部位",
+        "property_type": "classification",
+        "description": "鉄筋が使用される部位（柱・はりの出すみ部分、煙突、その他）",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-specified-location",
+        "type": "process",
+        "title": "指定部位該当判定",
+        "process_type": "mechanical",
+        "target_subject": "鉄筋",
+        "iteration": "iterative",
+        "description": "各号に掲げる部分（柱及びはり（基礎ばりを除く）の出すみ部分、煙突）に該当するかを判定",
+        "logic_expression": "L ∈ {柱・はりの出すみ部分, 煙突}"
+      },
+      {
+        "id": "info-specified-location",
+        "type": "information",
+        "title": "指定部位該当",
+        "symbol": "S",
+        "subject": "鉄筋",
+        "property": "各号部位への該当",
+        "property_type": "proposition",
+        "description": "当該鉄筋が各号に掲げる部分（柱・はりの出すみ部分、煙突）に使用されているか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-exempt-check",
+        "type": "process",
+        "title": "折り曲げ省略可否判定",
+        "process_type": "mechanical",
+        "target_subject": "鉄筋",
+        "iteration": "iterative",
+        "description": "ただし書きにより折り曲げ省略が可能かを判定（異形鉄筋で各号部位以外の場合に省略可）",
+        "logic_expression": "D AND (NOT S)"
+      },
+      {
+        "id": "info-exempt",
+        "type": "information",
+        "title": "折り曲げ省略可",
+        "symbol": "X",
+        "subject": "鉄筋",
+        "property": "折り曲げ省略可否",
+        "property_type": "proposition",
+        "description": "ただし書きにより末端の折り曲げを省略できるか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-end-shape",
+        "type": "process",
+        "title": "末端形状の確認",
+        "process_type": "human_judgment",
+        "target_subject": "鉄筋",
+        "iteration": "iterative",
+        "description": "設計図書等から各鉄筋の末端がかぎ状に折り曲げられているかを確認する"
+      },
+      {
+        "id": "info-hook-shape",
+        "type": "information",
+        "title": "かぎ状折り曲げ",
+        "symbol": "H",
+        "subject": "鉄筋",
+        "property": "かぎ状折り曲げの有無",
+        "property_type": "proposition",
+        "description": "鉄筋の末端がかぎ状に折り曲げられているか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-anchoring",
+        "type": "process",
+        "title": "定着状況の確認",
+        "process_type": "human_judgment",
+        "target_subject": "鉄筋",
+        "iteration": "iterative",
+        "description": "設計図書等から鉄筋がコンクリートから抜け出ないように定着されているかを確認する"
+      },
+      {
+        "id": "info-anchored",
+        "type": "information",
+        "title": "定着状況",
+        "symbol": "A",
+        "subject": "鉄筋",
+        "property": "コンクリートへの定着",
+        "property_type": "proposition",
+        "description": "鉄筋がコンクリートから抜け出ないように定着されているか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-hook-anchored",
+        "type": "process",
+        "title": "本文要件判定",
+        "process_type": "mechanical",
+        "target_subject": "鉄筋",
+        "iteration": "iterative",
+        "description": "本文の要件（かぎ状に折り曲げて定着）を満たすかを判定",
+        "logic_expression": "H AND A"
+      },
+      {
+        "id": "info-hook-anchored",
+        "type": "information",
+        "title": "本文要件適合",
+        "symbol": "M",
+        "subject": "鉄筋",
+        "property": "本文要件への適合",
+        "property_type": "proposition",
+        "description": "本文の要件（かぎ状に折り曲げてコンクリートから抜け出ないように定着）を満たすか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-final-judgment",
+        "type": "process",
+        "title": "適合判定",
+        "process_type": "mechanical",
+        "target_subject": "鉄筋",
+        "iteration": "iterative",
+        "description": "各鉄筋について、本文要件適合または折り曲げ省略可のいずれかを満たすことを確認",
+        "logic_expression": "M OR X"
+      },
+      {
+        "id": "info-compliance",
+        "type": "information",
+        "title": "令73条1項適合",
+        "symbol": "C",
+        "subject": "鉄筋",
+        "property": "令73条1項適合",
+        "property_type": "proposition",
+        "description": "令73条1項の規定に適合するか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-all-check",
+        "type": "process",
+        "title": "全鉄筋適合確認",
+        "process_type": "mechanical",
+        "description": "全ての鉄筋が令73条1項に適合することを確認",
+        "logic_expression": "∀r ∈ Rebars: C(r) = true"
+      },
+      {
+        "id": "info-final",
+        "type": "information",
+        "title": "建築物の令73条1項適合",
+        "subject": "建築物",
+        "property": "令73条1項適合",
+        "property_type": "proposition",
+        "description": "建築物全体として令73条1項の規定に適合するか",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-rebar-set",
+        "to": "info-rebar-set",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "info-rebar-set",
+        "to": "proc-rebar-type",
+        "role": "input"
+      },
+      {
+        "id": "e03",
+        "from": "proc-rebar-type",
+        "to": "info-deformed-bar",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "info-rebar-set",
+        "to": "proc-location-check",
+        "role": "input"
+      },
+      {
+        "id": "e05",
+        "from": "proc-location-check",
+        "to": "info-location",
+        "role": "output"
+      },
+      {
+        "id": "e06",
+        "from": "info-location",
+        "to": "proc-specified-location",
+        "role": "input"
+      },
+      {
+        "id": "e07",
+        "from": "proc-specified-location",
+        "to": "info-specified-location",
+        "role": "output"
+      },
+      {
+        "id": "e08",
+        "from": "info-deformed-bar",
+        "to": "proc-exempt-check",
+        "role": "input"
+      },
+      {
+        "id": "e09",
+        "from": "info-specified-location",
+        "to": "proc-exempt-check",
+        "role": "input"
+      },
+      {
+        "id": "e10",
+        "from": "proc-exempt-check",
+        "to": "info-exempt",
+        "role": "output"
+      },
+      {
+        "id": "e11",
+        "from": "info-rebar-set",
+        "to": "proc-end-shape",
+        "role": "input"
+      },
+      {
+        "id": "e12",
+        "from": "proc-end-shape",
+        "to": "info-hook-shape",
+        "role": "output"
+      },
+      {
+        "id": "e13",
+        "from": "info-rebar-set",
+        "to": "proc-anchoring",
+        "role": "input"
+      },
+      {
+        "id": "e14",
+        "from": "proc-anchoring",
+        "to": "info-anchored",
+        "role": "output"
+      },
+      {
+        "id": "e15",
+        "from": "info-hook-shape",
+        "to": "proc-hook-anchored",
+        "role": "input"
+      },
+      {
+        "id": "e16",
+        "from": "info-anchored",
+        "to": "proc-hook-anchored",
+        "role": "input"
+      },
+      {
+        "id": "e17",
+        "from": "proc-hook-anchored",
+        "to": "info-hook-anchored",
+        "role": "output"
+      },
+      {
+        "id": "e18",
+        "from": "info-hook-anchored",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e19",
+        "from": "info-exempt",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e20",
+        "from": "proc-final-judgment",
+        "to": "info-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e21",
+        "from": "info-compliance",
+        "to": "proc-all-check",
+        "role": "input"
+      },
+      {
+        "id": "e22",
+        "from": "proc-all-check",
+        "to": "info-final",
+        "role": "output"
+      }
+    ]
+  },
+  "metadata": {
+    "created_at": "2026-01-23T12:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

@@ -1,0 +1,151 @@
+{
+  "id": "CHK-BSL-ORDER-A52-P4",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "組積造の施工（芋目地禁止）",
+    "target_subject": "組積材",
+    "description": "組積材が芋目地ができないように組積されているかを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "52",
+    "paragraph": "4",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造",
+    "組積造",
+    "施工"
+  ],
+  "text_raw": "組積材は、芋目地ができないように組積しなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "structure_type",
+          "value": "組積造"
+        }
+      ],
+      "note": "組積造の建築物に適用"
+    },
+    "judgment_rule": {
+      "operator": "==",
+      "lhs": {
+        "ref": "info-no-imomoji",
+        "property": "芋目地なし"
+      },
+      "rhs": {
+        "value": true
+      }
+    },
+    "exceptions": null
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-identify-masonry",
+        "type": "process",
+        "title": "組積材の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書から組積造に使用される組積材を特定する"
+      },
+      {
+        "id": "info-masonry-set",
+        "type": "information",
+        "title": "建築物の組積材",
+        "symbol": "M",
+        "subject": "建築物",
+        "property": "組積材の集合",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "判定対象となる建築物に属する組積材を特定"
+      },
+      {
+        "id": "proc-check-joint-pattern",
+        "type": "process",
+        "title": "目地パターンの確認",
+        "process_type": "human_judgment",
+        "target_subject": "組積材",
+        "iteration": "iterative",
+        "description": "各組積材の目地パターンが芋目地になっていないかを確認する。芋目地とは縦横の目地が一直線に通っている状態を指す。"
+      },
+      {
+        "id": "info-joint-pattern",
+        "type": "information",
+        "title": "各組積材の目地パターン",
+        "symbol": "JP",
+        "subject": "組積材",
+        "property": "目地パターン",
+        "property_type": "visual",
+        "plurality": "multiple",
+        "description": "各組積材の組積における目地パターンの状態（芋目地か否か）"
+      },
+      {
+        "id": "proc-imomoji-judgment",
+        "type": "process",
+        "title": "芋目地有無判定",
+        "process_type": "mechanical",
+        "target_subject": "組積材",
+        "iteration": "iterative",
+        "description": "全ての組積材において芋目地が発生していないことを判定",
+        "logic_expression": "∀m ∈ M: JP(m) ≠ 芋目地"
+      },
+      {
+        "id": "info-no-imomoji",
+        "type": "information",
+        "title": "芋目地なし",
+        "symbol": "R",
+        "subject": "組積材",
+        "property": "芋目地なし適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "全ての組積材が芋目地ができないように組積されているか"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-identify-masonry",
+        "to": "info-masonry-set",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "info-masonry-set",
+        "to": "proc-check-joint-pattern",
+        "role": "input"
+      },
+      {
+        "id": "e03",
+        "from": "proc-check-joint-pattern",
+        "to": "info-joint-pattern",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "info-joint-pattern",
+        "to": "proc-imomoji-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e05",
+        "from": "proc-imomoji-judgment",
+        "to": "info-no-imomoji",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [],
+  "metadata": {
+    "created_at": "2026-01-23T12:00:00Z",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

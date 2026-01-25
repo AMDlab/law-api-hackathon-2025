@@ -1,0 +1,194 @@
+{
+  "id": "CHK-BSL-KIJO-A57-P4",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "組積造のはね出し窓・縁の補強",
+    "target_subject": "組積造のはね出し窓又ははね出し縁",
+    "description": "組積造のはね出し窓・はね出し縁を鉄骨又は鉄筋コンクリートで補強する義務"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "57",
+    "paragraph": "4",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造規定",
+    "組積造"
+  ],
+  "text_raw": "組積造のはね出し窓又ははね出し縁は、鉄骨又は鉄筋コンクリートで補強しなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "structure_type",
+          "value": "組積造の壁を有する建築物"
+        },
+        {
+          "type": "building_part",
+          "value": "はね出し窓又ははね出し縁を有するもの"
+        }
+      ],
+      "note": "組積造のはね出し窓又ははね出し縁が存在する場合に適用"
+    },
+    "judgment_rule": {
+      "operator": "FORALL",
+      "conditions": [
+        {
+          "type": "requirement",
+          "value": "各はね出し窓・縁が鉄骨又は鉄筋コンクリートで補強されていること"
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-masonry-wall-set",
+        "type": "process",
+        "title": "組積造の壁の特定",
+        "process_type": "undefined_input",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "建築物に属する組積造の壁を特定"
+      },
+      {
+        "id": "info-masonry-wall-set",
+        "type": "information",
+        "title": "組積造の壁",
+        "symbol": "MW",
+        "subject": "建築物",
+        "property": "組積造の壁の集合",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "判定対象となる建築物に属する組積造の壁を特定"
+      },
+      {
+        "id": "proc-cantilever-set",
+        "type": "process",
+        "title": "はね出し窓・縁の特定",
+        "process_type": "undefined_input",
+        "target_subject": "組積造の壁",
+        "iteration": "single",
+        "description": "組積造の壁に属するはね出し窓・はね出し縁を特定"
+      },
+      {
+        "id": "info-cantilever-set",
+        "type": "information",
+        "title": "はね出し窓・縁",
+        "symbol": "CW",
+        "subject": "組積造の壁",
+        "property": "はね出し窓・縁の集合",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "組積造の壁に属するはね出し窓又ははね出し縁の集合"
+      },
+      {
+        "id": "proc-reinforce-check",
+        "type": "process",
+        "title": "補強構造の確認",
+        "process_type": "undefined_input",
+        "target_subject": "はね出し窓・縁",
+        "iteration": "iterative",
+        "description": "各はね出し窓・縁の補強構造を確認"
+      },
+      {
+        "id": "info-reinforce-method",
+        "type": "information",
+        "title": "補強構造",
+        "symbol": "RF",
+        "subject": "はね出し窓・縁",
+        "property": "補強構造",
+        "property_type": "classification",
+        "plurality": "multiple",
+        "description": "鉄骨又は鉄筋コンクリートによる補強の有無・種類"
+      },
+      {
+        "id": "proc-final-judge",
+        "type": "process",
+        "title": "適合判定",
+        "process_type": "mechanical",
+        "target_subject": "はね出し窓・縁",
+        "iteration": "iterative",
+        "description": "各はね出し窓・縁が補強要件を満たすか判定",
+        "logic_expression": "FORALL(cw in CW): RF(cw) in {鉄骨, 鉄筋コンクリート}"
+      },
+      {
+        "id": "info-compliance",
+        "type": "information",
+        "title": "第4項適合判定結果",
+        "symbol": "R",
+        "subject": "建築物",
+        "property": "適合判定結果",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "全てのはね出し窓・縁が補強されている場合に適合"
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge-001",
+        "from": "proc-masonry-wall-set",
+        "to": "info-masonry-wall-set",
+        "role": "output"
+      },
+      {
+        "id": "edge-002",
+        "from": "info-masonry-wall-set",
+        "to": "proc-cantilever-set",
+        "role": "input"
+      },
+      {
+        "id": "edge-003",
+        "from": "proc-cantilever-set",
+        "to": "info-cantilever-set",
+        "role": "output"
+      },
+      {
+        "id": "edge-004",
+        "from": "info-cantilever-set",
+        "to": "proc-reinforce-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-005",
+        "from": "proc-reinforce-check",
+        "to": "info-reinforce-method",
+        "role": "output"
+      },
+      {
+        "id": "edge-006",
+        "from": "info-cantilever-set",
+        "to": "proc-final-judge",
+        "role": "input"
+      },
+      {
+        "id": "edge-007",
+        "from": "info-reinforce-method",
+        "to": "proc-final-judge",
+        "role": "input"
+      },
+      {
+        "id": "edge-008",
+        "from": "proc-final-judge",
+        "to": "info-compliance",
+        "role": "output"
+      }
+    ]
+  },
+  "metadata": {
+    "created_at": "2026-01-23T00:00:00Z",
+    "updated_at": "2026-01-23T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "kijo-generator",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令",
+    "source": "e-Gov法令API"
+  }
+}

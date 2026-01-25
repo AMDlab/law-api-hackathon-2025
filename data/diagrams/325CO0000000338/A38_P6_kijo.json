@@ -1,0 +1,304 @@
+{
+  "id": "CHK-BSL-ORDER-A38-P6",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "基礎に使用する木ぐいの位置",
+    "target_subject": "木ぐい",
+    "description": "建築物の基礎に使用する木ぐいは常水面下に設置しなければならない"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "38",
+    "paragraph": "6",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造規定",
+    "基礎"
+  ],
+  "text_raw": "建築物の基礎に木ぐいを使用する場合においては、その木ぐいは、平家建の木造の建築物に使用する場合を除き、常水面下にあるようにしなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "design",
+          "value": "建築物の基礎に木ぐいを使用する"
+        }
+      ],
+      "note": "建築物の基礎に木ぐいを使用する場合に適用"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "ref": "info-is-exception",
+          "operator": "==",
+          "value": true,
+          "note": "平家建の木造の建築物に使用する場合は適用除外"
+        },
+        {
+          "ref": "info-below-water",
+          "operator": "==",
+          "value": true,
+          "note": "木ぐいが常水面下にある"
+        }
+      ]
+    },
+    "exceptions": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "building_type",
+          "value": "平家建の木造の建築物"
+        }
+      ],
+      "effect": "EXEMPT"
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-use-wooden-pile",
+        "type": "process",
+        "title": "木ぐい使用有無の確認",
+        "process_type": "undefined_input",
+        "description": "建築物の基礎に木ぐいを使用するか設計図書から確認"
+      },
+      {
+        "id": "info-use-wooden-pile",
+        "type": "information",
+        "title": "基礎に木ぐいを使用",
+        "symbol": "U",
+        "subject": "建築物",
+        "property": "基礎に木ぐいを使用",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "建築物の基礎に木ぐいを使用するか否か"
+      },
+      {
+        "id": "proc-check-building-type",
+        "type": "process",
+        "title": "建築物種別の確認",
+        "process_type": "undefined_input",
+        "description": "建築物が平家建の木造の建築物であるか確認"
+      },
+      {
+        "id": "info-is-exception",
+        "type": "information",
+        "title": "平家建の木造の建築物",
+        "symbol": "E",
+        "subject": "建築物",
+        "property": "平家建の木造の建築物である",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "平家建の木造の建築物か否か（該当する場合は適用除外）"
+      },
+      {
+        "id": "info-wooden-piles-set",
+        "type": "information",
+        "title": "基礎の木ぐい",
+        "symbol": "PS",
+        "subject": "建築物",
+        "property": "基礎に使用する木ぐいの集合",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "判定対象となる建築物の基礎に使用される木ぐいを特定"
+      },
+      {
+        "id": "proc-identify-piles",
+        "type": "process",
+        "title": "木ぐいの特定",
+        "process_type": "undefined_input",
+        "description": "基礎に使用する木ぐいを設計図書から特定"
+      },
+      {
+        "id": "proc-check-water-level",
+        "type": "process",
+        "title": "常水面位置の確認",
+        "process_type": "undefined_input",
+        "description": "敷地における常水面の位置を地盤調査等から確認"
+      },
+      {
+        "id": "info-water-level",
+        "type": "information",
+        "title": "常水面の位置",
+        "symbol": "WL",
+        "subject": "敷地",
+        "property": "常水面の位置",
+        "property_type": "geometric_surface",
+        "plurality": "single",
+        "description": "敷地における常水面の位置（GL-○○m等）"
+      },
+      {
+        "id": "proc-check-pile-position",
+        "type": "process",
+        "title": "木ぐい位置の確認",
+        "process_type": "undefined_input",
+        "description": "各木ぐいの設置位置を設計図書から確認"
+      },
+      {
+        "id": "info-pile-positions",
+        "type": "information",
+        "title": "木ぐいの設置位置",
+        "symbol": "PP",
+        "subject": "木ぐい",
+        "property": "設置位置",
+        "property_type": "geometric_solid",
+        "plurality": "multiple",
+        "description": "各木ぐいの設置位置（深度）"
+      },
+      {
+        "id": "proc-compare-position",
+        "type": "process",
+        "title": "常水面下判定",
+        "process_type": "mechanical",
+        "target_subject": "木ぐい",
+        "iteration": "iterative",
+        "description": "木ぐいが常水面下にあるか判定",
+        "logic_expression": "PP ≤ WL (各木ぐいの上端が常水面以下)"
+      },
+      {
+        "id": "info-below-water",
+        "type": "information",
+        "title": "木ぐいが常水面下にある",
+        "symbol": "B",
+        "subject": "木ぐい",
+        "property": "常水面下にある",
+        "property_type": "proposition",
+        "plurality": "multiple",
+        "description": "各木ぐいが常水面下にあるか否か"
+      },
+      {
+        "id": "proc-exception-check",
+        "type": "process",
+        "title": "適用除外判定",
+        "process_type": "mechanical",
+        "description": "平家建の木造の建築物か否かを判定",
+        "logic_expression": "E == true → 適用除外"
+      },
+      {
+        "id": "proc-final-judgment",
+        "type": "process",
+        "title": "木ぐい位置適合判定",
+        "process_type": "mechanical",
+        "description": "令38条6項の木ぐい位置規定への適合を判定",
+        "logic_expression": "E OR ∀p∈PS: B(p)"
+      },
+      {
+        "id": "info-final",
+        "type": "information",
+        "title": "木ぐい位置規定適合",
+        "symbol": "R",
+        "subject": "建築物",
+        "property": "木ぐい位置規定適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "令第38条第6項の木ぐい位置規定に適合するか"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-use-wooden-pile",
+        "to": "info-use-wooden-pile",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "proc-check-building-type",
+        "to": "info-is-exception",
+        "role": "output"
+      },
+      {
+        "id": "e03",
+        "from": "proc-identify-piles",
+        "to": "info-wooden-piles-set",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "proc-check-water-level",
+        "to": "info-water-level",
+        "role": "output"
+      },
+      {
+        "id": "e05",
+        "from": "info-wooden-piles-set",
+        "to": "proc-check-pile-position",
+        "role": "input"
+      },
+      {
+        "id": "e06",
+        "from": "proc-check-pile-position",
+        "to": "info-pile-positions",
+        "role": "output"
+      },
+      {
+        "id": "e07",
+        "from": "info-pile-positions",
+        "to": "proc-compare-position",
+        "role": "input"
+      },
+      {
+        "id": "e08",
+        "from": "info-water-level",
+        "to": "proc-compare-position",
+        "role": "input"
+      },
+      {
+        "id": "e09",
+        "from": "proc-compare-position",
+        "to": "info-below-water",
+        "role": "output"
+      },
+      {
+        "id": "e10",
+        "from": "info-is-exception",
+        "to": "proc-exception-check",
+        "role": "input"
+      },
+      {
+        "id": "e11",
+        "from": "proc-exception-check",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e12",
+        "from": "info-below-water",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e13",
+        "from": "proc-final-judgment",
+        "to": "info-final",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": [
+        "A20:P1"
+      ],
+      "description": "法第20条（構造耐力）に基づく政令委任"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-23T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

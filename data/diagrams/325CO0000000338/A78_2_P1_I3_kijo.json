@@ -1,0 +1,386 @@
+{
+  "id": "CHK-REG-A78-2-P1-I3",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "耐力壁の鉄筋配置間隔検証",
+    "target_subject": "耐力壁",
+    "description": "耐力壁における径9mm以上の鉄筋の縦横配置間隔が基準値以下であることを検証する処理"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "78の2",
+    "paragraph": "1",
+    "item": "3"
+  },
+  "labels": ["単体規定", "構造関連", "鉄筋コンクリート造"],
+  "text_raw": "径九ミリメートル以上の鉄筋を縦横に三十センチメートル（複配筋として配置する場合においては、四十五センチメートル）以下の間隔で配置すること。ただし、平家建ての建築物にあつては、その間隔を三十五センチメートル（複配筋として配置する場合においては、五十センチメートル）以下とすることができる。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "structural_type",
+          "value": "鉄筋コンクリート造"
+        },
+        {
+          "type": "structural_part",
+          "value": "耐力壁"
+        }
+      ],
+      "note": "令第78条の2第1項に基づく鉄筋コンクリート造の耐力壁"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "property": "鉄筋径",
+          "operator": "GE",
+          "value": "9mm"
+        },
+        {
+          "property": "鉄筋配置間隔",
+          "operator": "LE",
+          "value": {
+            "type": "conditional",
+            "base": "30cm（複配筋の場合は45cm）",
+            "exception": "平家建ての場合は35cm（複配筋の場合は50cm）"
+          }
+        }
+      ]
+    },
+    "exceptions": {
+      "operator": "IF",
+      "conditions": [
+        {
+          "property": "階数",
+          "operator": "EQ",
+          "value": "1（平家建て）"
+        }
+      ],
+      "effect": "間隔上限の緩和（30cm→35cm、45cm→50cm）"
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "info-walls-set",
+        "type": "information",
+        "title": "建築物の耐力壁",
+        "symbol": "W",
+        "subject": "建築物",
+        "property": "耐力壁の集合",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "判定対象となる建築物に属する耐力壁を特定"
+      },
+      {
+        "id": "proc-identify-rebar",
+        "type": "process",
+        "title": "鉄筋の特定",
+        "process_type": "undefined_input",
+        "target_subject": "耐力壁",
+        "iteration": "iterative",
+        "description": "設計図書等から耐力壁に配置された鉄筋を読み取る"
+      },
+      {
+        "id": "info-rebar-diameter",
+        "type": "information",
+        "title": "鉄筋の径",
+        "symbol": "D",
+        "subject": "鉄筋",
+        "property": "径",
+        "property_type": "numeric",
+        "unit": "mm",
+        "plurality": "multiple",
+        "description": "耐力壁に配置される鉄筋の径"
+      },
+      {
+        "id": "proc-check-diameter",
+        "type": "process",
+        "title": "鉄筋径の確認",
+        "process_type": "mechanical",
+        "target_subject": "鉄筋",
+        "iteration": "iterative",
+        "description": "鉄筋の径が9mm以上であることを確認する",
+        "logic_expression": "D ≥ 9mm"
+      },
+      {
+        "id": "info-diameter-ok",
+        "type": "information",
+        "title": "鉄筋径の適合性",
+        "symbol": "D_OK",
+        "subject": "耐力壁",
+        "property": "鉄筋径基準充足性",
+        "property_type": "proposition",
+        "plurality": "multiple",
+        "description": "耐力壁に配置される鉄筋が径9mm以上であるかの判定結果"
+      },
+      {
+        "id": "proc-identify-spacing",
+        "type": "process",
+        "title": "鉄筋配置間隔の読み取り",
+        "process_type": "undefined_input",
+        "target_subject": "耐力壁",
+        "iteration": "iterative",
+        "description": "設計図書等から耐力壁における鉄筋の縦横配置間隔を読み取る"
+      },
+      {
+        "id": "info-rebar-spacing",
+        "type": "information",
+        "title": "鉄筋の縦横配置間隔",
+        "symbol": "S",
+        "subject": "耐力壁",
+        "property": "鉄筋配置間隔",
+        "property_type": "numeric",
+        "unit": "cm",
+        "plurality": "multiple",
+        "description": "耐力壁における鉄筋の縦横配置間隔"
+      },
+      {
+        "id": "proc-identify-double",
+        "type": "process",
+        "title": "複配筋かどうかの特定",
+        "process_type": "undefined_input",
+        "target_subject": "耐力壁",
+        "iteration": "iterative",
+        "description": "設計図書等から耐力壁が複配筋として配置されているかを読み取る"
+      },
+      {
+        "id": "info-double-rebar",
+        "type": "information",
+        "title": "複配筋の有無",
+        "symbol": "DR",
+        "subject": "耐力壁",
+        "property": "複配筋配置",
+        "property_type": "proposition",
+        "plurality": "multiple",
+        "description": "耐力壁の鉄筋が複配筋として配置されているかどうか"
+      },
+      {
+        "id": "proc-identify-stories",
+        "type": "process",
+        "title": "階数の特定",
+        "process_type": "undefined_input",
+        "target_subject": "建築物",
+        "description": "設計図書等から建築物の階数を読み取る"
+      },
+      {
+        "id": "info-stories",
+        "type": "information",
+        "title": "建築物の階数",
+        "symbol": "N",
+        "subject": "建築物",
+        "property": "階数",
+        "property_type": "numeric",
+        "unit": "階",
+        "plurality": "single",
+        "description": "建築物の地上階数"
+      },
+      {
+        "id": "proc-determine-limit",
+        "type": "process",
+        "title": "配置間隔上限値の決定",
+        "process_type": "mechanical",
+        "target_subject": "耐力壁",
+        "iteration": "iterative",
+        "description": "複配筋の有無と階数に基づき、適用される配置間隔の上限値を決定する",
+        "logic_expression": "IF N = 1 THEN (IF DR THEN 50cm ELSE 35cm) ELSE (IF DR THEN 45cm ELSE 30cm)",
+        "remarks": "平家建て（N=1）の場合はただし書の緩和規定を適用"
+      },
+      {
+        "id": "info-spacing-limit",
+        "type": "information",
+        "title": "配置間隔上限値",
+        "symbol": "S_MAX",
+        "subject": "耐力壁",
+        "property": "適用配置間隔上限",
+        "property_type": "numeric",
+        "unit": "cm",
+        "plurality": "multiple",
+        "description": "複配筋有無と階数に応じた鉄筋配置間隔の上限値（30cm/35cm/45cm/50cm）"
+      },
+      {
+        "id": "proc-check-spacing",
+        "type": "process",
+        "title": "配置間隔の確認",
+        "process_type": "mechanical",
+        "target_subject": "耐力壁",
+        "iteration": "iterative",
+        "description": "鉄筋の縦横配置間隔が上限値以下であることを確認する",
+        "logic_expression": "S ≤ S_MAX"
+      },
+      {
+        "id": "info-spacing-ok",
+        "type": "information",
+        "title": "配置間隔の適合性",
+        "symbol": "S_OK",
+        "subject": "耐力壁",
+        "property": "配置間隔基準充足性",
+        "property_type": "proposition",
+        "plurality": "multiple",
+        "description": "耐力壁の鉄筋配置間隔が基準以下であるかの判定結果"
+      },
+      {
+        "id": "proc-final-check",
+        "type": "process",
+        "title": "総合判定",
+        "process_type": "mechanical",
+        "target_subject": "耐力壁",
+        "iteration": "iterative",
+        "description": "鉄筋径と配置間隔の両方が基準を満たすことを確認する",
+        "logic_expression": "D_OK AND S_OK"
+      },
+      {
+        "id": "info-compliance",
+        "type": "information",
+        "title": "第3号適合判定",
+        "symbol": "RESULT",
+        "subject": "耐力壁",
+        "property": "令第78条の2第1項第3号適合性",
+        "property_type": "proposition",
+        "plurality": "multiple",
+        "description": "耐力壁が令第78条の2第1項第3号の鉄筋配置要件を満たすことの判定結果"
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge-001",
+        "from": "info-walls-set",
+        "to": "proc-identify-rebar",
+        "role": "input"
+      },
+      {
+        "id": "edge-002",
+        "from": "proc-identify-rebar",
+        "to": "info-rebar-diameter",
+        "role": "output"
+      },
+      {
+        "id": "edge-003",
+        "from": "info-rebar-diameter",
+        "to": "proc-check-diameter",
+        "role": "input"
+      },
+      {
+        "id": "edge-004",
+        "from": "proc-check-diameter",
+        "to": "info-diameter-ok",
+        "role": "output"
+      },
+      {
+        "id": "edge-005",
+        "from": "info-walls-set",
+        "to": "proc-identify-spacing",
+        "role": "input"
+      },
+      {
+        "id": "edge-006",
+        "from": "proc-identify-spacing",
+        "to": "info-rebar-spacing",
+        "role": "output"
+      },
+      {
+        "id": "edge-007",
+        "from": "info-walls-set",
+        "to": "proc-identify-double",
+        "role": "input"
+      },
+      {
+        "id": "edge-008",
+        "from": "proc-identify-double",
+        "to": "info-double-rebar",
+        "role": "output"
+      },
+      {
+        "id": "edge-009",
+        "from": "proc-identify-stories",
+        "to": "info-stories",
+        "role": "output"
+      },
+      {
+        "id": "edge-010",
+        "from": "info-double-rebar",
+        "to": "proc-determine-limit",
+        "role": "input"
+      },
+      {
+        "id": "edge-011",
+        "from": "info-stories",
+        "to": "proc-determine-limit",
+        "role": "input"
+      },
+      {
+        "id": "edge-012",
+        "from": "proc-determine-limit",
+        "to": "info-spacing-limit",
+        "role": "output"
+      },
+      {
+        "id": "edge-013",
+        "from": "info-rebar-spacing",
+        "to": "proc-check-spacing",
+        "role": "input"
+      },
+      {
+        "id": "edge-014",
+        "from": "info-spacing-limit",
+        "to": "proc-check-spacing",
+        "role": "input"
+      },
+      {
+        "id": "edge-015",
+        "from": "proc-check-spacing",
+        "to": "info-spacing-ok",
+        "role": "output"
+      },
+      {
+        "id": "edge-016",
+        "from": "info-diameter-ok",
+        "to": "proc-final-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-017",
+        "from": "info-spacing-ok",
+        "to": "proc-final-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-018",
+        "from": "proc-final-check",
+        "to": "info-compliance",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": ["A20"],
+      "description": "法第20条（構造耐力）に基づく委任規定"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": ["A78_2:P1:I1", "A78_2:P1:I2", "A78_2:P1:I4"],
+      "description": "同項の他の号（厚さ、開口部補強筋、接合部）との関連"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-23T00:00:00Z",
+    "updated_at": "2026-01-23T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "kijo-generator",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令",
+    "source": "e-Gov法令API v2"
+  }
+}

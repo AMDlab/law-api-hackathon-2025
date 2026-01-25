@@ -1,0 +1,276 @@
+{
+  "id": "CHK-BSL-ORD-A128_4-P2",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "内装制限を受ける階数3以上の建築物の判定",
+    "target_subject": "建築物",
+    "description": "法第35条の2に基づき内装制限を受ける階数3以上の建築物の範囲を判定"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "128の4",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "内装制限",
+    "階数3以上の建築物"
+  ],
+  "text_raw": "法第三十五条の二の規定により政令で定める階数が三以上である建築物は、延べ面積が五百平方メートルを超えるもの（学校等の用途に供するものを除く。）以外のものとする。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        { "type": "article_scope", "value": "法第35条の2の適用対象（階数3以上の建築物）" }
+      ],
+      "note": "法第35条の2で定める内装制限のうち、階数3以上の建築物に関する委任規定"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        { "ref": "階数", "operator": ">=", "value": 3, "unit": "階" },
+        { "ref": "延べ面積", "operator": ">", "value": 500, "unit": "m2" },
+        { "ref": "用途", "operator": "NOT_IN", "value": "学校等" }
+      ]
+    },
+    "exceptions": {
+      "operator": "OR",
+      "conditions": [
+        { "type": "use", "value": "学校等の用途", "effect": "EXEMPT" }
+      ],
+      "effect": "EXEMPT"
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-story-identify",
+        "type": "process",
+        "title": "階数の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書から建築物の階数を読み取る"
+      },
+      {
+        "id": "info-story-count",
+        "type": "information",
+        "title": "階数",
+        "symbol": "N",
+        "subject": "建築物",
+        "property": "階数",
+        "property_type": "numeric",
+        "unit": "階",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-story-check",
+        "type": "process",
+        "title": "階数3以上の判定",
+        "process_type": "mechanical",
+        "description": "階数が3以上であるか判定",
+        "logic_expression": "N >= 3"
+      },
+      {
+        "id": "info-story-applicable",
+        "type": "information",
+        "title": "階数3以上",
+        "symbol": "A1",
+        "subject": "建築物",
+        "property": "階数3以上の該当性",
+        "property_type": "proposition",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-area-identify",
+        "type": "process",
+        "title": "延べ面積の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書から建築物の延べ面積を読み取る"
+      },
+      {
+        "id": "info-total-area",
+        "type": "information",
+        "title": "延べ面積",
+        "symbol": "S",
+        "subject": "建築物",
+        "property": "延べ面積",
+        "property_type": "numeric",
+        "unit": "m2",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-area-check",
+        "type": "process",
+        "title": "延べ面積500m2超の判定",
+        "process_type": "mechanical",
+        "description": "延べ面積が500m2を超えるか判定",
+        "logic_expression": "S > 500"
+      },
+      {
+        "id": "info-area-exceed",
+        "type": "information",
+        "title": "延べ面積500m2超",
+        "symbol": "A2",
+        "subject": "建築物",
+        "property": "延べ面積500m2超の該当性",
+        "property_type": "proposition",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-use-identify",
+        "type": "process",
+        "title": "用途の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書から建築物の用途を読み取る"
+      },
+      {
+        "id": "info-use",
+        "type": "information",
+        "title": "建築物の用途",
+        "symbol": "U",
+        "subject": "建築物",
+        "property": "用途",
+        "property_type": "classification",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-school-check",
+        "type": "process",
+        "title": "学校等の該当性判定",
+        "process_type": "mechanical",
+        "description": "用途が学校等（小学校、中学校、義務教育学校、高等学校、中等教育学校、特別支援学校又は幼稚園）に該当するか判定",
+        "logic_expression": "U IN {学校等}"
+      },
+      {
+        "id": "info-school-applicable",
+        "type": "information",
+        "title": "学校等の用途",
+        "symbol": "A3",
+        "subject": "建築物",
+        "property": "学校等の該当性",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "学校等：小学校、中学校、義務教育学校、高等学校、中等教育学校、特別支援学校又は幼稚園"
+      },
+      {
+        "id": "proc-final-judge",
+        "type": "process",
+        "title": "内装制限適用判定",
+        "process_type": "mechanical",
+        "description": "階数3以上かつ延べ面積500m2超かつ学校等でない場合に内装制限の適用対象と判定",
+        "logic_expression": "A1 AND A2 AND NOT(A3)"
+      },
+      {
+        "id": "info-final-compliance",
+        "type": "information",
+        "title": "内装制限適用対象",
+        "symbol": "SUBJECT",
+        "subject": "建築物",
+        "property": "内装制限適用対象の該当性",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "法第35条の2に基づく内装制限の適用対象となる階数3以上の建築物"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-story-identify",
+        "to": "info-story-count",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "info-story-count",
+        "to": "proc-story-check",
+        "role": "input"
+      },
+      {
+        "id": "e03",
+        "from": "proc-story-check",
+        "to": "info-story-applicable",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "proc-area-identify",
+        "to": "info-total-area",
+        "role": "output"
+      },
+      {
+        "id": "e05",
+        "from": "info-total-area",
+        "to": "proc-area-check",
+        "role": "input"
+      },
+      {
+        "id": "e06",
+        "from": "proc-area-check",
+        "to": "info-area-exceed",
+        "role": "output"
+      },
+      {
+        "id": "e07",
+        "from": "proc-use-identify",
+        "to": "info-use",
+        "role": "output"
+      },
+      {
+        "id": "e08",
+        "from": "info-use",
+        "to": "proc-school-check",
+        "role": "input"
+      },
+      {
+        "id": "e09",
+        "from": "proc-school-check",
+        "to": "info-school-applicable",
+        "role": "output"
+      },
+      {
+        "id": "e10",
+        "from": "info-story-applicable",
+        "to": "proc-final-judge",
+        "role": "input"
+      },
+      {
+        "id": "e11",
+        "from": "info-area-exceed",
+        "to": "proc-final-judge",
+        "role": "input"
+      },
+      {
+        "id": "e12",
+        "from": "info-school-applicable",
+        "to": "proc-final-judge",
+        "role": "input"
+      },
+      {
+        "id": "e13",
+        "from": "proc-final-judge",
+        "to": "info-final-compliance",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": ["A35_2"],
+      "description": "法第35条の2が本項に委任"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-25T00:00:00+09:00",
+    "author": "Claude",
+    "generator": "kijo-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

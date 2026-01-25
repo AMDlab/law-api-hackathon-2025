@@ -1,0 +1,321 @@
+{
+  "id": "CHK-BSL-ORDER-A45-P4",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "筋かいの欠込み禁止",
+    "target_subject": "筋かい",
+    "description": "筋かいに欠込みがないこと、または例外としてたすき掛けのためにやむを得ない場合で必要な補強が行われていることを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "45",
+    "paragraph": "4",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造",
+    "木造",
+    "筋かい"
+  ],
+  "text_raw": "筋かいには、欠込みをしてはならない。ただし、筋かいをたすき掛けにするためにやむを得ない場合において、必要な補強を行つたときは、この限りでない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "building_element",
+          "value": "筋かいを有する建築物"
+        }
+      ],
+      "note": "筋かいを有する木造建築物に適用"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "ref": "info-notch-existence",
+          "operator": "==",
+          "value": false,
+          "note": "欠込みなし"
+        },
+        {
+          "operator": "AND",
+          "conditions": [
+            {
+              "ref": "info-cross-bracing-purpose",
+              "operator": "==",
+              "value": true
+            },
+            {
+              "ref": "info-reinforcement-done",
+              "operator": "==",
+              "value": true
+            }
+          ],
+          "note": "たすき掛け目的かつ補強あり"
+        }
+      ]
+    },
+    "exceptions": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "purpose",
+          "value": "たすき掛けにするためにやむを得ない場合"
+        },
+        {
+          "type": "measure",
+          "value": "必要な補強を行った"
+        }
+      ],
+      "effect": "EXEMPT"
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-braces-set",
+        "type": "process",
+        "title": "筋かいの特定",
+        "process_type": "undefined_input",
+        "description": "設計図書から建築物に設けられた筋かいを特定する"
+      },
+      {
+        "id": "info-braces-set",
+        "type": "information",
+        "title": "建築物の筋かい",
+        "symbol": "BS",
+        "subject": "建築物",
+        "property": "筋かいの集合",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "判定対象となる建築物に設けられた筋かいを特定"
+      },
+      {
+        "id": "proc-notch-check",
+        "type": "process",
+        "title": "欠込みの有無確認",
+        "process_type": "human_judgment",
+        "target_subject": "筋かい",
+        "iteration": "iterative",
+        "description": "各筋かいに欠込みがあるか確認する"
+      },
+      {
+        "id": "info-notch-existence",
+        "type": "information",
+        "title": "筋かいの欠込みの有無",
+        "symbol": "N",
+        "subject": "筋かい",
+        "property": "欠込みの有無",
+        "property_type": "proposition",
+        "plurality": "multiple",
+        "description": "各筋かいに欠込みがあるか（true: 欠込みあり、false: 欠込みなし）"
+      },
+      {
+        "id": "proc-cross-bracing-check",
+        "type": "process",
+        "title": "たすき掛け目的の確認",
+        "process_type": "human_judgment",
+        "target_subject": "筋かい",
+        "iteration": "iterative",
+        "description": "欠込みがある筋かいについて、たすき掛けにするためにやむを得ない場合か確認する"
+      },
+      {
+        "id": "info-cross-bracing-purpose",
+        "type": "information",
+        "title": "たすき掛け目的該当",
+        "symbol": "CB",
+        "subject": "筋かい",
+        "property": "たすき掛け目的でやむを得ない場合",
+        "property_type": "proposition",
+        "plurality": "multiple",
+        "description": "欠込みが筋かいをたすき掛けにするためにやむを得ない場合か"
+      },
+      {
+        "id": "proc-reinforcement-check",
+        "type": "process",
+        "title": "必要な補強の確認",
+        "process_type": "human_judgment",
+        "target_subject": "筋かい",
+        "iteration": "iterative",
+        "description": "欠込みがある筋かいについて、必要な補強が行われているか確認する"
+      },
+      {
+        "id": "info-reinforcement-done",
+        "type": "information",
+        "title": "必要な補強の有無",
+        "symbol": "R",
+        "subject": "筋かい",
+        "property": "必要な補強の実施",
+        "property_type": "proposition",
+        "plurality": "multiple",
+        "description": "欠込み部分に必要な補強が行われているか"
+      },
+      {
+        "id": "proc-exception-judgment",
+        "type": "process",
+        "title": "例外適用判定",
+        "process_type": "mechanical",
+        "target_subject": "筋かい",
+        "iteration": "iterative",
+        "description": "欠込みがある筋かいについて、ただし書きの例外条件（たすき掛け目的かつ補強あり）を満たすか判定",
+        "logic_expression": "CB AND R"
+      },
+      {
+        "id": "info-exception-applicable",
+        "type": "information",
+        "title": "例外適用可否",
+        "symbol": "E",
+        "subject": "筋かい",
+        "property": "ただし書き例外の適用",
+        "property_type": "proposition",
+        "plurality": "multiple",
+        "description": "欠込みがある筋かいが、ただし書きの例外条件を満たすか"
+      },
+      {
+        "id": "proc-final-judgment",
+        "type": "process",
+        "title": "令第45条第4項適合判定",
+        "process_type": "mechanical",
+        "target_subject": "筋かい",
+        "iteration": "iterative",
+        "description": "各筋かいについて、欠込みがないか、または例外適用により適合するか判定",
+        "logic_expression": "NOT N OR E"
+      },
+      {
+        "id": "info-each-compliance",
+        "type": "information",
+        "title": "各筋かいの適合",
+        "symbol": "C1",
+        "subject": "筋かい",
+        "property": "令第45条第4項適合",
+        "property_type": "proposition",
+        "plurality": "multiple",
+        "description": "各筋かいが令第45条第4項に適合するか"
+      },
+      {
+        "id": "proc-all-judgment",
+        "type": "process",
+        "title": "全筋かい適合判定",
+        "process_type": "mechanical",
+        "description": "すべての筋かいが適合しているか判定",
+        "logic_expression": "ALL(C1)"
+      },
+      {
+        "id": "info-final",
+        "type": "information",
+        "title": "令第45条第4項適合",
+        "symbol": "C",
+        "subject": "建築物",
+        "property": "令第45条第4項適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "建築物が令第45条第4項の規定に適合するか（すべての筋かいが適合）"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-braces-set",
+        "to": "info-braces-set",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "info-braces-set",
+        "to": "proc-notch-check",
+        "role": "input"
+      },
+      {
+        "id": "e03",
+        "from": "proc-notch-check",
+        "to": "info-notch-existence",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "info-notch-existence",
+        "to": "proc-cross-bracing-check",
+        "role": "input"
+      },
+      {
+        "id": "e05",
+        "from": "proc-cross-bracing-check",
+        "to": "info-cross-bracing-purpose",
+        "role": "output"
+      },
+      {
+        "id": "e06",
+        "from": "info-notch-existence",
+        "to": "proc-reinforcement-check",
+        "role": "input"
+      },
+      {
+        "id": "e07",
+        "from": "proc-reinforcement-check",
+        "to": "info-reinforcement-done",
+        "role": "output"
+      },
+      {
+        "id": "e08",
+        "from": "info-cross-bracing-purpose",
+        "to": "proc-exception-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e09",
+        "from": "info-reinforcement-done",
+        "to": "proc-exception-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e10",
+        "from": "proc-exception-judgment",
+        "to": "info-exception-applicable",
+        "role": "output"
+      },
+      {
+        "id": "e11",
+        "from": "info-notch-existence",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e12",
+        "from": "info-exception-applicable",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e13",
+        "from": "proc-final-judgment",
+        "to": "info-each-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e14",
+        "from": "info-each-compliance",
+        "to": "proc-all-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e15",
+        "from": "proc-all-judgment",
+        "to": "info-final",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [],
+  "metadata": {
+    "created_at": "2026-01-23T12:00:00Z",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}
