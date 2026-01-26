@@ -1,0 +1,249 @@
+{
+  "id": "FLOW-BSL-ORDER-A135_21-P1",
+  "version": "3.2",
+  "page_title": {
+    "title": "建蔽率の制限の緩和に当たり建築物から除かれる部分",
+    "target_subject": "建築物の部分",
+    "description": "法第53条第4項の建蔽率計算から除外される建築物の部分を判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "135_21",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "定義",
+    "建蔽率",
+    "除外部分"
+  ],
+  "text_raw": "法第五十三条第四項の政令で定める建築物の部分は、次に掲げるものとする。一 軒、ひさし、ぬれ縁及び国土交通省令で定める建築設備 二 建築物の地盤面下の部分 三 高さが二メートル以下の門又は塀",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "reference",
+          "value": "法第53条第4項の適用を受ける建築計画"
+        }
+      ],
+      "note": "建蔽率の制限の緩和を受ける際に除外される部分の判定"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "ref": "info-item1-result",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "ref": "info-item2-result",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "ref": "info-item3-result",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "flow_diagram": {
+    "title": "建蔽率計算除外部分の判定フロー",
+    "description": "法第53条第4項に基づき建蔽率計算から除外される建築物の部分を判定するフローチャート",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "建築物の部分が建蔽率計算から除外されるか判定を開始"
+      },
+      {
+        "id": "dec-part-type",
+        "type": "decision",
+        "title": "部分の種別は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "軒・ひさし・ぬれ縁・建築設備", "description": "軒、ひさし、ぬれ縁、国土交通省令で定める建築設備" },
+          { "value": "地盤面下部分", "description": "建築物の地盤面下の部分" },
+          { "value": "門・塀", "description": "門又は塀" },
+          { "value": "その他", "description": "上記以外の部分" }
+        ],
+        "description": "設計図書から建築物の部分の種別を特定し分類する",
+        "condition": {
+          "operator": "IN",
+          "lhs": { "var": "T", "desc": "部分の種別" },
+          "rhs": { "value": ["軒・ひさし・ぬれ縁・建築設備", "地盤面下部分", "門・塀", "その他"] }
+        }
+      },
+      {
+        "id": "proc-item1-match",
+        "type": "process",
+        "title": "第1号該当（軒・ひさし・ぬれ縁・建築設備）",
+        "process_type": "mechanical",
+        "description": "軒、ひさし、ぬれ縁及び国土交通省令で定める建築設備に該当"
+      },
+      {
+        "id": "proc-item2-match",
+        "type": "process",
+        "title": "第2号該当（地盤面下部分）",
+        "process_type": "mechanical",
+        "description": "建築物の地盤面下の部分に該当"
+      },
+      {
+        "id": "dec-is-gate-or-fence",
+        "type": "decision",
+        "title": "門又は塀か？",
+        "decision_type": "binary",
+        "description": "部分が門又は塀であるか確認",
+        "condition": {
+          "operator": "IN",
+          "lhs": { "var": "T", "desc": "部分の種別" },
+          "rhs": { "value": ["門", "塀"] }
+        }
+      },
+      {
+        "id": "dec-height-check",
+        "type": "decision",
+        "title": "高さ ≤ 2m か？",
+        "decision_type": "binary",
+        "description": "門又は塀の高さが2メートル以下か判定",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "H", "desc": "門・塀の高さ" },
+          "rhs": { "value": 2, "unit": "m" }
+        }
+      },
+      {
+        "id": "proc-item3-match",
+        "type": "process",
+        "title": "第3号該当（高さ2m以下の門・塀）",
+        "process_type": "mechanical",
+        "description": "高さが2メートル以下の門又は塀に該当"
+      },
+      {
+        "id": "end-excluded",
+        "type": "terminal",
+        "title": "建蔽率計算から除外",
+        "result": "pass",
+        "description": "法第53条第4項に基づき建蔽率計算から除外される部分に該当する"
+      },
+      {
+        "id": "end-not-excluded",
+        "type": "terminal",
+        "title": "建蔽率計算に算入",
+        "result": "fail",
+        "description": "建蔽率計算から除外される部分に該当しない"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-part-type",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-part-type",
+        "to": "proc-item1-match",
+        "role": "option",
+        "label": "軒・ひさし・ぬれ縁・建築設備"
+      },
+      {
+        "id": "e03",
+        "from": "dec-part-type",
+        "to": "proc-item2-match",
+        "role": "option",
+        "label": "地盤面下部分"
+      },
+      {
+        "id": "e04",
+        "from": "dec-part-type",
+        "to": "dec-is-gate-or-fence",
+        "role": "option",
+        "label": "門・塀"
+      },
+      {
+        "id": "e05",
+        "from": "dec-part-type",
+        "to": "end-not-excluded",
+        "role": "option",
+        "label": "その他"
+      },
+      {
+        "id": "e06",
+        "from": "proc-item1-match",
+        "to": "end-excluded",
+        "role": "flow"
+      },
+      {
+        "id": "e07",
+        "from": "proc-item2-match",
+        "to": "end-excluded",
+        "role": "flow"
+      },
+      {
+        "id": "e08",
+        "from": "dec-is-gate-or-fence",
+        "to": "dec-height-check",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e09",
+        "from": "dec-is-gate-or-fence",
+        "to": "end-not-excluded",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e10",
+        "from": "dec-height-check",
+        "to": "proc-item3-match",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e11",
+        "from": "dec-height-check",
+        "to": "end-not-excluded",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e12",
+        "from": "proc-item3-match",
+        "to": "end-excluded",
+        "role": "flow"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-ORDER-A135_21-P1",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": [
+        "A53:P4"
+      ],
+      "description": "法第53条第4項の建蔽率計算除外部分の委任"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

@@ -1,0 +1,260 @@
+{
+  "id": "A59_2_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "補強を要する組積造",
+    "target_subject": "建築物",
+    "description": "高さ13mを超える又は軒の高さが9mを超える建築物が国土交通大臣が定める構造方法により補強されていることを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "59の2",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造関係規定",
+    "組積造"
+  ],
+  "text_raw": "高さ十三メートル又は軒の高さが九メートルを超える建築物にあつては、国土交通大臣が定める構造方法により、鉄筋、鉄骨又は鉄筋コンクリートによつて補強しなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "type": "building_dimension",
+          "value": "高さ13mを超える"
+        },
+        {
+          "type": "building_dimension",
+          "value": "軒の高さ9mを超える"
+        }
+      ],
+      "note": "高さ13m超又は軒の高さ9m超の建築物が対象"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-reinforcement-compliance",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    }
+  },
+  "flow_diagram": {
+    "title": "令第59条の2第1項 補強を要する組積造 適合判定フロー",
+    "description": "高さ13m超又は軒の高さ9m超の組積造建築物における補強要件の適合判定フロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start"
+      },
+      {
+        "id": "dec-height-over-13m",
+        "type": "decision",
+        "title": "建築物の高さ > 13m か？",
+        "decision_type": "binary",
+        "description": "令第2条第1項第6号に規定する高さが13mを超えるか判定",
+        "condition": {
+          "operator": "GT",
+          "lhs": { "var": "H", "desc": "建築物の高さ" },
+          "rhs": { "value": 13, "unit": "m" }
+        }
+      },
+      {
+        "id": "dec-eaves-height-over-9m",
+        "type": "decision",
+        "title": "軒の高さ > 9m か？",
+        "decision_type": "binary",
+        "description": "令第2条第1項第7号に規定する軒の高さが9mを超えるか判定",
+        "condition": {
+          "operator": "GT",
+          "lhs": { "var": "He", "desc": "建築物の軒の高さ" },
+          "rhs": { "value": 9, "unit": "m" }
+        }
+      },
+      {
+        "id": "proc-scope-applicable",
+        "type": "process",
+        "title": "規定適用対象と判定",
+        "process_type": "mechanical",
+        "description": "高さ13m超又は軒の高さ9m超の要件を満たすため、本規定の適用対象となる"
+      },
+      {
+        "id": "dec-reinforcement-material",
+        "type": "decision",
+        "title": "補強材料は？",
+        "decision_type": "multi",
+        "description": "建築物の補強に使用される材料を判定",
+        "options": [
+          { "value": "鉄筋" },
+          { "value": "鉄骨" },
+          { "value": "鉄筋コンクリート" },
+          { "value": "その他" }
+        ]
+      },
+      {
+        "id": "proc-valid-material",
+        "type": "process",
+        "title": "適切な補強材料",
+        "process_type": "mechanical",
+        "description": "鉄筋、鉄骨又は鉄筋コンクリートのいずれかによる補強であることを確認"
+      },
+      {
+        "id": "dec-mlit-structure-method",
+        "type": "decision",
+        "title": "国土交通大臣が定める構造方法に適合か？",
+        "decision_type": "binary",
+        "description": "平成12年建設省告示第1355号等の構造方法の詳細仕様への適合を判定"
+      },
+      {
+        "id": "proc-structure-compliant",
+        "type": "process",
+        "title": "構造方法適合と判定",
+        "process_type": "human_judgment",
+        "description": "国土交通大臣が定める構造方法により適切に補強されていることを確認"
+      },
+      {
+        "id": "terminal-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令第59条の2第1項に適合"
+      },
+      {
+        "id": "terminal-pass-not-applicable",
+        "type": "terminal",
+        "title": "適合（適用対象外）",
+        "result": "pass",
+        "description": "高さ13m以下かつ軒の高さ9m以下のため、本規定の適用対象外として適合"
+      },
+      {
+        "id": "terminal-fail-material",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "補強材料が鉄筋、鉄骨、鉄筋コンクリートのいずれでもないため不適合"
+      },
+      {
+        "id": "terminal-fail-method",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "国土交通大臣が定める構造方法に適合しないため不適合"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e-start-height",
+        "from": "start",
+        "to": "dec-height-over-13m",
+        "role": "flow"
+      },
+      {
+        "id": "e-height-yes",
+        "from": "dec-height-over-13m",
+        "to": "proc-scope-applicable",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e-height-no",
+        "from": "dec-height-over-13m",
+        "to": "dec-eaves-height-over-9m",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e-eaves-yes",
+        "from": "dec-eaves-height-over-9m",
+        "to": "proc-scope-applicable",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e-eaves-no",
+        "from": "dec-eaves-height-over-9m",
+        "to": "terminal-pass-not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e-scope-material",
+        "from": "proc-scope-applicable",
+        "to": "dec-reinforcement-material",
+        "role": "flow"
+      },
+      {
+        "id": "e-material-iron-rod",
+        "from": "dec-reinforcement-material",
+        "to": "proc-valid-material",
+        "role": "option",
+        "label": "鉄筋"
+      },
+      {
+        "id": "e-material-steel",
+        "from": "dec-reinforcement-material",
+        "to": "proc-valid-material",
+        "role": "option",
+        "label": "鉄骨"
+      },
+      {
+        "id": "e-material-rc",
+        "from": "dec-reinforcement-material",
+        "to": "proc-valid-material",
+        "role": "option",
+        "label": "鉄筋コンクリート"
+      },
+      {
+        "id": "e-material-other",
+        "from": "dec-reinforcement-material",
+        "to": "terminal-fail-material",
+        "role": "option",
+        "label": "その他"
+      },
+      {
+        "id": "e-valid-method",
+        "from": "proc-valid-material",
+        "to": "dec-mlit-structure-method",
+        "role": "flow"
+      },
+      {
+        "id": "e-method-yes",
+        "from": "dec-mlit-structure-method",
+        "to": "proc-structure-compliant",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e-method-no",
+        "from": "dec-mlit-structure-method",
+        "to": "terminal-fail-method",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e-compliant-pass",
+        "from": "proc-structure-compliant",
+        "to": "terminal-pass",
+        "role": "flow"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "A59_2_P1_kijo",
+  "metadata": {
+    "created_at": "2026-01-26T12:00:00+09:00",
+    "updated_at": "2026-01-26T12:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

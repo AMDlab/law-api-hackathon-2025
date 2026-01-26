@@ -1,0 +1,320 @@
+{
+  "id": "A130_2_3_P2_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "特定行政庁による規模決定",
+    "target_subject": "建築物",
+    "description": "特定行政庁が法51条ただし書許可時に定めた規模の適用判定フロー"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "130の2の3",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": [
+    "集団規定",
+    "用途",
+    "特殊建築物の位置"
+  ],
+  "text_raw": "特定行政庁が法第五十一条ただし書の規定による許可をする場合において、前項第四号から第六号までに規定する規模の範囲内において、増築し、又は用途を変更することができる規模を定めたときは、同項の規定にかかわらず、その規模を同条ただし書の規定により政令で定める規模とする。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "permit_status",
+          "value": "法第51条ただし書の許可対象案件"
+        },
+        {
+          "type": "building_use",
+          "value": "卸売市場、と畜場、火葬場、汚物処理場、ごみ処理施設、産業廃棄物処理施設"
+        }
+      ],
+      "note": "特定行政庁が法51条ただし書の規定による許可をする場合に適用"
+    },
+    "judgment_rule": {
+      "operator": "IF_THEN",
+      "conditions": [
+        {
+          "type": "administrative_decision",
+          "value": "特定行政庁が規模を定めた場合",
+          "description": "前項第4号から第6号までに規定する規模の範囲内で、増築又は用途変更できる規模を特定行政庁が定めた場合"
+        }
+      ],
+      "effect": "その規模を政令で定める規模とする"
+    }
+  },
+  "flow_diagram": {
+    "title": "令第130条の2の3第2項 適合判定フロー",
+    "description": "特定行政庁が法51条ただし書許可時に定めた規模の適用判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "法第51条ただし書許可対象案件の規模判定を開始"
+      },
+      {
+        "id": "dec-permit-target",
+        "type": "decision",
+        "title": "法51条ただし書の許可対象案件か？",
+        "decision_type": "binary",
+        "description": "法第51条ただし書の規定による許可対象案件に該当するか確認"
+      },
+      {
+        "id": "dec-permit-category",
+        "type": "decision",
+        "title": "許可対象区分は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "第4号（卸売市場等）", "description": "卸売市場、と畜場、火葬場" },
+          { "value": "第5号（汚物処理場等）", "description": "汚物処理場、ごみ処理施設" },
+          { "value": "第6号（産業廃棄物処理施設）", "description": "産業廃棄物処理施設" }
+        ],
+        "description": "前項第4号、第5号、第6号のいずれに該当するか判定"
+      },
+      {
+        "id": "proc-category-4",
+        "type": "process",
+        "title": "第4号該当",
+        "process_type": "mechanical",
+        "description": "卸売市場、と畜場、火葬場として判定"
+      },
+      {
+        "id": "proc-category-5",
+        "type": "process",
+        "title": "第5号該当",
+        "process_type": "mechanical",
+        "description": "汚物処理場、ごみ処理施設として判定"
+      },
+      {
+        "id": "proc-category-6",
+        "type": "process",
+        "title": "第6号該当",
+        "process_type": "mechanical",
+        "description": "産業廃棄物処理施設として判定"
+      },
+      {
+        "id": "dec-admin-scale-defined",
+        "type": "decision",
+        "title": "特定行政庁が増築・用途変更可能な規模を定めたか？",
+        "decision_type": "binary",
+        "description": "特定行政庁が前項第4号から第6号の規模範囲内で増築又は用途変更できる規模を定めているか確認"
+      },
+      {
+        "id": "proc-read-defined-scale",
+        "type": "process",
+        "title": "定められた規模の読取り",
+        "process_type": "undefined_input",
+        "description": "特定行政庁が定めた増築又は用途変更できる規模を許可条件から読み取る"
+      },
+      {
+        "id": "dec-scale-within-range",
+        "type": "decision",
+        "title": "定められた規模は該当号の規模範囲内か？",
+        "decision_type": "binary",
+        "description": "特定行政庁が定めた規模が前項第4号から第6号に規定する規模の範囲内であるか確認",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "S_admin", "desc": "特定行政庁が定めた規模" },
+          "rhs": { "var": "S_max", "desc": "該当号の規模上限" }
+        }
+      },
+      {
+        "id": "proc-apply-admin-scale",
+        "type": "process",
+        "title": "特定行政庁が定めた規模を適用",
+        "process_type": "mechanical",
+        "description": "特定行政庁が定めた規模を政令で定める規模として適用"
+      },
+      {
+        "id": "dec-plan-within-scale",
+        "type": "decision",
+        "title": "計画規模（増築・用途変更）は定められた規模以内か？",
+        "decision_type": "binary",
+        "description": "増築又は用途変更の計画規模が特定行政庁が定めた規模以内であるか確認",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "S_plan", "desc": "計画規模（増築・用途変更）" },
+          "rhs": { "var": "S_applicable", "desc": "政令で定める規模（特定行政庁が定めた規模）" }
+        }
+      },
+      {
+        "id": "end-admin-scale",
+        "type": "terminal",
+        "title": "判定完了（適合）",
+        "result": "pass",
+        "description": "計画規模が政令で定める規模以内で適合"
+      },
+      {
+        "id": "end-over-scale",
+        "type": "terminal",
+        "title": "判定完了（不適合）",
+        "result": "fail",
+        "description": "計画規模が政令で定める規模を超過し不適合"
+      },
+      {
+        "id": "end-paragraph1",
+        "type": "terminal",
+        "title": "判定完了（第1項規模適用）",
+        "result": "end",
+        "description": "第1項に規定する規模を政令で定める規模とする（本項は適用されない）"
+      },
+      {
+        "id": "end-not-applicable",
+        "type": "terminal",
+        "title": "判定完了（本項適用対象外）",
+        "result": "end",
+        "description": "法第51条ただし書の許可対象案件でないため本項は適用されない"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-permit-target",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-permit-target",
+        "to": "dec-permit-category",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "dec-permit-target",
+        "to": "end-not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e04",
+        "from": "dec-permit-category",
+        "to": "proc-category-4",
+        "role": "option",
+        "label": "第4号（卸売市場等）"
+      },
+      {
+        "id": "e05",
+        "from": "dec-permit-category",
+        "to": "proc-category-5",
+        "role": "option",
+        "label": "第5号（汚物処理場等）"
+      },
+      {
+        "id": "e06",
+        "from": "dec-permit-category",
+        "to": "proc-category-6",
+        "role": "option",
+        "label": "第6号（産業廃棄物処理施設）"
+      },
+      {
+        "id": "e07",
+        "from": "proc-category-4",
+        "to": "dec-admin-scale-defined",
+        "role": "flow"
+      },
+      {
+        "id": "e08",
+        "from": "proc-category-5",
+        "to": "dec-admin-scale-defined",
+        "role": "flow"
+      },
+      {
+        "id": "e09",
+        "from": "proc-category-6",
+        "to": "dec-admin-scale-defined",
+        "role": "flow"
+      },
+      {
+        "id": "e10",
+        "from": "dec-admin-scale-defined",
+        "to": "proc-read-defined-scale",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e11",
+        "from": "dec-admin-scale-defined",
+        "to": "end-paragraph1",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e12",
+        "from": "proc-read-defined-scale",
+        "to": "dec-scale-within-range",
+        "role": "flow"
+      },
+      {
+        "id": "e13",
+        "from": "dec-scale-within-range",
+        "to": "proc-apply-admin-scale",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e14",
+        "from": "dec-scale-within-range",
+        "to": "end-paragraph1",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e15",
+        "from": "proc-apply-admin-scale",
+        "to": "dec-plan-within-scale",
+        "role": "flow"
+      },
+      {
+        "id": "e16",
+        "from": "dec-plan-within-scale",
+        "to": "end-admin-scale",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e17",
+        "from": "dec-plan-within-scale",
+        "to": "end-over-scale",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "A130_2_3_P2_kijo",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": ["A51:P1"],
+      "description": "法第51条ただし書の規定による許可の委任元"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": ["A130_2_3:P1:I4", "A130_2_3:P1:I5", "A130_2_3:P1:I6"],
+      "description": "前項第4号から第6号の規模基準を参照"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-01-26T00:00:00+09:00",
+    "updated_at": "2025-01-26T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令",
+    "checklist_ref": "建築基準法施行令第130条の2の3第2項"
+  }
+}

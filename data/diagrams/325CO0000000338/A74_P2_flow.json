@@ -1,0 +1,180 @@
+{
+  "id": "A74_P2_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "コンクリート強度試験方法の適合判定",
+    "target_subject": "コンクリート",
+    "description": "コンクリートの強度を求める場合に国土交通大臣指定の強度試験によっているかを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "74",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造",
+    "鉄筋コンクリート造",
+    "コンクリート強度"
+  ],
+  "text_raw": "前項に規定するコンクリートの強度を求める場合においては、国土交通大臣が指定する強度試験によらなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "reference",
+          "value": "鉄筋コンクリート造の建築物"
+        },
+        {
+          "type": "reference",
+          "value": "令第74条第1項のコンクリート強度を求める場合"
+        }
+      ],
+      "note": "鉄筋コンクリート造に使用するコンクリートの強度を求める場合に適用"
+    },
+    "judgment_rule": {
+      "operator": "==",
+      "lhs": {
+        "ref": "info-compliance",
+        "description": "強度試験方法適合"
+      },
+      "rhs": {
+        "value": true
+      }
+    },
+    "exceptions": null
+  },
+  "flow_diagram": {
+    "title": "令第74条第2項 コンクリート強度試験方法の適合判定フロー",
+    "description": "コンクリートの強度を求める場合に使用した試験方法が国土交通大臣指定のものであるかを判定する",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "コンクリート強度試験方法の適合判定を開始"
+      },
+      {
+        "id": "dec-scope",
+        "type": "decision",
+        "title": "コンクリート強度を求める場合か？",
+        "decision_type": "binary",
+        "description": "令第74条第1項に規定するコンクリートの強度を求める場合に該当するか"
+      },
+      {
+        "id": "dec-test-method",
+        "type": "decision",
+        "title": "国土交通大臣指定の強度試験か？",
+        "decision_type": "binary",
+        "description": "コンクリートの強度を求めるために用いた試験方法が、国土交通大臣が指定する強度試験に該当するか判定する",
+        "condition": {
+          "operator": "IN",
+          "lhs": {
+            "var": "T",
+            "desc": "使用した強度試験方法"
+          },
+          "rhs": {
+            "value": "国土交通大臣指定強度試験",
+            "desc": "国土交通大臣が指定する強度試験の一覧"
+          }
+        }
+      },
+      {
+        "id": "proc-designated-confirm",
+        "type": "process",
+        "title": "指定試験適合確認",
+        "process_type": "mechanical",
+        "description": "国土交通大臣が指定する強度試験によっていることを確認"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令第74条第2項に適合"
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "令第74条第2項に不適合（国土交通大臣が指定する強度試験によっていない）"
+      },
+      {
+        "id": "end-not-applicable",
+        "type": "terminal",
+        "title": "適用外",
+        "result": "end",
+        "description": "コンクリート強度を求める場合に該当しないため本項は適用外"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-scope",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-scope",
+        "to": "dec-test-method",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "dec-scope",
+        "to": "end-not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e04",
+        "from": "dec-test-method",
+        "to": "proc-designated-confirm",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e05",
+        "from": "dec-test-method",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e06",
+        "from": "proc-designated-confirm",
+        "to": "end-pass",
+        "role": "flow"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-ORDER-A74-P2",
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": [
+        "A74:P1"
+      ],
+      "description": "前項に規定するコンクリートの強度の基準"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T12:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

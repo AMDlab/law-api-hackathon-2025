@@ -1,0 +1,361 @@
+{
+  "id": "A125_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "避難階における屋外への出口までの歩行距離",
+    "target_subject": "避難階",
+    "description": "階段から屋外への出口、居室から屋外への出口への歩行距離制限の適合判定フロー"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "125",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "避難",
+    "歩行距離"
+  ],
+  "text_raw": "避難階においては、階段から屋外への出口の一に至る歩行距離は第百二十条に規定する数値以下と、居室（避難上有効な開口部を有するものを除く。）の各部分から屋外への出口の一に至る歩行距離は同条に規定する数値の二倍以下としなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        { "type": "floor", "value": "避難階" }
+      ],
+      "note": "避難階に適用"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "description": "階段から屋外への出口の一に至る歩行距離が令第120条に規定する数値以下",
+          "lhs": { "ref": "D1", "description": "階段から屋外への出口の一に至る歩行距離" },
+          "operator": "<=",
+          "rhs": { "ref": "L1", "description": "令第120条に規定する数値" }
+        },
+        {
+          "description": "居室（避難上有効な開口部を有するものを除く）の各部分から屋外への出口の一に至る歩行距離が令第120条に規定する数値の二倍以下",
+          "lhs": { "ref": "D2", "description": "居室の各部分から屋外への出口の一に至る歩行距離" },
+          "operator": "<=",
+          "rhs": { "ref": "L2", "description": "令第120条に規定する数値の二倍" }
+        }
+      ]
+    }
+  },
+  "flow_diagram": {
+    "title": "令第125条第1項 適合判定フロー",
+    "description": "避難階における屋外への出口までの歩行距離の適合判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "令第125条第1項の適合判定を開始"
+      },
+      {
+        "id": "dec-is-evacuation-floor",
+        "type": "decision",
+        "title": "避難階か？",
+        "decision_type": "binary",
+        "description": "当該階が避難階に該当するか判定"
+      },
+      {
+        "id": "dec-has-stairs",
+        "type": "decision",
+        "title": "避難階に階段があるか？",
+        "decision_type": "binary",
+        "description": "避難階に階段が設けられているか確認"
+      },
+      {
+        "id": "proc-get-limit-value",
+        "type": "process",
+        "title": "令第120条の基準値を取得",
+        "process_type": "sub_diagram_reference",
+        "description": "居室の種類及び主要構造部の構造に応じた歩行距離の基準値Lを令第120条から取得",
+        "related_articles": ["令::A120:P1"]
+      },
+      {
+        "id": "info-limit-value",
+        "type": "information",
+        "title": "歩行距離基準値 L",
+        "symbol": "L",
+        "subject": "建築物",
+        "property": "令第120条に規定する歩行距離数値",
+        "property_type": "numeric",
+        "description": "居室の種類及び主要構造部の構造に応じた基準歩行距離（単位：m）"
+      },
+      {
+        "id": "proc-measure-stair-distance",
+        "type": "process",
+        "title": "階段から出口への歩行距離を計測",
+        "process_type": "undefined_input",
+        "description": "各階段から屋外への出口の一に至る歩行距離D1を計測"
+      },
+      {
+        "id": "info-stair-distance",
+        "type": "information",
+        "title": "階段から出口への歩行距離 D1",
+        "symbol": "D1",
+        "subject": "階段",
+        "property": "屋外への出口の一に至る歩行距離",
+        "property_type": "numeric",
+        "description": "各階段から屋外への出口の一に至る最短歩行距離（単位：m）"
+      },
+      {
+        "id": "dec-stair-distance-compliant",
+        "type": "decision",
+        "title": "D1 <= L か？",
+        "decision_type": "binary",
+        "description": "階段から出口への歩行距離が基準値以下か判定",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "D1", "desc": "階段から出口への歩行距離" },
+          "rhs": { "var": "L", "desc": "令第120条の基準値", "unit": "m" }
+        }
+      },
+      {
+        "id": "dec-has-target-rooms",
+        "type": "decision",
+        "title": "避難上有効な開口部を有しない居室があるか？",
+        "decision_type": "binary",
+        "description": "避難上有効な開口部を有しない居室（適用対象居室）が存在するか確認"
+      },
+      {
+        "id": "proc-calc-double-limit",
+        "type": "process",
+        "title": "基準値の二倍を算出",
+        "process_type": "mechanical",
+        "description": "居室からの歩行距離基準値 L2 = L × 2 を算出"
+      },
+      {
+        "id": "info-double-limit",
+        "type": "information",
+        "title": "歩行距離基準値の二倍 L2",
+        "symbol": "L2",
+        "subject": "建築物",
+        "property": "令第120条に規定する数値の二倍",
+        "property_type": "numeric",
+        "description": "居室からの歩行距離に適用する基準値（単位：m）"
+      },
+      {
+        "id": "proc-measure-room-distance",
+        "type": "process",
+        "title": "居室から出口への歩行距離を計測",
+        "process_type": "undefined_input",
+        "description": "各居室の各部分から屋外への出口の一に至る歩行距離D2を計測"
+      },
+      {
+        "id": "info-room-distance",
+        "type": "information",
+        "title": "居室から出口への歩行距離 D2",
+        "symbol": "D2",
+        "subject": "居室",
+        "property": "各部分から屋外への出口の一に至る歩行距離",
+        "property_type": "numeric",
+        "description": "各居室の各部分から屋外への出口の一に至る最長歩行距離（単位：m）"
+      },
+      {
+        "id": "dec-room-distance-compliant",
+        "type": "decision",
+        "title": "D2 <= L2 か？",
+        "decision_type": "binary",
+        "description": "居室から出口への歩行距離が基準値の二倍以下か判定",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "D2", "desc": "居室から出口への歩行距離" },
+          "rhs": { "var": "L2", "desc": "基準値の二倍", "unit": "m" }
+        }
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令第125条第1項に適合"
+      },
+      {
+        "id": "end-fail-stair",
+        "type": "terminal",
+        "title": "不適合（階段からの歩行距離超過）",
+        "result": "fail",
+        "description": "階段から屋外への出口の一に至る歩行距離が令第120条に規定する数値を超過"
+      },
+      {
+        "id": "end-fail-room",
+        "type": "terminal",
+        "title": "不適合（居室からの歩行距離超過）",
+        "result": "fail",
+        "description": "居室の各部分から屋外への出口の一に至る歩行距離が令第120条に規定する数値の二倍を超過"
+      },
+      {
+        "id": "end-not-applicable",
+        "type": "terminal",
+        "title": "適用対象外",
+        "result": "end",
+        "description": "避難階ではないため、令第125条第1項は適用対象外"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-is-evacuation-floor",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-is-evacuation-floor",
+        "to": "end-not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e03",
+        "from": "dec-is-evacuation-floor",
+        "to": "dec-has-stairs",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e04",
+        "from": "dec-has-stairs",
+        "to": "dec-has-target-rooms",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e05",
+        "from": "dec-has-stairs",
+        "to": "proc-get-limit-value",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e06",
+        "from": "proc-get-limit-value",
+        "to": "info-limit-value",
+        "role": "output"
+      },
+      {
+        "id": "e07",
+        "from": "info-limit-value",
+        "to": "proc-measure-stair-distance",
+        "role": "input"
+      },
+      {
+        "id": "e08",
+        "from": "proc-measure-stair-distance",
+        "to": "info-stair-distance",
+        "role": "output"
+      },
+      {
+        "id": "e09",
+        "from": "info-stair-distance",
+        "to": "dec-stair-distance-compliant",
+        "role": "input"
+      },
+      {
+        "id": "e10",
+        "from": "info-limit-value",
+        "to": "dec-stair-distance-compliant",
+        "role": "input"
+      },
+      {
+        "id": "e11",
+        "from": "dec-stair-distance-compliant",
+        "to": "end-fail-stair",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e12",
+        "from": "dec-stair-distance-compliant",
+        "to": "dec-has-target-rooms",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e13",
+        "from": "dec-has-target-rooms",
+        "to": "end-pass",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e14",
+        "from": "dec-has-target-rooms",
+        "to": "proc-calc-double-limit",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e15",
+        "from": "proc-calc-double-limit",
+        "to": "info-double-limit",
+        "role": "output"
+      },
+      {
+        "id": "e16",
+        "from": "info-double-limit",
+        "to": "proc-measure-room-distance",
+        "role": "input"
+      },
+      {
+        "id": "e17",
+        "from": "proc-measure-room-distance",
+        "to": "info-room-distance",
+        "role": "output"
+      },
+      {
+        "id": "e18",
+        "from": "info-room-distance",
+        "to": "dec-room-distance-compliant",
+        "role": "input"
+      },
+      {
+        "id": "e19",
+        "from": "info-double-limit",
+        "to": "dec-room-distance-compliant",
+        "role": "input"
+      },
+      {
+        "id": "e20",
+        "from": "dec-room-distance-compliant",
+        "to": "end-fail-room",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e21",
+        "from": "dec-room-distance-compliant",
+        "to": "end-pass",
+        "role": "yes",
+        "label": "はい"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-ORD-A125-P1",
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": ["A120:P1"],
+      "description": "歩行距離の基準値を令第120条に委任"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00+09:00",
+    "author": "Claude",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

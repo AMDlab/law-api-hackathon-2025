@@ -1,0 +1,232 @@
+{
+  "id": "A111_P1_I2_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "避難上有効な開口部の適合判定フロー",
+    "target_subject": "開口部",
+    "description": "居室に設けられた開口部が、直接外気に接する避難上有効な構造で、かつ所定の大きさを満たすかを判定するフロー"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "111",
+    "paragraph": "1",
+    "item": "2"
+  },
+  "labels": ["単体規定", "避難", "開口部"],
+  "text_raw": "直接外気に接する避難上有効な構造のもので、かつ、その大きさが直径一メートル以上の円が内接することができるもの又はその幅及び高さが、それぞれ、七十五センチメートル以上及び一・二メートル以上のもの",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {"type": "subject", "value": "居室の開口部"}
+      ],
+      "note": "居室に設けられた窓その他の開口部が対象"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {"ref": "info-direct-air", "operator": "==", "value": true, "note": "直接外気に接する"},
+        {"ref": "info-evacuation-effective", "operator": "==", "value": true, "note": "避難上有効な構造"},
+        {
+          "operator": "OR",
+          "conditions": [
+            {"ref": "info-circle-ok", "operator": "==", "value": true, "note": "直径1m以上の円が内接可能"},
+            {
+              "operator": "AND",
+              "conditions": [
+                {"ref": "info-width-ok", "operator": "==", "value": true, "note": "幅75cm以上"},
+                {"ref": "info-height-ok", "operator": "==", "value": true, "note": "高さ1.2m以上"}
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "flow_diagram": {
+    "title": "令第111条第1項第2号 避難上有効な開口部の適合判定",
+    "description": "開口部が避難上有効な構造かつ所定の大きさを満たすかを判定するフローチャート",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "開口部の第2号適合判定を開始"
+      },
+      {
+        "id": "dec-direct-air",
+        "type": "decision",
+        "title": "直接外気に接するか？",
+        "decision_type": "binary",
+        "description": "開口部が直接外気に接しているかを判定",
+        "condition": {
+          "operator": "EQ",
+          "lhs": {"var": "direct_air", "desc": "外気直接接続"},
+          "rhs": {"value": true}
+        }
+      },
+      {
+        "id": "dec-evacuation-effective",
+        "type": "decision",
+        "title": "避難上有効な構造か？",
+        "decision_type": "binary",
+        "description": "開口部が避難上有効な構造であるかを判定",
+        "condition": {
+          "operator": "EQ",
+          "lhs": {"var": "evacuation_effective", "desc": "避難上有効な構造"},
+          "rhs": {"value": true}
+        }
+      },
+      {
+        "id": "dec-circle",
+        "type": "decision",
+        "title": "直径1m以上の円が内接可能か？",
+        "decision_type": "binary",
+        "description": "開口部に直径1m以上の円が内接できるかを判定",
+        "condition": {
+          "operator": "GTE",
+          "lhs": {"var": "inscribed_circle_diameter", "desc": "内接可能な円の直径"},
+          "rhs": {"value": 1.0, "unit": "m"}
+        }
+      },
+      {
+        "id": "dec-width",
+        "type": "decision",
+        "title": "幅75cm以上か？",
+        "decision_type": "binary",
+        "description": "開口部の幅が75cm以上であるかを判定",
+        "condition": {
+          "operator": "GTE",
+          "lhs": {"var": "opening_width", "desc": "開口部の幅"},
+          "rhs": {"value": 0.75, "unit": "m"}
+        }
+      },
+      {
+        "id": "dec-height",
+        "type": "decision",
+        "title": "高さ1.2m以上か？",
+        "decision_type": "binary",
+        "description": "開口部の高さが1.2m以上であるかを判定",
+        "condition": {
+          "operator": "GTE",
+          "lhs": {"var": "opening_height", "desc": "開口部の高さ"},
+          "rhs": {"value": 1.2, "unit": "m"}
+        }
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "第2号適合",
+        "result": "pass",
+        "description": "開口部は令第111条第1項第2号に適合"
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "第2号不適合",
+        "result": "fail",
+        "description": "開口部は令第111条第1項第2号に不適合"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-direct-air",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-direct-air",
+        "to": "dec-evacuation-effective",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "dec-direct-air",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e04",
+        "from": "dec-evacuation-effective",
+        "to": "dec-circle",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e05",
+        "from": "dec-evacuation-effective",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e06",
+        "from": "dec-circle",
+        "to": "end-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e07",
+        "from": "dec-circle",
+        "to": "dec-width",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e08",
+        "from": "dec-width",
+        "to": "dec-height",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e09",
+        "from": "dec-width",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e10",
+        "from": "dec-height",
+        "to": "end-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e11",
+        "from": "dec-height",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-A111-P1-I2",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": ["A35_3"],
+      "description": "法35条の3（無窓居室）から委任された政令規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

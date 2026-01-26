@@ -1,0 +1,428 @@
+{
+  "id": "A126_3_P1_I3_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "排煙口の位置・設置場所・風道直結",
+    "target_subject": "排煙口",
+    "description": "排煙口の水平距離、設置場所、排煙風道への直結の基準適合を判定"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "126_3",
+    "paragraph": "1",
+    "item": "3"
+  },
+  "labels": [
+    "単体規定",
+    "設備",
+    "排煙設備",
+    "排煙口"
+  ],
+  "text_raw": "排煙口は、第一号の規定により区画された部分（以下「防煙区画部分」という。）のそれぞれについて、当該防煙区画部分の各部分から排煙口の一に至る水平距離が三十メートル以下となるように、天井又は壁（床面から天井までの垂直距離に応じて、排煙口を設けた場合に火災時に生ずる煙を有効に排出することができるものとして国土交通大臣が定める部分に限る。）に設け、直接外気に接する場合を除き、排煙風道に直結すること。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "equipment",
+          "value": "令第126条の2第1項の排煙設備"
+        }
+      ],
+      "note": "令第126条の2第1項の排煙設備を設置する場合に適用"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "distance",
+          "description": "防煙区画部分の各部分から排煙口の一に至る水平距離が30m以下"
+        },
+        {
+          "type": "location",
+          "description": "排煙口を天井又は壁（国土交通大臣が定める部分）に設置"
+        },
+        {
+          "type": "connection",
+          "description": "直接外気に接する場合を除き、排煙風道に直結"
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "flow_diagram": {
+    "title": "令第126条の3第1項第3号 適合判定フロー",
+    "description": "排煙口の水平距離・設置場所・風道直結の基準適合判定フローチャート",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "排煙口の基準適合判定開始"
+      },
+      {
+        "id": "proc-get-smoke-compartment",
+        "type": "process",
+        "title": "防煙区画部分の取得",
+        "process_type": "undefined_input",
+        "description": "設計図書等から第1号の規定により区画された防煙区画部分を取得"
+      },
+      {
+        "id": "dec-smoke-compartment-exists",
+        "type": "decision",
+        "title": "防煙区画部分があるか？",
+        "decision_type": "binary",
+        "description": "第1号の規定により区画された防煙区画部分が存在するか確認"
+      },
+      {
+        "id": "proc-get-exhaust-openings",
+        "type": "process",
+        "title": "排煙口の取得",
+        "process_type": "undefined_input",
+        "description": "設計図書等から各防煙区画部分に設ける排煙口を取得"
+      },
+      {
+        "id": "dec-exhaust-openings-exist",
+        "type": "decision",
+        "title": "排煙口があるか？",
+        "decision_type": "binary",
+        "description": "各防煙区画部分に排煙口が設けられているか確認"
+      },
+      {
+        "id": "proc-measure-horizontal-distance",
+        "type": "process",
+        "title": "水平距離の測定",
+        "process_type": "undefined_input",
+        "description": "各防煙区画部分の各部分から排煙口の一に至る水平距離の最大値を測定"
+      },
+      {
+        "id": "dec-distance-30m",
+        "type": "decision",
+        "title": "全防煙区画部分で水平距離30m以下か？",
+        "decision_type": "binary",
+        "description": "各防煙区画部分について、当該区画部分の各部分から排煙口の一に至る水平距離が30m以下かを判定",
+        "condition": {
+          "operator": "LTE",
+          "lhs": {
+            "var": "HD",
+            "desc": "各部分から排煙口の一に至る水平距離の最大値"
+          },
+          "rhs": {
+            "value": 30,
+            "unit": "m"
+          }
+        }
+      },
+      {
+        "id": "proc-check-opening-location",
+        "type": "process",
+        "title": "排煙口設置場所の確認",
+        "process_type": "undefined_input",
+        "description": "設計図書等から排煙口の設置場所（天井・壁）を確認"
+      },
+      {
+        "id": "dec-location-type",
+        "type": "decision",
+        "title": "排煙口の設置場所は？",
+        "decision_type": "multi",
+        "options": [
+          {
+            "value": "天井",
+            "description": "天井に設置"
+          },
+          {
+            "value": "壁（大臣指定部分）",
+            "description": "壁の国土交通大臣が定める部分に設置"
+          },
+          {
+            "value": "その他",
+            "description": "天井・壁（大臣指定部分）以外に設置"
+          }
+        ],
+        "description": "排煙口が天井又は壁（国土交通大臣が定める部分）に設置されているか判定"
+      },
+      {
+        "id": "dec-all-openings-valid-location",
+        "type": "decision",
+        "title": "全排煙口が適切な位置か？",
+        "decision_type": "binary",
+        "description": "全ての排煙口について設置場所の適合性を判定"
+      },
+      {
+        "id": "proc-check-outside-air",
+        "type": "process",
+        "title": "直接外気接触の確認",
+        "process_type": "undefined_input",
+        "description": "設計図書等から排煙口が直接外気に接するか確認"
+      },
+      {
+        "id": "dec-direct-outside",
+        "type": "decision",
+        "title": "直接外気に接するか？",
+        "decision_type": "binary",
+        "description": "排煙口が直接外気に接するかを判定"
+      },
+      {
+        "id": "proc-check-duct-connection",
+        "type": "process",
+        "title": "排煙風道直結の確認",
+        "process_type": "undefined_input",
+        "description": "設計図書等から排煙口が排煙風道に直結しているか確認"
+      },
+      {
+        "id": "dec-duct-connected",
+        "type": "decision",
+        "title": "排煙風道に直結しているか？",
+        "decision_type": "binary",
+        "description": "排煙口が排煙風道に直結しているかを判定"
+      },
+      {
+        "id": "dec-all-openings-connection-valid",
+        "type": "decision",
+        "title": "全排煙口で風道直結要件を満たすか？",
+        "decision_type": "binary",
+        "description": "全ての排煙口について、直接外気に接する又は排煙風道に直結しているかを判定"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令第126条の3第1項第3号の基準に適合",
+        "related_articles": ["令126条の3:1項:3号"]
+      },
+      {
+        "id": "end-fail-no-compartment",
+        "type": "terminal",
+        "title": "不適合（防煙区画なし）",
+        "result": "fail",
+        "description": "防煙区画部分が存在しない",
+        "related_articles": ["令126条の3:1項:3号"]
+      },
+      {
+        "id": "end-fail-no-openings",
+        "type": "terminal",
+        "title": "不適合（排煙口なし）",
+        "result": "fail",
+        "description": "排煙口が設けられていない",
+        "related_articles": ["令126条の3:1項:3号"]
+      },
+      {
+        "id": "end-fail-distance",
+        "type": "terminal",
+        "title": "不適合（水平距離超過）",
+        "result": "fail",
+        "description": "防煙区画部分の各部分から排煙口の一に至る水平距離が30mを超える",
+        "related_articles": ["令126条の3:1項:3号"]
+      },
+      {
+        "id": "end-fail-location",
+        "type": "terminal",
+        "title": "不適合（設置場所不適）",
+        "result": "fail",
+        "description": "排煙口が天井又は壁（国土交通大臣が定める部分）に設置されていない",
+        "related_articles": ["令126条の3:1項:3号"]
+      },
+      {
+        "id": "end-fail-connection",
+        "type": "terminal",
+        "title": "不適合（風道直結不適）",
+        "result": "fail",
+        "description": "直接外気に接しない排煙口が排煙風道に直結していない",
+        "related_articles": ["令126条の3:1項:3号"]
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "proc-get-smoke-compartment",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "proc-get-smoke-compartment",
+        "to": "dec-smoke-compartment-exists",
+        "role": "flow"
+      },
+      {
+        "id": "e03",
+        "from": "dec-smoke-compartment-exists",
+        "to": "proc-get-exhaust-openings",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e04",
+        "from": "dec-smoke-compartment-exists",
+        "to": "end-fail-no-compartment",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e05",
+        "from": "proc-get-exhaust-openings",
+        "to": "dec-exhaust-openings-exist",
+        "role": "flow"
+      },
+      {
+        "id": "e06",
+        "from": "dec-exhaust-openings-exist",
+        "to": "proc-measure-horizontal-distance",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e07",
+        "from": "dec-exhaust-openings-exist",
+        "to": "end-fail-no-openings",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e08",
+        "from": "proc-measure-horizontal-distance",
+        "to": "dec-distance-30m",
+        "role": "flow"
+      },
+      {
+        "id": "e09",
+        "from": "dec-distance-30m",
+        "to": "proc-check-opening-location",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e10",
+        "from": "dec-distance-30m",
+        "to": "end-fail-distance",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e11",
+        "from": "proc-check-opening-location",
+        "to": "dec-location-type",
+        "role": "flow"
+      },
+      {
+        "id": "e12",
+        "from": "dec-location-type",
+        "to": "dec-all-openings-valid-location",
+        "role": "option",
+        "label": "天井"
+      },
+      {
+        "id": "e13",
+        "from": "dec-location-type",
+        "to": "dec-all-openings-valid-location",
+        "role": "option",
+        "label": "壁（大臣指定部分）"
+      },
+      {
+        "id": "e14",
+        "from": "dec-location-type",
+        "to": "end-fail-location",
+        "role": "option",
+        "label": "その他"
+      },
+      {
+        "id": "e15",
+        "from": "dec-all-openings-valid-location",
+        "to": "proc-check-outside-air",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e16",
+        "from": "dec-all-openings-valid-location",
+        "to": "end-fail-location",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e17",
+        "from": "proc-check-outside-air",
+        "to": "dec-direct-outside",
+        "role": "flow"
+      },
+      {
+        "id": "e18",
+        "from": "dec-direct-outside",
+        "to": "dec-all-openings-connection-valid",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e19",
+        "from": "dec-direct-outside",
+        "to": "proc-check-duct-connection",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e20",
+        "from": "proc-check-duct-connection",
+        "to": "dec-duct-connected",
+        "role": "flow"
+      },
+      {
+        "id": "e21",
+        "from": "dec-duct-connected",
+        "to": "dec-all-openings-connection-valid",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e22",
+        "from": "dec-duct-connected",
+        "to": "end-fail-connection",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e23",
+        "from": "dec-all-openings-connection-valid",
+        "to": "end-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e24",
+        "from": "dec-all-openings-connection-valid",
+        "to": "end-fail-connection",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-ORDER-A126_3-P1-I3",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": ["A35"],
+      "description": "法第35条による政令への委任（排煙設備の構造規定）"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": ["A126_3:P1:I1"],
+      "description": "第1号の防煙区画部分の定義を参照"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

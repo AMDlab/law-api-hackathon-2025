@@ -1,0 +1,206 @@
+{
+  "id": "A88_P3_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "必要保有水平耐力計算時の標準せん断力係数の判定",
+    "target_subject": "建築物",
+    "description": "必要保有水平耐力を計算する場合における標準せん断力係数の下限値判定"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "88",
+    "paragraph": "3",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造規定",
+    "地震力"
+  ],
+  "text_raw": "第八十二条の三第二号の規定により必要保有水平耐力を計算する場合においては、前項の規定にかかわらず、標準せん断力係数は、一・〇以上としなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "calculation_method",
+          "value": "令第82条の3第2号による必要保有水平耐力計算",
+          "description": "保有水平耐力計算を採用する建築物"
+        }
+      ],
+      "note": "令第82条の3第2号の規定により必要保有水平耐力を計算する場合に適用"
+    },
+    "judgment_rule": {
+      "operator": "GE",
+      "lhs": {
+        "type": "numeric",
+        "name": "Co",
+        "description": "標準せん断力係数"
+      },
+      "rhs": {
+        "type": "constant",
+        "value": 1.0
+      }
+    },
+    "exceptions": null
+  },
+  "flow_diagram": {
+    "title": "令第88条第3項 標準せん断力係数の適合判定フロー",
+    "description": "必要保有水平耐力計算時における標準せん断力係数の基準適合判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "令第88条第3項の適合判定を開始"
+      },
+      {
+        "id": "proc-001",
+        "type": "process",
+        "title": "構造計算方法の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から構造計算方法を読み取る"
+      },
+      {
+        "id": "decision-001",
+        "type": "decision",
+        "title": "構造計算方法は？",
+        "decision_type": "multi",
+        "options": [
+          {
+            "value": "令第82条の3第2号",
+            "description": "必要保有水平耐力計算"
+          },
+          {
+            "value": "その他",
+            "description": "許容応力度計算等その他の計算方法"
+          }
+        ],
+        "description": "採用している構造計算方法が必要保有水平耐力計算か判定",
+        "related_articles": ["令::A82_3:P1"]
+      },
+      {
+        "id": "proc-002",
+        "type": "process",
+        "title": "標準せん断力係数の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から採用された標準せん断力係数を読み取る"
+      },
+      {
+        "id": "decision-002",
+        "type": "decision",
+        "title": "標準せん断力係数Co ≧ 1.0 か？",
+        "decision_type": "binary",
+        "description": "標準せん断力係数が1.0以上であることを判定",
+        "condition": {
+          "operator": "GTE",
+          "lhs": {
+            "var": "Co",
+            "desc": "標準せん断力係数"
+          },
+          "rhs": {
+            "value": 1.0,
+            "desc": "下限値"
+          }
+        }
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令第88条第3項の基準に適合"
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "令第88条第3項の基準に不適合（標準せん断力係数が1.0未満）"
+      },
+      {
+        "id": "end-not-applicable",
+        "type": "terminal",
+        "title": "対象外",
+        "result": "end",
+        "description": "令第82条の3第2号による計算ではないため本項は適用対象外"
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge-001",
+        "from": "start",
+        "to": "proc-001",
+        "role": "flow"
+      },
+      {
+        "id": "edge-002",
+        "from": "proc-001",
+        "to": "decision-001",
+        "role": "flow"
+      },
+      {
+        "id": "edge-003",
+        "from": "decision-001",
+        "to": "proc-002",
+        "role": "option",
+        "label": "令第82条の3第2号"
+      },
+      {
+        "id": "edge-004",
+        "from": "decision-001",
+        "to": "end-not-applicable",
+        "role": "option",
+        "label": "その他"
+      },
+      {
+        "id": "edge-005",
+        "from": "proc-002",
+        "to": "decision-002",
+        "role": "flow"
+      },
+      {
+        "id": "edge-006",
+        "from": "decision-002",
+        "to": "end-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "edge-007",
+        "from": "decision-002",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-KIJO-A88-P3",
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": [
+        "A82_3:P1",
+        "A88:P1",
+        "A88:P2"
+      ],
+      "description": "第82条の3で保有水平耐力計算を規定、第88条第1項で地震力の計算方法と地震層せん断力係数を規定、第2項で標準せん断力係数の原則（0.2以上）を規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00Z",
+    "updated_at": "2026-01-26T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令",
+    "checklist_ref": "建築基準法施行令第88条第3項（地震力）"
+  }
+}

@@ -1,0 +1,256 @@
+{
+  "id": "A62_5_P2_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "臥梁の有効幅の適合判定フロー",
+    "target_subject": "臥梁",
+    "description": "補強コンクリートブロック造の臥梁の有効幅が基準を満たすかを判定するフロー"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "62_5",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造",
+    "補強コンクリートブロック造"
+  ],
+  "text_raw": "臥梁の有効幅は、二十センチメートル以上で、かつ、耐力壁の水平力に対する支点間の距離の二十分の一以上としなければならない。",
+  "compliance_logic": {
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "dec-width-min",
+          "operator": "==",
+          "value": true,
+          "note": "臥梁の有効幅が20cm以上"
+        },
+        {
+          "ref": "dec-width-ratio",
+          "operator": "==",
+          "value": true,
+          "note": "臥梁の有効幅が支点間距離の1/20以上"
+        }
+      ]
+    }
+  },
+  "flow_diagram": {
+    "title": "令62条の5第2項 臥梁の有効幅判定フロー",
+    "description": "臥梁の有効幅について、(1)20cm以上、(2)支点間距離の1/20以上の両条件を判定する",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "臥梁の有効幅の適合判定を開始"
+      },
+      {
+        "id": "proc-input-garyo",
+        "type": "process",
+        "title": "臥梁の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から対象となる臥梁を特定する"
+      },
+      {
+        "id": "proc-input-width",
+        "type": "process",
+        "title": "有効幅(W)の取得",
+        "process_type": "undefined_input",
+        "description": "設計図書等から臥梁の有効幅を読み取る"
+      },
+      {
+        "id": "dec-width-min",
+        "type": "decision",
+        "title": "有効幅W >= 20cm か？",
+        "decision_type": "binary",
+        "description": "臥梁の有効幅が最小基準値20cm以上かを判定",
+        "condition": {
+          "operator": "GTE",
+          "lhs": {
+            "var": "W",
+            "desc": "臥梁の有効幅"
+          },
+          "rhs": {
+            "value": 20,
+            "unit": "cm"
+          }
+        },
+        "related_articles": ["令62条の5第2項"]
+      },
+      {
+        "id": "proc-fail-width-min",
+        "type": "process",
+        "title": "最小幅基準不適合",
+        "process_type": "mechanical",
+        "description": "有効幅が20cm未満のため不適合"
+      },
+      {
+        "id": "proc-input-wall",
+        "type": "process",
+        "title": "耐力壁の特定",
+        "process_type": "undefined_input",
+        "description": "臥梁が設置される耐力壁を特定する"
+      },
+      {
+        "id": "proc-input-span",
+        "type": "process",
+        "title": "支点間距離(L)の取得",
+        "process_type": "undefined_input",
+        "description": "耐力壁の水平力に対する支点間の距離を読み取る"
+      },
+      {
+        "id": "proc-calc-required",
+        "type": "process",
+        "title": "必要有効幅の計算 (Wreq = L/20)",
+        "process_type": "mechanical",
+        "description": "支点間距離を20で除して必要有効幅を算出"
+      },
+      {
+        "id": "dec-width-ratio",
+        "type": "decision",
+        "title": "有効幅W >= 必要有効幅(L/20) か？",
+        "decision_type": "binary",
+        "description": "臥梁の有効幅が支点間距離の1/20以上かを判定",
+        "condition": {
+          "operator": "GTE",
+          "lhs": {
+            "var": "W",
+            "desc": "臥梁の有効幅"
+          },
+          "rhs": {
+            "var": "Wreq",
+            "desc": "必要有効幅(L/20)"
+          }
+        },
+        "related_articles": ["令62条の5第2項"]
+      },
+      {
+        "id": "proc-fail-width-ratio",
+        "type": "process",
+        "title": "幅比率基準不適合",
+        "process_type": "mechanical",
+        "description": "有効幅が支点間距離の1/20未満のため不適合"
+      },
+      {
+        "id": "proc-pass-all",
+        "type": "process",
+        "title": "両条件適合",
+        "process_type": "mechanical",
+        "description": "有効幅が20cm以上かつ支点間距離の1/20以上であることを確認"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "臥梁の有効幅は令62条の5第2項の基準に適合"
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "臥梁の有効幅は令62条の5第2項の基準に不適合"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e001",
+        "from": "start",
+        "to": "proc-input-garyo",
+        "role": "flow"
+      },
+      {
+        "id": "e002",
+        "from": "proc-input-garyo",
+        "to": "proc-input-width",
+        "role": "flow"
+      },
+      {
+        "id": "e003",
+        "from": "proc-input-width",
+        "to": "dec-width-min",
+        "role": "flow"
+      },
+      {
+        "id": "e004",
+        "from": "dec-width-min",
+        "to": "proc-fail-width-min",
+        "role": "no",
+        "label": "No (W < 20cm)"
+      },
+      {
+        "id": "e005",
+        "from": "proc-fail-width-min",
+        "to": "end-fail",
+        "role": "flow"
+      },
+      {
+        "id": "e006",
+        "from": "dec-width-min",
+        "to": "proc-input-wall",
+        "role": "yes",
+        "label": "Yes (W >= 20cm)"
+      },
+      {
+        "id": "e007",
+        "from": "proc-input-wall",
+        "to": "proc-input-span",
+        "role": "flow"
+      },
+      {
+        "id": "e008",
+        "from": "proc-input-span",
+        "to": "proc-calc-required",
+        "role": "flow"
+      },
+      {
+        "id": "e009",
+        "from": "proc-calc-required",
+        "to": "dec-width-ratio",
+        "role": "flow"
+      },
+      {
+        "id": "e010",
+        "from": "dec-width-ratio",
+        "to": "proc-fail-width-ratio",
+        "role": "no",
+        "label": "No (W < L/20)"
+      },
+      {
+        "id": "e011",
+        "from": "proc-fail-width-ratio",
+        "to": "end-fail",
+        "role": "flow"
+      },
+      {
+        "id": "e012",
+        "from": "dec-width-ratio",
+        "to": "proc-pass-all",
+        "role": "yes",
+        "label": "Yes (W >= L/20)"
+      },
+      {
+        "id": "e013",
+        "from": "proc-pass-all",
+        "to": "end-pass",
+        "role": "flow"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSO-A62_5-P2",
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00Z",
+    "generator": "claude-code-flow-generator",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令",
+    "checklist_ref": "確認審査報告書チェックリスト"
+  }
+}

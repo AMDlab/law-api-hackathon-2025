@@ -1,0 +1,496 @@
+{
+  "id": "CHK-BSL-FLOW-A128_5-P3",
+  "version": "3.2",
+  "page_title": {
+    "title": "地階等の特殊建築物の内装制限",
+    "target_subject": "特殊建築物",
+    "description": "地階等に居室を有する特殊建築物の壁・天井の内装仕上げ要件の適合判定フロー"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "128_5",
+    "paragraph": "3",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "内装制限"
+  ],
+  "text_raw": "前条第一項第三号に掲げる特殊建築物は、同号に規定する居室及びこれから地上に通ずる主たる廊下、階段その他の通路の壁及び天井の室内に面する部分の仕上げを第一項第二号に掲げる仕上げとしなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "building_classification",
+          "value": "令第128条の4第1項第3号に掲げる特殊建築物"
+        },
+        {
+          "type": "building_feature",
+          "value": "地階又は地下工作物内に設ける居室その他これらに類する居室で法別表第一（い）欄（一）項、（二）項又は（四）項に掲げる用途に供するものを有する"
+        }
+      ],
+      "note": "適用対象は地階等に法別表第一の特定用途居室を有する特殊建築物"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "requirement",
+          "target": "居室の壁・天井",
+          "value": "準不燃材料またはこれに準ずる仕上げ"
+        },
+        {
+          "type": "requirement",
+          "target": "通路の壁・天井",
+          "value": "準不燃材料またはこれに準ずる仕上げ"
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "flow_diagram": {
+    "title": "令第128条の5第3項 内装制限適合判定フロー",
+    "description": "地階等に居室を有する特殊建築物について、居室及び通路の壁・天井の仕上げが準不燃材料等であるかを判定する",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "令第128条の5第3項の適合判定を開始"
+      },
+      {
+        "id": "dec-001",
+        "type": "decision",
+        "title": "令第128条の4第1項第3号に該当するか？",
+        "decision_type": "binary",
+        "description": "建築物が地階又は地下工作物内に設ける居室で法別表第一（い）欄（一）項、（二）項又は（四）項に掲げる用途に供するものを有する特殊建築物に該当するか判定",
+        "condition": {
+          "operator": "EQ",
+          "lhs": { "var": "S", "desc": "令第128条の4第1項第3号該当性" },
+          "rhs": { "value": true, "desc": "該当する" }
+        },
+        "related_articles": ["令::A128_4:P1:I3"]
+      },
+      {
+        "id": "proc-001",
+        "type": "process",
+        "title": "対象居室の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書から地階等に設けられた法別表第一の特定用途に供する居室を特定する"
+      },
+      {
+        "id": "dec-002",
+        "type": "decision",
+        "title": "対象居室は存在するか？",
+        "decision_type": "binary",
+        "description": "令第128条の4第1項第3号に規定する居室が存在するか確認",
+        "condition": {
+          "operator": "GT",
+          "lhs": { "var": "R.count", "desc": "対象居室の数" },
+          "rhs": { "value": 0, "desc": "0" }
+        }
+      },
+      {
+        "id": "proc-002",
+        "type": "process",
+        "title": "対象通路の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書から対象居室から地上に通ずる主たる廊下、階段その他の通路を特定する"
+      },
+      {
+        "id": "proc-003",
+        "type": "process",
+        "title": "居室の壁の仕上げ材の特定",
+        "process_type": "undefined_input",
+        "description": "各対象居室の壁（床面からの高さが1.2m以下の部分を除く）の室内に面する部分の仕上げ材を特定"
+      },
+      {
+        "id": "dec-003",
+        "type": "decision",
+        "title": "居室の壁の仕上げ材は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "準不燃材料", "description": "準不燃材料を使用" },
+          { "value": "大臣定め仕上げ", "description": "国土交通大臣が定める仕上げ" },
+          { "value": "その他", "description": "上記以外の仕上げ" }
+        ],
+        "description": "居室の壁の室内面仕上げ材の分類を判定",
+        "condition": {
+          "operator": "IN",
+          "lhs": { "var": "W1", "desc": "居室の壁の仕上げ材" },
+          "rhs": { "value": ["準不燃材料", "大臣定め仕上げ"], "desc": "適合する仕上げ" }
+        },
+        "related_articles": ["令::A128_5:P1:I2"]
+      },
+      {
+        "id": "proc-004",
+        "type": "process",
+        "title": "居室の壁の仕上げ適合を確認",
+        "process_type": "mechanical",
+        "description": "居室の壁の仕上げが第1項第2号に掲げる仕上げに適合していることを記録"
+      },
+      {
+        "id": "proc-005",
+        "type": "process",
+        "title": "居室の天井の仕上げ材の特定",
+        "process_type": "undefined_input",
+        "description": "各対象居室の天井（天井のない場合は屋根）の室内に面する部分の仕上げ材を特定"
+      },
+      {
+        "id": "dec-004",
+        "type": "decision",
+        "title": "居室の天井の仕上げ材は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "準不燃材料", "description": "準不燃材料を使用" },
+          { "value": "大臣定め仕上げ", "description": "国土交通大臣が定める仕上げ" },
+          { "value": "その他", "description": "上記以外の仕上げ" }
+        ],
+        "description": "居室の天井の室内面仕上げ材の分類を判定",
+        "condition": {
+          "operator": "IN",
+          "lhs": { "var": "C1", "desc": "居室の天井の仕上げ材" },
+          "rhs": { "value": ["準不燃材料", "大臣定め仕上げ"], "desc": "適合する仕上げ" }
+        },
+        "related_articles": ["令::A128_5:P1:I2"]
+      },
+      {
+        "id": "proc-006",
+        "type": "process",
+        "title": "居室の天井の仕上げ適合を確認",
+        "process_type": "mechanical",
+        "description": "居室の天井の仕上げが第1項第2号に掲げる仕上げに適合していることを記録"
+      },
+      {
+        "id": "dec-005",
+        "type": "decision",
+        "title": "対象通路は存在するか？",
+        "decision_type": "binary",
+        "description": "対象居室から地上に通ずる主たる廊下、階段その他の通路が存在するか確認",
+        "condition": {
+          "operator": "GT",
+          "lhs": { "var": "P.count", "desc": "対象通路の数" },
+          "rhs": { "value": 0, "desc": "0" }
+        }
+      },
+      {
+        "id": "proc-007",
+        "type": "process",
+        "title": "通路の壁の仕上げ材の特定",
+        "process_type": "undefined_input",
+        "description": "各対象通路の壁の室内に面する部分の仕上げ材を特定"
+      },
+      {
+        "id": "dec-006",
+        "type": "decision",
+        "title": "通路の壁の仕上げ材は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "準不燃材料", "description": "準不燃材料を使用" },
+          { "value": "大臣定め仕上げ", "description": "国土交通大臣が定める仕上げ" },
+          { "value": "その他", "description": "上記以外の仕上げ" }
+        ],
+        "description": "通路の壁の室内面仕上げ材の分類を判定",
+        "condition": {
+          "operator": "IN",
+          "lhs": { "var": "W2", "desc": "通路の壁の仕上げ材" },
+          "rhs": { "value": ["準不燃材料", "大臣定め仕上げ"], "desc": "適合する仕上げ" }
+        },
+        "related_articles": ["令::A128_5:P1:I2"]
+      },
+      {
+        "id": "proc-008",
+        "type": "process",
+        "title": "通路の壁の仕上げ適合を確認",
+        "process_type": "mechanical",
+        "description": "通路の壁の仕上げが第1項第2号に掲げる仕上げに適合していることを記録"
+      },
+      {
+        "id": "proc-009",
+        "type": "process",
+        "title": "通路の天井の仕上げ材の特定",
+        "process_type": "undefined_input",
+        "description": "各対象通路の天井の室内に面する部分の仕上げ材を特定"
+      },
+      {
+        "id": "dec-007",
+        "type": "decision",
+        "title": "通路の天井の仕上げ材は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "準不燃材料", "description": "準不燃材料を使用" },
+          { "value": "大臣定め仕上げ", "description": "国土交通大臣が定める仕上げ" },
+          { "value": "その他", "description": "上記以外の仕上げ" }
+        ],
+        "description": "通路の天井の室内面仕上げ材の分類を判定",
+        "condition": {
+          "operator": "IN",
+          "lhs": { "var": "C2", "desc": "通路の天井の仕上げ材" },
+          "rhs": { "value": ["準不燃材料", "大臣定め仕上げ"], "desc": "適合する仕上げ" }
+        },
+        "related_articles": ["令::A128_5:P1:I2"]
+      },
+      {
+        "id": "proc-010",
+        "type": "process",
+        "title": "通路の天井の仕上げ適合を確認",
+        "process_type": "mechanical",
+        "description": "通路の天井の仕上げが第1項第2号に掲げる仕上げに適合していることを記録"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令第128条の5第3項の内装制限に適合"
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "令第128条の5第3項の内装制限に不適合"
+      },
+      {
+        "id": "end-not-applicable",
+        "type": "terminal",
+        "title": "適用対象外",
+        "result": "pass",
+        "description": "令第128条の4第1項第3号に該当しないため、本項は適用されない"
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge-001",
+        "from": "start",
+        "to": "dec-001",
+        "role": "flow"
+      },
+      {
+        "id": "edge-002",
+        "from": "dec-001",
+        "to": "proc-001",
+        "role": "yes",
+        "label": "該当する"
+      },
+      {
+        "id": "edge-003",
+        "from": "dec-001",
+        "to": "end-not-applicable",
+        "role": "no",
+        "label": "該当しない"
+      },
+      {
+        "id": "edge-004",
+        "from": "proc-001",
+        "to": "dec-002",
+        "role": "flow"
+      },
+      {
+        "id": "edge-005",
+        "from": "dec-002",
+        "to": "proc-002",
+        "role": "yes",
+        "label": "存在する"
+      },
+      {
+        "id": "edge-006",
+        "from": "dec-002",
+        "to": "end-pass",
+        "role": "no",
+        "label": "存在しない"
+      },
+      {
+        "id": "edge-007",
+        "from": "proc-002",
+        "to": "proc-003",
+        "role": "flow"
+      },
+      {
+        "id": "edge-008",
+        "from": "proc-003",
+        "to": "dec-003",
+        "role": "flow"
+      },
+      {
+        "id": "edge-009",
+        "from": "dec-003",
+        "to": "proc-004",
+        "role": "option",
+        "label": "準不燃材料"
+      },
+      {
+        "id": "edge-010",
+        "from": "dec-003",
+        "to": "proc-004",
+        "role": "option",
+        "label": "大臣定め仕上げ"
+      },
+      {
+        "id": "edge-011",
+        "from": "dec-003",
+        "to": "end-fail",
+        "role": "option",
+        "label": "その他"
+      },
+      {
+        "id": "edge-012",
+        "from": "proc-004",
+        "to": "proc-005",
+        "role": "flow"
+      },
+      {
+        "id": "edge-013",
+        "from": "proc-005",
+        "to": "dec-004",
+        "role": "flow"
+      },
+      {
+        "id": "edge-014",
+        "from": "dec-004",
+        "to": "proc-006",
+        "role": "option",
+        "label": "準不燃材料"
+      },
+      {
+        "id": "edge-015",
+        "from": "dec-004",
+        "to": "proc-006",
+        "role": "option",
+        "label": "大臣定め仕上げ"
+      },
+      {
+        "id": "edge-016",
+        "from": "dec-004",
+        "to": "end-fail",
+        "role": "option",
+        "label": "その他"
+      },
+      {
+        "id": "edge-017",
+        "from": "proc-006",
+        "to": "dec-005",
+        "role": "flow"
+      },
+      {
+        "id": "edge-018",
+        "from": "dec-005",
+        "to": "proc-007",
+        "role": "yes",
+        "label": "存在する"
+      },
+      {
+        "id": "edge-019",
+        "from": "dec-005",
+        "to": "end-pass",
+        "role": "no",
+        "label": "存在しない"
+      },
+      {
+        "id": "edge-020",
+        "from": "proc-007",
+        "to": "dec-006",
+        "role": "flow"
+      },
+      {
+        "id": "edge-021",
+        "from": "dec-006",
+        "to": "proc-008",
+        "role": "option",
+        "label": "準不燃材料"
+      },
+      {
+        "id": "edge-022",
+        "from": "dec-006",
+        "to": "proc-008",
+        "role": "option",
+        "label": "大臣定め仕上げ"
+      },
+      {
+        "id": "edge-023",
+        "from": "dec-006",
+        "to": "end-fail",
+        "role": "option",
+        "label": "その他"
+      },
+      {
+        "id": "edge-024",
+        "from": "proc-008",
+        "to": "proc-009",
+        "role": "flow"
+      },
+      {
+        "id": "edge-025",
+        "from": "proc-009",
+        "to": "dec-007",
+        "role": "flow"
+      },
+      {
+        "id": "edge-026",
+        "from": "dec-007",
+        "to": "proc-010",
+        "role": "option",
+        "label": "準不燃材料"
+      },
+      {
+        "id": "edge-027",
+        "from": "dec-007",
+        "to": "proc-010",
+        "role": "option",
+        "label": "大臣定め仕上げ"
+      },
+      {
+        "id": "edge-028",
+        "from": "dec-007",
+        "to": "end-fail",
+        "role": "option",
+        "label": "その他"
+      },
+      {
+        "id": "edge-029",
+        "from": "proc-010",
+        "to": "end-pass",
+        "role": "flow"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-KIJO-A128_5-P3",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": [
+        "A35_2",
+        "別表第一"
+      ],
+      "description": "法第35条の2で内装制限の規定を定め、法別表第一で特殊建築物の用途を規定"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": [
+        "A128_4:P1:I3",
+        "A128_5:P1:I2"
+      ],
+      "description": "令第128条の4第1項第3号で適用対象の特殊建築物を規定、令第128条の5第1項第2号で準不燃材料仕上げを規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00Z",
+    "updated_at": "2026-01-26T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令",
+    "checklist_ref": "建築基準法施行令第128条の5第3項（特殊建築物等の内装）"
+  }
+}

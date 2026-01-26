@@ -1,0 +1,285 @@
+{
+  "id": "CHK-BSL-FLOW-A122-P2",
+  "version": "3.2",
+  "page_title": {
+    "title": "物品販売店舗における直通階段の設置要件判定フロー",
+    "target_subject": "建築物",
+    "description": "三階以上の階を物品販売業店舗用途とする建築物における直通階段の数量及び構造要件の適合判定フロー"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "122",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "避難施設"
+  ],
+  "text_raw": "三階以上の階を物品販売業を営む店舗の用途に供する建築物にあつては、各階の売場及び屋上広場に通ずる二以上の直通階段を設け、これを次条の規定による避難階段又は特別避難階段としなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "building_use",
+          "value": "物品販売業を営む店舗"
+        },
+        {
+          "type": "floor_condition",
+          "value": "三階以上の階を当該用途に供する"
+        }
+      ],
+      "note": "三階以上の階を物品販売業店舗の用途に供する建築物が対象"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "requirement",
+          "value": "直通階段数量",
+          "description": "各階の売場及び屋上広場に通ずる二以上の直通階段を設ける"
+        },
+        {
+          "type": "requirement",
+          "value": "直通階段構造",
+          "description": "令第123条の規定による避難階段又は特別避難階段とする"
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "flow_diagram": {
+    "title": "令第122条第2項適合判定フロー",
+    "description": "三階以上の階を物品販売業店舗用途とする建築物における直通階段の設置要件を判定するフローチャート",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "令第122条第2項の適合判定を開始"
+      },
+      {
+        "id": "dec-001",
+        "type": "decision",
+        "title": "建築物の用途は物品販売業店舗か？",
+        "decision_type": "binary",
+        "description": "建築物の用途が物品販売業を営む店舗に該当するか判定",
+        "condition": {
+          "operator": "EQ",
+          "lhs": { "var": "U", "desc": "建築物の用途" },
+          "rhs": { "value": "物品販売業店舗", "desc": "物品販売業を営む店舗" }
+        }
+      },
+      {
+        "id": "dec-002",
+        "type": "decision",
+        "title": "三階以上の階に売場があるか？",
+        "decision_type": "binary",
+        "description": "三階以上の階を物品販売業店舗の売場として使用しているか判定",
+        "condition": {
+          "operator": "EQ",
+          "lhs": { "var": "SC", "desc": "三階以上の物品販売店舗該当性" },
+          "rhs": { "value": true, "desc": "該当する" }
+        }
+      },
+      {
+        "id": "proc-001",
+        "type": "process",
+        "title": "売場のある各階及び屋上広場を特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から売場のある各階及び屋上広場を特定する"
+      },
+      {
+        "id": "proc-002",
+        "type": "process",
+        "title": "直通階段を特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物に設けられた直通階段を特定する"
+      },
+      {
+        "id": "proc-003",
+        "type": "process",
+        "title": "売場等に通ずる直通階段数を算定",
+        "process_type": "mechanical",
+        "description": "各階の売場及び屋上広場に通ずる直通階段の数を算定する"
+      },
+      {
+        "id": "dec-003",
+        "type": "decision",
+        "title": "直通階段は二以上あるか？",
+        "decision_type": "binary",
+        "description": "各階の売場及び屋上広場に通ずる直通階段が二以上設けられているか判定",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "SN", "desc": "売場等に通ずる直通階段数" },
+          "rhs": { "value": 2, "desc": "二以上", "unit": "箇所" }
+        }
+      },
+      {
+        "id": "proc-004",
+        "type": "process",
+        "title": "各直通階段の構造種別を判定",
+        "process_type": "sub_diagram_reference",
+        "description": "令第123条の規定に基づき各直通階段の構造種別（避難階段/特別避難階段/その他）を判定",
+        "related_articles": ["令::A123:P1", "令::A123:P2", "令::A123:P3"]
+      },
+      {
+        "id": "dec-004",
+        "type": "decision",
+        "title": "すべての直通階段が避難階段又は特別避難階段か？",
+        "decision_type": "binary",
+        "description": "すべての直通階段が令第123条の規定による避難階段又は特別避難階段であるか判定",
+        "condition": {
+          "operator": "EQ",
+          "lhs": { "var": "TC", "desc": "直通階段構造要件適合性" },
+          "rhs": { "value": true, "desc": "すべて適合" }
+        }
+      },
+      {
+        "id": "end-pass-scope",
+        "type": "terminal",
+        "title": "適合（適用対象外）",
+        "result": "pass",
+        "description": "三階以上の階を物品販売業店舗の用途に供する建築物に該当しないため、本項の適用対象外"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "直通階段の数量及び構造要件を満たすため、令第122条第2項に適合"
+      },
+      {
+        "id": "end-fail-count",
+        "type": "terminal",
+        "title": "不適合（直通階段数不足）",
+        "result": "fail",
+        "description": "各階の売場及び屋上広場に通ずる直通階段が二以上設けられていないため、令第122条第2項に不適合"
+      },
+      {
+        "id": "end-fail-structure",
+        "type": "terminal",
+        "title": "不適合（構造要件未達）",
+        "result": "fail",
+        "description": "直通階段が避難階段又は特別避難階段の構造要件を満たさないため、令第122条第2項に不適合"
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge-001",
+        "from": "start",
+        "to": "dec-001",
+        "role": "flow"
+      },
+      {
+        "id": "edge-002",
+        "from": "dec-001",
+        "to": "dec-002",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "edge-003",
+        "from": "dec-001",
+        "to": "end-pass-scope",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "edge-004",
+        "from": "dec-002",
+        "to": "proc-001",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "edge-005",
+        "from": "dec-002",
+        "to": "end-pass-scope",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "edge-006",
+        "from": "proc-001",
+        "to": "proc-002",
+        "role": "flow"
+      },
+      {
+        "id": "edge-007",
+        "from": "proc-002",
+        "to": "proc-003",
+        "role": "flow"
+      },
+      {
+        "id": "edge-008",
+        "from": "proc-003",
+        "to": "dec-003",
+        "role": "flow"
+      },
+      {
+        "id": "edge-009",
+        "from": "dec-003",
+        "to": "proc-004",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "edge-010",
+        "from": "dec-003",
+        "to": "end-fail-count",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "edge-011",
+        "from": "proc-004",
+        "to": "dec-004",
+        "role": "flow"
+      },
+      {
+        "id": "edge-012",
+        "from": "dec-004",
+        "to": "end-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "edge-013",
+        "from": "dec-004",
+        "to": "end-fail-structure",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-KIJO-A122-P2",
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": [
+        "A123:P1",
+        "A123:P2",
+        "A123:P3"
+      ],
+      "description": "令第123条で避難階段及び特別避難階段の構造を規定。第1項は屋内避難階段、第2項は屋外避難階段、第3項は特別避難階段の構造基準"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00Z",
+    "updated_at": "2026-01-26T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令",
+    "checklist_ref": "建築基準法施行令第122条第2項（物品販売店舗の直通階段）"
+  }
+}

@@ -1,0 +1,301 @@
+{
+  "id": "A96_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "鋼材等の材料強度",
+    "target_subject": "鋼材等",
+    "description": "鋼材等の材料強度が表一又は表二の数値に適合するか判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "96",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造",
+    "材料強度"
+  ],
+  "text_raw": "鋼材等の材料強度は、次の表一又は表二の数値によらなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "material",
+          "value": "鋼材等を使用する建築物"
+        }
+      ],
+      "note": "鋼材等（構造用鋼材、高力ボルト、ボルト、構造用ケーブル、リベット鋼、鋳鋼、鋳鉄、丸鋼、異形鉄筋、溶接金網）を使用する場合に適用"
+    },
+    "judgment_rule": {
+      "operator": "FORALL",
+      "conditions": [
+        {
+          "ref": "info-strength-compliance",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "flow_diagram": {
+    "title": "令第96条第1項 鋼材等の材料強度 適合判定フロー",
+    "description": "鋼材等の材料強度が表一又は表二の基準に適合するかを判定するフローチャート",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "令第96条第1項の適合判定を開始"
+      },
+      {
+        "id": "dec-steel-exists",
+        "type": "decision",
+        "title": "建築物に鋼材等を使用するか？",
+        "decision_type": "binary",
+        "description": "判定対象の建築物が鋼材等を使用しているか確認"
+      },
+      {
+        "id": "proc-enum-steel",
+        "type": "process",
+        "title": "鋼材等の列挙",
+        "process_type": "undefined_input",
+        "description": "建築物に使用される全ての鋼材等を列挙する"
+      },
+      {
+        "id": "dec-steel-remaining",
+        "type": "decision",
+        "title": "未判定の鋼材等があるか？",
+        "decision_type": "binary",
+        "description": "まだ判定していない鋼材等が残っているか確認"
+      },
+      {
+        "id": "proc-select-steel",
+        "type": "process",
+        "title": "鋼材等を1つ選択",
+        "process_type": "mechanical",
+        "description": "未判定の鋼材等から1つを選択して判定対象とする"
+      },
+      {
+        "id": "dec-steel-type",
+        "type": "decision",
+        "title": "鋼材等の種類は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "表一材料", "description": "炭素鋼・ステンレス鋼・鋳鉄（構造用鋼材、高力ボルト、ボルト、構造用ケーブル、リベット鋼、鋳鋼）" },
+          { "value": "表二材料", "description": "丸鋼・異形鉄筋・溶接金網" }
+        ],
+        "description": "鋼材等の種類に応じて適用する表を決定"
+      },
+      {
+        "id": "proc-get-strength-table1",
+        "type": "process",
+        "title": "表一の基準強度を取得",
+        "process_type": "mechanical",
+        "description": "表一から該当する鋼材等の基準強度（圧縮、引張り、曲げ、せん断）を取得",
+        "related_articles": ["令::A90"]
+      },
+      {
+        "id": "proc-get-strength-table2",
+        "type": "process",
+        "title": "表二の基準強度を取得",
+        "process_type": "mechanical",
+        "description": "表二から該当する鋼材等の基準強度（圧縮、引張り、曲げ、せん断）を取得",
+        "related_articles": ["令::A90"]
+      },
+      {
+        "id": "proc-get-actual-strength",
+        "type": "process",
+        "title": "実際の材料強度を取得",
+        "process_type": "undefined_input",
+        "description": "当該鋼材等の実際の材料強度（圧縮、引張り、曲げ、せん断）を特定"
+      },
+      {
+        "id": "dec-strength-comply",
+        "type": "decision",
+        "title": "材料強度が基準値以下か？",
+        "decision_type": "binary",
+        "description": "実際の材料強度が表一又は表二の基準強度以下であるか判定",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "F", "desc": "材料強度" },
+          "rhs": { "var": "F_standard", "desc": "基準強度", "unit": "N/mm2" }
+        }
+      },
+      {
+        "id": "proc-mark-compliant",
+        "type": "process",
+        "title": "当該鋼材等を適合とマーク",
+        "process_type": "mechanical",
+        "description": "当該鋼材等が材料強度基準に適合したことを記録"
+      },
+      {
+        "id": "dec-all-compliant",
+        "type": "decision",
+        "title": "全ての鋼材等が適合か？",
+        "decision_type": "binary",
+        "description": "すべての鋼材等が材料強度基準に適合しているか最終確認"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令第96条第1項に適合"
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "令第96条第1項に不適合（材料強度が基準値を超過）"
+      },
+      {
+        "id": "end-not-applicable",
+        "type": "terminal",
+        "title": "適用対象外",
+        "result": "pass",
+        "description": "鋼材等を使用していないため本条項は適用対象外"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-steel-exists",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-steel-exists",
+        "to": "proc-enum-steel",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "dec-steel-exists",
+        "to": "end-not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e04",
+        "from": "proc-enum-steel",
+        "to": "dec-steel-remaining",
+        "role": "flow"
+      },
+      {
+        "id": "e05",
+        "from": "dec-steel-remaining",
+        "to": "proc-select-steel",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e06",
+        "from": "dec-steel-remaining",
+        "to": "dec-all-compliant",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e07",
+        "from": "proc-select-steel",
+        "to": "dec-steel-type",
+        "role": "flow"
+      },
+      {
+        "id": "e08",
+        "from": "dec-steel-type",
+        "to": "proc-get-strength-table1",
+        "role": "option",
+        "label": "表一材料"
+      },
+      {
+        "id": "e09",
+        "from": "dec-steel-type",
+        "to": "proc-get-strength-table2",
+        "role": "option",
+        "label": "表二材料"
+      },
+      {
+        "id": "e10",
+        "from": "proc-get-strength-table1",
+        "to": "proc-get-actual-strength",
+        "role": "flow"
+      },
+      {
+        "id": "e11",
+        "from": "proc-get-strength-table2",
+        "to": "proc-get-actual-strength",
+        "role": "flow"
+      },
+      {
+        "id": "e12",
+        "from": "proc-get-actual-strength",
+        "to": "dec-strength-comply",
+        "role": "flow"
+      },
+      {
+        "id": "e13",
+        "from": "dec-strength-comply",
+        "to": "proc-mark-compliant",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e14",
+        "from": "dec-strength-comply",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e15",
+        "from": "proc-mark-compliant",
+        "to": "dec-steel-remaining",
+        "role": "flow"
+      },
+      {
+        "id": "e16",
+        "from": "dec-all-compliant",
+        "to": "end-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e17",
+        "from": "dec-all-compliant",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-ORDER-A96-P1",
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": ["A90"],
+      "description": "令第90条に基準強度の規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T12:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

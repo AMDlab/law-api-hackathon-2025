@@ -1,0 +1,238 @@
+{
+  "id": "A75_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "コンクリートの養生",
+    "target_subject": "コンクリート",
+    "description": "コンクリート打込み中及び打込み後5日間の温度管理と養生状態を判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "75",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造",
+    "コンクリート",
+    "養生"
+  ],
+  "text_raw": "コンクリート打込み中及び打込み後五日間は、コンクリートの温度が二度を下らないようにし、かつ、乾燥、震動等によつてコンクリートの凝結及び硬化が妨げられないように養生しなければならない。ただし、コンクリートの凝結及び硬化を促進するための特別の措置を講ずる場合においては、この限りでない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "material",
+          "value": "コンクリートを使用する建築物"
+        },
+        {
+          "type": "period",
+          "value": "打込み中及び打込み後5日間"
+        }
+      ],
+      "note": "コンクリート構造の建築物が対象"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-temp-compliance",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "ref": "info-curing-compliance",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    },
+    "exceptions": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "type": "special_measure",
+          "value": "凝結及び硬化を促進するための特別の措置"
+        }
+      ],
+      "effect": "EXEMPT"
+    }
+  },
+  "flow_diagram": {
+    "title": "令第75条第1項 コンクリートの養生 適合判定フロー",
+    "description": "コンクリート打込み中及び打込み後5日間の温度管理と養生状態を判定するフロー。ただし書の特別措置がある場合は適用除外。",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start"
+      },
+      {
+        "id": "dec-special-measure",
+        "type": "decision",
+        "title": "凝結・硬化促進の特別措置があるか？",
+        "decision_type": "binary",
+        "description": "コンクリートの凝結及び硬化を促進するための特別の措置を講じているか（ただし書の適用除外条件）"
+      },
+      {
+        "id": "proc-exempt",
+        "type": "process",
+        "title": "ただし書適用（適用除外）",
+        "process_type": "mechanical",
+        "description": "特別の措置を講ずる場合は本則の要件適用除外"
+      },
+      {
+        "id": "dec-temp",
+        "type": "decision",
+        "title": "コンクリート温度 >= 2度か？",
+        "decision_type": "binary",
+        "description": "打込み中及び打込み後5日間のコンクリート温度が2度を下らないか",
+        "condition": {
+          "operator": "GTE",
+          "lhs": {
+            "var": "T",
+            "desc": "コンクリート温度"
+          },
+          "rhs": {
+            "value": 2,
+            "unit": "度"
+          }
+        }
+      },
+      {
+        "id": "proc-temp-ok",
+        "type": "process",
+        "title": "温度基準適合",
+        "process_type": "mechanical",
+        "description": "コンクリート温度が2度以上を維持している"
+      },
+      {
+        "id": "dec-curing",
+        "type": "decision",
+        "title": "養生状態は適切か？",
+        "decision_type": "binary",
+        "description": "乾燥、震動等によってコンクリートの凝結及び硬化が妨げられないように養生されているか"
+      },
+      {
+        "id": "proc-curing-ok",
+        "type": "process",
+        "title": "養生基準適合",
+        "process_type": "human_judgment",
+        "description": "乾燥、震動等から適切に保護されている"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令第75条第1項に適合"
+      },
+      {
+        "id": "end-fail-temp",
+        "type": "terminal",
+        "title": "不適合（温度基準）",
+        "result": "fail",
+        "description": "コンクリート温度が2度を下回っており不適合"
+      },
+      {
+        "id": "end-fail-curing",
+        "type": "terminal",
+        "title": "不適合（養生基準）",
+        "result": "fail",
+        "description": "養生状態が不適切であり不適合"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-special-measure",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-special-measure",
+        "to": "proc-exempt",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "proc-exempt",
+        "to": "end-pass",
+        "role": "flow"
+      },
+      {
+        "id": "e04",
+        "from": "dec-special-measure",
+        "to": "dec-temp",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e05",
+        "from": "dec-temp",
+        "to": "proc-temp-ok",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e06",
+        "from": "proc-temp-ok",
+        "to": "dec-curing",
+        "role": "flow"
+      },
+      {
+        "id": "e07",
+        "from": "dec-temp",
+        "to": "end-fail-temp",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e08",
+        "from": "dec-curing",
+        "to": "proc-curing-ok",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e09",
+        "from": "proc-curing-ok",
+        "to": "end-pass",
+        "role": "flow"
+      },
+      {
+        "id": "e10",
+        "from": "dec-curing",
+        "to": "end-fail-curing",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "A75_P1_kijo",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": ["A20"],
+      "description": "法第20条の構造耐力に関する規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T12:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

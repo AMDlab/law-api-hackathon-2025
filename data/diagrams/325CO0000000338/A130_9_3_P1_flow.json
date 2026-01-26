@@ -1,0 +1,234 @@
+{
+  "id": "A130_9_3_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "田園住居地域内の禁止事業（金属鍛造）",
+    "target_subject": "事業所",
+    "description": "スエージングマシン又はロールを用いる金属鍛造事業の該当判定フロー"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "130の9の3",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "集団規定",
+    "用途地域",
+    "田園住居地域",
+    "金属加工"
+  ],
+  "text_raw": "法別表第二（り）項第三号（二十）（法第八十七条第二項又は第三項において法第四十八条第八項の規定を準用する場合を含む。）の規定により政令で定める事業は、スエージングマシン又はロールを用いる金属の鍛造とする。",
+  "kijo_diagram_ref": "CHK-BSL-ORD-A130_9_3-P1",
+  "flow_diagram": {
+    "title": "田園住居地域内の禁止事業（金属鍛造）適合判定フロー",
+    "description": "法別表第二（り）項第三号(20)に基づき、スエージングマシン又はロールを用いる金属鍛造事業に該当するか判定するフロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "田園住居地域内の禁止事業該当性の判定を開始"
+      },
+      {
+        "id": "dec-zone",
+        "type": "decision",
+        "title": "田園住居地域か？",
+        "decision_type": "binary",
+        "description": "建築物の敷地が田園住居地域内にあるか確認"
+      },
+      {
+        "id": "dec-use-factory",
+        "type": "decision",
+        "title": "工場用途か？",
+        "decision_type": "binary",
+        "description": "建築物の用途が工場に該当するか確認"
+      },
+      {
+        "id": "proc-business-identify",
+        "type": "process",
+        "title": "事業内容を特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物で行う事業の内容を特定する"
+      },
+      {
+        "id": "dec-forging",
+        "type": "decision",
+        "title": "金属の鍛造事業か？",
+        "decision_type": "binary",
+        "description": "事業内容が金属の鍛造に該当するか判定",
+        "condition": {
+          "operator": "IN",
+          "lhs": { "var": "B", "desc": "事業の種類" },
+          "rhs": { "value": ["金属の鍛造"], "desc": "金属鍛造事業" }
+        }
+      },
+      {
+        "id": "proc-equipment-identify",
+        "type": "process",
+        "title": "使用設備を特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から金属鍛造に使用する設備・機械を特定する"
+      },
+      {
+        "id": "dec-swaging",
+        "type": "decision",
+        "title": "スエージングマシンを使用するか？",
+        "decision_type": "binary",
+        "description": "金属鍛造にスエージングマシンを使用するか確認"
+      },
+      {
+        "id": "dec-roll",
+        "type": "decision",
+        "title": "ロールを使用するか？",
+        "decision_type": "binary",
+        "description": "金属鍛造にロールを使用するか確認"
+      },
+      {
+        "id": "proc-prohibited",
+        "type": "process",
+        "title": "禁止事業該当",
+        "process_type": "mechanical",
+        "description": "スエージングマシン又はロールを用いる金属の鍛造に該当"
+      },
+      {
+        "id": "end-prohibited",
+        "type": "terminal",
+        "title": "建築不可",
+        "result": "fail",
+        "description": "令第130条の9の3に定める禁止事業に該当。田園住居地域内では建築不可"
+      },
+      {
+        "id": "end-not-applicable",
+        "type": "terminal",
+        "title": "本条非該当",
+        "result": "pass",
+        "description": "本条の適用対象外（田園住居地域外または工場用途でない）"
+      },
+      {
+        "id": "end-not-prohibited",
+        "type": "terminal",
+        "title": "禁止事業非該当",
+        "result": "pass",
+        "description": "令第130条の9の3に定める禁止事業に非該当。田園住居地域内でも建築可能"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-zone",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-zone",
+        "to": "dec-use-factory",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "dec-zone",
+        "to": "end-not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e04",
+        "from": "dec-use-factory",
+        "to": "proc-business-identify",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e05",
+        "from": "dec-use-factory",
+        "to": "end-not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e06",
+        "from": "proc-business-identify",
+        "to": "dec-forging",
+        "role": "flow"
+      },
+      {
+        "id": "e07",
+        "from": "dec-forging",
+        "to": "proc-equipment-identify",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e08",
+        "from": "dec-forging",
+        "to": "end-not-prohibited",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e09",
+        "from": "proc-equipment-identify",
+        "to": "dec-swaging",
+        "role": "flow"
+      },
+      {
+        "id": "e10",
+        "from": "dec-swaging",
+        "to": "proc-prohibited",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e11",
+        "from": "dec-swaging",
+        "to": "dec-roll",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e12",
+        "from": "dec-roll",
+        "to": "proc-prohibited",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e13",
+        "from": "dec-roll",
+        "to": "end-not-prohibited",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e14",
+        "from": "proc-prohibited",
+        "to": "end-prohibited",
+        "role": "flow"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": ["別表第二（り）:I3", "A48:P8", "A87:P2", "A87:P3"],
+      "description": "法別表第二（り）項第三号(20)の委任規定。田園住居地域内で建築してはならない工場の原動機・作業内容を政令に委任"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00+09:00",
+    "author": "Claude",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

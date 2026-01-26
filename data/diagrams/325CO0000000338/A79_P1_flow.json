@@ -1,0 +1,409 @@
+{
+  "id": "A79_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "鉄筋のかぶり厚さ",
+    "target_subject": "鉄筋コンクリート部材",
+    "description": "鉄筋に対するコンクリートのかぶり厚さの最小値を部材種類ごとに判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "79",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造",
+    "鉄筋コンクリート",
+    "かぶり厚さ"
+  ],
+  "text_raw": "鉄筋に対するコンクリートのかぶり厚さは、耐力壁以外の壁又は床にあつては二センチメートル以上、耐力壁、柱又ははりにあつては三センチメートル以上、直接土に接する壁、柱、床若しくははり又は布基礎の立上り部分にあつては四センチメートル以上、基礎（布基礎の立上り部分を除く。）にあつては捨コンクリートの部分を除いて六センチメートル以上としなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "structure",
+          "value": "鉄筋コンクリート造の建築物"
+        }
+      ],
+      "note": "鉄筋コンクリート造の建築物における鉄筋を有する部材に適用"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-cat1-compliance",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "ref": "info-cat2-compliance",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "ref": "info-cat3-compliance",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "ref": "info-cat4-compliance",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "flow_diagram": {
+    "title": "令第79条第1項 かぶり厚さ適合判定フロー",
+    "description": "鉄筋コンクリート部材のかぶり厚さが部材種別ごとの基準値を満たすか判定する",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "令第79条第1項のかぶり厚さ判定を開始"
+      },
+      {
+        "id": "proc-identify-members",
+        "type": "process",
+        "title": "鉄筋コンクリート部材の特定",
+        "process_type": "undefined_input",
+        "description": "建築物の鉄筋コンクリート部材（壁、床、柱、はり、基礎）を特定する"
+      },
+      {
+        "id": "dec-has-members",
+        "type": "decision",
+        "title": "鉄筋コンクリート部材があるか？",
+        "decision_type": "binary",
+        "description": "判定対象となる鉄筋コンクリート部材が存在するか確認"
+      },
+      {
+        "id": "proc-read-cover-depth",
+        "type": "process",
+        "title": "かぶり厚さの読取",
+        "process_type": "undefined_input",
+        "description": "設計図書から各部材の鉄筋に対するコンクリートのかぶり厚さを読み取る"
+      },
+      {
+        "id": "dec-member-category",
+        "type": "decision",
+        "title": "部材の種別は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "耐力壁以外の壁/床", "description": "耐力壁以外の壁又は床" },
+          { "value": "耐力壁/柱/はり", "description": "耐力壁、柱又ははり" },
+          { "value": "土に接する部材", "description": "直接土に接する壁、柱、床、はり又は布基礎の立上り部分" },
+          { "value": "基礎", "description": "基礎（布基礎の立上り部分を除く）" }
+        ],
+        "description": "各部材が4つの区分のいずれに該当するかを判別"
+      },
+      {
+        "id": "dec-cat1-check",
+        "type": "decision",
+        "title": "かぶり厚さ≧2cmか？",
+        "decision_type": "binary",
+        "description": "耐力壁以外の壁又は床のかぶり厚さが2cm以上か判定",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "cover_depth", "desc": "かぶり厚さ" },
+          "rhs": { "value": 2, "unit": "cm" }
+        }
+      },
+      {
+        "id": "dec-cat2-check",
+        "type": "decision",
+        "title": "かぶり厚さ≧3cmか？",
+        "decision_type": "binary",
+        "description": "耐力壁、柱又ははりのかぶり厚さが3cm以上か判定",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "cover_depth", "desc": "かぶり厚さ" },
+          "rhs": { "value": 3, "unit": "cm" }
+        }
+      },
+      {
+        "id": "dec-cat3-check",
+        "type": "decision",
+        "title": "かぶり厚さ≧4cmか？",
+        "decision_type": "binary",
+        "description": "直接土に接する壁、柱、床、はり又は布基礎の立上り部分のかぶり厚さが4cm以上か判定",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "cover_depth", "desc": "かぶり厚さ" },
+          "rhs": { "value": 4, "unit": "cm" }
+        }
+      },
+      {
+        "id": "dec-cat4-check",
+        "type": "decision",
+        "title": "かぶり厚さ≧6cmか？（捨コン除く）",
+        "decision_type": "binary",
+        "description": "基礎（布基礎の立上り部分を除く）のかぶり厚さが捨コンクリート部分を除いて6cm以上か判定",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "cover_depth", "desc": "かぶり厚さ（捨コン除く）" },
+          "rhs": { "value": 6, "unit": "cm" }
+        }
+      },
+      {
+        "id": "proc-cat1-ok",
+        "type": "process",
+        "title": "区分1適合を記録",
+        "process_type": "mechanical",
+        "description": "耐力壁以外の壁又は床がかぶり厚さ基準を満たすことを記録"
+      },
+      {
+        "id": "proc-cat2-ok",
+        "type": "process",
+        "title": "区分2適合を記録",
+        "process_type": "mechanical",
+        "description": "耐力壁、柱又ははりがかぶり厚さ基準を満たすことを記録"
+      },
+      {
+        "id": "proc-cat3-ok",
+        "type": "process",
+        "title": "区分3適合を記録",
+        "process_type": "mechanical",
+        "description": "土に接する部材がかぶり厚さ基準を満たすことを記録"
+      },
+      {
+        "id": "proc-cat4-ok",
+        "type": "process",
+        "title": "区分4適合を記録",
+        "process_type": "mechanical",
+        "description": "基礎がかぶり厚さ基準を満たすことを記録"
+      },
+      {
+        "id": "dec-more-members",
+        "type": "decision",
+        "title": "未判定の部材があるか？",
+        "decision_type": "binary",
+        "description": "まだ判定していない部材が残っているか確認"
+      },
+      {
+        "id": "dec-all-categories-checked",
+        "type": "decision",
+        "title": "全区分で適合か？",
+        "decision_type": "binary",
+        "description": "全ての部材区分（区分1〜4）でかぶり厚さ基準を満たしているか確認"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令第79条第1項に適合"
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "令第79条第1項に不適合（かぶり厚さ不足）"
+      },
+      {
+        "id": "end-not-applicable",
+        "type": "terminal",
+        "title": "対象外",
+        "result": "pass",
+        "description": "鉄筋コンクリート部材がないため本規定の対象外"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "proc-identify-members",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "proc-identify-members",
+        "to": "dec-has-members",
+        "role": "flow"
+      },
+      {
+        "id": "e03",
+        "from": "dec-has-members",
+        "to": "proc-read-cover-depth",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e04",
+        "from": "dec-has-members",
+        "to": "end-not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e05",
+        "from": "proc-read-cover-depth",
+        "to": "dec-member-category",
+        "role": "flow"
+      },
+      {
+        "id": "e06",
+        "from": "dec-member-category",
+        "to": "dec-cat1-check",
+        "role": "option",
+        "label": "耐力壁以外の壁/床"
+      },
+      {
+        "id": "e07",
+        "from": "dec-member-category",
+        "to": "dec-cat2-check",
+        "role": "option",
+        "label": "耐力壁/柱/はり"
+      },
+      {
+        "id": "e08",
+        "from": "dec-member-category",
+        "to": "dec-cat3-check",
+        "role": "option",
+        "label": "土に接する部材"
+      },
+      {
+        "id": "e09",
+        "from": "dec-member-category",
+        "to": "dec-cat4-check",
+        "role": "option",
+        "label": "基礎"
+      },
+      {
+        "id": "e10",
+        "from": "dec-cat1-check",
+        "to": "proc-cat1-ok",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e11",
+        "from": "dec-cat1-check",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e12",
+        "from": "dec-cat2-check",
+        "to": "proc-cat2-ok",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e13",
+        "from": "dec-cat2-check",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e14",
+        "from": "dec-cat3-check",
+        "to": "proc-cat3-ok",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e15",
+        "from": "dec-cat3-check",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e16",
+        "from": "dec-cat4-check",
+        "to": "proc-cat4-ok",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e17",
+        "from": "dec-cat4-check",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e18",
+        "from": "proc-cat1-ok",
+        "to": "dec-more-members",
+        "role": "flow"
+      },
+      {
+        "id": "e19",
+        "from": "proc-cat2-ok",
+        "to": "dec-more-members",
+        "role": "flow"
+      },
+      {
+        "id": "e20",
+        "from": "proc-cat3-ok",
+        "to": "dec-more-members",
+        "role": "flow"
+      },
+      {
+        "id": "e21",
+        "from": "proc-cat4-ok",
+        "to": "dec-more-members",
+        "role": "flow"
+      },
+      {
+        "id": "e22",
+        "from": "dec-more-members",
+        "to": "proc-read-cover-depth",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e23",
+        "from": "dec-more-members",
+        "to": "dec-all-categories-checked",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e24",
+        "from": "dec-all-categories-checked",
+        "to": "end-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e25",
+        "from": "dec-all-categories-checked",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-ORDER-A79-P1",
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": ["A79:P2"],
+      "description": "第2項で適用除外（大臣認定等）を規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T12:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

@@ -1,0 +1,445 @@
+{
+  "id": "A89_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "木材の繊維方向の許容応力度",
+    "target_subject": "木材",
+    "description": "木材の繊維方向の許容応力度が令第89条の表の数値によっているかを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "89",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造関係規定",
+    "木造",
+    "許容応力度"
+  ],
+  "text_raw": "木材の繊維方向の許容応力度は、次の表の数値によらなければならない。ただし、第八十二条第一号から第三号までの規定によつて積雪時の構造計算をするに当たつては、長期に生ずる力に対する許容応力度は同表の数値に一・三を乗じて得た数値と、短期に生ずる力に対する許容応力度は同表の数値に〇・八を乗じて得た数値としなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "material",
+          "value": "木材を使用する建築物"
+        }
+      ],
+      "note": "木材を構造部材として使用する場合に適用"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-allowable-stress-compliance",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    },
+    "exceptions": {
+      "operator": "WHEN",
+      "conditions": [
+        {
+          "type": "calculation_type",
+          "value": "令第82条第1号〜第3号による積雪時構造計算"
+        }
+      ],
+      "effect": "MODIFY",
+      "note": "長期は1.3倍、短期は0.8倍"
+    }
+  },
+  "flow_diagram": {
+    "title": "木材の繊維方向の許容応力度 適合判定フロー",
+    "description": "令第89条第1項に基づき、木材の繊維方向の許容応力度が表の数値によっているかを判定するフローチャート",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "木材の繊維方向の許容応力度の適合判定を開始"
+      },
+      {
+        "id": "proc-get-wood-type",
+        "type": "process",
+        "title": "木材の種類を取得",
+        "process_type": "undefined_input",
+        "description": "構造計算に用いる木材の種類を設計図書等から読み取る"
+      },
+      {
+        "id": "info-wood-type",
+        "type": "information",
+        "title": "木材の種類",
+        "symbol": "T",
+        "subject": "木材",
+        "property": "種類",
+        "property_type": "classification",
+        "description": "構造計算に用いる木材の種類（樹種等）"
+      },
+      {
+        "id": "proc-get-wood-quality",
+        "type": "process",
+        "title": "木材の品質を取得",
+        "process_type": "undefined_input",
+        "description": "構造計算に用いる木材の品質（等級等）を設計図書等から読み取る"
+      },
+      {
+        "id": "info-wood-quality",
+        "type": "information",
+        "title": "木材の品質",
+        "symbol": "Q",
+        "subject": "木材",
+        "property": "品質",
+        "property_type": "classification",
+        "description": "構造計算に用いる木材の品質（JAS等級等）"
+      },
+      {
+        "id": "proc-calc-standard-strength",
+        "type": "process",
+        "title": "基準強度を算定",
+        "process_type": "mechanical",
+        "description": "木材の種類及び品質に応じて国土交通大臣が定める基準強度（Fc, Ft, Fb, Fs）を参照する"
+      },
+      {
+        "id": "info-standard-strength",
+        "type": "information",
+        "title": "基準強度 F",
+        "symbol": "F",
+        "subject": "木材",
+        "property": "基準強度",
+        "property_type": "numeric",
+        "description": "国土交通大臣が定める圧縮(Fc)、引張り(Ft)、曲げ(Fb)、せん断(Fs)に対する基準強度"
+      },
+      {
+        "id": "proc-get-load-type",
+        "type": "process",
+        "title": "荷重種別を取得",
+        "process_type": "undefined_input",
+        "description": "構造計算における荷重の種別（長期/短期）を設計図書等から読み取る"
+      },
+      {
+        "id": "info-load-type",
+        "type": "information",
+        "title": "荷重種別",
+        "symbol": "L",
+        "subject": "構造計算",
+        "property": "荷重種別",
+        "property_type": "classification",
+        "description": "長期に生ずる力か短期に生ずる力か"
+      },
+      {
+        "id": "dec-load-type",
+        "type": "decision",
+        "title": "荷重種別は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "長期", "description": "長期に生ずる力に対する荷重" },
+          { "value": "短期", "description": "短期に生ずる力に対する荷重" }
+        ],
+        "description": "構造計算における荷重が長期か短期かを判定"
+      },
+      {
+        "id": "dec-snow-calc-long",
+        "type": "decision",
+        "title": "令第82条第1号〜第3号による積雪時構造計算か？",
+        "decision_type": "binary",
+        "description": "長期荷重に対して積雪時の構造計算を行うか否かを判定"
+      },
+      {
+        "id": "dec-snow-calc-short",
+        "type": "decision",
+        "title": "令第82条第1号〜第3号による積雪時構造計算か？",
+        "decision_type": "binary",
+        "description": "短期荷重に対して積雪時の構造計算を行うか否かを判定"
+      },
+      {
+        "id": "proc-calc-allowable-long-normal",
+        "type": "process",
+        "title": "長期許容応力度を算定（通常）",
+        "process_type": "mechanical",
+        "description": "長期許容応力度 = 1.1F/3 を算定"
+      },
+      {
+        "id": "proc-calc-allowable-long-snow",
+        "type": "process",
+        "title": "長期許容応力度を算定（積雪時）",
+        "process_type": "mechanical",
+        "description": "長期許容応力度 = 1.1F/3 × 1.3 を算定"
+      },
+      {
+        "id": "proc-calc-allowable-short-normal",
+        "type": "process",
+        "title": "短期許容応力度を算定（通常）",
+        "process_type": "mechanical",
+        "description": "短期許容応力度 = 2F/3 を算定"
+      },
+      {
+        "id": "proc-calc-allowable-short-snow",
+        "type": "process",
+        "title": "短期許容応力度を算定（積雪時）",
+        "process_type": "mechanical",
+        "description": "短期許容応力度 = 2F/3 × 0.8 を算定"
+      },
+      {
+        "id": "info-allowable-required",
+        "type": "information",
+        "title": "必要許容応力度 Ar",
+        "symbol": "Ar",
+        "subject": "木材",
+        "property": "必要許容応力度",
+        "property_type": "numeric",
+        "description": "令第89条第1項の表に基づき算定された許容応力度の上限値"
+      },
+      {
+        "id": "proc-get-design-allowable",
+        "type": "process",
+        "title": "設計許容応力度を取得",
+        "process_type": "undefined_input",
+        "description": "構造計算に用いる設計許容応力度を設計図書等から読み取る"
+      },
+      {
+        "id": "info-allowable-design",
+        "type": "information",
+        "title": "設計許容応力度 Ad",
+        "symbol": "Ad",
+        "subject": "木材",
+        "property": "設計許容応力度",
+        "property_type": "numeric",
+        "description": "構造計算で採用した許容応力度の値"
+      },
+      {
+        "id": "dec-allowable-compliance",
+        "type": "decision",
+        "title": "Ad ≤ Ar か？",
+        "decision_type": "binary",
+        "description": "設計許容応力度が必要許容応力度以下であるかを判定",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "Ad", "desc": "設計許容応力度" },
+          "rhs": { "var": "Ar", "desc": "必要許容応力度" }
+        }
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "木材の繊維方向の許容応力度が令第89条第1項の表の数値に適合"
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "木材の繊維方向の許容応力度が令第89条第1項の表の数値に不適合"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "proc-get-wood-type",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "proc-get-wood-type",
+        "to": "info-wood-type",
+        "role": "output"
+      },
+      {
+        "id": "e03",
+        "from": "info-wood-type",
+        "to": "proc-get-wood-quality",
+        "role": "flow"
+      },
+      {
+        "id": "e04",
+        "from": "proc-get-wood-quality",
+        "to": "info-wood-quality",
+        "role": "output"
+      },
+      {
+        "id": "e05",
+        "from": "info-wood-quality",
+        "to": "proc-calc-standard-strength",
+        "role": "flow"
+      },
+      {
+        "id": "e06",
+        "from": "info-wood-type",
+        "to": "proc-calc-standard-strength",
+        "role": "input"
+      },
+      {
+        "id": "e07",
+        "from": "info-wood-quality",
+        "to": "proc-calc-standard-strength",
+        "role": "input"
+      },
+      {
+        "id": "e08",
+        "from": "proc-calc-standard-strength",
+        "to": "info-standard-strength",
+        "role": "output"
+      },
+      {
+        "id": "e09",
+        "from": "info-standard-strength",
+        "to": "proc-get-load-type",
+        "role": "flow"
+      },
+      {
+        "id": "e10",
+        "from": "proc-get-load-type",
+        "to": "info-load-type",
+        "role": "output"
+      },
+      {
+        "id": "e11",
+        "from": "info-load-type",
+        "to": "dec-load-type",
+        "role": "flow"
+      },
+      {
+        "id": "e12",
+        "from": "dec-load-type",
+        "to": "dec-snow-calc-long",
+        "role": "option",
+        "label": "長期"
+      },
+      {
+        "id": "e13",
+        "from": "dec-load-type",
+        "to": "dec-snow-calc-short",
+        "role": "option",
+        "label": "短期"
+      },
+      {
+        "id": "e14",
+        "from": "dec-snow-calc-long",
+        "to": "proc-calc-allowable-long-snow",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e15",
+        "from": "dec-snow-calc-long",
+        "to": "proc-calc-allowable-long-normal",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e16",
+        "from": "dec-snow-calc-short",
+        "to": "proc-calc-allowable-short-snow",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e17",
+        "from": "dec-snow-calc-short",
+        "to": "proc-calc-allowable-short-normal",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e18",
+        "from": "proc-calc-allowable-long-normal",
+        "to": "info-allowable-required",
+        "role": "output"
+      },
+      {
+        "id": "e19",
+        "from": "proc-calc-allowable-long-snow",
+        "to": "info-allowable-required",
+        "role": "output"
+      },
+      {
+        "id": "e20",
+        "from": "proc-calc-allowable-short-normal",
+        "to": "info-allowable-required",
+        "role": "output"
+      },
+      {
+        "id": "e21",
+        "from": "proc-calc-allowable-short-snow",
+        "to": "info-allowable-required",
+        "role": "output"
+      },
+      {
+        "id": "e22",
+        "from": "info-allowable-required",
+        "to": "proc-get-design-allowable",
+        "role": "flow"
+      },
+      {
+        "id": "e23",
+        "from": "proc-get-design-allowable",
+        "to": "info-allowable-design",
+        "role": "output"
+      },
+      {
+        "id": "e24",
+        "from": "info-allowable-design",
+        "to": "dec-allowable-compliance",
+        "role": "flow"
+      },
+      {
+        "id": "e25",
+        "from": "info-allowable-required",
+        "to": "dec-allowable-compliance",
+        "role": "input"
+      },
+      {
+        "id": "e26",
+        "from": "info-allowable-design",
+        "to": "dec-allowable-compliance",
+        "role": "input"
+      },
+      {
+        "id": "e27",
+        "from": "dec-allowable-compliance",
+        "to": "end-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e28",
+        "from": "dec-allowable-compliance",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-ORDER-A89-P1",
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": [
+        "A82:I1",
+        "A82:I2",
+        "A82:I3"
+      ],
+      "description": "積雪時の構造計算の規定（ただし書きの適用条件）"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T12:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

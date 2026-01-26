@@ -1,0 +1,85 @@
+{
+  "id": "A22_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "居室の床の高さ及び防湿方法判定フロー",
+    "target_subject": "最下階の居室の床",
+    "description": "最下階の居室の木造床の高さ及び防湿方法の技術基準を判定するフロー"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "22",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": ["単体規定", "居室", "衛生", "防湿"],
+  "text_raw": "最下階の居室の床が木造である場合における床の高さ及び防湿方法は、次の各号に定めるところによらなければならない。ただし、床下をコンクリート、たたきその他これらに類する材料で覆う場合及び当該最下階の居室の床の構造が、地面から発生する水蒸気によつて腐食しないものとして、国土交通大臣の認定を受けたものである場合においては、この限りでない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [{ "type": "structural", "value": "最下階の居室の床が木造である場合" }]
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        { "ref": "exception", "value": true },
+        { "operator": "AND", "conditions": [{ "ref": "item1" }, { "ref": "item2" }] }
+      ]
+    }
+  },
+  "flow_diagram": {
+    "title": "令第22条第1項 床高さ・防湿方法判定フロー",
+    "description": "最下階の居室の木造床の技術基準適合判定",
+    "nodes": [
+      { "id": "start", "type": "terminal", "title": "判定開始", "result": "start" },
+      { "id": "dec-wooden", "type": "decision", "title": "最下階の居室の床が木造か？", "decision_type": "binary", "description": "本条の適用対象か判定" },
+      { "id": "dec-concrete", "type": "decision", "title": "床下をコンクリート等で被覆しているか？", "decision_type": "binary", "description": "ただし書き第1号：床下被覆" },
+      { "id": "proc-exception1", "type": "process", "title": "ただし書き該当（床下被覆）", "process_type": "mechanical" },
+      { "id": "dec-certification", "type": "decision", "title": "大臣認定構造か？", "decision_type": "binary", "description": "ただし書き第2号：水蒸気腐食防止の大臣認定" },
+      { "id": "proc-exception2", "type": "process", "title": "ただし書き該当（大臣認定）", "process_type": "mechanical" },
+      { "id": "dec-height", "type": "decision", "title": "床の高さ≥45cmか？", "decision_type": "binary", "description": "第一号：地面から床上面まで45cm以上" },
+      { "id": "proc-item1", "type": "process", "title": "第一号適合", "process_type": "mechanical" },
+      { "id": "dec-vent-interval", "type": "decision", "title": "換気孔の間隔≤5mか？", "decision_type": "binary", "description": "第二号：壁の長さ5m以下ごと" },
+      { "id": "dec-vent-area", "type": "decision", "title": "換気孔の面積≥300cm²か？", "decision_type": "binary", "description": "第二号：面積300cm²以上" },
+      { "id": "dec-mouse-guard", "type": "decision", "title": "ねずみ侵入防止設備があるか？", "decision_type": "binary", "description": "第二号：ねずみ侵入防止" },
+      { "id": "proc-item2", "type": "process", "title": "第二号適合", "process_type": "mechanical" },
+      { "id": "end-pass", "type": "terminal", "title": "適合", "result": "pass", "description": "令22条1項の基準に適合" },
+      { "id": "end-fail", "type": "terminal", "title": "不適合", "result": "fail", "description": "令22条1項の基準に不適合" },
+      { "id": "end-na", "type": "terminal", "title": "適用除外", "result": "end", "description": "本条の適用対象外（木造床でない）" }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "dec-wooden", "role": "flow" },
+      { "id": "e02", "from": "dec-wooden", "to": "dec-concrete", "role": "yes" },
+      { "id": "e03", "from": "dec-wooden", "to": "end-na", "role": "no" },
+      { "id": "e04", "from": "dec-concrete", "to": "proc-exception1", "role": "yes" },
+      { "id": "e05", "from": "dec-concrete", "to": "dec-certification", "role": "no" },
+      { "id": "e06", "from": "proc-exception1", "to": "end-pass", "role": "flow" },
+      { "id": "e07", "from": "dec-certification", "to": "proc-exception2", "role": "yes" },
+      { "id": "e08", "from": "dec-certification", "to": "dec-height", "role": "no" },
+      { "id": "e09", "from": "proc-exception2", "to": "end-pass", "role": "flow" },
+      { "id": "e10", "from": "dec-height", "to": "proc-item1", "role": "yes" },
+      { "id": "e11", "from": "dec-height", "to": "end-fail", "role": "no" },
+      { "id": "e12", "from": "proc-item1", "to": "dec-vent-interval", "role": "flow" },
+      { "id": "e13", "from": "dec-vent-interval", "to": "dec-vent-area", "role": "yes" },
+      { "id": "e14", "from": "dec-vent-interval", "to": "end-fail", "role": "no" },
+      { "id": "e15", "from": "dec-vent-area", "to": "dec-mouse-guard", "role": "yes" },
+      { "id": "e16", "from": "dec-vent-area", "to": "end-fail", "role": "no" },
+      { "id": "e17", "from": "dec-mouse-guard", "to": "proc-item2", "role": "yes" },
+      { "id": "e18", "from": "dec-mouse-guard", "to": "end-fail", "role": "no" },
+      { "id": "e19", "from": "proc-item2", "to": "end-pass", "role": "flow" }
+    ]
+  },
+  "kijo_diagram_ref": "A22_P1_kijo",
+  "related_laws": [
+    { "law_id": "325AC0000000201", "law_name": "建築基準法", "law_type": "act", "relationship": "delegated_from", "articles": ["A28:P2"], "description": "法第28条第2項に基づく政令委任" }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00Z",
+    "updated_at": "2026-01-26T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator"
+  }
+}

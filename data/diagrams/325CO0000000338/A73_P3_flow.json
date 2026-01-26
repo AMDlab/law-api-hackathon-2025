@@ -1,0 +1,342 @@
+{
+  "id": "A73_P3_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "はりの引張鉄筋の定着長さ（適合判定フロー）",
+    "target_subject": "引張鉄筋",
+    "description": "柱に取り付けるはりの引張鉄筋の定着長さ基準の適合判定フロー"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "73",
+    "paragraph": "3",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造",
+    "鉄筋コンクリート造"
+  ],
+  "text_raw": "柱に取り付けるはりの引張鉄筋は、柱の主筋に溶接する場合を除き、柱に定着される部分の長さをその径の四十倍以上としなければならない。ただし、国土交通大臣が定める基準に従つた構造計算によつて構造耐力上安全であることが確かめられた場合においては、この限りでない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "structure",
+          "value": "鉄筋コンクリート造"
+        },
+        {
+          "type": "element",
+          "value": "柱に取り付けるはりの引張鉄筋"
+        }
+      ]
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "ref": "溶接",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "ref": "定着長さ基準適合",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "ref": "構造計算安全確認",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    },
+    "exceptions": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "type": "condition",
+          "value": "柱の主筋に溶接する場合"
+        },
+        {
+          "type": "proviso",
+          "value": "国土交通大臣が定める基準に従つた構造計算によつて構造耐力上安全であることが確かめられた場合"
+        }
+      ],
+      "effect": "EXEMPT"
+    }
+  },
+  "flow_diagram": {
+    "title": "令73条3項 はりの引張鉄筋の定着長さ 適合判定フロー",
+    "description": "柱に取り付けるはりの引張鉄筋について、溶接・定着長さ基準・構造計算のいずれかで適合判定を行う",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "令73条3項の適合判定を開始"
+      },
+      {
+        "id": "proc-identify-beam",
+        "type": "process",
+        "title": "柱に取り付けるはりを特定",
+        "process_type": "undefined_input",
+        "description": "判定対象となる柱に取り付けるはりを特定する"
+      },
+      {
+        "id": "proc-identify-rebar",
+        "type": "process",
+        "title": "はりの引張鉄筋を特定",
+        "process_type": "undefined_input",
+        "description": "各はりに属する引張鉄筋を特定する"
+      },
+      {
+        "id": "dec-has-rebar",
+        "type": "decision",
+        "title": "判定対象の引張鉄筋があるか？",
+        "decision_type": "binary",
+        "description": "判定対象となる未判定の引張鉄筋が残っているかを確認"
+      },
+      {
+        "id": "dec-welded",
+        "type": "decision",
+        "title": "柱の主筋に溶接しているか？",
+        "decision_type": "binary",
+        "description": "引張鉄筋が柱の主筋に溶接されているかを確認",
+        "condition": {
+          "operator": "EQ",
+          "lhs": { "var": "W", "desc": "主筋への溶接有無" },
+          "rhs": { "value": true }
+        }
+      },
+      {
+        "id": "proc-welded-exempt",
+        "type": "process",
+        "title": "溶接による適用除外",
+        "process_type": "mechanical",
+        "description": "当該鉄筋は柱の主筋に溶接されているため、定着長さ基準の適用除外"
+      },
+      {
+        "id": "proc-read-diameter",
+        "type": "process",
+        "title": "鉄筋径（D）を読み取り",
+        "process_type": "undefined_input",
+        "description": "引張鉄筋の径を読み取る"
+      },
+      {
+        "id": "proc-read-anchorage",
+        "type": "process",
+        "title": "定着長さ（L）を読み取り",
+        "process_type": "undefined_input",
+        "description": "柱に定着される部分の長さを読み取る"
+      },
+      {
+        "id": "proc-calc-required",
+        "type": "process",
+        "title": "必要定着長さ（Lreq = D×40）を算出",
+        "process_type": "mechanical",
+        "description": "径の40倍の値を算出して必要定着長さとする"
+      },
+      {
+        "id": "dec-length-compare",
+        "type": "decision",
+        "title": "定着長さ L >= 必要定着長さ Lreq か？",
+        "decision_type": "binary",
+        "description": "定着長さが径の40倍以上かを判定",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "L", "desc": "定着長さ" },
+          "rhs": { "var": "Lreq", "desc": "必要定着長さ（D×40）" }
+        }
+      },
+      {
+        "id": "proc-length-ok",
+        "type": "process",
+        "title": "定着長さ基準適合",
+        "process_type": "mechanical",
+        "description": "当該鉄筋の定着長さは径の40倍以上であり、本則に適合"
+      },
+      {
+        "id": "dec-calc-safe",
+        "type": "decision",
+        "title": "構造計算で安全確認済みか？",
+        "decision_type": "binary",
+        "description": "国土交通大臣が定める基準に従った構造計算によって構造耐力上安全であることが確かめられたか",
+        "condition": {
+          "operator": "EQ",
+          "lhs": { "var": "S", "desc": "構造計算による安全確認" },
+          "rhs": { "value": true }
+        }
+      },
+      {
+        "id": "proc-calc-exempt",
+        "type": "process",
+        "title": "構造計算によるただし書き適用",
+        "process_type": "human_judgment",
+        "description": "構造計算により安全が確認されたため、ただし書き規定により適合"
+      },
+      {
+        "id": "proc-rebar-fail",
+        "type": "process",
+        "title": "当該鉄筋は不適合",
+        "process_type": "mechanical",
+        "description": "当該引張鉄筋は定着長さ基準を満たさず、かつ構造計算による安全確認もされていない"
+      },
+      {
+        "id": "terminal-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "令73条3項に不適合（定着長さ基準を満たさない引張鉄筋が存在）"
+      },
+      {
+        "id": "terminal-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令73条3項に適合（全ての引張鉄筋が溶接・定着長さ基準・構造計算のいずれかで適合）"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "proc-identify-beam",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "proc-identify-beam",
+        "to": "proc-identify-rebar",
+        "role": "flow"
+      },
+      {
+        "id": "e03",
+        "from": "proc-identify-rebar",
+        "to": "dec-has-rebar",
+        "role": "flow"
+      },
+      {
+        "id": "e04",
+        "from": "dec-has-rebar",
+        "to": "dec-welded",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e05",
+        "from": "dec-has-rebar",
+        "to": "terminal-pass",
+        "role": "no",
+        "label": "いいえ（全て判定済み）"
+      },
+      {
+        "id": "e06",
+        "from": "dec-welded",
+        "to": "proc-welded-exempt",
+        "role": "yes",
+        "label": "はい（溶接あり）"
+      },
+      {
+        "id": "e07",
+        "from": "dec-welded",
+        "to": "proc-read-diameter",
+        "role": "no",
+        "label": "いいえ（溶接なし）"
+      },
+      {
+        "id": "e08",
+        "from": "proc-welded-exempt",
+        "to": "dec-has-rebar",
+        "role": "flow"
+      },
+      {
+        "id": "e09",
+        "from": "proc-read-diameter",
+        "to": "proc-read-anchorage",
+        "role": "flow"
+      },
+      {
+        "id": "e10",
+        "from": "proc-read-anchorage",
+        "to": "proc-calc-required",
+        "role": "flow"
+      },
+      {
+        "id": "e11",
+        "from": "proc-calc-required",
+        "to": "dec-length-compare",
+        "role": "flow"
+      },
+      {
+        "id": "e12",
+        "from": "dec-length-compare",
+        "to": "proc-length-ok",
+        "role": "yes",
+        "label": "はい（L >= D×40）"
+      },
+      {
+        "id": "e13",
+        "from": "dec-length-compare",
+        "to": "dec-calc-safe",
+        "role": "no",
+        "label": "いいえ（L < D×40）"
+      },
+      {
+        "id": "e14",
+        "from": "proc-length-ok",
+        "to": "dec-has-rebar",
+        "role": "flow"
+      },
+      {
+        "id": "e15",
+        "from": "dec-calc-safe",
+        "to": "proc-calc-exempt",
+        "role": "yes",
+        "label": "はい（安全確認済み）"
+      },
+      {
+        "id": "e16",
+        "from": "dec-calc-safe",
+        "to": "proc-rebar-fail",
+        "role": "no",
+        "label": "いいえ（未確認）"
+      },
+      {
+        "id": "e17",
+        "from": "proc-calc-exempt",
+        "to": "dec-has-rebar",
+        "role": "flow"
+      },
+      {
+        "id": "e18",
+        "from": "proc-rebar-fail",
+        "to": "terminal-fail",
+        "role": "flow"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-ORDER-A73-P3",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": ["A20"],
+      "description": "構造耐力の一般規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

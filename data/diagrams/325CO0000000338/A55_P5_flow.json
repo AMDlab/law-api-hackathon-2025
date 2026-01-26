@@ -1,0 +1,282 @@
+{
+  "id": "A55_P5_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "組積造の壁の厚さ（上下階関係）適合判定フロー",
+    "target_subject": "組積造の壁",
+    "description": "組積造の各階の壁の厚さが、その上にある壁の厚さより薄くないことを確認するフロー"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "55",
+    "paragraph": "5",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造規定",
+    "組積造"
+  ],
+  "text_raw": "組積造の各階の壁の厚さは、その上にある壁の厚さより薄くしてはならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "structure",
+          "value": "組積造"
+        }
+      ],
+      "note": "組積造の建築物に適用"
+    },
+    "judgment_rule": {
+      "operator": "FORALL",
+      "conditions": [
+        {
+          "description": "各階の壁について、その厚さがその上にある壁の厚さ以上であること"
+        }
+      ]
+    }
+  },
+  "flow_diagram": {
+    "title": "令第55条第5項 適合判定フロー",
+    "description": "組積造の各階の壁の厚さが上にある壁の厚さより薄くないことを判定する",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "令第55条第5項の適合判定を開始"
+      },
+      {
+        "id": "dec-structure-type",
+        "type": "decision",
+        "title": "構造種別は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "組積造", "description": "れんが造、石造、コンクリートブロック造等" },
+          { "value": "その他", "description": "組積造以外の構造" }
+        ],
+        "description": "設計図書から建築物の構造種別を確認する",
+        "related_articles": ["令第55条"]
+      },
+      {
+        "id": "proc-scope-out",
+        "type": "process",
+        "title": "適用対象外と判定",
+        "process_type": "mechanical",
+        "description": "組積造以外の構造のため本項は適用されない"
+      },
+      {
+        "id": "end-not-applicable",
+        "type": "terminal",
+        "title": "適用除外",
+        "result": "pass",
+        "description": "組積造でないため令第55条第5項は適用されない"
+      },
+      {
+        "id": "proc-scope-applicable",
+        "type": "process",
+        "title": "適用対象と確定",
+        "process_type": "mechanical",
+        "description": "組積造の建築物であるため本項が適用される"
+      },
+      {
+        "id": "proc-identify-floors",
+        "type": "process",
+        "title": "階を特定する",
+        "process_type": "undefined_input",
+        "description": "建築物の各階を設計図書から特定する"
+      },
+      {
+        "id": "proc-identify-walls",
+        "type": "process",
+        "title": "各階の壁を特定する",
+        "process_type": "undefined_input",
+        "description": "各階に属する組積造の壁を設計図書から特定する"
+      },
+      {
+        "id": "proc-get-thickness",
+        "type": "process",
+        "title": "壁の厚さを読み取る",
+        "process_type": "undefined_input",
+        "description": "各階の壁の厚さを設計図書から読み取る（仕上材料を除く）"
+      },
+      {
+        "id": "dec-single-floor",
+        "type": "decision",
+        "title": "階数は1階か？",
+        "decision_type": "binary",
+        "description": "上階がなければ比較対象がないため、1階建ての場合は自動適合",
+        "related_articles": ["令第55条第5項"]
+      },
+      {
+        "id": "proc-single-floor-pass",
+        "type": "process",
+        "title": "比較不要と判定",
+        "process_type": "mechanical",
+        "description": "1階建てのため上階との比較は不要"
+      },
+      {
+        "id": "proc-compare-thickness",
+        "type": "process",
+        "title": "上下階の壁厚さを比較する",
+        "process_type": "mechanical",
+        "description": "各階の壁について、その上にある壁との厚さを比較する"
+      },
+      {
+        "id": "dec-thickness-compliance",
+        "type": "decision",
+        "title": "全ての壁で T(下階) >= T(上階) を満たすか？",
+        "decision_type": "binary",
+        "description": "各階の壁の厚さが、その上にある壁の厚さ以上であるかを確認",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "T_lower", "desc": "下階の壁の厚さ" },
+          "rhs": { "var": "T_upper", "desc": "上階の壁の厚さ" }
+        },
+        "related_articles": ["令第55条第5項"]
+      },
+      {
+        "id": "proc-all-pass",
+        "type": "process",
+        "title": "全壁適合と判定",
+        "process_type": "mechanical",
+        "description": "全ての壁で厚さの条件を満たすことを確認"
+      },
+      {
+        "id": "proc-fail-found",
+        "type": "process",
+        "title": "不適合壁を検出",
+        "process_type": "mechanical",
+        "description": "上階より薄い壁が存在することを検出"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令第55条第5項に適合（全ての壁で厚さ条件を満たす）"
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "令第55条第5項に不適合（上階より薄い壁が存在）"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-structure-type",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-structure-type",
+        "to": "proc-scope-out",
+        "role": "option",
+        "label": "その他"
+      },
+      {
+        "id": "e03",
+        "from": "proc-scope-out",
+        "to": "end-not-applicable",
+        "role": "flow"
+      },
+      {
+        "id": "e04",
+        "from": "dec-structure-type",
+        "to": "proc-scope-applicable",
+        "role": "option",
+        "label": "組積造"
+      },
+      {
+        "id": "e05",
+        "from": "proc-scope-applicable",
+        "to": "proc-identify-floors",
+        "role": "flow"
+      },
+      {
+        "id": "e06",
+        "from": "proc-identify-floors",
+        "to": "proc-identify-walls",
+        "role": "flow"
+      },
+      {
+        "id": "e07",
+        "from": "proc-identify-walls",
+        "to": "proc-get-thickness",
+        "role": "flow"
+      },
+      {
+        "id": "e08",
+        "from": "proc-get-thickness",
+        "to": "dec-single-floor",
+        "role": "flow"
+      },
+      {
+        "id": "e09",
+        "from": "dec-single-floor",
+        "to": "proc-single-floor-pass",
+        "role": "yes"
+      },
+      {
+        "id": "e10",
+        "from": "proc-single-floor-pass",
+        "to": "end-pass",
+        "role": "flow"
+      },
+      {
+        "id": "e11",
+        "from": "dec-single-floor",
+        "to": "proc-compare-thickness",
+        "role": "no"
+      },
+      {
+        "id": "e12",
+        "from": "proc-compare-thickness",
+        "to": "dec-thickness-compliance",
+        "role": "flow"
+      },
+      {
+        "id": "e13",
+        "from": "dec-thickness-compliance",
+        "to": "proc-all-pass",
+        "role": "yes"
+      },
+      {
+        "id": "e14",
+        "from": "proc-all-pass",
+        "to": "end-pass",
+        "role": "flow"
+      },
+      {
+        "id": "e15",
+        "from": "dec-thickness-compliance",
+        "to": "proc-fail-found",
+        "role": "no"
+      },
+      {
+        "id": "e16",
+        "from": "proc-fail-found",
+        "to": "end-fail",
+        "role": "flow"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-ORD-A55-P5",
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00+09:00",
+    "author": "Claude",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

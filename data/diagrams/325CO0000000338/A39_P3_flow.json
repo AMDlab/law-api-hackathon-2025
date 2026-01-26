@@ -1,0 +1,328 @@
+{
+  "id": "A39_P3_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "特定天井の構造",
+    "target_subject": "特定天井",
+    "description": "特定天井の構造が構造耐力上安全なものであることを判定するフロー"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "39",
+    "paragraph": "3",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造",
+    "特定天井"
+  ],
+  "text_raw": "特定天井（脱落によつて重大な危害を生ずるおそれがあるものとして国土交通大臣が定める天井をいう。以下同じ。）の構造は、構造耐力上安全なものとして、国土交通大臣が定めた構造方法を用いるもの又は国土交通大臣の認定を受けたものとしなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "subject",
+          "value": "特定天井を有する建築物"
+        }
+      ],
+      "note": "特定天井とは、脱落によって重大な危害を生ずるおそれがあるものとして国土交通大臣が定める天井"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-structural-safety",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "operator": "OR",
+          "conditions": [
+            {
+              "ref": "info-minister-method",
+              "operator": "==",
+              "value": true
+            },
+            {
+              "ref": "info-minister-approval",
+              "operator": "==",
+              "value": true
+            }
+          ]
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "flow_diagram": {
+    "title": "令39条3項 特定天井の構造 適合判定フロー",
+    "description": "特定天井が構造耐力上安全であり、大臣定め構造方法または大臣認定のいずれかを満たすことを判定するフロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "令39条3項 特定天井の構造 適合判定開始"
+      },
+      {
+        "id": "dec-has-tokutei-ceiling",
+        "type": "decision",
+        "title": "建築物に特定天井があるか？",
+        "decision_type": "binary",
+        "description": "脱落によって重大な危害を生ずるおそれがある天井（国土交通大臣が定める天井）の有無を確認"
+      },
+      {
+        "id": "proc-identify-ceiling",
+        "type": "process",
+        "title": "特定天井を特定",
+        "process_type": "undefined_input",
+        "description": "設計図書から対象となる特定天井を特定する"
+      },
+      {
+        "id": "dec-ceiling-structure-type",
+        "type": "decision",
+        "title": "天井の構造方法の種類は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "大臣定め構造方法", "description": "告示に定める構造方法を用いたもの" },
+          { "value": "大臣認定構造", "description": "国土交通大臣の認定を受けたもの" },
+          { "value": "その他", "description": "いずれにも該当しないもの" }
+        ],
+        "description": "特定天井の構造方法が告示による方法か認定による方法かを判定"
+      },
+      {
+        "id": "proc-minister-method-route",
+        "type": "process",
+        "title": "大臣定め構造方法ルート",
+        "process_type": "mechanical",
+        "description": "告示に定める構造方法を採用している場合の判定経路"
+      },
+      {
+        "id": "dec-minister-method-compliant",
+        "type": "decision",
+        "title": "告示の仕様規定に適合するか？",
+        "decision_type": "binary",
+        "description": "国土交通大臣が定めた構造方法（告示第771号等）の仕様規定に適合するか確認"
+      },
+      {
+        "id": "proc-minister-approval-route",
+        "type": "process",
+        "title": "大臣認定ルート",
+        "process_type": "undefined_input",
+        "description": "国土交通大臣の認定を受けた構造方法を採用している場合の判定経路"
+      },
+      {
+        "id": "dec-has-approval-cert",
+        "type": "decision",
+        "title": "認定書があるか？",
+        "decision_type": "binary",
+        "description": "国土交通大臣の認定を受けたことを証する書類（認定書）が存在するか確認"
+      },
+      {
+        "id": "dec-approval-valid",
+        "type": "decision",
+        "title": "認定内容と設計内容が整合するか？",
+        "decision_type": "binary",
+        "description": "認定書の内容と設計図書の内容が整合しているか確認"
+      },
+      {
+        "id": "dec-structural-safety",
+        "type": "decision",
+        "title": "構造耐力上安全か？",
+        "decision_type": "binary",
+        "description": "特定天井の構造が構造耐力上安全なものであるか判定",
+        "condition": {
+          "operator": "EQ",
+          "lhs": { "var": "structural_safety", "desc": "構造耐力上の安全性" },
+          "rhs": { "value": true, "desc": "安全" }
+        }
+      },
+      {
+        "id": "proc-ceiling-pass",
+        "type": "process",
+        "title": "当該天井は適合",
+        "process_type": "mechanical",
+        "description": "当該特定天井は令39条3項に適合"
+      },
+      {
+        "id": "dec-more-ceilings",
+        "type": "decision",
+        "title": "他に判定対象の特定天井があるか？",
+        "decision_type": "binary",
+        "description": "建築物内の全ての特定天井について判定が完了したか確認"
+      },
+      {
+        "id": "terminal-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "全ての特定天井が令39条3項に適合"
+      },
+      {
+        "id": "terminal-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "特定天井が令39条3項に不適合"
+      },
+      {
+        "id": "terminal-not-applicable",
+        "type": "terminal",
+        "title": "適用対象外",
+        "result": "pass",
+        "description": "特定天井がないため令39条3項は適用されない"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-has-tokutei-ceiling",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-has-tokutei-ceiling",
+        "to": "proc-identify-ceiling",
+        "role": "yes",
+        "label": "あり"
+      },
+      {
+        "id": "e03",
+        "from": "dec-has-tokutei-ceiling",
+        "to": "terminal-not-applicable",
+        "role": "no",
+        "label": "なし"
+      },
+      {
+        "id": "e04",
+        "from": "proc-identify-ceiling",
+        "to": "dec-ceiling-structure-type",
+        "role": "flow"
+      },
+      {
+        "id": "e05",
+        "from": "dec-ceiling-structure-type",
+        "to": "proc-minister-method-route",
+        "role": "option",
+        "label": "大臣定め構造方法"
+      },
+      {
+        "id": "e06",
+        "from": "dec-ceiling-structure-type",
+        "to": "proc-minister-approval-route",
+        "role": "option",
+        "label": "大臣認定構造"
+      },
+      {
+        "id": "e07",
+        "from": "dec-ceiling-structure-type",
+        "to": "terminal-fail",
+        "role": "option",
+        "label": "その他"
+      },
+      {
+        "id": "e08",
+        "from": "proc-minister-method-route",
+        "to": "dec-minister-method-compliant",
+        "role": "flow"
+      },
+      {
+        "id": "e09",
+        "from": "dec-minister-method-compliant",
+        "to": "dec-structural-safety",
+        "role": "yes",
+        "label": "適合"
+      },
+      {
+        "id": "e10",
+        "from": "dec-minister-method-compliant",
+        "to": "terminal-fail",
+        "role": "no",
+        "label": "不適合"
+      },
+      {
+        "id": "e11",
+        "from": "proc-minister-approval-route",
+        "to": "dec-has-approval-cert",
+        "role": "flow"
+      },
+      {
+        "id": "e12",
+        "from": "dec-has-approval-cert",
+        "to": "dec-approval-valid",
+        "role": "yes",
+        "label": "あり"
+      },
+      {
+        "id": "e13",
+        "from": "dec-has-approval-cert",
+        "to": "terminal-fail",
+        "role": "no",
+        "label": "なし"
+      },
+      {
+        "id": "e14",
+        "from": "dec-approval-valid",
+        "to": "dec-structural-safety",
+        "role": "yes",
+        "label": "整合"
+      },
+      {
+        "id": "e15",
+        "from": "dec-approval-valid",
+        "to": "terminal-fail",
+        "role": "no",
+        "label": "不整合"
+      },
+      {
+        "id": "e16",
+        "from": "dec-structural-safety",
+        "to": "proc-ceiling-pass",
+        "role": "yes",
+        "label": "安全"
+      },
+      {
+        "id": "e17",
+        "from": "dec-structural-safety",
+        "to": "terminal-fail",
+        "role": "no",
+        "label": "不安全"
+      },
+      {
+        "id": "e18",
+        "from": "proc-ceiling-pass",
+        "to": "dec-more-ceilings",
+        "role": "flow"
+      },
+      {
+        "id": "e19",
+        "from": "dec-more-ceilings",
+        "to": "dec-ceiling-structure-type",
+        "role": "yes",
+        "label": "あり"
+      },
+      {
+        "id": "e20",
+        "from": "dec-more-ceilings",
+        "to": "terminal-pass",
+        "role": "no",
+        "label": "なし"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSLO-A39-P3",
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

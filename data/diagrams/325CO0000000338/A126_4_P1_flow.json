@@ -1,0 +1,440 @@
+{
+  "id": "FLOW-BSL-ORD-A126_4-P1",
+  "version": "3.2.0",
+  "page_title": {
+    "title": "非常用の照明装置の設置",
+    "target_subject": "建築物の部分",
+    "description": "特殊建築物等の居室及び通路における非常用照明装置の設置義務の適合判定フロー"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "126_4",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "避難",
+    "非常用照明"
+  ],
+  "text_raw": "法別表第一（い）欄（一）項から（四）項までに掲げる用途に供する特殊建築物の居室、階数が三以上で延べ面積が五百平方メートルを超える建築物の居室、第百十六条の二第一項第一号に該当する窓その他の開口部を有しない居室又は延べ面積が千平方メートルを超える建築物の居室及びこれらの居室から地上に通ずる廊下、階段その他の通路（採光上有効に直接外気に開放された通路を除く。）並びにこれらに類する建築物の部分で照明装置の設置を通常要する部分には、非常用の照明装置を設けなければならない。ただし、次の各号のいずれかに該当する建築物又は建築物の部分については、この限りでない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "type": "building_use",
+          "value": "法別表第一（い）欄（一）項から（四）項の特殊建築物の居室"
+        },
+        {
+          "type": "building_scale",
+          "value": "階数3以上かつ延べ面積500㎡超の建築物の居室"
+        },
+        {
+          "type": "windowless",
+          "value": "令116条の2第1項第1号該当の無窓居室"
+        },
+        {
+          "type": "building_scale",
+          "value": "延べ面積1000㎡超の建築物の居室"
+        }
+      ]
+    },
+    "exceptions": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "type": "building_type",
+          "item": "一号",
+          "value": "一戸建住宅、長屋・共同住宅の住戸"
+        },
+        {
+          "type": "room_type",
+          "item": "二号",
+          "value": "病院の病室、下宿の宿泊室、寄宿舎の寝室等"
+        },
+        {
+          "type": "building_use",
+          "item": "三号",
+          "value": "学校等"
+        },
+        {
+          "type": "location",
+          "item": "四号",
+          "value": "避難階又は直上階・直下階の避難上支障がない居室等"
+        }
+      ],
+      "effect": "EXEMPT"
+    }
+  },
+  "flow_diagram": {
+    "title": "令第126条の4第1項 非常用照明装置設置 適合判定フロー",
+    "description": "特殊建築物等の居室及び通路における非常用照明装置の設置義務の適合を判定するフローチャート",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "令第126条の4第1項の適合判定を開始"
+      },
+      {
+        "id": "dec-dwelling",
+        "type": "decision",
+        "title": "一戸建住宅、または長屋・共同住宅の住戸か？",
+        "decision_type": "binary",
+        "description": "一号除外：一戸建住宅、長屋・共同住宅の住戸に該当するか判定"
+      },
+      {
+        "id": "dec-school",
+        "type": "decision",
+        "title": "学校等か？",
+        "decision_type": "binary",
+        "description": "三号除外：学校等に該当するか判定"
+      },
+      {
+        "id": "dec-special-building",
+        "type": "decision",
+        "title": "法別表第一（い）欄（一）〜（四）項の特殊建築物か？",
+        "decision_type": "binary",
+        "description": "劇場・病院・学校・百貨店等の用途に該当するか判定"
+      },
+      {
+        "id": "dec-floors",
+        "type": "decision",
+        "title": "階数は3以上か？",
+        "decision_type": "binary",
+        "description": "建築物の階数が3以上か判定"
+      },
+      {
+        "id": "dec-area-500",
+        "type": "decision",
+        "title": "延べ面積は500㎡を超えるか？",
+        "decision_type": "binary",
+        "description": "延べ面積が500㎡超か判定（階数3以上の場合）"
+      },
+      {
+        "id": "dec-area-1000",
+        "type": "decision",
+        "title": "延べ面積は1000㎡を超えるか？",
+        "decision_type": "binary",
+        "description": "延べ面積が1000㎡超か判定"
+      },
+      {
+        "id": "proc-identify-rooms",
+        "type": "process",
+        "title": "対象居室の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書から建築物の居室を特定する"
+      },
+      {
+        "id": "dec-windowless",
+        "type": "decision",
+        "title": "令116条の2第1項第1号の無窓居室があるか？",
+        "decision_type": "binary",
+        "description": "採光上有効な開口部を有しない居室があるか判定"
+      },
+      {
+        "id": "dec-has-target-rooms",
+        "type": "decision",
+        "title": "非常用照明対象の居室があるか？",
+        "decision_type": "binary",
+        "description": "上記いずれかの条件に該当する居室があるか判定"
+      },
+      {
+        "id": "proc-identify-passages",
+        "type": "process",
+        "title": "対象通路の特定",
+        "process_type": "undefined_input",
+        "description": "対象居室から地上に通ずる廊下・階段等を特定（採光上有効に直接外気に開放された通路を除く）"
+      },
+      {
+        "id": "dec-room-exempt-hospital",
+        "type": "decision",
+        "title": "病院の病室、下宿の宿泊室、寄宿舎の寝室等か？",
+        "decision_type": "binary",
+        "description": "二号除外：病院の病室等に該当するか判定（居室ごと）"
+      },
+      {
+        "id": "dec-room-exempt-evacuation",
+        "type": "decision",
+        "title": "避難階又は直上階・直下階の避難上支障がない居室か？",
+        "decision_type": "binary",
+        "description": "四号除外：避難階等の大臣告示による除外対象か判定（居室ごと）"
+      },
+      {
+        "id": "dec-lighting-installed",
+        "type": "decision",
+        "title": "非常用照明装置が設置されているか？",
+        "decision_type": "binary",
+        "description": "対象部分に非常用照明装置が設けられているか確認"
+      },
+      {
+        "id": "dec-all-parts-checked",
+        "type": "decision",
+        "title": "全ての対象部分を確認したか？",
+        "decision_type": "binary",
+        "description": "全ての対象居室・通路について確認が完了したか判定"
+      },
+      {
+        "id": "end-pass-dwelling",
+        "type": "terminal",
+        "title": "適合（一号除外）",
+        "result": "pass",
+        "description": "一戸建住宅、長屋・共同住宅の住戸は本条の適用除外"
+      },
+      {
+        "id": "end-pass-school",
+        "type": "terminal",
+        "title": "適合（三号除外）",
+        "result": "pass",
+        "description": "学校等は本条の適用除外"
+      },
+      {
+        "id": "end-pass-not-applicable",
+        "type": "terminal",
+        "title": "適合（適用対象外）",
+        "result": "pass",
+        "description": "特殊建築物でなく、規模要件・無窓要件にも該当しないため本条の適用対象外"
+      },
+      {
+        "id": "end-pass-exempt-room",
+        "type": "terminal",
+        "title": "適合（当該部分除外）",
+        "result": "pass",
+        "description": "二号又は四号の適用除外に該当"
+      },
+      {
+        "id": "end-pass-compliant",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "全ての対象部分に非常用照明装置が設置されている"
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "対象部分に非常用照明装置が設置されていない"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-dwelling",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-dwelling",
+        "to": "end-pass-dwelling",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "dec-dwelling",
+        "to": "dec-school",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e04",
+        "from": "dec-school",
+        "to": "end-pass-school",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e05",
+        "from": "dec-school",
+        "to": "dec-special-building",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e06",
+        "from": "dec-special-building",
+        "to": "proc-identify-rooms",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e07",
+        "from": "dec-special-building",
+        "to": "dec-floors",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e08",
+        "from": "dec-floors",
+        "to": "dec-area-500",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e09",
+        "from": "dec-floors",
+        "to": "dec-area-1000",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e10",
+        "from": "dec-area-500",
+        "to": "proc-identify-rooms",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e11",
+        "from": "dec-area-500",
+        "to": "dec-area-1000",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e12",
+        "from": "dec-area-1000",
+        "to": "proc-identify-rooms",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e13",
+        "from": "dec-area-1000",
+        "to": "dec-windowless",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e14",
+        "from": "proc-identify-rooms",
+        "to": "dec-windowless",
+        "role": "flow"
+      },
+      {
+        "id": "e15",
+        "from": "dec-windowless",
+        "to": "dec-has-target-rooms",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e16",
+        "from": "dec-windowless",
+        "to": "dec-has-target-rooms",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e17",
+        "from": "dec-has-target-rooms",
+        "to": "proc-identify-passages",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e18",
+        "from": "dec-has-target-rooms",
+        "to": "end-pass-not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e19",
+        "from": "proc-identify-passages",
+        "to": "dec-room-exempt-hospital",
+        "role": "flow"
+      },
+      {
+        "id": "e20",
+        "from": "dec-room-exempt-hospital",
+        "to": "end-pass-exempt-room",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e21",
+        "from": "dec-room-exempt-hospital",
+        "to": "dec-room-exempt-evacuation",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e22",
+        "from": "dec-room-exempt-evacuation",
+        "to": "end-pass-exempt-room",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e23",
+        "from": "dec-room-exempt-evacuation",
+        "to": "dec-lighting-installed",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e24",
+        "from": "dec-lighting-installed",
+        "to": "dec-all-parts-checked",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e25",
+        "from": "dec-lighting-installed",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e26",
+        "from": "dec-all-parts-checked",
+        "to": "end-pass-compliant",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e27",
+        "from": "dec-all-parts-checked",
+        "to": "dec-room-exempt-hospital",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-ORD-A126_4-P1",
+  "related_laws": [
+    {
+      "law_id": "324AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["別表第一"],
+      "description": "法別表第一（い）欄（一）項から（四）項の用途を参照"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": ["A116_2:P1:I1"],
+      "description": "令116条の2第1項第1号の無窓居室要件を参照"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00+09:00",
+    "author": "Claude",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

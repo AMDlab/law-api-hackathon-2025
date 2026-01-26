@@ -1,0 +1,290 @@
+{
+  "id": "A52_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "組積材の水洗い",
+    "target_subject": "組積材",
+    "description": "組積造に使用する組積材が組積に当たって充分に水洗いをされていることを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "52",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造",
+    "組積造"
+  ],
+  "text_raw": "組積造に使用するれんが、石、コンクリートブロツクその他の組積材は、組積するに当たつて充分に水洗いをしなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "structure",
+          "value": "組積造"
+        }
+      ],
+      "note": "組積造の建築物に適用"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-wash-compliance",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "flow_diagram": {
+    "title": "令第52条第1項 組積材の水洗い 適合判定フロー",
+    "description": "組積造に使用する組積材が組積するに当たって充分に水洗いされているかを判定するフロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "令第52条第1項の適合判定を開始"
+      },
+      {
+        "id": "dec-structure-type",
+        "type": "decision",
+        "title": "構造種別は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "組積造", "description": "れんが造、石造、コンクリートブロック造等" },
+          { "value": "その他", "description": "組積造以外の構造" }
+        ],
+        "description": "設計図書等から建築物の構造種別を確認し、組積造であるかを判定する"
+      },
+      {
+        "id": "proc-not-applicable",
+        "type": "process",
+        "title": "本条非該当",
+        "process_type": "mechanical",
+        "description": "組積造以外の構造であるため、令第52条第1項は適用されない"
+      },
+      {
+        "id": "end-not-applicable",
+        "type": "terminal",
+        "title": "対象外（適用除外）",
+        "result": "pass",
+        "description": "組積造でないため本条の適用対象外"
+      },
+      {
+        "id": "proc-masonry-applicable",
+        "type": "process",
+        "title": "組積造該当",
+        "process_type": "mechanical",
+        "description": "組積造であることが確認されたため、令第52条第1項の規定が適用される"
+      },
+      {
+        "id": "dec-materials-in-drawings",
+        "type": "decision",
+        "title": "組積材が設計図書に明示されているか？",
+        "decision_type": "binary",
+        "description": "設計図書等に使用する組積材（れんが、石、コンクリートブロック等）が明示されているか"
+      },
+      {
+        "id": "proc-materials-identified",
+        "type": "process",
+        "title": "組積材特定完了",
+        "process_type": "undefined_input",
+        "description": "組積造に使用する組積材（れんが、石、コンクリートブロック等）を特定した"
+      },
+      {
+        "id": "dec-wash-record-exists",
+        "type": "decision",
+        "title": "水洗い実施の記録があるか？",
+        "decision_type": "binary",
+        "description": "施工計画書、施工記録、現場写真等に水洗い実施の記録があるか"
+      },
+      {
+        "id": "proc-check-wash-status",
+        "type": "process",
+        "title": "水洗い状況確認中",
+        "process_type": "human_judgment",
+        "description": "各組積材が組積に当たって充分に水洗いをされているかを確認する"
+      },
+      {
+        "id": "dec-wash-sufficient",
+        "type": "decision",
+        "title": "水洗いは充分か？",
+        "decision_type": "binary",
+        "description": "各組積材の水洗いが「充分」と判断できるか（組積に適した状態か）"
+      },
+      {
+        "id": "dec-all-materials-washed",
+        "type": "decision",
+        "title": "全ての組積材が水洗いされているか？",
+        "decision_type": "binary",
+        "description": "全ての組積材について水洗いが実施されていることを確認",
+        "condition": {
+          "operator": "EQ",
+          "lhs": { "var": "all_washed", "desc": "全組積材の水洗い実施" },
+          "rhs": { "value": true }
+        }
+      },
+      {
+        "id": "proc-all-washed-confirmed",
+        "type": "process",
+        "title": "全組積材水洗い確認完了",
+        "process_type": "mechanical",
+        "description": "全ての組積材が充分に水洗いされていることを確認した"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "組積造に使用する全ての組積材が組積するに当たって充分に水洗いされており、令第52条第1項に適合"
+      },
+      {
+        "id": "end-fail-no-record",
+        "type": "terminal",
+        "title": "不適合（記録不足）",
+        "result": "fail",
+        "description": "水洗い実施の記録がなく、令第52条第1項への適合を確認できない"
+      },
+      {
+        "id": "end-fail-insufficient",
+        "type": "terminal",
+        "title": "不適合（水洗い不十分）",
+        "result": "fail",
+        "description": "水洗いが充分でないため、令第52条第1項に不適合"
+      },
+      {
+        "id": "end-fail-partial",
+        "type": "terminal",
+        "title": "不適合（一部未実施）",
+        "result": "fail",
+        "description": "一部の組積材が水洗いされておらず、令第52条第1項に不適合"
+      },
+      {
+        "id": "end-fail-materials",
+        "type": "terminal",
+        "title": "不適合（組積材不明）",
+        "result": "fail",
+        "description": "組積材が明示されていないため、令第52条第1項への適合を確認できない"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-structure-type",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-structure-type",
+        "to": "proc-masonry-applicable",
+        "role": "option",
+        "label": "組積造"
+      },
+      {
+        "id": "e03",
+        "from": "dec-structure-type",
+        "to": "proc-not-applicable",
+        "role": "option",
+        "label": "その他"
+      },
+      {
+        "id": "e04",
+        "from": "proc-not-applicable",
+        "to": "end-not-applicable",
+        "role": "flow"
+      },
+      {
+        "id": "e05",
+        "from": "proc-masonry-applicable",
+        "to": "dec-materials-in-drawings",
+        "role": "flow"
+      },
+      {
+        "id": "e06",
+        "from": "dec-materials-in-drawings",
+        "to": "proc-materials-identified",
+        "role": "yes"
+      },
+      {
+        "id": "e07",
+        "from": "dec-materials-in-drawings",
+        "to": "end-fail-materials",
+        "role": "no"
+      },
+      {
+        "id": "e08",
+        "from": "proc-materials-identified",
+        "to": "dec-wash-record-exists",
+        "role": "flow"
+      },
+      {
+        "id": "e09",
+        "from": "dec-wash-record-exists",
+        "to": "proc-check-wash-status",
+        "role": "yes"
+      },
+      {
+        "id": "e10",
+        "from": "dec-wash-record-exists",
+        "to": "end-fail-no-record",
+        "role": "no"
+      },
+      {
+        "id": "e11",
+        "from": "proc-check-wash-status",
+        "to": "dec-wash-sufficient",
+        "role": "flow"
+      },
+      {
+        "id": "e12",
+        "from": "dec-wash-sufficient",
+        "to": "dec-all-materials-washed",
+        "role": "yes"
+      },
+      {
+        "id": "e13",
+        "from": "dec-wash-sufficient",
+        "to": "end-fail-insufficient",
+        "role": "no"
+      },
+      {
+        "id": "e14",
+        "from": "dec-all-materials-washed",
+        "to": "proc-all-washed-confirmed",
+        "role": "yes"
+      },
+      {
+        "id": "e15",
+        "from": "dec-all-materials-washed",
+        "to": "end-fail-partial",
+        "role": "no"
+      },
+      {
+        "id": "e16",
+        "from": "proc-all-washed-confirmed",
+        "to": "end-pass",
+        "role": "flow"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSO-A52-P1",
+  "related_laws": [],
+  "metadata": {
+    "created_at": "2026-01-26T12:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

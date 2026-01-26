@@ -1,0 +1,344 @@
+{
+  "id": "A126_2_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "排煙設備設置義務の判定（適合判定フロー）",
+    "target_subject": "建築物",
+    "description": "特殊建築物、一定規模以上の建築物、無窓居室等に対する排煙設備の設置要件の判定フロー"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "126_2",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": ["単体規定", "排煙設備"],
+  "text_raw": "法別表第一（い）欄（一）項から（四）項までに掲げる用途に供する特殊建築物で延べ面積が五百平方メートルを超えるもの、階数が三以上で延べ面積が五百平方メートルを超える建築物（建築物の高さが三十一メートル以下の部分にある居室で、床面積百平方メートル以内ごとに、間仕切壁、天井面から五十センチメートル以上下方に突出した垂れ壁又ははりその他これらと同等以上に煙の流動を妨げる効力のあるもので、準耐火構造であるもの（その下端から床面までの垂直距離が居室の床面積に応じ国土交通大臣の定める距離以上であるものに限る。）又は不燃材料で造り、若しくは覆われたもの（以下「防煙壁」という。）によつて区画されたものを除く。）、第百十六条の二第一項第二号に該当する窓その他の開口部を有しない居室又は延べ面積が千平方メートルを超える建築物の居室で、その床面積が二百平方メートルを超えるもの（建築物の高さが三十一メートル以下の部分にある居室で、床面積百平方メートル以内ごとに防煙壁で区画されたものを除く。）には、排煙設備を設けなければならない。ただし、次の各号のいずれかに該当する建築物又は建築物の部分については、この限りでない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "type": "building_use",
+          "value": "法別表第一(い)欄(一)項〜(四)項の特殊建築物で延べ面積500㎡超"
+        },
+        {
+          "type": "building_scale",
+          "value": "階数3以上かつ延べ面積500㎡超（防煙壁区画除外）"
+        },
+        {
+          "type": "room",
+          "value": "令第116条の2第1項第2号該当の無窓居室"
+        },
+        {
+          "type": "room",
+          "value": "延べ面積1000㎡超の建築物の床面積200㎡超の居室（防煙壁区画除外）"
+        }
+      ],
+      "note": "いずれかに該当する場合に排煙設備の設置が必要"
+    },
+    "judgment_rule": {
+      "operator": "REQUIRE",
+      "conditions": [
+        {
+          "type": "requirement",
+          "value": "排煙設備の設置"
+        }
+      ]
+    },
+    "exceptions": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "type": "building_use",
+          "ref": "第1号",
+          "value": "法別表第一(い)欄(二)項の特殊建築物で準耐火構造等で区画され床面積100㎡以内（共同住宅200㎡）"
+        },
+        {
+          "type": "building_use",
+          "ref": "第2号",
+          "value": "学校等（学校、体育館、ボーリング場、スキー場、スケート場、水泳場、スポーツ練習場）"
+        },
+        {
+          "type": "building_part",
+          "ref": "第3号",
+          "value": "階段の部分、昇降機の昇降路の部分等"
+        },
+        {
+          "type": "building_use",
+          "ref": "第4号",
+          "value": "機械製作工場、不燃性物品保管倉庫等で主要構造部が不燃材料"
+        },
+        {
+          "type": "ministerial_provision",
+          "ref": "第5号",
+          "value": "国土交通大臣が定めるもの"
+        }
+      ],
+      "effect": "EXEMPT",
+      "description": "ただし書により排煙設備の設置義務が免除される"
+    }
+  },
+  "flow_diagram": {
+    "title": "令126条の2第1項 排煙設備設置義務 適合判定フロー",
+    "description": "排煙設備の設置義務の有無および適用除外の該当を判定するフロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "排煙設備設置義務の判定を開始"
+      },
+      {
+        "id": "dec-special-building",
+        "type": "decision",
+        "title": "法別表第一(い)欄(一)〜(四)項の特殊建築物か？",
+        "decision_type": "binary",
+        "description": "劇場、病院、共同住宅、百貨店等の特殊建築物に該当するか判定",
+        "related_articles": ["法::別表第一"]
+      },
+      {
+        "id": "dec-special-area",
+        "type": "decision",
+        "title": "延べ面積 > 500㎡か？",
+        "decision_type": "binary",
+        "description": "特殊建築物の延べ面積が500平方メートルを超えるか判定",
+        "condition": {
+          "operator": "GT",
+          "lhs": { "var": "A", "desc": "延べ面積" },
+          "rhs": { "value": 500, "unit": "m2" }
+        }
+      },
+      {
+        "id": "dec-floors",
+        "type": "decision",
+        "title": "階数 >= 3か？",
+        "decision_type": "binary",
+        "description": "建築物の階数が3以上か判定",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "F", "desc": "階数" },
+          "rhs": { "value": 3 }
+        }
+      },
+      {
+        "id": "dec-scale-area",
+        "type": "decision",
+        "title": "延べ面積 > 500㎡か？",
+        "decision_type": "binary",
+        "description": "階数3以上の建築物で延べ面積が500平方メートルを超えるか判定",
+        "condition": {
+          "operator": "GT",
+          "lhs": { "var": "A", "desc": "延べ面積" },
+          "rhs": { "value": 500, "unit": "m2" }
+        }
+      },
+      {
+        "id": "dec-smoke-partition-scale",
+        "type": "decision",
+        "title": "床面積100㎡以内ごとに防煙壁で区画か？",
+        "decision_type": "binary",
+        "description": "高さ31m以下の部分にある居室が床面積100㎡以内ごとに防煙壁で区画されているか判定"
+      },
+      {
+        "id": "dec-windowless",
+        "type": "decision",
+        "title": "令116条の2第1項第2号該当の無窓居室があるか？",
+        "decision_type": "binary",
+        "description": "排煙上有効な開口部を有しない居室があるか判定",
+        "related_articles": ["令::A116_2:P1:I2"]
+      },
+      {
+        "id": "dec-large-building",
+        "type": "decision",
+        "title": "延べ面積 > 1000㎡か？",
+        "decision_type": "binary",
+        "description": "建築物の延べ面積が1000平方メートルを超えるか判定",
+        "condition": {
+          "operator": "GT",
+          "lhs": { "var": "A", "desc": "延べ面積" },
+          "rhs": { "value": 1000, "unit": "m2" }
+        }
+      },
+      {
+        "id": "dec-large-room",
+        "type": "decision",
+        "title": "床面積 > 200㎡の居室があるか？",
+        "decision_type": "binary",
+        "description": "床面積200平方メートルを超える居室があるか判定",
+        "condition": {
+          "operator": "GT",
+          "lhs": { "var": "AR", "desc": "居室の床面積" },
+          "rhs": { "value": 200, "unit": "m2" }
+        }
+      },
+      {
+        "id": "dec-smoke-partition-large",
+        "type": "decision",
+        "title": "床面積100㎡以内ごとに防煙壁で区画か？",
+        "decision_type": "binary",
+        "description": "高さ31m以下の部分にある居室が床面積100㎡以内ごとに防煙壁で区画されているか判定"
+      },
+      {
+        "id": "proc-subject-to-smoke",
+        "type": "process",
+        "title": "排煙設備設置義務の対象",
+        "process_type": "mechanical",
+        "description": "本則により排煙設備を設けなければならない建築物・居室に該当"
+      },
+      {
+        "id": "dec-exception-type",
+        "type": "decision",
+        "title": "ただし書の適用除外該当は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "第1号", "description": "法別表(い)欄(二)項の100㎡（共同住宅200㎡）以内区画" },
+          { "value": "第2号", "description": "学校、体育館、ボーリング場等" },
+          { "value": "第3号", "description": "階段、昇降機昇降路等" },
+          { "value": "第4号", "description": "不燃材料主要構造部の工場・倉庫等" },
+          { "value": "第5号", "description": "国土交通大臣が定めるもの" },
+          { "value": "該当なし", "description": "いずれの適用除外にも該当しない" }
+        ],
+        "description": "ただし書の第1号から第5号のいずれかに該当するか判定"
+      },
+      {
+        "id": "proc-exempt-1",
+        "type": "process",
+        "title": "適用除外（第1号）",
+        "process_type": "mechanical",
+        "description": "法別表第一(い)欄(二)項の特殊建築物で準耐火構造等により100㎡（共同住宅200㎡）以内に区画されているため適用除外"
+      },
+      {
+        "id": "proc-exempt-2",
+        "type": "process",
+        "title": "適用除外（第2号）",
+        "process_type": "mechanical",
+        "description": "学校、体育館、ボーリング場、スキー場、スケート場、水泳場、スポーツ練習場に該当するため適用除外"
+      },
+      {
+        "id": "proc-exempt-3",
+        "type": "process",
+        "title": "適用除外（第3号）",
+        "process_type": "mechanical",
+        "description": "階段の部分、昇降機の昇降路の部分等に該当するため適用除外"
+      },
+      {
+        "id": "proc-exempt-4",
+        "type": "process",
+        "title": "適用除外（第4号）",
+        "process_type": "mechanical",
+        "description": "機械製作工場、不燃性物品保管倉庫等で主要構造部が不燃材料であるため適用除外"
+      },
+      {
+        "id": "proc-exempt-5",
+        "type": "process",
+        "title": "適用除外（第5号）",
+        "process_type": "mechanical",
+        "description": "国土交通大臣が定めるものに該当するため適用除外"
+      },
+      {
+        "id": "dec-smoke-equipment",
+        "type": "decision",
+        "title": "排煙設備が設けられているか？",
+        "decision_type": "binary",
+        "description": "所定の排煙設備が設置されているか判定",
+        "related_articles": ["令::A126_3"]
+      },
+      {
+        "id": "pass-not-subject",
+        "type": "terminal",
+        "title": "適合（対象外）",
+        "result": "pass",
+        "description": "排煙設備設置義務の対象外のため適合"
+      },
+      {
+        "id": "pass-exempt",
+        "type": "terminal",
+        "title": "適合（適用除外）",
+        "result": "pass",
+        "description": "ただし書により適用除外のため適合"
+      },
+      {
+        "id": "pass-main",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "排煙設備が設けられており適合"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "排煙設備が設けられていないため不適合"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "dec-special-building", "role": "flow" },
+      { "id": "e02", "from": "dec-special-building", "to": "dec-special-area", "role": "yes", "label": "はい" },
+      { "id": "e03", "from": "dec-special-building", "to": "dec-floors", "role": "no", "label": "いいえ" },
+      { "id": "e04", "from": "dec-special-area", "to": "proc-subject-to-smoke", "role": "yes", "label": "はい" },
+      { "id": "e05", "from": "dec-special-area", "to": "dec-floors", "role": "no", "label": "いいえ" },
+      { "id": "e06", "from": "dec-floors", "to": "dec-scale-area", "role": "yes", "label": "はい" },
+      { "id": "e07", "from": "dec-floors", "to": "dec-windowless", "role": "no", "label": "いいえ" },
+      { "id": "e08", "from": "dec-scale-area", "to": "dec-smoke-partition-scale", "role": "yes", "label": "はい" },
+      { "id": "e09", "from": "dec-scale-area", "to": "dec-windowless", "role": "no", "label": "いいえ" },
+      { "id": "e10", "from": "dec-smoke-partition-scale", "to": "dec-windowless", "role": "yes", "label": "はい" },
+      { "id": "e11", "from": "dec-smoke-partition-scale", "to": "proc-subject-to-smoke", "role": "no", "label": "いいえ" },
+      { "id": "e12", "from": "dec-windowless", "to": "proc-subject-to-smoke", "role": "yes", "label": "はい" },
+      { "id": "e13", "from": "dec-windowless", "to": "dec-large-building", "role": "no", "label": "いいえ" },
+      { "id": "e14", "from": "dec-large-building", "to": "dec-large-room", "role": "yes", "label": "はい" },
+      { "id": "e15", "from": "dec-large-building", "to": "pass-not-subject", "role": "no", "label": "いいえ" },
+      { "id": "e16", "from": "dec-large-room", "to": "dec-smoke-partition-large", "role": "yes", "label": "はい" },
+      { "id": "e17", "from": "dec-large-room", "to": "pass-not-subject", "role": "no", "label": "いいえ" },
+      { "id": "e18", "from": "dec-smoke-partition-large", "to": "pass-not-subject", "role": "yes", "label": "はい" },
+      { "id": "e19", "from": "dec-smoke-partition-large", "to": "proc-subject-to-smoke", "role": "no", "label": "いいえ" },
+      { "id": "e20", "from": "proc-subject-to-smoke", "to": "dec-exception-type", "role": "flow" },
+      { "id": "e21", "from": "dec-exception-type", "to": "proc-exempt-1", "role": "option", "label": "第1号" },
+      { "id": "e22", "from": "dec-exception-type", "to": "proc-exempt-2", "role": "option", "label": "第2号" },
+      { "id": "e23", "from": "dec-exception-type", "to": "proc-exempt-3", "role": "option", "label": "第3号" },
+      { "id": "e24", "from": "dec-exception-type", "to": "proc-exempt-4", "role": "option", "label": "第4号" },
+      { "id": "e25", "from": "dec-exception-type", "to": "proc-exempt-5", "role": "option", "label": "第5号" },
+      { "id": "e26", "from": "dec-exception-type", "to": "dec-smoke-equipment", "role": "option", "label": "該当なし" },
+      { "id": "e27", "from": "proc-exempt-1", "to": "pass-exempt", "role": "flow" },
+      { "id": "e28", "from": "proc-exempt-2", "to": "pass-exempt", "role": "flow" },
+      { "id": "e29", "from": "proc-exempt-3", "to": "pass-exempt", "role": "flow" },
+      { "id": "e30", "from": "proc-exempt-4", "to": "pass-exempt", "role": "flow" },
+      { "id": "e31", "from": "proc-exempt-5", "to": "pass-exempt", "role": "flow" },
+      { "id": "e32", "from": "dec-smoke-equipment", "to": "pass-main", "role": "yes", "label": "はい" },
+      { "id": "e33", "from": "dec-smoke-equipment", "to": "fail", "role": "no", "label": "いいえ" }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-KIJO-A126_2-P1",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["別表第一", "A2:P1:I9_2"],
+      "description": "法別表第一で特殊建築物の用途を規定、法第2条第9号の2ロで防火設備を規定"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": ["A116_2:P1:I2", "A112:P19", "A126_3"],
+      "description": "令第116条の2で無窓居室の基準、令第112条で防煙壁の構造要件、令第126条の3で排煙設備の構造を規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00+09:00",
+    "updated_at": "2026-01-26T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令",
+    "checklist_ref": "建築基準法施行令第126条の2第1項（排煙設備の設置）"
+  }
+}

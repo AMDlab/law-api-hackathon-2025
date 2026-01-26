@@ -1,0 +1,204 @@
+{
+  "id": "A86_P5_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "積雪量不均等の影響考慮",
+    "target_subject": "建築物",
+    "description": "屋根面における積雪量が不均等となるおそれのある場合に、その影響を考慮して積雪荷重を計算する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "86",
+    "paragraph": "5",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造",
+    "積雪荷重"
+  ],
+  "text_raw": "屋根面における積雪量が不均等となるおそれのある場合においては、その影響を考慮して積雪荷重を計算しなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "building",
+          "value": "構造計算を要する建築物"
+        },
+        {
+          "type": "condition",
+          "value": "屋根面における積雪量が不均等となるおそれのある場合"
+        }
+      ],
+      "note": "積雪量が不均等となるおそれがある場合に適用（複雑な屋根形状、段違い屋根、L字型屋根等）"
+    },
+    "judgment_rule": {
+      "operator": "IF_THEN",
+      "lhs": {
+        "ref": "info-uneven-risk",
+        "condition": "積雪量不均等のおそれあり"
+      },
+      "rhs": {
+        "ref": "info-uneven-considered",
+        "condition": "不均等影響を考慮して計算"
+      }
+    },
+    "exceptions": null
+  },
+  "flow_diagram": {
+    "title": "令第86条第5項 積雪量不均等の影響考慮 適合判定フロー",
+    "description": "屋根面における積雪量が不均等となるおそれのある場合の積雪荷重計算に関する適合判定フロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "令第86条第5項の適合判定を開始"
+      },
+      {
+        "id": "proc-check-roof-shape",
+        "type": "process",
+        "title": "屋根形状の確認",
+        "process_type": "undefined_input",
+        "description": "設計図書から屋根形状を読み取る"
+      },
+      {
+        "id": "dec-uneven-risk",
+        "type": "decision",
+        "title": "積雪量が不均等となるおそれがあるか？",
+        "decision_type": "binary",
+        "description": "屋根形状から積雪量が不均等となるおそれがあるか判断（段違い屋根、L字型屋根、複雑な屋根形状等）",
+        "condition": {
+          "operator": "EQ",
+          "lhs": {
+            "var": "uneven_risk",
+            "desc": "積雪量不均等のおそれ"
+          },
+          "rhs": {
+            "value": true,
+            "desc": "おそれあり"
+          }
+        }
+      },
+      {
+        "id": "proc-check-consideration",
+        "type": "process",
+        "title": "不均等影響考慮の確認",
+        "process_type": "undefined_input",
+        "description": "構造計算書から不均等影響を考慮した積雪荷重計算がなされているか確認"
+      },
+      {
+        "id": "dec-consideration",
+        "type": "decision",
+        "title": "不均等影響を考慮して積雪荷重を計算しているか？",
+        "decision_type": "binary",
+        "description": "積雪量不均等の影響を考慮した積雪荷重計算が行われているか判定",
+        "condition": {
+          "operator": "EQ",
+          "lhs": {
+            "var": "uneven_considered",
+            "desc": "不均等影響考慮"
+          },
+          "rhs": {
+            "value": true,
+            "desc": "考慮している"
+          }
+        }
+      },
+      {
+        "id": "end-pass-not-applicable",
+        "type": "terminal",
+        "title": "適合（規定対象外）",
+        "result": "pass",
+        "description": "積雪量が不均等となるおそれがないため、本項の規定は適用されない"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "不均等影響を考慮して積雪荷重を計算しており、令第86条第5項に適合"
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "積雪量不均等のおそれがあるにもかかわらず、不均等影響を考慮していないため不適合"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "proc-check-roof-shape",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "proc-check-roof-shape",
+        "to": "dec-uneven-risk",
+        "role": "flow"
+      },
+      {
+        "id": "e03",
+        "from": "dec-uneven-risk",
+        "to": "end-pass-not-applicable",
+        "role": "no",
+        "label": "おそれなし"
+      },
+      {
+        "id": "e04",
+        "from": "dec-uneven-risk",
+        "to": "proc-check-consideration",
+        "role": "yes",
+        "label": "おそれあり"
+      },
+      {
+        "id": "e05",
+        "from": "proc-check-consideration",
+        "to": "dec-consideration",
+        "role": "flow"
+      },
+      {
+        "id": "e06",
+        "from": "dec-consideration",
+        "to": "end-pass",
+        "role": "yes",
+        "label": "考慮している"
+      },
+      {
+        "id": "e07",
+        "from": "dec-consideration",
+        "to": "end-fail",
+        "role": "no",
+        "label": "考慮していない"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-ORDER-A86-P5",
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": [
+        "A86:P1"
+      ],
+      "description": "積雪荷重の基本計算方法（第1項）"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T12:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

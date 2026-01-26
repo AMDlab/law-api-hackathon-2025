@@ -1,0 +1,304 @@
+{
+  "id": "A136_2_10_P2_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "準景観地区における敷地面積最低限度規定の適用除外判定",
+    "target_subject": "敷地",
+    "description": "条例施行時の既存敷地に対する敷地面積最低限度規定の適用除外判定フロー"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "136_2_10",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": [
+    "集団規定",
+    "準景観地区",
+    "敷地規制"
+  ],
+  "text_raw": "法第六十八条の九第二項の規定に基づく条例で建築物の敷地面積の最低限度を定める場合においては、当該条例に、当該条例の規定の施行又は適用の際、現に建築物の敷地として使用されている土地で当該規定に適合しないもの及び現に存する所有権その他の権利に基づいて建築物の敷地として使用するならば当該規定に適合しないこととなる土地について、その全部を一の敷地として使用する場合の適用の除外に関する規定（法第三条第三項第一号及び第五号の規定に相当する規定を含む。）を定めるものとする。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "準景観地区内"
+        },
+        {
+          "type": "regulation",
+          "value": "条例で敷地面積の最低限度が定められている場合"
+        }
+      ],
+      "note": "法第68条の9第2項に基づく条例により敷地面積の最低限度が定められている準景観地区に適用"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "type": "existing_use",
+          "value": "条例施行時に現に敷地として使用",
+          "description": "規定の施行又は適用の際、現に建築物の敷地として使用されている土地"
+        },
+        {
+          "type": "existing_right",
+          "value": "既存権利に基づく使用予定",
+          "description": "現に存する所有権その他の権利に基づいて建築物の敷地として使用するならば規定に適合しないこととなる土地"
+        }
+      ]
+    },
+    "exceptions": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "use_condition",
+          "value": "敷地全部を一の敷地として使用"
+        }
+      ],
+      "effect": "EXEMPT",
+      "description": "敷地面積の最低限度規定の適用除外"
+    }
+  },
+  "flow_diagram": {
+    "title": "敷地面積最低限度規定の適用除外判定フロー",
+    "description": "条例施行時の既存敷地又は既存権利に基づく敷地について、敷地面積最低限度規定の適用除外該当性を判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "敷地面積最低限度規定の適用除外判定を開始"
+      },
+      {
+        "id": "decision-001",
+        "type": "decision",
+        "title": "条例施行時の土地利用状況は？",
+        "decision_type": "multi",
+        "options": [
+          {
+            "value": "既存敷地",
+            "description": "条例施行時に現に建築物の敷地として使用されている土地"
+          },
+          {
+            "value": "未使用",
+            "description": "条例施行時に建築物の敷地として使用されていない土地"
+          }
+        ],
+        "description": "条例の規定の施行又は適用の際における土地の利用状況を確認",
+        "condition": {
+          "operator": "EQ",
+          "lhs": {
+            "var": "S",
+            "desc": "条例施行時利用状況"
+          },
+          "rhs": {
+            "value": ["既存敷地", "未使用"],
+            "desc": "利用状況の分類"
+          }
+        }
+      },
+      {
+        "id": "process-001",
+        "type": "process",
+        "title": "既存敷地に該当",
+        "process_type": "mechanical",
+        "description": "条例施行時に現に建築物の敷地として使用されている土地であることを確認"
+      },
+      {
+        "id": "decision-002",
+        "type": "decision",
+        "title": "既存権利に基づく敷地使用予定があるか？",
+        "decision_type": "binary",
+        "description": "条例施行時に現に存する所有権その他の権利に基づいて建築物の敷地として使用する予定があり、その場合に規定に適合しないこととなるか確認",
+        "condition": {
+          "operator": "EQ",
+          "lhs": {
+            "var": "R",
+            "desc": "既存権利状況"
+          },
+          "rhs": {
+            "value": true,
+            "desc": "既存権利あり"
+          }
+        }
+      },
+      {
+        "id": "process-002",
+        "type": "process",
+        "title": "既存権利に基づく敷地に該当",
+        "process_type": "mechanical",
+        "description": "現に存する所有権その他の権利に基づいて敷地として使用する予定があることを確認"
+      },
+      {
+        "id": "decision-003",
+        "type": "decision",
+        "title": "敷地全部を一の敷地として使用するか？",
+        "decision_type": "binary",
+        "description": "敷地の全部を一の敷地として使用する計画か確認",
+        "condition": {
+          "operator": "EQ",
+          "lhs": {
+            "var": "U",
+            "desc": "全部一体使用"
+          },
+          "rhs": {
+            "value": true,
+            "desc": "一の敷地として使用"
+          }
+        }
+      },
+      {
+        "id": "process-003",
+        "type": "process",
+        "title": "適用除外に該当",
+        "process_type": "mechanical",
+        "description": "敷地面積最低限度規定の適用除外要件を満たす"
+      },
+      {
+        "id": "decision-004",
+        "type": "decision",
+        "title": "敷地面積は条例で定める最低限度以上か？",
+        "decision_type": "binary",
+        "description": "敷地面積が条例で定める最低限度を満たしているか判定",
+        "condition": {
+          "operator": "GTE",
+          "lhs": {
+            "var": "A",
+            "desc": "敷地面積"
+          },
+          "rhs": {
+            "var": "minimum_area",
+            "desc": "条例で定める敷地面積の最低限度",
+            "unit": "m2"
+          }
+        }
+      },
+      {
+        "id": "terminal-pass-exempt",
+        "type": "terminal",
+        "title": "適合（適用除外）",
+        "result": "pass",
+        "description": "敷地面積最低限度規定の適用除外に該当し、適合"
+      },
+      {
+        "id": "terminal-pass-compliant",
+        "type": "terminal",
+        "title": "適合（規定充足）",
+        "result": "pass",
+        "description": "敷地面積が条例で定める最低限度以上であり、適合"
+      },
+      {
+        "id": "terminal-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "適用除外に該当せず、敷地面積が最低限度未満のため不適合"
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge-001",
+        "from": "start",
+        "to": "decision-001",
+        "role": "flow"
+      },
+      {
+        "id": "edge-002",
+        "from": "decision-001",
+        "to": "process-001",
+        "role": "option",
+        "label": "既存敷地"
+      },
+      {
+        "id": "edge-003",
+        "from": "decision-001",
+        "to": "decision-002",
+        "role": "option",
+        "label": "未使用"
+      },
+      {
+        "id": "edge-004",
+        "from": "process-001",
+        "to": "decision-003",
+        "role": "flow"
+      },
+      {
+        "id": "edge-005",
+        "from": "decision-002",
+        "to": "process-002",
+        "role": "yes"
+      },
+      {
+        "id": "edge-006",
+        "from": "decision-002",
+        "to": "decision-004",
+        "role": "no"
+      },
+      {
+        "id": "edge-007",
+        "from": "process-002",
+        "to": "decision-003",
+        "role": "flow"
+      },
+      {
+        "id": "edge-008",
+        "from": "decision-003",
+        "to": "process-003",
+        "role": "yes"
+      },
+      {
+        "id": "edge-009",
+        "from": "decision-003",
+        "to": "decision-004",
+        "role": "no"
+      },
+      {
+        "id": "edge-010",
+        "from": "process-003",
+        "to": "terminal-pass-exempt",
+        "role": "flow"
+      },
+      {
+        "id": "edge-011",
+        "from": "decision-004",
+        "to": "terminal-pass-compliant",
+        "role": "yes"
+      },
+      {
+        "id": "edge-012",
+        "from": "decision-004",
+        "to": "terminal-fail",
+        "role": "no"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-KIJO-A136_2_10-P2",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": [
+        "A68_9:P2",
+        "A3:P3:I1",
+        "A3:P3:I5"
+      ],
+      "description": "法第68条の9第2項の委任を受けた条例制定基準、既存不適格に関する法第3条第3項を準用"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00Z",
+    "updated_at": "2026-01-26T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令",
+    "checklist_ref": "建築基準法施行令第136条の2の10第2項（準景観地区における敷地面積最低限度の適用除外）"
+  }
+}

@@ -1,0 +1,536 @@
+{
+  "id": "A30_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "特殊建築物及び特定区域の便所の構造",
+    "target_subject": "便所",
+    "description": "都市計画区域等内の特殊建築物の便所が所定の基準を満たすことを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "30",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "衛生"
+  ],
+  "text_raw": "都市計画区域又は準都市計画区域内における学校、病院、劇場、映画館、演芸場、観覧場、公会堂、集会場、百貨店、ホテル、旅館、寄宿舎、停車場その他地方公共団体が条例で指定する用途に供する建築物の便所及び公衆便所の構造は、前条各号に掲げる基準及び次に掲げる基準に適合するものとして、国土交通大臣が定めた構造方法を用いるもの又は国土交通大臣の認定を受けたものとしなければならない。\n一 便器及び小便器から便槽までの汚水管が、汚水を浸透させないものであること。\n二 水洗便所以外の大便所にあつては、窓その他換気のための開口部からはえが入らないものであること。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "都市計画区域又は準都市計画区域内"
+        },
+        {
+          "type": "use",
+          "value": "学校、病院、劇場、映画館、演芸場、観覧場、公会堂、集会場、百貨店、ホテル、旅館、寄宿舎、停車場その他地方公共団体が条例で指定する用途"
+        }
+      ],
+      "note": "公衆便所も対象となる"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "R",
+          "operator": "==",
+          "value": true,
+          "note": "第29条各号基準適合"
+        },
+        {
+          "ref": "P",
+          "operator": "==",
+          "value": true,
+          "note": "第1号適合（汚水管浸透防止）"
+        },
+        {
+          "ref": "F",
+          "operator": "==",
+          "value": true,
+          "note": "第2号適合（はえ侵入防止）※水洗便所以外"
+        },
+        {
+          "operator": "OR",
+          "conditions": [
+            {
+              "ref": "M1",
+              "operator": "==",
+              "value": true
+            },
+            {
+              "ref": "M2",
+              "operator": "==",
+              "value": true
+            }
+          ],
+          "note": "大臣定め構造方法または大臣認定"
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "flow_diagram": {
+    "title": "令第30条1項 便所の構造適合判定フロー",
+    "description": "特殊建築物等の便所が令第30条1項の基準に適合するかを判定する",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start"
+      },
+      {
+        "id": "dec-area",
+        "type": "decision",
+        "title": "都市計画区域又は準都市計画区域内か？",
+        "decision_type": "binary",
+        "description": "建築物の敷地が都市計画区域又は準都市計画区域内にあるかを確認"
+      },
+      {
+        "id": "dec-use",
+        "type": "decision",
+        "title": "用途は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "学校" },
+          { "value": "病院" },
+          { "value": "劇場・映画館等" },
+          { "value": "百貨店" },
+          { "value": "ホテル・旅館" },
+          { "value": "その他対象用途" },
+          { "value": "対象外" }
+        ],
+        "description": "学校、病院、劇場、映画館、演芸場、観覧場、公会堂、集会場、百貨店、ホテル、旅館、寄宿舎、停車場その他条例指定用途のいずれかに該当するか"
+      },
+      {
+        "id": "proc-target-use",
+        "type": "process",
+        "title": "対象用途に該当",
+        "process_type": "mechanical",
+        "description": "令第30条1項の対象用途に該当"
+      },
+      {
+        "id": "dec-public-toilet",
+        "type": "decision",
+        "title": "公衆便所か？",
+        "decision_type": "binary",
+        "description": "公衆便所も本条の対象となる"
+      },
+      {
+        "id": "proc-public-toilet",
+        "type": "process",
+        "title": "公衆便所として対象",
+        "process_type": "mechanical",
+        "description": "公衆便所は用途に関係なく本条の対象"
+      },
+      {
+        "id": "dec-toilet-exist",
+        "type": "decision",
+        "title": "便所があるか？",
+        "decision_type": "binary",
+        "description": "建築物に便所が設置されているかを確認"
+      },
+      {
+        "id": "dec-toilet-type",
+        "type": "decision",
+        "title": "便所の種別は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "水洗便所" },
+          { "value": "水洗便所以外" }
+        ],
+        "description": "判定対象の便所が水洗便所か否かを特定"
+      },
+      {
+        "id": "proc-water-closet",
+        "type": "process",
+        "title": "水洗便所として判定",
+        "process_type": "mechanical",
+        "description": "水洗便所の場合、第2号（はえ侵入防止）は適用対象外"
+      },
+      {
+        "id": "proc-non-water-closet",
+        "type": "process",
+        "title": "非水洗便所として判定",
+        "process_type": "mechanical",
+        "description": "水洗便所以外の場合、第2号（はえ侵入防止）も適用"
+      },
+      {
+        "id": "dec-art29",
+        "type": "decision",
+        "title": "第29条各号基準に適合するか？",
+        "decision_type": "binary",
+        "description": "前条（令第29条）各号に掲げる基準に適合するかを判定",
+        "related_articles": ["令第29条"]
+      },
+      {
+        "id": "proc-art29-pass",
+        "type": "process",
+        "title": "第29条各号基準適合",
+        "process_type": "sub_diagram_reference",
+        "description": "前条各号の基準を満たす"
+      },
+      {
+        "id": "dec-pipe-seal",
+        "type": "decision",
+        "title": "汚水管は汚水を浸透させないものか？",
+        "decision_type": "binary",
+        "description": "第1号：便器及び小便器から便槽までの汚水管が汚水を浸透させないものであること"
+      },
+      {
+        "id": "proc-pipe-pass",
+        "type": "process",
+        "title": "第1号適合",
+        "process_type": "human_judgment",
+        "description": "汚水管の浸透防止基準を満たす"
+      },
+      {
+        "id": "dec-fly-prevention",
+        "type": "decision",
+        "title": "換気開口部からはえが入らないものか？",
+        "decision_type": "binary",
+        "description": "第2号：水洗便所以外の大便所において、窓その他換気のための開口部からはえが入らないものであること"
+      },
+      {
+        "id": "proc-fly-pass",
+        "type": "process",
+        "title": "第2号適合",
+        "process_type": "human_judgment",
+        "description": "はえ侵入防止基準を満たす"
+      },
+      {
+        "id": "dec-minister-method",
+        "type": "decision",
+        "title": "大臣定め構造方法に該当するか？",
+        "decision_type": "binary",
+        "description": "国土交通大臣が定めた構造方法（告示）に該当するかを判定"
+      },
+      {
+        "id": "proc-minister-method-pass",
+        "type": "process",
+        "title": "大臣定め構造方法に該当",
+        "process_type": "mechanical",
+        "description": "告示で定める構造方法に適合"
+      },
+      {
+        "id": "dec-minister-approval",
+        "type": "decision",
+        "title": "大臣認定を受けているか？",
+        "decision_type": "binary",
+        "description": "国土交通大臣の認定を受けた構造方法であるかを確認"
+      },
+      {
+        "id": "proc-minister-approval-pass",
+        "type": "process",
+        "title": "大臣認定あり",
+        "process_type": "undefined_input",
+        "description": "国土交通大臣の認定を受けた構造方法"
+      },
+      {
+        "id": "dec-all-toilets",
+        "type": "decision",
+        "title": "全ての便所を判定したか？",
+        "decision_type": "binary",
+        "description": "建築物内の全ての便所について判定が完了したかを確認"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令第30条1項の規定に適合"
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "令第30条1項の規定に不適合"
+      },
+      {
+        "id": "end-not-applicable",
+        "type": "terminal",
+        "title": "適用対象外",
+        "result": "end",
+        "description": "令第30条1項の適用対象外"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-area",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-area",
+        "to": "dec-use",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "dec-area",
+        "to": "dec-public-toilet",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e04",
+        "from": "dec-use",
+        "to": "proc-target-use",
+        "role": "option",
+        "label": "学校"
+      },
+      {
+        "id": "e05",
+        "from": "dec-use",
+        "to": "proc-target-use",
+        "role": "option",
+        "label": "病院"
+      },
+      {
+        "id": "e06",
+        "from": "dec-use",
+        "to": "proc-target-use",
+        "role": "option",
+        "label": "劇場・映画館等"
+      },
+      {
+        "id": "e07",
+        "from": "dec-use",
+        "to": "proc-target-use",
+        "role": "option",
+        "label": "百貨店"
+      },
+      {
+        "id": "e08",
+        "from": "dec-use",
+        "to": "proc-target-use",
+        "role": "option",
+        "label": "ホテル・旅館"
+      },
+      {
+        "id": "e09",
+        "from": "dec-use",
+        "to": "proc-target-use",
+        "role": "option",
+        "label": "その他対象用途"
+      },
+      {
+        "id": "e10",
+        "from": "dec-use",
+        "to": "dec-public-toilet",
+        "role": "option",
+        "label": "対象外"
+      },
+      {
+        "id": "e11",
+        "from": "proc-target-use",
+        "to": "dec-toilet-exist",
+        "role": "flow"
+      },
+      {
+        "id": "e12",
+        "from": "dec-public-toilet",
+        "to": "proc-public-toilet",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e13",
+        "from": "dec-public-toilet",
+        "to": "end-not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e14",
+        "from": "proc-public-toilet",
+        "to": "dec-toilet-exist",
+        "role": "flow"
+      },
+      {
+        "id": "e15",
+        "from": "dec-toilet-exist",
+        "to": "dec-toilet-type",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e16",
+        "from": "dec-toilet-exist",
+        "to": "end-not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e17",
+        "from": "dec-toilet-type",
+        "to": "proc-water-closet",
+        "role": "option",
+        "label": "水洗便所"
+      },
+      {
+        "id": "e18",
+        "from": "dec-toilet-type",
+        "to": "proc-non-water-closet",
+        "role": "option",
+        "label": "水洗便所以外"
+      },
+      {
+        "id": "e19",
+        "from": "proc-water-closet",
+        "to": "dec-art29",
+        "role": "flow"
+      },
+      {
+        "id": "e20",
+        "from": "proc-non-water-closet",
+        "to": "dec-art29",
+        "role": "flow"
+      },
+      {
+        "id": "e21",
+        "from": "dec-art29",
+        "to": "proc-art29-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e22",
+        "from": "dec-art29",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e23",
+        "from": "proc-art29-pass",
+        "to": "dec-pipe-seal",
+        "role": "flow"
+      },
+      {
+        "id": "e24",
+        "from": "dec-pipe-seal",
+        "to": "proc-pipe-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e25",
+        "from": "dec-pipe-seal",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e26",
+        "from": "proc-pipe-pass",
+        "to": "dec-fly-prevention",
+        "role": "flow"
+      },
+      {
+        "id": "e27",
+        "from": "dec-fly-prevention",
+        "to": "proc-fly-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e28",
+        "from": "dec-fly-prevention",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e29",
+        "from": "proc-fly-pass",
+        "to": "dec-minister-method",
+        "role": "flow"
+      },
+      {
+        "id": "e30",
+        "from": "dec-minister-method",
+        "to": "proc-minister-method-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e31",
+        "from": "dec-minister-method",
+        "to": "dec-minister-approval",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e32",
+        "from": "proc-minister-method-pass",
+        "to": "dec-all-toilets",
+        "role": "flow"
+      },
+      {
+        "id": "e33",
+        "from": "dec-minister-approval",
+        "to": "proc-minister-approval-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e34",
+        "from": "dec-minister-approval",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e35",
+        "from": "proc-minister-approval-pass",
+        "to": "dec-all-toilets",
+        "role": "flow"
+      },
+      {
+        "id": "e36",
+        "from": "dec-all-toilets",
+        "to": "dec-toilet-type",
+        "role": "no",
+        "label": "いいえ（次の便所）"
+      },
+      {
+        "id": "e37",
+        "from": "dec-all-toilets",
+        "to": "end-pass",
+        "role": "yes",
+        "label": "はい"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-ORDER-A30-P1",
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": ["A29"],
+      "description": "前条各号の基準を参照"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令",
+    "checklist_ref": "確認審査報告書チェックリスト"
+  }
+}

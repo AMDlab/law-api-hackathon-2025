@@ -1,0 +1,489 @@
+{
+  "id": "A58_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "壁のみぞ",
+    "target_subject": "組積造の壁のみぞ",
+    "description": "組積造の壁に設ける縦壁みぞ・横壁みぞの深さと長さの制限を判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "58",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "組積造"
+  ],
+  "text_raw": "組積造の壁に、その階の壁の高さの四分の三以上連続した縦壁みぞを設ける場合においては、その深さは壁の厚さの三分の一以下とし、横壁みぞを設ける場合においては、その深さは壁の厚さの三分の一以下で、かつ、長さを三メートル以下としなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "structure",
+          "value": "組積造の壁",
+          "note": "組積造の壁に適用"
+        }
+      ]
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "vertical_groove_compliance",
+          "note": "縦壁みぞを設ける場合: 深さ ≤ 壁の厚さの1/3"
+        },
+        {
+          "ref": "horizontal_groove_compliance",
+          "note": "横壁みぞを設ける場合: 深さ ≤ 壁の厚さの1/3 かつ 長さ ≤ 3m"
+        }
+      ]
+    }
+  },
+  "flow_diagram": {
+    "title": "令第58条第1項 壁のみぞの適合判定フロー",
+    "description": "組積造の壁に設ける縦壁みぞ・横壁みぞの深さと長さの制限を判定するフロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "組積造の壁のみぞに関する判定を開始"
+      },
+      {
+        "id": "proc-identify-wall",
+        "type": "process",
+        "title": "組積造の壁を特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から判定対象の組積造の壁を特定する"
+      },
+      {
+        "id": "proc-get-wall-thickness",
+        "type": "process",
+        "title": "壁の厚さを取得",
+        "process_type": "undefined_input",
+        "description": "設計図書等から壁の厚さを読み取る"
+      },
+      {
+        "id": "proc-get-wall-height",
+        "type": "process",
+        "title": "壁の高さを取得",
+        "process_type": "undefined_input",
+        "description": "設計図書等からその階の壁の高さを読み取る"
+      },
+      {
+        "id": "proc-calc-depth-limit",
+        "type": "process",
+        "title": "深さ上限を算定（壁厚×1/3）",
+        "process_type": "mechanical",
+        "description": "壁の厚さの1/3を算定し、みぞの深さ上限とする"
+      },
+      {
+        "id": "dec-has-vertical-groove",
+        "type": "decision",
+        "title": "縦壁みぞがあるか？",
+        "decision_type": "binary",
+        "description": "壁に縦壁みぞが設けられているかを確認"
+      },
+      {
+        "id": "proc-identify-vertical-grooves",
+        "type": "process",
+        "title": "縦壁みぞを特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から縦壁みぞの有無と位置を特定する"
+      },
+      {
+        "id": "proc-get-vertical-groove-continuity",
+        "type": "process",
+        "title": "縦壁みぞの連続長さを取得",
+        "process_type": "undefined_input",
+        "description": "各縦壁みぞの連続した長さを読み取る"
+      },
+      {
+        "id": "proc-calc-continuity-threshold",
+        "type": "process",
+        "title": "連続長さ閾値を算定（壁高×3/4）",
+        "process_type": "mechanical",
+        "description": "壁の高さの3/4を算定し、縦壁みぞ規制対象の閾値とする"
+      },
+      {
+        "id": "dec-vertical-groove-applicable",
+        "type": "decision",
+        "title": "連続長さ≧壁高さ×3/4か？",
+        "decision_type": "binary",
+        "description": "縦壁みぞが壁高さの3/4以上連続しているか（規制対象か）を判定",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "vertical_groove_continuity", "desc": "縦壁みぞの連続長さ" },
+          "rhs": { "var": "wall_height_threshold", "desc": "壁高さ×3/4" }
+        }
+      },
+      {
+        "id": "proc-vertical-groove-applicable",
+        "type": "process",
+        "title": "縦壁みぞ規制対象",
+        "process_type": "mechanical",
+        "description": "壁高さの3/4以上連続しているため、深さ制限の対象となる"
+      },
+      {
+        "id": "proc-get-vertical-groove-depth",
+        "type": "process",
+        "title": "縦壁みぞの深さを取得",
+        "process_type": "undefined_input",
+        "description": "規制対象の縦壁みぞの深さを読み取る"
+      },
+      {
+        "id": "dec-vertical-groove-depth-ok",
+        "type": "decision",
+        "title": "縦壁みぞの深さ≦壁厚×1/3か？",
+        "decision_type": "binary",
+        "description": "縦壁みぞの深さが壁の厚さの1/3以下であるかを判定",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "vertical_groove_depth", "desc": "縦壁みぞの深さ" },
+          "rhs": { "var": "depth_limit", "desc": "壁厚×1/3" }
+        }
+      },
+      {
+        "id": "proc-vertical-groove-pass",
+        "type": "process",
+        "title": "縦壁みぞ適合",
+        "process_type": "mechanical",
+        "description": "縦壁みぞの深さが基準を満たしている"
+      },
+      {
+        "id": "proc-vertical-groove-not-applicable",
+        "type": "process",
+        "title": "縦壁みぞ規制対象外",
+        "process_type": "mechanical",
+        "description": "壁高さの3/4未満の連続長さのため、深さ制限の対象外"
+      },
+      {
+        "id": "proc-no-vertical-groove",
+        "type": "process",
+        "title": "縦壁みぞなし",
+        "process_type": "mechanical",
+        "description": "縦壁みぞがないため、縦壁みぞに関する規制は適用されない"
+      },
+      {
+        "id": "dec-has-horizontal-groove",
+        "type": "decision",
+        "title": "横壁みぞがあるか？",
+        "decision_type": "binary",
+        "description": "壁に横壁みぞが設けられているかを確認"
+      },
+      {
+        "id": "proc-identify-horizontal-grooves",
+        "type": "process",
+        "title": "横壁みぞを特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から横壁みぞの有無と位置を特定する"
+      },
+      {
+        "id": "proc-get-horizontal-groove-depth",
+        "type": "process",
+        "title": "横壁みぞの深さを取得",
+        "process_type": "undefined_input",
+        "description": "各横壁みぞの深さを読み取る"
+      },
+      {
+        "id": "dec-horizontal-groove-depth-ok",
+        "type": "decision",
+        "title": "横壁みぞの深さ≦壁厚×1/3か？",
+        "decision_type": "binary",
+        "description": "横壁みぞの深さが壁の厚さの1/3以下であるかを判定",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "horizontal_groove_depth", "desc": "横壁みぞの深さ" },
+          "rhs": { "var": "depth_limit", "desc": "壁厚×1/3" }
+        }
+      },
+      {
+        "id": "proc-horizontal-groove-depth-pass",
+        "type": "process",
+        "title": "横壁みぞ深さ適合",
+        "process_type": "mechanical",
+        "description": "横壁みぞの深さが基準を満たしている"
+      },
+      {
+        "id": "proc-get-horizontal-groove-length",
+        "type": "process",
+        "title": "横壁みぞの長さを取得",
+        "process_type": "undefined_input",
+        "description": "各横壁みぞの長さを読み取る"
+      },
+      {
+        "id": "dec-horizontal-groove-length-ok",
+        "type": "decision",
+        "title": "横壁みぞの長さ≦3mか？",
+        "decision_type": "binary",
+        "description": "横壁みぞの長さが3m以下であるかを判定",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "horizontal_groove_length", "desc": "横壁みぞの長さ" },
+          "rhs": { "value": 3, "unit": "m", "desc": "3m" }
+        }
+      },
+      {
+        "id": "proc-horizontal-groove-pass",
+        "type": "process",
+        "title": "横壁みぞ適合",
+        "process_type": "mechanical",
+        "description": "横壁みぞの深さと長さの両方が基準を満たしている"
+      },
+      {
+        "id": "proc-no-horizontal-groove",
+        "type": "process",
+        "title": "横壁みぞなし",
+        "process_type": "mechanical",
+        "description": "横壁みぞがないため、横壁みぞに関する規制は適用されない"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令第58条第1項に適合",
+        "related_articles": ["令第58条第1項"]
+      },
+      {
+        "id": "end-fail-vertical-depth",
+        "type": "terminal",
+        "title": "不適合（縦壁みぞ深さ）",
+        "result": "fail",
+        "description": "縦壁みぞの深さが壁厚の1/3を超えているため不適合",
+        "related_articles": ["令第58条第1項"]
+      },
+      {
+        "id": "end-fail-horizontal-depth",
+        "type": "terminal",
+        "title": "不適合（横壁みぞ深さ）",
+        "result": "fail",
+        "description": "横壁みぞの深さが壁厚の1/3を超えているため不適合",
+        "related_articles": ["令第58条第1項"]
+      },
+      {
+        "id": "end-fail-horizontal-length",
+        "type": "terminal",
+        "title": "不適合（横壁みぞ長さ）",
+        "result": "fail",
+        "description": "横壁みぞの長さが3mを超えているため不適合",
+        "related_articles": ["令第58条第1項"]
+      }
+    ],
+    "edges": [
+      {
+        "id": "e001",
+        "from": "start",
+        "to": "proc-identify-wall",
+        "role": "flow"
+      },
+      {
+        "id": "e002",
+        "from": "proc-identify-wall",
+        "to": "proc-get-wall-thickness",
+        "role": "flow"
+      },
+      {
+        "id": "e003",
+        "from": "proc-get-wall-thickness",
+        "to": "proc-get-wall-height",
+        "role": "flow"
+      },
+      {
+        "id": "e004",
+        "from": "proc-get-wall-height",
+        "to": "proc-calc-depth-limit",
+        "role": "flow"
+      },
+      {
+        "id": "e005",
+        "from": "proc-calc-depth-limit",
+        "to": "dec-has-vertical-groove",
+        "role": "flow"
+      },
+      {
+        "id": "e006",
+        "from": "dec-has-vertical-groove",
+        "to": "proc-identify-vertical-grooves",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e007",
+        "from": "dec-has-vertical-groove",
+        "to": "proc-no-vertical-groove",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e008",
+        "from": "proc-identify-vertical-grooves",
+        "to": "proc-get-vertical-groove-continuity",
+        "role": "flow"
+      },
+      {
+        "id": "e009",
+        "from": "proc-get-vertical-groove-continuity",
+        "to": "proc-calc-continuity-threshold",
+        "role": "flow"
+      },
+      {
+        "id": "e010",
+        "from": "proc-calc-continuity-threshold",
+        "to": "dec-vertical-groove-applicable",
+        "role": "flow"
+      },
+      {
+        "id": "e011",
+        "from": "dec-vertical-groove-applicable",
+        "to": "proc-vertical-groove-applicable",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e012",
+        "from": "dec-vertical-groove-applicable",
+        "to": "proc-vertical-groove-not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e013",
+        "from": "proc-vertical-groove-applicable",
+        "to": "proc-get-vertical-groove-depth",
+        "role": "flow"
+      },
+      {
+        "id": "e014",
+        "from": "proc-get-vertical-groove-depth",
+        "to": "dec-vertical-groove-depth-ok",
+        "role": "flow"
+      },
+      {
+        "id": "e015",
+        "from": "dec-vertical-groove-depth-ok",
+        "to": "proc-vertical-groove-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e016",
+        "from": "dec-vertical-groove-depth-ok",
+        "to": "end-fail-vertical-depth",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e017",
+        "from": "proc-vertical-groove-pass",
+        "to": "dec-has-horizontal-groove",
+        "role": "flow"
+      },
+      {
+        "id": "e018",
+        "from": "proc-vertical-groove-not-applicable",
+        "to": "dec-has-horizontal-groove",
+        "role": "flow"
+      },
+      {
+        "id": "e019",
+        "from": "proc-no-vertical-groove",
+        "to": "dec-has-horizontal-groove",
+        "role": "flow"
+      },
+      {
+        "id": "e020",
+        "from": "dec-has-horizontal-groove",
+        "to": "proc-identify-horizontal-grooves",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e021",
+        "from": "dec-has-horizontal-groove",
+        "to": "proc-no-horizontal-groove",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e022",
+        "from": "proc-identify-horizontal-grooves",
+        "to": "proc-get-horizontal-groove-depth",
+        "role": "flow"
+      },
+      {
+        "id": "e023",
+        "from": "proc-get-horizontal-groove-depth",
+        "to": "dec-horizontal-groove-depth-ok",
+        "role": "flow"
+      },
+      {
+        "id": "e024",
+        "from": "dec-horizontal-groove-depth-ok",
+        "to": "proc-horizontal-groove-depth-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e025",
+        "from": "dec-horizontal-groove-depth-ok",
+        "to": "end-fail-horizontal-depth",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e026",
+        "from": "proc-horizontal-groove-depth-pass",
+        "to": "proc-get-horizontal-groove-length",
+        "role": "flow"
+      },
+      {
+        "id": "e027",
+        "from": "proc-get-horizontal-groove-length",
+        "to": "dec-horizontal-groove-length-ok",
+        "role": "flow"
+      },
+      {
+        "id": "e028",
+        "from": "dec-horizontal-groove-length-ok",
+        "to": "proc-horizontal-groove-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e029",
+        "from": "dec-horizontal-groove-length-ok",
+        "to": "end-fail-horizontal-length",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e030",
+        "from": "proc-horizontal-groove-pass",
+        "to": "end-pass",
+        "role": "flow"
+      },
+      {
+        "id": "e031",
+        "from": "proc-no-horizontal-groove",
+        "to": "end-pass",
+        "role": "flow"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSE-A58-P1",
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00Z",
+    "generator": "claude-code-flow-generator",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令",
+    "checklist_ref": "確認審査報告書チェックリスト"
+  }
+}

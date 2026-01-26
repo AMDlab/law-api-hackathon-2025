@@ -1,0 +1,349 @@
+{
+  "id": "A128_2_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "大規模な木造等の建築物の敷地内通路設置判定フロー",
+    "target_subject": "建築物",
+    "description": "主要構造部が木造の大規模建築物について、敷地内における避難上及び消火上有効な通路の設置要否を判定するフロー"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "128_2",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "避難",
+    "消火",
+    "通路",
+    "木造建築物"
+  ],
+  "text_raw": "主要構造部の全部が木造の建築物（法第二条第九号の二イに掲げる基準に適合する建築物を除く。）でその延べ面積が千平方メートルを超える場合又は主要構造部の一部が木造の建築物でその延べ面積（主要構造部が耐火構造の部分を含む場合で、その部分とその他の部分とが耐火構造とした壁又は特定防火設備で区画されているときは、その部分の床面積を除く。以下この条において同じ。）が千平方メートルを超える場合においては、その周囲（道に接する部分その他避難上及び消火上支障がないものとして国土交通大臣が定める部分を除く。）に避難上及び消火上有効なものとして国土交通大臣が定める基準に適合する通路を設けなければならない。",
+  "kijo_diagram_ref": "CHK-BSL-ORDER-A128_2-P1",
+  "flow_diagram": {
+    "title": "令第128条の2第1項 敷地内通路設置判定フロー",
+    "description": "主要構造部が木造の大規模建築物における敷地内通路の設置要否と適合性を判定するフローチャート",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "令第128条の2第1項の適合判定を開始"
+      },
+      {
+        "id": "dec-structure-type",
+        "type": "decision",
+        "title": "主要構造部の構造種別は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "全部木造", "description": "主要構造部の全部が木造" },
+          { "value": "一部木造", "description": "主要構造部の一部が木造" },
+          { "value": "その他", "description": "木造を含まない" }
+        ],
+        "description": "主要構造部が全部木造か、一部木造か、その他かを判定"
+      },
+      {
+        "id": "proc-structure-all-wood",
+        "type": "process",
+        "title": "全部木造の場合",
+        "process_type": "mechanical",
+        "description": "主要構造部の全部が木造と判定"
+      },
+      {
+        "id": "proc-structure-partial-wood",
+        "type": "process",
+        "title": "一部木造の場合",
+        "process_type": "mechanical",
+        "description": "主要構造部の一部が木造と判定"
+      },
+      {
+        "id": "dec-fire-resistant",
+        "type": "decision",
+        "title": "耐火建築物等か？",
+        "decision_type": "binary",
+        "description": "法第2条第9号の2イに掲げる基準（耐火建築物の構造）に適合するか確認",
+        "related_articles": ["法第2条第9号の2イ"]
+      },
+      {
+        "id": "proc-fire-resistant-excluded",
+        "type": "process",
+        "title": "耐火建築物等に該当",
+        "process_type": "mechanical",
+        "description": "法第2条第9号の2イに適合するため、本条の適用対象外"
+      },
+      {
+        "id": "dec-area-all-wood",
+        "type": "decision",
+        "title": "延べ面積 > 1000㎡か？",
+        "decision_type": "binary",
+        "description": "建築物の延べ面積が1000平方メートルを超えるか判定",
+        "condition": {
+          "operator": "GT",
+          "lhs": { "var": "A", "desc": "延べ面積" },
+          "rhs": { "value": 1000, "unit": "㎡" }
+        }
+      },
+      {
+        "id": "dec-area-partial-wood",
+        "type": "decision",
+        "title": "延べ面積（耐火区画部分除外後） > 1000㎡か？",
+        "decision_type": "binary",
+        "description": "主要構造部が耐火構造の部分が耐火構造の壁又は特定防火設備で区画されている場合、その部分の床面積を除いた延べ面積が1000㎡を超えるか判定",
+        "condition": {
+          "operator": "GT",
+          "lhs": { "var": "A", "desc": "延べ面積（耐火区画部分除外後）" },
+          "rhs": { "value": 1000, "unit": "㎡" }
+        }
+      },
+      {
+        "id": "proc-scope-applicable",
+        "type": "process",
+        "title": "本条適用対象",
+        "process_type": "mechanical",
+        "description": "令第128条の2第1項の通路設置義務が適用される"
+      },
+      {
+        "id": "dec-road-contact",
+        "type": "decision",
+        "title": "道に接する部分があるか？",
+        "decision_type": "binary",
+        "description": "建築物の周囲に道に接する部分があるか確認"
+      },
+      {
+        "id": "proc-road-exempt",
+        "type": "process",
+        "title": "道に接する部分を除外",
+        "process_type": "mechanical",
+        "description": "道に接する部分は通路設置不要範囲として除外"
+      },
+      {
+        "id": "dec-minister-exempt",
+        "type": "decision",
+        "title": "国土交通大臣が定める除外部分があるか？",
+        "decision_type": "binary",
+        "description": "避難上及び消火上支障がないものとして国土交通大臣が定める部分があるか確認"
+      },
+      {
+        "id": "proc-minister-exempt",
+        "type": "process",
+        "title": "大臣告示で定める部分を除外",
+        "process_type": "mechanical",
+        "description": "国土交通大臣が定める部分を通路設置不要範囲として除外"
+      },
+      {
+        "id": "dec-passage-required-area",
+        "type": "decision",
+        "title": "通路設置必要範囲があるか？",
+        "decision_type": "binary",
+        "description": "除外部分を除いた後、通路を設けなければならない周囲部分が残るか確認"
+      },
+      {
+        "id": "dec-passage-compliance",
+        "type": "decision",
+        "title": "通路は国土交通大臣基準に適合するか？",
+        "decision_type": "binary",
+        "description": "避難上及び消火上有効なものとして国土交通大臣が定める基準に適合する通路が設けられているか確認"
+      },
+      {
+        "id": "end-pass-not-applicable",
+        "type": "terminal",
+        "title": "適合（適用対象外）",
+        "result": "pass",
+        "description": "本条の適用対象外のため適合"
+      },
+      {
+        "id": "end-pass-no-area",
+        "type": "terminal",
+        "title": "適合（通路設置不要）",
+        "result": "pass",
+        "description": "通路設置必要範囲がないため適合"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "通路が国土交通大臣基準に適合しているため、令第128条の2第1項に適合"
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "通路が国土交通大臣基準に適合していないため、令第128条の2第1項に不適合"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-structure-type",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-structure-type",
+        "to": "proc-structure-all-wood",
+        "role": "option",
+        "label": "全部木造"
+      },
+      {
+        "id": "e03",
+        "from": "dec-structure-type",
+        "to": "proc-structure-partial-wood",
+        "role": "option",
+        "label": "一部木造"
+      },
+      {
+        "id": "e04",
+        "from": "dec-structure-type",
+        "to": "end-pass-not-applicable",
+        "role": "option",
+        "label": "その他"
+      },
+      {
+        "id": "e05",
+        "from": "proc-structure-all-wood",
+        "to": "dec-fire-resistant",
+        "role": "flow"
+      },
+      {
+        "id": "e06",
+        "from": "dec-fire-resistant",
+        "to": "proc-fire-resistant-excluded",
+        "role": "yes"
+      },
+      {
+        "id": "e07",
+        "from": "proc-fire-resistant-excluded",
+        "to": "end-pass-not-applicable",
+        "role": "flow"
+      },
+      {
+        "id": "e08",
+        "from": "dec-fire-resistant",
+        "to": "dec-area-all-wood",
+        "role": "no"
+      },
+      {
+        "id": "e09",
+        "from": "dec-area-all-wood",
+        "to": "proc-scope-applicable",
+        "role": "yes"
+      },
+      {
+        "id": "e10",
+        "from": "dec-area-all-wood",
+        "to": "end-pass-not-applicable",
+        "role": "no"
+      },
+      {
+        "id": "e11",
+        "from": "proc-structure-partial-wood",
+        "to": "dec-area-partial-wood",
+        "role": "flow"
+      },
+      {
+        "id": "e12",
+        "from": "dec-area-partial-wood",
+        "to": "proc-scope-applicable",
+        "role": "yes"
+      },
+      {
+        "id": "e13",
+        "from": "dec-area-partial-wood",
+        "to": "end-pass-not-applicable",
+        "role": "no"
+      },
+      {
+        "id": "e14",
+        "from": "proc-scope-applicable",
+        "to": "dec-road-contact",
+        "role": "flow"
+      },
+      {
+        "id": "e15",
+        "from": "dec-road-contact",
+        "to": "proc-road-exempt",
+        "role": "yes"
+      },
+      {
+        "id": "e16",
+        "from": "dec-road-contact",
+        "to": "dec-minister-exempt",
+        "role": "no"
+      },
+      {
+        "id": "e17",
+        "from": "proc-road-exempt",
+        "to": "dec-minister-exempt",
+        "role": "flow"
+      },
+      {
+        "id": "e18",
+        "from": "dec-minister-exempt",
+        "to": "proc-minister-exempt",
+        "role": "yes"
+      },
+      {
+        "id": "e19",
+        "from": "dec-minister-exempt",
+        "to": "dec-passage-required-area",
+        "role": "no"
+      },
+      {
+        "id": "e20",
+        "from": "proc-minister-exempt",
+        "to": "dec-passage-required-area",
+        "role": "flow"
+      },
+      {
+        "id": "e21",
+        "from": "dec-passage-required-area",
+        "to": "dec-passage-compliance",
+        "role": "yes"
+      },
+      {
+        "id": "e22",
+        "from": "dec-passage-required-area",
+        "to": "end-pass-no-area",
+        "role": "no"
+      },
+      {
+        "id": "e23",
+        "from": "dec-passage-compliance",
+        "to": "end-pass",
+        "role": "yes"
+      },
+      {
+        "id": "e24",
+        "from": "dec-passage-compliance",
+        "to": "end-fail",
+        "role": "no"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A2:I9_2"],
+      "description": "法第2条第9号の2イの耐火建築物の構造基準（適用除外の判定に使用）"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令",
+    "checklist_ref": "建築基準法施行令第128条の2第1項（大規模な木造等の建築物の敷地内における通路）"
+  }
+}

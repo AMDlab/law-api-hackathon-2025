@@ -1,0 +1,354 @@
+{
+  "id": "A90_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "鋼材等の許容応力度",
+    "target_subject": "鋼材等",
+    "description": "鋼材等の許容応力度が表一又は表二の数値に適合するか判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "90",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "構造計算",
+    "許容応力度",
+    "鋼材"
+  ],
+  "text_raw": "鋼材等の許容応力度は、次の表一又は表二の数値によらなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "material",
+          "value": "鋼材等を使用する構造計算"
+        }
+      ],
+      "note": "構造計算において鋼材等を使用する場合に適用"
+    },
+    "judgment_rule": {
+      "operator": "==",
+      "lhs": {
+        "ref": "info-compliance"
+      },
+      "rhs": {
+        "value": true
+      }
+    },
+    "exceptions": null
+  },
+  "flow_diagram": {
+    "title": "鋼材等の許容応力度適合判定フロー",
+    "description": "構造計算に用いる鋼材等の許容応力度が令第90条第1項に適合するか判定する",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "鋼材等の許容応力度判定を開始"
+      },
+      {
+        "id": "proc-get-steel-set",
+        "type": "process",
+        "title": "構造計算に用いる鋼材等の集合を取得",
+        "process_type": "undefined_input",
+        "description": "構造計算において許容応力度を設定する鋼材等を特定"
+      },
+      {
+        "id": "dec-has-steel",
+        "type": "decision",
+        "title": "判定対象の鋼材等があるか？",
+        "decision_type": "binary",
+        "description": "未判定の鋼材等が残っているか確認"
+      },
+      {
+        "id": "proc-select-steel",
+        "type": "process",
+        "title": "鋼材等を1つ選択",
+        "process_type": "mechanical",
+        "description": "判定対象の鋼材等を1つ選択"
+      },
+      {
+        "id": "proc-identify-type",
+        "type": "process",
+        "title": "鋼材等の種類・区分を特定",
+        "process_type": "undefined_input",
+        "description": "各鋼材等の種類（炭素鋼/ステンレス鋼/鋳鉄等）及び区分を特定する"
+      },
+      {
+        "id": "dec-table-type",
+        "type": "decision",
+        "title": "適用する表は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "表一", "description": "炭素鋼・ステンレス鋼・鋳鉄に適用" },
+          { "value": "表二", "description": "丸鋼・異形鉄筋・溶接金網に適用" }
+        ],
+        "description": "鋼材等の種類に応じて適用する表を判定"
+      },
+      {
+        "id": "proc-identify-base-strength",
+        "type": "process",
+        "title": "基準強度Fを特定",
+        "process_type": "undefined_input",
+        "description": "鋼材等の種類及び品質に応じて国土交通大臣が定める基準強度Fを特定"
+      },
+      {
+        "id": "proc-identify-stress-type",
+        "type": "process",
+        "title": "応力の種類と荷重区分を特定",
+        "process_type": "undefined_input",
+        "description": "判定する応力の種類（圧縮/引張り/曲げ/せん断）及び荷重区分（長期/短期）を特定"
+      },
+      {
+        "id": "dec-stress-type",
+        "type": "decision",
+        "title": "応力の種類は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "圧縮", "description": "圧縮応力" },
+          { "value": "引張り", "description": "引張り応力" },
+          { "value": "曲げ", "description": "曲げ応力" },
+          { "value": "せん断", "description": "せん断応力" }
+        ],
+        "description": "応力の種類を判定"
+      },
+      {
+        "id": "dec-load-type",
+        "type": "decision",
+        "title": "荷重区分は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "長期", "description": "長期許容応力度" },
+          { "value": "短期", "description": "短期許容応力度" }
+        ],
+        "description": "荷重区分を判定"
+      },
+      {
+        "id": "proc-calc-allowable-long",
+        "type": "process",
+        "title": "長期許容応力度を算定",
+        "process_type": "mechanical",
+        "description": "表一：F/1.5（せん断はF/(1.5√3)）、表二：F/1.5（上限値あり）"
+      },
+      {
+        "id": "proc-calc-allowable-short",
+        "type": "process",
+        "title": "短期許容応力度を算定",
+        "process_type": "mechanical",
+        "description": "表一：長期の1.5倍、表二：F（上限値あり）"
+      },
+      {
+        "id": "proc-get-design-stress",
+        "type": "process",
+        "title": "設計許容応力度を取得",
+        "process_type": "undefined_input",
+        "description": "構造計算書から各鋼材等に設定された設計許容応力度を読み取る"
+      },
+      {
+        "id": "dec-compliance",
+        "type": "decision",
+        "title": "設計許容応力度 ≤ 規定許容応力度か？",
+        "decision_type": "binary",
+        "description": "設計許容応力度が規定許容応力度以下であることを判定",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "AD", "desc": "設計許容応力度" },
+          "rhs": { "var": "AR", "desc": "規定許容応力度" }
+        }
+      },
+      {
+        "id": "proc-mark-pass",
+        "type": "process",
+        "title": "当該鋼材等を適合とする",
+        "process_type": "mechanical",
+        "description": "当該鋼材等について許容応力度適合と判定"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "全ての鋼材等について設計許容応力度が規定許容応力度以下"
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "設計許容応力度が規定許容応力度を超過"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "proc-get-steel-set",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "proc-get-steel-set",
+        "to": "dec-has-steel",
+        "role": "flow"
+      },
+      {
+        "id": "e03",
+        "from": "dec-has-steel",
+        "to": "proc-select-steel",
+        "role": "yes",
+        "label": "あり"
+      },
+      {
+        "id": "e04",
+        "from": "dec-has-steel",
+        "to": "end-pass",
+        "role": "no",
+        "label": "なし"
+      },
+      {
+        "id": "e05",
+        "from": "proc-select-steel",
+        "to": "proc-identify-type",
+        "role": "flow"
+      },
+      {
+        "id": "e06",
+        "from": "proc-identify-type",
+        "to": "dec-table-type",
+        "role": "flow"
+      },
+      {
+        "id": "e07",
+        "from": "dec-table-type",
+        "to": "proc-identify-base-strength",
+        "role": "option",
+        "label": "表一"
+      },
+      {
+        "id": "e08",
+        "from": "dec-table-type",
+        "to": "proc-identify-base-strength",
+        "role": "option",
+        "label": "表二"
+      },
+      {
+        "id": "e09",
+        "from": "proc-identify-base-strength",
+        "to": "proc-identify-stress-type",
+        "role": "flow"
+      },
+      {
+        "id": "e10",
+        "from": "proc-identify-stress-type",
+        "to": "dec-stress-type",
+        "role": "flow"
+      },
+      {
+        "id": "e11",
+        "from": "dec-stress-type",
+        "to": "dec-load-type",
+        "role": "option",
+        "label": "圧縮"
+      },
+      {
+        "id": "e12",
+        "from": "dec-stress-type",
+        "to": "dec-load-type",
+        "role": "option",
+        "label": "引張り"
+      },
+      {
+        "id": "e13",
+        "from": "dec-stress-type",
+        "to": "dec-load-type",
+        "role": "option",
+        "label": "曲げ"
+      },
+      {
+        "id": "e14",
+        "from": "dec-stress-type",
+        "to": "dec-load-type",
+        "role": "option",
+        "label": "せん断"
+      },
+      {
+        "id": "e15",
+        "from": "dec-load-type",
+        "to": "proc-calc-allowable-long",
+        "role": "option",
+        "label": "長期"
+      },
+      {
+        "id": "e16",
+        "from": "dec-load-type",
+        "to": "proc-calc-allowable-short",
+        "role": "option",
+        "label": "短期"
+      },
+      {
+        "id": "e17",
+        "from": "proc-calc-allowable-long",
+        "to": "proc-get-design-stress",
+        "role": "flow"
+      },
+      {
+        "id": "e18",
+        "from": "proc-calc-allowable-short",
+        "to": "proc-get-design-stress",
+        "role": "flow"
+      },
+      {
+        "id": "e19",
+        "from": "proc-get-design-stress",
+        "to": "dec-compliance",
+        "role": "flow"
+      },
+      {
+        "id": "e20",
+        "from": "dec-compliance",
+        "to": "proc-mark-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e21",
+        "from": "dec-compliance",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e22",
+        "from": "proc-mark-pass",
+        "to": "dec-has-steel",
+        "role": "flow"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-ORDER-A90-P1",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": ["A20"],
+      "description": "法第20条に基づく構造耐力の規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T12:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

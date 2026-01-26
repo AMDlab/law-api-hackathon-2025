@@ -1,0 +1,324 @@
+{
+  "id": "A125_2_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "屋外への出口等の施錠装置の構造等",
+    "target_subject": "施錠装置",
+    "description": "避難用出口の施錠装置について、屋内からの解錠可能性及び解錠方法表示の基準"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "125_2",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "避難",
+    "施錠装置"
+  ],
+  "text_raw": "次の各号に掲げる出口に設ける戸の施錠装置は、当該建築物が法令の規定により人を拘禁する目的に供せられるものである場合を除き、屋内からかぎを用いることなく解錠できるものとし、かつ、当該戸の近くの見やすい場所にその解錠方法を表示しなければならない。\n一 屋外に設ける避難階段に屋内から通ずる出口\n二 避難階段から屋外に通ずる出口\n三 前二号に掲げる出口以外の出口のうち、維持管理上常時鎖錠状態にある出口で、火災その他の非常の場合に避難の用に供すべきもの",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "exception",
+          "value": "法令の規定により人を拘禁する目的に供せられる建築物でない場合に適用"
+        }
+      ],
+      "note": "人を拘禁する目的の建築物（刑務所、拘置所等）は適用除外"
+    }
+  },
+  "flow_diagram": {
+    "title": "令第125条の2第1項 施錠装置の適合判定フロー",
+    "description": "避難用出口の施錠装置における解錠可能性及び表示適合の判定フロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "令第125条の2第1項適合判定開始"
+      },
+      {
+        "id": "dec-detention",
+        "type": "decision",
+        "title": "建築物の用途は人を拘禁する目的か？",
+        "decision_type": "binary",
+        "description": "法令の規定により人を拘禁する目的に供せられる建築物（刑務所、拘置所等）か判定"
+      },
+      {
+        "id": "term-not-applicable",
+        "type": "terminal",
+        "title": "適用除外",
+        "result": "pass",
+        "description": "人を拘禁する目的の建築物のため本条は適用除外"
+      },
+      {
+        "id": "proc-identify-exits",
+        "type": "process",
+        "title": "対象出口の特定",
+        "process_type": "undefined_input",
+        "description": "一号（屋外避難階段への出口）、二号（避難階段からの屋外出口）、三号（常時鎖錠の避難出口）を特定し集約"
+      },
+      {
+        "id": "dec-exits-exist",
+        "type": "decision",
+        "title": "対象出口は存在するか？",
+        "decision_type": "binary",
+        "description": "本条の対象となる出口（一号〜三号）が存在するか確認"
+      },
+      {
+        "id": "term-no-exits",
+        "type": "terminal",
+        "title": "適合（対象なし）",
+        "result": "pass",
+        "description": "対象出口が存在しないため本条は適用されない"
+      },
+      {
+        "id": "proc-identify-doors",
+        "type": "process",
+        "title": "戸の特定",
+        "process_type": "undefined_input",
+        "description": "対象出口に設けられた戸を特定"
+      },
+      {
+        "id": "proc-identify-locks",
+        "type": "process",
+        "title": "施錠装置の特定",
+        "process_type": "undefined_input",
+        "description": "各戸に設けられた施錠装置を特定"
+      },
+      {
+        "id": "dec-locks-exist",
+        "type": "decision",
+        "title": "施錠装置は存在するか？",
+        "decision_type": "binary",
+        "description": "戸に施錠装置が設けられているか確認"
+      },
+      {
+        "id": "term-no-locks",
+        "type": "terminal",
+        "title": "適合（施錠装置なし）",
+        "result": "pass",
+        "description": "施錠装置がないため本条は適用されない"
+      },
+      {
+        "id": "info-remaining-locks",
+        "type": "information",
+        "title": "未検査施錠装置",
+        "symbol": "L",
+        "subject": "施錠装置",
+        "property": "検査対象の残り施錠装置",
+        "property_type": "set_definition",
+        "description": "まだ検査が完了していない施錠装置の集合"
+      },
+      {
+        "id": "dec-more-locks",
+        "type": "decision",
+        "title": "未検査の施錠装置はあるか？",
+        "decision_type": "binary",
+        "description": "検査すべき施錠装置が残っているか確認"
+      },
+      {
+        "id": "proc-select-lock",
+        "type": "process",
+        "title": "施錠装置を1つ選択",
+        "process_type": "mechanical",
+        "description": "未検査の施錠装置から1つを選択して検査対象とする"
+      },
+      {
+        "id": "dec-unlock-indoor",
+        "type": "decision",
+        "title": "屋内からかぎを用いずに解錠できるか？",
+        "decision_type": "binary",
+        "description": "施錠装置が屋内からかぎを用いることなく解錠できる構造か確認"
+      },
+      {
+        "id": "term-fail-unlock",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "屋内からかぎを用いずに解錠できないため不適合"
+      },
+      {
+        "id": "dec-display-method",
+        "type": "decision",
+        "title": "戸の近くの見やすい場所に解錠方法が表示されているか？",
+        "decision_type": "binary",
+        "description": "当該戸の近くの見やすい場所に解錠方法の表示があるか確認"
+      },
+      {
+        "id": "term-fail-display",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "解錠方法の表示がないため不適合"
+      },
+      {
+        "id": "proc-mark-checked",
+        "type": "process",
+        "title": "検査済みとしてマーク",
+        "process_type": "mechanical",
+        "description": "当該施錠装置を検査済みとしてマークし、次の施錠装置へ進む"
+      },
+      {
+        "id": "term-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "全ての施錠装置が解錠可能性と表示要件を満たしており適合"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-detention",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-detention",
+        "to": "term-not-applicable",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "dec-detention",
+        "to": "proc-identify-exits",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e04",
+        "from": "proc-identify-exits",
+        "to": "dec-exits-exist",
+        "role": "flow"
+      },
+      {
+        "id": "e05",
+        "from": "dec-exits-exist",
+        "to": "proc-identify-doors",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e06",
+        "from": "dec-exits-exist",
+        "to": "term-no-exits",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e07",
+        "from": "proc-identify-doors",
+        "to": "proc-identify-locks",
+        "role": "flow"
+      },
+      {
+        "id": "e08",
+        "from": "proc-identify-locks",
+        "to": "dec-locks-exist",
+        "role": "flow"
+      },
+      {
+        "id": "e09",
+        "from": "dec-locks-exist",
+        "to": "info-remaining-locks",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e10",
+        "from": "dec-locks-exist",
+        "to": "term-no-locks",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e11",
+        "from": "info-remaining-locks",
+        "to": "dec-more-locks",
+        "role": "flow"
+      },
+      {
+        "id": "e12",
+        "from": "dec-more-locks",
+        "to": "proc-select-lock",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e13",
+        "from": "dec-more-locks",
+        "to": "term-pass",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e14",
+        "from": "proc-select-lock",
+        "to": "dec-unlock-indoor",
+        "role": "flow"
+      },
+      {
+        "id": "e15",
+        "from": "dec-unlock-indoor",
+        "to": "dec-display-method",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e16",
+        "from": "dec-unlock-indoor",
+        "to": "term-fail-unlock",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e17",
+        "from": "dec-display-method",
+        "to": "proc-mark-checked",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e18",
+        "from": "dec-display-method",
+        "to": "term-fail-display",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e19",
+        "from": "proc-mark-checked",
+        "to": "dec-more-locks",
+        "role": "flow"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-ORD-A125_2-P1",
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": ["A123:P2"],
+      "description": "屋外避難階段（令123条2項）を参照"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00+09:00",
+    "author": "Claude",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

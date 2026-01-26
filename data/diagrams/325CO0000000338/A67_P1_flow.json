@@ -1,0 +1,752 @@
+{
+  "id": "A67_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "鋼材の接合方法",
+    "target_subject": "鋼材の接合",
+    "description": "構造耐力上主要な部分である鋼材の接合が所定の接合方法によることを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "67",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造"
+  ],
+  "text_raw": "構造耐力上主要な部分である鋼材の接合は、接合される鋼材が炭素鋼であるときは高力ボルト接合、溶接接合若しくはリベット接合（構造耐力上主要な部分である継手又は仕口に係るリベット接合にあつては、添板リベット接合）又はこれらと同等以上の効力を有するものとして国土交通大臣の認定を受けた接合方法に、接合される鋼材がステンレス鋼であるときは高力ボルト接合若しくは溶接接合又はこれらと同等以上の効力を有するものとして国土交通大臣の認定を受けた接合方法に、それぞれよらなければならない。ただし、軒の高さが九メートル以下で、かつ、張り間が十三メートル以下の建築物（延べ面積が三千平方メートルを超えるものを除く。）その他その規模及び構造に関し安全上支障がないものとして国土交通大臣が定める基準に適合する建築物にあつては、ボルトが緩まないように次の各号のいずれかに該当する措置を講じたボルト接合によることができる。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "structure",
+          "value": "構造耐力上主要な部分である鋼材の接合がある建築物"
+        }
+      ],
+      "note": "構造耐力上主要な部分に鋼材の接合がある場合に適用"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "note": "原則：鋼材種別に応じた接合方法の採用",
+          "operator": "AND",
+          "conditions": [
+            {
+              "ref": "info-steel-type",
+              "note": "鋼材種別の特定"
+            },
+            {
+              "operator": "OR",
+              "conditions": [
+                {
+                  "ref": "info-joint-method-compliance",
+                  "operator": "==",
+                  "value": true
+                },
+                {
+                  "ref": "info-minister-approval",
+                  "operator": "==",
+                  "value": true
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "note": "例外：緩まない措置を講じたボルト接合",
+          "operator": "AND",
+          "conditions": [
+            {
+              "ref": "info-exception-applicable",
+              "operator": "==",
+              "value": true
+            },
+            {
+              "ref": "info-bolt-measure",
+              "operator": "==",
+              "value": true
+            }
+          ]
+        }
+      ]
+    },
+    "exceptions": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "operator": "OR",
+          "conditions": [
+            {
+              "note": "軒高9m以下かつ張り間13m以下で延べ面積3000m2以下",
+              "operator": "AND",
+              "conditions": [
+                {
+                  "ref": "info-eave-height",
+                  "operator": "<=",
+                  "value": 9
+                },
+                {
+                  "ref": "info-span",
+                  "operator": "<=",
+                  "value": 13
+                },
+                {
+                  "ref": "info-floor-area",
+                  "operator": "<=",
+                  "value": 3000
+                }
+              ]
+            },
+            {
+              "ref": "info-minister-standard",
+              "operator": "==",
+              "value": true
+            }
+          ]
+        },
+        {
+          "ref": "info-bolt-measure",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "effect": "ALTERNATIVE_COMPLIANCE"
+    }
+  },
+  "flow_diagram": {
+    "title": "令67条1項 鋼材の接合方法 適合判定フロー",
+    "description": "構造耐力上主要な部分である鋼材の接合方法が令67条1項に適合するかを判定するフロー図",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "鋼材の接合方法の適合判定を開始"
+      },
+      {
+        "id": "dec-has-joints",
+        "type": "decision",
+        "title": "構造耐力上主要な部分に鋼材接合部があるか？",
+        "decision_type": "binary",
+        "description": "建築物に構造耐力上主要な部分における鋼材の接合部があるかを確認"
+      },
+      {
+        "id": "proc-identify-joints",
+        "type": "process",
+        "title": "鋼材接合部を特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から構造耐力上主要な部分における鋼材の接合部を特定する"
+      },
+      {
+        "id": "proc-loop-start",
+        "type": "process",
+        "title": "各接合部について判定開始",
+        "process_type": "mechanical",
+        "description": "特定した鋼材接合部について順次判定を行う"
+      },
+      {
+        "id": "dec-steel-type",
+        "type": "decision",
+        "title": "鋼材種別は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "炭素鋼" },
+          { "value": "ステンレス鋼" }
+        ],
+        "description": "接合される鋼材が炭素鋼かステンレス鋼かを確認"
+      },
+      {
+        "id": "dec-carbon-joint-method",
+        "type": "decision",
+        "title": "接合方法は？（炭素鋼）",
+        "decision_type": "multi",
+        "options": [
+          { "value": "高力ボルト接合" },
+          { "value": "溶接接合" },
+          { "value": "リベット接合" },
+          { "value": "その他" }
+        ],
+        "description": "炭素鋼の接合部における接合方法を確認"
+      },
+      {
+        "id": "proc-carbon-highbolt-ok",
+        "type": "process",
+        "title": "高力ボルト接合（炭素鋼）で適合",
+        "process_type": "mechanical",
+        "description": "炭素鋼の高力ボルト接合は所定の接合方法に適合"
+      },
+      {
+        "id": "proc-carbon-weld-ok",
+        "type": "process",
+        "title": "溶接接合（炭素鋼）で適合",
+        "process_type": "mechanical",
+        "description": "炭素鋼の溶接接合は所定の接合方法に適合"
+      },
+      {
+        "id": "dec-is-joint-or-connection",
+        "type": "decision",
+        "title": "継手又は仕口に係る接合か？",
+        "decision_type": "binary",
+        "description": "リベット接合が構造耐力上主要な部分である継手又は仕口に係るかを確認"
+      },
+      {
+        "id": "dec-is-addition-plate-rivet",
+        "type": "decision",
+        "title": "添板リベット接合か？",
+        "decision_type": "binary",
+        "description": "継手・仕口のリベット接合が添板リベット接合であるかを確認"
+      },
+      {
+        "id": "proc-rivet-ok",
+        "type": "process",
+        "title": "リベット接合（炭素鋼）で適合",
+        "process_type": "mechanical",
+        "description": "炭素鋼のリベット接合（継手・仕口以外、又は添板リベット）は所定の接合方法に適合"
+      },
+      {
+        "id": "proc-rivet-ng",
+        "type": "process",
+        "title": "リベット接合不適合（添板リベット必要）",
+        "process_type": "mechanical",
+        "description": "継手・仕口に係るリベット接合は添板リベット接合でなければならない"
+      },
+      {
+        "id": "dec-stainless-joint-method",
+        "type": "decision",
+        "title": "接合方法は？（ステンレス鋼）",
+        "decision_type": "multi",
+        "options": [
+          { "value": "高力ボルト接合" },
+          { "value": "溶接接合" },
+          { "value": "その他" }
+        ],
+        "description": "ステンレス鋼の接合部における接合方法を確認"
+      },
+      {
+        "id": "proc-stainless-highbolt-ok",
+        "type": "process",
+        "title": "高力ボルト接合（ステンレス鋼）で適合",
+        "process_type": "mechanical",
+        "description": "ステンレス鋼の高力ボルト接合は所定の接合方法に適合"
+      },
+      {
+        "id": "proc-stainless-weld-ok",
+        "type": "process",
+        "title": "溶接接合（ステンレス鋼）で適合",
+        "process_type": "mechanical",
+        "description": "ステンレス鋼の溶接接合は所定の接合方法に適合"
+      },
+      {
+        "id": "dec-minister-approval",
+        "type": "decision",
+        "title": "大臣認定を受けた接合方法か？",
+        "decision_type": "binary",
+        "description": "同等以上の効力を有するものとして国土交通大臣の認定を受けた接合方法であるかを確認"
+      },
+      {
+        "id": "proc-minister-approval-ok",
+        "type": "process",
+        "title": "大臣認定接合方法で適合",
+        "process_type": "mechanical",
+        "description": "国土交通大臣の認定を受けた接合方法として適合"
+      },
+      {
+        "id": "dec-eave-height",
+        "type": "decision",
+        "title": "軒の高さ ≤ 9m か？",
+        "decision_type": "binary",
+        "description": "建築物の軒の高さが9メートル以下であるかを確認"
+      },
+      {
+        "id": "dec-span",
+        "type": "decision",
+        "title": "張り間 ≤ 13m か？",
+        "decision_type": "binary",
+        "description": "建築物の張り間が13メートル以下であるかを確認"
+      },
+      {
+        "id": "dec-floor-area",
+        "type": "decision",
+        "title": "延べ面積 ≤ 3000m2 か？",
+        "decision_type": "binary",
+        "description": "建築物の延べ面積が3000平方メートル以下であるかを確認"
+      },
+      {
+        "id": "proc-size-exception-met",
+        "type": "process",
+        "title": "規模条件によるただし書き適用",
+        "process_type": "mechanical",
+        "description": "軒高9m以下かつ張り間13m以下かつ延べ面積3000m2以下のためただし書き適用可"
+      },
+      {
+        "id": "dec-minister-standard",
+        "type": "decision",
+        "title": "大臣基準（安全上支障がない規模・構造）に適合するか？",
+        "decision_type": "binary",
+        "description": "その規模及び構造に関し安全上支障がないものとして国土交通大臣が定める基準に適合するかを確認"
+      },
+      {
+        "id": "proc-minister-standard-ok",
+        "type": "process",
+        "title": "大臣基準によるただし書き適用",
+        "process_type": "mechanical",
+        "description": "国土交通大臣が定める基準に適合するためただし書き適用可"
+      },
+      {
+        "id": "dec-bolt-connection",
+        "type": "decision",
+        "title": "ボルト接合であるか？",
+        "decision_type": "binary",
+        "description": "当該接合部がボルト接合であるかを確認"
+      },
+      {
+        "id": "dec-bolt-measure",
+        "type": "decision",
+        "title": "ボルト緩み止め措置は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "コンクリート埋込み（1号）" },
+          { "value": "ナット溶接（2号）" },
+          { "value": "ダブルナット（3号）" },
+          { "value": "同等の戻り止め（4号）" },
+          { "value": "措置なし" }
+        ],
+        "description": "ボルトが緩まないように講じられている措置を確認（各号のいずれかに該当するか）"
+      },
+      {
+        "id": "proc-item1-met",
+        "type": "process",
+        "title": "1号該当（コンクリート埋込み）",
+        "process_type": "mechanical",
+        "description": "ボルトをコンクリートで埋め込む措置が講じられている"
+      },
+      {
+        "id": "proc-item2-met",
+        "type": "process",
+        "title": "2号該当（ナット溶接）",
+        "process_type": "mechanical",
+        "description": "ナット部分を溶接する措置が講じられている"
+      },
+      {
+        "id": "proc-item3-met",
+        "type": "process",
+        "title": "3号該当（ダブルナット）",
+        "process_type": "mechanical",
+        "description": "ナットを二重に使用する措置が講じられている"
+      },
+      {
+        "id": "proc-item4-met",
+        "type": "process",
+        "title": "4号該当（同等の戻り止め）",
+        "process_type": "mechanical",
+        "description": "前3号と同等以上の効力を有する戻り止め措置が講じられている"
+      },
+      {
+        "id": "proc-bolt-exception-ok",
+        "type": "process",
+        "title": "ボルト接合（緩み止め措置付き）で適合",
+        "process_type": "mechanical",
+        "description": "ただし書きに基づきボルト接合として適合"
+      },
+      {
+        "id": "dec-more-joints",
+        "type": "decision",
+        "title": "未判定の接合部があるか？",
+        "decision_type": "binary",
+        "description": "判定が完了していない鋼材接合部が残っているかを確認"
+      },
+      {
+        "id": "proc-all-joints-ok",
+        "type": "process",
+        "title": "全接合部の適合を確認",
+        "process_type": "mechanical",
+        "description": "全ての鋼材接合部が令67条1項に適合することを確認"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令67条1項（鋼材の接合）に適合"
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "令67条1項（鋼材の接合）に不適合"
+      },
+      {
+        "id": "end-not-applicable",
+        "type": "terminal",
+        "title": "該当なし",
+        "result": "pass",
+        "description": "構造耐力上主要な部分に鋼材接合部がないため本条適用外"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-has-joints",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-has-joints",
+        "to": "proc-identify-joints",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "dec-has-joints",
+        "to": "end-not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e04",
+        "from": "proc-identify-joints",
+        "to": "proc-loop-start",
+        "role": "flow"
+      },
+      {
+        "id": "e05",
+        "from": "proc-loop-start",
+        "to": "dec-steel-type",
+        "role": "flow"
+      },
+      {
+        "id": "e06",
+        "from": "dec-steel-type",
+        "to": "dec-carbon-joint-method",
+        "role": "option",
+        "label": "炭素鋼"
+      },
+      {
+        "id": "e07",
+        "from": "dec-steel-type",
+        "to": "dec-stainless-joint-method",
+        "role": "option",
+        "label": "ステンレス鋼"
+      },
+      {
+        "id": "e08",
+        "from": "dec-carbon-joint-method",
+        "to": "proc-carbon-highbolt-ok",
+        "role": "option",
+        "label": "高力ボルト接合"
+      },
+      {
+        "id": "e09",
+        "from": "dec-carbon-joint-method",
+        "to": "proc-carbon-weld-ok",
+        "role": "option",
+        "label": "溶接接合"
+      },
+      {
+        "id": "e10",
+        "from": "dec-carbon-joint-method",
+        "to": "dec-is-joint-or-connection",
+        "role": "option",
+        "label": "リベット接合"
+      },
+      {
+        "id": "e11",
+        "from": "dec-carbon-joint-method",
+        "to": "dec-minister-approval",
+        "role": "option",
+        "label": "その他"
+      },
+      {
+        "id": "e12",
+        "from": "dec-is-joint-or-connection",
+        "to": "dec-is-addition-plate-rivet",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e13",
+        "from": "dec-is-joint-or-connection",
+        "to": "proc-rivet-ok",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e14",
+        "from": "dec-is-addition-plate-rivet",
+        "to": "proc-rivet-ok",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e15",
+        "from": "dec-is-addition-plate-rivet",
+        "to": "proc-rivet-ng",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e16",
+        "from": "proc-rivet-ng",
+        "to": "dec-minister-approval",
+        "role": "flow"
+      },
+      {
+        "id": "e17",
+        "from": "dec-stainless-joint-method",
+        "to": "proc-stainless-highbolt-ok",
+        "role": "option",
+        "label": "高力ボルト接合"
+      },
+      {
+        "id": "e18",
+        "from": "dec-stainless-joint-method",
+        "to": "proc-stainless-weld-ok",
+        "role": "option",
+        "label": "溶接接合"
+      },
+      {
+        "id": "e19",
+        "from": "dec-stainless-joint-method",
+        "to": "dec-minister-approval",
+        "role": "option",
+        "label": "その他"
+      },
+      {
+        "id": "e20",
+        "from": "dec-minister-approval",
+        "to": "proc-minister-approval-ok",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e21",
+        "from": "dec-minister-approval",
+        "to": "dec-eave-height",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e22",
+        "from": "dec-eave-height",
+        "to": "dec-span",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e23",
+        "from": "dec-eave-height",
+        "to": "dec-minister-standard",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e24",
+        "from": "dec-span",
+        "to": "dec-floor-area",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e25",
+        "from": "dec-span",
+        "to": "dec-minister-standard",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e26",
+        "from": "dec-floor-area",
+        "to": "proc-size-exception-met",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e27",
+        "from": "dec-floor-area",
+        "to": "dec-minister-standard",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e28",
+        "from": "proc-size-exception-met",
+        "to": "dec-bolt-connection",
+        "role": "flow"
+      },
+      {
+        "id": "e29",
+        "from": "dec-minister-standard",
+        "to": "proc-minister-standard-ok",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e30",
+        "from": "dec-minister-standard",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e31",
+        "from": "proc-minister-standard-ok",
+        "to": "dec-bolt-connection",
+        "role": "flow"
+      },
+      {
+        "id": "e32",
+        "from": "dec-bolt-connection",
+        "to": "dec-bolt-measure",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e33",
+        "from": "dec-bolt-connection",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e34",
+        "from": "dec-bolt-measure",
+        "to": "proc-item1-met",
+        "role": "option",
+        "label": "コンクリート埋込み（1号）"
+      },
+      {
+        "id": "e35",
+        "from": "dec-bolt-measure",
+        "to": "proc-item2-met",
+        "role": "option",
+        "label": "ナット溶接（2号）"
+      },
+      {
+        "id": "e36",
+        "from": "dec-bolt-measure",
+        "to": "proc-item3-met",
+        "role": "option",
+        "label": "ダブルナット（3号）"
+      },
+      {
+        "id": "e37",
+        "from": "dec-bolt-measure",
+        "to": "proc-item4-met",
+        "role": "option",
+        "label": "同等の戻り止め（4号）"
+      },
+      {
+        "id": "e38",
+        "from": "dec-bolt-measure",
+        "to": "end-fail",
+        "role": "option",
+        "label": "措置なし"
+      },
+      {
+        "id": "e39",
+        "from": "proc-item1-met",
+        "to": "proc-bolt-exception-ok",
+        "role": "flow"
+      },
+      {
+        "id": "e40",
+        "from": "proc-item2-met",
+        "to": "proc-bolt-exception-ok",
+        "role": "flow"
+      },
+      {
+        "id": "e41",
+        "from": "proc-item3-met",
+        "to": "proc-bolt-exception-ok",
+        "role": "flow"
+      },
+      {
+        "id": "e42",
+        "from": "proc-item4-met",
+        "to": "proc-bolt-exception-ok",
+        "role": "flow"
+      },
+      {
+        "id": "e43",
+        "from": "proc-carbon-highbolt-ok",
+        "to": "dec-more-joints",
+        "role": "flow"
+      },
+      {
+        "id": "e44",
+        "from": "proc-carbon-weld-ok",
+        "to": "dec-more-joints",
+        "role": "flow"
+      },
+      {
+        "id": "e45",
+        "from": "proc-rivet-ok",
+        "to": "dec-more-joints",
+        "role": "flow"
+      },
+      {
+        "id": "e46",
+        "from": "proc-stainless-highbolt-ok",
+        "to": "dec-more-joints",
+        "role": "flow"
+      },
+      {
+        "id": "e47",
+        "from": "proc-stainless-weld-ok",
+        "to": "dec-more-joints",
+        "role": "flow"
+      },
+      {
+        "id": "e48",
+        "from": "proc-minister-approval-ok",
+        "to": "dec-more-joints",
+        "role": "flow"
+      },
+      {
+        "id": "e49",
+        "from": "proc-bolt-exception-ok",
+        "to": "dec-more-joints",
+        "role": "flow"
+      },
+      {
+        "id": "e50",
+        "from": "dec-more-joints",
+        "to": "proc-loop-start",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e51",
+        "from": "dec-more-joints",
+        "to": "proc-all-joints-ok",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e52",
+        "from": "proc-all-joints-ok",
+        "to": "end-pass",
+        "role": "flow"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSO-A67-P1",
+  "metadata": {
+    "created_at": "2026-01-26T12:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

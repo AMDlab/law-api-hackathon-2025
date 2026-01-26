@@ -1,0 +1,263 @@
+{
+  "id": "CHK-BSL-FLOW-A108_3-P1-I2",
+  "version": "3.2.0",
+  "page_title": {
+    "title": "防火上・避難上支障がない部分（避難通路要件）適合判定フロー",
+    "target_subject": "主要構造部の防火上・避難上支障がない部分",
+    "description": "当該部分が避難通路の一部となっている場合の避難経路確保要件の適合判定"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "108_3",
+    "paragraph": "1",
+    "item": "2"
+  },
+  "labels": [
+    "単体規定",
+    "主要構造部",
+    "耐火構造",
+    "避難安全"
+  ],
+  "text_raw": "当該部分が避難の用に供する廊下その他の通路の一部となつている場合にあつては、通常の火災時において、建築物に存する者の全てが当該通路を経由しないで地上までの避難を終了することができるものであること。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "building_part",
+          "value": "主要構造部のうち防火上・避難上支障がない部分として除外しようとする部分"
+        }
+      ],
+      "note": "法第2条第9号の2イの政令で定める部分の判定"
+    },
+    "judgment_rule": {
+      "operator": "IMPLIES",
+      "conditions": [
+        {
+          "type": "condition",
+          "value": "当該部分が避難通路の一部である場合"
+        },
+        {
+          "type": "requirement",
+          "value": "当該通路を経由せずに全員が地上まで避難可能"
+        }
+      ]
+    }
+  },
+  "flow_diagram": {
+    "title": "令第108条の3第1項第2号 適合判定フロー",
+    "description": "防火上・避難上支障がない部分として除外しようとする部分が避難通路の一部である場合の要件判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "令第108条の3第1項第2号の適合判定を開始"
+      },
+      {
+        "id": "proc-identify-part",
+        "type": "process",
+        "title": "対象部分の特定",
+        "process_type": "undefined_input",
+        "description": "防火上・避難上支障がない部分として除外しようとする主要構造部を特定する"
+      },
+      {
+        "id": "info-target-part",
+        "type": "information",
+        "title": "対象部分",
+        "symbol": "P",
+        "subject": "主要構造部",
+        "property": "対象部分の位置・範囲",
+        "property_type": "geometric_solid",
+        "description": "防火上・避難上支障がない部分として除外しようとする部分"
+      },
+      {
+        "id": "dec-is-corridor",
+        "type": "decision",
+        "title": "当該部分は避難通路の一部か？",
+        "decision_type": "binary",
+        "description": "当該部分が避難の用に供する廊下その他の通路の一部となっているかを判定",
+        "condition": {
+          "operator": "EQ",
+          "lhs": {
+            "var": "C",
+            "desc": "避難通路該当性"
+          },
+          "rhs": {
+            "value": true,
+            "desc": "避難通路の一部である"
+          }
+        }
+      },
+      {
+        "id": "proc-identify-occupants",
+        "type": "process",
+        "title": "在館者の想定",
+        "process_type": "undefined_input",
+        "description": "通常の火災時において建築物に存する者を想定する"
+      },
+      {
+        "id": "info-occupants",
+        "type": "information",
+        "title": "在館者",
+        "symbol": "O",
+        "subject": "建築物",
+        "property": "在館者の集合",
+        "property_type": "set_definition",
+        "description": "通常の火災時において建築物に存する者の全て"
+      },
+      {
+        "id": "proc-check-alt-route",
+        "type": "process",
+        "title": "代替避難経路の確認",
+        "process_type": "human_judgment",
+        "description": "各在館者が当該通路を経由しないで地上まで避難できるか確認する"
+      },
+      {
+        "id": "dec-all-evac-possible",
+        "type": "decision",
+        "title": "全員が代替経路で地上まで避難可能か？",
+        "decision_type": "binary",
+        "description": "建築物に存する者の全てが当該通路を経由しないで地上までの避難を終了することができるか判定",
+        "condition": {
+          "operator": "EQ",
+          "lhs": {
+            "var": "ALL",
+            "desc": "全員代替避難可否"
+          },
+          "rhs": {
+            "value": true,
+            "desc": "全員が代替経路で避難可能"
+          }
+        }
+      },
+      {
+        "id": "end-pass-not-corridor",
+        "type": "terminal",
+        "title": "適合（避難通路でない）",
+        "result": "pass",
+        "description": "当該部分が避難通路の一部でないため、第2号要件を満たす",
+        "related_articles": ["令第108条の3第1項第2号"]
+      },
+      {
+        "id": "end-pass-alt-evac",
+        "type": "terminal",
+        "title": "適合（代替避難可能）",
+        "result": "pass",
+        "description": "当該通路を経由せずに全員が地上まで避難可能であるため、第2号要件を満たす",
+        "related_articles": ["令第108条の3第1項第2号"]
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "避難通路の一部であり、かつ代替経路での全員避難が不可能であるため、第2号要件を満たさない",
+        "related_articles": ["令第108条の3第1項第2号"]
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge-001",
+        "from": "start",
+        "to": "proc-identify-part",
+        "role": "flow"
+      },
+      {
+        "id": "edge-002",
+        "from": "proc-identify-part",
+        "to": "info-target-part",
+        "role": "output"
+      },
+      {
+        "id": "edge-003",
+        "from": "info-target-part",
+        "to": "dec-is-corridor",
+        "role": "input"
+      },
+      {
+        "id": "edge-004",
+        "from": "dec-is-corridor",
+        "to": "end-pass-not-corridor",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "edge-005",
+        "from": "dec-is-corridor",
+        "to": "proc-identify-occupants",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "edge-006",
+        "from": "proc-identify-occupants",
+        "to": "info-occupants",
+        "role": "output"
+      },
+      {
+        "id": "edge-007",
+        "from": "info-occupants",
+        "to": "proc-check-alt-route",
+        "role": "input"
+      },
+      {
+        "id": "edge-008",
+        "from": "info-target-part",
+        "to": "proc-check-alt-route",
+        "role": "input"
+      },
+      {
+        "id": "edge-009",
+        "from": "proc-check-alt-route",
+        "to": "dec-all-evac-possible",
+        "role": "flow"
+      },
+      {
+        "id": "edge-010",
+        "from": "dec-all-evac-possible",
+        "to": "end-pass-alt-evac",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "edge-011",
+        "from": "dec-all-evac-possible",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-KIJO-A108_3-P1-I2",
+  "related_laws": [
+    {
+      "law_id": "324AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": ["A2:I9_2"],
+      "description": "法第2条第9号の2イにおいて政令で定める部分として委任"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": ["A109"],
+      "description": "第1号で参照される防火設備の規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00Z",
+    "updated_at": "2026-01-26T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

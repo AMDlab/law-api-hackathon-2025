@@ -1,0 +1,72 @@
+{
+  "id": "A20_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "採光有効面積の算定フロー",
+    "target_subject": "居室",
+    "description": "居室の開口部で採光に有効な部分の面積を算定するフロー"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "20",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": ["単体規定", "衛生", "採光"],
+  "text_raw": "法第二十八条第一項に規定する居室の窓その他の開口部（以下この条において「開口部」という。）で採光に有効な部分の面積は、当該居室の開口部ごとの面積に、それぞれ採光補正係数を乗じて得た面積を合計して算定するものとする。ただし、国土交通大臣が別に算定方法を定めた建築物の開口部については、その算定方法によることができる。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [{ "type": "legal_reference", "value": "法第28条第1項に規定する居室" }]
+    },
+    "judgment_rule": {
+      "operator": "COMPUTE",
+      "description": "採光有効面積 = Σ(開口部面積 × 採光補正係数)"
+    }
+  },
+  "flow_diagram": {
+    "title": "令第20条第1項 採光有効面積算定フロー",
+    "description": "居室の開口部で採光に有効な部分の面積を算定",
+    "nodes": [
+      { "id": "start", "type": "terminal", "title": "算定開始", "result": "start" },
+      { "id": "proc-rooms", "type": "process", "title": "対象居室を特定", "process_type": "undefined_input", "description": "法28条1項の規定が適用される居室を特定" },
+      { "id": "proc-openings", "type": "process", "title": "開口部を特定", "process_type": "undefined_input", "description": "各居室の採光のための窓その他の開口部を特定" },
+      { "id": "dec-special-method", "type": "decision", "title": "大臣別定算定方法の対象か？", "decision_type": "binary", "description": "国土交通大臣が別に算定方法を定めた建築物の開口部か" },
+      { "id": "proc-special-calc", "type": "process", "title": "大臣別定方法で算定", "process_type": "human_judgment", "description": "国土交通大臣が定める算定方法により有効面積を算定" },
+      { "id": "proc-opening-area", "type": "process", "title": "開口部面積を特定", "process_type": "undefined_input", "description": "設計図書等から各開口部の面積を読み取る" },
+      { "id": "proc-correction", "type": "process", "title": "採光補正係数を算定", "process_type": "sub_diagram_reference", "description": "令20条2項に基づき採光補正係数を算定" },
+      { "id": "proc-individual", "type": "process", "title": "個別有効面積を計算", "process_type": "mechanical", "description": "開口部面積 × 採光補正係数" },
+      { "id": "dec-more-openings", "type": "decision", "title": "未算定の開口部があるか？", "decision_type": "binary", "description": "全開口部について計算が完了したか確認" },
+      { "id": "proc-sum", "type": "process", "title": "有効面積を合計", "process_type": "mechanical", "description": "各開口部の有効面積を合計して採光有効面積を算定" },
+      { "id": "end-result", "type": "terminal", "title": "採光有効面積確定", "result": "end", "description": "採光有効面積の算定完了" }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "proc-rooms", "role": "flow" },
+      { "id": "e02", "from": "proc-rooms", "to": "proc-openings", "role": "flow" },
+      { "id": "e03", "from": "proc-openings", "to": "dec-special-method", "role": "flow" },
+      { "id": "e04", "from": "dec-special-method", "to": "proc-special-calc", "role": "yes" },
+      { "id": "e05", "from": "dec-special-method", "to": "proc-opening-area", "role": "no" },
+      { "id": "e06", "from": "proc-special-calc", "to": "end-result", "role": "flow" },
+      { "id": "e07", "from": "proc-opening-area", "to": "proc-correction", "role": "flow" },
+      { "id": "e08", "from": "proc-correction", "to": "proc-individual", "role": "flow" },
+      { "id": "e09", "from": "proc-individual", "to": "dec-more-openings", "role": "flow" },
+      { "id": "e10", "from": "dec-more-openings", "to": "proc-opening-area", "role": "yes", "label": "次の開口部へ" },
+      { "id": "e11", "from": "dec-more-openings", "to": "proc-sum", "role": "no" },
+      { "id": "e12", "from": "proc-sum", "to": "end-result", "role": "flow" }
+    ]
+  },
+  "kijo_diagram_ref": "A20_P1_kijo",
+  "related_laws": [
+    { "law_id": "325AC0000000201", "law_name": "建築基準法", "law_type": "act", "relationship": "delegated_from", "articles": ["A28:P1"], "description": "法28条1項の居室の採光規定から委任" },
+    { "law_id": "325CO0000000338", "law_name": "建築基準法施行令", "law_type": "order", "relationship": "defines_detail", "articles": ["A20:P2"], "description": "採光補正係数の算定方法を定める" }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00Z",
+    "updated_at": "2026-01-26T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator"
+  }
+}

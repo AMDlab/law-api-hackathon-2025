@@ -1,0 +1,404 @@
+{
+  "id": "A92_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "溶接継目の許容応力度",
+    "target_subject": "溶接継目",
+    "description": "溶接継目ののど断面に対する許容応力度が基準値以下であることを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "92",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造",
+    "溶接",
+    "許容応力度"
+  ],
+  "text_raw": "溶接継目ののど断面に対する許容応力度は、次の表の数値によらなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "structure",
+          "value": "鋼構造建築物で溶接継目を有するもの"
+        }
+      ],
+      "note": "溶接継目を有する鋼構造建築物に適用"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-compliance",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "flow_diagram": {
+    "title": "令第92条第1項 溶接継目の許容応力度判定フロー",
+    "description": "溶接継目ののど断面に対する許容応力度が基準値以下であることを判定するフローチャート",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "溶接継目の許容応力度判定を開始"
+      },
+      {
+        "id": "dec-has-joints",
+        "type": "decision",
+        "title": "溶接継目を有するか？",
+        "decision_type": "binary",
+        "description": "建築物が溶接継目を有するかどうかを判定"
+      },
+      {
+        "id": "proc-identify-joints",
+        "type": "process",
+        "title": "溶接継目の集合を特定",
+        "process_type": "undefined_input",
+        "description": "判定対象となる建築物に属する全ての溶接継目を特定する"
+      },
+      {
+        "id": "info-joints-set",
+        "type": "information",
+        "title": "溶接継目の集合",
+        "symbol": "JS",
+        "subject": "建築物",
+        "property": "溶接継目の集合",
+        "property_type": "set_definition",
+        "description": "判定対象となる溶接継目の集合"
+      },
+      {
+        "id": "dec-more-joints",
+        "type": "decision",
+        "title": "未判定の溶接継目があるか？",
+        "decision_type": "binary",
+        "description": "まだ判定していない溶接継目があるかどうかを確認"
+      },
+      {
+        "id": "proc-select-joint",
+        "type": "process",
+        "title": "溶接継目を1つ選択",
+        "process_type": "mechanical",
+        "description": "未判定の溶接継目から1つを選択して判定対象とする"
+      },
+      {
+        "id": "proc-identify-joint-type",
+        "type": "process",
+        "title": "継目形式の特定",
+        "process_type": "undefined_input",
+        "description": "選択した溶接継目の継目形式（突合せ/突合せ以外）を特定する"
+      },
+      {
+        "id": "dec-joint-type",
+        "type": "decision",
+        "title": "継目形式は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "突合せ", "description": "突合せ継目" },
+          { "value": "突合せ以外", "description": "突合せ以外の継目" }
+        ],
+        "description": "溶接継目の形式を判定"
+      },
+      {
+        "id": "proc-identify-steel-type",
+        "type": "process",
+        "title": "鋼材種別の特定",
+        "process_type": "undefined_input",
+        "description": "溶接される鋼材の種類及び品質を特定する"
+      },
+      {
+        "id": "info-steel-type",
+        "type": "information",
+        "title": "鋼材の種類・品質",
+        "symbol": "ST",
+        "subject": "溶接継目",
+        "property": "鋼材の種類及び品質",
+        "property_type": "classification",
+        "description": "溶接される鋼材の種類及び品質"
+      },
+      {
+        "id": "proc-get-base-strength",
+        "type": "process",
+        "title": "基準強度Fの取得",
+        "process_type": "mechanical",
+        "description": "鋼材の種類及び品質に応じて国土交通大臣が定める溶接部の基準強度Fを取得"
+      },
+      {
+        "id": "info-base-strength",
+        "type": "information",
+        "title": "溶接部の基準強度F",
+        "symbol": "F",
+        "subject": "溶接継目",
+        "property": "基準強度",
+        "property_type": "numeric",
+        "description": "国土交通大臣が定める溶接部の基準強度（N/mm2）"
+      },
+      {
+        "id": "proc-calc-allowable-butt",
+        "type": "process",
+        "title": "許容応力度算定（突合せ）",
+        "process_type": "mechanical",
+        "description": "突合せ継目の許容応力度を算定: 長期=F/1.5, 短期=長期×1.5"
+      },
+      {
+        "id": "proc-calc-allowable-other",
+        "type": "process",
+        "title": "許容応力度算定（突合せ以外）",
+        "process_type": "mechanical",
+        "description": "突合せ以外の継目の許容応力度を算定: F/(1.5×√3)"
+      },
+      {
+        "id": "info-allowable-stress",
+        "type": "information",
+        "title": "許容応力度",
+        "symbol": "AS",
+        "subject": "溶接継目",
+        "property": "許容応力度",
+        "property_type": "numeric",
+        "description": "溶接継目ののど断面に対する許容応力度（N/mm2）"
+      },
+      {
+        "id": "proc-identify-applied-stress",
+        "type": "process",
+        "title": "設計応力度の特定",
+        "process_type": "undefined_input",
+        "description": "構造計算で算定された溶接継目に生ずる応力度を特定"
+      },
+      {
+        "id": "info-applied-stress",
+        "type": "information",
+        "title": "設計応力度",
+        "symbol": "DS",
+        "subject": "溶接継目",
+        "property": "設計応力度",
+        "property_type": "numeric",
+        "description": "構造計算で算定された溶接継目に生ずる応力度（N/mm2）"
+      },
+      {
+        "id": "dec-stress-check",
+        "type": "decision",
+        "title": "DS ≦ AS か？",
+        "decision_type": "binary",
+        "description": "設計応力度が許容応力度以下であることを判定",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "DS", "desc": "設計応力度" },
+          "rhs": { "var": "AS", "desc": "許容応力度", "unit": "N/mm2" }
+        }
+      },
+      {
+        "id": "proc-mark-ok",
+        "type": "process",
+        "title": "この継目は適合",
+        "process_type": "mechanical",
+        "description": "この溶接継目は許容応力度基準に適合していることを記録"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "全ての溶接継目が許容応力度基準に適合"
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "溶接継目の許容応力度が基準値を超過"
+      },
+      {
+        "id": "end-na",
+        "type": "terminal",
+        "title": "対象外",
+        "result": "pass",
+        "description": "溶接継目を有しないため本条適用対象外"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-has-joints",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-has-joints",
+        "to": "proc-identify-joints",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "dec-has-joints",
+        "to": "end-na",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e04",
+        "from": "proc-identify-joints",
+        "to": "info-joints-set",
+        "role": "flow"
+      },
+      {
+        "id": "e05",
+        "from": "info-joints-set",
+        "to": "dec-more-joints",
+        "role": "flow"
+      },
+      {
+        "id": "e06",
+        "from": "dec-more-joints",
+        "to": "proc-select-joint",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e07",
+        "from": "dec-more-joints",
+        "to": "end-pass",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e08",
+        "from": "proc-select-joint",
+        "to": "proc-identify-joint-type",
+        "role": "flow"
+      },
+      {
+        "id": "e09",
+        "from": "proc-identify-joint-type",
+        "to": "dec-joint-type",
+        "role": "flow"
+      },
+      {
+        "id": "e10",
+        "from": "dec-joint-type",
+        "to": "proc-identify-steel-type",
+        "role": "option",
+        "label": "突合せ"
+      },
+      {
+        "id": "e11",
+        "from": "dec-joint-type",
+        "to": "proc-identify-steel-type",
+        "role": "option",
+        "label": "突合せ以外"
+      },
+      {
+        "id": "e12",
+        "from": "proc-identify-steel-type",
+        "to": "info-steel-type",
+        "role": "flow"
+      },
+      {
+        "id": "e13",
+        "from": "info-steel-type",
+        "to": "proc-get-base-strength",
+        "role": "flow"
+      },
+      {
+        "id": "e14",
+        "from": "proc-get-base-strength",
+        "to": "info-base-strength",
+        "role": "flow"
+      },
+      {
+        "id": "e15",
+        "from": "info-base-strength",
+        "to": "proc-calc-allowable-butt",
+        "role": "flow"
+      },
+      {
+        "id": "e16",
+        "from": "info-base-strength",
+        "to": "proc-calc-allowable-other",
+        "role": "flow"
+      },
+      {
+        "id": "e17",
+        "from": "proc-calc-allowable-butt",
+        "to": "info-allowable-stress",
+        "role": "flow"
+      },
+      {
+        "id": "e18",
+        "from": "proc-calc-allowable-other",
+        "to": "info-allowable-stress",
+        "role": "flow"
+      },
+      {
+        "id": "e19",
+        "from": "info-allowable-stress",
+        "to": "proc-identify-applied-stress",
+        "role": "flow"
+      },
+      {
+        "id": "e20",
+        "from": "proc-identify-applied-stress",
+        "to": "info-applied-stress",
+        "role": "flow"
+      },
+      {
+        "id": "e21",
+        "from": "info-applied-stress",
+        "to": "dec-stress-check",
+        "role": "flow"
+      },
+      {
+        "id": "e22",
+        "from": "dec-stress-check",
+        "to": "proc-mark-ok",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e23",
+        "from": "dec-stress-check",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e24",
+        "from": "proc-mark-ok",
+        "to": "dec-more-joints",
+        "role": "flow"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-ORDER-A92-P1",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": ["A20"],
+      "description": "法第20条の構造計算規定の委任に基づく"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T12:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

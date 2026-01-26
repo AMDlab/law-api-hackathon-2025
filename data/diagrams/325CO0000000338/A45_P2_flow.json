@@ -1,0 +1,434 @@
+{
+  "id": "A45_P2_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "圧縮力を負担する筋かいの材料適合判定",
+    "target_subject": "筋かい",
+    "description": "圧縮力を負担する筋かいが所定の木材又は大臣が定めた材料・認定材料を使用していることを判定するフロー"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "45",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造"
+  ],
+  "text_raw": "圧縮力を負担する筋かいは、厚さ三センチメートル以上で幅九センチメートル以上の木材又はこれと同等以上に圧縮力を負担することができる材料として国土交通大臣が定めたもの若しくは国土交通大臣の認定を受けたものを使用したものとしなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "EXISTS",
+      "conditions": [
+        {
+          "type": "element",
+          "value": "圧縮力を負担する筋かい"
+        }
+      ],
+      "note": "建築物に圧縮力を負担する筋かいが存在する場合に適用"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "type": "wood_spec",
+          "operator": "AND",
+          "conditions": [
+            {
+              "property": "厚さ",
+              "operator": ">=",
+              "value": 3,
+              "unit": "cm"
+            },
+            {
+              "property": "幅",
+              "operator": ">=",
+              "value": 9,
+              "unit": "cm"
+            }
+          ]
+        },
+        {
+          "type": "minister_designation",
+          "value": "国土交通大臣が定めた同等以上の材料"
+        },
+        {
+          "type": "minister_approval",
+          "value": "国土交通大臣の認定を受けた同等以上の材料"
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "flow_diagram": {
+    "title": "令第45条第2項 圧縮力を負担する筋かいの材料適合判定フロー",
+    "description": "圧縮力を負担する筋かいが木材寸法基準、大臣定め材料、大臣認定材料のいずれかを満たすかを判定する",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "令第45条第2項（圧縮力を負担する筋かいの材料）の適合判定を開始"
+      },
+      {
+        "id": "dec-brace-exists",
+        "type": "decision",
+        "title": "圧縮力を負担する筋かいがあるか？",
+        "decision_type": "binary",
+        "description": "建築物に圧縮力を負担する筋かいが設けられているかを確認"
+      },
+      {
+        "id": "proc-identify-braces",
+        "type": "process",
+        "title": "圧縮力を負担する筋かいを特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物に設けられた圧縮力を負担する筋かいを特定する"
+      },
+      {
+        "id": "dec-remaining-braces",
+        "type": "decision",
+        "title": "未判定の筋かいがあるか？",
+        "decision_type": "binary",
+        "description": "まだ判定していない筋かいが残っているかを確認"
+      },
+      {
+        "id": "proc-select-brace",
+        "type": "process",
+        "title": "判定対象の筋かいを選択",
+        "process_type": "mechanical",
+        "description": "未判定の筋かいから1つを選択して判定対象とする"
+      },
+      {
+        "id": "dec-material-type",
+        "type": "decision",
+        "title": "材料種別は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "木材", "description": "木材を使用" },
+          { "value": "大臣定め材料", "description": "国土交通大臣が定めた同等以上の材料" },
+          { "value": "大臣認定材料", "description": "国土交通大臣の認定を受けた同等以上の材料" },
+          { "value": "その他", "description": "上記以外の材料" }
+        ],
+        "description": "筋かいに使用されている材料の種類を判定"
+      },
+      {
+        "id": "proc-wood-selected",
+        "type": "process",
+        "title": "木材使用",
+        "process_type": "mechanical",
+        "description": "材料種別が木材であることを確認"
+      },
+      {
+        "id": "dec-wood-thickness",
+        "type": "decision",
+        "title": "木材の厚さは3cm以上か？",
+        "decision_type": "binary",
+        "description": "木材の厚さが3センチメートル以上であるかを判定",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "T", "desc": "木材の厚さ" },
+          "rhs": { "value": 3, "unit": "cm" }
+        }
+      },
+      {
+        "id": "dec-wood-width",
+        "type": "decision",
+        "title": "木材の幅は9cm以上か？",
+        "decision_type": "binary",
+        "description": "木材の幅が9センチメートル以上であるかを判定",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "W", "desc": "木材の幅" },
+          "rhs": { "value": 9, "unit": "cm" }
+        }
+      },
+      {
+        "id": "proc-wood-spec-pass",
+        "type": "process",
+        "title": "木材寸法基準適合",
+        "process_type": "mechanical",
+        "description": "厚さ3cm以上×幅9cm以上の木材基準に適合"
+      },
+      {
+        "id": "proc-minister-designation-selected",
+        "type": "process",
+        "title": "大臣定め材料使用",
+        "process_type": "mechanical",
+        "description": "国土交通大臣が定めた同等以上の材料を使用"
+      },
+      {
+        "id": "dec-minister-designation-valid",
+        "type": "decision",
+        "title": "大臣告示に適合しているか？",
+        "decision_type": "binary",
+        "description": "国土交通大臣が定めた同等以上の材料の基準に適合しているかを判定"
+      },
+      {
+        "id": "proc-minister-designation-pass",
+        "type": "process",
+        "title": "大臣定め材料基準適合",
+        "process_type": "mechanical",
+        "description": "国土交通大臣が定めた同等以上の材料基準に適合"
+      },
+      {
+        "id": "proc-minister-approval-selected",
+        "type": "process",
+        "title": "大臣認定材料使用",
+        "process_type": "undefined_input",
+        "description": "国土交通大臣の認定を受けた同等以上の材料を使用"
+      },
+      {
+        "id": "dec-minister-approval-valid",
+        "type": "decision",
+        "title": "有効な大臣認定を受けているか？",
+        "decision_type": "binary",
+        "description": "国土交通大臣の認定を受けた同等以上の材料であり、認定が有効かを判定"
+      },
+      {
+        "id": "proc-minister-approval-pass",
+        "type": "process",
+        "title": "大臣認定材料基準適合",
+        "process_type": "mechanical",
+        "description": "国土交通大臣の認定を受けた同等以上の材料基準に適合"
+      },
+      {
+        "id": "proc-brace-pass",
+        "type": "process",
+        "title": "当該筋かい適合",
+        "process_type": "mechanical",
+        "description": "当該筋かいが令第45条第2項の材料基準に適合"
+      },
+      {
+        "id": "proc-brace-fail",
+        "type": "process",
+        "title": "当該筋かい不適合",
+        "process_type": "mechanical",
+        "description": "当該筋かいが令第45条第2項の材料基準に不適合"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "全ての圧縮力を負担する筋かいが令第45条第2項の材料基準に適合"
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "圧縮力を負担する筋かいが令第45条第2項の材料基準に不適合"
+      },
+      {
+        "id": "end-na",
+        "type": "terminal",
+        "title": "適用対象外",
+        "result": "pass",
+        "description": "圧縮力を負担する筋かいがないため、本規定は適用されない"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-brace-exists",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-brace-exists",
+        "to": "proc-identify-braces",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "dec-brace-exists",
+        "to": "end-na",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e04",
+        "from": "proc-identify-braces",
+        "to": "dec-remaining-braces",
+        "role": "flow"
+      },
+      {
+        "id": "e05",
+        "from": "dec-remaining-braces",
+        "to": "proc-select-brace",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e06",
+        "from": "dec-remaining-braces",
+        "to": "end-pass",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e07",
+        "from": "proc-select-brace",
+        "to": "dec-material-type",
+        "role": "flow"
+      },
+      {
+        "id": "e08",
+        "from": "dec-material-type",
+        "to": "proc-wood-selected",
+        "role": "option",
+        "label": "木材"
+      },
+      {
+        "id": "e09",
+        "from": "dec-material-type",
+        "to": "proc-minister-designation-selected",
+        "role": "option",
+        "label": "大臣定め材料"
+      },
+      {
+        "id": "e10",
+        "from": "dec-material-type",
+        "to": "proc-minister-approval-selected",
+        "role": "option",
+        "label": "大臣認定材料"
+      },
+      {
+        "id": "e11",
+        "from": "dec-material-type",
+        "to": "proc-brace-fail",
+        "role": "option",
+        "label": "その他"
+      },
+      {
+        "id": "e12",
+        "from": "proc-wood-selected",
+        "to": "dec-wood-thickness",
+        "role": "flow"
+      },
+      {
+        "id": "e13",
+        "from": "dec-wood-thickness",
+        "to": "dec-wood-width",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e14",
+        "from": "dec-wood-thickness",
+        "to": "proc-brace-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e15",
+        "from": "dec-wood-width",
+        "to": "proc-wood-spec-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e16",
+        "from": "dec-wood-width",
+        "to": "proc-brace-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e17",
+        "from": "proc-wood-spec-pass",
+        "to": "proc-brace-pass",
+        "role": "flow"
+      },
+      {
+        "id": "e18",
+        "from": "proc-minister-designation-selected",
+        "to": "dec-minister-designation-valid",
+        "role": "flow"
+      },
+      {
+        "id": "e19",
+        "from": "dec-minister-designation-valid",
+        "to": "proc-minister-designation-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e20",
+        "from": "dec-minister-designation-valid",
+        "to": "proc-brace-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e21",
+        "from": "proc-minister-designation-pass",
+        "to": "proc-brace-pass",
+        "role": "flow"
+      },
+      {
+        "id": "e22",
+        "from": "proc-minister-approval-selected",
+        "to": "dec-minister-approval-valid",
+        "role": "flow"
+      },
+      {
+        "id": "e23",
+        "from": "dec-minister-approval-valid",
+        "to": "proc-minister-approval-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e24",
+        "from": "dec-minister-approval-valid",
+        "to": "proc-brace-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e25",
+        "from": "proc-minister-approval-pass",
+        "to": "proc-brace-pass",
+        "role": "flow"
+      },
+      {
+        "id": "e26",
+        "from": "proc-brace-pass",
+        "to": "dec-remaining-braces",
+        "role": "flow"
+      },
+      {
+        "id": "e27",
+        "from": "proc-brace-fail",
+        "to": "end-fail",
+        "role": "flow"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-ORD-A45-P2",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": [],
+      "description": "建築基準法の委任を受けて筋かいの構造基準を定める"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T12:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

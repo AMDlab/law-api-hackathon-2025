@@ -1,0 +1,503 @@
+{
+  "id": "A23_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "階段及び踊場の寸法基準（適合判定フロー）",
+    "target_subject": "階段",
+    "description": "階段及びその踊場の幅並びに階段の蹴上げ及び踏面の寸法の適合判定"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "23",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": ["単体規定", "避難施設"],
+  "text_raw": "階段及びその踊場の幅並びに階段の蹴上げ及び踏面の寸法は、次の表によらなければならない。ただし、屋外階段の幅は、第百二十条又は第百二十一条の規定による直通階段にあつては九十センチメートル以上、その他のものにあつては六十センチメートル以上、住宅の階段（共同住宅の共用の階段を除く。）の蹴上げは二十三センチメートル以下、踏面は十五センチメートル以上とすることができる。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "building_element",
+          "value": "建築物に設けられた階段"
+        }
+      ],
+      "note": "建築物内の全ての階段が対象"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "dimension_check",
+          "value": "階段種別に応じた表の基準値との照合",
+          "description": "階段及び踊場の幅、蹴上げ、踏面の寸法が表に適合"
+        }
+      ]
+    },
+    "exceptions": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "type": "outdoor_stair",
+          "value": "屋外階段の幅緩和",
+          "description": "直通階段90cm以上、その他60cm以上"
+        },
+        {
+          "type": "residential_stair",
+          "value": "住宅階段の蹴上げ・踏面緩和",
+          "description": "蹴上げ23cm以下、踏面15cm以上（共同住宅共用階段を除く）"
+        }
+      ],
+      "effect": "RELAXATION"
+    }
+  },
+  "flow_diagram": {
+    "title": "令第23条第1項 階段及び踊場の寸法基準 適合判定フロー",
+    "description": "階段種別を判定し、幅・蹴上げ・踏面の各寸法が基準に適合するか判定。屋外階段・住宅階段のただし書き緩和を含む。",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "令第23条第1項の適合判定を開始"
+      },
+      {
+        "id": "dec-outdoor",
+        "type": "decision",
+        "title": "屋外階段か？",
+        "decision_type": "binary",
+        "description": "対象階段が屋外に設置されているか判定"
+      },
+      {
+        "id": "dec-direct-stair",
+        "type": "decision",
+        "title": "直通階段か？",
+        "decision_type": "binary",
+        "description": "令第120条又は第121条の規定による直通階段に該当するか判定",
+        "related_articles": ["令::A120", "令::A121"]
+      },
+      {
+        "id": "dec-outdoor-direct-width",
+        "type": "decision",
+        "title": "幅 >= 90cmか？",
+        "decision_type": "binary",
+        "description": "屋外直通階段の幅が90cm以上か判定",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "W", "desc": "階段及び踊場の幅" },
+          "rhs": { "value": 90, "unit": "cm" }
+        }
+      },
+      {
+        "id": "dec-outdoor-other-width",
+        "type": "decision",
+        "title": "幅 >= 60cmか？",
+        "decision_type": "binary",
+        "description": "屋外その他階段の幅が60cm以上か判定",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "W", "desc": "階段及び踊場の幅" },
+          "rhs": { "value": 60, "unit": "cm" }
+        }
+      },
+      {
+        "id": "proc-outdoor-width-ok",
+        "type": "process",
+        "title": "屋外階段幅適合",
+        "process_type": "mechanical",
+        "description": "ただし書きに基づき屋外階段の幅が適合"
+      },
+      {
+        "id": "dec-residential",
+        "type": "decision",
+        "title": "住宅階段（共同住宅共用除く）か？",
+        "decision_type": "binary",
+        "description": "住宅の階段で、かつ共同住宅の共用階段でないか判定"
+      },
+      {
+        "id": "dec-residential-riser",
+        "type": "decision",
+        "title": "蹴上げ <= 23cmか？",
+        "decision_type": "binary",
+        "description": "住宅階段の蹴上げが23cm以下か判定",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "R", "desc": "蹴上げ寸法" },
+          "rhs": { "value": 23, "unit": "cm" }
+        }
+      },
+      {
+        "id": "dec-residential-tread",
+        "type": "decision",
+        "title": "踏面 >= 15cmか？",
+        "decision_type": "binary",
+        "description": "住宅階段の踏面が15cm以上か判定",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "D", "desc": "踏面寸法" },
+          "rhs": { "value": 15, "unit": "cm" }
+        }
+      },
+      {
+        "id": "proc-residential-relax-ok",
+        "type": "process",
+        "title": "住宅階段緩和適合",
+        "process_type": "mechanical",
+        "description": "ただし書きに基づき住宅階段の蹴上げ・踏面が適合"
+      },
+      {
+        "id": "dec-building-use",
+        "type": "decision",
+        "title": "建築物用途は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "小学校", "description": "小学校" },
+          { "value": "中学校・高等学校等", "description": "中学校、高等学校、中等教育学校等" },
+          { "value": "大規模物販・劇場等", "description": "大規模物販店舗、劇場、映画館、公会堂、集会場等" },
+          { "value": "その他", "description": "上記以外の用途" }
+        ],
+        "description": "建築物の用途を判定（階段種別判定の基礎）"
+      },
+      {
+        "id": "dec-stair-use-child",
+        "type": "decision",
+        "title": "児童用階段か？",
+        "decision_type": "binary",
+        "description": "小学校において児童の利用に供する階段か判定"
+      },
+      {
+        "id": "proc-type-1",
+        "type": "process",
+        "title": "種別（一）該当",
+        "process_type": "mechanical",
+        "description": "小学校の児童用階段として種別（一）に該当"
+      },
+      {
+        "id": "dec-stair-use-student",
+        "type": "decision",
+        "title": "生徒用階段か？",
+        "decision_type": "binary",
+        "description": "中学校・高等学校等において生徒の利用に供する階段か判定"
+      },
+      {
+        "id": "proc-type-2-student",
+        "type": "process",
+        "title": "種別（二）該当（生徒用）",
+        "process_type": "mechanical",
+        "description": "中学校等の生徒用階段として種別（二）に該当"
+      },
+      {
+        "id": "dec-stair-use-guest",
+        "type": "decision",
+        "title": "客用階段か？",
+        "decision_type": "binary",
+        "description": "大規模物販・劇場等において客の利用に供する階段か判定"
+      },
+      {
+        "id": "proc-type-2-guest",
+        "type": "process",
+        "title": "種別（二）該当（客用）",
+        "process_type": "mechanical",
+        "description": "大規模物販・劇場等の客用階段として種別（二）に該当"
+      },
+      {
+        "id": "dec-floor-area",
+        "type": "decision",
+        "title": "直上階居室床面積 > 200㎡か？",
+        "decision_type": "binary",
+        "description": "階段の直上階における居室の床面積の合計が200㎡を超えるか判定",
+        "condition": {
+          "operator": "GT",
+          "lhs": { "var": "FA", "desc": "直上階居室床面積の合計" },
+          "rhs": { "value": 200, "unit": "m2" }
+        }
+      },
+      {
+        "id": "proc-type-3-floor",
+        "type": "process",
+        "title": "種別（三）該当（直上階面積）",
+        "process_type": "mechanical",
+        "description": "直上階居室床面積200㎡超により種別（三）に該当"
+      },
+      {
+        "id": "dec-basement-area",
+        "type": "decision",
+        "title": "地階等居室床面積 > 100㎡か？",
+        "decision_type": "binary",
+        "description": "地階若しくは地下工作物内の居室の床面積の合計が100㎡を超えるか判定",
+        "condition": {
+          "operator": "GT",
+          "lhs": { "var": "BA", "desc": "地階等居室床面積の合計" },
+          "rhs": { "value": 100, "unit": "m2" }
+        }
+      },
+      {
+        "id": "proc-type-3-basement",
+        "type": "process",
+        "title": "種別（三）該当（地階面積）",
+        "process_type": "mechanical",
+        "description": "地階等居室床面積100㎡超により種別（三）に該当"
+      },
+      {
+        "id": "proc-type-4",
+        "type": "process",
+        "title": "種別（四）該当",
+        "process_type": "mechanical",
+        "description": "上記以外として種別（四）に該当"
+      },
+      {
+        "id": "dec-type1-width",
+        "type": "decision",
+        "title": "幅 >= 140cmか？",
+        "decision_type": "binary",
+        "description": "種別（一）の幅基準（140cm以上）を満たすか判定",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "W", "desc": "階段及び踊場の幅" },
+          "rhs": { "value": 140, "unit": "cm" }
+        }
+      },
+      {
+        "id": "dec-type1-riser",
+        "type": "decision",
+        "title": "蹴上げ <= 16cmか？",
+        "decision_type": "binary",
+        "description": "種別（一）の蹴上げ基準（16cm以下）を満たすか判定",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "R", "desc": "蹴上げ寸法" },
+          "rhs": { "value": 16, "unit": "cm" }
+        }
+      },
+      {
+        "id": "dec-type1-tread",
+        "type": "decision",
+        "title": "踏面 >= 26cmか？",
+        "decision_type": "binary",
+        "description": "種別（一）の踏面基準（26cm以上）を満たすか判定",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "D", "desc": "踏面寸法" },
+          "rhs": { "value": 26, "unit": "cm" }
+        }
+      },
+      {
+        "id": "dec-type2-width",
+        "type": "decision",
+        "title": "幅 >= 140cmか？",
+        "decision_type": "binary",
+        "description": "種別（二）の幅基準（140cm以上）を満たすか判定",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "W", "desc": "階段及び踊場の幅" },
+          "rhs": { "value": 140, "unit": "cm" }
+        }
+      },
+      {
+        "id": "dec-type2-riser",
+        "type": "decision",
+        "title": "蹴上げ <= 18cmか？",
+        "decision_type": "binary",
+        "description": "種別（二）の蹴上げ基準（18cm以下）を満たすか判定",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "R", "desc": "蹴上げ寸法" },
+          "rhs": { "value": 18, "unit": "cm" }
+        }
+      },
+      {
+        "id": "dec-type2-tread",
+        "type": "decision",
+        "title": "踏面 >= 26cmか？",
+        "decision_type": "binary",
+        "description": "種別（二）の踏面基準（26cm以上）を満たすか判定",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "D", "desc": "踏面寸法" },
+          "rhs": { "value": 26, "unit": "cm" }
+        }
+      },
+      {
+        "id": "dec-type3-width",
+        "type": "decision",
+        "title": "幅 >= 120cmか？",
+        "decision_type": "binary",
+        "description": "種別（三）の幅基準（120cm以上）を満たすか判定",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "W", "desc": "階段及び踊場の幅" },
+          "rhs": { "value": 120, "unit": "cm" }
+        }
+      },
+      {
+        "id": "dec-type3-riser",
+        "type": "decision",
+        "title": "蹴上げ <= 20cmか？",
+        "decision_type": "binary",
+        "description": "種別（三）の蹴上げ基準（20cm以下）を満たすか判定",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "R", "desc": "蹴上げ寸法" },
+          "rhs": { "value": 20, "unit": "cm" }
+        }
+      },
+      {
+        "id": "dec-type3-tread",
+        "type": "decision",
+        "title": "踏面 >= 24cmか？",
+        "decision_type": "binary",
+        "description": "種別（三）の踏面基準（24cm以上）を満たすか判定",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "D", "desc": "踏面寸法" },
+          "rhs": { "value": 24, "unit": "cm" }
+        }
+      },
+      {
+        "id": "dec-type4-width",
+        "type": "decision",
+        "title": "幅 >= 75cmか？",
+        "decision_type": "binary",
+        "description": "種別（四）の幅基準（75cm以上）を満たすか判定",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "W", "desc": "階段及び踊場の幅" },
+          "rhs": { "value": 75, "unit": "cm" }
+        }
+      },
+      {
+        "id": "dec-type4-riser",
+        "type": "decision",
+        "title": "蹴上げ <= 22cmか？",
+        "decision_type": "binary",
+        "description": "種別（四）の蹴上げ基準（22cm以下）を満たすか判定",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "R", "desc": "蹴上げ寸法" },
+          "rhs": { "value": 22, "unit": "cm" }
+        }
+      },
+      {
+        "id": "dec-type4-tread",
+        "type": "decision",
+        "title": "踏面 >= 21cmか？",
+        "decision_type": "binary",
+        "description": "種別（四）の踏面基準（21cm以上）を満たすか判定",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "D", "desc": "踏面寸法" },
+          "rhs": { "value": 21, "unit": "cm" }
+        }
+      },
+      {
+        "id": "proc-comply",
+        "type": "process",
+        "title": "寸法基準適合",
+        "process_type": "mechanical",
+        "description": "幅、蹴上げ、踏面の全てが種別に応じた基準に適合"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令第23条第1項の規定に適合"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "令第23条第1項の規定に不適合"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "dec-outdoor", "role": "flow" },
+      { "id": "e02", "from": "dec-outdoor", "to": "dec-direct-stair", "role": "yes", "label": "はい" },
+      { "id": "e03", "from": "dec-outdoor", "to": "dec-residential", "role": "no", "label": "いいえ" },
+      { "id": "e04", "from": "dec-direct-stair", "to": "dec-outdoor-direct-width", "role": "yes", "label": "はい" },
+      { "id": "e05", "from": "dec-direct-stair", "to": "dec-outdoor-other-width", "role": "no", "label": "いいえ" },
+      { "id": "e06", "from": "dec-outdoor-direct-width", "to": "proc-outdoor-width-ok", "role": "yes", "label": "はい" },
+      { "id": "e07", "from": "dec-outdoor-direct-width", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e08", "from": "dec-outdoor-other-width", "to": "proc-outdoor-width-ok", "role": "yes", "label": "はい" },
+      { "id": "e09", "from": "dec-outdoor-other-width", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e10", "from": "proc-outdoor-width-ok", "to": "dec-residential", "role": "flow" },
+      { "id": "e11", "from": "dec-residential", "to": "dec-residential-riser", "role": "yes", "label": "はい" },
+      { "id": "e12", "from": "dec-residential", "to": "dec-building-use", "role": "no", "label": "いいえ" },
+      { "id": "e13", "from": "dec-residential-riser", "to": "dec-residential-tread", "role": "yes", "label": "はい" },
+      { "id": "e14", "from": "dec-residential-riser", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e15", "from": "dec-residential-tread", "to": "proc-residential-relax-ok", "role": "yes", "label": "はい" },
+      { "id": "e16", "from": "dec-residential-tread", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e17", "from": "proc-residential-relax-ok", "to": "pass", "role": "flow" },
+      { "id": "e18", "from": "dec-building-use", "to": "dec-stair-use-child", "role": "option", "label": "小学校" },
+      { "id": "e19", "from": "dec-building-use", "to": "dec-stair-use-student", "role": "option", "label": "中学校・高等学校等" },
+      { "id": "e20", "from": "dec-building-use", "to": "dec-stair-use-guest", "role": "option", "label": "大規模物販・劇場等" },
+      { "id": "e21", "from": "dec-building-use", "to": "dec-floor-area", "role": "option", "label": "その他" },
+      { "id": "e22", "from": "dec-stair-use-child", "to": "proc-type-1", "role": "yes", "label": "はい" },
+      { "id": "e23", "from": "dec-stair-use-child", "to": "dec-floor-area", "role": "no", "label": "いいえ" },
+      { "id": "e24", "from": "proc-type-1", "to": "dec-type1-width", "role": "flow" },
+      { "id": "e25", "from": "dec-stair-use-student", "to": "proc-type-2-student", "role": "yes", "label": "はい" },
+      { "id": "e26", "from": "dec-stair-use-student", "to": "dec-floor-area", "role": "no", "label": "いいえ" },
+      { "id": "e27", "from": "proc-type-2-student", "to": "dec-type2-width", "role": "flow" },
+      { "id": "e28", "from": "dec-stair-use-guest", "to": "proc-type-2-guest", "role": "yes", "label": "はい" },
+      { "id": "e29", "from": "dec-stair-use-guest", "to": "dec-floor-area", "role": "no", "label": "いいえ" },
+      { "id": "e30", "from": "proc-type-2-guest", "to": "dec-type2-width", "role": "flow" },
+      { "id": "e31", "from": "dec-floor-area", "to": "proc-type-3-floor", "role": "yes", "label": "はい" },
+      { "id": "e32", "from": "dec-floor-area", "to": "dec-basement-area", "role": "no", "label": "いいえ" },
+      { "id": "e33", "from": "proc-type-3-floor", "to": "dec-type3-width", "role": "flow" },
+      { "id": "e34", "from": "dec-basement-area", "to": "proc-type-3-basement", "role": "yes", "label": "はい" },
+      { "id": "e35", "from": "dec-basement-area", "to": "proc-type-4", "role": "no", "label": "いいえ" },
+      { "id": "e36", "from": "proc-type-3-basement", "to": "dec-type3-width", "role": "flow" },
+      { "id": "e37", "from": "proc-type-4", "to": "dec-type4-width", "role": "flow" },
+      { "id": "e38", "from": "dec-type1-width", "to": "dec-type1-riser", "role": "yes", "label": "はい" },
+      { "id": "e39", "from": "dec-type1-width", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e40", "from": "dec-type1-riser", "to": "dec-type1-tread", "role": "yes", "label": "はい" },
+      { "id": "e41", "from": "dec-type1-riser", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e42", "from": "dec-type1-tread", "to": "proc-comply", "role": "yes", "label": "はい" },
+      { "id": "e43", "from": "dec-type1-tread", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e44", "from": "dec-type2-width", "to": "dec-type2-riser", "role": "yes", "label": "はい" },
+      { "id": "e45", "from": "dec-type2-width", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e46", "from": "dec-type2-riser", "to": "dec-type2-tread", "role": "yes", "label": "はい" },
+      { "id": "e47", "from": "dec-type2-riser", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e48", "from": "dec-type2-tread", "to": "proc-comply", "role": "yes", "label": "はい" },
+      { "id": "e49", "from": "dec-type2-tread", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e50", "from": "dec-type3-width", "to": "dec-type3-riser", "role": "yes", "label": "はい" },
+      { "id": "e51", "from": "dec-type3-width", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e52", "from": "dec-type3-riser", "to": "dec-type3-tread", "role": "yes", "label": "はい" },
+      { "id": "e53", "from": "dec-type3-riser", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e54", "from": "dec-type3-tread", "to": "proc-comply", "role": "yes", "label": "はい" },
+      { "id": "e55", "from": "dec-type3-tread", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e56", "from": "dec-type4-width", "to": "dec-type4-riser", "role": "yes", "label": "はい" },
+      { "id": "e57", "from": "dec-type4-width", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e58", "from": "dec-type4-riser", "to": "dec-type4-tread", "role": "yes", "label": "はい" },
+      { "id": "e59", "from": "dec-type4-riser", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e60", "from": "dec-type4-tread", "to": "proc-comply", "role": "yes", "label": "はい" },
+      { "id": "e61", "from": "dec-type4-tread", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e62", "from": "proc-comply", "to": "pass", "role": "flow" }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-KIJO-A23-P1",
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": ["A120:P1", "A121:P1"],
+      "description": "直通階段に関する規定（屋外階段幅のただし書き条件）"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00+09:00",
+    "updated_at": "2026-01-26T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

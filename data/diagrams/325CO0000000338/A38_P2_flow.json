@@ -1,0 +1,363 @@
+{
+  "id": "A38_P2_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "基礎の構造方法の統一",
+    "target_subject": "建築物",
+    "description": "建築物において異なる構造方法による基礎を併用していないことを確認する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "38",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造関係",
+    "基礎"
+  ],
+  "text_raw": "建築物には、異なる構造方法による基礎を併用してはならない。",
+  "compliance_logic": {
+    "scope_condition": null,
+    "judgment_rule": {
+      "operator": "==",
+      "conditions": [
+        {
+          "ref": "info-compliance",
+          "operator": "==",
+          "value": true,
+          "note": "異なる構造方法による基礎を併用していない"
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "flow_diagram": {
+    "title": "令38条2項 基礎併用禁止の適合判定フロー",
+    "description": "建築物の基礎が単一の構造方法で構成されているかを判定する",
+    "nodes": [
+      {
+        "id": "term-start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "令38条2項の適合判定を開始"
+      },
+      {
+        "id": "info-building",
+        "type": "information",
+        "title": "建築物",
+        "subject": "建築物",
+        "property": "判定対象",
+        "property_type": "set_definition",
+        "description": "判定対象となる建築物"
+      },
+      {
+        "id": "dec-building-exists",
+        "type": "decision",
+        "title": "建築物が存在するか？",
+        "decision_type": "binary",
+        "description": "判定対象となる建築物が設計図書から特定できるか"
+      },
+      {
+        "id": "info-foundations",
+        "type": "information",
+        "title": "建築物の基礎",
+        "subject": "建築物",
+        "property": "基礎の集合",
+        "property_type": "set_definition",
+        "description": "当該建築物に属する基礎"
+      },
+      {
+        "id": "dec-foundations-exist",
+        "type": "decision",
+        "title": "基礎が存在するか？",
+        "decision_type": "binary",
+        "description": "設計図書から基礎が特定できるか"
+      },
+      {
+        "id": "dec-foundation-count",
+        "type": "decision",
+        "title": "基礎の箇所数は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "1箇所", "description": "基礎が1箇所のみ" },
+          { "value": "2箇所以上", "description": "基礎が2箇所以上" }
+        ],
+        "description": "建築物の基礎が何箇所あるか"
+      },
+      {
+        "id": "proc-single-foundation",
+        "type": "process",
+        "title": "基礎1箇所のため併用なし",
+        "process_type": "mechanical",
+        "description": "基礎が1箇所のみの場合、併用は発生しない"
+      },
+      {
+        "id": "info-foundation-methods",
+        "type": "information",
+        "title": "各基礎の構造方法",
+        "subject": "基礎",
+        "property": "構造方法",
+        "property_type": "classification",
+        "description": "各基礎の構造方法（直接基礎、杭基礎等）"
+      },
+      {
+        "id": "dec-method-type",
+        "type": "decision",
+        "title": "基礎の構造方法は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "直接基礎のみ", "description": "全て直接基礎" },
+          { "value": "杭基礎のみ", "description": "全て杭基礎" },
+          { "value": "混合", "description": "異なる構造方法の併用" }
+        ],
+        "description": "建築物の基礎の構造方法の種類"
+      },
+      {
+        "id": "proc-direct-only",
+        "type": "process",
+        "title": "直接基礎のみ確認",
+        "process_type": "mechanical",
+        "description": "全ての基礎が直接基礎であることを確認"
+      },
+      {
+        "id": "proc-pile-only",
+        "type": "process",
+        "title": "杭基礎のみ確認",
+        "process_type": "mechanical",
+        "description": "全ての基礎が杭基礎であることを確認"
+      },
+      {
+        "id": "dec-method-count",
+        "type": "decision",
+        "title": "構造方法の種類数は1か？",
+        "decision_type": "binary",
+        "description": "採用されている構造方法の種類数が1種類のみかどうか",
+        "condition": {
+          "operator": "EQ",
+          "lhs": { "var": "method_count", "desc": "構造方法の種類数" },
+          "rhs": { "value": 1, "unit": "種類" }
+        }
+      },
+      {
+        "id": "proc-combination-detected",
+        "type": "process",
+        "title": "構造方法の併用を検出",
+        "process_type": "mechanical",
+        "description": "異なる構造方法による基礎の併用が検出された"
+      },
+      {
+        "id": "dec-combination",
+        "type": "decision",
+        "title": "異なる構造方法を併用しているか？",
+        "decision_type": "binary",
+        "description": "構造方法が2種類以上であれば併用と判定",
+        "condition": {
+          "operator": "GT",
+          "lhs": { "var": "method_count", "desc": "構造方法の種類数" },
+          "rhs": { "value": 1 }
+        }
+      },
+      {
+        "id": "proc-no-combination",
+        "type": "process",
+        "title": "併用なし確認",
+        "process_type": "mechanical",
+        "description": "異なる構造方法による基礎の併用がないことを確認"
+      },
+      {
+        "id": "term-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "異なる構造方法による基礎を併用していないため、令38条2項に適合"
+      },
+      {
+        "id": "term-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "異なる構造方法による基礎を併用しているため、令38条2項に不適合"
+      },
+      {
+        "id": "term-error",
+        "type": "terminal",
+        "title": "判定不能",
+        "result": "fail",
+        "description": "必要な情報が不足しているため判定できない"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e001",
+        "from": "term-start",
+        "to": "info-building",
+        "role": "flow"
+      },
+      {
+        "id": "e002",
+        "from": "info-building",
+        "to": "dec-building-exists",
+        "role": "flow"
+      },
+      {
+        "id": "e003",
+        "from": "dec-building-exists",
+        "to": "info-foundations",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e004",
+        "from": "dec-building-exists",
+        "to": "term-error",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e005",
+        "from": "info-foundations",
+        "to": "dec-foundations-exist",
+        "role": "flow"
+      },
+      {
+        "id": "e006",
+        "from": "dec-foundations-exist",
+        "to": "dec-foundation-count",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e007",
+        "from": "dec-foundations-exist",
+        "to": "term-error",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e008",
+        "from": "dec-foundation-count",
+        "to": "proc-single-foundation",
+        "role": "option",
+        "label": "1箇所"
+      },
+      {
+        "id": "e009",
+        "from": "dec-foundation-count",
+        "to": "info-foundation-methods",
+        "role": "option",
+        "label": "2箇所以上"
+      },
+      {
+        "id": "e010",
+        "from": "proc-single-foundation",
+        "to": "term-pass",
+        "role": "flow"
+      },
+      {
+        "id": "e011",
+        "from": "info-foundation-methods",
+        "to": "dec-method-type",
+        "role": "flow"
+      },
+      {
+        "id": "e012",
+        "from": "dec-method-type",
+        "to": "proc-direct-only",
+        "role": "option",
+        "label": "直接基礎のみ"
+      },
+      {
+        "id": "e013",
+        "from": "dec-method-type",
+        "to": "proc-pile-only",
+        "role": "option",
+        "label": "杭基礎のみ"
+      },
+      {
+        "id": "e014",
+        "from": "dec-method-type",
+        "to": "proc-combination-detected",
+        "role": "option",
+        "label": "混合"
+      },
+      {
+        "id": "e015",
+        "from": "proc-direct-only",
+        "to": "dec-method-count",
+        "role": "flow"
+      },
+      {
+        "id": "e016",
+        "from": "proc-pile-only",
+        "to": "dec-method-count",
+        "role": "flow"
+      },
+      {
+        "id": "e017",
+        "from": "dec-method-count",
+        "to": "proc-no-combination",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e018",
+        "from": "dec-method-count",
+        "to": "dec-combination",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e019",
+        "from": "proc-combination-detected",
+        "to": "dec-combination",
+        "role": "flow"
+      },
+      {
+        "id": "e020",
+        "from": "dec-combination",
+        "to": "term-fail",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e021",
+        "from": "dec-combination",
+        "to": "proc-no-combination",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e022",
+        "from": "proc-no-combination",
+        "to": "term-pass",
+        "role": "flow"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSO-A38-P2",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": ["20条"],
+      "description": "構造耐力に関する委任規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00Z",
+    "updated_at": "2026-01-26T00:00:00Z",
+    "author": "claude-code-flow-generator",
+    "generator": "claude-code-flow-generator",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令",
+    "checklist_ref": "確認審査報告書チェックリスト"
+  }
+}

@@ -1,0 +1,191 @@
+{
+  "id": "A86_P3_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "垂直積雪量の決定",
+    "target_subject": "垂直積雪量",
+    "description": "第1項に規定する垂直積雪量が特定行政庁規則で定める数値であることを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "86",
+    "paragraph": "3",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造関係",
+    "積雪荷重"
+  ],
+  "text_raw": "第一項に規定する垂直積雪量は、国土交通大臣が定める基準に基づいて特定行政庁が規則で定める数値としなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "reference",
+          "value": "令第86条第1項の積雪荷重計算を行う建築物"
+        }
+      ],
+      "note": "積雪荷重計算において使用する垂直積雪量の決定基準"
+    },
+    "judgment_rule": {
+      "operator": "==",
+      "lhs": {
+        "ref": "info-snow-depth-used"
+      },
+      "rhs": {
+        "ref": "info-snow-depth-regulation"
+      }
+    },
+    "exceptions": null
+  },
+  "flow_diagram": {
+    "title": "垂直積雪量の適合判定フロー",
+    "description": "使用垂直積雪量が特定行政庁規則で定める数値以上であることを判定する",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "垂直積雪量の適合判定を開始"
+      },
+      {
+        "id": "proc-identify-snow-depth",
+        "type": "process",
+        "title": "使用垂直積雪量の特定",
+        "process_type": "undefined_input",
+        "description": "建築計画において積雪荷重計算に使用する垂直積雪量の数値を設計図書等から特定する"
+      },
+      {
+        "id": "info-snow-depth-used",
+        "type": "information",
+        "title": "使用垂直積雪量",
+        "symbol": "D1",
+        "subject": "建築計画",
+        "property": "使用垂直積雪量",
+        "property_type": "numeric",
+        "description": "積雪荷重計算において使用する垂直積雪量の数値（単位: m）"
+      },
+      {
+        "id": "proc-get-regulation-value",
+        "type": "process",
+        "title": "規則規定値の取得",
+        "process_type": "mechanical",
+        "description": "国土交通大臣が定める基準に基づき特定行政庁が規則で定める垂直積雪量を取得する"
+      },
+      {
+        "id": "info-snow-depth-regulation",
+        "type": "information",
+        "title": "規則規定垂直積雪量",
+        "symbol": "D2",
+        "subject": "特定行政庁規則",
+        "property": "規定垂直積雪量",
+        "property_type": "numeric",
+        "description": "特定行政庁が規則で定める垂直積雪量の数値（単位: m）"
+      },
+      {
+        "id": "decision-compare-snow-depth",
+        "type": "decision",
+        "title": "D1 >= D2 か？",
+        "decision_type": "binary",
+        "description": "使用垂直積雪量が規則規定値以上であるか判定",
+        "condition": {
+          "operator": "GTE",
+          "lhs": {
+            "var": "D1",
+            "desc": "使用垂直積雪量"
+          },
+          "rhs": {
+            "var": "D2",
+            "desc": "規則規定垂直積雪量"
+          }
+        }
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "使用垂直積雪量が特定行政庁規則で定める数値以上であり適合"
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "使用垂直積雪量が特定行政庁規則で定める数値未満であり不適合"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "proc-identify-snow-depth",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "proc-identify-snow-depth",
+        "to": "info-snow-depth-used",
+        "role": "output"
+      },
+      {
+        "id": "e03",
+        "from": "info-snow-depth-used",
+        "to": "proc-get-regulation-value",
+        "role": "flow"
+      },
+      {
+        "id": "e04",
+        "from": "proc-get-regulation-value",
+        "to": "info-snow-depth-regulation",
+        "role": "output"
+      },
+      {
+        "id": "e05",
+        "from": "info-snow-depth-regulation",
+        "to": "decision-compare-snow-depth",
+        "role": "flow"
+      },
+      {
+        "id": "e06",
+        "from": "decision-compare-snow-depth",
+        "to": "end-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e07",
+        "from": "decision-compare-snow-depth",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-ORDER-A86-P3",
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": [
+        "A86:P1"
+      ],
+      "description": "第1項の積雪荷重計算で使用する垂直積雪量"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

@@ -1,0 +1,267 @@
+{
+  "id": "A89_P3_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "常時湿潤状態における木材の許容応力度",
+    "target_subject": "木材",
+    "description": "常時湿潤状態にある部分に使用する木材の許容応力度を判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "89",
+    "paragraph": "3",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造",
+    "許容応力度",
+    "木材"
+  ],
+  "text_raw": "基礎ぐい、水槽、浴室その他これらに類する常時湿潤状態にある部分に使用する場合においては、その許容応力度は、それぞれ前二項の規定による数値の七十パーセントに相当する数値としなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "material",
+          "value": "木材"
+        },
+        {
+          "type": "usage_location",
+          "value": "常時湿潤状態にある部分（基礎ぐい、水槽、浴室等）"
+        }
+      ],
+      "note": "常時湿潤状態にある部分に木材を使用する場合に適用"
+    },
+    "judgment_rule": {
+      "operator": "==",
+      "lhs": {
+        "ref": "info-actual-stress",
+        "description": "計画における許容応力度"
+      },
+      "rhs": {
+        "ref": "info-required-stress",
+        "description": "前二項の数値の70%"
+      }
+    },
+    "exceptions": null
+  },
+  "flow_diagram": {
+    "title": "令第89条第3項 常時湿潤状態における木材の許容応力度 適合判定フロー",
+    "description": "常時湿潤状態にある部分に使用する木材の許容応力度が前二項の70%以下かを判定する",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "令第89条第3項の適合判定を開始"
+      },
+      {
+        "id": "decision-wet-location",
+        "type": "decision",
+        "title": "木材使用部分は常時湿潤状態にあるか？",
+        "decision_type": "binary",
+        "description": "基礎ぐい、水槽、浴室その他これらに類する常時湿潤状態にある部分かどうかを判定"
+      },
+      {
+        "id": "process-get-base-stress",
+        "type": "process",
+        "title": "前二項の許容応力度を取得",
+        "process_type": "undefined_input",
+        "description": "令第89条第1項又は第2項の規定による許容応力度の数値を取得する",
+        "related_articles": [
+          "令::A89:P1",
+          "令::A89:P2"
+        ]
+      },
+      {
+        "id": "info-base-stress",
+        "type": "information",
+        "title": "前二項の許容応力度 S0",
+        "symbol": "S0",
+        "subject": "木材",
+        "property": "前二項の規定による許容応力度",
+        "property_type": "numeric",
+        "description": "令第89条第1項（繊維方向の許容応力度）又は第2項（かた木の増大許容応力度）による数値"
+      },
+      {
+        "id": "process-calc-70percent",
+        "type": "process",
+        "title": "必要許容応力度を算出（S0×70%）",
+        "process_type": "mechanical",
+        "description": "前二項の数値に70%を乗じて必要許容応力度を算出する（Sreq = S0 × 0.70）"
+      },
+      {
+        "id": "info-required-stress",
+        "type": "information",
+        "title": "必要許容応力度 Sreq",
+        "symbol": "Sreq",
+        "subject": "木材",
+        "property": "常時湿潤状態における必要許容応力度",
+        "property_type": "numeric",
+        "description": "前二項の数値の70%に相当する値"
+      },
+      {
+        "id": "process-get-actual-stress",
+        "type": "process",
+        "title": "計画許容応力度を取得",
+        "process_type": "undefined_input",
+        "description": "建築計画において設定されている木材の許容応力度を取得する"
+      },
+      {
+        "id": "info-actual-stress",
+        "type": "information",
+        "title": "計画許容応力度 Sp",
+        "symbol": "Sp",
+        "subject": "木材",
+        "property": "計画で使用する許容応力度",
+        "property_type": "numeric",
+        "description": "建築計画において設定されている木材の許容応力度"
+      },
+      {
+        "id": "decision-compliance",
+        "type": "decision",
+        "title": "計画許容応力度 Sp ≦ 必要許容応力度 Sreq か？",
+        "decision_type": "binary",
+        "description": "計画で使用する許容応力度が必要許容応力度（前二項の70%）以下かを判定",
+        "condition": {
+          "operator": "LTE",
+          "lhs": {
+            "var": "Sp",
+            "desc": "計画許容応力度"
+          },
+          "rhs": {
+            "var": "Sreq",
+            "desc": "必要許容応力度",
+            "unit": "N/mm2"
+          }
+        }
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令第89条第3項に適合（常時湿潤状態における許容応力度が前二項の70%以下）"
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "令第89条第3項に不適合（許容応力度が前二項の70%を超過）"
+      },
+      {
+        "id": "end-not-applicable",
+        "type": "terminal",
+        "title": "対象外",
+        "result": "end",
+        "description": "本項の適用対象外（常時湿潤状態にある部分ではない）"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "decision-wet-location",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "decision-wet-location",
+        "to": "process-get-base-stress",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "decision-wet-location",
+        "to": "end-not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e04",
+        "from": "process-get-base-stress",
+        "to": "info-base-stress",
+        "role": "output"
+      },
+      {
+        "id": "e05",
+        "from": "info-base-stress",
+        "to": "process-calc-70percent",
+        "role": "input"
+      },
+      {
+        "id": "e06",
+        "from": "process-calc-70percent",
+        "to": "info-required-stress",
+        "role": "output"
+      },
+      {
+        "id": "e07",
+        "from": "info-required-stress",
+        "to": "process-get-actual-stress",
+        "role": "flow"
+      },
+      {
+        "id": "e08",
+        "from": "process-get-actual-stress",
+        "to": "info-actual-stress",
+        "role": "output"
+      },
+      {
+        "id": "e09",
+        "from": "info-actual-stress",
+        "to": "decision-compliance",
+        "role": "input"
+      },
+      {
+        "id": "e10",
+        "from": "info-required-stress",
+        "to": "decision-compliance",
+        "role": "input"
+      },
+      {
+        "id": "e11",
+        "from": "decision-compliance",
+        "to": "end-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e12",
+        "from": "decision-compliance",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-ORDER-A89-P3",
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": [
+        "A89:P1",
+        "A89:P2"
+      ],
+      "description": "木材の繊維方向の許容応力度及びかた木の許容応力度増大規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T12:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

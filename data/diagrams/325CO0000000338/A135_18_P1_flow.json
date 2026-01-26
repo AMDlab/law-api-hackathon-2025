@@ -1,0 +1,304 @@
+{
+  "id": "A135_18_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "容積率の制限における前面道路幅員加算数値の算定",
+    "target_subject": "敷地",
+    "description": "法第52条第9項に規定する前面道路の幅員に加算する数値を算定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "135_18",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "集団規定",
+    "容積率",
+    "前面道路",
+    "特定道路"
+  ],
+  "text_raw": "法第五十二条第九項の政令で定める数値は、次の式によつて計算したものとする。\nＷａ＝（１２－Ｗｒ）（７０－Ｌ）／７０\n（この式において、Ｗａ、Ｗｒ及びＬは、それぞれ次の数値を表すものとする。\nＷａ　法第五十二条第九項の政令で定める数値（単位　メートル）\nＷｒ　前面道路の幅員（単位　メートル）\nＬ　法第五十二条第九項の特定道路からその建築物の敷地が接する前面道路の部分の直近の端までの延長（単位　メートル））",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "法第52条第9項の適用がある敷地"
+        },
+        {
+          "type": "condition",
+          "value": "前面道路幅員が6m以上12m未満"
+        },
+        {
+          "type": "condition",
+          "value": "特定道路（幅員15m以上）から70m以内"
+        }
+      ],
+      "note": "法第52条第9項の適用対象となる敷地について、前面道路幅員に加算する数値を算定"
+    },
+    "judgment_rule": {
+      "operator": "FORMULA",
+      "lhs": {
+        "symbol": "Wa",
+        "description": "前面道路幅員に加算する数値"
+      },
+      "rhs": {
+        "formula": "(12 - Wr) * (70 - L) / 70",
+        "description": "Wr: 前面道路の幅員、L: 特定道路から敷地が接する前面道路部分の直近の端までの延長"
+      }
+    }
+  },
+  "flow_diagram": {
+    "title": "前面道路幅員加算数値（Wa）の算定フロー",
+    "description": "法第52条第9項の適用を受ける敷地について、前面道路幅員に加算する数値Waを算定する",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "前面道路幅員加算数値の算定を開始"
+      },
+      {
+        "id": "proc-read-road-width",
+        "type": "process",
+        "title": "前面道路の幅員を読み取る",
+        "process_type": "undefined_input",
+        "description": "設計図書等から敷地が接する前面道路の幅員（Wr）を読み取る"
+      },
+      {
+        "id": "info-road-width",
+        "type": "information",
+        "title": "前面道路の幅員 Wr",
+        "symbol": "Wr",
+        "subject": "前面道路",
+        "property": "幅員",
+        "property_type": "numeric",
+        "description": "敷地が接する前面道路の幅員（単位：m）"
+      },
+      {
+        "id": "dec-road-width-range",
+        "type": "decision",
+        "title": "前面道路幅員は6m以上12m未満か？",
+        "decision_type": "binary",
+        "description": "本条の適用要件として、前面道路幅員が6m以上12m未満である必要がある",
+        "condition": {
+          "operator": "IN",
+          "lhs": {
+            "var": "Wr",
+            "desc": "前面道路幅員"
+          },
+          "rhs": {
+            "desc": "6m以上12m未満",
+            "unit": "m"
+          }
+        }
+      },
+      {
+        "id": "proc-read-distance",
+        "type": "process",
+        "title": "特定道路までの延長を読み取る",
+        "process_type": "undefined_input",
+        "description": "設計図書等から特定道路から敷地が接する前面道路部分の直近の端までの延長（L）を読み取る"
+      },
+      {
+        "id": "info-distance",
+        "type": "information",
+        "title": "特定道路までの延長 L",
+        "symbol": "L",
+        "subject": "敷地",
+        "property": "特定道路までの延長",
+        "property_type": "numeric",
+        "description": "特定道路から敷地が接する前面道路部分の直近の端までの延長（単位：m）"
+      },
+      {
+        "id": "dec-distance-range",
+        "type": "decision",
+        "title": "特定道路までの延長は70m以内か？",
+        "decision_type": "binary",
+        "description": "本条の適用要件として、特定道路までの延長が70m以内である必要がある",
+        "condition": {
+          "operator": "LTE",
+          "lhs": {
+            "var": "L",
+            "desc": "特定道路までの延長"
+          },
+          "rhs": {
+            "value": 70,
+            "unit": "m"
+          }
+        }
+      },
+      {
+        "id": "proc-calculate-wa",
+        "type": "process",
+        "title": "Wa = (12 - Wr) × (70 - L) / 70 を計算",
+        "process_type": "mechanical",
+        "description": "前面道路幅員加算数値Waを計算式により算定する"
+      },
+      {
+        "id": "info-wa",
+        "type": "information",
+        "title": "前面道路幅員加算数値 Wa",
+        "symbol": "Wa",
+        "subject": "敷地",
+        "property": "前面道路幅員加算数値",
+        "property_type": "numeric",
+        "description": "法第52条第9項の政令で定める数値（単位：m）"
+      },
+      {
+        "id": "dec-wa-valid",
+        "type": "decision",
+        "title": "Waは0以上か？",
+        "decision_type": "binary",
+        "description": "算定されたWaが有効な値（0以上）であることを確認する",
+        "condition": {
+          "operator": "GTE",
+          "lhs": {
+            "var": "Wa",
+            "desc": "前面道路幅員加算数値"
+          },
+          "rhs": {
+            "value": 0,
+            "unit": "m"
+          }
+        }
+      },
+      {
+        "id": "end-calculated",
+        "type": "terminal",
+        "title": "算定完了",
+        "result": "end",
+        "description": "前面道路幅員加算数値Waの算定が完了した"
+      },
+      {
+        "id": "end-not-applicable",
+        "type": "terminal",
+        "title": "本条適用外",
+        "result": "end",
+        "description": "適用要件を満たさないため、本条による加算は適用されない"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "proc-read-road-width",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "proc-read-road-width",
+        "to": "info-road-width",
+        "role": "output"
+      },
+      {
+        "id": "e03",
+        "from": "info-road-width",
+        "to": "dec-road-width-range",
+        "role": "input"
+      },
+      {
+        "id": "e04",
+        "from": "dec-road-width-range",
+        "to": "proc-read-distance",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e05",
+        "from": "dec-road-width-range",
+        "to": "end-not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e06",
+        "from": "proc-read-distance",
+        "to": "info-distance",
+        "role": "output"
+      },
+      {
+        "id": "e07",
+        "from": "info-distance",
+        "to": "dec-distance-range",
+        "role": "input"
+      },
+      {
+        "id": "e08",
+        "from": "dec-distance-range",
+        "to": "proc-calculate-wa",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e09",
+        "from": "dec-distance-range",
+        "to": "end-not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e10",
+        "from": "info-road-width",
+        "to": "proc-calculate-wa",
+        "role": "input"
+      },
+      {
+        "id": "e11",
+        "from": "info-distance",
+        "to": "proc-calculate-wa",
+        "role": "input"
+      },
+      {
+        "id": "e12",
+        "from": "proc-calculate-wa",
+        "to": "info-wa",
+        "role": "output"
+      },
+      {
+        "id": "e13",
+        "from": "info-wa",
+        "to": "dec-wa-valid",
+        "role": "input"
+      },
+      {
+        "id": "e14",
+        "from": "dec-wa-valid",
+        "to": "end-calculated",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e15",
+        "from": "dec-wa-valid",
+        "to": "end-not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-ORD-A135-18-P1",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": ["A52:P9"],
+      "description": "法第52条第9項により政令で定める前面道路幅員に加算する数値"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T12:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

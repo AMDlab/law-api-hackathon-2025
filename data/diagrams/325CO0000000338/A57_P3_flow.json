@@ -1,0 +1,217 @@
+{
+  "id": "A57_P3_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "幅1m超の開口部のまぐさ（適合判定フロー）",
+    "target_subject": "開口部",
+    "description": "組積造の壁における幅1mを超える開口部の上部に鉄筋コンクリート造のまぐさが設けられていることを判定するフロー"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "57",
+    "paragraph": "3",
+    "item": null
+  },
+  "labels": ["単体規定", "構造"],
+  "text_raw": "幅が一メートルをこえる開口部の上部には、鉄筋コンクリート造のまぐさを設けなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        { "type": "structure", "value": "組積造の壁" },
+        { "type": "element", "value": "開口部" }
+      ]
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        { "ref": "info-compliance", "operator": "==", "value": true }
+      ]
+    }
+  },
+  "flow_diagram": {
+    "title": "令57条3項 幅1m超の開口部のまぐさ 適合判定フロー",
+    "description": "組積造の壁における開口部について、幅1m超の場合は鉄筋コンクリート造のまぐさが必要であることを判定する",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "令57条3項の適合判定を開始"
+      },
+      {
+        "id": "dec-wall-structure",
+        "type": "decision",
+        "title": "壁の構造種別は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "組積造", "description": "組積造の壁" },
+          { "value": "その他", "description": "組積造以外の壁" }
+        ],
+        "description": "対象壁の構造種別を判定"
+      },
+      {
+        "id": "proc-not-applicable",
+        "type": "process",
+        "title": "本条項非適用",
+        "process_type": "mechanical",
+        "description": "組積造以外の壁のため本条項の適用対象外"
+      },
+      {
+        "id": "pass-not-applicable",
+        "type": "terminal",
+        "title": "適用外",
+        "result": "pass",
+        "description": "組積造以外のため本条項の適用対象外（適合扱い）"
+      },
+      {
+        "id": "dec-has-openings",
+        "type": "decision",
+        "title": "組積造の壁に開口部があるか？",
+        "decision_type": "binary",
+        "description": "組積造の壁に開口部が存在するか判定"
+      },
+      {
+        "id": "proc-no-openings",
+        "type": "process",
+        "title": "開口部なし",
+        "process_type": "mechanical",
+        "description": "開口部がないため判定対象なし"
+      },
+      {
+        "id": "pass-no-openings",
+        "type": "terminal",
+        "title": "適合（開口部なし）",
+        "result": "pass",
+        "description": "開口部がないため適合"
+      },
+      {
+        "id": "info-loop-start",
+        "type": "information",
+        "title": "各開口部について判定",
+        "subject": "開口部",
+        "property": "反復判定開始",
+        "property_type": "set_definition",
+        "description": "組積造の壁に属する全ての開口部について以下の判定を行う"
+      },
+      {
+        "id": "dec-width-over-1m",
+        "type": "decision",
+        "title": "開口部の幅は1mを超えるか？",
+        "decision_type": "binary",
+        "description": "当該開口部の幅が1mを超えるかを判定（Ow > 1）",
+        "condition": {
+          "operator": "GT",
+          "lhs": { "var": "Ow", "desc": "開口部の幅" },
+          "rhs": { "value": 1, "unit": "m" }
+        }
+      },
+      {
+        "id": "proc-width-ok",
+        "type": "process",
+        "title": "幅1m以下：当該開口部適合",
+        "process_type": "mechanical",
+        "description": "開口部の幅が1m以下のため、まぐさの要否判定は不要"
+      },
+      {
+        "id": "dec-lintel-exists",
+        "type": "decision",
+        "title": "開口部上部にまぐさがあるか？",
+        "decision_type": "binary",
+        "description": "幅1m超の開口部の上部にまぐさが設けられているか判定"
+      },
+      {
+        "id": "fail-no-lintel",
+        "type": "terminal",
+        "title": "不適合（まぐさなし）",
+        "result": "fail",
+        "description": "幅1m超の開口部上部にまぐさが設けられていないため不適合"
+      },
+      {
+        "id": "dec-lintel-rc",
+        "type": "decision",
+        "title": "まぐさは鉄筋コンクリート造か？",
+        "decision_type": "binary",
+        "description": "設けられたまぐさが鉄筋コンクリート造であるか判定"
+      },
+      {
+        "id": "proc-lintel-ok",
+        "type": "process",
+        "title": "RC造まぐさ：当該開口部適合",
+        "process_type": "mechanical",
+        "description": "鉄筋コンクリート造のまぐさが設けられており、当該開口部は適合"
+      },
+      {
+        "id": "fail-not-rc",
+        "type": "terminal",
+        "title": "不適合（RC造でない）",
+        "result": "fail",
+        "description": "まぐさが鉄筋コンクリート造でないため不適合"
+      },
+      {
+        "id": "dec-more-openings",
+        "type": "decision",
+        "title": "未判定の開口部があるか？",
+        "decision_type": "binary",
+        "description": "まだ判定していない開口部が残っているか確認"
+      },
+      {
+        "id": "proc-all-checked",
+        "type": "process",
+        "title": "全開口部判定完了",
+        "process_type": "mechanical",
+        "description": "全ての開口部について適合判定が完了"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "全ての開口部が令57条3項に適合"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "dec-wall-structure", "role": "flow" },
+      { "id": "e02", "from": "dec-wall-structure", "to": "dec-has-openings", "role": "option", "label": "組積造" },
+      { "id": "e03", "from": "dec-wall-structure", "to": "proc-not-applicable", "role": "option", "label": "その他" },
+      { "id": "e04", "from": "proc-not-applicable", "to": "pass-not-applicable", "role": "flow" },
+      { "id": "e05", "from": "dec-has-openings", "to": "info-loop-start", "role": "yes", "label": "はい" },
+      { "id": "e06", "from": "dec-has-openings", "to": "proc-no-openings", "role": "no", "label": "いいえ" },
+      { "id": "e07", "from": "proc-no-openings", "to": "pass-no-openings", "role": "flow" },
+      { "id": "e08", "from": "info-loop-start", "to": "dec-width-over-1m", "role": "flow" },
+      { "id": "e09", "from": "dec-width-over-1m", "to": "proc-width-ok", "role": "no", "label": "いいえ（1m以下）" },
+      { "id": "e10", "from": "dec-width-over-1m", "to": "dec-lintel-exists", "role": "yes", "label": "はい（1m超）" },
+      { "id": "e11", "from": "proc-width-ok", "to": "dec-more-openings", "role": "flow" },
+      { "id": "e12", "from": "dec-lintel-exists", "to": "dec-lintel-rc", "role": "yes", "label": "はい" },
+      { "id": "e13", "from": "dec-lintel-exists", "to": "fail-no-lintel", "role": "no", "label": "いいえ" },
+      { "id": "e14", "from": "dec-lintel-rc", "to": "proc-lintel-ok", "role": "yes", "label": "はい" },
+      { "id": "e15", "from": "dec-lintel-rc", "to": "fail-not-rc", "role": "no", "label": "いいえ" },
+      { "id": "e16", "from": "proc-lintel-ok", "to": "dec-more-openings", "role": "flow" },
+      { "id": "e17", "from": "dec-more-openings", "to": "info-loop-start", "role": "yes", "label": "はい" },
+      { "id": "e18", "from": "dec-more-openings", "to": "proc-all-checked", "role": "no", "label": "いいえ" },
+      { "id": "e19", "from": "proc-all-checked", "to": "pass", "role": "flow" }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSO-A57-P3",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": ["A20"],
+      "description": "法第20条（構造耐力）に基づく委任規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

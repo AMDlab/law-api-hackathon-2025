@@ -1,0 +1,483 @@
+{
+  "id": "A20_2_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "換気設備の技術的基準 適合判定フロー",
+    "target_subject": "換気設備",
+    "description": "法第28条第2項ただし書の政令で定める技術的基準及び同条第3項に規定する特殊建築物の居室に設ける換気設備の技術的基準の適合判定フロー"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "20_2",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "換気設備"
+  ],
+  "text_raw": "法第二十八条第二項ただし書の政令で定める技術的基準及び同条第三項（法第八十七条第三項において準用する場合を含む。以下この条及び次条第一項において同じ。）の政令で定める法第二十八条第三項に規定する特殊建築物（第一号において「特殊建築物」という。）の居室に設ける換気設備の技術的基準は、次に掲げるものとする。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "type": "provision",
+          "value": "法第28条第2項ただし書に基づく換気設備"
+        },
+        {
+          "type": "provision",
+          "value": "法第28条第3項に規定する特殊建築物の居室に設ける換気設備"
+        }
+      ]
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "第1号適合",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "ref": "第2号適合",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "flow_diagram": {
+    "title": "令第20条の2第1項 換気設備の技術的基準 適合判定フロー",
+    "description": "換気設備が第1号（構造基準）及び第2号（中央管理室での制御・監視）に適合するかを判定する",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start"
+      },
+      {
+        "id": "dec-special-building",
+        "type": "decision",
+        "title": "法第28条第3項の特殊建築物か？",
+        "decision_type": "binary",
+        "description": "建築物が法第28条第3項に規定する特殊建築物に該当するか",
+        "condition": {
+          "operator": "EQ",
+          "lhs": { "var": "BT", "desc": "特殊建築物該当" },
+          "rhs": { "value": true }
+        }
+      },
+      {
+        "id": "dec-equipment-type",
+        "type": "decision",
+        "title": "換気設備の種別は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "自然換気設備", "description": "イに該当" },
+          { "value": "機械換気設備", "description": "ロに該当" },
+          { "value": "中央管理方式空調", "description": "ハに該当" },
+          { "value": "その他", "description": "ニに該当する可能性" }
+        ],
+        "description": "換気設備が自然換気設備、機械換気設備、中央管理方式の空気調和設備、その他のいずれか"
+      },
+      {
+        "id": "proc-special-applicable-check",
+        "type": "process",
+        "title": "特殊建築物ではイは適用不可",
+        "process_type": "mechanical",
+        "description": "特殊建築物の居室に設ける換気設備にあってはロ～ニのみが適用可能"
+      },
+      {
+        "id": "end-fail-type",
+        "type": "terminal",
+        "title": "不適合（適用種別違反）",
+        "result": "fail",
+        "description": "特殊建築物の居室に自然換気設備（イ）は適用不可"
+      },
+      {
+        "id": "dec-natural-compliance",
+        "type": "decision",
+        "title": "令第129条の2の5第1項及びイの基準に適合か？",
+        "decision_type": "binary",
+        "description": "自然換気設備として令第129条の2の5第1項の規定及びイの構造基準に適合するか",
+        "related_articles": ["令::A129_2_5:P1"]
+      },
+      {
+        "id": "proc-natural-pass",
+        "type": "process",
+        "title": "イ（自然換気設備）に適合",
+        "process_type": "mechanical",
+        "description": "自然換気設備として第1号イの基準に適合"
+      },
+      {
+        "id": "dec-mechanical-compliance",
+        "type": "decision",
+        "title": "令第129条の2の5第2項及びロの基準に適合か？",
+        "decision_type": "binary",
+        "description": "機械換気設備として令第129条の2の5第2項の規定及びロの構造基準に適合するか",
+        "related_articles": ["令::A129_2_5:P2"]
+      },
+      {
+        "id": "proc-mechanical-pass",
+        "type": "process",
+        "title": "ロ（機械換気設備）に適合",
+        "process_type": "mechanical",
+        "description": "機械換気設備として第1号ロの基準に適合"
+      },
+      {
+        "id": "dec-central-compliance",
+        "type": "decision",
+        "title": "令第129条の2の5第3項及びハの基準に適合か？",
+        "decision_type": "binary",
+        "description": "中央管理方式の空気調和設備として令第129条の2の5第3項の規定及びハの構造基準に適合するか",
+        "related_articles": ["令::A129_2_5:P3"]
+      },
+      {
+        "id": "proc-central-pass",
+        "type": "process",
+        "title": "ハ（中央管理方式空調）に適合",
+        "process_type": "mechanical",
+        "description": "中央管理方式の空気調和設備として第1号ハの基準に適合"
+      },
+      {
+        "id": "dec-certification",
+        "type": "decision",
+        "title": "国土交通大臣の認定を受けた換気設備か？",
+        "decision_type": "binary",
+        "description": "イ～ハ以外の場合、国土交通大臣の認定を受けた換気設備であるか"
+      },
+      {
+        "id": "proc-certification-pass",
+        "type": "process",
+        "title": "ニ（認定換気設備）に適合",
+        "process_type": "mechanical",
+        "description": "国土交通大臣認定の換気設備として第1号ニの基準に適合"
+      },
+      {
+        "id": "end-fail-item1",
+        "type": "terminal",
+        "title": "不適合（第1号違反）",
+        "result": "fail",
+        "description": "換気設備の構造がイ～ニのいずれにも適合しない"
+      },
+      {
+        "id": "proc-item1-pass",
+        "type": "process",
+        "title": "第1号に適合",
+        "process_type": "mechanical",
+        "description": "換気設備の構造がイ～ニ（特殊建築物はロ～ニ）のいずれかに適合"
+      },
+      {
+        "id": "dec-item2-target-building",
+        "type": "decision",
+        "title": "法第34条第2項建築物または床面積1000㎡超の地下街か？",
+        "decision_type": "binary",
+        "description": "法第34条第2項に規定する建築物又は各構えの床面積の合計が1000㎡を超える地下街であるか"
+      },
+      {
+        "id": "dec-item2-target-equipment",
+        "type": "decision",
+        "title": "機械換気設備または中央管理方式空調か？",
+        "decision_type": "binary",
+        "description": "換気設備が機械換気設備又は中央管理方式の空気調和設備であるか"
+      },
+      {
+        "id": "dec-item2-single-room",
+        "type": "decision",
+        "title": "一の居室のみに係る機械換気設備か？",
+        "decision_type": "binary",
+        "description": "機械換気設備が一の居室のみに係るものであるか（該当する場合は第2号適用除外）"
+      },
+      {
+        "id": "proc-item2-not-applicable",
+        "type": "process",
+        "title": "第2号は適用対象外",
+        "process_type": "mechanical",
+        "description": "第2号の適用条件に該当しないため、第2号は自動的に適合"
+      },
+      {
+        "id": "dec-central-room-control",
+        "type": "decision",
+        "title": "中央管理室で制御・監視が可能か？",
+        "decision_type": "binary",
+        "description": "換気設備の制御及び作動状態の監視を中央管理室において行うことができるか"
+      },
+      {
+        "id": "proc-item2-pass",
+        "type": "process",
+        "title": "第2号に適合",
+        "process_type": "mechanical",
+        "description": "中央管理室での制御・監視が可能であり第2号に適合"
+      },
+      {
+        "id": "end-fail-item2",
+        "type": "terminal",
+        "title": "不適合（第2号違反）",
+        "result": "fail",
+        "description": "中央管理室での制御・監視ができないため第2号に不適合"
+      },
+      {
+        "id": "proc-final-judgment",
+        "type": "process",
+        "title": "第1号及び第2号に適合",
+        "process_type": "mechanical",
+        "description": "換気設備が第1号及び第2号の両方に適合"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令第20条の2第1項の技術的基準に適合"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-special-building",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-special-building",
+        "to": "dec-equipment-type",
+        "role": "no",
+        "label": "いいえ（一般建築物）"
+      },
+      {
+        "id": "e03",
+        "from": "dec-special-building",
+        "to": "proc-special-applicable-check",
+        "role": "yes",
+        "label": "はい（特殊建築物）"
+      },
+      {
+        "id": "e04",
+        "from": "proc-special-applicable-check",
+        "to": "dec-equipment-type",
+        "role": "flow"
+      },
+      {
+        "id": "e05",
+        "from": "dec-equipment-type",
+        "to": "dec-natural-compliance",
+        "role": "option",
+        "label": "自然換気設備"
+      },
+      {
+        "id": "e06",
+        "from": "dec-equipment-type",
+        "to": "dec-mechanical-compliance",
+        "role": "option",
+        "label": "機械換気設備"
+      },
+      {
+        "id": "e07",
+        "from": "dec-equipment-type",
+        "to": "dec-central-compliance",
+        "role": "option",
+        "label": "中央管理方式空調"
+      },
+      {
+        "id": "e08",
+        "from": "dec-equipment-type",
+        "to": "dec-certification",
+        "role": "option",
+        "label": "その他"
+      },
+      {
+        "id": "e09",
+        "from": "dec-natural-compliance",
+        "to": "proc-natural-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e10",
+        "from": "dec-natural-compliance",
+        "to": "end-fail-item1",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e11",
+        "from": "proc-natural-pass",
+        "to": "proc-item1-pass",
+        "role": "flow"
+      },
+      {
+        "id": "e12",
+        "from": "dec-mechanical-compliance",
+        "to": "proc-mechanical-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e13",
+        "from": "dec-mechanical-compliance",
+        "to": "end-fail-item1",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e14",
+        "from": "proc-mechanical-pass",
+        "to": "proc-item1-pass",
+        "role": "flow"
+      },
+      {
+        "id": "e15",
+        "from": "dec-central-compliance",
+        "to": "proc-central-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e16",
+        "from": "dec-central-compliance",
+        "to": "end-fail-item1",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e17",
+        "from": "proc-central-pass",
+        "to": "proc-item1-pass",
+        "role": "flow"
+      },
+      {
+        "id": "e18",
+        "from": "dec-certification",
+        "to": "proc-certification-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e19",
+        "from": "dec-certification",
+        "to": "end-fail-item1",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e20",
+        "from": "proc-certification-pass",
+        "to": "proc-item1-pass",
+        "role": "flow"
+      },
+      {
+        "id": "e21",
+        "from": "proc-item1-pass",
+        "to": "dec-item2-target-building",
+        "role": "flow"
+      },
+      {
+        "id": "e22",
+        "from": "dec-item2-target-building",
+        "to": "proc-item2-not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e23",
+        "from": "dec-item2-target-building",
+        "to": "dec-item2-target-equipment",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e24",
+        "from": "dec-item2-target-equipment",
+        "to": "proc-item2-not-applicable",
+        "role": "no",
+        "label": "いいえ（自然換気設備等）"
+      },
+      {
+        "id": "e25",
+        "from": "dec-item2-target-equipment",
+        "to": "dec-item2-single-room",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e26",
+        "from": "dec-item2-single-room",
+        "to": "proc-item2-not-applicable",
+        "role": "yes",
+        "label": "はい（適用除外）"
+      },
+      {
+        "id": "e27",
+        "from": "dec-item2-single-room",
+        "to": "dec-central-room-control",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e28",
+        "from": "dec-central-room-control",
+        "to": "proc-item2-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e29",
+        "from": "dec-central-room-control",
+        "to": "end-fail-item2",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e30",
+        "from": "proc-item2-not-applicable",
+        "to": "proc-final-judgment",
+        "role": "flow"
+      },
+      {
+        "id": "e31",
+        "from": "proc-item2-pass",
+        "to": "proc-final-judgment",
+        "role": "flow"
+      },
+      {
+        "id": "e32",
+        "from": "proc-final-judgment",
+        "to": "end-pass",
+        "role": "flow"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSO-A20_2-P1",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": ["A28:P2", "A28:P3", "A34:P2", "A87:P3"],
+      "description": "法第28条第2項ただし書及び第3項から委任を受けた技術的基準"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": ["A129_2_5:P1", "A129_2_5:P2", "A129_2_5:P3"],
+      "description": "自然換気設備、機械換気設備、中央管理方式空調設備の構造基準を参照"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T12:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

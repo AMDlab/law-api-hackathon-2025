@@ -1,0 +1,294 @@
+{
+  "id": "A128_2_P5_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "敷地内通路の道路接続要件",
+    "target_subject": "通路",
+    "description": "令第128条の2第1項から第4項の規定による通路が敷地の接する道まで達しているか判定"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "128の2",
+    "paragraph": "5",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "避難",
+    "敷地内通路"
+  ],
+  "text_raw": "前各項の規定による通路は、敷地の接する道まで達しなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        { "type": "precondition", "value": "令第128条の2第1項〜第4項の規定による通路が設けられている" }
+      ],
+      "note": "前各項の規定による通路が存在する場合に適用"
+    },
+    "judgment_rule": {
+      "operator": "ALL",
+      "conditions": [
+        { "type": "requirement", "value": "通路が敷地の接する道まで達している" }
+      ]
+    }
+  },
+  "flow_diagram": {
+    "title": "敷地内通路の道路接続要件フロー",
+    "description": "令第128条の2第5項に基づき、前各項規定の通路が敷地の接する道まで達しているかを判定するフロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "審査開始",
+        "result": "start"
+      },
+      {
+        "id": "dec-passage-exists",
+        "type": "decision",
+        "title": "前各項規定の通路はあるか？",
+        "decision_type": "binary",
+        "description": "令第128条の2第1項〜第4項の規定により設けられた通路が存在するか確認"
+      },
+      {
+        "id": "proc-not-applicable",
+        "type": "process",
+        "title": "本項不適用",
+        "process_type": "mechanical",
+        "description": "前各項規定の通路がないため、本項の適用対象外"
+      },
+      {
+        "id": "dec-road-identified",
+        "type": "decision",
+        "title": "敷地の接する道を確認できるか？",
+        "decision_type": "binary",
+        "description": "敷地が接する道（道路）を確認できるか"
+      },
+      {
+        "id": "proc-identify-passages",
+        "type": "process",
+        "title": "通路一覧を確認",
+        "process_type": "undefined_input",
+        "description": "審査対象となる全通路を特定し一覧化"
+      },
+      {
+        "id": "dec-passages-remaining",
+        "type": "decision",
+        "title": "未確認の通路はあるか？",
+        "decision_type": "binary",
+        "description": "まだ終端位置を確認していない通路があるか"
+      },
+      {
+        "id": "proc-select-passage",
+        "type": "process",
+        "title": "次の通路を選択",
+        "process_type": "mechanical",
+        "description": "未確認通路から1つ選択し確認対象とする"
+      },
+      {
+        "id": "dec-endpoint-identified",
+        "type": "decision",
+        "title": "通路の終端位置を確認できるか？",
+        "decision_type": "binary",
+        "description": "選択した通路の終端位置（敷地境界方向への端部）を確認できるか"
+      },
+      {
+        "id": "dec-endpoint-reaches-road",
+        "type": "decision",
+        "title": "終端は敷地の接する道に達しているか？",
+        "decision_type": "binary",
+        "description": "通路の終端位置が敷地境界線上の道に面する部分に達しているか判定",
+        "condition": {
+          "operator": "IN",
+          "lhs": { "var": "EP", "desc": "通路終端位置" },
+          "rhs": { "desc": "敷地境界線上の道に面する部分" }
+        }
+      },
+      {
+        "id": "proc-passage-ok",
+        "type": "process",
+        "title": "当該通路は適合",
+        "process_type": "mechanical",
+        "description": "この通路は敷地の接する道に達している"
+      },
+      {
+        "id": "proc-passage-ng",
+        "type": "process",
+        "title": "当該通路は不適合",
+        "process_type": "mechanical",
+        "description": "この通路は敷地の接する道に達していない"
+      },
+      {
+        "id": "dec-all-passages-ok",
+        "type": "decision",
+        "title": "全通路が道路に接続しているか？",
+        "decision_type": "binary",
+        "description": "すべての通路について終端が敷地の接する道に達しているか最終判定"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "前各項規定のすべての通路が敷地の接する道まで達している"
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "敷地の接する道に達していない通路がある"
+      },
+      {
+        "id": "end-not-applicable",
+        "type": "terminal",
+        "title": "適用除外",
+        "result": "pass",
+        "description": "本項の適用対象外（前各項規定の通路がない）"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e-start",
+        "from": "start",
+        "to": "dec-passage-exists",
+        "role": "flow"
+      },
+      {
+        "id": "e-no-passage",
+        "from": "dec-passage-exists",
+        "to": "proc-not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e-not-applicable-end",
+        "from": "proc-not-applicable",
+        "to": "end-not-applicable",
+        "role": "flow"
+      },
+      {
+        "id": "e-passage-exists",
+        "from": "dec-passage-exists",
+        "to": "dec-road-identified",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e-road-not-identified",
+        "from": "dec-road-identified",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e-road-identified",
+        "from": "dec-road-identified",
+        "to": "proc-identify-passages",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e-list-to-check",
+        "from": "proc-identify-passages",
+        "to": "dec-passages-remaining",
+        "role": "flow"
+      },
+      {
+        "id": "e-no-remaining",
+        "from": "dec-passages-remaining",
+        "to": "dec-all-passages-ok",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e-remaining-yes",
+        "from": "dec-passages-remaining",
+        "to": "proc-select-passage",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e-select-to-endpoint",
+        "from": "proc-select-passage",
+        "to": "dec-endpoint-identified",
+        "role": "flow"
+      },
+      {
+        "id": "e-endpoint-not-identified",
+        "from": "dec-endpoint-identified",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e-endpoint-identified",
+        "from": "dec-endpoint-identified",
+        "to": "dec-endpoint-reaches-road",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e-reaches-road-yes",
+        "from": "dec-endpoint-reaches-road",
+        "to": "proc-passage-ok",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e-reaches-road-no",
+        "from": "dec-endpoint-reaches-road",
+        "to": "proc-passage-ng",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e-passage-ok-loop",
+        "from": "proc-passage-ok",
+        "to": "dec-passages-remaining",
+        "role": "flow"
+      },
+      {
+        "id": "e-passage-ng-loop",
+        "from": "proc-passage-ng",
+        "to": "dec-passages-remaining",
+        "role": "flow"
+      },
+      {
+        "id": "e-all-ok-yes",
+        "from": "dec-all-passages-ok",
+        "to": "end-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e-all-ok-no",
+        "from": "dec-all-passages-ok",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "A128_2_P5_kijo",
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": ["A128_2:P1", "A128_2:P2", "A128_2:P3", "A128_2:P4"],
+      "description": "前各項の規定による通路設置要件を参照"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00+09:00",
+    "author": "Claude",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

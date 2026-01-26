@@ -1,0 +1,284 @@
+{
+  "id": "A79_4_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "鉄骨鉄筋コンクリート造に対する準用規定",
+    "target_subject": "鉄骨鉄筋コンクリート造の建築物又は構造部分",
+    "description": "鉄骨鉄筋コンクリート造の建築物又は構造部分に対する鉄筋コンクリート造・鉄骨造の規定の準用を判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "79の4",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造規定",
+    "鉄骨鉄筋コンクリート造",
+    "準用規定"
+  ],
+  "text_raw": "鉄骨鉄筋コンクリート造の建築物又は建築物の構造部分については、前二節（第六十五条、第七十条及び第七十七条第四号を除く。）の規定を準用する。この場合において、第七十二条第二号中「鉄筋相互間及び鉄筋とせき板」とあるのは「鉄骨及び鉄筋の間並びにこれらとせき板」と、第七十七条第六号中「主筋」とあるのは「鉄骨及び主筋」と読み替えるものとする。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "structure_type",
+          "value": "鉄骨鉄筋コンクリート造"
+        }
+      ],
+      "note": "鉄骨鉄筋コンクリート造の建築物又は建築物の構造部分が対象"
+    },
+    "judgment_rule": {
+      "operator": "==",
+      "lhs": {
+        "ref": "info-final"
+      },
+      "rhs": {
+        "value": true
+      }
+    },
+    "exceptions": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "type": "exclusion",
+          "value": "令第65条（柱の脚部）"
+        },
+        {
+          "type": "exclusion",
+          "value": "令第70条（柱の防火被覆）"
+        },
+        {
+          "type": "exclusion",
+          "value": "令第77条第4号（継手及び定着）"
+        }
+      ],
+      "effect": "準用対象から除外"
+    }
+  },
+  "flow_diagram": {
+    "title": "令第79条の4第1項 適合判定フロー",
+    "description": "鉄骨鉄筋コンクリート造の建築物又は構造部分に対する準用規定の適合判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "令第79条の4第1項の適合判定を開始"
+      },
+      {
+        "id": "proc-get-structure-type",
+        "type": "process",
+        "title": "構造種別の取得",
+        "process_type": "undefined_input",
+        "description": "設計図書から建築物又は構造部分の構造種別を読み取る"
+      },
+      {
+        "id": "dec-structure-type",
+        "type": "decision",
+        "title": "構造種別は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "鉄骨鉄筋コンクリート造", "description": "SRC造" },
+          { "value": "その他", "description": "SRC造以外の構造種別" }
+        ],
+        "description": "建築物又は構造部分の構造種別を判定",
+        "condition": {
+          "operator": "EQ",
+          "lhs": { "var": "ST", "desc": "構造種別" },
+          "rhs": { "value": "鉄骨鉄筋コンクリート造" }
+        }
+      },
+      {
+        "id": "proc-rc-check",
+        "type": "process",
+        "title": "第五節（RC造）規定適合確認",
+        "process_type": "sub_diagram_reference",
+        "description": "第五節（鉄筋コンクリート造）の規定への適合を確認（第70条を除く、第72条第2号は読替え適用）",
+        "related_articles": ["A71", "A72", "A73", "A74", "A75", "A76", "A77", "A78", "A78_2", "A79"]
+      },
+      {
+        "id": "dec-rc-compliance",
+        "type": "decision",
+        "title": "第五節規定に適合か？",
+        "decision_type": "binary",
+        "description": "第五節（鉄筋コンクリート造）の規定に適合するか判定（第70条を除く）",
+        "condition": {
+          "operator": "EQ",
+          "lhs": { "var": "RC", "desc": "第五節規定適合" },
+          "rhs": { "value": true }
+        }
+      },
+      {
+        "id": "proc-steel-check",
+        "type": "process",
+        "title": "第六節（S造）規定適合確認",
+        "process_type": "sub_diagram_reference",
+        "description": "第六節（鉄骨造）の規定への適合を確認（第65条、第77条第4号を除く、第77条第6号は読替え適用）",
+        "related_articles": ["A63", "A64", "A66", "A67", "A68", "A69"]
+      },
+      {
+        "id": "dec-steel-compliance",
+        "type": "decision",
+        "title": "第六節規定に適合か？",
+        "decision_type": "binary",
+        "description": "第六節（鉄骨造）の規定に適合するか判定（第65条、第77条第4号を除く）",
+        "condition": {
+          "operator": "EQ",
+          "lhs": { "var": "S", "desc": "第六節規定適合" },
+          "rhs": { "value": true }
+        }
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令第79条の4第1項の準用規定に適合"
+      },
+      {
+        "id": "end-fail-rc",
+        "type": "terminal",
+        "title": "不適合（RC規定）",
+        "result": "fail",
+        "description": "第五節（鉄筋コンクリート造）規定に不適合",
+        "related_articles": ["A71", "A72", "A73", "A74", "A75", "A76", "A77", "A78", "A78_2", "A79"]
+      },
+      {
+        "id": "end-fail-steel",
+        "type": "terminal",
+        "title": "不適合（S規定）",
+        "result": "fail",
+        "description": "第六節（鉄骨造）規定に不適合",
+        "related_articles": ["A63", "A64", "A66", "A67", "A68", "A69"]
+      },
+      {
+        "id": "end-not-applicable",
+        "type": "terminal",
+        "title": "対象外",
+        "result": "end",
+        "description": "鉄骨鉄筋コンクリート造ではないため本条は適用対象外"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "proc-get-structure-type",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "proc-get-structure-type",
+        "to": "dec-structure-type",
+        "role": "flow"
+      },
+      {
+        "id": "e03",
+        "from": "dec-structure-type",
+        "to": "proc-rc-check",
+        "role": "option",
+        "label": "鉄骨鉄筋コンクリート造"
+      },
+      {
+        "id": "e04",
+        "from": "dec-structure-type",
+        "to": "end-not-applicable",
+        "role": "option",
+        "label": "その他"
+      },
+      {
+        "id": "e05",
+        "from": "proc-rc-check",
+        "to": "dec-rc-compliance",
+        "role": "flow"
+      },
+      {
+        "id": "e06",
+        "from": "dec-rc-compliance",
+        "to": "proc-steel-check",
+        "role": "yes"
+      },
+      {
+        "id": "e07",
+        "from": "dec-rc-compliance",
+        "to": "end-fail-rc",
+        "role": "no"
+      },
+      {
+        "id": "e08",
+        "from": "proc-steel-check",
+        "to": "dec-steel-compliance",
+        "role": "flow"
+      },
+      {
+        "id": "e09",
+        "from": "dec-steel-compliance",
+        "to": "end-pass",
+        "role": "yes"
+      },
+      {
+        "id": "e10",
+        "from": "dec-steel-compliance",
+        "to": "end-fail-steel",
+        "role": "no"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-ORDER-A79-4-P1",
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": ["A71", "A72", "A73", "A74", "A75", "A76", "A77", "A78", "A78_2", "A79"],
+      "description": "第五節（鉄筋コンクリート造）の規定を準用（第70条を除く）"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": ["A63", "A64", "A66", "A67", "A68", "A69"],
+      "description": "第六節（鉄骨造）の規定を準用（第65条を除く）"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": ["A65"],
+      "description": "準用から除外（柱の脚部）"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": ["A70"],
+      "description": "準用から除外（柱の防火被覆）"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": ["A77:P1:I4"],
+      "description": "準用から除外（継手及び定着の一部）"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T12:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

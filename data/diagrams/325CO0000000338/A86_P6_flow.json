@@ -1,0 +1,294 @@
+{
+  "id": "CHK-BSL-FLOW-A86-P6",
+  "version": "3.2",
+  "page_title": {
+    "title": "雪下ろしによる積雪荷重の軽減判定フロー",
+    "target_subject": "建築物",
+    "description": "雪下ろし慣習地方における積雪荷重計算の軽減措置の適用判定フロー"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "86",
+    "paragraph": "6",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造規定",
+    "積雪荷重"
+  ],
+  "text_raw": "雪下ろしを行う慣習のある地方においては、その地方における垂直積雪量が一メートルを超える場合においても、積雪荷重は、雪下ろしの実況に応じて垂直積雪量を一メートルまで減らして計算することができる。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "雪下ろしを行う慣習のある地方"
+        }
+      ],
+      "note": "雪下ろしを行う慣習のある地方に限り適用される軽減規定。地方の指定は特定行政庁が行う。"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "numeric",
+          "value": "垂直積雪量 > 1m",
+          "description": "垂直積雪量が1mを超える場合に軽減措置の適用可能"
+        },
+        {
+          "type": "requirement",
+          "value": "雪下ろしの実況に応じて垂直積雪量を1mまで減じて積雪荷重を計算",
+          "description": "雪下ろしの実施状況に基づき、積雪荷重計算に用いる垂直積雪量を軽減できる"
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "flow_diagram": {
+    "title": "雪下ろしによる積雪荷重軽減判定フロー",
+    "description": "令第86条第6項に基づく雪下ろしによる積雪荷重軽減措置の適用判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "雪下ろしによる積雪荷重軽減判定を開始"
+      },
+      {
+        "id": "proc-001",
+        "type": "process",
+        "title": "垂直積雪量の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築計画地の垂直積雪量を読み取る"
+      },
+      {
+        "id": "dec-001",
+        "type": "decision",
+        "title": "雪下ろし慣習地方か？",
+        "decision_type": "binary",
+        "description": "建築計画地が雪下ろしを行う慣習のある地方に該当するか判定",
+        "condition": {
+          "operator": "EQ",
+          "lhs": {
+            "var": "location_type",
+            "desc": "地域区分"
+          },
+          "rhs": {
+            "value": "雪下ろし慣習地方",
+            "desc": "雪下ろしを行う慣習のある地方"
+          }
+        }
+      },
+      {
+        "id": "dec-002",
+        "type": "decision",
+        "title": "垂直積雪量は1mを超えるか？",
+        "decision_type": "binary",
+        "description": "垂直積雪量が1mを超える場合に軽減措置の適用対象となる",
+        "condition": {
+          "operator": "GT",
+          "lhs": {
+            "var": "D",
+            "desc": "垂直積雪量"
+          },
+          "rhs": {
+            "value": 1,
+            "unit": "m",
+            "desc": "基準値"
+          }
+        },
+        "related_articles": [
+          "令::A86:P1",
+          "令::A86:P3"
+        ]
+      },
+      {
+        "id": "proc-002",
+        "type": "process",
+        "title": "雪下ろしの実況の確認",
+        "process_type": "undefined_input",
+        "description": "設計図書等から雪下ろしの実施計画・方法を読み取る"
+      },
+      {
+        "id": "dec-003",
+        "type": "decision",
+        "title": "軽減措置を適用するか？",
+        "decision_type": "binary",
+        "description": "雪下ろしの実況に基づき軽減措置の適用を選択するか判定"
+      },
+      {
+        "id": "proc-003",
+        "type": "process",
+        "title": "軽減垂直積雪量の決定",
+        "process_type": "human_judgment",
+        "description": "雪下ろしの実況に応じて軽減後の垂直積雪量を決定（最小値1m）"
+      },
+      {
+        "id": "dec-004",
+        "type": "decision",
+        "title": "軽減後の垂直積雪量は1m以上か？",
+        "decision_type": "binary",
+        "description": "軽減後の垂直積雪量が下限値1m以上であるか確認",
+        "condition": {
+          "operator": "GTE",
+          "lhs": {
+            "var": "Dr",
+            "desc": "軽減後垂直積雪量"
+          },
+          "rhs": {
+            "value": 1,
+            "unit": "m",
+            "desc": "下限値"
+          }
+        }
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "軽減措置適用可",
+        "result": "pass",
+        "description": "雪下ろしによる積雪荷重の軽減措置を適用できる"
+      },
+      {
+        "id": "end-not-applicable",
+        "type": "terminal",
+        "title": "軽減措置適用対象外",
+        "result": "end",
+        "description": "雪下ろし慣習地方でないため軽減措置の適用対象外"
+      },
+      {
+        "id": "end-no-reduction",
+        "type": "terminal",
+        "title": "軽減不要",
+        "result": "end",
+        "description": "垂直積雪量が1m以下のため軽減措置の適用は不要"
+      },
+      {
+        "id": "end-no-apply",
+        "type": "terminal",
+        "title": "軽減措置不適用",
+        "result": "end",
+        "description": "軽減措置を適用しない選択"
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "軽減条件不適合",
+        "result": "fail",
+        "description": "軽減後の垂直積雪量が下限値1m未満のため不適合"
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge-001",
+        "from": "start",
+        "to": "proc-001",
+        "role": "flow"
+      },
+      {
+        "id": "edge-002",
+        "from": "proc-001",
+        "to": "dec-001",
+        "role": "flow"
+      },
+      {
+        "id": "edge-003",
+        "from": "dec-001",
+        "to": "dec-002",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "edge-004",
+        "from": "dec-001",
+        "to": "end-not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "edge-005",
+        "from": "dec-002",
+        "to": "proc-002",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "edge-006",
+        "from": "dec-002",
+        "to": "end-no-reduction",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "edge-007",
+        "from": "proc-002",
+        "to": "dec-003",
+        "role": "flow"
+      },
+      {
+        "id": "edge-008",
+        "from": "dec-003",
+        "to": "proc-003",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "edge-009",
+        "from": "dec-003",
+        "to": "end-no-apply",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "edge-010",
+        "from": "proc-003",
+        "to": "dec-004",
+        "role": "flow"
+      },
+      {
+        "id": "edge-011",
+        "from": "dec-004",
+        "to": "end-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "edge-012",
+        "from": "dec-004",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-KIJO-A86-P6",
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": [
+        "A86:P1",
+        "A86:P3",
+        "A86:P7"
+      ],
+      "description": "第1項で積雪荷重の計算方法、第3項で垂直積雪量の決定方法を規定。第7項で軽減適用建築物の表示義務を規定。"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00Z",
+    "updated_at": "2026-01-26T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令",
+    "checklist_ref": "建築基準法施行令第86条第6項（積雪荷重の軽減）"
+  }
+}

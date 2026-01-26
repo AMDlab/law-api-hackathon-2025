@@ -1,0 +1,260 @@
+{
+  "id": "A42_P2_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "土台の基礎への緊結",
+    "target_subject": "土台",
+    "description": "土台が基礎に緊結されているかを判定するフローチャート"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "42",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造",
+    "適合判定フロー"
+  ],
+  "text_raw": "土台は、基礎に緊結しなければならない。ただし、平家建ての建築物で延べ面積が五十平方メートル以内のものについては、この限りでない。",
+  "kijo_diagram_ref": "CHK-ORD-A42-P2",
+  "flow_diagram": {
+    "title": "令第42条第2項適合判定フロー",
+    "description": "土台の基礎への緊結要件の適合判定。ただし書きによる適用除外（平家建てかつ延べ面積50m2以内）の判定を含む。",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "令第42条第2項の適合判定を開始"
+      },
+      {
+        "id": "proc-identify-building",
+        "type": "process",
+        "title": "対象建築物の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から判定対象となる建築物を特定する"
+      },
+      {
+        "id": "dec-has-dodai",
+        "type": "decision",
+        "title": "土台を有するか？",
+        "decision_type": "binary",
+        "description": "建築物が土台を有する構造であるかを確認"
+      },
+      {
+        "id": "proc-identify-dodai",
+        "type": "process",
+        "title": "土台の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の土台を特定する"
+      },
+      {
+        "id": "dec-story-count",
+        "type": "decision",
+        "title": "階数は？",
+        "decision_type": "multi",
+        "description": "建築物の階数を確認する",
+        "options": [
+          { "value": "1階", "description": "平家建て" },
+          { "value": "2階以上", "description": "2階以上の建築物" }
+        ]
+      },
+      {
+        "id": "proc-hiraya-check",
+        "type": "process",
+        "title": "平家建て該当",
+        "process_type": "mechanical",
+        "description": "階数が1階のため平家建てに該当"
+      },
+      {
+        "id": "dec-area-50",
+        "type": "decision",
+        "title": "延べ面積 <= 50m2か？",
+        "decision_type": "binary",
+        "description": "延べ面積が五十平方メートル以内であるかを判定",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "total_area", "desc": "延べ面積" },
+          "rhs": { "value": 50, "unit": "m2" }
+        }
+      },
+      {
+        "id": "dec-exempt-check",
+        "type": "decision",
+        "title": "ただし書き適用除外に該当するか？",
+        "decision_type": "binary",
+        "description": "平家建てかつ延べ面積50m2以内の条件をすべて満たすか確認"
+      },
+      {
+        "id": "proc-exempt",
+        "type": "process",
+        "title": "ただし書き適用除外該当",
+        "process_type": "mechanical",
+        "description": "平家建てかつ延べ面積50m2以内のため、本項の適用除外となる"
+      },
+      {
+        "id": "dec-fastening",
+        "type": "decision",
+        "title": "土台が基礎に緊結されているか？",
+        "decision_type": "binary",
+        "description": "全ての土台が基礎に緊結されているかを確認"
+      },
+      {
+        "id": "proc-fastening-ok",
+        "type": "process",
+        "title": "緊結要件適合",
+        "process_type": "human_judgment",
+        "description": "土台が基礎に緊結されていることを確認"
+      },
+      {
+        "id": "end-pass-exempt",
+        "type": "terminal",
+        "title": "適合（適用除外）",
+        "result": "pass",
+        "description": "ただし書きの適用除外に該当するため適合"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "土台が基礎に緊結されているため令第42条第2項に適合"
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "土台が基礎に緊結されていないため令第42条第2項に不適合"
+      },
+      {
+        "id": "end-not-applicable",
+        "type": "terminal",
+        "title": "該当なし",
+        "result": "end",
+        "description": "土台を有しない建築物のため本項の対象外"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e001",
+        "from": "start",
+        "to": "proc-identify-building",
+        "role": "flow"
+      },
+      {
+        "id": "e002",
+        "from": "proc-identify-building",
+        "to": "dec-has-dodai",
+        "role": "flow"
+      },
+      {
+        "id": "e003",
+        "from": "dec-has-dodai",
+        "to": "end-not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e004",
+        "from": "dec-has-dodai",
+        "to": "proc-identify-dodai",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e005",
+        "from": "proc-identify-dodai",
+        "to": "dec-story-count",
+        "role": "flow"
+      },
+      {
+        "id": "e006",
+        "from": "dec-story-count",
+        "to": "proc-hiraya-check",
+        "role": "option",
+        "label": "1階"
+      },
+      {
+        "id": "e007",
+        "from": "dec-story-count",
+        "to": "dec-fastening",
+        "role": "option",
+        "label": "2階以上"
+      },
+      {
+        "id": "e008",
+        "from": "proc-hiraya-check",
+        "to": "dec-area-50",
+        "role": "flow"
+      },
+      {
+        "id": "e009",
+        "from": "dec-area-50",
+        "to": "dec-exempt-check",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e009a",
+        "from": "dec-exempt-check",
+        "to": "proc-exempt",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e009b",
+        "from": "dec-exempt-check",
+        "to": "dec-fastening",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e010",
+        "from": "dec-area-50",
+        "to": "dec-fastening",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e011",
+        "from": "proc-exempt",
+        "to": "end-pass-exempt",
+        "role": "flow"
+      },
+      {
+        "id": "e012",
+        "from": "dec-fastening",
+        "to": "proc-fastening-ok",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e013",
+        "from": "dec-fastening",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e014",
+        "from": "proc-fastening-ok",
+        "to": "end-pass",
+        "role": "flow"
+      }
+    ]
+  },
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00Z",
+    "generator": "claude-code-flow-generator",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令",
+    "checklist_ref": "確認審査報告書チェックリスト"
+  }
+}

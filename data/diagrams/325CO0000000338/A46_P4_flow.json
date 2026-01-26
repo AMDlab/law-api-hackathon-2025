@@ -1,0 +1,433 @@
+{
+  "id": "A46_P4_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "木造軸組の構造方法",
+    "target_subject": "軸組",
+    "description": "階数2以上又は延べ面積50平方メートルを超える木造建築物において、第1項で配置する軸組が所定の構造方法を用い、大臣定め基準に従って設置されていることを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "46",
+    "paragraph": "4",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造",
+    "木造",
+    "軸組"
+  ],
+  "text_raw": "階数が二以上又は延べ面積が五十平方メートルを超える木造の建築物においては、第一項の規定により配置する軸組は、当該建築物の各階に作用する水平力により構造耐力上支障のある変形又は破壊が生じないよう木材、鉄筋その他必要な強度を有する材料を使用した壁又は筋かいが有効に設けられたものとして国土交通大臣が定めた構造方法を用いるもの又は国土交通大臣の認定を受けたものを、当該建築物が地震及び風圧に対して構造耐力上安全なものとなるように国土交通大臣が定める基準に従つて設置するものでなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "structure",
+          "value": "木造"
+        },
+        {
+          "operator": "OR",
+          "conditions": [
+            {
+              "type": "numeric",
+              "field": "階数",
+              "operator": ">=",
+              "value": 2
+            },
+            {
+              "type": "numeric",
+              "field": "延べ面積",
+              "operator": ">",
+              "value": 50,
+              "unit": "m2"
+            }
+          ]
+        }
+      ],
+      "note": "階数が二以上又は延べ面積が五十平方メートルを超える木造の建築物"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "operator": "OR",
+          "conditions": [
+            {
+              "ref": "info-minister-method",
+              "operator": "==",
+              "value": true
+            },
+            {
+              "ref": "info-minister-approval",
+              "operator": "==",
+              "value": true
+            }
+          ]
+        },
+        {
+          "ref": "info-installation-compliance",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    }
+  },
+  "flow_diagram": {
+    "title": "令第46条第4項 適合判定フロー",
+    "description": "木造軸組の構造方法に関する適合判定フローチャート",
+    "nodes": [
+      {
+        "id": "terminal-start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start"
+      },
+      {
+        "id": "decision-structure-type",
+        "type": "decision",
+        "title": "構造種別は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "木造", "description": "主要構造部が木造" },
+          { "value": "その他", "description": "木造以外（鉄骨造、RC造等）" }
+        ],
+        "description": "設計図書等から建築物の構造種別を確認"
+      },
+      {
+        "id": "decision-story-count",
+        "type": "decision",
+        "title": "階数は2以上か？",
+        "decision_type": "binary",
+        "description": "建築物の階数が2以上であるか確認",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "N", "desc": "階数" },
+          "rhs": { "value": 2, "unit": "階" }
+        }
+      },
+      {
+        "id": "decision-total-area",
+        "type": "decision",
+        "title": "延べ面積は50m2超か？",
+        "decision_type": "binary",
+        "description": "建築物の延べ面積が50平方メートルを超えるか確認",
+        "condition": {
+          "operator": "GT",
+          "lhs": { "var": "A", "desc": "延べ面積" },
+          "rhs": { "value": 50, "unit": "m2" }
+        }
+      },
+      {
+        "id": "process-scope-out",
+        "type": "process",
+        "title": "本項の適用範囲外",
+        "process_type": "mechanical",
+        "description": "木造以外、または階数1かつ延べ面積50m2以下のため本項不適用"
+      },
+      {
+        "id": "process-frame-identify",
+        "type": "process",
+        "title": "令46条1項で配置する軸組を特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から第1項の規定により配置する軸組を特定する"
+      },
+      {
+        "id": "process-loop-start",
+        "type": "process",
+        "title": "各軸組について以下を確認",
+        "process_type": "mechanical",
+        "description": "特定した軸組の集合に対して繰り返し処理を開始"
+      },
+      {
+        "id": "process-wall-brace-method",
+        "type": "process",
+        "title": "壁・筋かいの構造方法を特定",
+        "process_type": "undefined_input",
+        "description": "当該軸組について、壁又は筋かいの構造方法を特定する"
+      },
+      {
+        "id": "decision-minister-method",
+        "type": "decision",
+        "title": "大臣定め構造方法に該当するか？",
+        "decision_type": "binary",
+        "description": "軸組の構造方法が国土交通大臣が定めた構造方法に該当するか判定"
+      },
+      {
+        "id": "process-minister-method-ok",
+        "type": "process",
+        "title": "大臣定め構造方法に該当",
+        "process_type": "mechanical",
+        "description": "当該軸組は大臣定め構造方法を用いている"
+      },
+      {
+        "id": "decision-minister-approval",
+        "type": "decision",
+        "title": "大臣認定を受けたものか？",
+        "decision_type": "binary",
+        "description": "軸組の構造方法が国土交通大臣の認定を受けたものであるか確認"
+      },
+      {
+        "id": "process-minister-approval-ok",
+        "type": "process",
+        "title": "大臣認定を受けたものである",
+        "process_type": "mechanical",
+        "description": "当該軸組は大臣認定を受けたものである"
+      },
+      {
+        "id": "process-method-compliance-ok",
+        "type": "process",
+        "title": "当該軸組は構造方法適合",
+        "process_type": "mechanical",
+        "description": "当該軸組は大臣定め構造方法又は大臣認定に適合"
+      },
+      {
+        "id": "decision-all-frames-checked",
+        "type": "decision",
+        "title": "全ての軸組を確認したか？",
+        "decision_type": "binary",
+        "description": "令46条1項で配置する全ての軸組について確認が完了したか"
+      },
+      {
+        "id": "process-all-method-compliance",
+        "type": "process",
+        "title": "全軸組が構造方法適合",
+        "process_type": "mechanical",
+        "description": "全ての軸組が大臣定め構造方法又は大臣認定に適合している"
+      },
+      {
+        "id": "process-installation-identify",
+        "type": "process",
+        "title": "軸組の設置方法を特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から軸組の設置方法（配置、接合等）を特定する"
+      },
+      {
+        "id": "decision-installation-compliance",
+        "type": "decision",
+        "title": "大臣定め設置基準に適合するか？",
+        "decision_type": "binary",
+        "description": "軸組が地震及び風圧に対して構造耐力上安全なものとなるように国土交通大臣が定める基準に従って設置されているか"
+      },
+      {
+        "id": "process-installation-ok",
+        "type": "process",
+        "title": "設置基準に適合",
+        "process_type": "mechanical",
+        "description": "軸組が大臣定め設置基準に従って設置されている"
+      },
+      {
+        "id": "terminal-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令第46条第4項に適合"
+      },
+      {
+        "id": "terminal-fail-method",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "軸組が大臣定め構造方法にも大臣認定にも該当しない"
+      },
+      {
+        "id": "terminal-fail-installation",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "軸組が大臣定め設置基準に適合しない"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "terminal-start",
+        "to": "decision-structure-type",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "decision-structure-type",
+        "to": "decision-story-count",
+        "role": "option",
+        "label": "木造"
+      },
+      {
+        "id": "e03",
+        "from": "decision-structure-type",
+        "to": "process-scope-out",
+        "role": "option",
+        "label": "その他"
+      },
+      {
+        "id": "e04",
+        "from": "decision-story-count",
+        "to": "process-frame-identify",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e05",
+        "from": "decision-story-count",
+        "to": "decision-total-area",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e06",
+        "from": "decision-total-area",
+        "to": "process-frame-identify",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e07",
+        "from": "decision-total-area",
+        "to": "process-scope-out",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e08",
+        "from": "process-scope-out",
+        "to": "terminal-pass",
+        "role": "flow"
+      },
+      {
+        "id": "e09",
+        "from": "process-frame-identify",
+        "to": "process-loop-start",
+        "role": "flow"
+      },
+      {
+        "id": "e10",
+        "from": "process-loop-start",
+        "to": "process-wall-brace-method",
+        "role": "flow"
+      },
+      {
+        "id": "e11",
+        "from": "process-wall-brace-method",
+        "to": "decision-minister-method",
+        "role": "flow"
+      },
+      {
+        "id": "e12",
+        "from": "decision-minister-method",
+        "to": "process-minister-method-ok",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e13",
+        "from": "decision-minister-method",
+        "to": "decision-minister-approval",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e14",
+        "from": "process-minister-method-ok",
+        "to": "process-method-compliance-ok",
+        "role": "flow"
+      },
+      {
+        "id": "e15",
+        "from": "decision-minister-approval",
+        "to": "process-minister-approval-ok",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e16",
+        "from": "decision-minister-approval",
+        "to": "terminal-fail-method",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e17",
+        "from": "process-minister-approval-ok",
+        "to": "process-method-compliance-ok",
+        "role": "flow"
+      },
+      {
+        "id": "e18",
+        "from": "process-method-compliance-ok",
+        "to": "decision-all-frames-checked",
+        "role": "flow"
+      },
+      {
+        "id": "e19",
+        "from": "decision-all-frames-checked",
+        "to": "process-all-method-compliance",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e20",
+        "from": "decision-all-frames-checked",
+        "to": "process-wall-brace-method",
+        "role": "no",
+        "label": "いいえ（次の軸組へ）"
+      },
+      {
+        "id": "e21",
+        "from": "process-all-method-compliance",
+        "to": "process-installation-identify",
+        "role": "flow"
+      },
+      {
+        "id": "e22",
+        "from": "process-installation-identify",
+        "to": "decision-installation-compliance",
+        "role": "flow"
+      },
+      {
+        "id": "e23",
+        "from": "decision-installation-compliance",
+        "to": "process-installation-ok",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e24",
+        "from": "decision-installation-compliance",
+        "to": "terminal-fail-installation",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e25",
+        "from": "process-installation-ok",
+        "to": "terminal-pass",
+        "role": "flow"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSO-A46-P4",
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": [
+        "A46:P1"
+      ],
+      "description": "第1項の規定により配置する軸組を参照"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00+09:00",
+    "updated_at": "2026-01-26T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

@@ -1,0 +1,269 @@
+{
+  "id": "CHK-BSL-FLOW-A122-P3",
+  "version": "3.2",
+  "page_title": {
+    "title": "物品販売店舗の直通階段における特別避難階段要件の適合判定",
+    "target_subject": "直通階段",
+    "description": "5階以上または15階以上の売場に通ずる直通階段の特別避難階段化要件の適合判定フロー"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "122",
+    "paragraph": "3",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "避難施設"
+  ],
+  "text_raw": "前項の直通階段で、五階以上の売場に通ずるものはその一以上を、十五階以上の売場に通ずるものはその全てを次条第三項の規定による特別避難階段としなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "building_use",
+          "value": "3階以上の階を物品販売業を営む店舗用途に供する建築物"
+        },
+        {
+          "type": "facility",
+          "value": "令第122条第2項に基づく直通階段（各階の売場及び屋上広場に通ずる2以上の直通階段）"
+        }
+      ],
+      "note": "前項（第2項）の直通階段が対象"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "type": "requirement",
+          "value": "5階以上の売場に通ずる直通階段は1以上を特別避難階段とする",
+          "description": "次条第3項の規定による特別避難階段"
+        },
+        {
+          "type": "requirement",
+          "value": "15階以上の売場に通ずる直通階段は全てを特別避難階段とする",
+          "description": "次条第3項の規定による特別避難階段"
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "flow_diagram": {
+    "title": "令第122条第3項適合判定フロー",
+    "description": "物品販売店舗の直通階段における特別避難階段要件の適合判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "令第122条第3項適合判定の開始"
+      },
+      {
+        "id": "proc-get-stairs",
+        "type": "process",
+        "title": "令第122条第2項に基づく直通階段を特定",
+        "process_type": "undefined_input",
+        "description": "設計図書から各階の売場及び屋上広場に通ずる2以上の直通階段を特定する",
+        "related_articles": ["令::A122:P2"]
+      },
+      {
+        "id": "proc-get-floors",
+        "type": "process",
+        "title": "各直通階段が通ずる売場の最上階を特定",
+        "process_type": "undefined_input",
+        "description": "各直通階段が何階の売場に通じているかを特定する"
+      },
+      {
+        "id": "dec-has-5f-stairs",
+        "type": "decision",
+        "title": "5階以上の売場に通ずる直通階段があるか？",
+        "decision_type": "binary",
+        "description": "5階以上の売場に通ずる直通階段が1つ以上存在するかを判定"
+      },
+      {
+        "id": "proc-check-5f-stair-types",
+        "type": "process",
+        "title": "5階以上売場に通ずる各直通階段の種別を確認",
+        "process_type": "undefined_input",
+        "description": "5階以上売場に通ずる直通階段が令第123条第3項の特別避難階段の構造を有するか確認",
+        "related_articles": ["令::A123:P3"]
+      },
+      {
+        "id": "dec-5f-has-special",
+        "type": "decision",
+        "title": "5階以上売場に通ずる直通階段のうち1以上が特別避難階段か？",
+        "decision_type": "binary",
+        "description": "5階以上売場に通ずる直通階段の中に特別避難階段が1以上あるかを判定",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "N5", "desc": "5階以上売場接続の特別避難階段数" },
+          "rhs": { "value": 1 }
+        }
+      },
+      {
+        "id": "dec-has-15f-stairs",
+        "type": "decision",
+        "title": "15階以上の売場に通ずる直通階段があるか？",
+        "decision_type": "binary",
+        "description": "15階以上の売場に通ずる直通階段が1つ以上存在するかを判定"
+      },
+      {
+        "id": "proc-check-15f-stair-types",
+        "type": "process",
+        "title": "15階以上売場に通ずる各直通階段の種別を確認",
+        "process_type": "undefined_input",
+        "description": "15階以上売場に通ずる直通階段が令第123条第3項の特別避難階段の構造を有するか確認",
+        "related_articles": ["令::A123:P3"]
+      },
+      {
+        "id": "dec-15f-all-special",
+        "type": "decision",
+        "title": "15階以上売場に通ずる直通階段の全てが特別避難階段か？",
+        "decision_type": "binary",
+        "description": "15階以上売場に通ずる直通階段の全てが特別避難階段であるかを判定",
+        "condition": {
+          "operator": "EQ",
+          "lhs": { "var": "A15", "desc": "15階以上売場接続の全てが特別避難階段" },
+          "rhs": { "value": true }
+        }
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令第122条第3項の要件を満たす"
+      },
+      {
+        "id": "end-fail-5f",
+        "type": "terminal",
+        "title": "不適合（5階以上要件）",
+        "result": "fail",
+        "description": "5階以上の売場に通ずる直通階段のうち1以上が特別避難階段でない"
+      },
+      {
+        "id": "end-fail-15f",
+        "type": "terminal",
+        "title": "不適合（15階以上要件）",
+        "result": "fail",
+        "description": "15階以上の売場に通ずる直通階段の全てが特別避難階段でない"
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge-001",
+        "from": "start",
+        "to": "proc-get-stairs",
+        "role": "flow"
+      },
+      {
+        "id": "edge-002",
+        "from": "proc-get-stairs",
+        "to": "proc-get-floors",
+        "role": "flow"
+      },
+      {
+        "id": "edge-003",
+        "from": "proc-get-floors",
+        "to": "dec-has-5f-stairs",
+        "role": "flow"
+      },
+      {
+        "id": "edge-004",
+        "from": "dec-has-5f-stairs",
+        "to": "proc-check-5f-stair-types",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "edge-005",
+        "from": "dec-has-5f-stairs",
+        "to": "dec-has-15f-stairs",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "edge-006",
+        "from": "proc-check-5f-stair-types",
+        "to": "dec-5f-has-special",
+        "role": "flow"
+      },
+      {
+        "id": "edge-007",
+        "from": "dec-5f-has-special",
+        "to": "dec-has-15f-stairs",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "edge-008",
+        "from": "dec-5f-has-special",
+        "to": "end-fail-5f",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "edge-009",
+        "from": "dec-has-15f-stairs",
+        "to": "proc-check-15f-stair-types",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "edge-010",
+        "from": "dec-has-15f-stairs",
+        "to": "end-pass",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "edge-011",
+        "from": "proc-check-15f-stair-types",
+        "to": "dec-15f-all-special",
+        "role": "flow"
+      },
+      {
+        "id": "edge-012",
+        "from": "dec-15f-all-special",
+        "to": "end-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "edge-013",
+        "from": "dec-15f-all-special",
+        "to": "end-fail-15f",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-KIJO-A122-P3",
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": [
+        "A122:P2",
+        "A123:P3"
+      ],
+      "description": "第122条第2項で前提となる直通階段の設置要件を規定。第123条第3項で特別避難階段の構造を規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00Z",
+    "updated_at": "2026-01-26T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令",
+    "checklist_ref": "建築基準法施行令第122条第3項（物品販売店舗の直通階段における特別避難階段要件）"
+  }
+}

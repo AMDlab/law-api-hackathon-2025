@@ -1,0 +1,232 @@
+{
+  "id": "FLOW-ORD-A126_3-P2",
+  "version": "3.2",
+  "page_title": {
+    "title": "排煙設備構造規定の適用除外判定フロー",
+    "target_subject": "排煙設備",
+    "description": "送風機を設けた排煙設備その他の特殊な構造の排煙設備について、第1項の構造規定が適用除外となるか判定するフローチャート"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "126_3",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "排煙設備",
+    "適用除外",
+    "大臣認定"
+  ],
+  "text_raw": "前項の規定は、送風機を設けた排煙設備その他の特殊な構造の排煙設備で、通常の火災時に生ずる煙を有効に排出することができるものとして、国土交通大臣が定めた構造方法を用いるもの又は国土交通大臣の認定を受けたものについては、適用しない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "equipment_type",
+          "description": "送風機を設けた排煙設備その他の特殊な構造の排煙設備であること"
+        },
+        {
+          "type": "performance",
+          "description": "通常の火災時に生ずる煙を有効に排出することができること"
+        }
+      ],
+      "note": "国土交通大臣が定めた構造方法または大臣認定が要件"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "lhs": {
+        "text": "国土交通大臣が定めた構造方法を用いるもの"
+      },
+      "rhs": {
+        "text": "国土交通大臣の認定を受けたもの"
+      },
+      "conditions": [
+        {
+          "type": "ministerial_approval",
+          "description": "大臣告示による構造方法または大臣認定のいずれかに該当"
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "flow_diagram": {
+    "title": "令第126条の3第2項 排煙設備構造規定の適用除外判定フロー",
+    "description": "特殊な構造の排煙設備が第1項の構造規定の適用除外となるか判定する",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "排煙設備構造規定の適用除外判定を開始"
+      },
+      {
+        "id": "dec-equipment-type",
+        "type": "decision",
+        "title": "排煙設備の種類は？",
+        "decision_type": "multi",
+        "options": [
+          {
+            "value": "送風機式排煙設備",
+            "description": "送風機を設けた排煙設備"
+          },
+          {
+            "value": "その他特殊構造",
+            "description": "その他の特殊な構造の排煙設備"
+          },
+          {
+            "value": "一般排煙設備",
+            "description": "一般的な排煙設備（自然排煙等）"
+          }
+        ],
+        "description": "設計図書等から排煙設備の種類を確認する"
+      },
+      {
+        "id": "dec-ministerial-method",
+        "type": "decision",
+        "title": "国土交通大臣が定めた構造方法を用いているか？",
+        "decision_type": "binary",
+        "description": "告示等で定められた構造方法との照合を行い、適合しているか確認する",
+        "condition": {
+          "operator": "EQ",
+          "lhs": {
+            "var": "M",
+            "desc": "大臣告示構造方法適合"
+          },
+          "rhs": {
+            "value": true,
+            "desc": "適合している"
+          }
+        }
+      },
+      {
+        "id": "dec-ministerial-certification",
+        "type": "decision",
+        "title": "国土交通大臣の認定を受けているか？",
+        "decision_type": "binary",
+        "description": "認定書の有無を確認し、大臣認定を受けているか判定する",
+        "condition": {
+          "operator": "EQ",
+          "lhs": {
+            "var": "C",
+            "desc": "大臣認定の有無"
+          },
+          "rhs": {
+            "value": true,
+            "desc": "認定あり"
+          }
+        }
+      },
+      {
+        "id": "end-exempt",
+        "type": "terminal",
+        "title": "第1項の規定は適用しない",
+        "result": "pass",
+        "description": "令第126条の3第1項の排煙設備構造規定が適用除外となる",
+        "related_articles": ["令第126条の3第1項"]
+      },
+      {
+        "id": "end-not-exempt",
+        "type": "terminal",
+        "title": "第1項の規定を適用",
+        "result": "fail",
+        "description": "令第126条の3第1項の排煙設備構造規定が適用される（適用除外に該当しない）",
+        "related_articles": ["令第126条の3第1項"]
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-equipment-type",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-equipment-type",
+        "to": "dec-ministerial-method",
+        "role": "option",
+        "label": "送風機式排煙設備"
+      },
+      {
+        "id": "e03",
+        "from": "dec-equipment-type",
+        "to": "dec-ministerial-method",
+        "role": "option",
+        "label": "その他特殊構造"
+      },
+      {
+        "id": "e04",
+        "from": "dec-equipment-type",
+        "to": "end-not-exempt",
+        "role": "option",
+        "label": "一般排煙設備"
+      },
+      {
+        "id": "e05",
+        "from": "dec-ministerial-method",
+        "to": "end-exempt",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e06",
+        "from": "dec-ministerial-method",
+        "to": "dec-ministerial-certification",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e07",
+        "from": "dec-ministerial-certification",
+        "to": "end-exempt",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e08",
+        "from": "dec-ministerial-certification",
+        "to": "end-not-exempt",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-ORD-A126_3-P2",
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": [
+        "A126_3:P1"
+      ],
+      "description": "第1項の排煙設備構造規定（本条が適用除外規定として機能）"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": [
+        "A126_2:P1"
+      ],
+      "description": "排煙設備の設置義務規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00+09:00",
+    "updated_at": "2026-01-26T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令",
+    "source": "e-Gov法令API v2"
+  }
+}

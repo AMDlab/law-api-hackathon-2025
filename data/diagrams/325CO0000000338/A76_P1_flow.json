@@ -1,0 +1,286 @@
+{
+  "id": "A76_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "型わく及び支柱の除去基準",
+    "target_subject": "型わく・支柱",
+    "description": "構造耐力上主要な部分に係る型わく及び支柱が、コンクリートが十分な強度になるまで取りはずされないことを確認する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "76",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造",
+    "施工"
+  ],
+  "text_raw": "構造耐力上主要な部分に係る型わく及び支柱は、コンクリートが自重及び工事の施工中の荷重によつて著しい変形又はひび割れその他の損傷を受けない強度になるまでは、取りはずしてはならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "building_component",
+          "value": "構造耐力上主要な部分に係る型わく及び支柱"
+        }
+      ],
+      "note": "構造耐力上主要な部分（壁、柱、床、はり、屋根、階段）に使用されるコンクリートの型わく及び支柱が対象"
+    },
+    "judgment_rule": {
+      "operator": "IMPLIES",
+      "conditions": [
+        {
+          "ref": "info-removal-status",
+          "operator": "==",
+          "value": true,
+          "note": "型わく・支柱を取り外す場合"
+        },
+        {
+          "ref": "info-strength-sufficient",
+          "operator": "==",
+          "value": true,
+          "note": "コンクリートが十分な強度に達していること"
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "flow_diagram": {
+    "title": "型わく・支柱の除去基準適合判定フロー",
+    "description": "構造耐力上主要な部分に係る型わく及び支柱の取り外しが適正であるかを判定するフロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "令76条1項適合判定開始"
+      },
+      {
+        "id": "dec-has-structural-parts",
+        "type": "decision",
+        "title": "構造耐力上主要な部分に係る型わく・支柱があるか？",
+        "decision_type": "binary",
+        "description": "建築物に構造耐力上主要な部分（壁、柱、床、はり、屋根、階段）に係る型わく及び支柱が存在するか確認"
+      },
+      {
+        "id": "proc-identify-formwork",
+        "type": "process",
+        "title": "型わく・支柱の特定",
+        "process_type": "human_judgment",
+        "description": "構造耐力上主要な部分に係る全ての型わく及び支柱を設計図書等から特定する"
+      },
+      {
+        "id": "dec-removal-planned",
+        "type": "decision",
+        "title": "当該型わく・支柱の取り外しが計画されているか？",
+        "decision_type": "binary",
+        "description": "施工計画書等において当該型わく・支柱の取り外しが計画されているかを確認"
+      },
+      {
+        "id": "proc-check-strength",
+        "type": "process",
+        "title": "コンクリート強度の確認",
+        "process_type": "human_judgment",
+        "description": "取り外し予定時点でのコンクリート強度を設計図書、試験成績書、養生記録等から確認する",
+        "related_articles": ["令::A76:P2"]
+      },
+      {
+        "id": "dec-strength-sufficient",
+        "type": "decision",
+        "title": "コンクリートが十分な強度に達しているか？",
+        "decision_type": "binary",
+        "description": "コンクリートが自重及び工事の施工中の荷重によって著しい変形又はひび割れその他の損傷を受けない強度に達しているか判定",
+        "condition": {
+          "operator": "GTE",
+          "lhs": {
+            "var": "concrete_strength",
+            "desc": "コンクリートの強度"
+          },
+          "rhs": {
+            "var": "required_strength",
+            "desc": "取り外しに必要な強度",
+            "unit": "N/mm2"
+          }
+        },
+        "related_articles": ["令::A76:P2"]
+      },
+      {
+        "id": "proc-individual-pass",
+        "type": "process",
+        "title": "当該型わく・支柱の適合確認",
+        "process_type": "mechanical",
+        "description": "当該型わく・支柱は令76条1項に適合（取り外し時にコンクリート強度が十分である）"
+      },
+      {
+        "id": "proc-no-removal-pass",
+        "type": "process",
+        "title": "取り外し計画なし：適合",
+        "process_type": "mechanical",
+        "description": "取り外し計画がない場合、規制の対象外（取りはずしてはならない規定に抵触しない）"
+      },
+      {
+        "id": "dec-all-checked",
+        "type": "decision",
+        "title": "全ての型わく・支柱を確認したか？",
+        "decision_type": "binary",
+        "description": "構造耐力上主要な部分に係る全ての型わく・支柱について確認が完了したか"
+      },
+      {
+        "id": "proc-check-next",
+        "type": "process",
+        "title": "次の型わく・支柱を確認",
+        "process_type": "mechanical",
+        "description": "未確認の型わく・支柱について確認を行う"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令76条1項に適合：全ての型わく・支柱について、取り外し時にコンクリートが十分な強度に達している"
+      },
+      {
+        "id": "pass-na",
+        "type": "terminal",
+        "title": "規定の適用なし",
+        "result": "pass",
+        "description": "構造耐力上主要な部分に係る型わく・支柱がないため、令76条1項の適用対象外"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "令76条1項に不適合：コンクリートが十分な強度に達する前に取り外しが計画されている"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-has-structural-parts",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-has-structural-parts",
+        "to": "proc-identify-formwork",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "dec-has-structural-parts",
+        "to": "pass-na",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e04",
+        "from": "proc-identify-formwork",
+        "to": "dec-removal-planned",
+        "role": "flow"
+      },
+      {
+        "id": "e05",
+        "from": "dec-removal-planned",
+        "to": "proc-check-strength",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e06",
+        "from": "dec-removal-planned",
+        "to": "proc-no-removal-pass",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e07",
+        "from": "proc-check-strength",
+        "to": "dec-strength-sufficient",
+        "role": "flow"
+      },
+      {
+        "id": "e08",
+        "from": "dec-strength-sufficient",
+        "to": "proc-individual-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e09",
+        "from": "dec-strength-sufficient",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e10",
+        "from": "proc-individual-pass",
+        "to": "dec-all-checked",
+        "role": "flow"
+      },
+      {
+        "id": "e11",
+        "from": "proc-no-removal-pass",
+        "to": "dec-all-checked",
+        "role": "flow"
+      },
+      {
+        "id": "e12",
+        "from": "dec-all-checked",
+        "to": "pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e13",
+        "from": "dec-all-checked",
+        "to": "proc-check-next",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e14",
+        "from": "proc-check-next",
+        "to": "dec-removal-planned",
+        "role": "flow"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-ORDER-A76-P1",
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": ["A76:P2"],
+      "description": "第2項で型わく及び支柱の取りはずしに関する技術的基準を国土交通大臣が定めることを規定"
+    },
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": ["A20:P1"],
+      "description": "法第20条（構造耐力）に基づく構造関係規定の一つ"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00.000Z",
+    "updated_at": "2026-01-26T00:00:00.000Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

@@ -1,0 +1,244 @@
+{
+  "id": "A68_P5_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "リベットの打ち方適合判定フロー",
+    "target_subject": "リベット",
+    "description": "リベットがリベット孔に充分埋まるように打たれているかを判定するフロー"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "68",
+    "paragraph": "5",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造規定",
+    "リベット接合"
+  ],
+  "text_raw": "リベットは、リベット孔に充分埋まるように打たなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "element",
+          "value": "リベット接合を用いる建築物"
+        }
+      ]
+    },
+    "judgment_rule": {
+      "operator": "FORALL",
+      "conditions": [
+        {
+          "ref": "info-rivet-filled",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "flow_diagram": {
+    "title": "令第68条第5項 リベットの打ち方適合判定フロー",
+    "description": "建築物のリベット接合部について、リベットがリベット孔に充分埋まっているかを判定する",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "令第68条第5項の適合判定を開始"
+      },
+      {
+        "id": "dec-rivet-exists",
+        "type": "decision",
+        "title": "リベット接合を使用しているか？",
+        "decision_type": "binary",
+        "description": "建築物にリベット接合が使用されているかを確認"
+      },
+      {
+        "id": "proc-identify-rivets",
+        "type": "process",
+        "title": "リベット接合箇所の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書からリベット接合箇所を特定し、検査対象のリベットを洗い出す"
+      },
+      {
+        "id": "dec-rivet-remaining",
+        "type": "decision",
+        "title": "未検査のリベットがあるか？",
+        "decision_type": "binary",
+        "description": "まだ充填状態を確認していないリベットがあるか"
+      },
+      {
+        "id": "proc-select-rivet",
+        "type": "process",
+        "title": "次のリベットを選択",
+        "process_type": "mechanical",
+        "description": "未検査のリベットから次の検査対象を選択"
+      },
+      {
+        "id": "dec-fill-check",
+        "type": "decision",
+        "title": "リベット孔に充分埋まっているか？",
+        "decision_type": "binary",
+        "description": "当該リベットがリベット孔に充分埋まるように打たれているかを目視または計測で確認"
+      },
+      {
+        "id": "proc-record-pass",
+        "type": "process",
+        "title": "当該リベット適合を記録",
+        "process_type": "mechanical",
+        "description": "当該リベットの充填状態が適合であることを記録"
+      },
+      {
+        "id": "proc-record-fail",
+        "type": "process",
+        "title": "当該リベット不適合を記録",
+        "process_type": "mechanical",
+        "description": "当該リベットの充填状態が不適合であることを記録"
+      },
+      {
+        "id": "dec-all-passed",
+        "type": "decision",
+        "title": "すべてのリベットが適合か？",
+        "decision_type": "binary",
+        "description": "全リベットの検査結果を確認し、全て適合しているかを判定"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "すべてのリベットがリベット孔に充分埋まっており、令第68条第5項に適合"
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "リベット孔に充分埋まっていないリベットがあり、令第68条第5項に不適合"
+      },
+      {
+        "id": "end-na",
+        "type": "terminal",
+        "title": "適用対象外",
+        "result": "pass",
+        "description": "リベット接合を使用していないため、本規定の適用対象外"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-rivet-exists",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-rivet-exists",
+        "to": "proc-identify-rivets",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "dec-rivet-exists",
+        "to": "end-na",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e04",
+        "from": "proc-identify-rivets",
+        "to": "dec-rivet-remaining",
+        "role": "flow"
+      },
+      {
+        "id": "e05",
+        "from": "dec-rivet-remaining",
+        "to": "proc-select-rivet",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e06",
+        "from": "dec-rivet-remaining",
+        "to": "dec-all-passed",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e07",
+        "from": "proc-select-rivet",
+        "to": "dec-fill-check",
+        "role": "flow"
+      },
+      {
+        "id": "e08",
+        "from": "dec-fill-check",
+        "to": "proc-record-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e09",
+        "from": "dec-fill-check",
+        "to": "proc-record-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e10",
+        "from": "proc-record-pass",
+        "to": "dec-rivet-remaining",
+        "role": "flow"
+      },
+      {
+        "id": "e11",
+        "from": "proc-record-fail",
+        "to": "dec-rivet-remaining",
+        "role": "flow"
+      },
+      {
+        "id": "e12",
+        "from": "dec-all-passed",
+        "to": "end-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e13",
+        "from": "dec-all-passed",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-ORDER-A68-P5",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": [
+        "A20:P1"
+      ],
+      "description": "法第20条（構造耐力）の委任規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

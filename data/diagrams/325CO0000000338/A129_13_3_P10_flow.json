@@ -1,0 +1,274 @@
+{
+  "id": "CHK-BSL-FLOW-A129_13_3-P10",
+  "version": "3.2.0",
+  "page_title": {
+    "title": "非常用エレベーターの予備電源",
+    "target_subject": "非常用エレベーター",
+    "description": "非常用エレベーターに予備電源が設けられていることの適合判定フロー"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "129の13の3",
+    "paragraph": "10",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "建築設備",
+    "非常用エレベーター"
+  ],
+  "text_raw": "非常用エレベーターには、予備電源を設けなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "building_standard",
+          "value": "高さ31mを超える建築物"
+        },
+        {
+          "type": "facility",
+          "value": "非常用エレベーター"
+        }
+      ],
+      "note": "法第34条第2項及び令第129条の13の2により非常用エレベーターの設置が義務付けられる建築物が対象"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "requirement",
+          "value": "予備電源の設置",
+          "description": "非常用エレベーターに予備電源を設けること"
+        }
+      ]
+    }
+  },
+  "flow_diagram": {
+    "title": "令第129条の13の3第10項 適合判定フロー",
+    "description": "非常用エレベーターに予備電源が設けられているかを判定するフロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "非常用エレベーターの予備電源設置判定を開始"
+      },
+      {
+        "id": "decision-elevator-exists",
+        "type": "decision",
+        "title": "非常用エレベーターがあるか？",
+        "decision_type": "binary",
+        "description": "建築物に非常用エレベーターが設けられているかを確認",
+        "condition": {
+          "operator": "GT",
+          "lhs": {
+            "var": "elevator_count",
+            "desc": "非常用エレベーターの数"
+          },
+          "rhs": {
+            "value": 0,
+            "desc": "0"
+          }
+        }
+      },
+      {
+        "id": "process-identify-elevators",
+        "type": "process",
+        "title": "非常用エレベーターを特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物に設ける非常用エレベーターを全て特定する"
+      },
+      {
+        "id": "process-init-loop",
+        "type": "process",
+        "title": "未確認エレベーターリストを初期化",
+        "process_type": "mechanical",
+        "description": "全ての非常用エレベーターを未確認リストに登録"
+      },
+      {
+        "id": "decision-remaining-elevator",
+        "type": "decision",
+        "title": "未確認のエレベーターがあるか？",
+        "decision_type": "binary",
+        "description": "予備電源の確認が完了していないエレベーターがあるかを判定",
+        "condition": {
+          "operator": "GT",
+          "lhs": {
+            "var": "unchecked_count",
+            "desc": "未確認エレベーター数"
+          },
+          "rhs": {
+            "value": 0,
+            "desc": "0"
+          }
+        }
+      },
+      {
+        "id": "process-select-elevator",
+        "type": "process",
+        "title": "次のエレベーターを選択",
+        "process_type": "mechanical",
+        "description": "未確認リストから次の非常用エレベーターを選択"
+      },
+      {
+        "id": "process-check-backup-power",
+        "type": "process",
+        "title": "予備電源の有無を確認",
+        "process_type": "undefined_input",
+        "description": "選択したエレベーターに予備電源が設けられているかを設計図書等から確認"
+      },
+      {
+        "id": "decision-has-backup-power",
+        "type": "decision",
+        "title": "予備電源があるか？",
+        "decision_type": "binary",
+        "description": "当該エレベーターに予備電源が設けられているかを判定",
+        "condition": {
+          "operator": "EQ",
+          "lhs": {
+            "var": "has_backup_power",
+            "desc": "予備電源の有無"
+          },
+          "rhs": {
+            "value": true,
+            "desc": "あり"
+          }
+        }
+      },
+      {
+        "id": "process-mark-checked",
+        "type": "process",
+        "title": "確認済みとしてマーク",
+        "process_type": "mechanical",
+        "description": "当該エレベーターを確認済みリストに移動"
+      },
+      {
+        "id": "terminal-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "全ての非常用エレベーターに予備電源が設けられており、令第129条の13の3第10項に適合"
+      },
+      {
+        "id": "terminal-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "予備電源が設けられていない非常用エレベーターがあり、令第129条の13の3第10項に不適合"
+      },
+      {
+        "id": "terminal-not-applicable",
+        "type": "terminal",
+        "title": "対象外",
+        "result": "end",
+        "description": "非常用エレベーターがないため本項の適用対象外"
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge-start-to-elevator-check",
+        "from": "start",
+        "to": "decision-elevator-exists",
+        "role": "flow"
+      },
+      {
+        "id": "edge-no-elevator",
+        "from": "decision-elevator-exists",
+        "to": "terminal-not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "edge-has-elevator",
+        "from": "decision-elevator-exists",
+        "to": "process-identify-elevators",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "edge-identify-to-init",
+        "from": "process-identify-elevators",
+        "to": "process-init-loop",
+        "role": "flow"
+      },
+      {
+        "id": "edge-init-to-loop-check",
+        "from": "process-init-loop",
+        "to": "decision-remaining-elevator",
+        "role": "flow"
+      },
+      {
+        "id": "edge-no-remaining",
+        "from": "decision-remaining-elevator",
+        "to": "terminal-pass",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "edge-has-remaining",
+        "from": "decision-remaining-elevator",
+        "to": "process-select-elevator",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "edge-select-to-check",
+        "from": "process-select-elevator",
+        "to": "process-check-backup-power",
+        "role": "flow"
+      },
+      {
+        "id": "edge-check-to-decision",
+        "from": "process-check-backup-power",
+        "to": "decision-has-backup-power",
+        "role": "flow"
+      },
+      {
+        "id": "edge-no-backup-power",
+        "from": "decision-has-backup-power",
+        "to": "terminal-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "edge-has-backup-power",
+        "from": "decision-has-backup-power",
+        "to": "process-mark-checked",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "edge-mark-to-loop",
+        "from": "process-mark-checked",
+        "to": "decision-remaining-elevator",
+        "role": "flow"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-KIJO-A129_13_3-P10",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": [
+        "A34:P2"
+      ],
+      "description": "法第34条第2項から委任される非常用エレベーターの構造基準"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-01-26T00:00:00Z",
+    "updated_at": "2025-01-26T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

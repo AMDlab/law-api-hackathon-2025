@@ -1,0 +1,482 @@
+{
+  "id": "A78_2_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "耐力壁の構造（適合判定フロー）",
+    "target_subject": "耐力壁",
+    "description": "鉄筋コンクリート造の耐力壁が令第78条の2第1項の構造要件に適合するかを判定するフロー"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "78_2",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造規定",
+    "鉄筋コンクリート造",
+    "耐力壁"
+  ],
+  "text_raw": "耐力壁は、次に定める構造としなければならない。一 厚さは、十二センチメートル以上とすること。二 開口部周囲に径十二ミリメートル以上の補強筋を配置すること。三 径九ミリメートル以上の鉄筋を縦横に三十センチメートル（複配筋として配置する場合においては、四十五センチメートル）以下の間隔で配置すること。ただし、平家建ての建築物にあつては、その間隔を三十五センチメートル（複配筋として配置する場合においては、五十センチメートル）以下とすることができる。四 周囲の柱及びはりとの接合部は、その部分の存在応力を伝えることができるものとすること。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        { "type": "structure", "value": "鉄筋コンクリート造" },
+        { "type": "element", "value": "耐力壁" }
+      ],
+      "note": "鉄筋コンクリート造の耐力壁に適用"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        { "ref": "第1号適合", "operator": "==", "value": true },
+        { "ref": "第2号適合", "operator": "==", "value": true },
+        { "ref": "第3号適合", "operator": "==", "value": true },
+        { "ref": "第4号適合", "operator": "==", "value": true }
+      ]
+    },
+    "exceptions": {
+      "type": "緩和",
+      "condition": "平家建ての建築物",
+      "effect": "第3号の配置間隔緩和（35cm/50cm）"
+    }
+  },
+  "flow_diagram": {
+    "title": "令78条の2第1項 耐力壁の構造 適合判定フロー",
+    "description": "鉄筋コンクリート造耐力壁の4つの構造要件（厚さ・補強筋・配筋・接合部）をすべて満たすか判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "鉄筋コンクリート造の耐力壁の適合判定を開始"
+      },
+      {
+        "id": "dec-thickness",
+        "type": "decision",
+        "title": "厚さ >= 12cm か？",
+        "decision_type": "binary",
+        "description": "第1号: 耐力壁の厚さが12cm以上であるか判定",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "T", "desc": "耐力壁の厚さ" },
+          "rhs": { "value": 12, "unit": "cm" }
+        }
+      },
+      {
+        "id": "proc-item1-pass",
+        "type": "process",
+        "title": "第1号適合",
+        "process_type": "mechanical",
+        "description": "厚さ要件を満たすことを確認"
+      },
+      {
+        "id": "dec-has-opening",
+        "type": "decision",
+        "title": "開口部があるか？",
+        "decision_type": "binary",
+        "description": "耐力壁に開口部が設けられているか確認"
+      },
+      {
+        "id": "dec-opening-rebar",
+        "type": "decision",
+        "title": "開口部補強筋径 >= 12mm か？",
+        "decision_type": "binary",
+        "description": "第2号: 開口部周囲に径12mm以上の補強筋が配置されているか判定",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "OR", "desc": "開口部周囲の補強筋の径" },
+          "rhs": { "value": 12, "unit": "mm" }
+        }
+      },
+      {
+        "id": "proc-item2-pass",
+        "type": "process",
+        "title": "第2号適合",
+        "process_type": "mechanical",
+        "description": "開口部補強筋要件を満たすことを確認"
+      },
+      {
+        "id": "dec-rebar-diameter",
+        "type": "decision",
+        "title": "鉄筋径 >= 9mm か？",
+        "decision_type": "binary",
+        "description": "第3号: 縦横に配置された鉄筋の径が9mm以上か判定",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "RD", "desc": "鉄筋の径" },
+          "rhs": { "value": 9, "unit": "mm" }
+        }
+      },
+      {
+        "id": "dec-building-type",
+        "type": "decision",
+        "title": "平家建てか？",
+        "decision_type": "binary",
+        "description": "建築物が平家建て（地上階数1）か判定（配置間隔の緩和基準適用の判断）",
+        "condition": {
+          "operator": "EQ",
+          "lhs": { "var": "ST", "desc": "建築物の階数" },
+          "rhs": { "value": 1 }
+        }
+      },
+      {
+        "id": "dec-rebar-type-flat",
+        "type": "decision",
+        "title": "配筋方式は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "単配筋", "description": "単配筋の場合" },
+          { "value": "複配筋", "description": "複配筋の場合" }
+        ],
+        "description": "平家建ての場合の配筋方式判定"
+      },
+      {
+        "id": "dec-spacing-flat-single",
+        "type": "decision",
+        "title": "配置間隔 <= 35cm か？",
+        "decision_type": "binary",
+        "description": "平家建て・単配筋の場合: 配置間隔35cm以下か判定",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "RS", "desc": "鉄筋の配置間隔" },
+          "rhs": { "value": 35, "unit": "cm" }
+        }
+      },
+      {
+        "id": "dec-spacing-flat-double",
+        "type": "decision",
+        "title": "配置間隔 <= 50cm か？",
+        "decision_type": "binary",
+        "description": "平家建て・複配筋の場合: 配置間隔50cm以下か判定",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "RS", "desc": "鉄筋の配置間隔" },
+          "rhs": { "value": 50, "unit": "cm" }
+        }
+      },
+      {
+        "id": "dec-rebar-type-multi",
+        "type": "decision",
+        "title": "配筋方式は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "単配筋", "description": "単配筋の場合" },
+          { "value": "複配筋", "description": "複配筋の場合" }
+        ],
+        "description": "2階建て以上の場合の配筋方式判定"
+      },
+      {
+        "id": "dec-spacing-multi-single",
+        "type": "decision",
+        "title": "配置間隔 <= 30cm か？",
+        "decision_type": "binary",
+        "description": "2階建て以上・単配筋の場合: 配置間隔30cm以下か判定",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "RS", "desc": "鉄筋の配置間隔" },
+          "rhs": { "value": 30, "unit": "cm" }
+        }
+      },
+      {
+        "id": "dec-spacing-multi-double",
+        "type": "decision",
+        "title": "配置間隔 <= 45cm か？",
+        "decision_type": "binary",
+        "description": "2階建て以上・複配筋の場合: 配置間隔45cm以下か判定",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "RS", "desc": "鉄筋の配置間隔" },
+          "rhs": { "value": 45, "unit": "cm" }
+        }
+      },
+      {
+        "id": "proc-item3-pass",
+        "type": "process",
+        "title": "第3号適合",
+        "process_type": "mechanical",
+        "description": "鉄筋径・配置間隔の要件を満たすことを確認"
+      },
+      {
+        "id": "dec-joint-stress",
+        "type": "decision",
+        "title": "接合部は存在応力を伝達可能か？",
+        "decision_type": "binary",
+        "description": "第4号: 周囲の柱及びはりとの接合部がその部分の存在応力を伝えることができる構造か判定（人的判断を要する）"
+      },
+      {
+        "id": "proc-item4-pass",
+        "type": "process",
+        "title": "第4号適合",
+        "process_type": "human_judgment",
+        "description": "接合部の構造要件を満たすことを確認"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令第78条の2第1項の全要件に適合"
+      },
+      {
+        "id": "end-fail-item1",
+        "type": "terminal",
+        "title": "不適合（第1号）",
+        "result": "fail",
+        "description": "厚さ12cm未満のため不適合"
+      },
+      {
+        "id": "end-fail-item2",
+        "type": "terminal",
+        "title": "不適合（第2号）",
+        "result": "fail",
+        "description": "開口部補強筋径12mm未満のため不適合"
+      },
+      {
+        "id": "end-fail-item3-diameter",
+        "type": "terminal",
+        "title": "不適合（第3号・径）",
+        "result": "fail",
+        "description": "鉄筋径9mm未満のため不適合"
+      },
+      {
+        "id": "end-fail-item3-spacing",
+        "type": "terminal",
+        "title": "不適合（第3号・間隔）",
+        "result": "fail",
+        "description": "配置間隔が基準超過のため不適合"
+      },
+      {
+        "id": "end-fail-item4",
+        "type": "terminal",
+        "title": "不適合（第4号）",
+        "result": "fail",
+        "description": "接合部が存在応力を伝達できないため不適合"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-thickness",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-thickness",
+        "to": "proc-item1-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "dec-thickness",
+        "to": "end-fail-item1",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e04",
+        "from": "proc-item1-pass",
+        "to": "dec-has-opening",
+        "role": "flow"
+      },
+      {
+        "id": "e05",
+        "from": "dec-has-opening",
+        "to": "dec-opening-rebar",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e06",
+        "from": "dec-has-opening",
+        "to": "proc-item2-pass",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e07",
+        "from": "dec-opening-rebar",
+        "to": "proc-item2-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e08",
+        "from": "dec-opening-rebar",
+        "to": "end-fail-item2",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e09",
+        "from": "proc-item2-pass",
+        "to": "dec-rebar-diameter",
+        "role": "flow"
+      },
+      {
+        "id": "e10",
+        "from": "dec-rebar-diameter",
+        "to": "dec-building-type",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e11",
+        "from": "dec-rebar-diameter",
+        "to": "end-fail-item3-diameter",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e12",
+        "from": "dec-building-type",
+        "to": "dec-rebar-type-flat",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e13",
+        "from": "dec-building-type",
+        "to": "dec-rebar-type-multi",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e14",
+        "from": "dec-rebar-type-flat",
+        "to": "dec-spacing-flat-single",
+        "role": "option",
+        "label": "単配筋"
+      },
+      {
+        "id": "e15",
+        "from": "dec-rebar-type-flat",
+        "to": "dec-spacing-flat-double",
+        "role": "option",
+        "label": "複配筋"
+      },
+      {
+        "id": "e16",
+        "from": "dec-spacing-flat-single",
+        "to": "proc-item3-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e17",
+        "from": "dec-spacing-flat-single",
+        "to": "end-fail-item3-spacing",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e18",
+        "from": "dec-spacing-flat-double",
+        "to": "proc-item3-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e19",
+        "from": "dec-spacing-flat-double",
+        "to": "end-fail-item3-spacing",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e20",
+        "from": "dec-rebar-type-multi",
+        "to": "dec-spacing-multi-single",
+        "role": "option",
+        "label": "単配筋"
+      },
+      {
+        "id": "e21",
+        "from": "dec-rebar-type-multi",
+        "to": "dec-spacing-multi-double",
+        "role": "option",
+        "label": "複配筋"
+      },
+      {
+        "id": "e22",
+        "from": "dec-spacing-multi-single",
+        "to": "proc-item3-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e23",
+        "from": "dec-spacing-multi-single",
+        "to": "end-fail-item3-spacing",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e24",
+        "from": "dec-spacing-multi-double",
+        "to": "proc-item3-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e25",
+        "from": "dec-spacing-multi-double",
+        "to": "end-fail-item3-spacing",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e26",
+        "from": "proc-item3-pass",
+        "to": "dec-joint-stress",
+        "role": "flow"
+      },
+      {
+        "id": "e27",
+        "from": "dec-joint-stress",
+        "to": "proc-item4-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e28",
+        "from": "dec-joint-stress",
+        "to": "end-fail-item4",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e29",
+        "from": "proc-item4-pass",
+        "to": "end-pass",
+        "role": "flow"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "A78_2_P1_kijo",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": ["A20"],
+      "description": "構造耐力に関する規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

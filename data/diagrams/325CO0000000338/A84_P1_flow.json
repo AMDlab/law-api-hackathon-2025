@@ -1,0 +1,468 @@
+{
+  "id": "A84_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "固定荷重の計算",
+    "target_subject": "建築物",
+    "description": "建築物の各部の固定荷重が実況に応じて適切に計算されていることを確認する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "84",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造"
+  ],
+  "text_raw": "建築物の各部の固定荷重は、当該建築物の実況に応じて計算しなければならない。ただし、次の表に掲げる建築物の部分の固定荷重については、それぞれ同表の単位面積当たり荷重の欄に定める数値に面積を乗じて計算することができる。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "building",
+          "value": "構造計算を要する建築物"
+        }
+      ],
+      "note": "構造計算において固定荷重を算定する必要がある建築物"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "ref": "info-actual-calc-compliance",
+          "operator": "==",
+          "value": true,
+          "note": "実況に応じた計算による場合"
+        },
+        {
+          "ref": "info-table-calc-compliance",
+          "operator": "==",
+          "value": true,
+          "note": "表の数値を用いた計算による場合（ただし書き）"
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "flow_diagram": {
+    "title": "令84条1項 固定荷重計算フロー",
+    "description": "建築物の各部分の固定荷重が適切に計算されているかを判定するフローチャート",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "固定荷重計算の審査開始"
+      },
+      {
+        "id": "proc-identify-parts",
+        "type": "process",
+        "title": "建築物の部分を特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から固定荷重算定対象となる建築物の部分（屋根、天井、床、壁等）を特定する"
+      },
+      {
+        "id": "dec-parts-exist",
+        "type": "decision",
+        "title": "算定対象部分があるか？",
+        "decision_type": "binary",
+        "description": "固定荷重を算定すべき部分が残っているかを確認"
+      },
+      {
+        "id": "proc-identify-type",
+        "type": "process",
+        "title": "部分の種別を特定",
+        "process_type": "undefined_input",
+        "description": "各部分の種別（屋根、天井、床、壁）と詳細仕様（瓦ぶき、板張等）を特定する"
+      },
+      {
+        "id": "info-part-type",
+        "type": "information",
+        "title": "部分の種別",
+        "symbol": "T",
+        "subject": "建築物の部分",
+        "property": "種別",
+        "property_type": "classification",
+        "description": "建築物の部分の種別と詳細仕様"
+      },
+      {
+        "id": "proc-identify-area",
+        "type": "process",
+        "title": "部分の面積を特定",
+        "process_type": "undefined_input",
+        "description": "各部分の面積（屋根面積、天井面積、床面積、壁面積）を特定する"
+      },
+      {
+        "id": "info-part-area",
+        "type": "information",
+        "title": "部分の面積",
+        "symbol": "S",
+        "subject": "建築物の部分",
+        "property": "面積",
+        "property_type": "numeric",
+        "description": "建築物の部分の面積（m2）"
+      },
+      {
+        "id": "dec-table-applicable",
+        "type": "decision",
+        "title": "表に該当する種別か？",
+        "decision_type": "binary",
+        "description": "当該部分が令84条の表に掲げる種別に該当するかを判定",
+        "condition": {
+          "operator": "IN",
+          "lhs": { "var": "T", "desc": "部分の種別" },
+          "rhs": { "value": "表に定める種別", "desc": "令84条表の種別一覧" }
+        }
+      },
+      {
+        "id": "dec-calc-method",
+        "type": "decision",
+        "title": "計算方法は？",
+        "decision_type": "multi",
+        "description": "表に該当する部分について、どの計算方法を採用するかを確認",
+        "options": [
+          { "value": "表の数値", "description": "表の単位面積当たり荷重を使用" },
+          { "value": "実況計算", "description": "実況に応じた計算を使用" }
+        ]
+      },
+      {
+        "id": "proc-get-unit-load",
+        "type": "process",
+        "title": "表から単位荷重を取得",
+        "process_type": "mechanical",
+        "description": "表から単位面積当たり荷重の数値を取得する"
+      },
+      {
+        "id": "info-unit-load",
+        "type": "information",
+        "title": "単位面積当たり荷重",
+        "symbol": "W",
+        "subject": "建築物の部分",
+        "property": "単位面積当たり荷重",
+        "property_type": "numeric",
+        "description": "表に定める単位面積当たり荷重（N/m2）"
+      },
+      {
+        "id": "proc-table-calc",
+        "type": "process",
+        "title": "表による固定荷重計算",
+        "process_type": "mechanical",
+        "description": "FL = W × S で固定荷重を計算"
+      },
+      {
+        "id": "info-table-load",
+        "type": "information",
+        "title": "表による固定荷重",
+        "symbol": "FL1",
+        "subject": "建築物の部分",
+        "property": "固定荷重（表による計算）",
+        "property_type": "numeric",
+        "description": "表の数値を用いて計算した固定荷重（N）"
+      },
+      {
+        "id": "dec-table-calc-appropriate",
+        "type": "decision",
+        "title": "表による計算結果は適切か？",
+        "decision_type": "binary",
+        "description": "表の数値を用いた固定荷重計算が適切に行われているかを確認"
+      },
+      {
+        "id": "proc-check-actual-method",
+        "type": "process",
+        "title": "実況計算方法を確認",
+        "process_type": "human_judgment",
+        "description": "実況に応じた計算方法が適切であるかを確認する"
+      },
+      {
+        "id": "dec-actual-method-appropriate",
+        "type": "decision",
+        "title": "実況計算方法は適切か？",
+        "decision_type": "binary",
+        "description": "実況に応じた計算方法が建築物の実況に適合しているかを判定"
+      },
+      {
+        "id": "proc-get-actual-load",
+        "type": "process",
+        "title": "実況による固定荷重を特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から実況に応じて計算された固定荷重の値を特定する"
+      },
+      {
+        "id": "info-actual-load",
+        "type": "information",
+        "title": "実況による固定荷重",
+        "symbol": "FL2",
+        "subject": "建築物の部分",
+        "property": "固定荷重（実況による計算）",
+        "property_type": "numeric",
+        "description": "実況に応じて計算された固定荷重（N）"
+      },
+      {
+        "id": "dec-actual-calc-appropriate",
+        "type": "decision",
+        "title": "実況計算結果は適切か？",
+        "decision_type": "binary",
+        "description": "実況に応じた固定荷重計算が適切に行われているかを確認"
+      },
+      {
+        "id": "proc-mark-part-pass",
+        "type": "process",
+        "title": "当該部分を適合とする",
+        "process_type": "mechanical",
+        "description": "当該部分の固定荷重計算が適合と判定"
+      },
+      {
+        "id": "proc-mark-part-fail",
+        "type": "process",
+        "title": "当該部分を不適合とする",
+        "process_type": "mechanical",
+        "description": "当該部分の固定荷重計算が不適合と判定"
+      },
+      {
+        "id": "proc-next-part",
+        "type": "process",
+        "title": "次の部分へ",
+        "process_type": "mechanical",
+        "description": "次の算定対象部分の確認に進む"
+      },
+      {
+        "id": "dec-all-parts-pass",
+        "type": "decision",
+        "title": "全部分が適合か？",
+        "decision_type": "binary",
+        "description": "全ての部分について固定荷重が適切に算定されていることを確認"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令84条1項に適合"
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "令84条1項に不適合"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "proc-identify-parts",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "proc-identify-parts",
+        "to": "dec-parts-exist",
+        "role": "flow"
+      },
+      {
+        "id": "e03",
+        "from": "dec-parts-exist",
+        "to": "proc-identify-type",
+        "role": "yes",
+        "label": "あり"
+      },
+      {
+        "id": "e04",
+        "from": "dec-parts-exist",
+        "to": "dec-all-parts-pass",
+        "role": "no",
+        "label": "なし"
+      },
+      {
+        "id": "e05",
+        "from": "proc-identify-type",
+        "to": "info-part-type",
+        "role": "output"
+      },
+      {
+        "id": "e06",
+        "from": "info-part-type",
+        "to": "proc-identify-area",
+        "role": "flow"
+      },
+      {
+        "id": "e07",
+        "from": "proc-identify-area",
+        "to": "info-part-area",
+        "role": "output"
+      },
+      {
+        "id": "e08",
+        "from": "info-part-area",
+        "to": "dec-table-applicable",
+        "role": "flow"
+      },
+      {
+        "id": "e09",
+        "from": "dec-table-applicable",
+        "to": "dec-calc-method",
+        "role": "yes",
+        "label": "該当"
+      },
+      {
+        "id": "e10",
+        "from": "dec-table-applicable",
+        "to": "proc-check-actual-method",
+        "role": "no",
+        "label": "非該当"
+      },
+      {
+        "id": "e11",
+        "from": "dec-calc-method",
+        "to": "proc-get-unit-load",
+        "role": "option",
+        "label": "表の数値"
+      },
+      {
+        "id": "e12",
+        "from": "dec-calc-method",
+        "to": "proc-check-actual-method",
+        "role": "option",
+        "label": "実況計算"
+      },
+      {
+        "id": "e13",
+        "from": "proc-get-unit-load",
+        "to": "info-unit-load",
+        "role": "output"
+      },
+      {
+        "id": "e14",
+        "from": "info-unit-load",
+        "to": "proc-table-calc",
+        "role": "input"
+      },
+      {
+        "id": "e15",
+        "from": "info-part-area",
+        "to": "proc-table-calc",
+        "role": "input"
+      },
+      {
+        "id": "e16",
+        "from": "proc-table-calc",
+        "to": "info-table-load",
+        "role": "output"
+      },
+      {
+        "id": "e17",
+        "from": "info-table-load",
+        "to": "dec-table-calc-appropriate",
+        "role": "flow"
+      },
+      {
+        "id": "e18",
+        "from": "dec-table-calc-appropriate",
+        "to": "proc-mark-part-pass",
+        "role": "yes",
+        "label": "適切"
+      },
+      {
+        "id": "e19",
+        "from": "dec-table-calc-appropriate",
+        "to": "proc-mark-part-fail",
+        "role": "no",
+        "label": "不適切"
+      },
+      {
+        "id": "e20",
+        "from": "proc-check-actual-method",
+        "to": "dec-actual-method-appropriate",
+        "role": "flow"
+      },
+      {
+        "id": "e21",
+        "from": "dec-actual-method-appropriate",
+        "to": "proc-get-actual-load",
+        "role": "yes",
+        "label": "適切"
+      },
+      {
+        "id": "e22",
+        "from": "dec-actual-method-appropriate",
+        "to": "proc-mark-part-fail",
+        "role": "no",
+        "label": "不適切"
+      },
+      {
+        "id": "e23",
+        "from": "proc-get-actual-load",
+        "to": "info-actual-load",
+        "role": "output"
+      },
+      {
+        "id": "e24",
+        "from": "info-actual-load",
+        "to": "dec-actual-calc-appropriate",
+        "role": "flow"
+      },
+      {
+        "id": "e25",
+        "from": "dec-actual-calc-appropriate",
+        "to": "proc-mark-part-pass",
+        "role": "yes",
+        "label": "適切"
+      },
+      {
+        "id": "e26",
+        "from": "dec-actual-calc-appropriate",
+        "to": "proc-mark-part-fail",
+        "role": "no",
+        "label": "不適切"
+      },
+      {
+        "id": "e27",
+        "from": "proc-mark-part-pass",
+        "to": "proc-next-part",
+        "role": "flow"
+      },
+      {
+        "id": "e28",
+        "from": "proc-mark-part-fail",
+        "to": "end-fail",
+        "role": "flow"
+      },
+      {
+        "id": "e29",
+        "from": "proc-next-part",
+        "to": "dec-parts-exist",
+        "role": "flow"
+      },
+      {
+        "id": "e30",
+        "from": "dec-all-parts-pass",
+        "to": "end-pass",
+        "role": "yes",
+        "label": "全適合"
+      },
+      {
+        "id": "e31",
+        "from": "dec-all-parts-pass",
+        "to": "end-fail",
+        "role": "no",
+        "label": "不適合あり"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-ORD-A84-P1",
+  "metadata": {
+    "created_at": "2026-01-26T12:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

@@ -1,0 +1,362 @@
+{
+  "id": "A47_P2_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "ボルト締の座金",
+    "target_subject": "ボルト締",
+    "description": "構造耐力上主要な部分の継手又は仕口のボルト締に使用する座金の要件を判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "47",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造"
+  ],
+  "text_raw": "前項の規定によるボルト締には、ボルトの径に応じ有効な大きさと厚さを有する座金を使用しなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "structural",
+          "value": "前項の規定によるボルト締を使用する継手又は仕口"
+        }
+      ],
+      "note": "構造耐力上主要な部分である継手又は仕口にボルト締を使用する場合"
+    },
+    "judgment_rule": {
+      "operator": "FOR_ALL",
+      "target": "ボルト締",
+      "conditions": [
+        {
+          "operator": "AND",
+          "conditions": [
+            {
+              "ref": "washer-used",
+              "operator": "==",
+              "value": true
+            },
+            {
+              "ref": "washer-effective",
+              "operator": "==",
+              "value": true
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "flow_diagram": {
+    "title": "令第47条第2項 座金の適合判定フロー",
+    "description": "ボルト締に使用する座金がボルトの径に応じた有効な大きさと厚さを有するかを判定する",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "令第47条第2項の適合判定を開始"
+      },
+      {
+        "id": "proc-identify-joints",
+        "type": "process",
+        "title": "ボルト締継手の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から令第47条第1項の規定によりボルト締を使用する継手又は仕口を特定する"
+      },
+      {
+        "id": "dec-joints-exist",
+        "type": "decision",
+        "title": "ボルト締継手があるか？",
+        "decision_type": "binary",
+        "description": "令第47条第1項によりボルト締を使用する継手又は仕口が存在するかを確認"
+      },
+      {
+        "id": "proc-loop-start",
+        "type": "process",
+        "title": "各ボルト締について確認開始",
+        "process_type": "mechanical",
+        "description": "全てのボルト締について以下の確認を繰り返す"
+      },
+      {
+        "id": "proc-identify-bolt-diameter",
+        "type": "process",
+        "title": "ボルトの径を確認",
+        "process_type": "undefined_input",
+        "description": "設計図書等から当該ボルト締のボルトの径を読み取る"
+      },
+      {
+        "id": "dec-washer-used",
+        "type": "decision",
+        "title": "座金を使用しているか？",
+        "decision_type": "binary",
+        "description": "当該ボルト締に座金が使用されているかを確認"
+      },
+      {
+        "id": "proc-washer-not-used",
+        "type": "process",
+        "title": "座金未使用",
+        "process_type": "mechanical",
+        "description": "座金が使用されていないため不適合"
+      },
+      {
+        "id": "proc-identify-washer-spec",
+        "type": "process",
+        "title": "座金の仕様を確認",
+        "process_type": "undefined_input",
+        "description": "設計図書等から座金の大きさと厚さを読み取る"
+      },
+      {
+        "id": "dec-washer-size-effective",
+        "type": "decision",
+        "title": "座金の大きさはボルト径に応じ有効か？",
+        "decision_type": "binary",
+        "description": "座金の大きさがボルトの径に応じた有効な大きさであるかを判定",
+        "condition": {
+          "operator": "GTE",
+          "lhs": {
+            "var": "washer_size",
+            "desc": "座金の大きさ"
+          },
+          "rhs": {
+            "var": "required_size",
+            "desc": "ボルト径に応じた必要な大きさ"
+          }
+        }
+      },
+      {
+        "id": "proc-size-ineffective",
+        "type": "process",
+        "title": "座金の大きさ不足",
+        "process_type": "mechanical",
+        "description": "座金の大きさがボルト径に応じた有効な大きさでないため不適合"
+      },
+      {
+        "id": "dec-washer-thickness-effective",
+        "type": "decision",
+        "title": "座金の厚さはボルト径に応じ有効か？",
+        "decision_type": "binary",
+        "description": "座金の厚さがボルトの径に応じた有効な厚さであるかを判定",
+        "condition": {
+          "operator": "GTE",
+          "lhs": {
+            "var": "washer_thickness",
+            "desc": "座金の厚さ"
+          },
+          "rhs": {
+            "var": "required_thickness",
+            "desc": "ボルト径に応じた必要な厚さ"
+          }
+        }
+      },
+      {
+        "id": "proc-thickness-ineffective",
+        "type": "process",
+        "title": "座金の厚さ不足",
+        "process_type": "mechanical",
+        "description": "座金の厚さがボルト径に応じた有効な厚さでないため不適合"
+      },
+      {
+        "id": "proc-bolt-compliant",
+        "type": "process",
+        "title": "当該ボルト締適合",
+        "process_type": "mechanical",
+        "description": "当該ボルト締は座金の要件を満たしている"
+      },
+      {
+        "id": "dec-more-bolts",
+        "type": "decision",
+        "title": "未確認のボルト締があるか？",
+        "decision_type": "binary",
+        "description": "まだ確認していないボルト締が残っているかを確認"
+      },
+      {
+        "id": "proc-all-compliant",
+        "type": "process",
+        "title": "全ボルト締適合確認完了",
+        "process_type": "mechanical",
+        "description": "全てのボルト締について座金の要件を確認し、全て適合"
+      },
+      {
+        "id": "terminal-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令第47条第2項に適合"
+      },
+      {
+        "id": "terminal-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "令第47条第2項に不適合"
+      },
+      {
+        "id": "terminal-not-applicable",
+        "type": "terminal",
+        "title": "該当なし",
+        "result": "pass",
+        "description": "ボルト締を使用する継手又は仕口がないため、本項は適用されない"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "proc-identify-joints",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "proc-identify-joints",
+        "to": "dec-joints-exist",
+        "role": "flow"
+      },
+      {
+        "id": "e03",
+        "from": "dec-joints-exist",
+        "to": "proc-loop-start",
+        "role": "yes",
+        "label": "あり"
+      },
+      {
+        "id": "e04",
+        "from": "dec-joints-exist",
+        "to": "terminal-not-applicable",
+        "role": "no",
+        "label": "なし"
+      },
+      {
+        "id": "e05",
+        "from": "proc-loop-start",
+        "to": "proc-identify-bolt-diameter",
+        "role": "flow"
+      },
+      {
+        "id": "e06",
+        "from": "proc-identify-bolt-diameter",
+        "to": "dec-washer-used",
+        "role": "flow"
+      },
+      {
+        "id": "e07",
+        "from": "dec-washer-used",
+        "to": "proc-identify-washer-spec",
+        "role": "yes",
+        "label": "使用"
+      },
+      {
+        "id": "e08",
+        "from": "dec-washer-used",
+        "to": "proc-washer-not-used",
+        "role": "no",
+        "label": "未使用"
+      },
+      {
+        "id": "e09",
+        "from": "proc-washer-not-used",
+        "to": "terminal-fail",
+        "role": "flow"
+      },
+      {
+        "id": "e10",
+        "from": "proc-identify-washer-spec",
+        "to": "dec-washer-size-effective",
+        "role": "flow"
+      },
+      {
+        "id": "e11",
+        "from": "dec-washer-size-effective",
+        "to": "dec-washer-thickness-effective",
+        "role": "yes",
+        "label": "有効"
+      },
+      {
+        "id": "e12",
+        "from": "dec-washer-size-effective",
+        "to": "proc-size-ineffective",
+        "role": "no",
+        "label": "不足"
+      },
+      {
+        "id": "e13",
+        "from": "proc-size-ineffective",
+        "to": "terminal-fail",
+        "role": "flow"
+      },
+      {
+        "id": "e14",
+        "from": "dec-washer-thickness-effective",
+        "to": "proc-bolt-compliant",
+        "role": "yes",
+        "label": "有効"
+      },
+      {
+        "id": "e15",
+        "from": "dec-washer-thickness-effective",
+        "to": "proc-thickness-ineffective",
+        "role": "no",
+        "label": "不足"
+      },
+      {
+        "id": "e16",
+        "from": "proc-thickness-ineffective",
+        "to": "terminal-fail",
+        "role": "flow"
+      },
+      {
+        "id": "e17",
+        "from": "proc-bolt-compliant",
+        "to": "dec-more-bolts",
+        "role": "flow"
+      },
+      {
+        "id": "e18",
+        "from": "dec-more-bolts",
+        "to": "proc-loop-start",
+        "role": "yes",
+        "label": "あり"
+      },
+      {
+        "id": "e19",
+        "from": "dec-more-bolts",
+        "to": "proc-all-compliant",
+        "role": "no",
+        "label": "なし"
+      },
+      {
+        "id": "e20",
+        "from": "proc-all-compliant",
+        "to": "terminal-pass",
+        "role": "flow"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSO-A47-P2",
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": [
+        "A47:P1"
+      ],
+      "description": "令第47条第1項（構造耐力上主要な部分である継手又は仕口の緊結方法）を前提とする"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T12:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

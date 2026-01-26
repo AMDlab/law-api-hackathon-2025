@@ -1,0 +1,511 @@
+{
+  "id": "A39_P4_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "特定天井の劣化対策",
+    "target_subject": "特定天井",
+    "description": "劣化のおそれのある特定天井に対して適切な材料を使用しているかを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "39",
+    "paragraph": "4",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造"
+  ],
+  "text_raw": "特定天井で特に腐食、腐朽その他の劣化のおそれのあるものには、腐食、腐朽その他の劣化しにくい材料又は有効なさび止め、防腐その他の劣化防止のための措置をした材料を使用しなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "subject_condition",
+          "value": "特定天井"
+        },
+        {
+          "type": "risk_condition",
+          "value": "腐食、腐朽その他の劣化のおそれがある"
+        }
+      ],
+      "note": "特定天井のうち、特に劣化のおそれのあるものに適用"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "condition": "劣化のおそれなし",
+          "result": "適合"
+        },
+        {
+          "condition": "劣化しにくい材料を使用",
+          "result": "適合"
+        },
+        {
+          "condition": "有効な劣化防止措置をした材料を使用",
+          "result": "適合"
+        }
+      ]
+    }
+  },
+  "kijo_diagram_ref": "CHK-BSO-A39-P4",
+  "flow_diagram": {
+    "title": "令第39条第4項 特定天井の劣化対策フロー",
+    "description": "特定天井に使用する材料について、劣化リスクに応じた対策の適合判定を行う",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "令39条4項の適合判定を開始"
+      },
+      {
+        "id": "proc-identify-building",
+        "type": "process",
+        "title": "建築物の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から判定対象の建築物を特定する"
+      },
+      {
+        "id": "proc-identify-ceiling",
+        "type": "process",
+        "title": "特定天井の特定",
+        "process_type": "undefined_input",
+        "description": "建築物に属する特定天井を特定する（国土交通大臣が定める天井）"
+      },
+      {
+        "id": "dec-has-special-ceiling",
+        "type": "decision",
+        "title": "特定天井があるか？",
+        "decision_type": "binary",
+        "description": "判定対象建築物に特定天井（脱落によって重大な危害を生ずるおそれがある天井）が存在するか"
+      },
+      {
+        "id": "proc-ceiling-loop-start",
+        "type": "process",
+        "title": "特定天井ごとの判定開始",
+        "process_type": "mechanical",
+        "description": "各特定天井について以下の判定を行う"
+      },
+      {
+        "id": "dec-deterioration-risk",
+        "type": "decision",
+        "title": "劣化のおそれがあるか？",
+        "decision_type": "binary",
+        "description": "当該特定天井の設置環境（湿度、結露、水回り近接等）から、腐食・腐朽その他の劣化のおそれがあるか判定",
+        "condition": {
+          "operator": "EQ",
+          "lhs": { "var": "D1", "desc": "劣化のおそれの有無" },
+          "rhs": { "value": true, "desc": "劣化のおそれあり" }
+        }
+      },
+      {
+        "id": "proc-no-risk",
+        "type": "process",
+        "title": "劣化リスクなし",
+        "process_type": "mechanical",
+        "description": "劣化のおそれがないため、材料要件は適用対象外"
+      },
+      {
+        "id": "proc-identify-material",
+        "type": "process",
+        "title": "使用材料の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書、仕上表等から当該特定天井の使用材料を読み取る"
+      },
+      {
+        "id": "dec-material-type",
+        "type": "decision",
+        "title": "材料種別は？",
+        "decision_type": "multi",
+        "description": "使用材料の種別を判定（材料特性による分類）",
+        "options": [
+          { "value": "耐食性金属", "description": "ステンレス、アルミニウム等" },
+          { "value": "樹脂・プラスチック", "description": "樹脂系材料" },
+          { "value": "木材（防腐処理済）", "description": "防腐処理を施した木材" },
+          { "value": "鉄鋼（未処理）", "description": "未処理の鉄鋼材料" },
+          { "value": "その他", "description": "その他の材料" }
+        ]
+      },
+      {
+        "id": "dec-material-durability",
+        "type": "decision",
+        "title": "劣化しにくい材料か？",
+        "decision_type": "binary",
+        "description": "使用材料が腐食・腐朽その他の劣化しにくい材料であるか（ステンレス、アルミニウム、樹脂等）",
+        "condition": {
+          "operator": "EQ",
+          "lhs": { "var": "R1", "desc": "材料の耐劣化性" },
+          "rhs": { "value": true, "desc": "劣化しにくい材料である" }
+        }
+      },
+      {
+        "id": "proc-durable-material",
+        "type": "process",
+        "title": "劣化しにくい材料を使用",
+        "process_type": "mechanical",
+        "description": "劣化しにくい材料の使用により要件を満たす"
+      },
+      {
+        "id": "proc-identify-treatment",
+        "type": "process",
+        "title": "劣化防止措置の確認",
+        "process_type": "undefined_input",
+        "description": "設計図書、仕様書等から材料の劣化防止措置（めっき、塗装、防腐処理等）を読み取る"
+      },
+      {
+        "id": "dec-treatment-type",
+        "type": "decision",
+        "title": "劣化防止措置の種類は？",
+        "decision_type": "multi",
+        "description": "施されている劣化防止措置の種類を判定",
+        "options": [
+          { "value": "めっき処理", "description": "亜鉛めっき、クロムめっき等" },
+          { "value": "塗装処理", "description": "さび止め塗装、防腐塗装等" },
+          { "value": "防腐処理", "description": "薬剤注入、防腐剤処理等" },
+          { "value": "複合処理", "description": "複数の処理を組み合わせ" },
+          { "value": "措置なし", "description": "劣化防止措置なし" }
+        ]
+      },
+      {
+        "id": "dec-has-treatment",
+        "type": "decision",
+        "title": "劣化防止措置があるか？",
+        "decision_type": "binary",
+        "description": "さび止め、防腐その他の劣化防止のための措置が施されているか",
+        "condition": {
+          "operator": "NE",
+          "lhs": { "var": "T1", "desc": "劣化防止措置の有無" },
+          "rhs": { "value": null, "desc": "措置なし" }
+        }
+      },
+      {
+        "id": "dec-treatment-effective",
+        "type": "decision",
+        "title": "劣化防止措置は有効か？",
+        "decision_type": "binary",
+        "description": "施されている劣化防止措置が設置環境に対して有効か（適切な下地処理、防錆仕様等）",
+        "condition": {
+          "operator": "EQ",
+          "lhs": { "var": "E1", "desc": "措置の有効性" },
+          "rhs": { "value": true, "desc": "有効" }
+        }
+      },
+      {
+        "id": "proc-effective-treatment",
+        "type": "process",
+        "title": "有効な劣化防止措置あり",
+        "process_type": "mechanical",
+        "description": "有効な劣化防止措置をした材料の使用により要件を満たす"
+      },
+      {
+        "id": "proc-ceiling-compliant",
+        "type": "process",
+        "title": "当該天井は適合",
+        "process_type": "mechanical",
+        "description": "当該特定天井は令39条4項の材料要件を満たす"
+      },
+      {
+        "id": "proc-ceiling-non-compliant",
+        "type": "process",
+        "title": "当該天井は不適合",
+        "process_type": "mechanical",
+        "description": "劣化のおそれがあるが、適切な材料または措置がない"
+      },
+      {
+        "id": "dec-all-ceilings-checked",
+        "type": "decision",
+        "title": "全ての特定天井を確認したか？",
+        "decision_type": "binary",
+        "description": "判定対象の全ての特定天井について判定が完了したか"
+      },
+      {
+        "id": "dec-all-compliant",
+        "type": "decision",
+        "title": "全ての天井が適合か？",
+        "decision_type": "binary",
+        "description": "判定した全ての特定天井が材料要件を満たしているか"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令39条4項の要件を満たす"
+      },
+      {
+        "id": "end-pass-no-ceiling",
+        "type": "terminal",
+        "title": "適合（対象外）",
+        "result": "pass",
+        "description": "特定天井がないため本条項の適用対象外"
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "令39条4項の要件を満たさない特定天井がある"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e001",
+        "from": "start",
+        "to": "proc-identify-building",
+        "role": "flow"
+      },
+      {
+        "id": "e002",
+        "from": "proc-identify-building",
+        "to": "proc-identify-ceiling",
+        "role": "flow"
+      },
+      {
+        "id": "e003",
+        "from": "proc-identify-ceiling",
+        "to": "dec-has-special-ceiling",
+        "role": "flow"
+      },
+      {
+        "id": "e004",
+        "from": "dec-has-special-ceiling",
+        "to": "end-pass-no-ceiling",
+        "role": "no",
+        "label": "なし"
+      },
+      {
+        "id": "e005",
+        "from": "dec-has-special-ceiling",
+        "to": "proc-ceiling-loop-start",
+        "role": "yes",
+        "label": "あり"
+      },
+      {
+        "id": "e006",
+        "from": "proc-ceiling-loop-start",
+        "to": "dec-deterioration-risk",
+        "role": "flow"
+      },
+      {
+        "id": "e007",
+        "from": "dec-deterioration-risk",
+        "to": "proc-no-risk",
+        "role": "no",
+        "label": "なし"
+      },
+      {
+        "id": "e008",
+        "from": "proc-no-risk",
+        "to": "proc-ceiling-compliant",
+        "role": "flow"
+      },
+      {
+        "id": "e009",
+        "from": "dec-deterioration-risk",
+        "to": "proc-identify-material",
+        "role": "yes",
+        "label": "あり"
+      },
+      {
+        "id": "e010",
+        "from": "proc-identify-material",
+        "to": "dec-material-type",
+        "role": "flow"
+      },
+      {
+        "id": "e011",
+        "from": "dec-material-type",
+        "to": "dec-material-durability",
+        "role": "option",
+        "label": "耐食性金属"
+      },
+      {
+        "id": "e012",
+        "from": "dec-material-type",
+        "to": "dec-material-durability",
+        "role": "option",
+        "label": "樹脂・プラスチック"
+      },
+      {
+        "id": "e013",
+        "from": "dec-material-type",
+        "to": "dec-material-durability",
+        "role": "option",
+        "label": "木材（防腐処理済）"
+      },
+      {
+        "id": "e014",
+        "from": "dec-material-type",
+        "to": "dec-material-durability",
+        "role": "option",
+        "label": "鉄鋼（未処理）"
+      },
+      {
+        "id": "e015",
+        "from": "dec-material-type",
+        "to": "dec-material-durability",
+        "role": "option",
+        "label": "その他"
+      },
+      {
+        "id": "e016",
+        "from": "dec-material-durability",
+        "to": "proc-durable-material",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e017",
+        "from": "proc-durable-material",
+        "to": "proc-ceiling-compliant",
+        "role": "flow"
+      },
+      {
+        "id": "e018",
+        "from": "dec-material-durability",
+        "to": "proc-identify-treatment",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e019",
+        "from": "proc-identify-treatment",
+        "to": "dec-treatment-type",
+        "role": "flow"
+      },
+      {
+        "id": "e020",
+        "from": "dec-treatment-type",
+        "to": "dec-has-treatment",
+        "role": "option",
+        "label": "めっき処理"
+      },
+      {
+        "id": "e021",
+        "from": "dec-treatment-type",
+        "to": "dec-has-treatment",
+        "role": "option",
+        "label": "塗装処理"
+      },
+      {
+        "id": "e022",
+        "from": "dec-treatment-type",
+        "to": "dec-has-treatment",
+        "role": "option",
+        "label": "防腐処理"
+      },
+      {
+        "id": "e023",
+        "from": "dec-treatment-type",
+        "to": "dec-has-treatment",
+        "role": "option",
+        "label": "複合処理"
+      },
+      {
+        "id": "e024",
+        "from": "dec-treatment-type",
+        "to": "proc-ceiling-non-compliant",
+        "role": "option",
+        "label": "措置なし"
+      },
+      {
+        "id": "e025",
+        "from": "dec-has-treatment",
+        "to": "dec-treatment-effective",
+        "role": "yes",
+        "label": "あり"
+      },
+      {
+        "id": "e026",
+        "from": "dec-has-treatment",
+        "to": "proc-ceiling-non-compliant",
+        "role": "no",
+        "label": "なし"
+      },
+      {
+        "id": "e027",
+        "from": "dec-treatment-effective",
+        "to": "proc-effective-treatment",
+        "role": "yes",
+        "label": "有効"
+      },
+      {
+        "id": "e028",
+        "from": "proc-effective-treatment",
+        "to": "proc-ceiling-compliant",
+        "role": "flow"
+      },
+      {
+        "id": "e029",
+        "from": "dec-treatment-effective",
+        "to": "proc-ceiling-non-compliant",
+        "role": "no",
+        "label": "無効"
+      },
+      {
+        "id": "e030",
+        "from": "proc-ceiling-compliant",
+        "to": "dec-all-ceilings-checked",
+        "role": "flow"
+      },
+      {
+        "id": "e031",
+        "from": "proc-ceiling-non-compliant",
+        "to": "dec-all-ceilings-checked",
+        "role": "flow"
+      },
+      {
+        "id": "e032",
+        "from": "dec-all-ceilings-checked",
+        "to": "proc-ceiling-loop-start",
+        "role": "no",
+        "label": "次の天井へ"
+      },
+      {
+        "id": "e033",
+        "from": "dec-all-ceilings-checked",
+        "to": "dec-all-compliant",
+        "role": "yes",
+        "label": "全て確認済"
+      },
+      {
+        "id": "e034",
+        "from": "dec-all-compliant",
+        "to": "end-pass",
+        "role": "yes",
+        "label": "全て適合"
+      },
+      {
+        "id": "e035",
+        "from": "dec-all-compliant",
+        "to": "end-fail",
+        "role": "no",
+        "label": "不適合あり"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": ["A39:P3"],
+      "description": "特定天井の定義（脱落によって重大な危害を生ずるおそれがあるものとして国土交通大臣が定める天井）"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00Z",
+    "generator": "claude-code-flow-generator",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令",
+    "checklist_ref": "確認審査報告書チェックリスト"
+  }
+}

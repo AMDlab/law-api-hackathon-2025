@@ -1,0 +1,307 @@
+{
+  "id": "A60_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "手すり又は手すり壁の構造（適合判定フロー）",
+    "target_subject": "手すり又は手すり壁",
+    "description": "手すり又は手すり壁が組積造でないこと、又は頂部に鉄筋コンクリート造の臥梁を設けていることを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "60",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造"
+  ],
+  "text_raw": "手すり又は手すり壁は、組積造としてはならない。ただし、これらの頂部に鉄筋コンクリート造の臥梁を設けた場合においては、この限りでない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "type": "building_element",
+          "value": "手すり"
+        },
+        {
+          "type": "building_element",
+          "value": "手すり壁"
+        }
+      ],
+      "note": "手すり又は手すり壁を有する建築物"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "ref": "info-not-masonry",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "ref": "info-exempt",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    },
+    "exceptions": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "note": "組積造であっても頂部に鉄筋コンクリート造の臥梁を設けた場合",
+          "ref": "info-has-rc-girder",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "effect": "EXEMPT"
+    }
+  },
+  "flow_diagram": {
+    "title": "令60条1項適合判定フロー",
+    "description": "手すり又は手すり壁の構造に関する適合判定フローチャート",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "手すり又は手すり壁の適合判定を開始"
+      },
+      {
+        "id": "proc-identify-handrail",
+        "type": "process",
+        "title": "手すり等の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から判定対象となる手すり又は手すり壁を特定する"
+      },
+      {
+        "id": "dec-has-handrail",
+        "type": "decision",
+        "title": "手すり又は手すり壁があるか？",
+        "decision_type": "binary",
+        "description": "建築物に手すり又は手すり壁が存在するか確認"
+      },
+      {
+        "id": "proc-check-structure",
+        "type": "process",
+        "title": "構造種別の確認",
+        "process_type": "undefined_input",
+        "description": "設計図書等から手すり又は手すり壁の構造種別を読み取る"
+      },
+      {
+        "id": "dec-structure-type",
+        "type": "decision",
+        "title": "構造種別は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "組積造", "description": "れんが造、石造、コンクリートブロック造等" },
+          { "value": "その他", "description": "鉄筋コンクリート造、鉄骨造、木造等" }
+        ],
+        "description": "手すり又は手すり壁の構造種別を判定"
+      },
+      {
+        "id": "proc-not-masonry",
+        "type": "process",
+        "title": "組積造でない構造",
+        "process_type": "mechanical",
+        "description": "構造種別が組積造でないため、本則の禁止規定に該当しない"
+      },
+      {
+        "id": "proc-masonry-identified",
+        "type": "process",
+        "title": "組積造に該当",
+        "process_type": "mechanical",
+        "description": "構造種別が組積造であるため、ただし書きの適用を確認する必要がある"
+      },
+      {
+        "id": "proc-check-girder",
+        "type": "process",
+        "title": "臥梁の確認",
+        "process_type": "human_judgment",
+        "description": "頂部に鉄筋コンクリート造の臥梁を設けているかを設計図書等から確認する"
+      },
+      {
+        "id": "dec-has-rc-girder",
+        "type": "decision",
+        "title": "頂部にRC臥梁を設けているか？",
+        "decision_type": "binary",
+        "description": "頂部に鉄筋コンクリート造の臥梁が設けられているか判定"
+      },
+      {
+        "id": "proc-exempt",
+        "type": "process",
+        "title": "ただし書き適用（適用除外）",
+        "process_type": "mechanical",
+        "description": "頂部にRC臥梁を設けているため、ただし書きにより組積造禁止規定の適用除外となる"
+      },
+      {
+        "id": "proc-all-check",
+        "type": "process",
+        "title": "全手すり等の適合確認",
+        "process_type": "mechanical",
+        "description": "全ての手すり又は手すり壁について判定が完了したか確認"
+      },
+      {
+        "id": "dec-all-complete",
+        "type": "decision",
+        "title": "全ての手すり等を確認したか？",
+        "decision_type": "binary",
+        "description": "建築物内の全ての手すり又は手すり壁について判定が完了したか"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令60条1項に適合"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "令60条1項に不適合（組積造でRC臥梁なし）"
+      },
+      {
+        "id": "not-applicable",
+        "type": "terminal",
+        "title": "該当なし",
+        "result": "pass",
+        "description": "手すり又は手すり壁がないため、本条の適用なし"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "proc-identify-handrail",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "proc-identify-handrail",
+        "to": "dec-has-handrail",
+        "role": "flow"
+      },
+      {
+        "id": "e03",
+        "from": "dec-has-handrail",
+        "to": "not-applicable",
+        "role": "no",
+        "label": "なし"
+      },
+      {
+        "id": "e04",
+        "from": "dec-has-handrail",
+        "to": "proc-check-structure",
+        "role": "yes",
+        "label": "あり"
+      },
+      {
+        "id": "e05",
+        "from": "proc-check-structure",
+        "to": "dec-structure-type",
+        "role": "flow"
+      },
+      {
+        "id": "e06",
+        "from": "dec-structure-type",
+        "to": "proc-not-masonry",
+        "role": "option",
+        "label": "その他"
+      },
+      {
+        "id": "e07",
+        "from": "dec-structure-type",
+        "to": "proc-masonry-identified",
+        "role": "option",
+        "label": "組積造"
+      },
+      {
+        "id": "e08",
+        "from": "proc-not-masonry",
+        "to": "proc-all-check",
+        "role": "flow"
+      },
+      {
+        "id": "e09",
+        "from": "proc-masonry-identified",
+        "to": "proc-check-girder",
+        "role": "flow"
+      },
+      {
+        "id": "e10",
+        "from": "proc-check-girder",
+        "to": "dec-has-rc-girder",
+        "role": "flow"
+      },
+      {
+        "id": "e11",
+        "from": "dec-has-rc-girder",
+        "to": "proc-exempt",
+        "role": "yes",
+        "label": "あり"
+      },
+      {
+        "id": "e12",
+        "from": "dec-has-rc-girder",
+        "to": "fail",
+        "role": "no",
+        "label": "なし"
+      },
+      {
+        "id": "e13",
+        "from": "proc-exempt",
+        "to": "proc-all-check",
+        "role": "flow"
+      },
+      {
+        "id": "e14",
+        "from": "proc-all-check",
+        "to": "dec-all-complete",
+        "role": "flow"
+      },
+      {
+        "id": "e15",
+        "from": "dec-all-complete",
+        "to": "proc-check-structure",
+        "role": "no",
+        "label": "次の手すり等へ"
+      },
+      {
+        "id": "e16",
+        "from": "dec-all-complete",
+        "to": "pass",
+        "role": "yes",
+        "label": "完了"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSO-A60-P1",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": [
+        "A36"
+      ],
+      "description": "法36条により構造方法に関する技術的基準として委任"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

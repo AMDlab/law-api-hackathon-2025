@@ -1,0 +1,483 @@
+{
+  "id": "A136_2_10_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "準景観地区内の建築物に係る制限",
+    "target_subject": "建築物",
+    "description": "準景観地区内において条例で定める制限（高さ・壁面位置・敷地面積）への適合性を判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "136の2の10",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "集団規定",
+    "準景観地区",
+    "形態規制"
+  ],
+  "text_raw": "法第六十八条の九第二項の規定に基づく条例による制限は、次の各号に掲げる事項のうち必要なものについて、それぞれ当該各号に適合するものでなければならない。一　建築物の高さの最高限度　地域の特性に応じた高さを有する建築物を整備し又は保全することが良好な景観の保全を図るために特に必要と認められる区域、当該地域が連続する山の稜線その他その背景と一体となつて構成している良好な景観を保全するために特に必要と認められる区域その他一定の高さを超える建築物の建築を禁止することが良好な景観の保全を図るために特に必要と認められる区域について、当該区域における良好な景観の保全に貢献する合理的な数値であり、かつ、地階を除く階数が二である建築物の通常の高さを下回らない数値であること。二　建築物の高さの最低限度　地域の特性に応じた高さを有する建築物を整備し又は保全することが良好な景観の保全を図るために特に必要と認められる区域について、当該区域における良好な景観の保全に貢献する合理的な数値であること。三　壁面の位置の制限　建築物の位置を整えることが良好な景観の保全を図るために特に必要と認められる区域について、当該区域における良好な景観の保全に貢献する合理的な制限であり、かつ、建築物の壁若しくはこれに代わる柱の位置の制限又は当該制限と併せて定められた建築物に附属する門若しくは塀で高さ二メートルを超えるものの位置の制限であること。四　建築物の敷地面積の最低限度　建築物の敷地が細分化されることを防止することが良好な景観の保全を図るために特に必要と認められる区域について、当該区域における良好な景観の保全に貢献する合理的な数値であること。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "準景観地区内"
+        },
+        {
+          "type": "reference",
+          "value": "法第68条の9第2項に基づく条例が定められている区域"
+        }
+      ],
+      "note": "準景観地区の指定及び条例の有無は公共データとして処理内に含まれる"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-height-max-ok",
+          "operator": "==",
+          "value": true,
+          "note": "高さ最高限度（条例で定められている場合）"
+        },
+        {
+          "ref": "info-height-min-ok",
+          "operator": "==",
+          "value": true,
+          "note": "高さ最低限度（条例で定められている場合）"
+        },
+        {
+          "ref": "info-setback-ok",
+          "operator": "==",
+          "value": true,
+          "note": "壁面位置制限（条例で定められている場合）"
+        },
+        {
+          "ref": "info-site-area-ok",
+          "operator": "==",
+          "value": true,
+          "note": "敷地面積最低限度（条例で定められている場合）"
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "flow_diagram": {
+    "title": "令第136条の2の10第1項 準景観地区内の建築物に係る制限 適合判定フロー",
+    "description": "準景観地区内の条例制限（高さ最高/最低限度、壁面位置制限、敷地面積最低限度）への適合性を順次判定する",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "準景観地区内の建築物に係る制限の適合判定を開始"
+      },
+      {
+        "id": "dec-height-max-ordinance",
+        "type": "decision",
+        "title": "条例で高さ最高限度が定められているか？",
+        "decision_type": "binary",
+        "description": "法第68条の9第2項に基づく条例で高さ最高限度が定められているか確認",
+        "related_articles": ["令136の2の10:P1:I1"]
+      },
+      {
+        "id": "proc-height-identify",
+        "type": "process",
+        "title": "建築物の高さの特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の高さを読み取る"
+      },
+      {
+        "id": "info-height",
+        "type": "information",
+        "title": "建築物の高さ",
+        "symbol": "H",
+        "subject": "建築物",
+        "property": "高さ",
+        "property_type": "numeric",
+        "description": "建築物の高さ（単位: m）"
+      },
+      {
+        "id": "dec-height-max-check",
+        "type": "decision",
+        "title": "建築物の高さ ≤ 条例最高限度か？",
+        "decision_type": "binary",
+        "description": "建築物の高さが条例で定める最高限度以下であるか判定",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "H", "desc": "建築物の高さ" },
+          "rhs": { "var": "Hmax", "desc": "条例で定める高さ最高限度", "unit": "m" }
+        },
+        "related_articles": ["令136の2の10:P1:I1"]
+      },
+      {
+        "id": "proc-height-max-ok",
+        "type": "process",
+        "title": "第1号（高さ最高限度）適合",
+        "process_type": "mechanical",
+        "description": "高さ最高限度に適合（条例で定められていないか、定められている場合は基準以下）"
+      },
+      {
+        "id": "dec-height-min-ordinance",
+        "type": "decision",
+        "title": "条例で高さ最低限度が定められているか？",
+        "decision_type": "binary",
+        "description": "法第68条の9第2項に基づく条例で高さ最低限度が定められているか確認",
+        "related_articles": ["令136の2の10:P1:I2"]
+      },
+      {
+        "id": "dec-height-min-check",
+        "type": "decision",
+        "title": "建築物の高さ ≥ 条例最低限度か？",
+        "decision_type": "binary",
+        "description": "建築物の高さが条例で定める最低限度以上であるか判定",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "H", "desc": "建築物の高さ" },
+          "rhs": { "var": "Hmin", "desc": "条例で定める高さ最低限度", "unit": "m" }
+        },
+        "related_articles": ["令136の2の10:P1:I2"]
+      },
+      {
+        "id": "proc-height-min-ok",
+        "type": "process",
+        "title": "第2号（高さ最低限度）適合",
+        "process_type": "mechanical",
+        "description": "高さ最低限度に適合（条例で定められていないか、定められている場合は基準以上）"
+      },
+      {
+        "id": "dec-setback-ordinance",
+        "type": "decision",
+        "title": "条例で壁面位置制限が定められているか？",
+        "decision_type": "binary",
+        "description": "法第68条の9第2項に基づく条例で壁面位置制限が定められているか確認",
+        "related_articles": ["令136の2の10:P1:I3"]
+      },
+      {
+        "id": "proc-setback-identify",
+        "type": "process",
+        "title": "壁面位置の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の壁面位置（壁・柱・門・塀）を読み取る"
+      },
+      {
+        "id": "info-setback",
+        "type": "information",
+        "title": "壁面の位置",
+        "symbol": "W",
+        "subject": "建築物",
+        "property": "壁面の位置",
+        "property_type": "geometric_line",
+        "description": "壁又はこれに代わる柱の位置、門・塀（高さ2m超）の位置"
+      },
+      {
+        "id": "dec-setback-check",
+        "type": "decision",
+        "title": "壁面位置が条例制限範囲内か？",
+        "decision_type": "binary",
+        "description": "壁面位置が条例で定める制限範囲内にあるか判定",
+        "condition": {
+          "operator": "IN",
+          "lhs": { "var": "W", "desc": "壁面の位置" },
+          "rhs": { "var": "Wlimit", "desc": "条例で定める壁面位置制限範囲" }
+        },
+        "related_articles": ["令136の2の10:P1:I3"]
+      },
+      {
+        "id": "proc-setback-ok",
+        "type": "process",
+        "title": "第3号（壁面位置制限）適合",
+        "process_type": "mechanical",
+        "description": "壁面位置制限に適合（条例で定められていないか、定められている場合は制限範囲内）"
+      },
+      {
+        "id": "dec-site-area-ordinance",
+        "type": "decision",
+        "title": "条例で敷地面積最低限度が定められているか？",
+        "decision_type": "binary",
+        "description": "法第68条の9第2項に基づく条例で敷地面積最低限度が定められているか確認",
+        "related_articles": ["令136の2の10:P1:I4"]
+      },
+      {
+        "id": "proc-site-area-identify",
+        "type": "process",
+        "title": "敷地面積の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から敷地面積を読み取る"
+      },
+      {
+        "id": "info-site-area",
+        "type": "information",
+        "title": "敷地面積",
+        "symbol": "S",
+        "subject": "敷地",
+        "property": "面積",
+        "property_type": "numeric",
+        "description": "建築物の敷地面積（単位: m2）"
+      },
+      {
+        "id": "dec-site-area-check",
+        "type": "decision",
+        "title": "敷地面積 ≥ 条例最低限度か？",
+        "decision_type": "binary",
+        "description": "敷地面積が条例で定める最低限度以上であるか判定",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "S", "desc": "敷地面積" },
+          "rhs": { "var": "Smin", "desc": "条例で定める敷地面積最低限度", "unit": "m2" }
+        },
+        "related_articles": ["令136の2の10:P1:I4"]
+      },
+      {
+        "id": "proc-site-area-ok",
+        "type": "process",
+        "title": "第4号（敷地面積最低限度）適合",
+        "process_type": "mechanical",
+        "description": "敷地面積最低限度に適合（条例で定められていないか、定められている場合は基準以上）"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令第136条の2の10第1項に適合（準景観地区内の条例制限をすべて満たす）"
+      },
+      {
+        "id": "end-fail-height-max",
+        "type": "terminal",
+        "title": "不適合（高さ最高限度超過）",
+        "result": "fail",
+        "description": "第1号不適合：建築物の高さが条例で定める最高限度を超過",
+        "related_articles": ["令136の2の10:P1:I1"]
+      },
+      {
+        "id": "end-fail-height-min",
+        "type": "terminal",
+        "title": "不適合（高さ最低限度未満）",
+        "result": "fail",
+        "description": "第2号不適合：建築物の高さが条例で定める最低限度未満",
+        "related_articles": ["令136の2の10:P1:I2"]
+      },
+      {
+        "id": "end-fail-setback",
+        "type": "terminal",
+        "title": "不適合（壁面位置制限違反）",
+        "result": "fail",
+        "description": "第3号不適合：壁面位置が条例で定める制限範囲外",
+        "related_articles": ["令136の2の10:P1:I3"]
+      },
+      {
+        "id": "end-fail-site-area",
+        "type": "terminal",
+        "title": "不適合（敷地面積最低限度未満）",
+        "result": "fail",
+        "description": "第4号不適合：敷地面積が条例で定める最低限度未満",
+        "related_articles": ["令136の2の10:P1:I4"]
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-height-max-ordinance",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-height-max-ordinance",
+        "to": "proc-height-identify",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "dec-height-max-ordinance",
+        "to": "dec-height-min-ordinance",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e04",
+        "from": "proc-height-identify",
+        "to": "info-height",
+        "role": "output"
+      },
+      {
+        "id": "e05",
+        "from": "info-height",
+        "to": "dec-height-max-check",
+        "role": "input"
+      },
+      {
+        "id": "e06",
+        "from": "dec-height-max-check",
+        "to": "proc-height-max-ok",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e07",
+        "from": "dec-height-max-check",
+        "to": "end-fail-height-max",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e08",
+        "from": "proc-height-max-ok",
+        "to": "dec-height-min-ordinance",
+        "role": "flow"
+      },
+      {
+        "id": "e09",
+        "from": "dec-height-min-ordinance",
+        "to": "dec-height-min-check",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e10",
+        "from": "dec-height-min-ordinance",
+        "to": "dec-setback-ordinance",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e11",
+        "from": "dec-height-min-check",
+        "to": "proc-height-min-ok",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e12",
+        "from": "dec-height-min-check",
+        "to": "end-fail-height-min",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e13",
+        "from": "proc-height-min-ok",
+        "to": "dec-setback-ordinance",
+        "role": "flow"
+      },
+      {
+        "id": "e14",
+        "from": "dec-setback-ordinance",
+        "to": "proc-setback-identify",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e15",
+        "from": "dec-setback-ordinance",
+        "to": "dec-site-area-ordinance",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e16",
+        "from": "proc-setback-identify",
+        "to": "info-setback",
+        "role": "output"
+      },
+      {
+        "id": "e17",
+        "from": "info-setback",
+        "to": "dec-setback-check",
+        "role": "input"
+      },
+      {
+        "id": "e18",
+        "from": "dec-setback-check",
+        "to": "proc-setback-ok",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e19",
+        "from": "dec-setback-check",
+        "to": "end-fail-setback",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e20",
+        "from": "proc-setback-ok",
+        "to": "dec-site-area-ordinance",
+        "role": "flow"
+      },
+      {
+        "id": "e21",
+        "from": "dec-site-area-ordinance",
+        "to": "proc-site-area-identify",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e22",
+        "from": "dec-site-area-ordinance",
+        "to": "end-pass",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e23",
+        "from": "proc-site-area-identify",
+        "to": "info-site-area",
+        "role": "output"
+      },
+      {
+        "id": "e24",
+        "from": "info-site-area",
+        "to": "dec-site-area-check",
+        "role": "input"
+      },
+      {
+        "id": "e25",
+        "from": "dec-site-area-check",
+        "to": "proc-site-area-ok",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e26",
+        "from": "dec-site-area-check",
+        "to": "end-fail-site-area",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e27",
+        "from": "proc-site-area-ok",
+        "to": "end-pass",
+        "role": "flow"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-ORD-A136_2_10-P1",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": ["A68_9:P2"],
+      "description": "法第68条の9第2項で準景観地区内の条例制限を委任"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

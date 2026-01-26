@@ -1,0 +1,357 @@
+{
+  "id": "FLOW-BSL-ORD-A136-2-5-P1",
+  "version": "3.2",
+  "page_title": {
+    "title": "地区計画等の区域内における条例制限適合判定フロー",
+    "target_subject": "建築物",
+    "description": "地区計画等の内容として定められた事項への建築物の適合性判定フロー"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "136_2_5",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "集団規定",
+    "地区計画",
+    "条例制限"
+  ],
+  "text_raw": "法第六十八条の二第一項の規定に基づく条例による制限は、次の各号に掲げる事項で地区計画等の内容として定められたものについて、それぞれ当該各号に適合するものでなければならない。一　建築物の用途の制限で次に掲げるもの　イ　地区計画の区域（再開発等促進区及び開発整備促進区を除く。）にあつては、当該区域の用途構成の適正化、各街区ごとの住居の環境の保持、商業その他の業務の利便の増進その他適正な土地利用の確保及び都市機能の増進による良好な環境の街区の形成に貢献する合理的な制限であることが明らかなもの",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "地区計画等の区域内"
+        },
+        {
+          "type": "regulation",
+          "value": "法第68条の2第1項に基づく条例が適用される区域"
+        }
+      ],
+      "note": "地区計画等の区域内において条例が定める制限の対象となる建築物に適用"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "requirement",
+          "value": "地区計画等で定められた事項への適合",
+          "description": "建築物の用途、容積率、建ぺい率、敷地面積、壁面位置、高さ等の各号に掲げる事項に適合"
+        }
+      ]
+    }
+  },
+  "flow_diagram": {
+    "title": "令第136条の2の5第1項 地区計画等条例制限適合判定フロー",
+    "description": "地区計画等の区域内における建築物の条例制限への適合判定を行うフロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "地区計画等条例制限適合判定を開始"
+      },
+      {
+        "id": "proc-read-use",
+        "type": "process",
+        "title": "建築物の用途を読み取る",
+        "process_type": "undefined_input",
+        "description": "設計図書から計画建築物の用途を読み取る"
+      },
+      {
+        "id": "proc-check-use",
+        "type": "process",
+        "title": "地区計画の用途制限と照合",
+        "process_type": "mechanical",
+        "description": "当該区域の地区計画等で定められた用途制限を確認し照合する"
+      },
+      {
+        "id": "dec-use-compliant",
+        "type": "decision",
+        "title": "用途は地区計画の制限に適合するか？",
+        "decision_type": "binary",
+        "description": "計画建築物の用途が地区計画等の用途制限に適合するか判定"
+      },
+      {
+        "id": "proc-read-far",
+        "type": "process",
+        "title": "容積率を算出",
+        "process_type": "undefined_input",
+        "description": "計画建築物の容積率を算出する"
+      },
+      {
+        "id": "dec-far-compliant",
+        "type": "decision",
+        "title": "FAR ≤ FAR_max か？",
+        "decision_type": "binary",
+        "description": "容積率が地区計画等で定められた最高限度以下か判定",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "FAR", "desc": "計画建築物の容積率" },
+          "rhs": { "var": "FAR_max", "desc": "容積率の最高限度", "unit": "%" }
+        }
+      },
+      {
+        "id": "proc-read-bcr",
+        "type": "process",
+        "title": "建ぺい率を算出",
+        "process_type": "undefined_input",
+        "description": "計画建築物の建ぺい率を算出する"
+      },
+      {
+        "id": "dec-bcr-compliant",
+        "type": "decision",
+        "title": "BCR ≤ BCR_max か？",
+        "decision_type": "binary",
+        "description": "建ぺい率が地区計画等で定められた最高限度以下か判定",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "BCR", "desc": "計画建築物の建ぺい率" },
+          "rhs": { "var": "BCR_max", "desc": "建ぺい率の最高限度", "unit": "%" }
+        }
+      },
+      {
+        "id": "proc-read-sa",
+        "type": "process",
+        "title": "敷地面積を算出",
+        "process_type": "undefined_input",
+        "description": "計画建築物の敷地面積を算出する"
+      },
+      {
+        "id": "dec-sa-compliant",
+        "type": "decision",
+        "title": "SA ≥ SA_min か？",
+        "decision_type": "binary",
+        "description": "敷地面積が地区計画等で定められた最低限度以上か判定",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "SA", "desc": "敷地面積" },
+          "rhs": { "var": "SA_min", "desc": "敷地面積の最低限度", "unit": "m2" }
+        }
+      },
+      {
+        "id": "proc-read-wp",
+        "type": "process",
+        "title": "壁面位置を確認",
+        "process_type": "undefined_input",
+        "description": "建築物の壁面の位置を確認する"
+      },
+      {
+        "id": "proc-check-wp",
+        "type": "process",
+        "title": "地区計画の壁面制限と照合",
+        "process_type": "mechanical",
+        "description": "壁面の位置が地区計画等で定められた制限に適合するか照合する"
+      },
+      {
+        "id": "dec-wp-compliant",
+        "type": "decision",
+        "title": "壁面位置は制限に適合するか？",
+        "decision_type": "binary",
+        "description": "壁面の位置が地区計画等で定められた壁面位置の制限に適合するか判定"
+      },
+      {
+        "id": "proc-read-h",
+        "type": "process",
+        "title": "高さを算出",
+        "process_type": "undefined_input",
+        "description": "計画建築物の高さを算出する"
+      },
+      {
+        "id": "dec-h-compliant",
+        "type": "decision",
+        "title": "H ≤ H_max か？",
+        "decision_type": "binary",
+        "description": "高さが地区計画等で定められた最高限度以下か判定",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "H", "desc": "建築物の高さ" },
+          "rhs": { "var": "H_max", "desc": "高さの最高限度", "unit": "m" }
+        }
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令第136条の2の5第1項に適合"
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "令第136条の2の5第1項に不適合"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "proc-read-use",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "proc-read-use",
+        "to": "proc-check-use",
+        "role": "flow"
+      },
+      {
+        "id": "e03",
+        "from": "proc-check-use",
+        "to": "dec-use-compliant",
+        "role": "flow"
+      },
+      {
+        "id": "e04",
+        "from": "dec-use-compliant",
+        "to": "proc-read-far",
+        "role": "yes",
+        "label": "適合"
+      },
+      {
+        "id": "e05",
+        "from": "dec-use-compliant",
+        "to": "end-fail",
+        "role": "no",
+        "label": "不適合"
+      },
+      {
+        "id": "e06",
+        "from": "proc-read-far",
+        "to": "dec-far-compliant",
+        "role": "flow"
+      },
+      {
+        "id": "e07",
+        "from": "dec-far-compliant",
+        "to": "proc-read-bcr",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e08",
+        "from": "dec-far-compliant",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e09",
+        "from": "proc-read-bcr",
+        "to": "dec-bcr-compliant",
+        "role": "flow"
+      },
+      {
+        "id": "e10",
+        "from": "dec-bcr-compliant",
+        "to": "proc-read-sa",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e11",
+        "from": "dec-bcr-compliant",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e12",
+        "from": "proc-read-sa",
+        "to": "dec-sa-compliant",
+        "role": "flow"
+      },
+      {
+        "id": "e13",
+        "from": "dec-sa-compliant",
+        "to": "proc-read-wp",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e14",
+        "from": "dec-sa-compliant",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e15",
+        "from": "proc-read-wp",
+        "to": "proc-check-wp",
+        "role": "flow"
+      },
+      {
+        "id": "e16",
+        "from": "proc-check-wp",
+        "to": "dec-wp-compliant",
+        "role": "flow"
+      },
+      {
+        "id": "e17",
+        "from": "dec-wp-compliant",
+        "to": "proc-read-h",
+        "role": "yes",
+        "label": "適合"
+      },
+      {
+        "id": "e18",
+        "from": "dec-wp-compliant",
+        "to": "end-fail",
+        "role": "no",
+        "label": "不適合"
+      },
+      {
+        "id": "e19",
+        "from": "proc-read-h",
+        "to": "dec-h-compliant",
+        "role": "flow"
+      },
+      {
+        "id": "e20",
+        "from": "dec-h-compliant",
+        "to": "end-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e21",
+        "from": "dec-h-compliant",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-ORD-A136-2-5-P1",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": [
+        "A68_2:P1"
+      ],
+      "description": "法第68条の2第1項の委任に基づき、条例で定める制限の基準を規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00+09:00",
+    "updated_at": "2026-01-26T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令",
+    "checklist_ref": "令第136条の2の5第1項（地区計画等の区域内において条例で定める制限）"
+  }
+}

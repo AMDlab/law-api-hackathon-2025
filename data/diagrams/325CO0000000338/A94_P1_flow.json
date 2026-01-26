@@ -1,0 +1,332 @@
+{
+  "id": "A94_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "構造耐力上主要な部分の材料の許容応力度（補則）適合判定フロー",
+    "target_subject": "構造耐力上主要な部分の材料",
+    "description": "第89条から第93条に定めるもののほか、許容応力度が国土交通大臣が定める数値によるか判定するフロー"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "94",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造関係規定",
+    "許容応力度"
+  ],
+  "text_raw": "第八十九条から前条までに定めるもののほか、構造耐力上主要な部分の材料の長期に生ずる力に対する許容応力度及び短期に生ずる力に対する許容応力度は、材料の種類及び品質に応じ、国土交通大臣が建築物の安全を確保するために必要なものとして定める数値によらなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "reference",
+          "value": "令第89条から第93条に該当しない材料"
+        }
+      ],
+      "note": "第89条から第93条に定めるもののほかの材料に適用"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-long-term-compliance",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "ref": "info-short-term-compliance",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "flow_diagram": {
+    "title": "令第94条第1項 適合判定フロー",
+    "description": "構造耐力上主要な部分の材料の許容応力度が国土交通大臣が定める数値によるか判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "令第94条第1項の適合判定を開始"
+      },
+      {
+        "id": "proc-identify-structural-parts",
+        "type": "process",
+        "title": "構造耐力上主要な部分の特定",
+        "process_type": "undefined_input",
+        "description": "建築物の構造耐力上主要な部分を特定する"
+      },
+      {
+        "id": "proc-identify-materials",
+        "type": "process",
+        "title": "使用材料の特定",
+        "process_type": "undefined_input",
+        "description": "構造耐力上主要な部分に使用されている材料を特定する"
+      },
+      {
+        "id": "decision-material-type",
+        "type": "decision",
+        "title": "材料の種類は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "令第89条〜第93条の材料", "description": "鋼材・コンクリート・溶接・ボルト接合等の規定材料" },
+          { "value": "その他の材料", "description": "令第89条〜第93条に定めのない材料" }
+        ],
+        "description": "材料が令第89条〜第93条に定める材料か、その他の材料かを判定"
+      },
+      {
+        "id": "terminal-out-of-scope",
+        "type": "terminal",
+        "title": "令第94条適用対象外",
+        "result": "end",
+        "description": "令第89条〜第93条の規定が適用される材料のため、令第94条の対象外"
+      },
+      {
+        "id": "proc-identify-material-type",
+        "type": "process",
+        "title": "材料の種類の特定",
+        "process_type": "undefined_input",
+        "description": "材料の種類（木材、特殊金属等）を特定する"
+      },
+      {
+        "id": "proc-identify-material-quality",
+        "type": "process",
+        "title": "材料の品質の特定",
+        "process_type": "undefined_input",
+        "description": "材料の品質（強度等級等）を特定する"
+      },
+      {
+        "id": "proc-identify-long-term-stress",
+        "type": "process",
+        "title": "設計長期許容応力度の特定",
+        "process_type": "undefined_input",
+        "description": "設計で用いている長期に生ずる力に対する許容応力度を特定する"
+      },
+      {
+        "id": "proc-identify-short-term-stress",
+        "type": "process",
+        "title": "設計短期許容応力度の特定",
+        "process_type": "undefined_input",
+        "description": "設計で用いている短期に生ずる力に対する許容応力度を特定する"
+      },
+      {
+        "id": "proc-get-minister-long-term",
+        "type": "process",
+        "title": "大臣告示による長期許容応力度の確認",
+        "process_type": "mechanical",
+        "description": "材料の種類・品質に応じた国土交通大臣が定める長期許容応力度を確認する"
+      },
+      {
+        "id": "decision-long-term-compliance",
+        "type": "decision",
+        "title": "長期許容応力度は大臣告示の数値によるか？",
+        "decision_type": "binary",
+        "description": "設計の長期許容応力度が国土交通大臣が定める数値以下か判定",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "SL", "desc": "設計長期許容応力度" },
+          "rhs": { "var": "SL_minister", "desc": "大臣告示による長期許容応力度" }
+        }
+      },
+      {
+        "id": "proc-get-minister-short-term",
+        "type": "process",
+        "title": "大臣告示による短期許容応力度の確認",
+        "process_type": "mechanical",
+        "description": "材料の種類・品質に応じた国土交通大臣が定める短期許容応力度を確認する"
+      },
+      {
+        "id": "decision-short-term-compliance",
+        "type": "decision",
+        "title": "短期許容応力度は大臣告示の数値によるか？",
+        "decision_type": "binary",
+        "description": "設計の短期許容応力度が国土交通大臣が定める数値以下か判定",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "SS", "desc": "設計短期許容応力度" },
+          "rhs": { "var": "SS_minister", "desc": "大臣告示による短期許容応力度" }
+        }
+      },
+      {
+        "id": "decision-all-materials-checked",
+        "type": "decision",
+        "title": "全ての材料を判定したか？",
+        "decision_type": "binary",
+        "description": "構造耐力上主要な部分の全ての材料について許容応力度の判定を完了したか確認"
+      },
+      {
+        "id": "terminal-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "全ての材料の長期・短期許容応力度が国土交通大臣が定める数値による",
+        "related_articles": ["令第94条第1項"]
+      },
+      {
+        "id": "terminal-fail-long-term",
+        "type": "terminal",
+        "title": "不適合（長期許容応力度）",
+        "result": "fail",
+        "description": "長期に生ずる力に対する許容応力度が国土交通大臣が定める数値によらない",
+        "related_articles": ["令第94条第1項"]
+      },
+      {
+        "id": "terminal-fail-short-term",
+        "type": "terminal",
+        "title": "不適合（短期許容応力度）",
+        "result": "fail",
+        "description": "短期に生ずる力に対する許容応力度が国土交通大臣が定める数値によらない",
+        "related_articles": ["令第94条第1項"]
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "proc-identify-structural-parts",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "proc-identify-structural-parts",
+        "to": "proc-identify-materials",
+        "role": "flow"
+      },
+      {
+        "id": "e03",
+        "from": "proc-identify-materials",
+        "to": "decision-material-type",
+        "role": "flow"
+      },
+      {
+        "id": "e04",
+        "from": "decision-material-type",
+        "to": "terminal-out-of-scope",
+        "role": "option",
+        "label": "令第89条〜第93条の材料"
+      },
+      {
+        "id": "e05",
+        "from": "decision-material-type",
+        "to": "proc-identify-material-type",
+        "role": "option",
+        "label": "その他の材料"
+      },
+      {
+        "id": "e06",
+        "from": "proc-identify-material-type",
+        "to": "proc-identify-material-quality",
+        "role": "flow"
+      },
+      {
+        "id": "e07",
+        "from": "proc-identify-material-quality",
+        "to": "proc-identify-long-term-stress",
+        "role": "flow"
+      },
+      {
+        "id": "e08",
+        "from": "proc-identify-long-term-stress",
+        "to": "proc-identify-short-term-stress",
+        "role": "flow"
+      },
+      {
+        "id": "e09",
+        "from": "proc-identify-short-term-stress",
+        "to": "proc-get-minister-long-term",
+        "role": "flow"
+      },
+      {
+        "id": "e10",
+        "from": "proc-get-minister-long-term",
+        "to": "decision-long-term-compliance",
+        "role": "flow"
+      },
+      {
+        "id": "e11",
+        "from": "decision-long-term-compliance",
+        "to": "terminal-fail-long-term",
+        "role": "no",
+        "label": "不適合"
+      },
+      {
+        "id": "e12",
+        "from": "decision-long-term-compliance",
+        "to": "proc-get-minister-short-term",
+        "role": "yes",
+        "label": "適合"
+      },
+      {
+        "id": "e13",
+        "from": "proc-get-minister-short-term",
+        "to": "decision-short-term-compliance",
+        "role": "flow"
+      },
+      {
+        "id": "e14",
+        "from": "decision-short-term-compliance",
+        "to": "terminal-fail-short-term",
+        "role": "no",
+        "label": "不適合"
+      },
+      {
+        "id": "e15",
+        "from": "decision-short-term-compliance",
+        "to": "decision-all-materials-checked",
+        "role": "yes",
+        "label": "適合"
+      },
+      {
+        "id": "e16",
+        "from": "decision-all-materials-checked",
+        "to": "proc-identify-materials",
+        "role": "no",
+        "label": "次の材料へ"
+      },
+      {
+        "id": "e17",
+        "from": "decision-all-materials-checked",
+        "to": "terminal-pass",
+        "role": "yes",
+        "label": "全て完了"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-ORDER-A94-P1",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": ["A20:P1"],
+      "description": "法第20条第1項の構造耐力規定の委任"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": ["A89", "A90", "A91", "A92", "A93"],
+      "description": "第89条から第93条に定める材料以外の材料に適用"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

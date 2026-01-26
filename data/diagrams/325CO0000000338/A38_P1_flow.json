@@ -1,0 +1,357 @@
+{
+  "id": "A38_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "建築物の基礎の構造安全性",
+    "target_subject": "建築物の基礎",
+    "description": "建築物の基礎が荷重及び外力を安全に地盤に伝え、地盤の沈下又は変形に対して構造耐力上安全であることを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "38",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造"
+  ],
+  "text_raw": "建築物の基礎は、建築物に作用する荷重及び外力を安全に地盤に伝え、かつ、地盤の沈下又は変形に対して構造耐力上安全なものとしなければならない。",
+  "kijo_diagram_ref": "CHK-BSO-A38-P1",
+  "flow_diagram": {
+    "title": "令38条1項 基礎の構造安全性判定フロー",
+    "description": "建築物の基礎が荷重及び外力を安全に地盤に伝え、かつ地盤の沈下又は変形に対して構造耐力上安全であるかを判定するフロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "令38条1項の適合判定を開始"
+      },
+      {
+        "id": "dec-foundation-identified",
+        "type": "decision",
+        "title": "判定対象の基礎があるか？",
+        "decision_type": "binary",
+        "description": "建築物に属する基礎が判定対象として特定されているか確認"
+      },
+      {
+        "id": "dec-foundation-type",
+        "type": "decision",
+        "title": "基礎の種別は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "直接基礎", "description": "布基礎、べた基礎等" },
+          { "value": "杭基礎", "description": "支持杭、摩擦杭等" },
+          { "value": "その他", "description": "地盤改良併用等" }
+        ],
+        "description": "設計図書等から基礎の構造方法を確認"
+      },
+      {
+        "id": "proc-foundation-type-noted",
+        "type": "process",
+        "title": "基礎種別確認",
+        "process_type": "mechanical",
+        "description": "基礎の構造方法（直接基礎、杭基礎等）を確認"
+      },
+      {
+        "id": "dec-ground-condition",
+        "type": "decision",
+        "title": "地盤の状況は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "良好", "description": "十分な地耐力あり" },
+          { "value": "普通", "description": "一般的な地盤" },
+          { "value": "軟弱", "description": "沈下・変形のおそれあり" }
+        ],
+        "description": "地盤調査報告書等から地盤の地耐力、沈下特性、変形特性等を確認"
+      },
+      {
+        "id": "proc-ground-condition-noted",
+        "type": "process",
+        "title": "地盤状況確認",
+        "process_type": "mechanical",
+        "description": "地盤の地耐力、沈下特性、変形特性等を確認"
+      },
+      {
+        "id": "dec-load-force-identified",
+        "type": "decision",
+        "title": "作用荷重及び外力は把握されているか？",
+        "decision_type": "binary",
+        "description": "設計図書等から建築物に作用する荷重（自重、積載荷重等）及び外力（地震力、風圧力等）が把握されているか確認"
+      },
+      {
+        "id": "proc-load-force-noted",
+        "type": "process",
+        "title": "荷重・外力確認",
+        "process_type": "mechanical",
+        "description": "建築物に作用する荷重及び外力を確認"
+      },
+      {
+        "id": "dec-load-transfer-safe",
+        "type": "decision",
+        "title": "荷重及び外力を安全に地盤に伝えるか？",
+        "decision_type": "binary",
+        "description": "基礎の支持力 ≥ 作用荷重及び外力。構造計算書、地盤調査報告書等により確認",
+        "condition": {
+          "operator": "GTE",
+          "lhs": {
+            "var": "foundation_bearing_capacity",
+            "desc": "基礎の支持力"
+          },
+          "rhs": {
+            "var": "load_and_force",
+            "desc": "作用荷重及び外力"
+          }
+        }
+      },
+      {
+        "id": "proc-load-transfer-ok",
+        "type": "process",
+        "title": "荷重伝達安全性確認",
+        "process_type": "human_judgment",
+        "description": "基礎が建築物に作用する荷重及び外力を安全に地盤に伝えることができることを確認"
+      },
+      {
+        "id": "dec-ground-deformation-safe",
+        "type": "decision",
+        "title": "地盤の沈下又は変形に対して安全か？",
+        "decision_type": "binary",
+        "description": "許容沈下量 ≥ 予想沈下量。沈下計算、不同沈下検討等により確認",
+        "condition": {
+          "operator": "GTE",
+          "lhs": {
+            "var": "allowable_settlement",
+            "desc": "許容沈下量"
+          },
+          "rhs": {
+            "var": "expected_settlement",
+            "desc": "予想沈下量"
+          }
+        }
+      },
+      {
+        "id": "proc-ground-deformation-ok",
+        "type": "process",
+        "title": "地盤変形安全性確認",
+        "process_type": "human_judgment",
+        "description": "基礎が地盤の沈下又は変形に対して構造耐力上安全であることを確認"
+      },
+      {
+        "id": "dec-both-conditions-met",
+        "type": "decision",
+        "title": "荷重伝達安全性と地盤変形安全性の両方を満たすか？",
+        "decision_type": "binary",
+        "description": "T AND D：荷重伝達安全性(T)と地盤変形安全性(D)の両方を満たすことを確認"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令38条1項に適合：基礎は荷重及び外力を安全に地盤に伝え、かつ地盤の沈下又は変形に対して構造耐力上安全"
+      },
+      {
+        "id": "end-fail-no-foundation",
+        "type": "terminal",
+        "title": "不適合（基礎未特定）",
+        "result": "fail",
+        "description": "判定対象の基礎が特定されていない"
+      },
+      {
+        "id": "end-fail-no-load",
+        "type": "terminal",
+        "title": "不適合（荷重未把握）",
+        "result": "fail",
+        "description": "作用荷重及び外力が把握されていない"
+      },
+      {
+        "id": "end-fail-load-transfer",
+        "type": "terminal",
+        "title": "不適合（荷重伝達不安全）",
+        "result": "fail",
+        "description": "基礎が荷重及び外力を安全に地盤に伝えることができない"
+      },
+      {
+        "id": "end-fail-ground-deformation",
+        "type": "terminal",
+        "title": "不適合（地盤変形不安全）",
+        "result": "fail",
+        "description": "基礎が地盤の沈下又は変形に対して構造耐力上安全でない"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-foundation-identified",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-foundation-identified",
+        "to": "dec-foundation-type",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "dec-foundation-identified",
+        "to": "end-fail-no-foundation",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e04",
+        "from": "dec-foundation-type",
+        "to": "proc-foundation-type-noted",
+        "role": "option",
+        "label": "直接基礎"
+      },
+      {
+        "id": "e05",
+        "from": "dec-foundation-type",
+        "to": "proc-foundation-type-noted",
+        "role": "option",
+        "label": "杭基礎"
+      },
+      {
+        "id": "e06",
+        "from": "dec-foundation-type",
+        "to": "proc-foundation-type-noted",
+        "role": "option",
+        "label": "その他"
+      },
+      {
+        "id": "e07",
+        "from": "proc-foundation-type-noted",
+        "to": "dec-ground-condition",
+        "role": "flow"
+      },
+      {
+        "id": "e08",
+        "from": "dec-ground-condition",
+        "to": "proc-ground-condition-noted",
+        "role": "option",
+        "label": "良好"
+      },
+      {
+        "id": "e09",
+        "from": "dec-ground-condition",
+        "to": "proc-ground-condition-noted",
+        "role": "option",
+        "label": "普通"
+      },
+      {
+        "id": "e10",
+        "from": "dec-ground-condition",
+        "to": "proc-ground-condition-noted",
+        "role": "option",
+        "label": "軟弱"
+      },
+      {
+        "id": "e11",
+        "from": "proc-ground-condition-noted",
+        "to": "dec-load-force-identified",
+        "role": "flow"
+      },
+      {
+        "id": "e12",
+        "from": "dec-load-force-identified",
+        "to": "proc-load-force-noted",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e13",
+        "from": "dec-load-force-identified",
+        "to": "end-fail-no-load",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e14",
+        "from": "proc-load-force-noted",
+        "to": "dec-load-transfer-safe",
+        "role": "flow"
+      },
+      {
+        "id": "e15",
+        "from": "dec-load-transfer-safe",
+        "to": "proc-load-transfer-ok",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e16",
+        "from": "dec-load-transfer-safe",
+        "to": "end-fail-load-transfer",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e17",
+        "from": "proc-load-transfer-ok",
+        "to": "dec-ground-deformation-safe",
+        "role": "flow"
+      },
+      {
+        "id": "e18",
+        "from": "dec-ground-deformation-safe",
+        "to": "proc-ground-deformation-ok",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e19",
+        "from": "dec-ground-deformation-safe",
+        "to": "end-fail-ground-deformation",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e20",
+        "from": "proc-ground-deformation-ok",
+        "to": "dec-both-conditions-met",
+        "role": "flow"
+      },
+      {
+        "id": "e21",
+        "from": "dec-both-conditions-met",
+        "to": "end-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e22",
+        "from": "dec-both-conditions-met",
+        "to": "end-fail-ground-deformation",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": [
+        "A20"
+      ],
+      "description": "構造耐力に関する基準として法20条から委任"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T12:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

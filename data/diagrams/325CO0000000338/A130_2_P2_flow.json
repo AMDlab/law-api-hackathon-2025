@@ -1,0 +1,284 @@
+{
+  "id": "A130_2_P2_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "既存不適格建築物の条例適用除外規定",
+    "target_subject": "建築物",
+    "description": "法第49条の2に基づく条例における既存不適格建築物の適用除外規定への適合を判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "130_2",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": [
+    "集団規定",
+    "特定用途制限地域",
+    "既存不適格",
+    "条例"
+  ],
+  "text_raw": "法第四十九条の二の規定に基づく条例には、法第三条第二項の規定により当該条例の規定の適用を受けない建築物について、法第八十六条の七第一項の規定の例により当該条例に定める制限の適用の除外に関する規定を定めるものとする。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "特定用途制限地域内"
+        },
+        {
+          "type": "building_status",
+          "value": "法第3条第2項により条例の適用を受けない建築物（既存不適格建築物）"
+        }
+      ]
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-existing-nonconforming",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "ref": "info-exemption-compliance",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "flow_diagram": {
+    "title": "令第130条の2第2項 適合判定フロー",
+    "description": "既存不適格建築物に対する条例適用除外規定の適合判定フロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start"
+      },
+      {
+        "id": "dec-existing-nonconforming",
+        "type": "decision",
+        "title": "既存不適格建築物か？",
+        "decision_type": "binary",
+        "description": "法第3条第2項により当該条例の適用を受けない建築物（既存不適格建築物）に該当するか",
+        "related_articles": ["法::A3:P2"]
+      },
+      {
+        "id": "proc-existing-confirmed",
+        "type": "process",
+        "title": "既存不適格該当確認",
+        "process_type": "mechanical",
+        "description": "既存不適格建築物に該当することを確認"
+      },
+      {
+        "id": "dec-work-type",
+        "type": "decision",
+        "title": "増改築等の行為種別は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "増築", "description": "建築物の床面積を増加させる行為" },
+          { "value": "改築", "description": "建築物の全部または一部を除却し、同一敷地内に建て替える行為" },
+          { "value": "大規模修繕", "description": "主要構造部の一種以上について過半の修繕" },
+          { "value": "大規模模様替", "description": "主要構造部の一種以上について過半の模様替" },
+          { "value": "その他", "description": "上記以外の行為" }
+        ],
+        "description": "既存不適格建築物に対して行う行為の種別"
+      },
+      {
+        "id": "proc-work-identified",
+        "type": "process",
+        "title": "行為種別確定",
+        "process_type": "mechanical",
+        "description": "増改築等の行為種別が確定"
+      },
+      {
+        "id": "dec-exemption-scope",
+        "type": "decision",
+        "title": "条例の適用除外対象行為か？",
+        "decision_type": "binary",
+        "description": "当該行為が条例で定める適用除外の対象行為に該当するか"
+      },
+      {
+        "id": "dec-exemption-compliance",
+        "type": "decision",
+        "title": "法86条の7第1項の例による緩和規定に適合するか？",
+        "decision_type": "binary",
+        "description": "法第86条の7第1項の規定の例により条例に定める制限の適用除外規定に適合するか",
+        "related_articles": ["法::A86_7:P1"]
+      },
+      {
+        "id": "proc-exemption-confirmed",
+        "type": "process",
+        "title": "適用除外規定適合確認",
+        "process_type": "human_judgment",
+        "description": "条例適用除外規定への適合を確認"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令第130条の2第2項に適合"
+      },
+      {
+        "id": "end-fail-not-existing",
+        "type": "terminal",
+        "title": "対象外",
+        "result": "end",
+        "description": "既存不適格建築物でないため本項の適用対象外"
+      },
+      {
+        "id": "end-fail-not-exempted",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "条例の適用除外規定に適合せず"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-existing-nonconforming",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-existing-nonconforming",
+        "to": "proc-existing-confirmed",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "dec-existing-nonconforming",
+        "to": "end-fail-not-existing",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e04",
+        "from": "proc-existing-confirmed",
+        "to": "dec-work-type",
+        "role": "flow"
+      },
+      {
+        "id": "e05",
+        "from": "dec-work-type",
+        "to": "proc-work-identified",
+        "role": "option",
+        "label": "増築"
+      },
+      {
+        "id": "e06",
+        "from": "dec-work-type",
+        "to": "proc-work-identified",
+        "role": "option",
+        "label": "改築"
+      },
+      {
+        "id": "e07",
+        "from": "dec-work-type",
+        "to": "proc-work-identified",
+        "role": "option",
+        "label": "大規模修繕"
+      },
+      {
+        "id": "e08",
+        "from": "dec-work-type",
+        "to": "proc-work-identified",
+        "role": "option",
+        "label": "大規模模様替"
+      },
+      {
+        "id": "e09",
+        "from": "dec-work-type",
+        "to": "proc-work-identified",
+        "role": "option",
+        "label": "その他"
+      },
+      {
+        "id": "e10",
+        "from": "proc-work-identified",
+        "to": "dec-exemption-scope",
+        "role": "flow"
+      },
+      {
+        "id": "e11",
+        "from": "dec-exemption-scope",
+        "to": "dec-exemption-compliance",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e12",
+        "from": "dec-exemption-scope",
+        "to": "end-fail-not-exempted",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e13",
+        "from": "dec-exemption-compliance",
+        "to": "proc-exemption-confirmed",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e14",
+        "from": "dec-exemption-compliance",
+        "to": "end-fail-not-exempted",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e15",
+        "from": "proc-exemption-confirmed",
+        "to": "end-pass",
+        "role": "flow"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-ORDER-A130_2-P2",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": ["A49_2"],
+      "description": "法第49条の2に基づく条例による用途制限"
+    },
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A3:P2"],
+      "description": "既存建築物等に対する制限の適用除外"
+    },
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A86_7:P1"],
+      "description": "既存不適格建築物に対する制限の緩和"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

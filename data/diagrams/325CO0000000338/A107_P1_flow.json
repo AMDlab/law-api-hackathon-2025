@@ -1,0 +1,429 @@
+{
+  "id": "A107_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "耐火性能に関する技術的基準（適合判定フロー）",
+    "target_subject": "主要構造部",
+    "description": "耐火建築物の主要構造部が法第2条第7号の耐火性能の技術的基準に適合することを判定するフロー"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "107",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": ["単体規定", "防火", "耐火構造"],
+  "text_raw": "法第二条第七号の政令で定める技術的基準は、次に掲げるものとする。\n一 次の表の上欄に掲げる建築物の部分にあつては、当該各部分に通常の火災による火熱が同表の下欄に掲げる当該部分の存する階の区分に応じそれぞれ同欄に掲げる時間加えられた場合に、構造耐力上支障のある変形、溶融、破壊その他の損傷を生じないものであること。\n二 前号に掲げるもののほか、壁及び床にあつては、これらに通常の火災による火熱が一時間（非耐力壁である外壁の延焼のおそれのある部分以外の部分にあつては、三十分間）加えられた場合に、当該加熱面以外の面（屋内に面するものに限る。）の温度が当該面に接する可燃物が燃焼するおそれのある温度として国土交通大臣が定める温度（以下「可燃物燃焼温度」という。）以上に上昇しないものであること。\n三 前二号に掲げるもののほか、外壁及び屋根にあつては、これらに屋内において発生する通常の火災による火熱が一時間（非耐力壁である外壁の延焼のおそれのある部分以外の部分及び屋根にあつては、三十分間）加えられた場合に、屋外に火炎を出す原因となる亀裂その他の損傷を生じないものであること。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "building_classification",
+          "value": "耐火建築物"
+        }
+      ],
+      "note": "法第2条第7号に定める耐火建築物の主要構造部に適用"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-structural-fire-resistance",
+          "note": "第1号：非損傷性",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "ref": "info-heat-insulation",
+          "note": "第2号：遮熱性",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "ref": "info-flame-prevention",
+          "note": "第3号：遮炎性",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    }
+  },
+  "flow_diagram": {
+    "title": "令第107条第1項 耐火性能技術的基準 適合判定フロー",
+    "description": "耐火建築物の主要構造部について、第1号（非損傷性）、第2号（遮熱性）、第3号（遮炎性）の全てに適合することを判定する",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "耐火建築物の主要構造部について耐火性能の判定を開始"
+      },
+      {
+        "id": "proc-identify-parts",
+        "type": "process",
+        "title": "主要構造部を特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から耐火建築物の主要構造部（壁、柱、床、はり、屋根、階段）を特定する"
+      },
+      {
+        "id": "dec-has-parts",
+        "type": "decision",
+        "title": "未判定の主要構造部があるか？",
+        "decision_type": "binary",
+        "description": "第1号の非損傷性判定が未完了の主要構造部が残っているか確認"
+      },
+      {
+        "id": "dec-part-type",
+        "type": "decision",
+        "title": "部分の種別は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "壁（間仕切壁・外壁）", "description": "耐力壁に限る" },
+          { "value": "柱", "description": "柱" },
+          { "value": "床", "description": "床" },
+          { "value": "はり", "description": "はり" },
+          { "value": "屋根", "description": "屋根" },
+          { "value": "階段", "description": "階段" }
+        ],
+        "description": "主要構造部の種別を判定（要求耐火時間の決定に使用）"
+      },
+      {
+        "id": "dec-floor-category-wall",
+        "type": "decision",
+        "title": "最上階からの階数は？（壁）",
+        "decision_type": "multi",
+        "options": [
+          { "value": "1〜4階", "description": "要求耐火時間1時間" },
+          { "value": "5〜9階", "description": "要求耐火時間1.5時間" },
+          { "value": "10〜14階", "description": "要求耐火時間2時間" },
+          { "value": "15階以上", "description": "要求耐火時間2時間" }
+        ],
+        "description": "壁の最上階からの階数区分を判定"
+      },
+      {
+        "id": "dec-floor-category-column",
+        "type": "decision",
+        "title": "最上階からの階数は？（柱・はり）",
+        "decision_type": "multi",
+        "options": [
+          { "value": "1〜4階", "description": "要求耐火時間1時間" },
+          { "value": "5〜9階", "description": "要求耐火時間1.5時間" },
+          { "value": "10〜14階", "description": "要求耐火時間2時間" },
+          { "value": "15〜19階", "description": "要求耐火時間2.5時間" },
+          { "value": "20階以上", "description": "要求耐火時間3時間" }
+        ],
+        "description": "柱・はりの最上階からの階数区分を判定"
+      },
+      {
+        "id": "dec-floor-category-floor",
+        "type": "decision",
+        "title": "最上階からの階数は？（床）",
+        "decision_type": "multi",
+        "options": [
+          { "value": "1〜4階", "description": "要求耐火時間1時間" },
+          { "value": "5〜9階", "description": "要求耐火時間1.5時間" },
+          { "value": "10階以上", "description": "要求耐火時間2時間" }
+        ],
+        "description": "床の最上階からの階数区分を判定"
+      },
+      {
+        "id": "proc-required-time-1h",
+        "type": "process",
+        "title": "要求耐火時間：1時間",
+        "process_type": "mechanical",
+        "description": "当該部分の要求耐火時間は1時間"
+      },
+      {
+        "id": "proc-required-time-1h30m",
+        "type": "process",
+        "title": "要求耐火時間：1.5時間",
+        "process_type": "mechanical",
+        "description": "当該部分の要求耐火時間は1.5時間（90分間）"
+      },
+      {
+        "id": "proc-required-time-2h",
+        "type": "process",
+        "title": "要求耐火時間：2時間",
+        "process_type": "mechanical",
+        "description": "当該部分の要求耐火時間は2時間"
+      },
+      {
+        "id": "proc-required-time-2h30m",
+        "type": "process",
+        "title": "要求耐火時間：2.5時間",
+        "process_type": "mechanical",
+        "description": "当該部分の要求耐火時間は2.5時間（150分間）"
+      },
+      {
+        "id": "proc-required-time-3h",
+        "type": "process",
+        "title": "要求耐火時間：3時間",
+        "process_type": "mechanical",
+        "description": "当該部分の要求耐火時間は3時間"
+      },
+      {
+        "id": "proc-required-time-30m",
+        "type": "process",
+        "title": "要求耐火時間：30分間",
+        "process_type": "mechanical",
+        "description": "屋根・階段の要求耐火時間は30分間"
+      },
+      {
+        "id": "dec-structural-check",
+        "type": "decision",
+        "title": "非損傷性を満たすか？",
+        "decision_type": "binary",
+        "description": "要求耐火時間の火熱により構造耐力上支障のある変形、溶融、破壊その他の損傷を生じないか判定（第1号）",
+        "related_articles": ["令::A107:P1:I1"]
+      },
+      {
+        "id": "proc-part-pass",
+        "type": "process",
+        "title": "当該部分：第1号適合",
+        "process_type": "mechanical",
+        "description": "当該主要構造部は第1号の非損傷性基準に適合"
+      },
+      {
+        "id": "dec-all-parts-checked",
+        "type": "decision",
+        "title": "全主要構造部の第1号適合を確認したか？",
+        "decision_type": "binary",
+        "description": "全ての主要構造部について第1号の非損傷性判定が完了したか確認"
+      },
+      {
+        "id": "proc-identify-wall-floor",
+        "type": "process",
+        "title": "壁及び床を抽出",
+        "process_type": "mechanical",
+        "description": "主要構造部のうち壁及び床を抽出（第2号遮熱性の判定対象）"
+      },
+      {
+        "id": "dec-has-wall-floor",
+        "type": "decision",
+        "title": "未判定の壁・床があるか？",
+        "decision_type": "binary",
+        "description": "第2号の遮熱性判定が未完了の壁・床が残っているか確認"
+      },
+      {
+        "id": "dec-wall-type",
+        "type": "decision",
+        "title": "当該壁の種別は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "耐力壁", "description": "耐力壁である壁" },
+          { "value": "非耐力壁（延焼部分）", "description": "非耐力壁である外壁で延焼のおそれのある部分" },
+          { "value": "非耐力壁（延焼部分以外）", "description": "非耐力壁である外壁で延焼のおそれのある部分以外" },
+          { "value": "床", "description": "床" }
+        ],
+        "description": "壁の耐力壁区分・延焼部分該当を判定（遮熱性要求時間の決定に使用）"
+      },
+      {
+        "id": "proc-heat-time-1h",
+        "type": "process",
+        "title": "遮熱性要求時間：1時間",
+        "process_type": "mechanical",
+        "description": "遮熱性に要求される加熱時間は1時間"
+      },
+      {
+        "id": "proc-heat-time-30m",
+        "type": "process",
+        "title": "遮熱性要求時間：30分間",
+        "process_type": "mechanical",
+        "description": "非耐力壁である外壁の延焼のおそれのある部分以外のため、遮熱性要求時間は30分間"
+      },
+      {
+        "id": "dec-heat-insulation-check",
+        "type": "decision",
+        "title": "遮熱性を満たすか？",
+        "decision_type": "binary",
+        "description": "要求時間の火熱により加熱面以外の面（屋内面）の温度が可燃物燃焼温度以上に上昇しないか判定（第2号）",
+        "related_articles": ["令::A107:P1:I2"]
+      },
+      {
+        "id": "proc-wall-floor-pass",
+        "type": "process",
+        "title": "当該壁・床：第2号適合",
+        "process_type": "mechanical",
+        "description": "当該壁・床は第2号の遮熱性基準に適合"
+      },
+      {
+        "id": "dec-all-wall-floor-checked",
+        "type": "decision",
+        "title": "全壁・床の第2号適合を確認したか？",
+        "decision_type": "binary",
+        "description": "全ての壁及び床について第2号の遮熱性判定が完了したか確認"
+      },
+      {
+        "id": "proc-identify-exterior-roof",
+        "type": "process",
+        "title": "外壁及び屋根を抽出",
+        "process_type": "mechanical",
+        "description": "主要構造部のうち外壁及び屋根を抽出（第3号遮炎性の判定対象）"
+      },
+      {
+        "id": "dec-has-exterior-roof",
+        "type": "decision",
+        "title": "未判定の外壁・屋根があるか？",
+        "decision_type": "binary",
+        "description": "第3号の遮炎性判定が未完了の外壁・屋根が残っているか確認"
+      },
+      {
+        "id": "dec-exterior-type",
+        "type": "decision",
+        "title": "当該部分の種別は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "耐力壁外壁", "description": "耐力壁である外壁" },
+          { "value": "非耐力壁外壁（延焼部分）", "description": "非耐力壁である外壁で延焼のおそれのある部分" },
+          { "value": "非耐力壁外壁（延焼部分以外）", "description": "非耐力壁である外壁で延焼のおそれのある部分以外" },
+          { "value": "屋根", "description": "屋根" }
+        ],
+        "description": "外壁・屋根の種別を判定（遮炎性要求時間の決定に使用）"
+      },
+      {
+        "id": "proc-flame-time-1h",
+        "type": "process",
+        "title": "遮炎性要求時間：1時間",
+        "process_type": "mechanical",
+        "description": "遮炎性に要求される加熱時間は1時間"
+      },
+      {
+        "id": "proc-flame-time-30m",
+        "type": "process",
+        "title": "遮炎性要求時間：30分間",
+        "process_type": "mechanical",
+        "description": "非耐力壁外壁の延焼部分以外または屋根のため、遮炎性要求時間は30分間"
+      },
+      {
+        "id": "dec-flame-check",
+        "type": "decision",
+        "title": "遮炎性を満たすか？",
+        "decision_type": "binary",
+        "description": "要求時間の火熱により屋外に火炎を出す原因となる亀裂その他の損傷を生じないか判定（第3号）",
+        "related_articles": ["令::A107:P1:I3"]
+      },
+      {
+        "id": "proc-exterior-roof-pass",
+        "type": "process",
+        "title": "当該外壁・屋根：第3号適合",
+        "process_type": "mechanical",
+        "description": "当該外壁・屋根は第3号の遮炎性基準に適合"
+      },
+      {
+        "id": "dec-all-exterior-roof-checked",
+        "type": "decision",
+        "title": "全外壁・屋根の第3号適合を確認したか？",
+        "decision_type": "binary",
+        "description": "全ての外壁及び屋根について第3号の遮炎性判定が完了したか確認"
+      },
+      {
+        "id": "proc-final-check",
+        "type": "process",
+        "title": "全基準適合確認",
+        "process_type": "mechanical",
+        "description": "第1号（非損傷性）、第2号（遮熱性）、第3号（遮炎性）の全てに適合することを確認"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令第107条第1項の耐火性能に関する技術的基準に適合"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "令第107条第1項の耐火性能に関する技術的基準に不適合"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "proc-identify-parts", "role": "flow" },
+      { "id": "e02", "from": "proc-identify-parts", "to": "dec-has-parts", "role": "flow" },
+      { "id": "e03", "from": "dec-has-parts", "to": "dec-part-type", "role": "yes", "label": "はい" },
+      { "id": "e04", "from": "dec-has-parts", "to": "dec-all-parts-checked", "role": "no", "label": "いいえ" },
+      { "id": "e05", "from": "dec-part-type", "to": "dec-floor-category-wall", "role": "option", "label": "壁（間仕切壁・外壁）" },
+      { "id": "e06", "from": "dec-part-type", "to": "dec-floor-category-column", "role": "option", "label": "柱" },
+      { "id": "e07", "from": "dec-part-type", "to": "dec-floor-category-floor", "role": "option", "label": "床" },
+      { "id": "e08", "from": "dec-part-type", "to": "dec-floor-category-column", "role": "option", "label": "はり" },
+      { "id": "e09", "from": "dec-part-type", "to": "proc-required-time-30m", "role": "option", "label": "屋根" },
+      { "id": "e10", "from": "dec-part-type", "to": "proc-required-time-30m", "role": "option", "label": "階段" },
+      { "id": "e11", "from": "dec-floor-category-wall", "to": "proc-required-time-1h", "role": "option", "label": "1〜4階" },
+      { "id": "e12", "from": "dec-floor-category-wall", "to": "proc-required-time-1h30m", "role": "option", "label": "5〜9階" },
+      { "id": "e13", "from": "dec-floor-category-wall", "to": "proc-required-time-2h", "role": "option", "label": "10〜14階" },
+      { "id": "e14", "from": "dec-floor-category-wall", "to": "proc-required-time-2h", "role": "option", "label": "15階以上" },
+      { "id": "e15", "from": "dec-floor-category-column", "to": "proc-required-time-1h", "role": "option", "label": "1〜4階" },
+      { "id": "e16", "from": "dec-floor-category-column", "to": "proc-required-time-1h30m", "role": "option", "label": "5〜9階" },
+      { "id": "e17", "from": "dec-floor-category-column", "to": "proc-required-time-2h", "role": "option", "label": "10〜14階" },
+      { "id": "e18", "from": "dec-floor-category-column", "to": "proc-required-time-2h30m", "role": "option", "label": "15〜19階" },
+      { "id": "e19", "from": "dec-floor-category-column", "to": "proc-required-time-3h", "role": "option", "label": "20階以上" },
+      { "id": "e20", "from": "dec-floor-category-floor", "to": "proc-required-time-1h", "role": "option", "label": "1〜4階" },
+      { "id": "e21", "from": "dec-floor-category-floor", "to": "proc-required-time-1h30m", "role": "option", "label": "5〜9階" },
+      { "id": "e22", "from": "dec-floor-category-floor", "to": "proc-required-time-2h", "role": "option", "label": "10階以上" },
+      { "id": "e23", "from": "proc-required-time-1h", "to": "dec-structural-check", "role": "flow" },
+      { "id": "e24", "from": "proc-required-time-1h30m", "to": "dec-structural-check", "role": "flow" },
+      { "id": "e25", "from": "proc-required-time-2h", "to": "dec-structural-check", "role": "flow" },
+      { "id": "e26", "from": "proc-required-time-2h30m", "to": "dec-structural-check", "role": "flow" },
+      { "id": "e27", "from": "proc-required-time-3h", "to": "dec-structural-check", "role": "flow" },
+      { "id": "e28", "from": "proc-required-time-30m", "to": "dec-structural-check", "role": "flow" },
+      { "id": "e29", "from": "dec-structural-check", "to": "proc-part-pass", "role": "yes", "label": "はい" },
+      { "id": "e30", "from": "dec-structural-check", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e31", "from": "proc-part-pass", "to": "dec-has-parts", "role": "flow" },
+      { "id": "e32", "from": "dec-all-parts-checked", "to": "proc-identify-wall-floor", "role": "yes", "label": "はい" },
+      { "id": "e33", "from": "dec-all-parts-checked", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e34", "from": "proc-identify-wall-floor", "to": "dec-has-wall-floor", "role": "flow" },
+      { "id": "e35", "from": "dec-has-wall-floor", "to": "dec-wall-type", "role": "yes", "label": "はい" },
+      { "id": "e36", "from": "dec-has-wall-floor", "to": "dec-all-wall-floor-checked", "role": "no", "label": "いいえ" },
+      { "id": "e37", "from": "dec-wall-type", "to": "proc-heat-time-1h", "role": "option", "label": "耐力壁" },
+      { "id": "e38", "from": "dec-wall-type", "to": "proc-heat-time-1h", "role": "option", "label": "非耐力壁（延焼部分）" },
+      { "id": "e39", "from": "dec-wall-type", "to": "proc-heat-time-30m", "role": "option", "label": "非耐力壁（延焼部分以外）" },
+      { "id": "e40", "from": "dec-wall-type", "to": "proc-heat-time-1h", "role": "option", "label": "床" },
+      { "id": "e41", "from": "proc-heat-time-1h", "to": "dec-heat-insulation-check", "role": "flow" },
+      { "id": "e42", "from": "proc-heat-time-30m", "to": "dec-heat-insulation-check", "role": "flow" },
+      { "id": "e43", "from": "dec-heat-insulation-check", "to": "proc-wall-floor-pass", "role": "yes", "label": "はい" },
+      { "id": "e44", "from": "dec-heat-insulation-check", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e45", "from": "proc-wall-floor-pass", "to": "dec-has-wall-floor", "role": "flow" },
+      { "id": "e46", "from": "dec-all-wall-floor-checked", "to": "proc-identify-exterior-roof", "role": "yes", "label": "はい" },
+      { "id": "e47", "from": "dec-all-wall-floor-checked", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e48", "from": "proc-identify-exterior-roof", "to": "dec-has-exterior-roof", "role": "flow" },
+      { "id": "e49", "from": "dec-has-exterior-roof", "to": "dec-exterior-type", "role": "yes", "label": "はい" },
+      { "id": "e50", "from": "dec-has-exterior-roof", "to": "dec-all-exterior-roof-checked", "role": "no", "label": "いいえ" },
+      { "id": "e51", "from": "dec-exterior-type", "to": "proc-flame-time-1h", "role": "option", "label": "耐力壁外壁" },
+      { "id": "e52", "from": "dec-exterior-type", "to": "proc-flame-time-1h", "role": "option", "label": "非耐力壁外壁（延焼部分）" },
+      { "id": "e53", "from": "dec-exterior-type", "to": "proc-flame-time-30m", "role": "option", "label": "非耐力壁外壁（延焼部分以外）" },
+      { "id": "e54", "from": "dec-exterior-type", "to": "proc-flame-time-30m", "role": "option", "label": "屋根" },
+      { "id": "e55", "from": "proc-flame-time-1h", "to": "dec-flame-check", "role": "flow" },
+      { "id": "e56", "from": "proc-flame-time-30m", "to": "dec-flame-check", "role": "flow" },
+      { "id": "e57", "from": "dec-flame-check", "to": "proc-exterior-roof-pass", "role": "yes", "label": "はい" },
+      { "id": "e58", "from": "dec-flame-check", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e59", "from": "proc-exterior-roof-pass", "to": "dec-has-exterior-roof", "role": "flow" },
+      { "id": "e60", "from": "dec-all-exterior-roof-checked", "to": "proc-final-check", "role": "yes", "label": "はい" },
+      { "id": "e61", "from": "dec-all-exterior-roof-checked", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e62", "from": "proc-final-check", "to": "pass", "role": "flow" }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSO-A107-P1",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": ["A2:I7"],
+      "description": "法第2条第7号の耐火建築物の定義における耐火性能の技術的基準"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T12:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

@@ -1,0 +1,329 @@
+{
+  "id": "A128_3_P2_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "地下街の各構え相互間の区画",
+    "target_subject": "地下街の各構え",
+    "description": "地下街の各構えが他の各構えに接する場合における相互間の区画要件"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "128_3",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "地下街",
+    "防火区画"
+  ],
+  "text_raw": "地下街の各構えが当該地下街の他の各構えに接する場合においては、当該各構えと当該他の各構えとを耐火構造の床若しくは壁又は特定防火設備で第百十二条第十九項第二号に規定する構造であるもので区画しなければならない。",
+  "kijo_diagram_ref": "CHK-BSL-ORD-A128_3-P2",
+  "flow_diagram": {
+    "title": "地下街の各構え相互間の区画 適合判定フロー",
+    "description": "地下街の各構えが他の各構えに接する場合の区画要件を判定するフロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start"
+      },
+      {
+        "id": "dec-underground-shopping",
+        "type": "decision",
+        "title": "地下街の各構えか？",
+        "decision_type": "binary",
+        "description": "対象が地下街の各構えに該当するか判定"
+      },
+      {
+        "id": "dec-adjacent",
+        "type": "decision",
+        "title": "他の各構えに接するか？",
+        "decision_type": "binary",
+        "description": "当該各構えが当該地下街の他の各構えに接する場合かどうかを判定"
+      },
+      {
+        "id": "proc-scope-out",
+        "type": "process",
+        "title": "本項適用対象外",
+        "process_type": "mechanical",
+        "description": "他の各構えに接しない場合は本項の適用対象外"
+      },
+      {
+        "id": "proc-loop-start",
+        "type": "process",
+        "title": "境界部分の確認開始",
+        "process_type": "mechanical",
+        "description": "隣接する各構えとの各境界部分について順次確認"
+      },
+      {
+        "id": "dec-partition-type",
+        "type": "decision",
+        "title": "区画の種類は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "床" },
+          { "value": "壁" },
+          { "value": "特定防火設備" }
+        ],
+        "description": "当該境界部分における区画の種類を判定"
+      },
+      {
+        "id": "dec-floor-fireproof",
+        "type": "decision",
+        "title": "床が耐火構造か？",
+        "decision_type": "binary",
+        "description": "区画が床の場合、耐火構造であるか判定"
+      },
+      {
+        "id": "proc-floor-ok",
+        "type": "process",
+        "title": "床区画適合",
+        "process_type": "mechanical",
+        "description": "耐火構造の床による区画が適合"
+      },
+      {
+        "id": "dec-wall-fireproof",
+        "type": "decision",
+        "title": "壁が耐火構造か？",
+        "decision_type": "binary",
+        "description": "区画が壁の場合、耐火構造であるか判定"
+      },
+      {
+        "id": "proc-wall-ok",
+        "type": "process",
+        "title": "壁区画適合",
+        "process_type": "mechanical",
+        "description": "耐火構造の壁による区画が適合"
+      },
+      {
+        "id": "dec-equipment-type",
+        "type": "decision",
+        "title": "特定防火設備か？",
+        "decision_type": "binary",
+        "description": "設備が特定防火設備に該当するか判定"
+      },
+      {
+        "id": "dec-equipment-structure",
+        "type": "decision",
+        "title": "令第112条第19項第2号の構造か？",
+        "decision_type": "binary",
+        "description": "特定防火設備が令第112条第19項第2号に規定する構造であるか判定",
+        "related_articles": ["令::A112:P19:I2"]
+      },
+      {
+        "id": "proc-equipment-ok",
+        "type": "process",
+        "title": "特定防火設備区画適合",
+        "process_type": "mechanical",
+        "description": "令第112条第19項第2号の構造を有する特定防火設備による区画が適合"
+      },
+      {
+        "id": "dec-more-partitions",
+        "type": "decision",
+        "title": "他の境界部分があるか？",
+        "decision_type": "binary",
+        "description": "確認すべき境界部分が残っているか判定"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "全ての境界部分が耐火構造の床・壁又は令第112条第19項第2号の特定防火設備で区画されている"
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "区画要件を満たさない境界部分がある"
+      },
+      {
+        "id": "end-scope-out",
+        "type": "terminal",
+        "title": "適用対象外",
+        "result": "end",
+        "description": "本項の適用対象外"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-underground-shopping",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-underground-shopping",
+        "to": "dec-adjacent",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "dec-underground-shopping",
+        "to": "end-scope-out",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e04",
+        "from": "dec-adjacent",
+        "to": "proc-loop-start",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e05",
+        "from": "dec-adjacent",
+        "to": "proc-scope-out",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e06",
+        "from": "proc-scope-out",
+        "to": "end-scope-out",
+        "role": "flow"
+      },
+      {
+        "id": "e07",
+        "from": "proc-loop-start",
+        "to": "dec-partition-type",
+        "role": "flow"
+      },
+      {
+        "id": "e08",
+        "from": "dec-partition-type",
+        "to": "dec-floor-fireproof",
+        "role": "option",
+        "label": "床"
+      },
+      {
+        "id": "e09",
+        "from": "dec-partition-type",
+        "to": "dec-wall-fireproof",
+        "role": "option",
+        "label": "壁"
+      },
+      {
+        "id": "e10",
+        "from": "dec-partition-type",
+        "to": "dec-equipment-type",
+        "role": "option",
+        "label": "特定防火設備"
+      },
+      {
+        "id": "e11",
+        "from": "dec-floor-fireproof",
+        "to": "proc-floor-ok",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e12",
+        "from": "dec-floor-fireproof",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e13",
+        "from": "proc-floor-ok",
+        "to": "dec-more-partitions",
+        "role": "flow"
+      },
+      {
+        "id": "e14",
+        "from": "dec-wall-fireproof",
+        "to": "proc-wall-ok",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e15",
+        "from": "dec-wall-fireproof",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e16",
+        "from": "proc-wall-ok",
+        "to": "dec-more-partitions",
+        "role": "flow"
+      },
+      {
+        "id": "e17",
+        "from": "dec-equipment-type",
+        "to": "dec-equipment-structure",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e18",
+        "from": "dec-equipment-type",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e19",
+        "from": "dec-equipment-structure",
+        "to": "proc-equipment-ok",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e20",
+        "from": "dec-equipment-structure",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e21",
+        "from": "proc-equipment-ok",
+        "to": "dec-more-partitions",
+        "role": "flow"
+      },
+      {
+        "id": "e22",
+        "from": "dec-more-partitions",
+        "to": "proc-loop-start",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e23",
+        "from": "dec-more-partitions",
+        "to": "end-pass",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": ["A112:P19:I2"],
+      "description": "特定防火設備の構造要件を参照"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00+09:00",
+    "author": "Claude",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

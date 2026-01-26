@@ -1,0 +1,305 @@
+{
+  "id": "A126_3_P1_I9_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "排煙機の能力",
+    "target_subject": "排煙機",
+    "description": "排煙機の自動作動及び排出能力に関する適合判定フロー"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "126の3",
+    "paragraph": "1",
+    "item": "9"
+  },
+  "labels": [
+    "単体規定",
+    "避難設備",
+    "排煙設備"
+  ],
+  "text_raw": "前号の排煙機は、一の排煙口の開放に伴い自動的に作動し、かつ、一分間に、百二十立方メートル以上で、かつ、防煙区画部分の床面積一平方メートルにつき一立方メートル（二以上の防煙区画部分に係る排煙機にあつては、当該防煙区画部分のうち床面積の最大のものの床面積一平方メートルにつき二立方メートル）以上の空気を排出する能力を有するものとすること。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "equipment",
+          "value": "排煙機",
+          "description": "第8号により設置が必要な排煙機"
+        }
+      ],
+      "note": "排煙口が防煙区画部分の床面積の50分の1以上の開口面積を有し直接外気に接する場合を除き排煙機設置が必要（第8号）"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "requirement",
+          "value": "自動作動",
+          "description": "一の排煙口の開放に伴い自動的に作動すること"
+        },
+        {
+          "type": "requirement",
+          "value": "最低排出能力",
+          "description": "一分間に120立方メートル以上の排出能力"
+        },
+        {
+          "type": "requirement",
+          "value": "面積比例排出能力",
+          "description": "防煙区画部分の床面積1平方メートルにつき1立方メートル（2以上の区画の場合は最大床面積1平方メートルにつき2立方メートル）以上の排出能力"
+        }
+      ]
+    }
+  },
+  "flow_diagram": {
+    "title": "排煙機の能力 適合判定フロー",
+    "description": "排煙機の自動作動機構および排出能力の基準適合を判定するフローチャート",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "排煙機の能力適合判定を開始"
+      },
+      {
+        "id": "dec-fan-exists",
+        "type": "decision",
+        "title": "排煙機があるか？",
+        "decision_type": "binary",
+        "description": "建築物に排煙機が設置されているか確認"
+      },
+      {
+        "id": "proc-fan-loop-start",
+        "type": "process",
+        "title": "各排煙機について以下を確認",
+        "process_type": "mechanical",
+        "description": "全ての排煙機について順次判定を行う"
+      },
+      {
+        "id": "dec-zone-count",
+        "type": "decision",
+        "title": "対象防煙区画数は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "1箇所", "description": "単一の防煙区画部分のみ" },
+          { "value": "2箇所以上", "description": "複数の防煙区画部分" }
+        ],
+        "description": "当該排煙機が対象とする防煙区画部分の数を確認"
+      },
+      {
+        "id": "proc-calc-single",
+        "type": "process",
+        "title": "必要排出能力 = max(120, A×1)",
+        "process_type": "mechanical",
+        "description": "単一区画の場合：床面積A×1m³/minと120m³/minの大きい方"
+      },
+      {
+        "id": "proc-calc-multi",
+        "type": "process",
+        "title": "必要排出能力 = max(120, Amax×2)",
+        "process_type": "mechanical",
+        "description": "複数区画の場合：最大床面積Amax×2m³/minと120m³/minの大きい方"
+      },
+      {
+        "id": "info-required-capacity",
+        "type": "information",
+        "title": "必要排出能力(Qreq)",
+        "symbol": "Qreq",
+        "subject": "排煙機",
+        "property": "必要排出能力",
+        "property_type": "numeric",
+        "description": "算定された必要排出能力（m³/min）"
+      },
+      {
+        "id": "dec-capacity-check",
+        "type": "decision",
+        "title": "排出能力Q ≧ 必要排出能力Qreq か？",
+        "decision_type": "binary",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "Q", "desc": "排煙機の排出能力" },
+          "rhs": { "var": "Qreq", "desc": "必要排出能力", "unit": "m³/min" }
+        },
+        "description": "排煙機の実際の排出能力が必要排出能力以上であるか判定"
+      },
+      {
+        "id": "dec-auto-check",
+        "type": "decision",
+        "title": "排煙口の開放で自動作動するか？",
+        "decision_type": "binary",
+        "description": "一の排煙口の開放に伴い自動的に作動する機構を有するか確認"
+      },
+      {
+        "id": "dec-all-fans-checked",
+        "type": "decision",
+        "title": "全ての排煙機を確認したか？",
+        "decision_type": "binary",
+        "description": "建築物内の全ての排煙機について判定が完了したか確認"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "全ての排煙機が9号基準に適合",
+        "related_articles": ["令第126条の3第1項第9号"]
+      },
+      {
+        "id": "end-fail-capacity",
+        "type": "terminal",
+        "title": "不適合（排出能力不足）",
+        "result": "fail",
+        "description": "排煙機の排出能力が基準に満たない",
+        "related_articles": ["令第126条の3第1項第9号"]
+      },
+      {
+        "id": "end-fail-auto",
+        "type": "terminal",
+        "title": "不適合（自動作動機構なし）",
+        "result": "fail",
+        "description": "排煙機が排煙口の開放に伴い自動的に作動しない",
+        "related_articles": ["令第126条の3第1項第9号"]
+      },
+      {
+        "id": "end-na",
+        "type": "terminal",
+        "title": "対象外",
+        "result": "end",
+        "description": "排煙機がない場合は本号の適用対象外"
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge-001",
+        "from": "start",
+        "to": "dec-fan-exists",
+        "role": "flow"
+      },
+      {
+        "id": "edge-002",
+        "from": "dec-fan-exists",
+        "to": "proc-fan-loop-start",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "edge-003",
+        "from": "dec-fan-exists",
+        "to": "end-na",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "edge-004",
+        "from": "proc-fan-loop-start",
+        "to": "dec-zone-count",
+        "role": "flow"
+      },
+      {
+        "id": "edge-005",
+        "from": "dec-zone-count",
+        "to": "proc-calc-single",
+        "role": "option",
+        "label": "1箇所"
+      },
+      {
+        "id": "edge-006",
+        "from": "dec-zone-count",
+        "to": "proc-calc-multi",
+        "role": "option",
+        "label": "2箇所以上"
+      },
+      {
+        "id": "edge-007",
+        "from": "proc-calc-single",
+        "to": "info-required-capacity",
+        "role": "flow"
+      },
+      {
+        "id": "edge-008",
+        "from": "proc-calc-multi",
+        "to": "info-required-capacity",
+        "role": "flow"
+      },
+      {
+        "id": "edge-009",
+        "from": "info-required-capacity",
+        "to": "dec-capacity-check",
+        "role": "flow"
+      },
+      {
+        "id": "edge-010",
+        "from": "dec-capacity-check",
+        "to": "dec-auto-check",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "edge-011",
+        "from": "dec-capacity-check",
+        "to": "end-fail-capacity",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "edge-012",
+        "from": "dec-auto-check",
+        "to": "dec-all-fans-checked",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "edge-013",
+        "from": "dec-auto-check",
+        "to": "end-fail-auto",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "edge-014",
+        "from": "dec-all-fans-checked",
+        "to": "end-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "edge-015",
+        "from": "dec-all-fans-checked",
+        "to": "proc-fan-loop-start",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-KIJO-A126_3-P1-I9",
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": ["A126_3:P1:I8"],
+      "description": "排煙機設置の要否（第8号）"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": ["A126_3:P1:I1"],
+      "description": "防煙区画部分の定義（第1号）"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00Z",
+    "updated_at": "2026-01-26T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

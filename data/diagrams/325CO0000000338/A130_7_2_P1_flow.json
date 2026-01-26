@@ -1,0 +1,463 @@
+{
+  "id": "A130_7_2_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "第一種住居地域内に建築できる大規模建築物の用途判定フロー",
+    "target_subject": "建築物",
+    "description": "床面積3,000m2超の建築物について、第一種住居地域で建築可能な用途か判定するフロー"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "130の7の2",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "集団規定",
+    "用途地域",
+    "第一種住居地域"
+  ],
+  "text_raw": "法別表第二（ほ）項第四号（法第八十七条第二項又は第三項において法第四十八条第五項の規定を準用する場合を含む。）の規定により政令で定める建築物は、次に掲げるものとする。一　税務署、警察署、保健所、消防署その他これらに類するもの　二　電気通信事業法第百二十条第一項に規定する認定電気通信事業者が同項に規定する認定電気通信事業の用に供する施設である建築物で国土交通大臣が指定するもの　三　建築物に附属する自動車車庫で、当該自動車車庫の床面積の合計に同一敷地内にある建築物に附属する自動車車庫の用途に供する工作物の築造面積を加えた値が当該敷地内にある建築物の延べ面積の合計を超えないもの（三階以上の部分をその用途に供するものを除く。）　四　公告対象区域内の建築物に附属する自動車車庫で、床面積の合計に同一公告対象区域内にある建築物に附属する他の自動車車庫の床面積の合計及び当該公告対象区域内にある建築物に附属する自動車車庫の用途に供する工作物の築造面積を加えた値が当該公告対象区域内の建築物の延べ面積の合計を超えないもの（三階以上の部分をその用途に供するものを除く。）　五　自動車車庫で都市計画として決定されたもの",
+  "kijo_diagram_ref": "CHK-BSL-ORD-A130_7_2-P1",
+  "flow_diagram": {
+    "title": "令第130条の7の2第1項 大規模建築物用途判定フロー",
+    "description": "第一種住居地域内で床面積3,000m2超の建築物が建築可能な用途に該当するか判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "第一種住居地域内の床面積3,000m2超建築物の用途判定を開始"
+      },
+      {
+        "id": "dec-use-type",
+        "type": "decision",
+        "title": "建築物の用途種別は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "公共施設系", "description": "税務署、警察署、保健所、消防署等" },
+          { "value": "電気通信施設", "description": "認定電気通信事業施設" },
+          { "value": "自動車車庫", "description": "附属車庫または都市計画車庫" },
+          { "value": "その他", "description": "上記以外の用途" }
+        ],
+        "description": "計画建築物の主たる用途を判定"
+      },
+      {
+        "id": "dec-public-type",
+        "type": "decision",
+        "title": "公共施設の種類は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "税務署" },
+          { "value": "警察署" },
+          { "value": "保健所" },
+          { "value": "消防署" },
+          { "value": "その他類するもの" },
+          { "value": "該当なし" }
+        ],
+        "description": "第1号に列挙された公共施設に該当するか判定"
+      },
+      {
+        "id": "proc-item1-match",
+        "type": "process",
+        "title": "第1号該当",
+        "process_type": "mechanical",
+        "description": "税務署、警察署、保健所、消防署その他これらに類するものに該当"
+      },
+      {
+        "id": "dec-telecom-certified",
+        "type": "decision",
+        "title": "認定電気通信事業施設か？",
+        "decision_type": "binary",
+        "description": "電気通信事業法第120条第1項に規定する認定電気通信事業者の施設か判定"
+      },
+      {
+        "id": "dec-minister-designated",
+        "type": "decision",
+        "title": "国土交通大臣が指定した施設か？",
+        "decision_type": "binary",
+        "description": "国土交通大臣が指定した施設に該当するか判定"
+      },
+      {
+        "id": "proc-item2-match",
+        "type": "process",
+        "title": "第2号該当",
+        "process_type": "mechanical",
+        "description": "認定電気通信事業施設で国土交通大臣指定のものに該当"
+      },
+      {
+        "id": "dec-garage-type",
+        "type": "decision",
+        "title": "自動車車庫の種別は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "附属車庫（一般敷地）", "description": "建築物に附属する自動車車庫" },
+          { "value": "附属車庫（公告対象区域）", "description": "公告対象区域内の附属自動車車庫" },
+          { "value": "都市計画車庫", "description": "都市計画として決定された自動車車庫" }
+        ],
+        "description": "自動車車庫の種別を判定"
+      },
+      {
+        "id": "dec-attached-to-building",
+        "type": "decision",
+        "title": "建築物に附属する車庫か？",
+        "decision_type": "binary",
+        "description": "計画車庫が建築物に附属するものか判定"
+      },
+      {
+        "id": "dec-garage-area-limit",
+        "type": "decision",
+        "title": "車庫面積合計は建築物延べ面積以下か？",
+        "decision_type": "binary",
+        "description": "自動車車庫の床面積合計（工作物築造面積を含む）が敷地内建築物の延べ面積合計を超えないか判定",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "GA", "desc": "車庫面積合計（工作物築造面積を含む）" },
+          "rhs": { "var": "BA", "desc": "建築物延べ面積の合計", "unit": "m2" }
+        }
+      },
+      {
+        "id": "dec-garage-floor-limit",
+        "type": "decision",
+        "title": "車庫用途は2階以下か？",
+        "decision_type": "binary",
+        "description": "3階以上の部分を自動車車庫の用途に供していないか判定",
+        "condition": {
+          "operator": "LT",
+          "lhs": { "var": "GF", "desc": "車庫用途に供する最上階" },
+          "rhs": { "value": 3, "desc": "3階" }
+        }
+      },
+      {
+        "id": "proc-item3-match",
+        "type": "process",
+        "title": "第3号該当",
+        "process_type": "mechanical",
+        "description": "附属自動車車庫（延べ面積以下かつ2階以下）に該当"
+      },
+      {
+        "id": "dec-in-announced-area",
+        "type": "decision",
+        "title": "公告対象区域内か？",
+        "decision_type": "binary",
+        "description": "建築物が公告対象区域内に存在するか判定"
+      },
+      {
+        "id": "dec-announced-area-garage-limit",
+        "type": "decision",
+        "title": "区域内車庫面積合計は区域内建築物延べ面積以下か？",
+        "decision_type": "binary",
+        "description": "公告対象区域内の車庫床面積合計（工作物築造面積を含む）が区域内建築物の延べ面積合計を超えないか判定"
+      },
+      {
+        "id": "dec-announced-area-floor-limit",
+        "type": "decision",
+        "title": "公告対象区域内車庫は2階以下か？",
+        "decision_type": "binary",
+        "description": "3階以上の部分を自動車車庫の用途に供していないか判定"
+      },
+      {
+        "id": "proc-item4-match",
+        "type": "process",
+        "title": "第4号該当",
+        "process_type": "mechanical",
+        "description": "公告対象区域内の附属自動車車庫（区域内延べ面積以下かつ2階以下）に該当"
+      },
+      {
+        "id": "dec-city-plan-garage",
+        "type": "decision",
+        "title": "都市計画として決定された自動車車庫か？",
+        "decision_type": "binary",
+        "description": "都市計画として決定された自動車車庫に該当するか判定"
+      },
+      {
+        "id": "proc-item5-match",
+        "type": "process",
+        "title": "第5号該当",
+        "process_type": "mechanical",
+        "description": "都市計画として決定された自動車車庫に該当"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令第130条の7の2第1項に該当し、第一種住居地域内で建築可能"
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "令第130条の7の2第1項に該当せず、第一種住居地域内で床面積3,000m2超の建築不可"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e-start",
+        "from": "start",
+        "to": "dec-use-type",
+        "role": "flow"
+      },
+      {
+        "id": "e-use-public",
+        "from": "dec-use-type",
+        "to": "dec-public-type",
+        "role": "option",
+        "label": "公共施設系"
+      },
+      {
+        "id": "e-use-telecom",
+        "from": "dec-use-type",
+        "to": "dec-telecom-certified",
+        "role": "option",
+        "label": "電気通信施設"
+      },
+      {
+        "id": "e-use-garage",
+        "from": "dec-use-type",
+        "to": "dec-garage-type",
+        "role": "option",
+        "label": "自動車車庫"
+      },
+      {
+        "id": "e-use-other",
+        "from": "dec-use-type",
+        "to": "end-fail",
+        "role": "option",
+        "label": "その他"
+      },
+      {
+        "id": "e-public-tax",
+        "from": "dec-public-type",
+        "to": "proc-item1-match",
+        "role": "option",
+        "label": "税務署"
+      },
+      {
+        "id": "e-public-police",
+        "from": "dec-public-type",
+        "to": "proc-item1-match",
+        "role": "option",
+        "label": "警察署"
+      },
+      {
+        "id": "e-public-health",
+        "from": "dec-public-type",
+        "to": "proc-item1-match",
+        "role": "option",
+        "label": "保健所"
+      },
+      {
+        "id": "e-public-fire",
+        "from": "dec-public-type",
+        "to": "proc-item1-match",
+        "role": "option",
+        "label": "消防署"
+      },
+      {
+        "id": "e-public-similar",
+        "from": "dec-public-type",
+        "to": "proc-item1-match",
+        "role": "option",
+        "label": "その他類するもの"
+      },
+      {
+        "id": "e-public-none",
+        "from": "dec-public-type",
+        "to": "end-fail",
+        "role": "option",
+        "label": "該当なし"
+      },
+      {
+        "id": "e-item1-pass",
+        "from": "proc-item1-match",
+        "to": "end-pass",
+        "role": "flow"
+      },
+      {
+        "id": "e-telecom-yes",
+        "from": "dec-telecom-certified",
+        "to": "dec-minister-designated",
+        "role": "yes"
+      },
+      {
+        "id": "e-telecom-no",
+        "from": "dec-telecom-certified",
+        "to": "end-fail",
+        "role": "no"
+      },
+      {
+        "id": "e-minister-yes",
+        "from": "dec-minister-designated",
+        "to": "proc-item2-match",
+        "role": "yes"
+      },
+      {
+        "id": "e-minister-no",
+        "from": "dec-minister-designated",
+        "to": "end-fail",
+        "role": "no"
+      },
+      {
+        "id": "e-item2-pass",
+        "from": "proc-item2-match",
+        "to": "end-pass",
+        "role": "flow"
+      },
+      {
+        "id": "e-garage-attached",
+        "from": "dec-garage-type",
+        "to": "dec-attached-to-building",
+        "role": "option",
+        "label": "附属車庫（一般敷地）"
+      },
+      {
+        "id": "e-garage-announced",
+        "from": "dec-garage-type",
+        "to": "dec-in-announced-area",
+        "role": "option",
+        "label": "附属車庫（公告対象区域）"
+      },
+      {
+        "id": "e-garage-city-plan",
+        "from": "dec-garage-type",
+        "to": "dec-city-plan-garage",
+        "role": "option",
+        "label": "都市計画車庫"
+      },
+      {
+        "id": "e-attached-yes",
+        "from": "dec-attached-to-building",
+        "to": "dec-garage-area-limit",
+        "role": "yes"
+      },
+      {
+        "id": "e-attached-no",
+        "from": "dec-attached-to-building",
+        "to": "end-fail",
+        "role": "no"
+      },
+      {
+        "id": "e-garage-area-yes",
+        "from": "dec-garage-area-limit",
+        "to": "dec-garage-floor-limit",
+        "role": "yes"
+      },
+      {
+        "id": "e-garage-area-no",
+        "from": "dec-garage-area-limit",
+        "to": "end-fail",
+        "role": "no"
+      },
+      {
+        "id": "e-garage-floor-yes",
+        "from": "dec-garage-floor-limit",
+        "to": "proc-item3-match",
+        "role": "yes"
+      },
+      {
+        "id": "e-garage-floor-no",
+        "from": "dec-garage-floor-limit",
+        "to": "end-fail",
+        "role": "no"
+      },
+      {
+        "id": "e-item3-pass",
+        "from": "proc-item3-match",
+        "to": "end-pass",
+        "role": "flow"
+      },
+      {
+        "id": "e-announced-yes",
+        "from": "dec-in-announced-area",
+        "to": "dec-announced-area-garage-limit",
+        "role": "yes"
+      },
+      {
+        "id": "e-announced-no",
+        "from": "dec-in-announced-area",
+        "to": "end-fail",
+        "role": "no"
+      },
+      {
+        "id": "e-announced-area-yes",
+        "from": "dec-announced-area-garage-limit",
+        "to": "dec-announced-area-floor-limit",
+        "role": "yes"
+      },
+      {
+        "id": "e-announced-area-no",
+        "from": "dec-announced-area-garage-limit",
+        "to": "end-fail",
+        "role": "no"
+      },
+      {
+        "id": "e-announced-floor-yes",
+        "from": "dec-announced-area-floor-limit",
+        "to": "proc-item4-match",
+        "role": "yes"
+      },
+      {
+        "id": "e-announced-floor-no",
+        "from": "dec-announced-area-floor-limit",
+        "to": "end-fail",
+        "role": "no"
+      },
+      {
+        "id": "e-item4-pass",
+        "from": "proc-item4-match",
+        "to": "end-pass",
+        "role": "flow"
+      },
+      {
+        "id": "e-city-plan-yes",
+        "from": "dec-city-plan-garage",
+        "to": "proc-item5-match",
+        "role": "yes"
+      },
+      {
+        "id": "e-city-plan-no",
+        "from": "dec-city-plan-garage",
+        "to": "end-fail",
+        "role": "no"
+      },
+      {
+        "id": "e-item5-pass",
+        "from": "proc-item5-match",
+        "to": "end-pass",
+        "role": "flow"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": ["A48:P5", "別表第二(ほ)項第4号"],
+      "description": "法別表第二(ほ)項第四号の委任規定"
+    },
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A87:P2", "A87:P3"],
+      "description": "用途変更への準用規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00+09:00",
+    "author": "Claude",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令",
+    "checklist_ref": "確認審査報告書チェックリスト"
+  }
+}

@@ -1,0 +1,540 @@
+{
+  "id": "A97_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "コンクリートの材料強度",
+    "target_subject": "コンクリート",
+    "description": "コンクリートの材料強度が規定の数値に適合するかを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "97",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "構造規定",
+    "材料強度",
+    "コンクリート"
+  ],
+  "text_raw": "コンクリートの材料強度は、次の表の数値によらなければならない。ただし、異形鉄筋を用いた付着について、国土交通大臣が異形鉄筋の種類及び品質に応じて別に数値を定めた場合は、当該数値によることができる。\n材料強度（単位：一平方ミリメートルにつきニュートン）\n圧縮：F\n引張り：F/10（Fが21を超えるコンクリートについて、国土交通大臣がこれと異なる数値を定めた場合は、その定めた数値）\nせん断：F/10（同上）\n付着：2.1（軽量骨材を使用する場合にあつては、1.8）\nFは、設計基準強度（単位：一平方ミリメートルにつきニュートン）を表す。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "material",
+          "value": "コンクリートを使用する建築物"
+        }
+      ],
+      "note": "コンクリートを使用する構造部分に適用"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "compression-compliance",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "ref": "tension-compliance",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "ref": "shear-compliance",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "ref": "bond-compliance",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    },
+    "exceptions": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "special_provision",
+          "value": "異形鉄筋を用いた付着について国土交通大臣が定めた数値がある場合"
+        }
+      ],
+      "effect": "大臣が定めた数値による"
+    }
+  },
+  "flow_diagram": {
+    "title": "令第97条第1項 コンクリートの材料強度適合判定フロー",
+    "description": "コンクリートの各材料強度（圧縮・引張り・せん断・付着）が規定値に適合するかを判定するフロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "コンクリートの材料強度適合判定を開始"
+      },
+      {
+        "id": "proc-read-design-strength",
+        "type": "process",
+        "title": "設計基準強度Fを読み取る",
+        "process_type": "undefined_input",
+        "description": "設計図書からコンクリートの設計基準強度F（N/mm2）を読み取る"
+      },
+      {
+        "id": "proc-read-aggregate-type",
+        "type": "process",
+        "title": "骨材種別を読み取る",
+        "process_type": "undefined_input",
+        "description": "コンクリートに使用する骨材の種別を特定"
+      },
+      {
+        "id": "proc-read-rebar-type",
+        "type": "process",
+        "title": "鉄筋種別を読み取る",
+        "process_type": "undefined_input",
+        "description": "付着部分に使用する鉄筋の種別を特定"
+      },
+      {
+        "id": "proc-read-compression-strength",
+        "type": "process",
+        "title": "採用する圧縮材料強度Fcを読み取る",
+        "process_type": "undefined_input",
+        "description": "計画で採用するコンクリートの圧縮に対する材料強度を読み取る"
+      },
+      {
+        "id": "decision-compression",
+        "type": "decision",
+        "title": "Fc ≤ F か？",
+        "decision_type": "binary",
+        "description": "圧縮に対する材料強度がFに適合するか判定",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "Fc", "desc": "採用する圧縮材料強度" },
+          "rhs": { "var": "F", "desc": "設計基準強度", "unit": "N/mm2" }
+        }
+      },
+      {
+        "id": "proc-read-tension-strength",
+        "type": "process",
+        "title": "採用する引張り材料強度Ftを読み取る",
+        "process_type": "undefined_input",
+        "description": "計画で採用するコンクリートの引張りに対する材料強度を読み取る"
+      },
+      {
+        "id": "decision-f-over-21",
+        "type": "decision",
+        "title": "F > 21 か？",
+        "decision_type": "binary",
+        "description": "設計基準強度Fが21を超えるか判定（大臣が定めた数値の適用可否に関わる）"
+      },
+      {
+        "id": "decision-minister-tension",
+        "type": "decision",
+        "title": "引張りについて大臣が定めた数値があるか？",
+        "decision_type": "binary",
+        "description": "Fが21を超えるコンクリートについて、国土交通大臣が引張りに関して別の数値を定めた場合"
+      },
+      {
+        "id": "decision-tension-minister",
+        "type": "decision",
+        "title": "Ft ≤ 大臣が定めた数値 か？",
+        "decision_type": "binary",
+        "description": "引張りに対する材料強度が大臣が定めた数値に適合するか判定"
+      },
+      {
+        "id": "decision-tension-standard",
+        "type": "decision",
+        "title": "Ft ≤ F/10 か？",
+        "decision_type": "binary",
+        "description": "引張りに対する材料強度がF/10に適合するか判定",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "Ft", "desc": "採用する引張り材料強度" },
+          "rhs": { "var": "F/10", "desc": "設計基準強度の1/10", "unit": "N/mm2" }
+        }
+      },
+      {
+        "id": "proc-read-shear-strength",
+        "type": "process",
+        "title": "採用するせん断材料強度Fsを読み取る",
+        "process_type": "undefined_input",
+        "description": "計画で採用するコンクリートのせん断に対する材料強度を読み取る"
+      },
+      {
+        "id": "decision-minister-shear",
+        "type": "decision",
+        "title": "せん断について大臣が定めた数値があるか？",
+        "decision_type": "binary",
+        "description": "Fが21を超えるコンクリートについて、国土交通大臣がせん断に関して別の数値を定めた場合"
+      },
+      {
+        "id": "decision-shear-minister",
+        "type": "decision",
+        "title": "Fs ≤ 大臣が定めた数値 か？",
+        "decision_type": "binary",
+        "description": "せん断に対する材料強度が大臣が定めた数値に適合するか判定"
+      },
+      {
+        "id": "decision-shear-standard",
+        "type": "decision",
+        "title": "Fs ≤ F/10 か？",
+        "decision_type": "binary",
+        "description": "せん断に対する材料強度がF/10に適合するか判定",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "Fs", "desc": "採用するせん断材料強度" },
+          "rhs": { "var": "F/10", "desc": "設計基準強度の1/10", "unit": "N/mm2" }
+        }
+      },
+      {
+        "id": "proc-read-bond-strength",
+        "type": "process",
+        "title": "採用する付着材料強度Fbを読み取る",
+        "process_type": "undefined_input",
+        "description": "計画で採用するコンクリートの付着に対する材料強度を読み取る"
+      },
+      {
+        "id": "decision-rebar-type",
+        "type": "decision",
+        "title": "異形鉄筋を使用するか？",
+        "decision_type": "binary",
+        "description": "付着部分に異形鉄筋を使用するか判定"
+      },
+      {
+        "id": "decision-minister-bond",
+        "type": "decision",
+        "title": "付着について大臣が定めた数値があるか？",
+        "decision_type": "binary",
+        "description": "異形鉄筋を用いた付着について、国土交通大臣が異形鉄筋の種類及び品質に応じて別に数値を定めた場合"
+      },
+      {
+        "id": "decision-bond-minister",
+        "type": "decision",
+        "title": "Fb ≤ 大臣が定めた数値 か？",
+        "decision_type": "binary",
+        "description": "付着に対する材料強度が大臣が定めた数値に適合するか判定"
+      },
+      {
+        "id": "decision-aggregate-type",
+        "type": "decision",
+        "title": "骨材種別は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "軽量骨材", "description": "軽量骨材を使用" },
+          { "value": "普通骨材", "description": "軽量骨材以外を使用" }
+        ],
+        "description": "コンクリートに使用する骨材の種別を判定"
+      },
+      {
+        "id": "decision-bond-lightweight",
+        "type": "decision",
+        "title": "Fb ≤ 1.8 か？",
+        "decision_type": "binary",
+        "description": "軽量骨材の場合、付着に対する材料強度が1.8に適合するか判定",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "Fb", "desc": "採用する付着材料強度" },
+          "rhs": { "value": 1.8, "desc": "軽量骨材の付着強度上限値", "unit": "N/mm2" }
+        }
+      },
+      {
+        "id": "decision-bond-normal",
+        "type": "decision",
+        "title": "Fb ≤ 2.1 か？",
+        "decision_type": "binary",
+        "description": "普通骨材の場合、付着に対する材料強度が2.1に適合するか判定",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "Fb", "desc": "採用する付着材料強度" },
+          "rhs": { "value": 2.1, "desc": "普通骨材の付着強度上限値", "unit": "N/mm2" }
+        }
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令第97条第1項に適合"
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "令第97条第1項に不適合"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "proc-read-design-strength",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "proc-read-design-strength",
+        "to": "proc-read-aggregate-type",
+        "role": "flow"
+      },
+      {
+        "id": "e03",
+        "from": "proc-read-aggregate-type",
+        "to": "proc-read-rebar-type",
+        "role": "flow"
+      },
+      {
+        "id": "e04",
+        "from": "proc-read-rebar-type",
+        "to": "proc-read-compression-strength",
+        "role": "flow"
+      },
+      {
+        "id": "e05",
+        "from": "proc-read-compression-strength",
+        "to": "decision-compression",
+        "role": "flow"
+      },
+      {
+        "id": "e06",
+        "from": "decision-compression",
+        "to": "proc-read-tension-strength",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e07",
+        "from": "decision-compression",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e08",
+        "from": "proc-read-tension-strength",
+        "to": "decision-f-over-21",
+        "role": "flow"
+      },
+      {
+        "id": "e09",
+        "from": "decision-f-over-21",
+        "to": "decision-minister-tension",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e10",
+        "from": "decision-f-over-21",
+        "to": "decision-tension-standard",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e11",
+        "from": "decision-minister-tension",
+        "to": "decision-tension-minister",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e12",
+        "from": "decision-minister-tension",
+        "to": "decision-tension-standard",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e13",
+        "from": "decision-tension-minister",
+        "to": "proc-read-shear-strength",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e14",
+        "from": "decision-tension-minister",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e15",
+        "from": "decision-tension-standard",
+        "to": "proc-read-shear-strength",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e16",
+        "from": "decision-tension-standard",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e17",
+        "from": "proc-read-shear-strength",
+        "to": "decision-minister-shear",
+        "role": "flow"
+      },
+      {
+        "id": "e18",
+        "from": "decision-minister-shear",
+        "to": "decision-shear-minister",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e19",
+        "from": "decision-minister-shear",
+        "to": "decision-shear-standard",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e20",
+        "from": "decision-shear-minister",
+        "to": "proc-read-bond-strength",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e21",
+        "from": "decision-shear-minister",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e22",
+        "from": "decision-shear-standard",
+        "to": "proc-read-bond-strength",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e23",
+        "from": "decision-shear-standard",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e24",
+        "from": "proc-read-bond-strength",
+        "to": "decision-rebar-type",
+        "role": "flow"
+      },
+      {
+        "id": "e25",
+        "from": "decision-rebar-type",
+        "to": "decision-minister-bond",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e26",
+        "from": "decision-rebar-type",
+        "to": "decision-aggregate-type",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e27",
+        "from": "decision-minister-bond",
+        "to": "decision-bond-minister",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e28",
+        "from": "decision-minister-bond",
+        "to": "decision-aggregate-type",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e29",
+        "from": "decision-bond-minister",
+        "to": "end-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e30",
+        "from": "decision-bond-minister",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e31",
+        "from": "decision-aggregate-type",
+        "to": "decision-bond-lightweight",
+        "role": "option",
+        "label": "軽量骨材"
+      },
+      {
+        "id": "e32",
+        "from": "decision-aggregate-type",
+        "to": "decision-bond-normal",
+        "role": "option",
+        "label": "普通骨材"
+      },
+      {
+        "id": "e33",
+        "from": "decision-bond-lightweight",
+        "to": "end-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e34",
+        "from": "decision-bond-lightweight",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e35",
+        "from": "decision-bond-normal",
+        "to": "end-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e36",
+        "from": "decision-bond-normal",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-ORDER-A97-P1",
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": [
+        "A91:P2"
+      ],
+      "description": "設計基準強度について第91条第2項を準用"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T12:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

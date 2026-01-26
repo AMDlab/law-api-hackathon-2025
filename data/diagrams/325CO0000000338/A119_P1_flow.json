@@ -1,0 +1,347 @@
+{
+  "id": "A119_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "廊下の幅",
+    "target_subject": "廊下",
+    "description": "建築物の用途と廊下配置に応じた幅員基準の適合判定フロー"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "119",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "避難",
+    "廊下"
+  ],
+  "text_raw": "廊下の幅は、それぞれ次の表に掲げる数値以上としなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "note": "表に掲げる用途の建築物における廊下が対象"
+    },
+    "judgment_rule": {
+      "operator": "ALL",
+      "conditions": [
+        {
+          "description": "各廊下の幅が用途・配置に応じた基準値以上"
+        }
+      ]
+    }
+  },
+  "kijo_diagram_ref": "CHK-BSL-ORD-A119-P1",
+  "flow_diagram": {
+    "title": "廊下の幅の適合判定フロー",
+    "description": "令第119条第1項に基づく廊下の幅員の適合性判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start"
+      },
+      {
+        "id": "dec-use-category",
+        "type": "decision",
+        "title": "建築物の廊下用途区分は？",
+        "decision_type": "multi",
+        "options": [
+          {
+            "value": "学校用",
+            "description": "小学校、中学校、義務教育学校、高等学校又は中等教育学校における児童用又は生徒用"
+          },
+          {
+            "value": "病院等用",
+            "description": "病院における患者用、共同住宅（住戸等床面積合計100㎡超）の共用、居室床面積合計200㎡超（地階は100㎡）の階"
+          },
+          {
+            "value": "該当なし",
+            "description": "上記のいずれにも該当しない"
+          }
+        ],
+        "description": "建築物の用途に基づき廊下用途区分を判定"
+      },
+      {
+        "id": "dec-school-arrangement",
+        "type": "decision",
+        "title": "廊下の両側に居室があるか？",
+        "decision_type": "binary",
+        "description": "学校用廊下の配置区分を判定"
+      },
+      {
+        "id": "dec-hospital-arrangement",
+        "type": "decision",
+        "title": "廊下の両側に居室があるか？",
+        "decision_type": "binary",
+        "description": "病院等用廊下の配置区分を判定"
+      },
+      {
+        "id": "proc-school-both-req",
+        "type": "process",
+        "title": "必要幅員: 2.3m",
+        "process_type": "mechanical",
+        "description": "学校用・両側居室ありの場合の必要幅員"
+      },
+      {
+        "id": "proc-school-other-req",
+        "type": "process",
+        "title": "必要幅員: 1.8m",
+        "process_type": "mechanical",
+        "description": "学校用・その他の廊下の場合の必要幅員"
+      },
+      {
+        "id": "proc-hospital-both-req",
+        "type": "process",
+        "title": "必要幅員: 1.6m",
+        "process_type": "mechanical",
+        "description": "病院等用・両側居室ありの場合の必要幅員"
+      },
+      {
+        "id": "proc-hospital-other-req",
+        "type": "process",
+        "title": "必要幅員: 1.2m",
+        "process_type": "mechanical",
+        "description": "病院等用・その他の廊下の場合の必要幅員"
+      },
+      {
+        "id": "dec-school-both-width",
+        "type": "decision",
+        "title": "廊下幅員 >= 2.3m か？",
+        "decision_type": "binary",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "W", "desc": "廊下幅員" },
+          "rhs": { "value": 2.3, "unit": "m" }
+        },
+        "description": "学校用・両側居室ありの幅員判定"
+      },
+      {
+        "id": "dec-school-other-width",
+        "type": "decision",
+        "title": "廊下幅員 >= 1.8m か？",
+        "decision_type": "binary",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "W", "desc": "廊下幅員" },
+          "rhs": { "value": 1.8, "unit": "m" }
+        },
+        "description": "学校用・その他の廊下の幅員判定"
+      },
+      {
+        "id": "dec-hospital-both-width",
+        "type": "decision",
+        "title": "廊下幅員 >= 1.6m か？",
+        "decision_type": "binary",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "W", "desc": "廊下幅員" },
+          "rhs": { "value": 1.6, "unit": "m" }
+        },
+        "description": "病院等用・両側居室ありの幅員判定"
+      },
+      {
+        "id": "dec-hospital-other-width",
+        "type": "decision",
+        "title": "廊下幅員 >= 1.2m か？",
+        "decision_type": "binary",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "W", "desc": "廊下幅員" },
+          "rhs": { "value": 1.2, "unit": "m" }
+        },
+        "description": "病院等用・その他の廊下の幅員判定"
+      },
+      {
+        "id": "dec-all-corridors",
+        "type": "decision",
+        "title": "全ての廊下を確認したか？",
+        "decision_type": "binary",
+        "description": "建築物内の全廊下について幅員確認が完了したか判定"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令第119条第1項に適合"
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "令第119条第1項に不適合"
+      },
+      {
+        "id": "end-na",
+        "type": "terminal",
+        "title": "規定対象外",
+        "result": "end",
+        "description": "本規定の対象外"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-use-category",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-use-category",
+        "to": "dec-school-arrangement",
+        "role": "option",
+        "label": "学校用"
+      },
+      {
+        "id": "e03",
+        "from": "dec-use-category",
+        "to": "dec-hospital-arrangement",
+        "role": "option",
+        "label": "病院等用"
+      },
+      {
+        "id": "e04",
+        "from": "dec-use-category",
+        "to": "end-na",
+        "role": "option",
+        "label": "該当なし"
+      },
+      {
+        "id": "e05",
+        "from": "dec-school-arrangement",
+        "to": "proc-school-both-req",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e06",
+        "from": "dec-school-arrangement",
+        "to": "proc-school-other-req",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e07",
+        "from": "dec-hospital-arrangement",
+        "to": "proc-hospital-both-req",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e08",
+        "from": "dec-hospital-arrangement",
+        "to": "proc-hospital-other-req",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e09",
+        "from": "proc-school-both-req",
+        "to": "dec-school-both-width",
+        "role": "flow"
+      },
+      {
+        "id": "e10",
+        "from": "proc-school-other-req",
+        "to": "dec-school-other-width",
+        "role": "flow"
+      },
+      {
+        "id": "e11",
+        "from": "proc-hospital-both-req",
+        "to": "dec-hospital-both-width",
+        "role": "flow"
+      },
+      {
+        "id": "e12",
+        "from": "proc-hospital-other-req",
+        "to": "dec-hospital-other-width",
+        "role": "flow"
+      },
+      {
+        "id": "e13",
+        "from": "dec-school-both-width",
+        "to": "dec-all-corridors",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e14",
+        "from": "dec-school-both-width",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e15",
+        "from": "dec-school-other-width",
+        "to": "dec-all-corridors",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e16",
+        "from": "dec-school-other-width",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e17",
+        "from": "dec-hospital-both-width",
+        "to": "dec-all-corridors",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e18",
+        "from": "dec-hospital-both-width",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e19",
+        "from": "dec-hospital-other-width",
+        "to": "dec-all-corridors",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e20",
+        "from": "dec-hospital-other-width",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e21",
+        "from": "dec-all-corridors",
+        "to": "end-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e22",
+        "from": "dec-all-corridors",
+        "to": "dec-use-category",
+        "role": "no",
+        "label": "いいえ（次の廊下へ）"
+      }
+    ]
+  },
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00+09:00",
+    "author": "Claude",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

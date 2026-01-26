@@ -1,0 +1,251 @@
+{
+  "id": "A109_10_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "準防火性能に関する技術的基準（適合判定フロー）",
+    "target_subject": "外壁",
+    "description": "法第23条の政令で定める準防火性能に関する技術的基準の適合判定フロー"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "109の10",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "定義",
+    "準防火性能",
+    "技術的基準",
+    "適合判定"
+  ],
+  "text_raw": "法第二十三条の政令で定める技術的基準は、次に掲げるものとする。一 耐力壁である外壁にあつては、これに建築物の周囲において発生する通常の火災による火熱が加えられた場合に、加熱開始後二十分間構造耐力上支障のある変形、溶融、破壊その他の損傷を生じないものであること。二 外壁にあつては、これに建築物の周囲において発生する通常の火災による火熱が加えられた場合に、加熱開始後二十分間当該加熱面以外の面（屋内に面するものに限る。）の温度が可燃物燃焼温度以上に上昇しないものであること。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "reference",
+          "value": "法第23条の準防火性能"
+        }
+      ]
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-item1-compliance",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "ref": "info-item2-compliance",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "flow_diagram": {
+    "title": "令第109条の10第1項 準防火性能適合判定フロー",
+    "description": "外壁の準防火性能に関する技術的基準への適合を判定するフローチャート",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "準防火性能適合判定の開始"
+      },
+      {
+        "id": "decision-wall-type",
+        "type": "decision",
+        "title": "外壁の種別は？",
+        "decision_type": "multi",
+        "options": [
+          {
+            "value": "耐力壁である外壁",
+            "description": "構造耐力を負担する外壁"
+          },
+          {
+            "value": "耐力壁でない外壁",
+            "description": "構造耐力を負担しない外壁"
+          }
+        ],
+        "description": "外壁が耐力壁であるか否かを判定"
+      },
+      {
+        "id": "decision-item1",
+        "type": "decision",
+        "title": "加熱開始後20分間、構造耐力上支障のある損傷を生じないか？",
+        "decision_type": "binary",
+        "description": "第1号基準：通常の火災による火熱が加えられた場合に、加熱開始後20分間構造耐力上支障のある変形、溶融、破壊その他の損傷を生じないものであること",
+        "condition": {
+          "operator": "EQ",
+          "lhs": {
+            "var": "structural_damage_20min",
+            "desc": "20分間の構造耐力上支障のある損傷"
+          },
+          "rhs": {
+            "value": false,
+            "desc": "損傷なし"
+          }
+        },
+        "related_articles": [
+          "令::A109_10:P1:I1"
+        ]
+      },
+      {
+        "id": "decision-item2",
+        "type": "decision",
+        "title": "加熱開始後20分間、屋内面の温度が可燃物燃焼温度未満か？",
+        "decision_type": "binary",
+        "description": "第2号基準：通常の火災による火熱が加えられた場合に、加熱開始後20分間当該加熱面以外の面（屋内に面するものに限る）の温度が可燃物燃焼温度以上に上昇しないものであること",
+        "condition": {
+          "operator": "LT",
+          "lhs": {
+            "var": "indoor_surface_temp_20min",
+            "desc": "20分後の屋内に面する面の温度"
+          },
+          "rhs": {
+            "value": "可燃物燃焼温度",
+            "desc": "可燃物燃焼温度"
+          }
+        },
+        "related_articles": [
+          "令::A109_10:P1:I2"
+        ]
+      },
+      {
+        "id": "decision-item2-nonbearing",
+        "type": "decision",
+        "title": "加熱開始後20分間、屋内面の温度が可燃物燃焼温度未満か？",
+        "decision_type": "binary",
+        "description": "第2号基準：耐力壁でない外壁に対する遮熱性能の判定",
+        "condition": {
+          "operator": "LT",
+          "lhs": {
+            "var": "indoor_surface_temp_20min",
+            "desc": "20分後の屋内に面する面の温度"
+          },
+          "rhs": {
+            "value": "可燃物燃焼温度",
+            "desc": "可燃物燃焼温度"
+          }
+        },
+        "related_articles": [
+          "令::A109_10:P1:I2"
+        ]
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令第109条の10第1項の準防火性能基準に適合"
+      },
+      {
+        "id": "end-fail-item1",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "第1号基準（構造耐力）不適合：20分間の耐火性能を満たさない"
+      },
+      {
+        "id": "end-fail-item2",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "第2号基準（遮熱性能）不適合：20分間の遮熱性能を満たさない"
+      },
+      {
+        "id": "end-fail-item2-nonbearing",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "第2号基準（遮熱性能）不適合：耐力壁でない外壁が20分間の遮熱性能を満たさない"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "decision-wall-type",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "decision-wall-type",
+        "to": "decision-item1",
+        "role": "option",
+        "label": "耐力壁である外壁"
+      },
+      {
+        "id": "e03",
+        "from": "decision-wall-type",
+        "to": "decision-item2-nonbearing",
+        "role": "option",
+        "label": "耐力壁でない外壁"
+      },
+      {
+        "id": "e04",
+        "from": "decision-item1",
+        "to": "decision-item2",
+        "role": "yes"
+      },
+      {
+        "id": "e05",
+        "from": "decision-item1",
+        "to": "end-fail-item1",
+        "role": "no"
+      },
+      {
+        "id": "e06",
+        "from": "decision-item2",
+        "to": "end-pass",
+        "role": "yes"
+      },
+      {
+        "id": "e07",
+        "from": "decision-item2",
+        "to": "end-fail-item2",
+        "role": "no"
+      },
+      {
+        "id": "e08",
+        "from": "decision-item2-nonbearing",
+        "to": "end-pass",
+        "role": "yes"
+      },
+      {
+        "id": "e09",
+        "from": "decision-item2-nonbearing",
+        "to": "end-fail-item2-nonbearing",
+        "role": "no"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-ORDER-A109_10-P1",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": [
+        "A23"
+      ],
+      "description": "法第23条の準防火性能の定義"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T12:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

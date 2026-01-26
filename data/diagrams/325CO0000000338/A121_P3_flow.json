@@ -1,0 +1,278 @@
+{
+  "id": "A121_P3_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "二以上の直通階段を設ける場合の重複区間の長さ制限",
+    "target_subject": "二以上の直通階段を設ける建築物の階",
+    "description": "居室の各部分から各直通階段に至る通常の歩行経路において共通の重複区間がある場合、当該重複区間の長さは歩行距離の1/2以下でなければならない"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "121",
+    "paragraph": "3",
+    "item": null
+  },
+  "labels": [
+    "避難施設",
+    "直通階段",
+    "歩行距離",
+    "重複区間",
+    "単体規定"
+  ],
+  "text_raw": "第一項の規定により避難階又は地上に通ずる二以上の直通階段を設ける場合において、居室の各部分から各直通階段に至る通常の歩行経路の全てに共通の重複区間があるときにおける当該重複区間の長さは、前条に規定する歩行距離の数値の二分の一をこえてはならない。ただし、居室の各部分から、当該重複区間を経由しないで、避難上有効なバルコニー、屋外通路その他これらに類するものに避難することができる場合は、この限りでない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "building_structure",
+          "value": "令第121条第1項の規定により二以上の直通階段を設ける建築物"
+        },
+        {
+          "type": "floor_condition",
+          "value": "居室から各直通階段への歩行経路に共通の重複区間がある階"
+        }
+      ],
+      "note": "第1項により二以上の直通階段を設けることが義務付けられた建築物に適用"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "id": "M1",
+          "description": "居室の各部分から各直通階段に至る歩行経路に共通の重複区間がある"
+        },
+        {
+          "id": "M2",
+          "description": "重複区間の長さが前条（令第120条）に規定する歩行距離の1/2以下"
+        }
+      ],
+      "lhs": {
+        "description": "重複区間の長さ"
+      },
+      "rhs": {
+        "description": "前条に規定する歩行距離の数値の1/2"
+      }
+    },
+    "exceptions": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "id": "E1",
+          "description": "居室の各部分から重複区間を経由せずにバルコニー、屋外通路等に避難可能"
+        }
+      ],
+      "effect": "EXEMPT"
+    }
+  },
+  "flow_diagram": {
+    "title": "重複区間長さ制限の適合判定フロー",
+    "description": "令第121条第3項に基づく重複区間長さ制限の適合判定を行うフローチャート",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "審査開始",
+        "result": "start",
+        "description": "令第121条第3項の適合判定を開始"
+      },
+      {
+        "id": "dec-001",
+        "type": "decision",
+        "title": "令第121条第1項により二以上の直通階段を設ける建築物か？",
+        "decision_type": "binary",
+        "description": "本項の適用対象となる建築物かどうかを判定",
+        "related_articles": ["令::A121:P1"]
+      },
+      {
+        "id": "dec-002",
+        "type": "decision",
+        "title": "歩行経路に共通の重複区間があるか？",
+        "decision_type": "binary",
+        "description": "居室の各部分から各直通階段に至る通常の歩行経路の全てに共通の重複区間があるか"
+      },
+      {
+        "id": "proc-001",
+        "type": "process",
+        "title": "重複区間の長さ(L)を算定",
+        "process_type": "mechanical",
+        "description": "居室の各部分から各直通階段に至る歩行経路全てに共通する重複区間の長さを算定"
+      },
+      {
+        "id": "proc-002",
+        "type": "process",
+        "title": "歩行距離の許容値(D)を決定",
+        "process_type": "mechanical",
+        "description": "居室の種類・構造区分に応じて令第120条に規定する歩行距離の許容値を決定",
+        "related_articles": ["令::A120:P1", "令::A120:P2", "令::A120:P3"]
+      },
+      {
+        "id": "proc-003",
+        "type": "process",
+        "title": "重複区間長さの許容値(Dh = D/2)を算定",
+        "process_type": "mechanical",
+        "description": "歩行距離の許容値の1/2を重複区間長さの許容値として算定"
+      },
+      {
+        "id": "dec-003",
+        "type": "decision",
+        "title": "重複区間を経由せずにバルコニー等へ避難可能か？",
+        "decision_type": "binary",
+        "description": "居室の各部分から重複区間を経由しないで避難上有効なバルコニー、屋外通路その他これらに類するものに避難可能か"
+      },
+      {
+        "id": "dec-004",
+        "type": "decision",
+        "title": "L <= Dh か？",
+        "decision_type": "binary",
+        "description": "重複区間の長さが歩行距離許容値の1/2以下であるか",
+        "condition": {
+          "operator": "LTE",
+          "lhs": {
+            "var": "L",
+            "desc": "重複区間の長さ"
+          },
+          "rhs": {
+            "var": "Dh",
+            "desc": "歩行距離許容値の1/2",
+            "unit": "m"
+          }
+        }
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令第121条第3項に適合"
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "令第121条第3項に不適合（重複区間の長さが許容値を超過）"
+      },
+      {
+        "id": "end-na",
+        "type": "terminal",
+        "title": "適用除外",
+        "result": "pass",
+        "description": "本項の適用対象外（二以上の直通階段を設ける建築物でない、又は重複区間がない）"
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge-001",
+        "from": "start",
+        "to": "dec-001",
+        "role": "flow"
+      },
+      {
+        "id": "edge-002",
+        "from": "dec-001",
+        "to": "dec-002",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "edge-003",
+        "from": "dec-001",
+        "to": "end-na",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "edge-004",
+        "from": "dec-002",
+        "to": "proc-001",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "edge-005",
+        "from": "dec-002",
+        "to": "end-na",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "edge-006",
+        "from": "proc-001",
+        "to": "proc-002",
+        "role": "flow"
+      },
+      {
+        "id": "edge-007",
+        "from": "proc-002",
+        "to": "proc-003",
+        "role": "flow"
+      },
+      {
+        "id": "edge-008",
+        "from": "proc-003",
+        "to": "dec-003",
+        "role": "flow"
+      },
+      {
+        "id": "edge-009",
+        "from": "dec-003",
+        "to": "end-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "edge-010",
+        "from": "dec-003",
+        "to": "dec-004",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "edge-011",
+        "from": "dec-004",
+        "to": "end-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "edge-012",
+        "from": "dec-004",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-A121-P3",
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": ["A121:P1"],
+      "description": "二以上の直通階段を設ける場合の要件（本項の適用前提）"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": ["A120:P1", "A120:P2", "A120:P3"],
+      "description": "歩行距離の数値の規定（重複区間長さ制限の基準値）"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00Z",
+    "updated_at": "2026-01-26T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-skill",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令",
+    "source": "e-Gov法令API v2"
+  }
+}

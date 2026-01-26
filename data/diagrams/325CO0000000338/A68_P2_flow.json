@@ -1,0 +1,350 @@
+{
+  "id": "A68_P2_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "高力ボルト孔の径",
+    "target_subject": "高力ボルト孔",
+    "description": "高力ボルト孔の径が高力ボルトの径との差の制限に適合するかを判定するフロー"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "68",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造"
+  ],
+  "text_raw": "高力ボルト孔の径は、高力ボルトの径より二ミリメートルを超えて大きくしてはならない。ただし、高力ボルトの径が二十七ミリメートル以上であり、かつ、構造耐力上支障がない場合においては、高力ボルト孔の径を高力ボルトの径より三ミリメートルまで大きくすることができる。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "existence",
+          "value": "高力ボルト接合を用いる建築物"
+        }
+      ],
+      "note": "高力ボルト接合を有する建築物に適用"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "note": "原則: 高力ボルト孔の径≦高力ボルトの径+2mm",
+          "operator": "<=",
+          "lhs": { "ref": "info-hole-diameter" },
+          "rhs": { "operator": "+", "lhs": { "ref": "info-bolt-diameter" }, "rhs": { "value": 2 } }
+        },
+        {
+          "note": "ただし書き: 高力ボルトの径≧27mm かつ 構造耐力上支障がない場合は、高力ボルト孔の径≦高力ボルトの径+3mm",
+          "operator": "AND",
+          "conditions": [
+            { "ref": "info-bolt-diameter", "operator": ">=", "value": 27 },
+            { "ref": "info-structural-safety", "operator": "==", "value": true },
+            { "ref": "info-hole-diameter", "operator": "<=", "rhs": { "operator": "+", "lhs": { "ref": "info-bolt-diameter" }, "rhs": { "value": 3 } } }
+          ]
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "flow_diagram": {
+    "title": "令68条2項 高力ボルト孔の径 適合判定フロー",
+    "description": "高力ボルト孔の径が規定の制限に適合するかを判定するフロー。原則規定（差≦2mm）とただし書き規定（径≧27mm、構造耐力上支障なし、差≦3mm）を順次判定する。",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "高力ボルト孔の径の適合判定を開始"
+      },
+      {
+        "id": "proc-identify-joints",
+        "type": "process",
+        "title": "高力ボルト接合を特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から判定対象となる高力ボルト接合を特定する"
+      },
+      {
+        "id": "dec-has-joints",
+        "type": "decision",
+        "title": "高力ボルト接合があるか？",
+        "decision_type": "binary",
+        "description": "建築物に高力ボルト接合が存在するか確認"
+      },
+      {
+        "id": "proc-identify-bolt-diameter",
+        "type": "process",
+        "title": "高力ボルトの径を特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から高力ボルトの径（D_bolt）を読み取る"
+      },
+      {
+        "id": "proc-identify-hole-diameter",
+        "type": "process",
+        "title": "高力ボルト孔の径を特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から高力ボルト孔の径（D_hole）を読み取る"
+      },
+      {
+        "id": "proc-calc-diff",
+        "type": "process",
+        "title": "孔径と軸径の差を算定",
+        "process_type": "mechanical",
+        "description": "Diff = D_hole - D_bolt を計算"
+      },
+      {
+        "id": "dec-diff-2mm",
+        "type": "decision",
+        "title": "孔径と軸径の差≦2mmか？",
+        "decision_type": "binary",
+        "description": "原則規定: 高力ボルト孔の径が高力ボルトの径より2mm以下の超過であるか判定",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "Diff", "desc": "孔径と軸径の差" },
+          "rhs": { "value": 2, "unit": "mm" }
+        }
+      },
+      {
+        "id": "proc-base-pass",
+        "type": "process",
+        "title": "原則規定に適合",
+        "process_type": "mechanical",
+        "description": "孔径と軸径の差が2mm以下のため原則規定に適合"
+      },
+      {
+        "id": "dec-bolt-27mm",
+        "type": "decision",
+        "title": "高力ボルトの径≧27mmか？",
+        "decision_type": "binary",
+        "description": "ただし書きの第1条件: 高力ボルトの径が27mm以上であるか確認",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "D_bolt", "desc": "高力ボルトの径" },
+          "rhs": { "value": 27, "unit": "mm" }
+        }
+      },
+      {
+        "id": "dec-structural-safety",
+        "type": "decision",
+        "title": "構造耐力上支障がないか？",
+        "decision_type": "binary",
+        "description": "ただし書きの第2条件: 構造耐力上支障がないことを確認"
+      },
+      {
+        "id": "dec-diff-3mm",
+        "type": "decision",
+        "title": "孔径と軸径の差≦3mmか？",
+        "decision_type": "binary",
+        "description": "ただし書きの第3条件: 高力ボルト孔の径が高力ボルトの径より3mm以下の超過であるか判定",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "Diff", "desc": "孔径と軸径の差" },
+          "rhs": { "value": 3, "unit": "mm" }
+        }
+      },
+      {
+        "id": "proc-exception-pass",
+        "type": "process",
+        "title": "ただし書き規定に適合",
+        "process_type": "mechanical",
+        "description": "ただし書きの全条件を満たすため、ただし書き規定に適合"
+      },
+      {
+        "id": "proc-joint-pass",
+        "type": "process",
+        "title": "当該接合部は適合",
+        "process_type": "mechanical",
+        "description": "原則規定またはただし書き規定のいずれかに適合"
+      },
+      {
+        "id": "dec-all-joints-checked",
+        "type": "decision",
+        "title": "全ての高力ボルト接合を確認したか？",
+        "decision_type": "binary",
+        "description": "全ての高力ボルト接合について判定が完了したか確認"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "全ての高力ボルト接合が令68条2項に適合",
+        "related_articles": ["令68条2項"]
+      },
+      {
+        "id": "end-not-applicable",
+        "type": "terminal",
+        "title": "適用外",
+        "result": "pass",
+        "description": "高力ボルト接合がないため本規定は適用されない"
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "原則規定にもただし書き規定にも適合しない高力ボルト接合がある",
+        "related_articles": ["令68条2項"]
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "proc-identify-joints",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "proc-identify-joints",
+        "to": "dec-has-joints",
+        "role": "flow"
+      },
+      {
+        "id": "e03",
+        "from": "dec-has-joints",
+        "to": "proc-identify-bolt-diameter",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e04",
+        "from": "dec-has-joints",
+        "to": "end-not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e05",
+        "from": "proc-identify-bolt-diameter",
+        "to": "proc-identify-hole-diameter",
+        "role": "flow"
+      },
+      {
+        "id": "e06",
+        "from": "proc-identify-hole-diameter",
+        "to": "proc-calc-diff",
+        "role": "flow"
+      },
+      {
+        "id": "e07",
+        "from": "proc-calc-diff",
+        "to": "dec-diff-2mm",
+        "role": "flow"
+      },
+      {
+        "id": "e08",
+        "from": "dec-diff-2mm",
+        "to": "proc-base-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e09",
+        "from": "dec-diff-2mm",
+        "to": "dec-bolt-27mm",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e10",
+        "from": "proc-base-pass",
+        "to": "proc-joint-pass",
+        "role": "flow"
+      },
+      {
+        "id": "e11",
+        "from": "dec-bolt-27mm",
+        "to": "dec-structural-safety",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e12",
+        "from": "dec-bolt-27mm",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e13",
+        "from": "dec-structural-safety",
+        "to": "dec-diff-3mm",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e14",
+        "from": "dec-structural-safety",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e15",
+        "from": "dec-diff-3mm",
+        "to": "proc-exception-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e16",
+        "from": "dec-diff-3mm",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e17",
+        "from": "proc-exception-pass",
+        "to": "proc-joint-pass",
+        "role": "flow"
+      },
+      {
+        "id": "e18",
+        "from": "proc-joint-pass",
+        "to": "dec-all-joints-checked",
+        "role": "flow"
+      },
+      {
+        "id": "e19",
+        "from": "dec-all-joints-checked",
+        "to": "end-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e20",
+        "from": "dec-all-joints-checked",
+        "to": "proc-identify-bolt-diameter",
+        "role": "no",
+        "label": "いいえ（次の接合部へ）"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSLO-A68-P2",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": ["A20"],
+      "description": "法第20条が構造耐力に関する技術的基準を施行令に委任"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T12:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

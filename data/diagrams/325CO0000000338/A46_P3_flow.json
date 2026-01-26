@@ -1,0 +1,327 @@
+{
+  "id": "A46_P3_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "床組・小屋ばり組・小屋組の構造補強",
+    "target_subject": "木造建築物",
+    "description": "床組及び小屋ばり組の木板打付け、小屋組の振れ止め設置義務を判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "46",
+    "paragraph": "3",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造規定",
+    "木造"
+  ],
+  "text_raw": "床組及び小屋ばり組には木板その他これに類するものを国土交通大臣が定める基準に従つて打ち付け、小屋組には振れ止めを設けなければならない。ただし、国土交通大臣が定める基準に従つた構造計算によつて構造耐力上安全であることが確かめられた場合においては、この限りでない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "structural",
+          "value": "木造建築物"
+        }
+      ],
+      "note": "令第46条第1項・第2項の適用対象である木造建築物"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "ref": "info-exception-compliant",
+          "operator": "==",
+          "value": true,
+          "note": "ただし書きに該当（構造計算で安全確認済み）"
+        },
+        {
+          "operator": "AND",
+          "conditions": [
+            {
+              "ref": "info-floor-board-compliant",
+              "operator": "==",
+              "value": true
+            },
+            {
+              "ref": "info-rafter-board-compliant",
+              "operator": "==",
+              "value": true
+            },
+            {
+              "ref": "info-roof-brace-compliant",
+              "operator": "==",
+              "value": true
+            }
+          ]
+        }
+      ]
+    },
+    "exceptions": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "structural_calculation",
+          "value": "国土交通大臣が定める基準に従つた構造計算によつて構造耐力上安全であることが確かめられた場合"
+        }
+      ],
+      "effect": "EXEMPT"
+    }
+  },
+  "flow_diagram": {
+    "title": "令第46条第3項 適合判定フロー",
+    "description": "床組・小屋ばり組の木板打付けと小屋組の振れ止め設置要件の判定フロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "令第46条第3項の適合判定を開始"
+      },
+      {
+        "id": "dec-exception",
+        "type": "decision",
+        "title": "構造計算により安全確認済みか？",
+        "decision_type": "binary",
+        "description": "国土交通大臣が定める基準に従った構造計算によって構造耐力上安全であることが確かめられたか",
+        "condition": {
+          "operator": "EQ",
+          "lhs": {
+            "var": "structural_calculation_confirmed",
+            "desc": "構造計算安全確認済"
+          },
+          "rhs": {
+            "value": true,
+            "desc": "確認済み"
+          }
+        },
+        "related_articles": ["令46条3項ただし書"]
+      },
+      {
+        "id": "proc-exception-exempt",
+        "type": "process",
+        "title": "ただし書き該当（免除）",
+        "process_type": "mechanical",
+        "description": "構造計算により安全確認されているため、本文要件は適用除外"
+      },
+      {
+        "id": "dec-floor-board",
+        "type": "decision",
+        "title": "床組に木板等が基準に従って打ち付けられているか？",
+        "decision_type": "binary",
+        "description": "床組に木板その他これに類するものが国土交通大臣が定める基準に従って打ち付けられているか確認",
+        "condition": {
+          "operator": "EQ",
+          "lhs": {
+            "var": "floor_board_compliant",
+            "desc": "床組木板打付け適合"
+          },
+          "rhs": {
+            "value": true,
+            "desc": "適合"
+          }
+        },
+        "related_articles": ["令46条3項本文"]
+      },
+      {
+        "id": "proc-floor-board-ok",
+        "type": "process",
+        "title": "床組要件適合",
+        "process_type": "mechanical",
+        "description": "床組に木板等が基準に従って打ち付けられていることを確認"
+      },
+      {
+        "id": "dec-rafter-board",
+        "type": "decision",
+        "title": "小屋ばり組に木板等が基準に従って打ち付けられているか？",
+        "decision_type": "binary",
+        "description": "小屋ばり組に木板その他これに類するものが国土交通大臣が定める基準に従って打ち付けられているか確認",
+        "condition": {
+          "operator": "EQ",
+          "lhs": {
+            "var": "rafter_board_compliant",
+            "desc": "小屋ばり組木板打付け適合"
+          },
+          "rhs": {
+            "value": true,
+            "desc": "適合"
+          }
+        },
+        "related_articles": ["令46条3項本文"]
+      },
+      {
+        "id": "proc-rafter-board-ok",
+        "type": "process",
+        "title": "小屋ばり組要件適合",
+        "process_type": "mechanical",
+        "description": "小屋ばり組に木板等が基準に従って打ち付けられていることを確認"
+      },
+      {
+        "id": "dec-roof-brace",
+        "type": "decision",
+        "title": "小屋組に振れ止めが設けられているか？",
+        "decision_type": "binary",
+        "description": "小屋組に振れ止めが設けられているか確認",
+        "condition": {
+          "operator": "EQ",
+          "lhs": {
+            "var": "roof_brace_compliant",
+            "desc": "小屋組振れ止め設置適合"
+          },
+          "rhs": {
+            "value": true,
+            "desc": "適合"
+          }
+        },
+        "related_articles": ["令46条3項本文"]
+      },
+      {
+        "id": "proc-roof-brace-ok",
+        "type": "process",
+        "title": "小屋組要件適合",
+        "process_type": "mechanical",
+        "description": "小屋組に振れ止めが設けられていることを確認"
+      },
+      {
+        "id": "proc-all-compliant",
+        "type": "process",
+        "title": "本文全要件適合",
+        "process_type": "mechanical",
+        "description": "床組・小屋ばり組の木板打付け、小屋組の振れ止め設置のすべてが適合"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令第46条第3項に適合"
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "令第46条第3項に不適合"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-exception",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-exception",
+        "to": "proc-exception-exempt",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "proc-exception-exempt",
+        "to": "end-pass",
+        "role": "flow"
+      },
+      {
+        "id": "e04",
+        "from": "dec-exception",
+        "to": "dec-floor-board",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e05",
+        "from": "dec-floor-board",
+        "to": "proc-floor-board-ok",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e06",
+        "from": "proc-floor-board-ok",
+        "to": "dec-rafter-board",
+        "role": "flow"
+      },
+      {
+        "id": "e07",
+        "from": "dec-floor-board",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e08",
+        "from": "dec-rafter-board",
+        "to": "proc-rafter-board-ok",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e09",
+        "from": "proc-rafter-board-ok",
+        "to": "dec-roof-brace",
+        "role": "flow"
+      },
+      {
+        "id": "e10",
+        "from": "dec-rafter-board",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e11",
+        "from": "dec-roof-brace",
+        "to": "proc-roof-brace-ok",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e12",
+        "from": "proc-roof-brace-ok",
+        "to": "proc-all-compliant",
+        "role": "flow"
+      },
+      {
+        "id": "e13",
+        "from": "dec-roof-brace",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e14",
+        "from": "proc-all-compliant",
+        "to": "end-pass",
+        "role": "flow"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-ORDER-A46-P3",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": ["A20"],
+      "description": "法第20条の構造耐力に関する規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T12:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

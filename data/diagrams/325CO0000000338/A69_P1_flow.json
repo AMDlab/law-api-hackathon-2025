@@ -1,0 +1,448 @@
+{
+  "id": "A69_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "斜材、壁等の配置",
+    "target_subject": "軸組、床組、小屋ばり組",
+    "description": "軸組、床組及び小屋ばり組における斜材又は壁等の釣合い良い配置の適合判定フロー"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "69",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造"
+  ],
+  "text_raw": "軸組、床組及び小屋ばり組には、すべての方向の水平力に対して安全であるように、国土交通大臣が定める基準に従つた構造計算によつて構造耐力上安全であることが確かめられた場合を除き、形鋼、棒鋼若しくは構造用ケーブルの斜材又は鉄筋コンクリート造の壁、屋根版若しくは床版を釣合い良く配置しなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "structure",
+          "value": "鉄骨造の軸組、床組又は小屋ばり組を有する建築物"
+        }
+      ]
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "ref": "dec-calc-safe",
+          "note": "構造計算によって構造耐力上安全であることが確かめられた場合（適用除外）"
+        },
+        {
+          "ref": "dec-balanced",
+          "note": "斜材又は壁等が釣合い良く配置されている場合"
+        }
+      ]
+    },
+    "exceptions": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "dec-calc-safe",
+          "value": true,
+          "note": "国土交通大臣が定める基準に従った構造計算によって構造耐力上安全であることが確かめられた場合"
+        }
+      ],
+      "effect": "EXEMPT"
+    }
+  },
+  "flow_diagram": {
+    "title": "令第69条第1項 斜材・壁等の配置 適合判定フロー",
+    "description": "軸組、床組及び小屋ばり組における斜材又は壁等の釣合い良い配置を判定するフローチャート",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "令第69条第1項の適合判定を開始"
+      },
+      {
+        "id": "dec-frame-exist",
+        "type": "decision",
+        "title": "軸組等を有するか？",
+        "decision_type": "binary",
+        "description": "鉄骨造の軸組、床組又は小屋ばり組を有する建築物か"
+      },
+      {
+        "id": "proc-frame-identify",
+        "type": "process",
+        "title": "軸組等を特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から判定対象となる軸組、床組及び小屋ばり組を特定する"
+      },
+      {
+        "id": "dec-calc-safe",
+        "type": "decision",
+        "title": "構造計算で安全確認済みか？",
+        "decision_type": "binary",
+        "description": "国土交通大臣が定める基準に従った構造計算によって、すべての方向の水平力に対して構造耐力上安全であることが確かめられているか",
+        "condition": {
+          "operator": "EQ",
+          "lhs": { "var": "calc_safe", "desc": "構造計算による安全確認" },
+          "rhs": { "value": true }
+        }
+      },
+      {
+        "id": "proc-exempt",
+        "type": "process",
+        "title": "適用除外該当",
+        "process_type": "mechanical",
+        "description": "構造計算により安全が確かめられたため、本条の配置規定から除外される"
+      },
+      {
+        "id": "dec-bracing-type",
+        "type": "decision",
+        "title": "斜材の種類は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "形鋼", "description": "形鋼による斜材" },
+          { "value": "棒鋼", "description": "棒鋼による斜材" },
+          { "value": "構造用ケーブル", "description": "構造用ケーブルによる斜材" },
+          { "value": "なし", "description": "斜材なし" }
+        ],
+        "description": "形鋼、棒鋼又は構造用ケーブルの斜材の有無と種類を判定"
+      },
+      {
+        "id": "proc-bracing-identified",
+        "type": "process",
+        "title": "斜材配置を確認",
+        "process_type": "undefined_input",
+        "description": "斜材の配置状況を確認する"
+      },
+      {
+        "id": "dec-wall-type",
+        "type": "decision",
+        "title": "壁等の種類は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "RC壁", "description": "鉄筋コンクリート造の壁" },
+          { "value": "RC屋根版", "description": "鉄筋コンクリート造の屋根版" },
+          { "value": "RC床版", "description": "鉄筋コンクリート造の床版" },
+          { "value": "なし", "description": "壁等なし" }
+        ],
+        "description": "鉄筋コンクリート造の壁、屋根版又は床版の有無と種類を判定"
+      },
+      {
+        "id": "proc-wall-identified",
+        "type": "process",
+        "title": "壁等配置を確認",
+        "process_type": "undefined_input",
+        "description": "壁等の配置状況を確認する"
+      },
+      {
+        "id": "dec-has-elements",
+        "type": "decision",
+        "title": "斜材又は壁等があるか？",
+        "decision_type": "binary",
+        "description": "斜材（形鋼、棒鋼、構造用ケーブル）又は壁等（RC壁、屋根版、床版）のいずれかがあるか"
+      },
+      {
+        "id": "dec-balanced",
+        "type": "decision",
+        "title": "釣合い良く配置されているか？",
+        "decision_type": "binary",
+        "description": "斜材又は壁等がすべての方向の水平力に対して安全であるように釣合い良く配置されているか",
+        "condition": {
+          "operator": "EQ",
+          "lhs": { "var": "balanced_placement", "desc": "釣合い良い配置" },
+          "rhs": { "value": true }
+        }
+      },
+      {
+        "id": "proc-balance-confirmed",
+        "type": "process",
+        "title": "釣合い配置確認",
+        "process_type": "human_judgment",
+        "description": "斜材又は壁等の釣合い良い配置を確認した"
+      },
+      {
+        "id": "dec-compliance",
+        "type": "decision",
+        "title": "当該軸組等は適合か？",
+        "decision_type": "binary",
+        "description": "当該軸組等が令69条1項の要件（適用除外または釣合い良い配置）を満たすか",
+        "condition": {
+          "operator": "EQ",
+          "lhs": { "var": "compliance", "desc": "軸組等の適合" },
+          "rhs": { "value": true }
+        }
+      },
+      {
+        "id": "proc-compliance-confirmed",
+        "type": "process",
+        "title": "軸組等の適合確認",
+        "process_type": "mechanical",
+        "description": "当該軸組等が令69条1項に適合することを確認した"
+      },
+      {
+        "id": "dec-more-frames",
+        "type": "decision",
+        "title": "他に判定対象の軸組等があるか？",
+        "decision_type": "binary",
+        "description": "未判定の軸組、床組又は小屋ばり組があるかを確認"
+      },
+      {
+        "id": "proc-all-pass",
+        "type": "process",
+        "title": "全軸組等適合確認",
+        "process_type": "mechanical",
+        "description": "全ての軸組、床組及び小屋ばり組が令69条1項に適合することを確認"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令第69条第1項に適合"
+      },
+      {
+        "id": "pass-exempt",
+        "type": "terminal",
+        "title": "適合（適用除外）",
+        "result": "pass",
+        "description": "構造計算により安全が確かめられたため、本条の配置規定は適用除外"
+      },
+      {
+        "id": "pass-not-applicable",
+        "type": "terminal",
+        "title": "適合（対象外）",
+        "result": "pass",
+        "description": "鉄骨造の軸組等を有しないため、本条は適用対象外"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "斜材又は壁等が釣合い良く配置されていないため、令第69条第1項に不適合"
+      },
+      {
+        "id": "fail-no-elements",
+        "type": "terminal",
+        "title": "不適合（斜材・壁等なし）",
+        "result": "fail",
+        "description": "斜材及び壁等のいずれも設置されていないため、令第69条第1項に不適合"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-frame-exist",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-frame-exist",
+        "to": "proc-frame-identify",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "dec-frame-exist",
+        "to": "pass-not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e04",
+        "from": "proc-frame-identify",
+        "to": "dec-calc-safe",
+        "role": "flow"
+      },
+      {
+        "id": "e05",
+        "from": "dec-calc-safe",
+        "to": "proc-exempt",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e06",
+        "from": "dec-calc-safe",
+        "to": "dec-bracing-type",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e07",
+        "from": "proc-exempt",
+        "to": "pass-exempt",
+        "role": "flow"
+      },
+      {
+        "id": "e08",
+        "from": "dec-bracing-type",
+        "to": "proc-bracing-identified",
+        "role": "option",
+        "label": "形鋼"
+      },
+      {
+        "id": "e09",
+        "from": "dec-bracing-type",
+        "to": "proc-bracing-identified",
+        "role": "option",
+        "label": "棒鋼"
+      },
+      {
+        "id": "e10",
+        "from": "dec-bracing-type",
+        "to": "proc-bracing-identified",
+        "role": "option",
+        "label": "構造用ケーブル"
+      },
+      {
+        "id": "e11",
+        "from": "dec-bracing-type",
+        "to": "dec-wall-type",
+        "role": "option",
+        "label": "なし"
+      },
+      {
+        "id": "e12",
+        "from": "proc-bracing-identified",
+        "to": "dec-wall-type",
+        "role": "flow"
+      },
+      {
+        "id": "e13",
+        "from": "dec-wall-type",
+        "to": "proc-wall-identified",
+        "role": "option",
+        "label": "RC壁"
+      },
+      {
+        "id": "e14",
+        "from": "dec-wall-type",
+        "to": "proc-wall-identified",
+        "role": "option",
+        "label": "RC屋根版"
+      },
+      {
+        "id": "e15",
+        "from": "dec-wall-type",
+        "to": "proc-wall-identified",
+        "role": "option",
+        "label": "RC床版"
+      },
+      {
+        "id": "e16",
+        "from": "dec-wall-type",
+        "to": "dec-has-elements",
+        "role": "option",
+        "label": "なし"
+      },
+      {
+        "id": "e17",
+        "from": "proc-wall-identified",
+        "to": "dec-has-elements",
+        "role": "flow"
+      },
+      {
+        "id": "e18",
+        "from": "dec-has-elements",
+        "to": "dec-balanced",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e19",
+        "from": "dec-has-elements",
+        "to": "fail-no-elements",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e20",
+        "from": "dec-balanced",
+        "to": "proc-balance-confirmed",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e21",
+        "from": "dec-balanced",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e22",
+        "from": "proc-balance-confirmed",
+        "to": "dec-compliance",
+        "role": "flow"
+      },
+      {
+        "id": "e23",
+        "from": "dec-compliance",
+        "to": "proc-compliance-confirmed",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e24",
+        "from": "dec-compliance",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e25",
+        "from": "proc-compliance-confirmed",
+        "to": "dec-more-frames",
+        "role": "flow"
+      },
+      {
+        "id": "e26",
+        "from": "dec-more-frames",
+        "to": "dec-calc-safe",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e27",
+        "from": "dec-more-frames",
+        "to": "proc-all-pass",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e28",
+        "from": "proc-all-pass",
+        "to": "pass",
+        "role": "flow"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSO-A69-P1",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": [
+        "A20:P1"
+      ],
+      "description": "建築基準法第20条に基づく構造耐力規定の委任"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T12:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

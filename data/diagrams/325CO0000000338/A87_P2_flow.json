@@ -1,0 +1,316 @@
+{
+  "id": "A87_P2_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "速度圧の計算",
+    "target_subject": "建築物",
+    "description": "風圧力算出のための速度圧を所定の式により計算する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "87",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造関係",
+    "風圧力",
+    "速度圧"
+  ],
+  "text_raw": "前項の速度圧は、次の式によつて計算しなければならない。q＝0.6E V0^2（この式において、q、E及びV0は、それぞれ次の数値を表すものとする。q 速度圧（単位 一平方メートルにつきニュートン）、E 当該建築物の屋根の高さ及び周辺の地域に存する建築物その他の工作物、樹木その他の風速に影響を与えるものの状況に応じて国土交通大臣が定める方法により算出した数値、V0 その地方における過去の台風の記録に基づく風害の程度その他の風の性状に応じて三十メートル毎秒から四十六メートル毎秒までの範囲内において国土交通大臣が定める風速（単位 メートル毎秒））",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "reference",
+          "value": "令第87条第1項の風圧力算出"
+        }
+      ],
+      "note": "風圧力を算出する必要がある建築物に適用"
+    },
+    "judgment_rule": {
+      "operator": "EQ",
+      "lhs": {
+        "ref": "info-velocity-pressure",
+        "description": "算出された速度圧"
+      },
+      "rhs": {
+        "formula": "0.6 × E × V0^2",
+        "description": "式による計算値"
+      }
+    },
+    "exceptions": null
+  },
+  "flow_diagram": {
+    "title": "速度圧計算の適合判定フロー",
+    "description": "令第87条第2項に基づく速度圧qの計算手順を示すフローチャート",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "速度圧計算開始",
+        "result": "start",
+        "description": "令第87条第2項の速度圧計算を開始"
+      },
+      {
+        "id": "proc-roof-height-identify",
+        "type": "process",
+        "title": "屋根の高さの特定",
+        "process_type": "undefined_input",
+        "description": "当該建築物の屋根の高さを設計図書等から読み取る"
+      },
+      {
+        "id": "info-roof-height",
+        "type": "information",
+        "title": "屋根の高さ H",
+        "symbol": "H",
+        "subject": "建築物",
+        "property": "屋根の高さ",
+        "property_type": "numeric",
+        "description": "当該建築物の屋根の高さ（単位: m）"
+      },
+      {
+        "id": "dec-roof-height-valid",
+        "type": "decision",
+        "title": "屋根の高さは有効か？",
+        "decision_type": "binary",
+        "description": "屋根の高さが正の値として特定できたか確認"
+      },
+      {
+        "id": "proc-E-calc",
+        "type": "process",
+        "title": "E値の算出",
+        "process_type": "mechanical",
+        "description": "屋根の高さ及び周辺状況に応じて国土交通大臣が定める方法（平成12年建設省告示第1454号）によりEを算出"
+      },
+      {
+        "id": "info-E-value",
+        "type": "information",
+        "title": "E値",
+        "symbol": "E",
+        "subject": "建築物",
+        "property": "Eの数値",
+        "property_type": "numeric",
+        "description": "屋根の高さ及び周辺状況に応じて算出した数値"
+      },
+      {
+        "id": "dec-E-value-valid",
+        "type": "decision",
+        "title": "E値は適正に算出されたか？",
+        "decision_type": "binary",
+        "description": "国土交通大臣が定める方法によりE値が正しく算出されたか確認"
+      },
+      {
+        "id": "proc-V0-identify",
+        "type": "process",
+        "title": "基準風速V0の特定",
+        "process_type": "mechanical",
+        "description": "建築物の所在地に応じて国土交通大臣が定める基準風速（平成12年建設省告示第1454号別表）を特定"
+      },
+      {
+        "id": "info-V0-value",
+        "type": "information",
+        "title": "基準風速V0",
+        "symbol": "V0",
+        "subject": "建築物",
+        "property": "基準風速",
+        "property_type": "numeric",
+        "description": "その地方における国土交通大臣が定める風速（30〜46m/s）"
+      },
+      {
+        "id": "dec-V0-range",
+        "type": "decision",
+        "title": "V0は30〜46m/sの範囲内か？",
+        "decision_type": "binary",
+        "description": "基準風速が法定の範囲（30〜46m/s）内であることを確認",
+        "condition": {
+          "operator": "IN",
+          "lhs": {
+            "var": "V0",
+            "desc": "基準風速"
+          },
+          "rhs": {
+            "value": [30, 46],
+            "desc": "法定範囲",
+            "unit": "m/s"
+          }
+        }
+      },
+      {
+        "id": "proc-velocity-pressure-calc",
+        "type": "process",
+        "title": "速度圧qの計算",
+        "process_type": "mechanical",
+        "description": "q = 0.6 × E × V0^2 により速度圧を計算"
+      },
+      {
+        "id": "info-velocity-pressure",
+        "type": "information",
+        "title": "速度圧q",
+        "symbol": "q",
+        "subject": "建築物",
+        "property": "速度圧",
+        "property_type": "numeric",
+        "description": "風圧力算出に用いる速度圧（単位: N/m2）"
+      },
+      {
+        "id": "dec-formula-correct",
+        "type": "decision",
+        "title": "速度圧は式 q=0.6EV0^2 で計算されているか？",
+        "decision_type": "binary",
+        "description": "速度圧が所定の式により正しく計算されているか確認"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "速度圧が令第87条第2項に適合"
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "速度圧の計算が令第87条第2項に不適合"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "proc-roof-height-identify",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "proc-roof-height-identify",
+        "to": "info-roof-height",
+        "role": "output"
+      },
+      {
+        "id": "e03",
+        "from": "info-roof-height",
+        "to": "dec-roof-height-valid",
+        "role": "flow"
+      },
+      {
+        "id": "e04",
+        "from": "dec-roof-height-valid",
+        "to": "proc-E-calc",
+        "role": "yes",
+        "label": "有効"
+      },
+      {
+        "id": "e05",
+        "from": "dec-roof-height-valid",
+        "to": "end-fail",
+        "role": "no",
+        "label": "無効"
+      },
+      {
+        "id": "e06",
+        "from": "proc-E-calc",
+        "to": "info-E-value",
+        "role": "output"
+      },
+      {
+        "id": "e07",
+        "from": "info-E-value",
+        "to": "dec-E-value-valid",
+        "role": "flow"
+      },
+      {
+        "id": "e08",
+        "from": "dec-E-value-valid",
+        "to": "proc-V0-identify",
+        "role": "yes",
+        "label": "適正"
+      },
+      {
+        "id": "e09",
+        "from": "dec-E-value-valid",
+        "to": "end-fail",
+        "role": "no",
+        "label": "不適正"
+      },
+      {
+        "id": "e10",
+        "from": "proc-V0-identify",
+        "to": "info-V0-value",
+        "role": "output"
+      },
+      {
+        "id": "e11",
+        "from": "info-V0-value",
+        "to": "dec-V0-range",
+        "role": "flow"
+      },
+      {
+        "id": "e12",
+        "from": "dec-V0-range",
+        "to": "proc-velocity-pressure-calc",
+        "role": "yes",
+        "label": "範囲内"
+      },
+      {
+        "id": "e13",
+        "from": "dec-V0-range",
+        "to": "end-fail",
+        "role": "no",
+        "label": "範囲外"
+      },
+      {
+        "id": "e14",
+        "from": "proc-velocity-pressure-calc",
+        "to": "info-velocity-pressure",
+        "role": "output"
+      },
+      {
+        "id": "e15",
+        "from": "info-velocity-pressure",
+        "to": "dec-formula-correct",
+        "role": "flow"
+      },
+      {
+        "id": "e16",
+        "from": "dec-formula-correct",
+        "to": "end-pass",
+        "role": "yes",
+        "label": "正しい"
+      },
+      {
+        "id": "e17",
+        "from": "dec-formula-correct",
+        "to": "end-fail",
+        "role": "no",
+        "label": "誤り"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-ORDER-A87-P2",
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": [
+        "A87:P1"
+      ],
+      "description": "令第87条第1項の風圧力計算に使用"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-01-26T12:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

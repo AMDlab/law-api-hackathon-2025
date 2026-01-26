@@ -1,0 +1,339 @@
+{
+  "id": "A83_P2_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "実況に応じた外力の採用",
+    "target_subject": "建築物",
+    "description": "建築物の実況に応じて土圧、水圧、震動及び衝撃による外力を採用するか判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "83",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造関係規定",
+    "荷重・外力"
+  ],
+  "text_raw": "前項に掲げるもののほか、建築物の実況に応じて、土圧、水圧、震動及び衝撃による外力を採用しなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "reference",
+          "value": "第1項の荷重・外力を採用する建築物"
+        }
+      ],
+      "note": "前項に掲げるもののほか"
+    },
+    "judgment_rule": {
+      "operator": "IMPLIES",
+      "conditions": [
+        {
+          "ref": "info-condition-applicable",
+          "operator": "==",
+          "value": true,
+          "description": "実況に応じた条件該当"
+        },
+        {
+          "ref": "info-additional-force-adopted",
+          "operator": "==",
+          "value": true,
+          "description": "追加外力の採用"
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "flow_diagram": {
+    "title": "令第83条第2項 適合判定フロー",
+    "description": "建築物の実況に応じた追加外力（土圧・水圧・震動・衝撃）の採用を判定するフロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "令第83条第2項の適合判定を開始"
+      },
+      {
+        "id": "dec-earth-pressure-condition",
+        "type": "decision",
+        "title": "土圧を受ける実況か？",
+        "decision_type": "binary",
+        "description": "建築物が土圧を受ける実況にあるか判定"
+      },
+      {
+        "id": "dec-earth-pressure-adopted",
+        "type": "decision",
+        "title": "土圧を採用しているか？",
+        "decision_type": "binary",
+        "description": "構造計算において土圧を外力として採用しているか判定"
+      },
+      {
+        "id": "proc-earth-pressure-ok",
+        "type": "process",
+        "title": "土圧：適合",
+        "process_type": "mechanical",
+        "description": "土圧の採用が適合"
+      },
+      {
+        "id": "dec-water-pressure-condition",
+        "type": "decision",
+        "title": "水圧を受ける実況か？",
+        "decision_type": "binary",
+        "description": "建築物が水圧を受ける実況にあるか判定"
+      },
+      {
+        "id": "dec-water-pressure-adopted",
+        "type": "decision",
+        "title": "水圧を採用しているか？",
+        "decision_type": "binary",
+        "description": "構造計算において水圧を外力として採用しているか判定"
+      },
+      {
+        "id": "proc-water-pressure-ok",
+        "type": "process",
+        "title": "水圧：適合",
+        "process_type": "mechanical",
+        "description": "水圧の採用が適合"
+      },
+      {
+        "id": "dec-vibration-condition",
+        "type": "decision",
+        "title": "震動を受ける実況か？",
+        "decision_type": "binary",
+        "description": "建築物が震動を受ける実況にあるか判定"
+      },
+      {
+        "id": "dec-vibration-adopted",
+        "type": "decision",
+        "title": "震動を採用しているか？",
+        "decision_type": "binary",
+        "description": "構造計算において震動による外力を採用しているか判定"
+      },
+      {
+        "id": "proc-vibration-ok",
+        "type": "process",
+        "title": "震動：適合",
+        "process_type": "mechanical",
+        "description": "震動の採用が適合"
+      },
+      {
+        "id": "dec-impact-condition",
+        "type": "decision",
+        "title": "衝撃を受ける実況か？",
+        "decision_type": "binary",
+        "description": "建築物が衝撃を受ける実況にあるか判定"
+      },
+      {
+        "id": "dec-impact-adopted",
+        "type": "decision",
+        "title": "衝撃を採用しているか？",
+        "decision_type": "binary",
+        "description": "構造計算において衝撃による外力を採用しているか判定"
+      },
+      {
+        "id": "proc-impact-ok",
+        "type": "process",
+        "title": "衝撃：適合",
+        "process_type": "mechanical",
+        "description": "衝撃の採用が適合"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令第83条第2項に適合"
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "令第83条第2項に不適合（実況に応じた外力が採用されていない）"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-earth-pressure-condition",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-earth-pressure-condition",
+        "to": "dec-earth-pressure-adopted",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "dec-earth-pressure-condition",
+        "to": "dec-water-pressure-condition",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e04",
+        "from": "dec-earth-pressure-adopted",
+        "to": "proc-earth-pressure-ok",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e05",
+        "from": "dec-earth-pressure-adopted",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e06",
+        "from": "proc-earth-pressure-ok",
+        "to": "dec-water-pressure-condition",
+        "role": "flow"
+      },
+      {
+        "id": "e07",
+        "from": "dec-water-pressure-condition",
+        "to": "dec-water-pressure-adopted",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e08",
+        "from": "dec-water-pressure-condition",
+        "to": "dec-vibration-condition",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e09",
+        "from": "dec-water-pressure-adopted",
+        "to": "proc-water-pressure-ok",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e10",
+        "from": "dec-water-pressure-adopted",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e11",
+        "from": "proc-water-pressure-ok",
+        "to": "dec-vibration-condition",
+        "role": "flow"
+      },
+      {
+        "id": "e12",
+        "from": "dec-vibration-condition",
+        "to": "dec-vibration-adopted",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e13",
+        "from": "dec-vibration-condition",
+        "to": "dec-impact-condition",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e14",
+        "from": "dec-vibration-adopted",
+        "to": "proc-vibration-ok",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e15",
+        "from": "dec-vibration-adopted",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e16",
+        "from": "proc-vibration-ok",
+        "to": "dec-impact-condition",
+        "role": "flow"
+      },
+      {
+        "id": "e17",
+        "from": "dec-impact-condition",
+        "to": "dec-impact-adopted",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e18",
+        "from": "dec-impact-condition",
+        "to": "end-pass",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e19",
+        "from": "dec-impact-adopted",
+        "to": "proc-impact-ok",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e20",
+        "from": "dec-impact-adopted",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e21",
+        "from": "proc-impact-ok",
+        "to": "end-pass",
+        "role": "flow"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-ORDER-A83-P2",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": [
+        "A20"
+      ],
+      "description": "法第20条の構造耐力に関する規定"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": [
+        "A83:P1"
+      ],
+      "description": "第1項の荷重及び外力（固定荷重、積載荷重、積雪荷重、風圧力、地震力）"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

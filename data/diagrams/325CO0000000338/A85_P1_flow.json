@@ -1,0 +1,365 @@
+{
+  "id": "A85_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "積載荷重の計算",
+    "target_subject": "建築物の各部",
+    "description": "建築物の各部の積載荷重を計算する方法を判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "85",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造規定",
+    "積載荷重"
+  ],
+  "text_raw": "建築物の各部の積載荷重は、当該建築物の実況に応じて計算しなければならない。ただし、次の表に掲げる室の床の積載荷重については、それぞれ同表の（い）、（ろ）又は（は）の欄に定める数値に床面積を乗じて計算することができる。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "subject",
+          "value": "建築物の構造計算を行う場合"
+        }
+      ],
+      "note": "構造計算が必要な建築物が対象"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "ref": "info-actual-calc-result",
+          "description": "実況に応じた計算による場合"
+        },
+        {
+          "ref": "info-table-calc-result",
+          "description": "表の数値による簡易計算の場合（表に掲げる室のみ）"
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "flow_diagram": {
+    "title": "令第85条第1項 積載荷重計算適合判定フロー",
+    "description": "積載荷重の計算方法が令85条1項に適合するかを判定するフローチャート",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "積載荷重計算の適合判定開始"
+      },
+      {
+        "id": "proc-identify-building-parts",
+        "type": "process",
+        "title": "建築物の各部を特定",
+        "process_type": "undefined_input",
+        "description": "積載荷重を計算すべき建築物の各部位を特定する"
+      },
+      {
+        "id": "dec-calc-method",
+        "type": "decision",
+        "title": "積載荷重の計算方法は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "実況計算", "description": "建築物の実況に応じて計算" },
+          { "value": "表計算", "description": "表の数値に床面積を乗じて計算" }
+        ],
+        "description": "積載荷重の計算方法を選択"
+      },
+      {
+        "id": "proc-actual-load-calc",
+        "type": "process",
+        "title": "実況に応じた積載荷重を計算",
+        "process_type": "undefined_input",
+        "description": "建築物の実況に応じた積載荷重を特定・計算する"
+      },
+      {
+        "id": "dec-actual-calc-valid",
+        "type": "decision",
+        "title": "実況に応じた計算値が存在するか？",
+        "decision_type": "binary",
+        "description": "実況に応じた計算結果が適切に存在するかを確認"
+      },
+      {
+        "id": "proc-identify-rooms",
+        "type": "process",
+        "title": "建築物に属する室を特定",
+        "process_type": "undefined_input",
+        "description": "建築物に属するすべての室を特定する"
+      },
+      {
+        "id": "dec-room-type",
+        "type": "decision",
+        "title": "室の種類は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "(一)住宅居室等", "description": "住宅の居室、住宅以外の建築物の寝室、病室" },
+          { "value": "(二)事務室", "description": "事務室" },
+          { "value": "(三)教室", "description": "教室" },
+          { "value": "(四)百貨店売場", "description": "百貨店又は店舗の売場" },
+          { "value": "(五)劇場客席等", "description": "劇場、映画館、演芸場、観覧場、公会堂、集会場その他これらに類するものの客席または集会室" },
+          { "value": "(六)自動車車庫", "description": "自動車車庫及び自動車通路" },
+          { "value": "(七)廊下等", "description": "廊下、玄関又は階段" },
+          { "value": "(八)屋上広場等", "description": "屋上広場又はバルコニー" },
+          { "value": "表対象外", "description": "表に該当しない室" }
+        ],
+        "description": "室の用途種別を特定（表の(一)〜(八)の区分）"
+      },
+      {
+        "id": "proc-identify-floor-area",
+        "type": "process",
+        "title": "室の床面積を特定",
+        "process_type": "undefined_input",
+        "description": "各室の床面積を特定する"
+      },
+      {
+        "id": "dec-calc-target",
+        "type": "decision",
+        "title": "構造計算の対象は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "(い)床", "description": "床の構造計算用" },
+          { "value": "(ろ)大ばり・柱・基礎", "description": "大ばり、柱又は基礎の構造計算用" },
+          { "value": "(は)地震力", "description": "地震力を計算する場合" }
+        ],
+        "description": "構造計算の対象（床/大ばり・柱・基礎/地震力）を特定"
+      },
+      {
+        "id": "proc-table-load-calc",
+        "type": "process",
+        "title": "表による積載荷重を計算",
+        "process_type": "mechanical",
+        "description": "室の種類と構造計算対象に応じた表の数値に床面積を乗じて積載荷重を計算"
+      },
+      {
+        "id": "dec-table-calc-valid",
+        "type": "decision",
+        "title": "表による計算値が適正か？",
+        "decision_type": "binary",
+        "description": "表の数値×床面積による計算が正しく行われているかを確認"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令85条1項の積載荷重計算に適合"
+      },
+      {
+        "id": "end-fail-actual",
+        "type": "terminal",
+        "title": "不適合（実況計算不備）",
+        "result": "fail",
+        "description": "実況に応じた計算が適切に行われていない"
+      },
+      {
+        "id": "end-fail-table-not-applicable",
+        "type": "terminal",
+        "title": "不適合（表計算適用不可）",
+        "result": "fail",
+        "description": "表に該当しない室に対して表計算を適用しようとした"
+      },
+      {
+        "id": "end-fail-table-calc",
+        "type": "terminal",
+        "title": "不適合（表計算不備）",
+        "result": "fail",
+        "description": "表による計算が適切に行われていない"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "proc-identify-building-parts",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "proc-identify-building-parts",
+        "to": "dec-calc-method",
+        "role": "flow"
+      },
+      {
+        "id": "e03",
+        "from": "dec-calc-method",
+        "to": "proc-actual-load-calc",
+        "role": "option",
+        "label": "実況計算"
+      },
+      {
+        "id": "e04",
+        "from": "dec-calc-method",
+        "to": "proc-identify-rooms",
+        "role": "option",
+        "label": "表計算"
+      },
+      {
+        "id": "e05",
+        "from": "proc-actual-load-calc",
+        "to": "dec-actual-calc-valid",
+        "role": "flow"
+      },
+      {
+        "id": "e06",
+        "from": "dec-actual-calc-valid",
+        "to": "end-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e07",
+        "from": "dec-actual-calc-valid",
+        "to": "end-fail-actual",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e08",
+        "from": "proc-identify-rooms",
+        "to": "dec-room-type",
+        "role": "flow"
+      },
+      {
+        "id": "e09",
+        "from": "dec-room-type",
+        "to": "proc-identify-floor-area",
+        "role": "option",
+        "label": "(一)住宅居室等"
+      },
+      {
+        "id": "e10",
+        "from": "dec-room-type",
+        "to": "proc-identify-floor-area",
+        "role": "option",
+        "label": "(二)事務室"
+      },
+      {
+        "id": "e11",
+        "from": "dec-room-type",
+        "to": "proc-identify-floor-area",
+        "role": "option",
+        "label": "(三)教室"
+      },
+      {
+        "id": "e12",
+        "from": "dec-room-type",
+        "to": "proc-identify-floor-area",
+        "role": "option",
+        "label": "(四)百貨店売場"
+      },
+      {
+        "id": "e13",
+        "from": "dec-room-type",
+        "to": "proc-identify-floor-area",
+        "role": "option",
+        "label": "(五)劇場客席等"
+      },
+      {
+        "id": "e14",
+        "from": "dec-room-type",
+        "to": "proc-identify-floor-area",
+        "role": "option",
+        "label": "(六)自動車車庫"
+      },
+      {
+        "id": "e15",
+        "from": "dec-room-type",
+        "to": "proc-identify-floor-area",
+        "role": "option",
+        "label": "(七)廊下等"
+      },
+      {
+        "id": "e16",
+        "from": "dec-room-type",
+        "to": "proc-identify-floor-area",
+        "role": "option",
+        "label": "(八)屋上広場等"
+      },
+      {
+        "id": "e17",
+        "from": "dec-room-type",
+        "to": "end-fail-table-not-applicable",
+        "role": "option",
+        "label": "表対象外"
+      },
+      {
+        "id": "e18",
+        "from": "proc-identify-floor-area",
+        "to": "dec-calc-target",
+        "role": "flow"
+      },
+      {
+        "id": "e19",
+        "from": "dec-calc-target",
+        "to": "proc-table-load-calc",
+        "role": "option",
+        "label": "(い)床"
+      },
+      {
+        "id": "e20",
+        "from": "dec-calc-target",
+        "to": "proc-table-load-calc",
+        "role": "option",
+        "label": "(ろ)大ばり・柱・基礎"
+      },
+      {
+        "id": "e21",
+        "from": "dec-calc-target",
+        "to": "proc-table-load-calc",
+        "role": "option",
+        "label": "(は)地震力"
+      },
+      {
+        "id": "e22",
+        "from": "proc-table-load-calc",
+        "to": "dec-table-calc-valid",
+        "role": "flow"
+      },
+      {
+        "id": "e23",
+        "from": "dec-table-calc-valid",
+        "to": "end-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e24",
+        "from": "dec-table-calc-valid",
+        "to": "end-fail-table-calc",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-ORDER-A85-P1",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": [
+        "A20"
+      ],
+      "description": "法第20条の構造耐力に関する規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T12:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

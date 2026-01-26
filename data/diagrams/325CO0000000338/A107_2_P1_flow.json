@@ -1,0 +1,287 @@
+{
+  "id": "A107_2_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "準耐火性能に関する技術的基準（適合判定フロー）",
+    "target_subject": "建築物の各部分",
+    "description": "法第2条第7号の2の政令で定める準耐火性能に関する技術的基準を判定するフロー"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "107_2",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": ["定義", "準耐火性能", "技術的基準"],
+  "text_raw": "法第二条第七号の二の政令で定める技術的基準は、次に掲げるものとする。一 次の表の上欄に掲げる建築物の部分にあつては、当該部分に通常の火災による火熱が加えられた場合に、加熱開始後それぞれ同表の下欄に掲げる時間において構造耐力上支障のある変形、溶融、破壊その他の損傷を生じないものであること。二 壁、床及び軒裏（外壁によつて小屋裏又は天井裏と防火上有効に遮られているものを除く。以下この号において同じ。）にあつては、これらに通常の火災による火熱が加えられた場合に、加熱開始後四十五分間（非耐力壁である外壁及び軒裏（いずれも延焼のおそれのある部分以外の部分に限る。）にあつては、三十分間）当該加熱面以外の面（屋内に面するものに限る。）の温度が可燃物燃焼温度以上に上昇しないものであること。三 外壁及び屋根にあつては、これらに屋内において発生する通常の火災による火熱が加えられた場合に、加熱開始後四十五分間（非耐力壁である外壁（延焼のおそれのある部分以外の部分に限る。）及び屋根にあつては、三十分間）屋外に火炎を出す原因となる亀裂その他の損傷を生じないものであること。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "reference",
+          "value": "法第2条第7号の2の準耐火性能"
+        }
+      ]
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-item1-compliance",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "ref": "info-item2-compliance",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "ref": "info-item3-compliance",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "flow_diagram": {
+    "title": "令107条の2第1項 準耐火性能基準 適合判定フロー",
+    "description": "建築物の各部分について、準耐火性能の3つの技術的基準（構造耐力、遮熱性、屋外火炎防止）への適合を判定する",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "準耐火性能基準の判定を開始"
+      },
+      {
+        "id": "dec-part-type",
+        "type": "decision",
+        "title": "建築物の部分の種類は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "壁", "description": "壁（間仕切壁・外壁）" },
+          { "value": "柱", "description": "柱" },
+          { "value": "床", "description": "床" },
+          { "value": "はり", "description": "はり" },
+          { "value": "屋根", "description": "屋根" },
+          { "value": "階段", "description": "階段" },
+          { "value": "軒裏", "description": "軒裏" }
+        ],
+        "description": "判定対象となる建築物の部分の種類を判定"
+      },
+      {
+        "id": "dec-wall-type",
+        "type": "decision",
+        "title": "壁の種別は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "耐力壁（間仕切壁）", "description": "耐力壁である間仕切壁" },
+          { "value": "耐力壁（外壁）", "description": "耐力壁である外壁" },
+          { "value": "非耐力壁（外壁）", "description": "非耐力壁である外壁" }
+        ],
+        "description": "壁の耐力壁/非耐力壁の区分と間仕切壁/外壁の区分を判定"
+      },
+      {
+        "id": "dec-fire-spread-wall",
+        "type": "decision",
+        "title": "延焼のおそれのある部分か？",
+        "decision_type": "binary",
+        "description": "非耐力壁である外壁が延焼のおそれのある部分に該当するか判定",
+        "related_articles": ["法::A2:I6"]
+      },
+      {
+        "id": "dec-nokiura-fire-spread",
+        "type": "decision",
+        "title": "延焼のおそれのある部分か？",
+        "decision_type": "binary",
+        "description": "軒裏が延焼のおそれのある部分に該当するか判定",
+        "related_articles": ["法::A2:I6"]
+      },
+      {
+        "id": "proc-item1-45min",
+        "type": "process",
+        "title": "第1号：45分間の構造耐力基準",
+        "process_type": "human_judgment",
+        "description": "加熱開始後45分間において構造耐力上支障のある変形、溶融、破壊その他の損傷を生じないか判定（壁・柱・床・はり）"
+      },
+      {
+        "id": "proc-item1-30min",
+        "type": "process",
+        "title": "第1号：30分間の構造耐力基準",
+        "process_type": "human_judgment",
+        "description": "加熱開始後30分間において構造耐力上支障のある変形、溶融、破壊その他の損傷を生じないか判定（屋根・階段）"
+      },
+      {
+        "id": "dec-item1-comply",
+        "type": "decision",
+        "title": "第1号基準に適合するか？",
+        "decision_type": "binary",
+        "description": "所定時間において構造耐力上支障のある損傷を生じないか"
+      },
+      {
+        "id": "dec-part-type-item2",
+        "type": "decision",
+        "title": "第2号対象部分か？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "壁・床・軒裏（耐力壁/延焼のおそれ）", "description": "壁・床または軒裏で、耐力壁または延焼のおそれのある部分" },
+          { "value": "非耐力壁外壁・軒裏（延焼のおそれ以外）", "description": "非耐力壁である外壁または軒裏で、延焼のおそれのある部分以外" },
+          { "value": "柱・はり・屋根・階段", "description": "第2号の対象外となる部分" }
+        ],
+        "description": "第2号基準（遮熱性）の対象となる部分かを判定"
+      },
+      {
+        "id": "proc-item2-45min",
+        "type": "process",
+        "title": "第2号：45分間の遮熱性基準",
+        "process_type": "human_judgment",
+        "description": "加熱開始後45分間において加熱面以外の面の温度が可燃物燃焼温度以上に上昇しないか判定"
+      },
+      {
+        "id": "proc-item2-30min",
+        "type": "process",
+        "title": "第2号：30分間の遮熱性基準",
+        "process_type": "human_judgment",
+        "description": "加熱開始後30分間において加熱面以外の面の温度が可燃物燃焼温度以上に上昇しないか判定（非耐力壁外壁・軒裏で延焼のおそれ以外）"
+      },
+      {
+        "id": "dec-item2-comply",
+        "type": "decision",
+        "title": "第2号基準に適合するか？",
+        "decision_type": "binary",
+        "description": "所定時間において遮熱性能を満たすか"
+      },
+      {
+        "id": "proc-item2-skip",
+        "type": "process",
+        "title": "第2号基準：対象外",
+        "process_type": "mechanical",
+        "description": "柱・はり・屋根・階段は第2号基準の対象外（壁・床・軒裏のみ対象）"
+      },
+      {
+        "id": "dec-part-type-item3",
+        "type": "decision",
+        "title": "第3号対象部分か？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "外壁（耐力壁/延焼のおそれ）", "description": "耐力壁である外壁または延焼のおそれのある部分" },
+          { "value": "非耐力壁外壁（延焼のおそれ以外）・屋根", "description": "非耐力壁である外壁で延焼のおそれのある部分以外、または屋根" },
+          { "value": "間仕切壁・柱・床・はり・階段・軒裏", "description": "第3号の対象外となる部分" }
+        ],
+        "description": "第3号基準（屋外火炎防止）の対象となる部分かを判定"
+      },
+      {
+        "id": "proc-item3-45min",
+        "type": "process",
+        "title": "第3号：45分間の屋外火炎防止基準",
+        "process_type": "human_judgment",
+        "description": "加熱開始後45分間において屋外に火炎を出す原因となる亀裂その他の損傷を生じないか判定"
+      },
+      {
+        "id": "proc-item3-30min",
+        "type": "process",
+        "title": "第3号：30分間の屋外火炎防止基準",
+        "process_type": "human_judgment",
+        "description": "加熱開始後30分間において屋外に火炎を出す原因となる亀裂その他の損傷を生じないか判定（非耐力壁外壁で延焼のおそれ以外、屋根）"
+      },
+      {
+        "id": "dec-item3-comply",
+        "type": "decision",
+        "title": "第3号基準に適合するか？",
+        "decision_type": "binary",
+        "description": "所定時間において屋外への火炎防止性能を満たすか"
+      },
+      {
+        "id": "proc-item3-skip",
+        "type": "process",
+        "title": "第3号基準：対象外",
+        "process_type": "mechanical",
+        "description": "間仕切壁・柱・床・はり・階段・軒裏は第3号基準の対象外（外壁・屋根のみ対象）"
+      },
+      {
+        "id": "proc-final-combine",
+        "type": "process",
+        "title": "総合判定",
+        "process_type": "mechanical",
+        "description": "第1号・第2号・第3号の適合結果を総合して準耐火性能基準への適合を判定"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令107条の2第1項の準耐火性能基準に適合"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "令107条の2第1項の準耐火性能基準に不適合"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "dec-part-type", "role": "flow" },
+      { "id": "e02", "from": "dec-part-type", "to": "dec-wall-type", "role": "option", "label": "壁" },
+      { "id": "e03", "from": "dec-part-type", "to": "proc-item1-45min", "role": "option", "label": "柱" },
+      { "id": "e04", "from": "dec-part-type", "to": "proc-item1-45min", "role": "option", "label": "床" },
+      { "id": "e05", "from": "dec-part-type", "to": "proc-item1-45min", "role": "option", "label": "はり" },
+      { "id": "e06", "from": "dec-part-type", "to": "proc-item1-30min", "role": "option", "label": "屋根" },
+      { "id": "e07", "from": "dec-part-type", "to": "proc-item1-30min", "role": "option", "label": "階段" },
+      { "id": "e08", "from": "dec-part-type", "to": "dec-nokiura-fire-spread", "role": "option", "label": "軒裏" },
+      { "id": "e09", "from": "dec-wall-type", "to": "proc-item1-45min", "role": "option", "label": "耐力壁（間仕切壁）" },
+      { "id": "e10", "from": "dec-wall-type", "to": "proc-item1-45min", "role": "option", "label": "耐力壁（外壁）" },
+      { "id": "e11", "from": "dec-wall-type", "to": "dec-fire-spread-wall", "role": "option", "label": "非耐力壁（外壁）" },
+      { "id": "e12", "from": "dec-fire-spread-wall", "to": "proc-item1-45min", "role": "yes", "label": "はい" },
+      { "id": "e13", "from": "dec-fire-spread-wall", "to": "proc-item1-45min", "role": "no", "label": "いいえ" },
+      { "id": "e14", "from": "dec-nokiura-fire-spread", "to": "proc-item1-45min", "role": "yes", "label": "はい" },
+      { "id": "e15", "from": "dec-nokiura-fire-spread", "to": "proc-item1-45min", "role": "no", "label": "いいえ" },
+      { "id": "e16", "from": "proc-item1-45min", "to": "dec-item1-comply", "role": "flow" },
+      { "id": "e17", "from": "proc-item1-30min", "to": "dec-item1-comply", "role": "flow" },
+      { "id": "e18", "from": "dec-item1-comply", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e19", "from": "dec-item1-comply", "to": "dec-part-type-item2", "role": "yes", "label": "はい" },
+      { "id": "e20", "from": "dec-part-type-item2", "to": "proc-item2-45min", "role": "option", "label": "壁・床・軒裏（耐力壁/延焼のおそれ）" },
+      { "id": "e21", "from": "dec-part-type-item2", "to": "proc-item2-30min", "role": "option", "label": "非耐力壁外壁・軒裏（延焼のおそれ以外）" },
+      { "id": "e22", "from": "dec-part-type-item2", "to": "proc-item2-skip", "role": "option", "label": "柱・はり・屋根・階段" },
+      { "id": "e23", "from": "proc-item2-45min", "to": "dec-item2-comply", "role": "flow" },
+      { "id": "e24", "from": "proc-item2-30min", "to": "dec-item2-comply", "role": "flow" },
+      { "id": "e25", "from": "proc-item2-skip", "to": "dec-part-type-item3", "role": "flow" },
+      { "id": "e26", "from": "dec-item2-comply", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e27", "from": "dec-item2-comply", "to": "dec-part-type-item3", "role": "yes", "label": "はい" },
+      { "id": "e28", "from": "dec-part-type-item3", "to": "proc-item3-45min", "role": "option", "label": "外壁（耐力壁/延焼のおそれ）" },
+      { "id": "e29", "from": "dec-part-type-item3", "to": "proc-item3-30min", "role": "option", "label": "非耐力壁外壁（延焼のおそれ以外）・屋根" },
+      { "id": "e30", "from": "dec-part-type-item3", "to": "proc-item3-skip", "role": "option", "label": "間仕切壁・柱・床・はり・階段・軒裏" },
+      { "id": "e31", "from": "proc-item3-45min", "to": "dec-item3-comply", "role": "flow" },
+      { "id": "e32", "from": "proc-item3-30min", "to": "dec-item3-comply", "role": "flow" },
+      { "id": "e33", "from": "proc-item3-skip", "to": "proc-final-combine", "role": "flow" },
+      { "id": "e34", "from": "dec-item3-comply", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e35", "from": "dec-item3-comply", "to": "proc-final-combine", "role": "yes", "label": "はい" },
+      { "id": "e36", "from": "proc-final-combine", "to": "pass", "role": "flow" }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-ORDER-A107_2-P1",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": ["A2_I7_2"],
+      "description": "法第2条第7号の2の準耐火性能の定義"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T12:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

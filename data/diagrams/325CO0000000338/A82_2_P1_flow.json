@@ -1,0 +1,357 @@
+{
+  "id": "A82_2_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "層間変形角",
+    "target_subject": "建築物の地上部分の各階",
+    "description": "地震力による各階の層間変形角が規定値以内であることを確認する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "82の2",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造",
+    "層間変形角"
+  ],
+  "text_raw": "建築物の地上部分については、第八十八条第一項に規定する地震力（以下この款において「地震力」という。）によつて各階に生ずる水平方向の層間変位を国土交通大臣が定める方法により計算し、当該層間変位の当該各階の高さに対する割合（第八十二条の六第二号イ及び第百九条の二の二第一項において「層間変形角」という。）が二百分の一（地震力による構造耐力上主要な部分の変形によつて建築物の部分に著しい損傷が生ずるおそれのない場合にあつては、百二十分の一）以内であることを確かめなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "building_part",
+          "value": "建築物の地上部分"
+        }
+      ],
+      "note": "建築物の地上部分の各階が対象"
+    },
+    "judgment_rule": {
+      "operator": "FORALL",
+      "conditions": [
+        {
+          "ref": "info-story-drift-angle-compliance",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    },
+    "exceptions": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "type": "condition",
+          "description": "地震力による構造耐力上主要な部分の変形によつて建築物の部分に著しい損傷が生ずるおそれのない場合"
+        }
+      ],
+      "effect": "閾値緩和（1/200→1/120）"
+    }
+  },
+  "flow_diagram": {
+    "title": "層間変形角の適合判定フロー",
+    "description": "建築物の地上部分の各階について層間変形角が規定値以内であることを判定するフロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "層間変形角の適合判定を開始"
+      },
+      {
+        "id": "proc-stories-identify",
+        "type": "process",
+        "title": "地上部分の階の特定",
+        "process_type": "undefined_input",
+        "description": "建築物の地上部分に属する各階を特定する"
+      },
+      {
+        "id": "dec-stories-exist",
+        "type": "decision",
+        "title": "地上部分の階があるか？",
+        "decision_type": "binary",
+        "description": "建築物に地上部分の階が存在するか判定"
+      },
+      {
+        "id": "proc-story-height-identify",
+        "type": "process",
+        "title": "各階の高さの特定",
+        "process_type": "undefined_input",
+        "description": "各階の高さを特定する"
+      },
+      {
+        "id": "proc-story-drift-calc",
+        "type": "process",
+        "title": "層間変位の計算",
+        "process_type": "mechanical",
+        "description": "令第88条第1項に規定する地震力によって各階に生ずる水平方向の層間変位を国土交通大臣が定める方法により計算",
+        "related_articles": ["令::A88:P1"]
+      },
+      {
+        "id": "proc-drift-angle-calc",
+        "type": "process",
+        "title": "層間変形角の計算",
+        "process_type": "mechanical",
+        "description": "層間変位を各階の高さで除して層間変形角を算出（A = D / H）"
+      },
+      {
+        "id": "proc-damage-risk-judgment",
+        "type": "process",
+        "title": "著しい損傷のおそれ判定",
+        "process_type": "human_judgment",
+        "description": "地震力による構造耐力上主要な部分の変形によつて建築物の部分に著しい損傷が生ずるおそれの有無を判定"
+      },
+      {
+        "id": "dec-damage-risk",
+        "type": "decision",
+        "title": "著しい損傷のおそれがあるか？",
+        "decision_type": "binary",
+        "description": "地震力による構造耐力上主要な部分の変形によつて建築物の部分に著しい損傷が生ずるおそれがあるか判定",
+        "condition": {
+          "operator": "EQ",
+          "lhs": { "var": "damage_risk", "desc": "著しい損傷のおそれ" },
+          "rhs": { "value": true, "desc": "おそれあり" }
+        }
+      },
+      {
+        "id": "proc-threshold-200",
+        "type": "process",
+        "title": "許容値を1/200に設定",
+        "process_type": "mechanical",
+        "description": "著しい損傷のおそれがある場合、層間変形角の許容値を1/200に設定"
+      },
+      {
+        "id": "proc-threshold-120",
+        "type": "process",
+        "title": "許容値を1/120に設定",
+        "process_type": "mechanical",
+        "description": "著しい損傷のおそれがない場合、層間変形角の許容値を1/120に設定（緩和）"
+      },
+      {
+        "id": "proc-merge-threshold",
+        "type": "process",
+        "title": "許容値の確定",
+        "process_type": "mechanical",
+        "description": "設定された許容値（1/200または1/120）を判定に使用"
+      },
+      {
+        "id": "dec-all-stories-checked",
+        "type": "decision",
+        "title": "全ての階を確認したか？",
+        "decision_type": "binary",
+        "description": "地上部分の全ての階について層間変形角の判定が完了したか確認"
+      },
+      {
+        "id": "proc-select-story",
+        "type": "process",
+        "title": "次の階を選択",
+        "process_type": "mechanical",
+        "description": "未確認の階を選択して判定を行う"
+      },
+      {
+        "id": "dec-drift-angle-check",
+        "type": "decision",
+        "title": "層間変形角が許容値以内か？",
+        "decision_type": "binary",
+        "description": "当該階の層間変形角が許容値（1/200または1/120）以内であるか判定",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "drift_angle", "desc": "層間変形角" },
+          "rhs": { "var": "threshold", "desc": "許容値" }
+        }
+      },
+      {
+        "id": "proc-mark-story-pass",
+        "type": "process",
+        "title": "当該階は適合",
+        "process_type": "mechanical",
+        "description": "当該階の層間変形角は許容値以内であり適合"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "全ての階の層間変形角が許容値以内であり、令第82条の2第1項に適合"
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "層間変形角が許容値を超える階があり、令第82条の2第1項に不適合"
+      },
+      {
+        "id": "end-not-applicable",
+        "type": "terminal",
+        "title": "対象外",
+        "result": "end",
+        "description": "地上部分の階がないため、本規定の対象外"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "proc-stories-identify",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "proc-stories-identify",
+        "to": "dec-stories-exist",
+        "role": "flow"
+      },
+      {
+        "id": "e03",
+        "from": "dec-stories-exist",
+        "to": "proc-story-height-identify",
+        "role": "yes",
+        "label": "あり"
+      },
+      {
+        "id": "e04",
+        "from": "dec-stories-exist",
+        "to": "end-not-applicable",
+        "role": "no",
+        "label": "なし"
+      },
+      {
+        "id": "e05",
+        "from": "proc-story-height-identify",
+        "to": "proc-story-drift-calc",
+        "role": "flow"
+      },
+      {
+        "id": "e06",
+        "from": "proc-story-drift-calc",
+        "to": "proc-drift-angle-calc",
+        "role": "flow"
+      },
+      {
+        "id": "e07",
+        "from": "proc-drift-angle-calc",
+        "to": "proc-damage-risk-judgment",
+        "role": "flow"
+      },
+      {
+        "id": "e08",
+        "from": "proc-damage-risk-judgment",
+        "to": "dec-damage-risk",
+        "role": "flow"
+      },
+      {
+        "id": "e09",
+        "from": "dec-damage-risk",
+        "to": "proc-threshold-200",
+        "role": "yes",
+        "label": "おそれあり"
+      },
+      {
+        "id": "e10",
+        "from": "dec-damage-risk",
+        "to": "proc-threshold-120",
+        "role": "no",
+        "label": "おそれなし"
+      },
+      {
+        "id": "e11",
+        "from": "proc-threshold-200",
+        "to": "proc-merge-threshold",
+        "role": "flow"
+      },
+      {
+        "id": "e12",
+        "from": "proc-threshold-120",
+        "to": "proc-merge-threshold",
+        "role": "flow"
+      },
+      {
+        "id": "e13",
+        "from": "proc-merge-threshold",
+        "to": "dec-all-stories-checked",
+        "role": "flow"
+      },
+      {
+        "id": "e14",
+        "from": "dec-all-stories-checked",
+        "to": "end-pass",
+        "role": "yes",
+        "label": "全階確認済"
+      },
+      {
+        "id": "e15",
+        "from": "dec-all-stories-checked",
+        "to": "proc-select-story",
+        "role": "no",
+        "label": "未確認あり"
+      },
+      {
+        "id": "e16",
+        "from": "proc-select-story",
+        "to": "dec-drift-angle-check",
+        "role": "flow"
+      },
+      {
+        "id": "e17",
+        "from": "dec-drift-angle-check",
+        "to": "proc-mark-story-pass",
+        "role": "yes",
+        "label": "許容値以内"
+      },
+      {
+        "id": "e18",
+        "from": "dec-drift-angle-check",
+        "to": "end-fail",
+        "role": "no",
+        "label": "許容値超過"
+      },
+      {
+        "id": "e19",
+        "from": "proc-mark-story-pass",
+        "to": "dec-all-stories-checked",
+        "role": "flow"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-ORDER-A82_2-P1",
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": ["A88:P1"],
+      "description": "地震力の規定"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": ["A82_6:P1:I2"],
+      "description": "層間変形角の定義参照"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": ["A109_2_2:P1"],
+      "description": "層間変形角の定義参照"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T12:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

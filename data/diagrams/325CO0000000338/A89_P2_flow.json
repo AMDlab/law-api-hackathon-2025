@@ -1,0 +1,252 @@
+{
+  "id": "A89_P2_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "かた木の許容応力度増大",
+    "target_subject": "木材",
+    "description": "かた木で特に品質優良なものをしやち・込み栓の類に使用する場合の許容応力度増大可否を判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "89",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造規定",
+    "木造",
+    "許容応力度"
+  ],
+  "text_raw": "かた木で特に品質優良なものをしやち、込み栓の類に使用する場合においては、その許容応力度は、それぞれ前項の表の数値の二倍まで増大することができる。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "structure",
+          "value": "木造構造"
+        },
+        {
+          "type": "material",
+          "value": "木材（かた木）"
+        }
+      ],
+      "note": "木材の許容応力度に関する規定"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-hardwood",
+          "description": "かた木である",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "ref": "info-quality",
+          "description": "特に品質優良",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "ref": "info-usage",
+          "description": "しやち・込み栓の類に使用",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "flow_diagram": {
+    "title": "令第89条第2項 かた木の許容応力度増大判定フロー",
+    "description": "かた木で特に品質優良なものをしやち・込み栓の類に使用する場合の許容応力度増大可否を判定するフロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "許容応力度増大可否判定開始"
+      },
+      {
+        "id": "proc-wood-type-identify",
+        "type": "process",
+        "title": "木材種類の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から使用木材がかた木か否かを特定する"
+      },
+      {
+        "id": "dec-hardwood",
+        "type": "decision",
+        "title": "かた木か？",
+        "decision_type": "binary",
+        "description": "使用木材がかた木に該当するか否か",
+        "condition": {
+          "operator": "EQ",
+          "lhs": { "var": "H", "desc": "かた木該当" },
+          "rhs": { "value": true, "desc": "該当" }
+        }
+      },
+      {
+        "id": "proc-quality-identify",
+        "type": "process",
+        "title": "品質の判定",
+        "process_type": "undefined_input",
+        "description": "設計図書・材料証明書等から木材の品質が特に優良か否かを判定する"
+      },
+      {
+        "id": "dec-quality",
+        "type": "decision",
+        "title": "特に品質優良か？",
+        "decision_type": "binary",
+        "description": "木材が特に品質優良であるか否か",
+        "condition": {
+          "operator": "EQ",
+          "lhs": { "var": "Q", "desc": "特に品質優良" },
+          "rhs": { "value": true, "desc": "該当" }
+        }
+      },
+      {
+        "id": "proc-usage-identify",
+        "type": "process",
+        "title": "使用箇所の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から木材の使用箇所がしやち・込み栓の類か否かを特定する"
+      },
+      {
+        "id": "dec-usage",
+        "type": "decision",
+        "title": "しやち・込み栓の類に使用するか？",
+        "decision_type": "binary",
+        "description": "木材がしやち、込み栓の類に使用されるか否か",
+        "condition": {
+          "operator": "EQ",
+          "lhs": { "var": "U", "desc": "使用箇所" },
+          "rhs": { "value": true, "desc": "しやち・込み栓の類" }
+        }
+      },
+      {
+        "id": "info-allowable-stress-increase",
+        "type": "information",
+        "title": "許容応力度増大可",
+        "symbol": "R",
+        "subject": "木材",
+        "property": "許容応力度増大可否",
+        "property_type": "proposition",
+        "description": "許容応力度を前項の表の数値の二倍まで増大することができる"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "許容応力度2倍まで増大可",
+        "result": "pass",
+        "description": "3条件を全て満たすため、許容応力度を前項の表の数値の二倍まで増大することができる",
+        "related_articles": ["令第89条第1項"]
+      },
+      {
+        "id": "end-not-applicable",
+        "type": "terminal",
+        "title": "本項適用外（増大不可）",
+        "result": "end",
+        "description": "条件を満たさないため、本項による許容応力度の増大は適用できない"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "proc-wood-type-identify",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "proc-wood-type-identify",
+        "to": "dec-hardwood",
+        "role": "flow"
+      },
+      {
+        "id": "e03",
+        "from": "dec-hardwood",
+        "to": "proc-quality-identify",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e04",
+        "from": "dec-hardwood",
+        "to": "end-not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e05",
+        "from": "proc-quality-identify",
+        "to": "dec-quality",
+        "role": "flow"
+      },
+      {
+        "id": "e06",
+        "from": "dec-quality",
+        "to": "proc-usage-identify",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e07",
+        "from": "dec-quality",
+        "to": "end-not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e08",
+        "from": "proc-usage-identify",
+        "to": "dec-usage",
+        "role": "flow"
+      },
+      {
+        "id": "e09",
+        "from": "dec-usage",
+        "to": "info-allowable-stress-increase",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e10",
+        "from": "dec-usage",
+        "to": "end-not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e11",
+        "from": "info-allowable-stress-increase",
+        "to": "end-pass",
+        "role": "flow"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-ORDER-A89-P2",
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": ["A89:P1"],
+      "description": "前項（第1項）の表の数値を参照"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T12:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

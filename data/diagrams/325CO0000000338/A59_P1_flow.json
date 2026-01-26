@@ -1,0 +1,265 @@
+{
+  "id": "A59_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "鉄骨組積造である壁の緊結",
+    "target_subject": "鉄骨組積造である壁",
+    "description": "鉄骨組積造である壁の組積造の部分が鉄骨の軸組に金物で緊結されているかを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "59",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造規定",
+    "鉄骨組積造"
+  ],
+  "text_raw": "鉄骨組積造である壁の組積造の部分は、鉄骨の軸組にボルト、かすがいその他の金物で緊結しなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "structure",
+          "value": "鉄骨組積造である壁を有する建築物"
+        }
+      ],
+      "note": "鉄骨組積造の壁を持つ建築物が対象"
+    },
+    "judgment_rule": {
+      "operator": "ALL",
+      "conditions": [
+        {
+          "ref": "info-fastening-compliance",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "flow_diagram": {
+    "title": "令第59条第1項 適合判定フロー",
+    "description": "鉄骨組積造である壁の組積造部分が鉄骨の軸組に金物で緊結されているかを判定するフロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start"
+      },
+      {
+        "id": "dec-wall-structure",
+        "type": "decision",
+        "title": "壁の構造種別は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "鉄骨組積造", "description": "鉄骨組積造である壁" },
+          { "value": "その他", "description": "鉄骨組積造以外の壁" }
+        ],
+        "description": "建築物の壁が鉄骨組積造であるかを判定する"
+      },
+      {
+        "id": "proc-not-applicable",
+        "type": "process",
+        "title": "本条適用外",
+        "process_type": "mechanical",
+        "description": "鉄骨組積造の壁がないため、本条の規定は適用されない"
+      },
+      {
+        "id": "dec-has-walls",
+        "type": "decision",
+        "title": "鉄骨組積造である壁があるか？",
+        "decision_type": "binary",
+        "description": "判定対象となる鉄骨組積造の壁の存在を確認"
+      },
+      {
+        "id": "proc-identify-masonry",
+        "type": "process",
+        "title": "組積造部分の特定",
+        "process_type": "undefined_input",
+        "description": "鉄骨組積造である壁における組積造の部分を特定する"
+      },
+      {
+        "id": "dec-fastening-method",
+        "type": "decision",
+        "title": "緊結方法は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "ボルト", "description": "ボルトによる緊結" },
+          { "value": "かすがい", "description": "かすがいによる緊結" },
+          { "value": "その他の金物", "description": "その他の金物による緊結" },
+          { "value": "金物以外", "description": "金物を使用していない" }
+        ],
+        "description": "組積造の部分が鉄骨の軸組にどのように緊結されているかを判定"
+      },
+      {
+        "id": "proc-fastening-ok",
+        "type": "process",
+        "title": "金物緊結確認",
+        "process_type": "mechanical",
+        "description": "金物（ボルト、かすがい、その他）による緊結を確認"
+      },
+      {
+        "id": "dec-all-parts-checked",
+        "type": "decision",
+        "title": "すべての組積造部分を確認したか？",
+        "decision_type": "binary",
+        "description": "鉄骨組積造である壁のすべての組積造部分について緊結方法を確認したか"
+      },
+      {
+        "id": "dec-all-parts-compliant",
+        "type": "decision",
+        "title": "すべての部分が金物で緊結されているか？",
+        "decision_type": "binary",
+        "description": "各組積造の部分が鉄骨の軸組にボルト、かすがいその他の金物で緊結されているかを最終確認"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "すべての組積造部分が金物で緊結されており、令第59条第1項に適合"
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "金物で緊結されていない組積造部分があり、令第59条第1項に不適合"
+      },
+      {
+        "id": "end-not-applicable",
+        "type": "terminal",
+        "title": "適用対象外",
+        "result": "pass",
+        "description": "鉄骨組積造の壁がないため、本条の規定は適用されない"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-wall-structure",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-wall-structure",
+        "to": "dec-has-walls",
+        "role": "option",
+        "label": "鉄骨組積造"
+      },
+      {
+        "id": "e03",
+        "from": "dec-wall-structure",
+        "to": "proc-not-applicable",
+        "role": "option",
+        "label": "その他"
+      },
+      {
+        "id": "e04",
+        "from": "proc-not-applicable",
+        "to": "end-not-applicable",
+        "role": "flow"
+      },
+      {
+        "id": "e05",
+        "from": "dec-has-walls",
+        "to": "proc-identify-masonry",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e06",
+        "from": "dec-has-walls",
+        "to": "end-not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e07",
+        "from": "proc-identify-masonry",
+        "to": "dec-fastening-method",
+        "role": "flow"
+      },
+      {
+        "id": "e08",
+        "from": "dec-fastening-method",
+        "to": "proc-fastening-ok",
+        "role": "option",
+        "label": "ボルト"
+      },
+      {
+        "id": "e09",
+        "from": "dec-fastening-method",
+        "to": "proc-fastening-ok",
+        "role": "option",
+        "label": "かすがい"
+      },
+      {
+        "id": "e10",
+        "from": "dec-fastening-method",
+        "to": "proc-fastening-ok",
+        "role": "option",
+        "label": "その他の金物"
+      },
+      {
+        "id": "e11",
+        "from": "dec-fastening-method",
+        "to": "end-fail",
+        "role": "option",
+        "label": "金物以外"
+      },
+      {
+        "id": "e12",
+        "from": "proc-fastening-ok",
+        "to": "dec-all-parts-checked",
+        "role": "flow"
+      },
+      {
+        "id": "e13",
+        "from": "dec-all-parts-checked",
+        "to": "dec-all-parts-compliant",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e14",
+        "from": "dec-all-parts-checked",
+        "to": "dec-fastening-method",
+        "role": "no",
+        "label": "いいえ（次の部分へ）"
+      },
+      {
+        "id": "e15",
+        "from": "dec-all-parts-compliant",
+        "to": "end-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e16",
+        "from": "dec-all-parts-compliant",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-ORDER-A59-P1",
+  "related_laws": [],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

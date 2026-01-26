@@ -1,0 +1,634 @@
+{
+  "id": "A136_2_9_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "都道府県知事指定区域内の建築物に係る条例制限の適合判定",
+    "target_subject": "建築物",
+    "description": "法第68条の9第1項に基づく条例による制限が各号の基準に適合するかを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "136の2の9",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "集団規定",
+    "都市計画区域外",
+    "条例制限"
+  ],
+  "text_raw": "法第六十八条の九第一項の規定に基づく条例による制限は、次の各号に掲げる事項のうち必要なものについて、それぞれ当該各号に適合するものでなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "都道府県知事が指定する区域内"
+        },
+        {
+          "type": "condition",
+          "value": "法第68条の9第1項に基づく条例が適用される建築物"
+        }
+      ],
+      "note": "都道府県知事指定区域情報は公共データとして[処理]に含まれる"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-applicable-items",
+          "description": "適用される制限事項が特定されていること"
+        },
+        {
+          "ref": "info-all-items-comply",
+          "description": "各制限事項がそれぞれの基準に適合すること"
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "flow_diagram": {
+    "title": "令第136条の2の9第1項 条例制限適合判定フロー",
+    "description": "法第68条の9第1項に基づく条例による制限の適合判定フロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "条例制限の適合判定を開始"
+      },
+      {
+        "id": "proc-ordinance-check",
+        "type": "process",
+        "title": "適用条例の確認",
+        "process_type": "undefined_input",
+        "description": "当該敷地に適用される法第68条の9第1項に基づく条例の内容を確認する"
+      },
+      {
+        "id": "dec-ordinance-exists",
+        "type": "decision",
+        "title": "法第68条の9第1項に基づく条例が存在するか？",
+        "decision_type": "binary",
+        "description": "当該敷地に適用される条例が定められているかを確認"
+      },
+      {
+        "id": "proc-applicable-items",
+        "type": "process",
+        "title": "適用制限事項の特定",
+        "process_type": "mechanical",
+        "description": "条例の内容から適用される制限事項（第1号〜第6号）を特定する"
+      },
+      {
+        "id": "dec-has-applicable-items",
+        "type": "decision",
+        "title": "適用される制限事項はあるか？",
+        "decision_type": "binary",
+        "description": "条例に第1号〜第6号のいずれかの制限事項が含まれているかを確認"
+      },
+      {
+        "id": "dec-item1-applicable",
+        "type": "decision",
+        "title": "道路関係制限（第1号）は適用されるか？",
+        "decision_type": "binary",
+        "description": "条例で道路関係の制限が定められているか"
+      },
+      {
+        "id": "proc-item1-check",
+        "type": "process",
+        "title": "道路関係制限の確認",
+        "process_type": "undefined_input",
+        "description": "条例で定める道路関係の制限内容を確認する"
+      },
+      {
+        "id": "dec-item1-judgment",
+        "type": "decision",
+        "title": "道路関係制限は法43条〜45条の制限より厳しくないか？",
+        "decision_type": "binary",
+        "description": "L1 ≦ 法43条〜45条の制限",
+        "related_articles": ["法43条", "法44条", "法45条"]
+      },
+      {
+        "id": "proc-item1-comply",
+        "type": "process",
+        "title": "第1号適合",
+        "process_type": "mechanical",
+        "description": "道路関係制限が第1号に適合"
+      },
+      {
+        "id": "dec-item2-applicable",
+        "type": "decision",
+        "title": "容積率制限（第2号）は適用されるか？",
+        "decision_type": "binary",
+        "description": "条例で容積率の最高限度が定められているか"
+      },
+      {
+        "id": "proc-item2-check",
+        "type": "process",
+        "title": "容積率制限の確認",
+        "process_type": "undefined_input",
+        "description": "条例で定める容積率の最高限度を確認する"
+      },
+      {
+        "id": "dec-item2-judgment",
+        "type": "decision",
+        "title": "容積率制限は法52条の制限より厳しくないか？",
+        "decision_type": "binary",
+        "description": "L2 ≦ 法52条の制限（用途地域指定なし区域）",
+        "related_articles": ["法52条"]
+      },
+      {
+        "id": "proc-item2-comply",
+        "type": "process",
+        "title": "第2号適合",
+        "process_type": "mechanical",
+        "description": "容積率制限が第2号に適合"
+      },
+      {
+        "id": "dec-item3-applicable",
+        "type": "decision",
+        "title": "建ぺい率制限（第3号）は適用されるか？",
+        "decision_type": "binary",
+        "description": "条例で建ぺい率の最高限度が定められているか"
+      },
+      {
+        "id": "proc-item3-check",
+        "type": "process",
+        "title": "建ぺい率制限の確認",
+        "process_type": "undefined_input",
+        "description": "条例で定める建ぺい率の最高限度を確認する"
+      },
+      {
+        "id": "dec-item3-judgment",
+        "type": "decision",
+        "title": "建ぺい率制限は法53条の制限より厳しくないか？",
+        "decision_type": "binary",
+        "description": "L3 ≦ 法53条の制限（用途地域指定なし区域）",
+        "related_articles": ["法53条"]
+      },
+      {
+        "id": "proc-item3-comply",
+        "type": "process",
+        "title": "第3号適合",
+        "process_type": "mechanical",
+        "description": "建ぺい率制限が第3号に適合"
+      },
+      {
+        "id": "dec-item4-applicable",
+        "type": "decision",
+        "title": "高さ制限（第4号）は適用されるか？",
+        "decision_type": "binary",
+        "description": "条例で建築物の高さの最高限度が定められているか"
+      },
+      {
+        "id": "proc-item4-check",
+        "type": "process",
+        "title": "高さ制限の確認",
+        "process_type": "undefined_input",
+        "description": "条例で定める建築物の高さの最高限度を確認する"
+      },
+      {
+        "id": "dec-item4-judgment",
+        "type": "decision",
+        "title": "高さ制限は地階除く2階建ての通常高さ以上か？",
+        "decision_type": "binary",
+        "description": "L4 ≧ 地階除く2階建ての通常高さ"
+      },
+      {
+        "id": "proc-item4-comply",
+        "type": "process",
+        "title": "第4号適合",
+        "process_type": "mechanical",
+        "description": "高さ制限が第4号に適合"
+      },
+      {
+        "id": "dec-item5-applicable",
+        "type": "decision",
+        "title": "各部分高さ制限（第5号）は適用されるか？",
+        "decision_type": "binary",
+        "description": "条例で建築物の各部分の高さの最高限度が定められているか"
+      },
+      {
+        "id": "proc-item5-check",
+        "type": "process",
+        "title": "各部分高さ制限の確認",
+        "process_type": "undefined_input",
+        "description": "条例で定める建築物の各部分の高さの最高限度を確認する"
+      },
+      {
+        "id": "dec-item5-judgment",
+        "type": "decision",
+        "title": "各部分高さ制限は法56条の制限より厳しくないか？",
+        "decision_type": "binary",
+        "description": "L5 ≦ 法56条の制限（用途地域指定なし区域）",
+        "related_articles": ["法56条"]
+      },
+      {
+        "id": "proc-item5-comply",
+        "type": "process",
+        "title": "第5号適合",
+        "process_type": "mechanical",
+        "description": "各部分高さ制限が第5号に適合"
+      },
+      {
+        "id": "dec-item6-applicable",
+        "type": "decision",
+        "title": "日影制限（第6号）は適用されるか？",
+        "decision_type": "binary",
+        "description": "条例で日影による中高層建築物の高さ制限が定められているか"
+      },
+      {
+        "id": "proc-item6-check",
+        "type": "process",
+        "title": "日影制限の確認",
+        "process_type": "undefined_input",
+        "description": "条例で定める日影による中高層建築物の高さ制限を確認する"
+      },
+      {
+        "id": "dec-item6-judgment",
+        "type": "decision",
+        "title": "日影制限は法56条の2の制限より厳しくないか？",
+        "decision_type": "binary",
+        "description": "L6 ≦ 法56条の2の制限（用途地域指定なし区域）",
+        "related_articles": ["法56条の2"]
+      },
+      {
+        "id": "proc-item6-comply",
+        "type": "process",
+        "title": "第6号適合",
+        "process_type": "mechanical",
+        "description": "日影制限が第6号に適合"
+      },
+      {
+        "id": "dec-final-judgment",
+        "type": "decision",
+        "title": "適用される全ての制限事項に適合したか？",
+        "decision_type": "binary",
+        "description": "適用される各号の基準に全て適合しているかを最終確認"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令第136条の2の9第1項に適合"
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "令第136条の2の9第1項に不適合"
+      },
+      {
+        "id": "end-not-applicable",
+        "type": "terminal",
+        "title": "適用なし",
+        "result": "pass",
+        "description": "法第68条の9第1項に基づく条例が存在しないため適用対象外"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "proc-ordinance-check",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "proc-ordinance-check",
+        "to": "dec-ordinance-exists",
+        "role": "flow"
+      },
+      {
+        "id": "e03",
+        "from": "dec-ordinance-exists",
+        "to": "proc-applicable-items",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e04",
+        "from": "dec-ordinance-exists",
+        "to": "end-not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e05",
+        "from": "proc-applicable-items",
+        "to": "dec-has-applicable-items",
+        "role": "flow"
+      },
+      {
+        "id": "e06",
+        "from": "dec-has-applicable-items",
+        "to": "dec-item1-applicable",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e07",
+        "from": "dec-has-applicable-items",
+        "to": "end-pass",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e08",
+        "from": "dec-item1-applicable",
+        "to": "proc-item1-check",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e09",
+        "from": "dec-item1-applicable",
+        "to": "dec-item2-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e10",
+        "from": "proc-item1-check",
+        "to": "dec-item1-judgment",
+        "role": "flow"
+      },
+      {
+        "id": "e11",
+        "from": "dec-item1-judgment",
+        "to": "proc-item1-comply",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e12",
+        "from": "dec-item1-judgment",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e13",
+        "from": "proc-item1-comply",
+        "to": "dec-item2-applicable",
+        "role": "flow"
+      },
+      {
+        "id": "e14",
+        "from": "dec-item2-applicable",
+        "to": "proc-item2-check",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e15",
+        "from": "dec-item2-applicable",
+        "to": "dec-item3-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e16",
+        "from": "proc-item2-check",
+        "to": "dec-item2-judgment",
+        "role": "flow"
+      },
+      {
+        "id": "e17",
+        "from": "dec-item2-judgment",
+        "to": "proc-item2-comply",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e18",
+        "from": "dec-item2-judgment",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e19",
+        "from": "proc-item2-comply",
+        "to": "dec-item3-applicable",
+        "role": "flow"
+      },
+      {
+        "id": "e20",
+        "from": "dec-item3-applicable",
+        "to": "proc-item3-check",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e21",
+        "from": "dec-item3-applicable",
+        "to": "dec-item4-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e22",
+        "from": "proc-item3-check",
+        "to": "dec-item3-judgment",
+        "role": "flow"
+      },
+      {
+        "id": "e23",
+        "from": "dec-item3-judgment",
+        "to": "proc-item3-comply",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e24",
+        "from": "dec-item3-judgment",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e25",
+        "from": "proc-item3-comply",
+        "to": "dec-item4-applicable",
+        "role": "flow"
+      },
+      {
+        "id": "e26",
+        "from": "dec-item4-applicable",
+        "to": "proc-item4-check",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e27",
+        "from": "dec-item4-applicable",
+        "to": "dec-item5-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e28",
+        "from": "proc-item4-check",
+        "to": "dec-item4-judgment",
+        "role": "flow"
+      },
+      {
+        "id": "e29",
+        "from": "dec-item4-judgment",
+        "to": "proc-item4-comply",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e30",
+        "from": "dec-item4-judgment",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e31",
+        "from": "proc-item4-comply",
+        "to": "dec-item5-applicable",
+        "role": "flow"
+      },
+      {
+        "id": "e32",
+        "from": "dec-item5-applicable",
+        "to": "proc-item5-check",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e33",
+        "from": "dec-item5-applicable",
+        "to": "dec-item6-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e34",
+        "from": "proc-item5-check",
+        "to": "dec-item5-judgment",
+        "role": "flow"
+      },
+      {
+        "id": "e35",
+        "from": "dec-item5-judgment",
+        "to": "proc-item5-comply",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e36",
+        "from": "dec-item5-judgment",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e37",
+        "from": "proc-item5-comply",
+        "to": "dec-item6-applicable",
+        "role": "flow"
+      },
+      {
+        "id": "e38",
+        "from": "dec-item6-applicable",
+        "to": "proc-item6-check",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e39",
+        "from": "dec-item6-applicable",
+        "to": "dec-final-judgment",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e40",
+        "from": "proc-item6-check",
+        "to": "dec-item6-judgment",
+        "role": "flow"
+      },
+      {
+        "id": "e41",
+        "from": "dec-item6-judgment",
+        "to": "proc-item6-comply",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e42",
+        "from": "dec-item6-judgment",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e43",
+        "from": "proc-item6-comply",
+        "to": "dec-final-judgment",
+        "role": "flow"
+      },
+      {
+        "id": "e44",
+        "from": "dec-final-judgment",
+        "to": "end-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e45",
+        "from": "dec-final-judgment",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-ORDER-A136-2-9-P1",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": [
+        "A68_9:P1"
+      ],
+      "description": "法第68条の9第1項の都道府県知事指定区域内の建築物に対する制限"
+    },
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": [
+        "A43",
+        "A44",
+        "A45",
+        "A52",
+        "A53",
+        "A56",
+        "A56_2"
+      ],
+      "description": "各号で参照される法の基準規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

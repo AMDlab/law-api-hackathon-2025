@@ -1,0 +1,539 @@
+{
+  "id": "A73_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "鉄筋の定着 適合判定フロー",
+    "target_subject": "鉄筋",
+    "description": "鉄筋の末端がかぎ状に折り曲げられ、コンクリートから抜け出ないように定着されていることを判定するフロー"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "73",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造"
+  ],
+  "text_raw": "鉄筋の末端は、かぎ状に折り曲げて、コンクリートから抜け出ないように定着しなければならない。ただし、次の各号に掲げる部分以外の部分に使用する異形鉄筋にあつては、その末端を折り曲げないことができる。一 柱及びはり（基礎ばりを除く。）の出すみ部分 二 煙突",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "structure",
+          "value": "鉄筋コンクリート造"
+        }
+      ],
+      "note": "鉄筋コンクリート造の建築物における鉄筋"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "note": "本文適用: かぎ状に折り曲げて定着",
+          "ref": "info-hook-anchored",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "note": "ただし書き適用: 異形鉄筋で指定部位以外",
+          "operator": "AND",
+          "conditions": [
+            {
+              "ref": "info-deformed-bar",
+              "operator": "==",
+              "value": true
+            },
+            {
+              "ref": "info-specified-location",
+              "operator": "==",
+              "value": false
+            }
+          ]
+        }
+      ]
+    },
+    "exceptions": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "note": "異形鉄筋であること",
+          "ref": "info-deformed-bar",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "note": "各号に掲げる部分以外の部分であること",
+          "ref": "info-specified-location",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "effect": "折り曲げ省略可"
+    }
+  },
+  "flow_diagram": {
+    "title": "令第73条第1項 鉄筋の定着 適合判定フロー",
+    "description": "各鉄筋について、本文要件（かぎ状折り曲げ+定着）を満たすか、またはただし書きによる省略が可能かを判定する",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "鉄筋の定着に関する適合判定を開始"
+      },
+      {
+        "id": "proc-identify-rebar",
+        "type": "process",
+        "title": "判定対象鉄筋の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から判定対象となる建築物の鉄筋を特定する"
+      },
+      {
+        "id": "dec-rebar-exists",
+        "type": "decision",
+        "title": "判定対象の鉄筋があるか？",
+        "decision_type": "binary",
+        "description": "判定対象となる鉄筋が残っているかを確認"
+      },
+      {
+        "id": "proc-select-rebar",
+        "type": "process",
+        "title": "鉄筋を1本選択",
+        "process_type": "mechanical",
+        "description": "未判定の鉄筋を1本選択して個別判定を行う"
+      },
+      {
+        "id": "dec-rebar-type",
+        "type": "decision",
+        "title": "鉄筋の種類は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "異形鉄筋", "description": "表面に節のある鉄筋（D10、D13等）" },
+          { "value": "丸鋼", "description": "表面が平滑な円形断面の鉄筋" }
+        ],
+        "description": "設計図書等から当該鉄筋が異形鉄筋か丸鋼かを特定"
+      },
+      {
+        "id": "proc-deformed-bar",
+        "type": "process",
+        "title": "異形鉄筋として記録",
+        "process_type": "mechanical",
+        "description": "当該鉄筋が異形鉄筋であることを記録"
+      },
+      {
+        "id": "proc-round-bar",
+        "type": "process",
+        "title": "丸鋼として記録",
+        "process_type": "mechanical",
+        "description": "当該鉄筋が丸鋼であることを記録（折り曲げ省略不可）"
+      },
+      {
+        "id": "dec-location",
+        "type": "decision",
+        "title": "鉄筋の使用部位は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "柱・はりの出すみ部分", "description": "柱及びはり（基礎ばりを除く）の出すみ部分（第1号）" },
+          { "value": "煙突", "description": "煙突（第2号）" },
+          { "value": "その他の部分", "description": "上記以外の部分" }
+        ],
+        "description": "設計図書等から当該鉄筋の使用部位を特定"
+      },
+      {
+        "id": "proc-item1-match",
+        "type": "process",
+        "title": "第1号該当（柱・はり出すみ）",
+        "process_type": "mechanical",
+        "description": "柱及びはり（基礎ばりを除く）の出すみ部分に使用される鉄筋として記録"
+      },
+      {
+        "id": "proc-item2-match",
+        "type": "process",
+        "title": "第2号該当（煙突）",
+        "process_type": "mechanical",
+        "description": "煙突に使用される鉄筋として記録"
+      },
+      {
+        "id": "proc-other-location",
+        "type": "process",
+        "title": "各号以外の部分として記録",
+        "process_type": "mechanical",
+        "description": "各号に掲げる部分以外の部分に使用される鉄筋として記録"
+      },
+      {
+        "id": "dec-specified-location",
+        "type": "decision",
+        "title": "各号に掲げる部分に該当するか？",
+        "decision_type": "binary",
+        "description": "第1号（柱・はりの出すみ部分）または第2号（煙突）に該当するかを判定"
+      },
+      {
+        "id": "dec-is-deformed-bar",
+        "type": "decision",
+        "title": "異形鉄筋か？",
+        "decision_type": "binary",
+        "description": "当該鉄筋が異形鉄筋であるかを確認（折り曲げ省略可否判定用）"
+      },
+      {
+        "id": "proc-exempt-confirmed",
+        "type": "process",
+        "title": "折り曲げ省略可として記録",
+        "process_type": "mechanical",
+        "description": "ただし書きにより末端の折り曲げを省略できることを記録"
+      },
+      {
+        "id": "dec-hook-shape",
+        "type": "decision",
+        "title": "末端がかぎ状に折り曲げられているか？",
+        "decision_type": "binary",
+        "description": "設計図書等から鉄筋の末端がかぎ状に折り曲げられているかを確認"
+      },
+      {
+        "id": "proc-hook-confirmed",
+        "type": "process",
+        "title": "かぎ状折り曲げ確認済み",
+        "process_type": "human_judgment",
+        "description": "末端がかぎ状に折り曲げられていることを確認"
+      },
+      {
+        "id": "dec-anchored",
+        "type": "decision",
+        "title": "コンクリートから抜け出ないように定着されているか？",
+        "decision_type": "binary",
+        "description": "設計図書等から鉄筋がコンクリートに適切に定着されているかを確認"
+      },
+      {
+        "id": "proc-anchored-confirmed",
+        "type": "process",
+        "title": "定着状況確認済み",
+        "process_type": "human_judgment",
+        "description": "コンクリートから抜け出ないように定着されていることを確認"
+      },
+      {
+        "id": "dec-main-rule-satisfied",
+        "type": "decision",
+        "title": "本文要件を満たすか？",
+        "decision_type": "binary",
+        "description": "かぎ状折り曲げかつ定着の両方を満たすかを判定（H AND A）"
+      },
+      {
+        "id": "proc-main-rule-pass",
+        "type": "process",
+        "title": "本文要件適合",
+        "process_type": "mechanical",
+        "description": "本文の要件（かぎ状に折り曲げて定着）を満たすことを記録"
+      },
+      {
+        "id": "dec-rebar-compliance",
+        "type": "decision",
+        "title": "当該鉄筋は適合か？",
+        "decision_type": "binary",
+        "description": "本文要件適合または折り曲げ省略可のいずれかを満たすか（M OR X）"
+      },
+      {
+        "id": "proc-rebar-pass",
+        "type": "process",
+        "title": "当該鉄筋適合",
+        "process_type": "mechanical",
+        "description": "当該鉄筋が令73条1項に適合することを記録"
+      },
+      {
+        "id": "proc-rebar-fail",
+        "type": "process",
+        "title": "当該鉄筋不適合",
+        "process_type": "mechanical",
+        "description": "当該鉄筋が令73条1項に不適合であることを記録"
+      },
+      {
+        "id": "dec-all-checked",
+        "type": "decision",
+        "title": "全鉄筋の判定が完了したか？",
+        "decision_type": "binary",
+        "description": "建築物の全ての鉄筋について判定が完了したかを確認"
+      },
+      {
+        "id": "dec-all-pass",
+        "type": "decision",
+        "title": "全鉄筋が適合か？",
+        "decision_type": "binary",
+        "description": "全ての鉄筋が令73条1項に適合しているかを確認"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "全ての鉄筋が令73条1項に適合"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "令73条1項に不適合の鉄筋が存在"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "proc-identify-rebar",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "proc-identify-rebar",
+        "to": "dec-rebar-exists",
+        "role": "flow"
+      },
+      {
+        "id": "e03",
+        "from": "dec-rebar-exists",
+        "to": "proc-select-rebar",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e04",
+        "from": "dec-rebar-exists",
+        "to": "pass",
+        "role": "no",
+        "label": "いいえ（鉄筋なし）"
+      },
+      {
+        "id": "e05",
+        "from": "proc-select-rebar",
+        "to": "dec-rebar-type",
+        "role": "flow"
+      },
+      {
+        "id": "e06",
+        "from": "dec-rebar-type",
+        "to": "proc-deformed-bar",
+        "role": "option",
+        "label": "異形鉄筋"
+      },
+      {
+        "id": "e07",
+        "from": "dec-rebar-type",
+        "to": "proc-round-bar",
+        "role": "option",
+        "label": "丸鋼"
+      },
+      {
+        "id": "e08",
+        "from": "proc-deformed-bar",
+        "to": "dec-location",
+        "role": "flow"
+      },
+      {
+        "id": "e09",
+        "from": "proc-round-bar",
+        "to": "dec-location",
+        "role": "flow"
+      },
+      {
+        "id": "e10",
+        "from": "dec-location",
+        "to": "proc-item1-match",
+        "role": "option",
+        "label": "柱・はりの出すみ部分"
+      },
+      {
+        "id": "e11",
+        "from": "dec-location",
+        "to": "proc-item2-match",
+        "role": "option",
+        "label": "煙突"
+      },
+      {
+        "id": "e12",
+        "from": "dec-location",
+        "to": "proc-other-location",
+        "role": "option",
+        "label": "その他の部分"
+      },
+      {
+        "id": "e13",
+        "from": "proc-item1-match",
+        "to": "dec-specified-location",
+        "role": "flow"
+      },
+      {
+        "id": "e14",
+        "from": "proc-item2-match",
+        "to": "dec-specified-location",
+        "role": "flow"
+      },
+      {
+        "id": "e15",
+        "from": "proc-other-location",
+        "to": "dec-specified-location",
+        "role": "flow"
+      },
+      {
+        "id": "e16",
+        "from": "dec-specified-location",
+        "to": "dec-hook-shape",
+        "role": "yes",
+        "label": "はい（各号該当）"
+      },
+      {
+        "id": "e17",
+        "from": "dec-specified-location",
+        "to": "dec-is-deformed-bar",
+        "role": "no",
+        "label": "いいえ（各号以外）"
+      },
+      {
+        "id": "e18",
+        "from": "dec-is-deformed-bar",
+        "to": "proc-exempt-confirmed",
+        "role": "yes",
+        "label": "はい（異形鉄筋）"
+      },
+      {
+        "id": "e19",
+        "from": "dec-is-deformed-bar",
+        "to": "dec-hook-shape",
+        "role": "no",
+        "label": "いいえ（丸鋼）"
+      },
+      {
+        "id": "e20",
+        "from": "proc-exempt-confirmed",
+        "to": "proc-rebar-pass",
+        "role": "flow"
+      },
+      {
+        "id": "e21",
+        "from": "dec-hook-shape",
+        "to": "proc-hook-confirmed",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e22",
+        "from": "dec-hook-shape",
+        "to": "proc-rebar-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e23",
+        "from": "proc-hook-confirmed",
+        "to": "dec-anchored",
+        "role": "flow"
+      },
+      {
+        "id": "e24",
+        "from": "dec-anchored",
+        "to": "proc-anchored-confirmed",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e25",
+        "from": "dec-anchored",
+        "to": "proc-rebar-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e26",
+        "from": "proc-anchored-confirmed",
+        "to": "dec-main-rule-satisfied",
+        "role": "flow"
+      },
+      {
+        "id": "e27",
+        "from": "dec-main-rule-satisfied",
+        "to": "proc-main-rule-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e28",
+        "from": "dec-main-rule-satisfied",
+        "to": "proc-rebar-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e29",
+        "from": "proc-main-rule-pass",
+        "to": "dec-rebar-compliance",
+        "role": "flow"
+      },
+      {
+        "id": "e30",
+        "from": "dec-rebar-compliance",
+        "to": "proc-rebar-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e31",
+        "from": "dec-rebar-compliance",
+        "to": "proc-rebar-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e32",
+        "from": "proc-rebar-pass",
+        "to": "dec-all-checked",
+        "role": "flow"
+      },
+      {
+        "id": "e33",
+        "from": "proc-rebar-fail",
+        "to": "fail",
+        "role": "flow"
+      },
+      {
+        "id": "e34",
+        "from": "dec-all-checked",
+        "to": "dec-rebar-exists",
+        "role": "no",
+        "label": "いいえ（次の鉄筋へ）"
+      },
+      {
+        "id": "e35",
+        "from": "dec-all-checked",
+        "to": "dec-all-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e36",
+        "from": "dec-all-pass",
+        "to": "pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e37",
+        "from": "dec-all-pass",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSLR-A73-P1",
+  "metadata": {
+    "created_at": "2026-01-26T12:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

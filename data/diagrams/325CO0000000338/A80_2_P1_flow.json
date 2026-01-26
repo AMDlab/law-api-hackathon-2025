@@ -1,0 +1,265 @@
+{
+  "id": "A80_2_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "構造方法に関する補則",
+    "target_subject": "建築物又は建築物の構造部分",
+    "description": "国土交通大臣が定めた技術的基準に従った構造であるかを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "80_2",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造",
+    "技術的基準"
+  ],
+  "text_raw": "第三節から前節までに定めるもののほか、国土交通大臣が、次の各号に掲げる建築物又は建築物の構造部分の構造方法に関し、安全上必要な技術的基準を定めた場合においては、それらの建築物又は建築物の構造部分は、その技術的基準に従つた構造としなければならない。一 木造、組積造、補強コンクリートブロック造、鉄骨造、鉄筋コンクリート造、鉄骨鉄筋コンクリート造又は無筋コンクリート造の建築物又は建築物の構造部分で、特殊の構造方法によるもの　二 木造、組積造、補強コンクリートブロック造、鉄骨造、鉄筋コンクリート造、鉄骨鉄筋コンクリート造及び無筋コンクリート造以外の建築物又は建築物の構造部分",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "ministerial_standard",
+          "value": "国土交通大臣が安全上必要な技術的基準を定めている場合"
+        }
+      ],
+      "note": "本条は国土交通大臣が技術的基準を定めている場合にのみ適用される"
+    },
+    "judgment_rule": {
+      "operator": "IMPLIES",
+      "conditions": [
+        {
+          "ref": "info-subject-category",
+          "operator": "IN",
+          "value": ["第1号該当", "第2号該当"]
+        }
+      ],
+      "consequence": {
+        "ref": "info-standard-compliance",
+        "operator": "==",
+        "value": true
+      }
+    },
+    "exceptions": null
+  },
+  "flow_diagram": {
+    "title": "令第80条の2第1項 適合判定フロー",
+    "description": "構造方法に関する補則の適合判定フローチャート",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "令第80条の2第1項の適合判定を開始"
+      },
+      {
+        "id": "proc-structure-type-identify",
+        "type": "process",
+        "title": "構造種別の特定",
+        "process_type": "undefined_input",
+        "description": "建築物又は構造部分の構造種別を設計図書等から特定する"
+      },
+      {
+        "id": "dec-structure-type",
+        "type": "decision",
+        "title": "構造種別は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "一般構造種別", "description": "木造、組積造、補強コンクリートブロック造、鉄骨造、鉄筋コンクリート造、鉄骨鉄筋コンクリート造、無筋コンクリート造" },
+          { "value": "その他の構造", "description": "上記以外の構造種別" }
+        ],
+        "description": "構造種別が一般構造種別かその他か判定",
+        "condition": {
+          "operator": "IN",
+          "lhs": { "var": "S", "desc": "構造種別" },
+          "rhs": { "value": ["木造", "組積造", "補強コンクリートブロック造", "鉄骨造", "鉄筋コンクリート造", "鉄骨鉄筋コンクリート造", "無筋コンクリート造"], "desc": "一般構造種別" }
+        }
+      },
+      {
+        "id": "proc-special-method-identify",
+        "type": "process",
+        "title": "特殊構造方法の確認",
+        "process_type": "undefined_input",
+        "description": "一般構造種別において特殊の構造方法を採用しているか確認する"
+      },
+      {
+        "id": "dec-special-method",
+        "type": "decision",
+        "title": "特殊の構造方法を採用しているか？",
+        "decision_type": "binary",
+        "description": "通常の構造方法ではなく特殊の構造方法を採用しているか判定",
+        "condition": {
+          "operator": "EQ",
+          "lhs": { "var": "M", "desc": "特殊の構造方法の採用" },
+          "rhs": { "value": true, "desc": "採用している" }
+        }
+      },
+      {
+        "id": "info-item1",
+        "type": "information",
+        "title": "第1号該当",
+        "symbol": "C1",
+        "subject": "建築物又は構造部分",
+        "property": "該当号区分",
+        "property_type": "classification",
+        "description": "一般構造種別で特殊の構造方法を採用：第1号に該当"
+      },
+      {
+        "id": "info-item2",
+        "type": "information",
+        "title": "第2号該当",
+        "symbol": "C2",
+        "subject": "建築物又は構造部分",
+        "property": "該当号区分",
+        "property_type": "classification",
+        "description": "一般構造種別以外の構造：第2号に該当"
+      },
+      {
+        "id": "proc-standard-compliance-check",
+        "type": "process",
+        "title": "技術的基準適合判定",
+        "process_type": "human_judgment",
+        "description": "国土交通大臣が定めた技術的基準に従った構造であるかを確認する"
+      },
+      {
+        "id": "dec-standard-compliance",
+        "type": "decision",
+        "title": "技術的基準に適合するか？",
+        "decision_type": "binary",
+        "description": "国土交通大臣が定めた安全上必要な技術的基準に適合するか判定",
+        "condition": {
+          "operator": "EQ",
+          "lhs": { "var": "T", "desc": "技術的基準適合" },
+          "rhs": { "value": true, "desc": "適合" }
+        }
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令第80条の2第1項に適合"
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "令第80条の2第1項に不適合（技術的基準に従っていない）"
+      },
+      {
+        "id": "end-not-applicable",
+        "type": "terminal",
+        "title": "適用除外",
+        "result": "pass",
+        "description": "本条の適用対象外（一般構造種別で特殊構造方法を採用していない）"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "proc-structure-type-identify",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "proc-structure-type-identify",
+        "to": "dec-structure-type",
+        "role": "flow"
+      },
+      {
+        "id": "e03",
+        "from": "dec-structure-type",
+        "to": "proc-special-method-identify",
+        "role": "option",
+        "label": "一般構造種別"
+      },
+      {
+        "id": "e04",
+        "from": "dec-structure-type",
+        "to": "info-item2",
+        "role": "option",
+        "label": "その他の構造"
+      },
+      {
+        "id": "e05",
+        "from": "proc-special-method-identify",
+        "to": "dec-special-method",
+        "role": "flow"
+      },
+      {
+        "id": "e06",
+        "from": "dec-special-method",
+        "to": "info-item1",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e07",
+        "from": "dec-special-method",
+        "to": "end-not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e08",
+        "from": "info-item1",
+        "to": "proc-standard-compliance-check",
+        "role": "flow"
+      },
+      {
+        "id": "e09",
+        "from": "info-item2",
+        "to": "proc-standard-compliance-check",
+        "role": "flow"
+      },
+      {
+        "id": "e10",
+        "from": "proc-standard-compliance-check",
+        "to": "dec-standard-compliance",
+        "role": "flow"
+      },
+      {
+        "id": "e11",
+        "from": "dec-standard-compliance",
+        "to": "end-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e12",
+        "from": "dec-standard-compliance",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-ORDER-A80_2-P1",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": ["A20"],
+      "description": "法第20条の構造耐力規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

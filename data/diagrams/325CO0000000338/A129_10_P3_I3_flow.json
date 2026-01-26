@@ -1,0 +1,283 @@
+{
+  "id": "FLOW-BSL-ORDER-A129_10-P3-I3",
+  "version": "3.2",
+  "page_title": {
+    "title": "非常連絡装置の設置",
+    "target_subject": "エレベーター",
+    "description": "停電等の非常の場合においてかご内からかご外に連絡することができる装置の適合判定フロー"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "129_10",
+    "paragraph": "3",
+    "item": "3"
+  },
+  "labels": [
+    "単体規定",
+    "設備",
+    "エレベーター",
+    "安全装置"
+  ],
+  "text_raw": "停電等の非常の場合においてかご内からかご外に連絡することができる装置",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "equipment",
+          "value": "エレベーター"
+        }
+      ],
+      "note": "エレベーターに設ける安全装置"
+    },
+    "judgment_rule": {
+      "operator": "==",
+      "lhs": {
+        "ref": "info-device-installed"
+      },
+      "rhs": {
+        "value": true
+      }
+    },
+    "exceptions": null
+  },
+  "flow_diagram": {
+    "title": "令第129条の10第3項第3号 非常連絡装置の設置 適合判定フロー",
+    "description": "エレベーターに停電等の非常の場合においてかご内からかご外に連絡することができる装置が設けられているかを判定する",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "令第129条の10第3項第3号の適合判定を開始"
+      },
+      {
+        "id": "dec-elevator-exists",
+        "type": "decision",
+        "title": "エレベーターがあるか？",
+        "decision_type": "binary",
+        "description": "建築物にエレベーターが設けられているか",
+        "condition": {
+          "operator": "GT",
+          "lhs": {
+            "var": "elevator_count",
+            "desc": "エレベーターの台数"
+          },
+          "rhs": {
+            "value": 0
+          }
+        }
+      },
+      {
+        "id": "proc-init-loop",
+        "type": "process",
+        "title": "未確認エレベーターリスト作成",
+        "process_type": "mechanical",
+        "description": "全エレベーターを未確認リストに登録"
+      },
+      {
+        "id": "dec-remaining-elevator",
+        "type": "decision",
+        "title": "未確認のエレベーターがあるか？",
+        "decision_type": "binary",
+        "description": "まだ確認していないエレベーターが残っているか"
+      },
+      {
+        "id": "proc-select-elevator",
+        "type": "process",
+        "title": "エレベーターを1台選択",
+        "process_type": "mechanical",
+        "description": "未確認リストから1台のエレベーターを選択"
+      },
+      {
+        "id": "dec-device-installed",
+        "type": "decision",
+        "title": "非常連絡装置が設けられているか？",
+        "decision_type": "binary",
+        "description": "当該エレベーターに停電等の非常の場合においてかご内からかご外に連絡することができる装置が設けられているか",
+        "condition": {
+          "operator": "EQ",
+          "lhs": {
+            "var": "emergency_device_installed",
+            "desc": "非常連絡装置の設置有無"
+          },
+          "rhs": {
+            "value": true
+          }
+        }
+      },
+      {
+        "id": "proc-mark-compliant",
+        "type": "process",
+        "title": "当該エレベーター: 適合",
+        "process_type": "mechanical",
+        "description": "当該エレベーターを確認済み（適合）としてマーク"
+      },
+      {
+        "id": "proc-mark-non-compliant",
+        "type": "process",
+        "title": "当該エレベーター: 不適合",
+        "process_type": "mechanical",
+        "description": "当該エレベーターを確認済み（不適合）としてマーク"
+      },
+      {
+        "id": "dec-all-compliant",
+        "type": "decision",
+        "title": "全エレベーターが適合か？",
+        "decision_type": "binary",
+        "description": "確認済みの全エレベーターについて非常連絡装置が設けられているか（ALL(D)の判定）",
+        "condition": {
+          "operator": "EQ",
+          "lhs": {
+            "var": "all_elevators_compliant",
+            "desc": "全エレベーター適合フラグ"
+          },
+          "rhs": {
+            "value": true
+          }
+        }
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令第129条の10第3項第3号に適合（全エレベーターに非常連絡装置あり）",
+        "related_articles": ["令129_10:P3:I3"]
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "令第129条の10第3項第3号に不適合（非常連絡装置のないエレベーターあり）",
+        "related_articles": ["令129_10:P3:I3"]
+      },
+      {
+        "id": "end-na",
+        "type": "terminal",
+        "title": "対象外",
+        "result": "end",
+        "description": "エレベーターがないため本号の適用対象外"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-elevator-exists",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-elevator-exists",
+        "to": "proc-init-loop",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "dec-elevator-exists",
+        "to": "end-na",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e04",
+        "from": "proc-init-loop",
+        "to": "dec-remaining-elevator",
+        "role": "flow"
+      },
+      {
+        "id": "e05",
+        "from": "dec-remaining-elevator",
+        "to": "proc-select-elevator",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e06",
+        "from": "dec-remaining-elevator",
+        "to": "dec-all-compliant",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e07",
+        "from": "proc-select-elevator",
+        "to": "dec-device-installed",
+        "role": "flow"
+      },
+      {
+        "id": "e08",
+        "from": "dec-device-installed",
+        "to": "proc-mark-compliant",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e09",
+        "from": "dec-device-installed",
+        "to": "proc-mark-non-compliant",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e10",
+        "from": "proc-mark-compliant",
+        "to": "dec-remaining-elevator",
+        "role": "flow"
+      },
+      {
+        "id": "e11",
+        "from": "proc-mark-non-compliant",
+        "to": "dec-remaining-elevator",
+        "role": "flow"
+      },
+      {
+        "id": "e12",
+        "from": "dec-all-compliant",
+        "to": "end-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e13",
+        "from": "dec-all-compliant",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-ORDER-A129_10-P3-I3",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": ["A36"],
+      "description": "法第36条による政令への委任（昇降機の構造規定）"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": ["A129_10:P3"],
+      "description": "第3項本文（エレベーターの安全装置の設置義務）"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}
