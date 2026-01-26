@@ -1,0 +1,632 @@
+{
+  "id": "A136_2_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "防火地域・準防火地域内の建築物の技術的基準",
+    "target_subject": "建築物",
+    "description": "法第61条第1項の政令で定める技術的基準を、建築物の区分に応じて判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "136の2",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "集団規定",
+    "防火地域",
+    "準防火地域",
+    "技術的基準"
+  ],
+  "text_raw": "法第六十一条第一項の政令で定める技術的基準は、次の各号に掲げる建築物の区分に応じ、当該各号に定めるものとする。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "防火地域内"
+        },
+        {
+          "type": "location",
+          "value": "準防火地域内"
+        }
+      ],
+      "note": "都市計画区域情報（防火地域・準防火地域）は公共データとして[処理]に含まれる"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-category-determined",
+          "description": "建築物の区分が特定されていること"
+        },
+        {
+          "ref": "info-item-compliance",
+          "description": "該当する号の基準に適合すること"
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "flow_diagram": {
+    "title": "令136条の2第1項 技術的基準適合判定フロー",
+    "description": "防火地域・準防火地域内の建築物について、該当する号の基準適合を判定するフロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "令136条の2第1項の技術的基準適合判定を開始"
+      },
+      {
+        "id": "dec-fire-zone",
+        "type": "decision",
+        "title": "防火地域区分は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "防火地域", "description": "防火地域内に所在" },
+          { "value": "準防火地域", "description": "準防火地域内に所在" },
+          { "value": "指定なし", "description": "防火地域・準防火地域の指定がない" }
+        ],
+        "description": "都市計画情報から防火地域区分を判定する"
+      },
+      {
+        "id": "dec-bouka-stories",
+        "type": "decision",
+        "title": "階数は3以上か？",
+        "decision_type": "binary",
+        "description": "防火地域内の建築物の階数が3以上かを判定",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "N", "desc": "階数" },
+          "rhs": { "value": 3 }
+        }
+      },
+      {
+        "id": "dec-bouka-area",
+        "type": "decision",
+        "title": "延べ面積は100m2超か？",
+        "decision_type": "binary",
+        "description": "防火地域内の建築物の延べ面積が100m2超かを判定",
+        "condition": {
+          "operator": "GT",
+          "lhs": { "var": "A", "desc": "延べ面積" },
+          "rhs": { "value": 100, "unit": "m2" }
+        }
+      },
+      {
+        "id": "proc-item1-bouka",
+        "type": "process",
+        "title": "第1号該当（防火地域）",
+        "process_type": "mechanical",
+        "description": "防火地域内で階数3以上または延べ面積100m2超の建築物として第1号に該当"
+      },
+      {
+        "id": "proc-item2-bouka",
+        "type": "process",
+        "title": "第2号該当（防火地域）",
+        "process_type": "mechanical",
+        "description": "防火地域内で階数2以下かつ延べ面積100m2以下の建築物として第2号に該当"
+      },
+      {
+        "id": "dec-junbouka-stories4",
+        "type": "decision",
+        "title": "階数は4以上か？",
+        "decision_type": "binary",
+        "description": "準防火地域内の建築物の階数が4以上かを判定",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "N", "desc": "階数" },
+          "rhs": { "value": 4 }
+        }
+      },
+      {
+        "id": "dec-junbouka-area1500",
+        "type": "decision",
+        "title": "延べ面積は1500m2超か？",
+        "decision_type": "binary",
+        "description": "準防火地域内の建築物の延べ面積が1500m2超かを判定",
+        "condition": {
+          "operator": "GT",
+          "lhs": { "var": "A", "desc": "延べ面積" },
+          "rhs": { "value": 1500, "unit": "m2" }
+        }
+      },
+      {
+        "id": "proc-item1-junbouka",
+        "type": "process",
+        "title": "第1号該当（準防火地域）",
+        "process_type": "mechanical",
+        "description": "準防火地域内で階数4以上または延べ面積1500m2超の建築物として第1号に該当"
+      },
+      {
+        "id": "dec-junbouka-stories3",
+        "type": "decision",
+        "title": "階数は3か？",
+        "decision_type": "binary",
+        "description": "準防火地域内の建築物の階数が3かを判定",
+        "condition": {
+          "operator": "EQ",
+          "lhs": { "var": "N", "desc": "階数" },
+          "rhs": { "value": 3 }
+        }
+      },
+      {
+        "id": "proc-item2-junbouka-3f",
+        "type": "process",
+        "title": "第2号該当（準防火地域・3階）",
+        "process_type": "mechanical",
+        "description": "準防火地域内で階数3かつ延べ面積1500m2以下の建築物として第2号に該当"
+      },
+      {
+        "id": "dec-junbouka-area500",
+        "type": "decision",
+        "title": "延べ面積は500m2超か？",
+        "decision_type": "binary",
+        "description": "準防火地域内で階数2以下の建築物の延べ面積が500m2超かを判定",
+        "condition": {
+          "operator": "GT",
+          "lhs": { "var": "A", "desc": "延べ面積" },
+          "rhs": { "value": 500, "unit": "m2" }
+        }
+      },
+      {
+        "id": "proc-item2-junbouka-area",
+        "type": "process",
+        "title": "第2号該当（準防火地域・500m2超）",
+        "process_type": "mechanical",
+        "description": "準防火地域内で階数2以下かつ延べ面積500m2超1500m2以下の建築物として第2号に該当"
+      },
+      {
+        "id": "dec-wooden",
+        "type": "decision",
+        "title": "木造建築物等に該当するか？",
+        "decision_type": "binary",
+        "description": "木造建築物等に該当するか判定",
+        "condition": {
+          "operator": "EQ",
+          "lhs": { "var": "W", "desc": "木造建築物等該当" },
+          "rhs": { "value": true }
+        }
+      },
+      {
+        "id": "proc-item3",
+        "type": "process",
+        "title": "第3号該当",
+        "process_type": "mechanical",
+        "description": "準防火地域内で階数2以下、延べ面積500m2以下の木造建築物等として第3号に該当"
+      },
+      {
+        "id": "proc-item4",
+        "type": "process",
+        "title": "第4号該当",
+        "process_type": "mechanical",
+        "description": "準防火地域内で階数2以下、延べ面積500m2以下の木造建築物等以外として第4号に該当"
+      },
+      {
+        "id": "dec-gate-fence",
+        "type": "decision",
+        "title": "高さ2m超の門又は塀があるか？",
+        "decision_type": "binary",
+        "description": "高さ2mを超える門又は塀の有無を判定",
+        "condition": {
+          "operator": "EQ",
+          "lhs": { "var": "G", "desc": "高さ2m超の門・塀" },
+          "rhs": { "value": true }
+        }
+      },
+      {
+        "id": "dec-gate-zone",
+        "type": "decision",
+        "title": "門・塀の防火規制は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "防火地域", "description": "防火地域内の門・塀" },
+          { "value": "準防火地域・木造", "description": "準防火地域内の木造建築物等に附属する門・塀" },
+          { "value": "該当なし", "description": "第5号の対象外" }
+        ],
+        "description": "門・塀が第5号の対象となるか判定"
+      },
+      {
+        "id": "proc-item5",
+        "type": "process",
+        "title": "第5号該当",
+        "process_type": "mechanical",
+        "description": "高さ2m超の門又は塀として第5号に該当"
+      },
+      {
+        "id": "dec-category",
+        "type": "decision",
+        "title": "該当号は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "第1号", "description": "耐火建築物等" },
+          { "value": "第2号", "description": "耐火建築物等又は準耐火建築物等" },
+          { "value": "第3号", "description": "木造建築物等の外壁等" },
+          { "value": "第4号", "description": "木造建築物等以外の外壁等" },
+          { "value": "第5号", "description": "門又は塀" }
+        ],
+        "description": "判定された該当号を確認"
+      },
+      {
+        "id": "proc-item1-check",
+        "type": "process",
+        "title": "第1号基準適合確認",
+        "process_type": "sub_diagram_reference",
+        "description": "第1号の基準（耐火建築物等）への適合を確認"
+      },
+      {
+        "id": "proc-item2-check",
+        "type": "process",
+        "title": "第2号基準適合確認",
+        "process_type": "sub_diagram_reference",
+        "description": "第2号の基準（耐火建築物等又は準耐火建築物等）への適合を確認"
+      },
+      {
+        "id": "proc-item3-check",
+        "type": "process",
+        "title": "第3号基準適合確認",
+        "process_type": "sub_diagram_reference",
+        "description": "第3号の基準（木造建築物等の外壁等）への適合を確認"
+      },
+      {
+        "id": "proc-item4-check",
+        "type": "process",
+        "title": "第4号基準適合確認",
+        "process_type": "sub_diagram_reference",
+        "description": "第4号の基準（木造建築物等以外の外壁等）への適合を確認"
+      },
+      {
+        "id": "proc-item5-check",
+        "type": "process",
+        "title": "第5号基準適合確認",
+        "process_type": "sub_diagram_reference",
+        "description": "第5号の基準（門又は塀）への適合を確認"
+      },
+      {
+        "id": "dec-compliance",
+        "type": "decision",
+        "title": "該当号の基準に適合するか？",
+        "decision_type": "binary",
+        "description": "該当する号の基準への適合可否を判定",
+        "condition": {
+          "operator": "EQ",
+          "lhs": { "var": "R1", "desc": "該当号基準適合" },
+          "rhs": { "value": true }
+        }
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令136条の2第1項の技術的基準に適合"
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "令136条の2第1項の技術的基準に不適合"
+      },
+      {
+        "id": "end-na",
+        "type": "terminal",
+        "title": "対象外",
+        "result": "end",
+        "description": "防火地域・準防火地域の指定がないため本条の対象外"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-fire-zone",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-fire-zone",
+        "to": "dec-bouka-stories",
+        "role": "option",
+        "label": "防火地域"
+      },
+      {
+        "id": "e03",
+        "from": "dec-fire-zone",
+        "to": "dec-junbouka-stories4",
+        "role": "option",
+        "label": "準防火地域"
+      },
+      {
+        "id": "e04",
+        "from": "dec-fire-zone",
+        "to": "end-na",
+        "role": "option",
+        "label": "指定なし"
+      },
+      {
+        "id": "e05",
+        "from": "dec-bouka-stories",
+        "to": "proc-item1-bouka",
+        "role": "yes"
+      },
+      {
+        "id": "e06",
+        "from": "dec-bouka-stories",
+        "to": "dec-bouka-area",
+        "role": "no"
+      },
+      {
+        "id": "e07",
+        "from": "dec-bouka-area",
+        "to": "proc-item1-bouka",
+        "role": "yes"
+      },
+      {
+        "id": "e08",
+        "from": "dec-bouka-area",
+        "to": "proc-item2-bouka",
+        "role": "no"
+      },
+      {
+        "id": "e09",
+        "from": "proc-item1-bouka",
+        "to": "dec-gate-fence",
+        "role": "flow"
+      },
+      {
+        "id": "e10",
+        "from": "proc-item2-bouka",
+        "to": "dec-gate-fence",
+        "role": "flow"
+      },
+      {
+        "id": "e11",
+        "from": "dec-junbouka-stories4",
+        "to": "proc-item1-junbouka",
+        "role": "yes"
+      },
+      {
+        "id": "e12",
+        "from": "dec-junbouka-stories4",
+        "to": "dec-junbouka-area1500",
+        "role": "no"
+      },
+      {
+        "id": "e13",
+        "from": "dec-junbouka-area1500",
+        "to": "proc-item1-junbouka",
+        "role": "yes"
+      },
+      {
+        "id": "e14",
+        "from": "dec-junbouka-area1500",
+        "to": "dec-junbouka-stories3",
+        "role": "no"
+      },
+      {
+        "id": "e15",
+        "from": "proc-item1-junbouka",
+        "to": "dec-gate-fence",
+        "role": "flow"
+      },
+      {
+        "id": "e16",
+        "from": "dec-junbouka-stories3",
+        "to": "proc-item2-junbouka-3f",
+        "role": "yes"
+      },
+      {
+        "id": "e17",
+        "from": "dec-junbouka-stories3",
+        "to": "dec-junbouka-area500",
+        "role": "no"
+      },
+      {
+        "id": "e18",
+        "from": "proc-item2-junbouka-3f",
+        "to": "dec-gate-fence",
+        "role": "flow"
+      },
+      {
+        "id": "e19",
+        "from": "dec-junbouka-area500",
+        "to": "proc-item2-junbouka-area",
+        "role": "yes"
+      },
+      {
+        "id": "e20",
+        "from": "dec-junbouka-area500",
+        "to": "dec-wooden",
+        "role": "no"
+      },
+      {
+        "id": "e21",
+        "from": "proc-item2-junbouka-area",
+        "to": "dec-gate-fence",
+        "role": "flow"
+      },
+      {
+        "id": "e22",
+        "from": "dec-wooden",
+        "to": "proc-item3",
+        "role": "yes"
+      },
+      {
+        "id": "e23",
+        "from": "dec-wooden",
+        "to": "proc-item4",
+        "role": "no"
+      },
+      {
+        "id": "e24",
+        "from": "proc-item3",
+        "to": "dec-gate-fence",
+        "role": "flow"
+      },
+      {
+        "id": "e25",
+        "from": "proc-item4",
+        "to": "dec-gate-fence",
+        "role": "flow"
+      },
+      {
+        "id": "e26",
+        "from": "dec-gate-fence",
+        "to": "dec-gate-zone",
+        "role": "yes"
+      },
+      {
+        "id": "e27",
+        "from": "dec-gate-fence",
+        "to": "dec-category",
+        "role": "no"
+      },
+      {
+        "id": "e28",
+        "from": "dec-gate-zone",
+        "to": "proc-item5",
+        "role": "option",
+        "label": "防火地域"
+      },
+      {
+        "id": "e29",
+        "from": "dec-gate-zone",
+        "to": "proc-item5",
+        "role": "option",
+        "label": "準防火地域・木造"
+      },
+      {
+        "id": "e30",
+        "from": "dec-gate-zone",
+        "to": "dec-category",
+        "role": "option",
+        "label": "該当なし"
+      },
+      {
+        "id": "e31",
+        "from": "proc-item5",
+        "to": "dec-category",
+        "role": "flow"
+      },
+      {
+        "id": "e32",
+        "from": "dec-category",
+        "to": "proc-item1-check",
+        "role": "option",
+        "label": "第1号"
+      },
+      {
+        "id": "e33",
+        "from": "dec-category",
+        "to": "proc-item2-check",
+        "role": "option",
+        "label": "第2号"
+      },
+      {
+        "id": "e34",
+        "from": "dec-category",
+        "to": "proc-item3-check",
+        "role": "option",
+        "label": "第3号"
+      },
+      {
+        "id": "e35",
+        "from": "dec-category",
+        "to": "proc-item4-check",
+        "role": "option",
+        "label": "第4号"
+      },
+      {
+        "id": "e36",
+        "from": "dec-category",
+        "to": "proc-item5-check",
+        "role": "option",
+        "label": "第5号"
+      },
+      {
+        "id": "e37",
+        "from": "proc-item1-check",
+        "to": "dec-compliance",
+        "role": "flow"
+      },
+      {
+        "id": "e38",
+        "from": "proc-item2-check",
+        "to": "dec-compliance",
+        "role": "flow"
+      },
+      {
+        "id": "e39",
+        "from": "proc-item3-check",
+        "to": "dec-compliance",
+        "role": "flow"
+      },
+      {
+        "id": "e40",
+        "from": "proc-item4-check",
+        "to": "dec-compliance",
+        "role": "flow"
+      },
+      {
+        "id": "e41",
+        "from": "proc-item5-check",
+        "to": "dec-compliance",
+        "role": "flow"
+      },
+      {
+        "id": "e42",
+        "from": "dec-compliance",
+        "to": "end-pass",
+        "role": "yes"
+      },
+      {
+        "id": "e43",
+        "from": "dec-compliance",
+        "to": "end-fail",
+        "role": "no"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-ORDER-A136-2-P1",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": [
+        "A61:P1"
+      ],
+      "description": "法第61条第1項の防火地域・準防火地域内の建築物の規定"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": [
+        "A107",
+        "A107_2",
+        "A108",
+        "A108_4",
+        "A109_2",
+        "A109_3"
+      ],
+      "description": "各号で参照される構造基準"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

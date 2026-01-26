@@ -1,0 +1,308 @@
+{
+  "id": "A115_3_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "耐火建築物等としなければならない特殊建築物の用途に類するものの判定フロー",
+    "target_subject": "建築物",
+    "description": "法別表第一（い）欄(二)項〜(四)項・(六)項に掲げる用途に類するものを判定するフローチャート"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "115_3",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "定義",
+    "特殊建築物",
+    "用途"
+  ],
+  "text_raw": "法別表第一（い）欄の（二）項から（四）項まで及び（六）項（法第八十七条第三項において法第二十七条の規定を準用する場合を含む。）に掲げる用途に類するもので政令で定めるものは、それぞれ次の各号に掲げるものとする。一 （二）項の用途に類するもの 児童福祉施設等（幼保連携型認定こども園を含む。以下同じ。）二 （三）項の用途に類するもの 博物館、美術館、図書館、ボーリング場、スキー場、スケート場、水泳場又はスポーツの練習場 三 （四）項の用途に類するもの 公衆浴場、待合、料理店、飲食店又は物品販売業を営む店舗（床面積が十平方メートル以内のものを除く。）四 （六）項の用途に類するもの 映画スタジオ又はテレビスタジオ",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "reference",
+          "value": "法第27条の適用対象となる特殊建築物"
+        }
+      ],
+      "note": "法別表第一（い）欄の用途に類するものの判定基準を定める"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "ref": "info-item1-match",
+          "operator": "==",
+          "value": true,
+          "note": "(二)項類似：児童福祉施設等"
+        },
+        {
+          "ref": "info-item2-match",
+          "operator": "==",
+          "value": true,
+          "note": "(三)項類似：博物館等"
+        },
+        {
+          "ref": "info-item3-match",
+          "operator": "==",
+          "value": true,
+          "note": "(四)項類似：公衆浴場等"
+        },
+        {
+          "ref": "info-item4-match",
+          "operator": "==",
+          "value": true,
+          "note": "(六)項類似：映画スタジオ等"
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "flow_diagram": {
+    "title": "用途類似判定フロー",
+    "description": "建築物の用途が法別表第一（い）欄(二)〜(四)項・(六)項の用途に類するものに該当するかを判定する",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "用途類似判定を開始"
+      },
+      {
+        "id": "dec-item1",
+        "type": "decision",
+        "title": "児童福祉施設等か？",
+        "decision_type": "binary",
+        "description": "(二)項類似：用途が児童福祉施設等（幼保連携型認定こども園を含む）に該当するか",
+        "condition": {
+          "operator": "IN",
+          "lhs": { "var": "U", "desc": "建築物の用途" },
+          "rhs": { "value": ["児童福祉施設等"], "desc": "第1号の用途" }
+        },
+        "related_articles": ["令115条の3第1項第1号"]
+      },
+      {
+        "id": "dec-item2",
+        "type": "decision",
+        "title": "博物館、美術館、図書館、ボーリング場、スキー場、スケート場、水泳場又はスポーツの練習場か？",
+        "decision_type": "binary",
+        "description": "(三)項類似：用途が博物館等に該当するか",
+        "condition": {
+          "operator": "IN",
+          "lhs": { "var": "U", "desc": "建築物の用途" },
+          "rhs": { "value": ["博物館", "美術館", "図書館", "ボーリング場", "スキー場", "スケート場", "水泳場", "スポーツの練習場"], "desc": "第2号の用途" }
+        },
+        "related_articles": ["令115条の3第1項第2号"]
+      },
+      {
+        "id": "dec-item3-use",
+        "type": "decision",
+        "title": "公衆浴場、待合、料理店、飲食店又は物品販売業店舗か？",
+        "decision_type": "binary",
+        "description": "(四)項類似：用途が公衆浴場等に該当するか",
+        "condition": {
+          "operator": "IN",
+          "lhs": { "var": "U", "desc": "建築物の用途" },
+          "rhs": { "value": ["公衆浴場", "待合", "料理店", "飲食店", "物品販売業店舗"], "desc": "第3号の用途候補" }
+        },
+        "related_articles": ["令115条の3第1項第3号"]
+      },
+      {
+        "id": "dec-item3-shop-type",
+        "type": "decision",
+        "title": "物品販売業店舗か？",
+        "decision_type": "binary",
+        "description": "物品販売業店舗の場合は床面積要件の確認が必要",
+        "condition": {
+          "operator": "EQ",
+          "lhs": { "var": "U", "desc": "建築物の用途" },
+          "rhs": { "value": "物品販売業店舗", "desc": "物品販売業店舗" }
+        }
+      },
+      {
+        "id": "dec-item3-area",
+        "type": "decision",
+        "title": "床面積は10m2を超えるか？",
+        "decision_type": "binary",
+        "description": "物品販売業店舗の床面積が10m2を超えるか確認（10m2以内は除外）",
+        "condition": {
+          "operator": "GT",
+          "lhs": { "var": "A", "desc": "店舗床面積" },
+          "rhs": { "value": 10, "unit": "m2", "desc": "除外基準面積" }
+        },
+        "related_articles": ["令115条の3第1項第3号"]
+      },
+      {
+        "id": "dec-item4",
+        "type": "decision",
+        "title": "映画スタジオ又はテレビスタジオか？",
+        "decision_type": "binary",
+        "description": "(六)項類似：用途が映画スタジオ又はテレビスタジオに該当するか",
+        "condition": {
+          "operator": "IN",
+          "lhs": { "var": "U", "desc": "建築物の用途" },
+          "rhs": { "value": ["映画スタジオ", "テレビスタジオ"], "desc": "第4号の用途" }
+        },
+        "related_articles": ["令115条の3第1項第4号"]
+      },
+      {
+        "id": "end-item1",
+        "type": "terminal",
+        "title": "(二)項類似用途に該当",
+        "result": "pass",
+        "description": "児童福祉施設等として(二)項の用途に類するものに該当",
+        "related_articles": ["令115条の3第1項第1号"]
+      },
+      {
+        "id": "end-item2",
+        "type": "terminal",
+        "title": "(三)項類似用途に該当",
+        "result": "pass",
+        "description": "博物館等として(三)項の用途に類するものに該当",
+        "related_articles": ["令115条の3第1項第2号"]
+      },
+      {
+        "id": "end-item3",
+        "type": "terminal",
+        "title": "(四)項類似用途に該当",
+        "result": "pass",
+        "description": "公衆浴場等として(四)項の用途に類するものに該当",
+        "related_articles": ["令115条の3第1項第3号"]
+      },
+      {
+        "id": "end-item4",
+        "type": "terminal",
+        "title": "(六)項類似用途に該当",
+        "result": "pass",
+        "description": "映画スタジオ等として(六)項の用途に類するものに該当",
+        "related_articles": ["令115条の3第1項第4号"]
+      },
+      {
+        "id": "end-not-applicable",
+        "type": "terminal",
+        "title": "用途類似に非該当",
+        "result": "fail",
+        "description": "法別表第一（い）欄(二)〜(四)項・(六)項の用途に類するものに該当しない"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-item1",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-item1",
+        "to": "end-item1",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "dec-item1",
+        "to": "dec-item2",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e04",
+        "from": "dec-item2",
+        "to": "end-item2",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e05",
+        "from": "dec-item2",
+        "to": "dec-item3-use",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e06",
+        "from": "dec-item3-use",
+        "to": "dec-item3-shop-type",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e07",
+        "from": "dec-item3-use",
+        "to": "dec-item4",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e08",
+        "from": "dec-item3-shop-type",
+        "to": "dec-item3-area",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e09",
+        "from": "dec-item3-shop-type",
+        "to": "end-item3",
+        "role": "no",
+        "label": "いいえ（公衆浴場、待合、料理店、飲食店）"
+      },
+      {
+        "id": "e10",
+        "from": "dec-item3-area",
+        "to": "end-item3",
+        "role": "yes",
+        "label": "はい（10m2超）"
+      },
+      {
+        "id": "e11",
+        "from": "dec-item3-area",
+        "to": "dec-item4",
+        "role": "no",
+        "label": "いいえ（10m2以下は除外）"
+      },
+      {
+        "id": "e12",
+        "from": "dec-item4",
+        "to": "end-item4",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e13",
+        "from": "dec-item4",
+        "to": "end-not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-ORDER-A115_3-P1",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": [
+        "A27",
+        "別表第一"
+      ],
+      "description": "法第27条の耐火建築物等の要求、法別表第一の用途分類"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T12:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

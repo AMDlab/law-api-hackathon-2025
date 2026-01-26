@@ -1,0 +1,191 @@
+{
+  "id": "CHK-BSL-ORDER-A85-P3",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "倉庫業を営む倉庫の床の積載荷重",
+    "target_subject": "倉庫業を営む倉庫",
+    "description": "倉庫業を営む倉庫における床の積載荷重の最低基準を判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "85",
+    "paragraph": "3",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造関係規定",
+    "積載荷重"
+  ],
+  "text_raw": "倉庫業を営む倉庫における床の積載荷重は、第一項の規定によつて実況に応じて計算した数値が一平方メートルにつき三千九百ニュートン未満の場合においても、三千九百ニュートンとしなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "building_use",
+          "value": "倉庫業を営む倉庫"
+        }
+      ],
+      "note": "倉庫業を営む倉庫に限定される"
+    },
+    "judgment_rule": {
+      "operator": ">=",
+      "lhs": {
+        "ref": "info-load-applied",
+        "description": "適用する積載荷重"
+      },
+      "rhs": {
+        "value": 3900,
+        "unit": "N/m2"
+      }
+    },
+    "exceptions": null
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-use-identify",
+        "type": "process",
+        "title": "用途の特定",
+        "process_type": "undefined_input",
+        "description": "建築物が倉庫業を営む倉庫であるかを特定"
+      },
+      {
+        "id": "info-use",
+        "type": "information",
+        "title": "倉庫業を営む倉庫",
+        "symbol": "U",
+        "subject": "建築物",
+        "property": "倉庫業を営む倉庫か否か",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "建築物が倉庫業法に基づく倉庫業を営む倉庫であるか"
+      },
+      {
+        "id": "proc-load-calc",
+        "type": "process",
+        "title": "実況に応じた積載荷重の計算",
+        "process_type": "undefined_input",
+        "description": "第1項の規定に基づき、実況に応じて床の積載荷重を計算"
+      },
+      {
+        "id": "info-load-calc",
+        "type": "information",
+        "title": "計算積載荷重",
+        "symbol": "L",
+        "subject": "床",
+        "property": "実況に応じて計算した積載荷重",
+        "property_type": "numeric",
+        "unit": "N/m2",
+        "plurality": "single",
+        "description": "令第85条第1項に基づき実況に応じて計算した数値"
+      },
+      {
+        "id": "proc-min-check",
+        "type": "process",
+        "title": "最低基準の適用判定",
+        "process_type": "mechanical",
+        "description": "計算値が3,900N/m2未満の場合、3,900N/m2を適用",
+        "logic_expression": "if L < 3900 then 3900 else L"
+      },
+      {
+        "id": "info-load-applied",
+        "type": "information",
+        "title": "適用積載荷重",
+        "symbol": "LA",
+        "subject": "床",
+        "property": "適用する積載荷重",
+        "property_type": "numeric",
+        "unit": "N/m2",
+        "plurality": "single",
+        "description": "構造計算に用いる積載荷重（3,900N/m2以上）"
+      },
+      {
+        "id": "proc-compliance-judge",
+        "type": "process",
+        "title": "基準適合判定",
+        "process_type": "mechanical",
+        "description": "適用積載荷重が最低基準を満たすか判定",
+        "logic_expression": "LA >= 3900"
+      },
+      {
+        "id": "info-compliance",
+        "type": "information",
+        "title": "令第85条第3項適合",
+        "symbol": "R",
+        "subject": "床",
+        "property": "積載荷重基準適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "床の積載荷重が令第85条第3項の最低基準を満たすか"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-use-identify",
+        "to": "info-use",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "info-use",
+        "to": "proc-load-calc",
+        "role": "input"
+      },
+      {
+        "id": "e03",
+        "from": "proc-load-calc",
+        "to": "info-load-calc",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "info-load-calc",
+        "to": "proc-min-check",
+        "role": "input"
+      },
+      {
+        "id": "e05",
+        "from": "proc-min-check",
+        "to": "info-load-applied",
+        "role": "output"
+      },
+      {
+        "id": "e06",
+        "from": "info-load-applied",
+        "to": "proc-compliance-judge",
+        "role": "input"
+      },
+      {
+        "id": "e07",
+        "from": "proc-compliance-judge",
+        "to": "info-compliance",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": [
+        "A85:P1"
+      ],
+      "description": "第1項の実況に応じた計算規定を参照"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-23T12:00:00Z",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

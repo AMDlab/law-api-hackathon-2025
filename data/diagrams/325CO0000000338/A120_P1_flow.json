@@ -1,0 +1,446 @@
+{
+  "id": "A120_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "直通階段の設置",
+    "target_subject": "居室",
+    "description": "避難階以外の階の居室から直通階段までの歩行距離基準"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "120",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "避難",
+    "直通階段",
+    "歩行距離"
+  ],
+  "text_raw": "建築物の避難階以外の階（地下街におけるものを除く。次条第一項において同じ。）においては、避難階又は地上に通ずる直通階段（傾斜路を含む。以下同じ。）を次の表の上欄に掲げる居室の種類の区分に応じ当該各居室からその一に至る歩行距離が同表の中欄又は下欄に掲げる場合の区分に応じそれぞれ同表の中欄又は下欄に掲げる数値以下となるように設けなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        { "type": "building_part", "value": "避難階以外の階" },
+        { "type": "exclusion", "value": "地下街を除く" }
+      ],
+      "note": "避難階以外の階（地下街におけるものを除く）"
+    },
+    "judgment_rule": {
+      "operator": "<=",
+      "lhs": { "type": "variable", "ref": "D", "description": "歩行距離" },
+      "rhs": { "type": "variable", "ref": "D_max", "description": "歩行距離の上限値（居室種類・構造により決定）" }
+    }
+  },
+  "flow_diagram": {
+    "title": "令第120条第1項 直通階段までの歩行距離判定フロー",
+    "description": "避難階以外の階の居室から直通階段までの歩行距離が基準値以下かを判定する",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start"
+      },
+      {
+        "id": "dec-underground",
+        "type": "decision",
+        "title": "地下街に該当するか？",
+        "decision_type": "binary",
+        "description": "対象が地下街かどうかを確認"
+      },
+      {
+        "id": "term-not-applicable",
+        "type": "terminal",
+        "title": "本条適用対象外",
+        "result": "pass",
+        "description": "地下街は本条の適用対象外"
+      },
+      {
+        "id": "dec-floor",
+        "type": "decision",
+        "title": "避難階以外の階が存在するか？",
+        "decision_type": "binary",
+        "description": "建築物に避難階以外の階があるかを確認"
+      },
+      {
+        "id": "term-no-floor",
+        "type": "terminal",
+        "title": "適合（対象階なし）",
+        "result": "pass",
+        "description": "避難階以外の階が存在しないため適合"
+      },
+      {
+        "id": "proc-identify-rooms",
+        "type": "process",
+        "title": "避難階以外の階の居室を特定",
+        "process_type": "undefined_input",
+        "description": "各避難階以外の階に属する居室を特定する"
+      },
+      {
+        "id": "dec-rooms-exist",
+        "type": "decision",
+        "title": "居室が存在するか？",
+        "decision_type": "binary",
+        "description": "避難階以外の階に居室があるかを確認"
+      },
+      {
+        "id": "term-no-rooms",
+        "type": "terminal",
+        "title": "適合（居室なし）",
+        "result": "pass",
+        "description": "避難階以外の階に居室が存在しないため適合"
+      },
+      {
+        "id": "proc-identify-stairs",
+        "type": "process",
+        "title": "直通階段を特定",
+        "process_type": "undefined_input",
+        "description": "避難階又は地上に通ずる直通階段（傾斜路を含む）を特定"
+      },
+      {
+        "id": "proc-loop-start",
+        "type": "process",
+        "title": "居室ごとの判定開始",
+        "process_type": "mechanical",
+        "description": "各居室について歩行距離判定を行う"
+      },
+      {
+        "id": "dec-room-type",
+        "type": "decision",
+        "title": "居室の種類は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "(一)", "description": "無窓居室又は法別表第一(い)(四)項の特殊建築物の居室" },
+          { "value": "(二)", "description": "法別表第一(い)(二)項の特殊建築物の居室" },
+          { "value": "(三)", "description": "その他の居室" }
+        ],
+        "description": "(一)無窓居室又は法別表第一(い)(四)項、(二)法別表第一(い)(二)項、(三)その他"
+      },
+      {
+        "id": "info-limit-30-fixed",
+        "type": "information",
+        "title": "歩行距離上限値 D_max = 30m",
+        "symbol": "D_max",
+        "property": "歩行距離上限値",
+        "property_type": "numeric",
+        "description": "居室種類(一)の場合、構造に関わらず30m"
+      },
+      {
+        "id": "dec-structure-type-2",
+        "type": "decision",
+        "title": "主要構造部は準耐火構造等か？",
+        "decision_type": "binary",
+        "description": "主要構造部が準耐火構造（耐火構造含む）又は不燃材料であるか"
+      },
+      {
+        "id": "info-limit-50-type2",
+        "type": "information",
+        "title": "歩行距離上限値 D_max = 50m",
+        "symbol": "D_max",
+        "property": "歩行距離上限値",
+        "property_type": "numeric",
+        "description": "居室種類(二)で準耐火構造等の場合"
+      },
+      {
+        "id": "info-limit-30-type2",
+        "type": "information",
+        "title": "歩行距離上限値 D_max = 30m",
+        "symbol": "D_max",
+        "property": "歩行距離上限値",
+        "property_type": "numeric",
+        "description": "居室種類(二)でその他構造の場合"
+      },
+      {
+        "id": "dec-structure-type-3",
+        "type": "decision",
+        "title": "主要構造部は準耐火構造等か？",
+        "decision_type": "binary",
+        "description": "主要構造部が準耐火構造（耐火構造含む）又は不燃材料であるか"
+      },
+      {
+        "id": "info-limit-50-type3",
+        "type": "information",
+        "title": "歩行距離上限値 D_max = 50m",
+        "symbol": "D_max",
+        "property": "歩行距離上限値",
+        "property_type": "numeric",
+        "description": "居室種類(三)で準耐火構造等の場合"
+      },
+      {
+        "id": "info-limit-40-type3",
+        "type": "information",
+        "title": "歩行距離上限値 D_max = 40m",
+        "symbol": "D_max",
+        "property": "歩行距離上限値",
+        "property_type": "numeric",
+        "description": "居室種類(三)でその他構造の場合"
+      },
+      {
+        "id": "proc-measure-distance",
+        "type": "process",
+        "title": "歩行距離を測定",
+        "process_type": "undefined_input",
+        "description": "当該居室から最も近い直通階段までの歩行距離Dを測定"
+      },
+      {
+        "id": "dec-distance-check",
+        "type": "decision",
+        "title": "D ≦ D_max か？",
+        "decision_type": "binary",
+        "description": "歩行距離が上限値以下かを判定",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "D", "desc": "歩行距離" },
+          "rhs": { "var": "D_max", "desc": "歩行距離上限値", "unit": "m" }
+        }
+      },
+      {
+        "id": "proc-room-pass",
+        "type": "process",
+        "title": "当該居室は適合",
+        "process_type": "mechanical",
+        "description": "歩行距離が基準以下のため適合"
+      },
+      {
+        "id": "term-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "歩行距離が上限値を超過"
+      },
+      {
+        "id": "dec-more-rooms",
+        "type": "decision",
+        "title": "未判定の居室があるか？",
+        "decision_type": "binary",
+        "description": "全居室の判定が完了したか確認"
+      },
+      {
+        "id": "term-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "全居室の歩行距離が基準以下"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-underground",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-underground",
+        "to": "term-not-applicable",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "dec-underground",
+        "to": "dec-floor",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e04",
+        "from": "dec-floor",
+        "to": "term-no-floor",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e05",
+        "from": "dec-floor",
+        "to": "proc-identify-rooms",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e06",
+        "from": "proc-identify-rooms",
+        "to": "dec-rooms-exist",
+        "role": "flow"
+      },
+      {
+        "id": "e07",
+        "from": "dec-rooms-exist",
+        "to": "term-no-rooms",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e08",
+        "from": "dec-rooms-exist",
+        "to": "proc-identify-stairs",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e09",
+        "from": "proc-identify-stairs",
+        "to": "proc-loop-start",
+        "role": "flow"
+      },
+      {
+        "id": "e10",
+        "from": "proc-loop-start",
+        "to": "dec-room-type",
+        "role": "flow"
+      },
+      {
+        "id": "e11",
+        "from": "dec-room-type",
+        "to": "info-limit-30-fixed",
+        "role": "option",
+        "label": "(一)"
+      },
+      {
+        "id": "e12",
+        "from": "dec-room-type",
+        "to": "dec-structure-type-2",
+        "role": "option",
+        "label": "(二)"
+      },
+      {
+        "id": "e13",
+        "from": "dec-room-type",
+        "to": "dec-structure-type-3",
+        "role": "option",
+        "label": "(三)"
+      },
+      {
+        "id": "e14",
+        "from": "info-limit-30-fixed",
+        "to": "proc-measure-distance",
+        "role": "flow"
+      },
+      {
+        "id": "e15",
+        "from": "dec-structure-type-2",
+        "to": "info-limit-50-type2",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e16",
+        "from": "dec-structure-type-2",
+        "to": "info-limit-30-type2",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e17",
+        "from": "info-limit-50-type2",
+        "to": "proc-measure-distance",
+        "role": "flow"
+      },
+      {
+        "id": "e18",
+        "from": "info-limit-30-type2",
+        "to": "proc-measure-distance",
+        "role": "flow"
+      },
+      {
+        "id": "e19",
+        "from": "dec-structure-type-3",
+        "to": "info-limit-50-type3",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e20",
+        "from": "dec-structure-type-3",
+        "to": "info-limit-40-type3",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e21",
+        "from": "info-limit-50-type3",
+        "to": "proc-measure-distance",
+        "role": "flow"
+      },
+      {
+        "id": "e22",
+        "from": "info-limit-40-type3",
+        "to": "proc-measure-distance",
+        "role": "flow"
+      },
+      {
+        "id": "e23",
+        "from": "proc-measure-distance",
+        "to": "dec-distance-check",
+        "role": "flow"
+      },
+      {
+        "id": "e24",
+        "from": "dec-distance-check",
+        "to": "proc-room-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e25",
+        "from": "dec-distance-check",
+        "to": "term-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e26",
+        "from": "proc-room-pass",
+        "to": "dec-more-rooms",
+        "role": "flow"
+      },
+      {
+        "id": "e27",
+        "from": "dec-more-rooms",
+        "to": "proc-loop-start",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e28",
+        "from": "dec-more-rooms",
+        "to": "term-pass",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-ORD-A120-P1",
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": ["A116_2:P1:I1"],
+      "description": "無窓居室の定義（令116条の2第1項第1号）"
+    },
+    {
+      "law_id": "322AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["別表第一"],
+      "description": "特殊建築物の用途区分（法別表第一(い)欄(二)項、(四)項）"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00+09:00",
+    "author": "Claude",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

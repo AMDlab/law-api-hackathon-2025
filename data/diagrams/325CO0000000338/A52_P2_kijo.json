@@ -1,0 +1,237 @@
+{
+  "id": "CHK-BSL-ORD-A52-P2",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "組積材の目地モルタル",
+    "target_subject": "組積材",
+    "description": "組積材が目地塗面の全部にモルタルが行きわたるように組積されているかを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "52",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造関係",
+    "組積造"
+  ],
+  "text_raw": "組積材は、その目地塗面の全部にモルタルが行きわたるように組積しなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "structure_type",
+          "value": "組積造"
+        }
+      ],
+      "note": "組積造の建築物に適用"
+    },
+    "judgment_rule": {
+      "operator": "ALL",
+      "conditions": [
+        {
+          "ref": "info-mortar-compliance",
+          "operator": "==",
+          "value": true,
+          "note": "全ての組積材について目地塗面の全部にモルタルが行きわたっている"
+        }
+      ]
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "info-building",
+        "type": "information",
+        "title": "建築物（組積造）",
+        "subject": "建築物",
+        "property": "特定",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "審査対象となる組積造の建築物を特定"
+      },
+      {
+        "id": "proc-building-input",
+        "type": "process",
+        "title": "建築物の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から審査対象の組積造建築物を特定する"
+      },
+      {
+        "id": "info-masonry-set",
+        "type": "information",
+        "title": "組積材の集合",
+        "subject": "建築物",
+        "property": "組積材の集合",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "建築物に使用される組積材（れんが、石、コンクリートブロック等）の集合を特定"
+      },
+      {
+        "id": "proc-masonry-set-input",
+        "type": "process",
+        "title": "組積材の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から使用される組積材を特定する"
+      },
+      {
+        "id": "info-joint-surface",
+        "type": "information",
+        "title": "各組積材の目地塗面",
+        "subject": "組積材",
+        "property": "目地塗面の形状",
+        "property_type": "geometric_surface",
+        "plurality": "multiple",
+        "description": "各組積材の目地塗面（モルタルを塗る面）"
+      },
+      {
+        "id": "proc-joint-surface-input",
+        "type": "process",
+        "title": "目地塗面の特定",
+        "process_type": "undefined_input",
+        "target_subject": "組積材",
+        "iteration": "iterative",
+        "description": "設計図書・施工図等から各組積材の目地塗面を特定する"
+      },
+      {
+        "id": "info-mortar-coverage",
+        "type": "information",
+        "title": "モルタル行きわたり状況",
+        "subject": "組積材",
+        "property": "目地塗面へのモルタル充填状況",
+        "property_type": "visual",
+        "plurality": "multiple",
+        "description": "各組積材の目地塗面の全部にモルタルが行きわたっているかの状況"
+      },
+      {
+        "id": "proc-mortar-coverage-check",
+        "type": "process",
+        "title": "モルタル充填状況確認",
+        "process_type": "human_judgment",
+        "target_subject": "組積材",
+        "iteration": "iterative",
+        "description": "施工図・仕様書等から各組積材の目地塗面の全部にモルタルが行きわたるよう組積されるかを確認する"
+      },
+      {
+        "id": "info-each-mortar-compliance",
+        "type": "information",
+        "title": "各組積材のモルタル適合",
+        "symbol": "M",
+        "subject": "組積材",
+        "property": "目地モルタル充填適合",
+        "property_type": "proposition",
+        "plurality": "multiple",
+        "description": "各組積材について目地塗面の全部にモルタルが行きわたっているか"
+      },
+      {
+        "id": "proc-each-compliance-judge",
+        "type": "process",
+        "title": "個別適合判定",
+        "process_type": "human_judgment",
+        "target_subject": "組積材",
+        "iteration": "iterative",
+        "description": "各組積材について目地塗面の全部にモルタルが行きわたっているかを判定する"
+      },
+      {
+        "id": "info-mortar-compliance",
+        "type": "information",
+        "title": "令52条2項適合",
+        "symbol": "PASS",
+        "subject": "建築物",
+        "property": "組積材目地モルタル適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "全ての組積材について目地塗面の全部にモルタルが行きわたっている"
+      },
+      {
+        "id": "proc-final-judgment",
+        "type": "process",
+        "title": "全体適合判定",
+        "process_type": "mechanical",
+        "logic_expression": "ALL(M)",
+        "description": "全ての組積材について目地モルタル充填が適合しているかを判定（全称命題）"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e001",
+        "from": "proc-building-input",
+        "to": "info-building",
+        "role": "output"
+      },
+      {
+        "id": "e002",
+        "from": "info-building",
+        "to": "proc-masonry-set-input",
+        "role": "input"
+      },
+      {
+        "id": "e003",
+        "from": "proc-masonry-set-input",
+        "to": "info-masonry-set",
+        "role": "output"
+      },
+      {
+        "id": "e004",
+        "from": "info-masonry-set",
+        "to": "proc-joint-surface-input",
+        "role": "input"
+      },
+      {
+        "id": "e005",
+        "from": "proc-joint-surface-input",
+        "to": "info-joint-surface",
+        "role": "output"
+      },
+      {
+        "id": "e006",
+        "from": "info-joint-surface",
+        "to": "proc-mortar-coverage-check",
+        "role": "input"
+      },
+      {
+        "id": "e007",
+        "from": "proc-mortar-coverage-check",
+        "to": "info-mortar-coverage",
+        "role": "output"
+      },
+      {
+        "id": "e008",
+        "from": "info-mortar-coverage",
+        "to": "proc-each-compliance-judge",
+        "role": "input"
+      },
+      {
+        "id": "e009",
+        "from": "proc-each-compliance-judge",
+        "to": "info-each-mortar-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e010",
+        "from": "info-each-mortar-compliance",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e011",
+        "from": "proc-final-judgment",
+        "to": "info-mortar-compliance",
+        "role": "output"
+      }
+    ]
+  },
+  "metadata": {
+    "created_at": "2026-01-23T00:00:00Z",
+    "generator": "claude-code-kijo-generator",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令",
+    "checklist_ref": "確認審査報告書チェックリスト"
+  }
+}

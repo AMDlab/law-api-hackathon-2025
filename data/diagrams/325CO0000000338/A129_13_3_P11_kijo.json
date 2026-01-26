@@ -1,0 +1,199 @@
+{
+  "id": "CHK-BSL-KIJO-A129_13_3-P11",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "非常用エレベーターの定格速度",
+    "target_subject": "非常用エレベーター",
+    "description": "非常用エレベーターの籠の定格速度に関する規定"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "129_13_3",
+    "paragraph": "11",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "建築設備",
+    "昇降機",
+    "非常用エレベーター"
+  ],
+  "text_raw": "非常用エレベーターの籠の定格速度は、六十メートル以上としなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "building_type",
+          "value": "高さ31mを超える建築物"
+        },
+        {
+          "type": "equipment",
+          "value": "非常用エレベーターを設置"
+        }
+      ],
+      "note": "法第34条第2項に基づき非常用エレベーターの設置が必要な建築物"
+    },
+    "judgment_rule": {
+      "operator": ">=",
+      "lhs": {
+        "type": "reference",
+        "value": "非常用エレベーターの籠の定格速度"
+      },
+      "rhs": {
+        "type": "value",
+        "value": "60m/分"
+      }
+    },
+    "exceptions": null
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-elevator-set",
+        "type": "process",
+        "title": "非常用エレベーターの特定",
+        "process_type": "undefined_input",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "設計図書から建築物に設置される非常用エレベーターを特定"
+      },
+      {
+        "id": "info-elevator-set",
+        "type": "information",
+        "title": "非常用エレベーター",
+        "symbol": "EV",
+        "subject": "建築物",
+        "property": "非常用エレベーターの集合",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "建築物に設置される非常用エレベーターを特定"
+      },
+      {
+        "id": "proc-speed-check",
+        "type": "process",
+        "title": "定格速度の確認",
+        "process_type": "undefined_input",
+        "target_subject": "非常用エレベーター",
+        "iteration": "iterative",
+        "description": "各非常用エレベーターの籠の定格速度を確認"
+      },
+      {
+        "id": "info-rated-speed",
+        "type": "information",
+        "title": "籠の定格速度",
+        "symbol": "V",
+        "subject": "非常用エレベーター",
+        "property": "定格速度",
+        "property_type": "numeric",
+        "unit": "m/分",
+        "plurality": "multiple",
+        "description": "各非常用エレベーターの籠の定格速度"
+      },
+      {
+        "id": "proc-speed-judge",
+        "type": "process",
+        "title": "速度要件判定",
+        "process_type": "mechanical",
+        "target_subject": "非常用エレベーター",
+        "iteration": "iterative",
+        "description": "定格速度が60m/分以上か判定",
+        "logic_expression": "V >= 60"
+      },
+      {
+        "id": "info-speed-ok",
+        "type": "information",
+        "title": "速度要件充足",
+        "symbol": "VOK",
+        "subject": "非常用エレベーター",
+        "property": "速度要件充足の有無",
+        "property_type": "proposition",
+        "plurality": "multiple",
+        "description": "各非常用エレベーターの定格速度が60m/分以上か"
+      },
+      {
+        "id": "proc-final-judge",
+        "type": "process",
+        "title": "適合判定",
+        "process_type": "mechanical",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "全ての非常用エレベーターの定格速度が要件を満たすか判定",
+        "logic_expression": "∀ev∈EV: VOK(ev)"
+      },
+      {
+        "id": "info-compliance",
+        "type": "information",
+        "title": "第11項適合判定結果",
+        "symbol": "R",
+        "subject": "建築物",
+        "property": "適合判定結果",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "令第129条の13の3第11項への適合判定結果"
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge-001",
+        "from": "proc-elevator-set",
+        "to": "info-elevator-set",
+        "role": "output"
+      },
+      {
+        "id": "edge-002",
+        "from": "info-elevator-set",
+        "to": "proc-speed-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-003",
+        "from": "proc-speed-check",
+        "to": "info-rated-speed",
+        "role": "output"
+      },
+      {
+        "id": "edge-004",
+        "from": "info-rated-speed",
+        "to": "proc-speed-judge",
+        "role": "input"
+      },
+      {
+        "id": "edge-005",
+        "from": "proc-speed-judge",
+        "to": "info-speed-ok",
+        "role": "output"
+      },
+      {
+        "id": "edge-006",
+        "from": "info-elevator-set",
+        "to": "proc-final-judge",
+        "role": "input"
+      },
+      {
+        "id": "edge-007",
+        "from": "info-speed-ok",
+        "to": "proc-final-judge",
+        "role": "input"
+      },
+      {
+        "id": "edge-008",
+        "from": "proc-final-judge",
+        "to": "info-compliance",
+        "role": "output"
+      }
+    ]
+  },
+  "metadata": {
+    "created_at": "2026-01-25T00:00:00Z",
+    "updated_at": "2026-01-25T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "kijo-generator",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令",
+    "source": "e-Gov法令API"
+  }
+}

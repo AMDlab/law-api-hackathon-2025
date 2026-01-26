@@ -1,0 +1,245 @@
+{
+  "id": "A52_P4_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "組積造の施工（芋目地禁止）- 適合判定フロー",
+    "target_subject": "組積材",
+    "description": "組積材が芋目地ができないように組積されているかを判定するフロー"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "52",
+    "paragraph": "4",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造",
+    "組積造",
+    "施工"
+  ],
+  "text_raw": "組積材は、芋目地ができないように組積しなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "structure_type",
+          "value": "組積造"
+        }
+      ],
+      "note": "組積造の建築物に適用"
+    },
+    "judgment_rule": {
+      "operator": "==",
+      "lhs": {
+        "ref": "info-no-imomoji",
+        "property": "芋目地なし"
+      },
+      "rhs": {
+        "value": true
+      }
+    },
+    "exceptions": null
+  },
+  "flow_diagram": {
+    "title": "令第52条第4項 組積材の芋目地禁止 適合判定フロー",
+    "description": "組積造における組積材の施工が芋目地になっていないかを判定する",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "令第52条第4項の適合判定を開始"
+      },
+      {
+        "id": "dec-is-masonry-construction",
+        "type": "decision",
+        "title": "組積造の建築物か？",
+        "decision_type": "binary",
+        "description": "判定対象の建築物が組積造であるかを確認（適用範囲判定）",
+        "related_articles": ["令第51条"]
+      },
+      {
+        "id": "proc-input-masonry-materials",
+        "type": "process",
+        "title": "組積材の情報入力",
+        "process_type": "undefined_input",
+        "description": "設計図書から組積造に使用される組積材を特定し入力する"
+      },
+      {
+        "id": "info-masonry-list",
+        "type": "information",
+        "title": "組積材一覧",
+        "symbol": "M",
+        "subject": "建築物",
+        "property": "組積材の集合",
+        "property_type": "set_definition",
+        "description": "判定対象となる建築物の組積材一覧"
+      },
+      {
+        "id": "dec-has-masonry-materials",
+        "type": "decision",
+        "title": "組積材が存在するか？",
+        "decision_type": "binary",
+        "description": "判定対象となる組積材が1つ以上存在するかを確認"
+      },
+      {
+        "id": "proc-check-joint-pattern",
+        "type": "process",
+        "title": "各組積材の目地パターンを確認",
+        "process_type": "human_judgment",
+        "description": "各組積材の組積における目地パターンを目視または図面で確認。芋目地とは縦横の目地が一直線に通っている状態を指す。"
+      },
+      {
+        "id": "info-joint-patterns",
+        "type": "information",
+        "title": "目地パターン確認結果",
+        "symbol": "JP",
+        "subject": "組積材",
+        "property": "目地パターン",
+        "property_type": "visual",
+        "description": "各組積材の目地パターンの確認結果（芋目地か否か）"
+      },
+      {
+        "id": "dec-has-imomoji",
+        "type": "decision",
+        "title": "芋目地が存在するか？",
+        "decision_type": "binary",
+        "description": "いずれかの組積材に芋目地が発生しているかを判定。判定式: ∃m ∈ M: JP(m) = 芋目地",
+        "condition": {
+          "operator": "EQ",
+          "lhs": {
+            "var": "has_imomoji",
+            "desc": "芋目地の有無"
+          },
+          "rhs": {
+            "value": true,
+            "desc": "芋目地が存在する"
+          }
+        }
+      },
+      {
+        "id": "proc-imomoji-found",
+        "type": "process",
+        "title": "芋目地検出",
+        "process_type": "mechanical",
+        "description": "組積材に芋目地が検出されたことを記録"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "全ての組積材が芋目地ができないように組積されている"
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "芋目地が発生している組積材が存在する"
+      },
+      {
+        "id": "end-not-applicable",
+        "type": "terminal",
+        "title": "適用対象外",
+        "result": "end",
+        "description": "組積造の建築物ではないため、本条項の適用対象外"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-is-masonry-construction",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-is-masonry-construction",
+        "to": "proc-input-masonry-materials",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "dec-is-masonry-construction",
+        "to": "end-not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e04",
+        "from": "proc-input-masonry-materials",
+        "to": "info-masonry-list",
+        "role": "output"
+      },
+      {
+        "id": "e05",
+        "from": "info-masonry-list",
+        "to": "dec-has-masonry-materials",
+        "role": "input"
+      },
+      {
+        "id": "e06",
+        "from": "dec-has-masonry-materials",
+        "to": "proc-check-joint-pattern",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e07",
+        "from": "dec-has-masonry-materials",
+        "to": "end-pass",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e08",
+        "from": "proc-check-joint-pattern",
+        "to": "info-joint-patterns",
+        "role": "output"
+      },
+      {
+        "id": "e09",
+        "from": "info-joint-patterns",
+        "to": "dec-has-imomoji",
+        "role": "input"
+      },
+      {
+        "id": "e10",
+        "from": "dec-has-imomoji",
+        "to": "proc-imomoji-found",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e11",
+        "from": "dec-has-imomoji",
+        "to": "end-pass",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e12",
+        "from": "proc-imomoji-found",
+        "to": "end-fail",
+        "role": "flow"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-ORDER-A52-P4",
+  "related_laws": [],
+  "metadata": {
+    "created_at": "2026-01-26T12:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

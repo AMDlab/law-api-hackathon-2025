@@ -1,0 +1,674 @@
+{
+  "id": "A43_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "柱の小径",
+    "target_subject": "柱",
+    "description": "構造耐力上主要な部分である柱の張り間方向及び桁行方向の小径が、横架材の相互間の垂直距離に対して、国土交通大臣が定める割合以上であることを判定するフロー"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "43",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造",
+    "木造"
+  ],
+  "text_raw": "構造耐力上主要な部分である柱の張り間方向及び桁行方向の小径は、それぞれの方向でその柱に接着する土台、足固め、胴差、はり、桁その他の構造耐力上主要な部分である横架材の相互間の垂直距離に対して、建築物の用途及び規模並びに屋根、外壁その他の建築物の部分の構造に応じて国土交通大臣が定める割合以上のものでなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "structure",
+          "value": "木造建築物等"
+        }
+      ],
+      "note": "木造の構造耐力上主要な部分である柱を有する建築物が対象"
+    },
+    "judgment_rule": {
+      "operator": "FORALL",
+      "conditions": [
+        {
+          "ref": "harigane-compliance",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "ref": "ketayuki-compliance",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "note": "すべての柱について、張り間方向と桁行方向それぞれの小径が基準割合以上"
+    }
+  },
+  "flow_diagram": {
+    "title": "令第43条第1項 柱の小径 適合判定フロー",
+    "description": "木造建築物の構造耐力上主要な柱の小径が基準割合以上かを判定する",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "令第43条第1項適合判定の開始"
+      },
+      {
+        "id": "dec-wood-structure",
+        "type": "decision",
+        "title": "木造の建築物か？",
+        "decision_type": "binary",
+        "description": "当該建築物が木造であるか確認"
+      },
+      {
+        "id": "proc-identify-columns",
+        "type": "process",
+        "title": "構造耐力上主要な柱を特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から構造耐力上主要な部分である柱を全て特定する"
+      },
+      {
+        "id": "dec-columns-exist",
+        "type": "decision",
+        "title": "構造耐力上主要な柱があるか？",
+        "decision_type": "binary",
+        "description": "構造耐力上主要な部分である柱が存在するか確認"
+      },
+      {
+        "id": "proc-select-column",
+        "type": "process",
+        "title": "柱を1本選択",
+        "process_type": "mechanical",
+        "description": "判定対象の柱を選択（ループ処理）"
+      },
+      {
+        "id": "proc-get-harigane-diameter",
+        "type": "process",
+        "title": "張り間方向小径を取得",
+        "process_type": "undefined_input",
+        "description": "選択した柱の張り間方向の小径を設計図書から読み取る"
+      },
+      {
+        "id": "dec-harigane-diameter-valid",
+        "type": "decision",
+        "title": "張り間方向小径は正の値か？",
+        "decision_type": "binary",
+        "description": "張り間方向小径が有効な正の数値であることを確認"
+      },
+      {
+        "id": "proc-get-ketayuki-diameter",
+        "type": "process",
+        "title": "桁行方向小径を取得",
+        "process_type": "undefined_input",
+        "description": "選択した柱の桁行方向の小径を設計図書から読み取る"
+      },
+      {
+        "id": "dec-ketayuki-diameter-valid",
+        "type": "decision",
+        "title": "桁行方向小径は正の値か？",
+        "decision_type": "binary",
+        "description": "桁行方向小径が有効な正の数値であることを確認"
+      },
+      {
+        "id": "proc-get-vertical-distance",
+        "type": "process",
+        "title": "横架材間垂直距離を取得",
+        "process_type": "undefined_input",
+        "description": "選択した柱に接着する横架材（土台、足固め、胴差、はり、桁等）の相互間の垂直距離を読み取る"
+      },
+      {
+        "id": "dec-vertical-distance-valid",
+        "type": "decision",
+        "title": "横架材間垂直距離は正の値か？",
+        "decision_type": "binary",
+        "description": "横架材間垂直距離が有効な正の数値であることを確認"
+      },
+      {
+        "id": "dec-building-use",
+        "type": "decision",
+        "title": "建築物の用途は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "住宅等", "description": "住宅、共同住宅、寄宿舎等" },
+          { "value": "学校等", "description": "学校、体育館等" },
+          { "value": "事務所等", "description": "事務所、店舗等" },
+          { "value": "その他", "description": "上記以外の用途" }
+        ],
+        "description": "建築物の用途区分を確認（告示第1349号による区分）"
+      },
+      {
+        "id": "proc-use-identified",
+        "type": "process",
+        "title": "用途区分を記録",
+        "process_type": "mechanical",
+        "description": "建築物の用途区分を基準割合決定のために記録"
+      },
+      {
+        "id": "dec-building-scale",
+        "type": "decision",
+        "title": "建築物の階数は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "1階建", "description": "地上1階建" },
+          { "value": "2階建", "description": "地上2階建" },
+          { "value": "3階建以上", "description": "地上3階建以上" }
+        ],
+        "description": "建築物の規模（階数）を確認"
+      },
+      {
+        "id": "proc-scale-identified",
+        "type": "process",
+        "title": "規模区分を記録",
+        "process_type": "mechanical",
+        "description": "建築物の規模区分を基準割合決定のために記録"
+      },
+      {
+        "id": "dec-roof-structure",
+        "type": "decision",
+        "title": "屋根の構造は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "重い屋根", "description": "瓦葺き、土葺き等の重い屋根" },
+          { "value": "軽い屋根", "description": "金属板葺き、スレート葺き等の軽い屋根" }
+        ],
+        "description": "屋根の構造区分を確認"
+      },
+      {
+        "id": "proc-roof-identified",
+        "type": "process",
+        "title": "屋根構造を記録",
+        "process_type": "mechanical",
+        "description": "屋根の構造区分を基準割合決定のために記録"
+      },
+      {
+        "id": "dec-wall-structure",
+        "type": "decision",
+        "title": "外壁等の構造は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "重い壁", "description": "土塗壁、コンクリート等の重い壁" },
+          { "value": "軽い壁", "description": "板張り、金属サイディング等の軽い壁" }
+        ],
+        "description": "外壁その他の建築物の部分の構造区分を確認"
+      },
+      {
+        "id": "proc-wall-identified",
+        "type": "process",
+        "title": "外壁構造を記録",
+        "process_type": "mechanical",
+        "description": "外壁等の構造区分を基準割合決定のために記録"
+      },
+      {
+        "id": "proc-determine-ratio",
+        "type": "process",
+        "title": "大臣定め割合を決定",
+        "process_type": "mechanical",
+        "description": "用途、規模、屋根・外壁構造に基づき、平成12年建設省告示第1349号から基準割合を決定",
+        "related_articles": ["平成12年建設省告示第1349号"]
+      },
+      {
+        "id": "dec-ratio-determined",
+        "type": "decision",
+        "title": "基準割合が決定できたか？",
+        "decision_type": "binary",
+        "description": "告示に基づく基準割合が正しく決定されたか確認"
+      },
+      {
+        "id": "proc-calc-harigane-ratio",
+        "type": "process",
+        "title": "張り間方向実割合を算出",
+        "process_type": "mechanical",
+        "description": "張り間方向小径 ÷ 横架材間垂直距離 を計算"
+      },
+      {
+        "id": "dec-harigane-compliance",
+        "type": "decision",
+        "title": "張り間方向小径は基準割合以上か？",
+        "decision_type": "binary",
+        "description": "張り間方向実割合 >= 基準割合 を判定",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "harigane_ratio", "desc": "張り間方向実割合" },
+          "rhs": { "var": "required_ratio", "desc": "基準割合" }
+        }
+      },
+      {
+        "id": "proc-harigane-ok",
+        "type": "process",
+        "title": "張り間方向適合",
+        "process_type": "mechanical",
+        "description": "当該柱の張り間方向小径は基準を満たしている"
+      },
+      {
+        "id": "proc-calc-ketayuki-ratio",
+        "type": "process",
+        "title": "桁行方向実割合を算出",
+        "process_type": "mechanical",
+        "description": "桁行方向小径 ÷ 横架材間垂直距離 を計算"
+      },
+      {
+        "id": "dec-ketayuki-compliance",
+        "type": "decision",
+        "title": "桁行方向小径は基準割合以上か？",
+        "decision_type": "binary",
+        "description": "桁行方向実割合 >= 基準割合 を判定",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "ketayuki_ratio", "desc": "桁行方向実割合" },
+          "rhs": { "var": "required_ratio", "desc": "基準割合" }
+        }
+      },
+      {
+        "id": "proc-ketayuki-ok",
+        "type": "process",
+        "title": "桁行方向適合",
+        "process_type": "mechanical",
+        "description": "当該柱の桁行方向小径は基準を満たしている"
+      },
+      {
+        "id": "proc-column-ok",
+        "type": "process",
+        "title": "当該柱適合",
+        "process_type": "mechanical",
+        "description": "当該柱は張り間・桁行両方向とも適合"
+      },
+      {
+        "id": "dec-more-columns",
+        "type": "decision",
+        "title": "未判定の柱があるか？",
+        "decision_type": "binary",
+        "description": "全ての構造耐力上主要な柱を判定したか確認"
+      },
+      {
+        "id": "dec-all-columns-pass",
+        "type": "decision",
+        "title": "すべての柱が適合したか？",
+        "decision_type": "binary",
+        "description": "すべての構造耐力上主要な柱について、張り間方向・桁行方向ともに適合判定を完了したことを最終確認"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令第43条第1項に適合：すべての構造耐力上主要な柱の小径が基準割合以上"
+      },
+      {
+        "id": "end-fail-harigane",
+        "type": "terminal",
+        "title": "不適合（張り間方向）",
+        "result": "fail",
+        "description": "令第43条第1項に不適合：張り間方向小径が基準割合未満"
+      },
+      {
+        "id": "end-fail-ketayuki",
+        "type": "terminal",
+        "title": "不適合（桁行方向）",
+        "result": "fail",
+        "description": "令第43条第1項に不適合：桁行方向小径が基準割合未満"
+      },
+      {
+        "id": "end-fail-data",
+        "type": "terminal",
+        "title": "判定不能",
+        "result": "fail",
+        "description": "必要なデータが取得できず判定不能"
+      },
+      {
+        "id": "end-not-applicable",
+        "type": "terminal",
+        "title": "適用外",
+        "result": "pass",
+        "description": "木造でない建築物、または構造耐力上主要な柱がない場合は本条項の適用対象外"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-wood-structure",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-wood-structure",
+        "to": "proc-identify-columns",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "dec-wood-structure",
+        "to": "end-not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e04",
+        "from": "proc-identify-columns",
+        "to": "dec-columns-exist",
+        "role": "flow"
+      },
+      {
+        "id": "e05",
+        "from": "dec-columns-exist",
+        "to": "proc-select-column",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e06",
+        "from": "dec-columns-exist",
+        "to": "end-not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e07",
+        "from": "proc-select-column",
+        "to": "proc-get-harigane-diameter",
+        "role": "flow"
+      },
+      {
+        "id": "e08",
+        "from": "proc-get-harigane-diameter",
+        "to": "dec-harigane-diameter-valid",
+        "role": "flow"
+      },
+      {
+        "id": "e09",
+        "from": "dec-harigane-diameter-valid",
+        "to": "proc-get-ketayuki-diameter",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e10",
+        "from": "dec-harigane-diameter-valid",
+        "to": "end-fail-data",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e11",
+        "from": "proc-get-ketayuki-diameter",
+        "to": "dec-ketayuki-diameter-valid",
+        "role": "flow"
+      },
+      {
+        "id": "e12",
+        "from": "dec-ketayuki-diameter-valid",
+        "to": "proc-get-vertical-distance",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e13",
+        "from": "dec-ketayuki-diameter-valid",
+        "to": "end-fail-data",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e14",
+        "from": "proc-get-vertical-distance",
+        "to": "dec-vertical-distance-valid",
+        "role": "flow"
+      },
+      {
+        "id": "e15",
+        "from": "dec-vertical-distance-valid",
+        "to": "dec-building-use",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e16",
+        "from": "dec-vertical-distance-valid",
+        "to": "end-fail-data",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e17a",
+        "from": "dec-building-use",
+        "to": "proc-use-identified",
+        "role": "option",
+        "label": "住宅等"
+      },
+      {
+        "id": "e17b",
+        "from": "dec-building-use",
+        "to": "proc-use-identified",
+        "role": "option",
+        "label": "学校等"
+      },
+      {
+        "id": "e17c",
+        "from": "dec-building-use",
+        "to": "proc-use-identified",
+        "role": "option",
+        "label": "事務所等"
+      },
+      {
+        "id": "e17d",
+        "from": "dec-building-use",
+        "to": "proc-use-identified",
+        "role": "option",
+        "label": "その他"
+      },
+      {
+        "id": "e18",
+        "from": "proc-use-identified",
+        "to": "dec-building-scale",
+        "role": "flow"
+      },
+      {
+        "id": "e19a",
+        "from": "dec-building-scale",
+        "to": "proc-scale-identified",
+        "role": "option",
+        "label": "1階建"
+      },
+      {
+        "id": "e19b",
+        "from": "dec-building-scale",
+        "to": "proc-scale-identified",
+        "role": "option",
+        "label": "2階建"
+      },
+      {
+        "id": "e19c",
+        "from": "dec-building-scale",
+        "to": "proc-scale-identified",
+        "role": "option",
+        "label": "3階建以上"
+      },
+      {
+        "id": "e20",
+        "from": "proc-scale-identified",
+        "to": "dec-roof-structure",
+        "role": "flow"
+      },
+      {
+        "id": "e21a",
+        "from": "dec-roof-structure",
+        "to": "proc-roof-identified",
+        "role": "option",
+        "label": "重い屋根"
+      },
+      {
+        "id": "e21b",
+        "from": "dec-roof-structure",
+        "to": "proc-roof-identified",
+        "role": "option",
+        "label": "軽い屋根"
+      },
+      {
+        "id": "e22",
+        "from": "proc-roof-identified",
+        "to": "dec-wall-structure",
+        "role": "flow"
+      },
+      {
+        "id": "e23a",
+        "from": "dec-wall-structure",
+        "to": "proc-wall-identified",
+        "role": "option",
+        "label": "重い壁"
+      },
+      {
+        "id": "e23b",
+        "from": "dec-wall-structure",
+        "to": "proc-wall-identified",
+        "role": "option",
+        "label": "軽い壁"
+      },
+      {
+        "id": "e24",
+        "from": "proc-wall-identified",
+        "to": "proc-determine-ratio",
+        "role": "flow"
+      },
+      {
+        "id": "e25",
+        "from": "proc-determine-ratio",
+        "to": "dec-ratio-determined",
+        "role": "flow"
+      },
+      {
+        "id": "e26",
+        "from": "dec-ratio-determined",
+        "to": "proc-calc-harigane-ratio",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e27",
+        "from": "dec-ratio-determined",
+        "to": "end-fail-data",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e28",
+        "from": "proc-calc-harigane-ratio",
+        "to": "dec-harigane-compliance",
+        "role": "flow"
+      },
+      {
+        "id": "e29",
+        "from": "dec-harigane-compliance",
+        "to": "proc-harigane-ok",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e30",
+        "from": "dec-harigane-compliance",
+        "to": "end-fail-harigane",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e31",
+        "from": "proc-harigane-ok",
+        "to": "proc-calc-ketayuki-ratio",
+        "role": "flow"
+      },
+      {
+        "id": "e32",
+        "from": "proc-calc-ketayuki-ratio",
+        "to": "dec-ketayuki-compliance",
+        "role": "flow"
+      },
+      {
+        "id": "e33",
+        "from": "dec-ketayuki-compliance",
+        "to": "proc-ketayuki-ok",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e34",
+        "from": "dec-ketayuki-compliance",
+        "to": "end-fail-ketayuki",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e35",
+        "from": "proc-ketayuki-ok",
+        "to": "proc-column-ok",
+        "role": "flow"
+      },
+      {
+        "id": "e36",
+        "from": "proc-column-ok",
+        "to": "dec-more-columns",
+        "role": "flow"
+      },
+      {
+        "id": "e37",
+        "from": "dec-more-columns",
+        "to": "proc-select-column",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e38",
+        "from": "dec-more-columns",
+        "to": "dec-all-columns-pass",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e39",
+        "from": "dec-all-columns-pass",
+        "to": "end-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e40",
+        "from": "dec-all-columns-pass",
+        "to": "end-fail-data",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSO-A43-P1",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": ["A20:P1"],
+      "description": "法第20条（構造耐力）の技術的基準の一つとして規定"
+    },
+    {
+      "law_id": "H12-KOKUDO-1349",
+      "law_name": "平成12年建設省告示第1349号",
+      "law_type": "notice",
+      "relationship": "defines_detail",
+      "description": "柱の小径の横架材間垂直距離に対する割合を定める告示"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00+09:00",
+    "updated_at": "2026-01-26T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

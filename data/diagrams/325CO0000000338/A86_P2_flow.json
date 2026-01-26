@@ -1,0 +1,294 @@
+{
+  "id": "A86_P2_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "積雪の単位荷重基準",
+    "target_subject": "構造計算",
+    "description": "積雪荷重の算定に用いる積雪の単位荷重が基準値以上かを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "86",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造関係",
+    "積雪荷重"
+  ],
+  "text_raw": "前項に規定する積雪の単位荷重は、積雪量一センチメートルごとに一平方メートルにつき二十ニュートン以上としなければならない。ただし、特定行政庁は、規則で、国土交通大臣が定める基準に基づいて多雪区域を指定し、その区域につきこれと異なる定めをすることができる。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "reference",
+          "value": "令第86条第1項の積雪荷重計算を行う建築物"
+        }
+      ],
+      "note": "多雪区域では特定行政庁の規則で異なる単位荷重が定められている場合がある"
+    },
+    "judgment_rule": {
+      "operator": ">=",
+      "lhs": {
+        "ref": "info-unit-load",
+        "description": "積雪の単位荷重"
+      },
+      "rhs": {
+        "value": 20,
+        "unit": "N/m²/cm",
+        "description": "基準単位荷重（又は特定行政庁が定める値）"
+      }
+    },
+    "exceptions": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "多雪区域（特定行政庁が規則で指定）"
+        }
+      ],
+      "effect": "ALTERNATIVE_STANDARD",
+      "note": "多雪区域では国土交通大臣が定める基準に基づき特定行政庁が異なる単位荷重を定めることができる"
+    }
+  },
+  "flow_diagram": {
+    "title": "令第86条第2項 積雪の単位荷重基準 適合判定フロー",
+    "description": "積雪荷重計算における単位荷重が基準値以上かを判定するフローチャート",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "令第86条第2項の適合判定を開始"
+      },
+      {
+        "id": "proc-identify-area",
+        "type": "process",
+        "title": "建築物の所在地区域を確認",
+        "process_type": "undefined_input",
+        "description": "建築物が多雪区域に該当するかを確認する"
+      },
+      {
+        "id": "dec-heavy-snow-area",
+        "type": "decision",
+        "title": "多雪区域か？",
+        "decision_type": "binary",
+        "description": "特定行政庁が規則で指定した多雪区域に該当するか判定",
+        "condition": {
+          "operator": "EQ",
+          "lhs": {
+            "var": "area_type",
+            "desc": "区域種別"
+          },
+          "rhs": {
+            "value": "多雪区域",
+            "desc": "多雪区域"
+          }
+        }
+      },
+      {
+        "id": "proc-get-local-standard",
+        "type": "process",
+        "title": "特定行政庁の基準値を確認",
+        "process_type": "undefined_input",
+        "description": "多雪区域における特定行政庁が定める単位荷重基準を確認する"
+      },
+      {
+        "id": "info-local-threshold",
+        "type": "information",
+        "title": "特定行政庁が定める単位荷重基準",
+        "symbol": "Ws_local",
+        "subject": "構造計算",
+        "property": "特定行政庁基準単位荷重",
+        "property_type": "numeric",
+        "description": "多雪区域で特定行政庁が定める積雪の単位荷重基準値"
+      },
+      {
+        "id": "proc-identify-unit-load",
+        "type": "process",
+        "title": "積雪の単位荷重を特定",
+        "process_type": "undefined_input",
+        "description": "構造計算で用いる積雪の単位荷重を特定する"
+      },
+      {
+        "id": "info-unit-load",
+        "type": "information",
+        "title": "積雪の単位荷重",
+        "symbol": "Ws",
+        "subject": "構造計算",
+        "property": "積雪の単位荷重",
+        "property_type": "numeric",
+        "description": "積雪量1cmごとに1m²につき設定された荷重値（N/m²/cm）"
+      },
+      {
+        "id": "dec-local-threshold-check",
+        "type": "decision",
+        "title": "単位荷重 ≥ 特定行政庁基準か？",
+        "decision_type": "binary",
+        "description": "積雪の単位荷重が特定行政庁が定める基準値以上か判定",
+        "condition": {
+          "operator": "GTE",
+          "lhs": {
+            "var": "Ws",
+            "desc": "積雪の単位荷重"
+          },
+          "rhs": {
+            "var": "Ws_local",
+            "desc": "特定行政庁基準単位荷重"
+          }
+        }
+      },
+      {
+        "id": "dec-standard-threshold-check",
+        "type": "decision",
+        "title": "単位荷重 ≥ 20 N/m²/cm か？",
+        "decision_type": "binary",
+        "description": "積雪の単位荷重が法定基準値20N/m²/cm以上か判定",
+        "condition": {
+          "operator": "GTE",
+          "lhs": {
+            "var": "Ws",
+            "desc": "積雪の単位荷重"
+          },
+          "rhs": {
+            "value": 20,
+            "unit": "N/m²/cm",
+            "desc": "法定基準単位荷重"
+          }
+        }
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令第86条第2項に適合"
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "令第86条第2項に不適合（単位荷重が基準値未満）"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "proc-identify-area",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "proc-identify-area",
+        "to": "dec-heavy-snow-area",
+        "role": "flow"
+      },
+      {
+        "id": "e03",
+        "from": "dec-heavy-snow-area",
+        "to": "proc-get-local-standard",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e04",
+        "from": "dec-heavy-snow-area",
+        "to": "proc-identify-unit-load",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e05",
+        "from": "proc-get-local-standard",
+        "to": "info-local-threshold",
+        "role": "output"
+      },
+      {
+        "id": "e06",
+        "from": "info-local-threshold",
+        "to": "proc-identify-unit-load",
+        "role": "flow"
+      },
+      {
+        "id": "e07",
+        "from": "proc-identify-unit-load",
+        "to": "info-unit-load",
+        "role": "output"
+      },
+      {
+        "id": "e08",
+        "from": "info-unit-load",
+        "to": "dec-local-threshold-check",
+        "role": "input"
+      },
+      {
+        "id": "e09",
+        "from": "info-local-threshold",
+        "to": "dec-local-threshold-check",
+        "role": "input"
+      },
+      {
+        "id": "e10",
+        "from": "dec-local-threshold-check",
+        "to": "end-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e11",
+        "from": "dec-local-threshold-check",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e12",
+        "from": "info-unit-load",
+        "to": "dec-standard-threshold-check",
+        "role": "input"
+      },
+      {
+        "id": "e13",
+        "from": "dec-standard-threshold-check",
+        "to": "end-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e14",
+        "from": "dec-standard-threshold-check",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-ORDER-A86-P2",
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": [
+        "A86:P1"
+      ],
+      "description": "第1項で定める積雪荷重の計算式における単位荷重"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T12:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

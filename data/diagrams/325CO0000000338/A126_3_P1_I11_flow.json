@@ -1,0 +1,227 @@
+{
+  "id": "CHK-BSL-FLOW-A126_3-P1-I11",
+  "version": "3.2",
+  "page_title": {
+    "title": "排煙設備の中央管理 適合判定フロー",
+    "target_subject": "排煙設備",
+    "description": "法第34条第2項に規定する建築物又は床面積合計1000平方メートル超の地下街における排煙設備の制御・監視の適合判定"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "126_3",
+    "paragraph": "1",
+    "item": "11"
+  },
+  "labels": [
+    "単体規定",
+    "排煙設備",
+    "中央管理"
+  ],
+  "text_raw": "法第三十四条第二項に規定する建築物又は各構えの床面積の合計が千平方メートルを超える地下街における排煙設備の制御及び作動状態の監視は、中央管理室において行うことができるものとすること。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "type": "building_category",
+          "value": "法第34条第2項に規定する建築物（高さ31mを超え非常用エレベーターを設けるもの）"
+        },
+        {
+          "type": "building_part",
+          "value": "各構えの床面積の合計が1000平方メートルを超える地下街"
+        }
+      ],
+      "note": "適用対象の判定は公共データ（法第34条第2項該当性）と設計情報による"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "requirement",
+          "value": "排煙設備の制御を中央管理室で行える"
+        },
+        {
+          "type": "requirement",
+          "value": "排煙設備の作動状態の監視を中央管理室で行える"
+        }
+      ]
+    }
+  },
+  "flow_diagram": {
+    "title": "令第126条の3第1項第11号 適合判定フロー",
+    "description": "排煙設備の中央管理室による制御・監視の適合判定フローチャート",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "審査開始",
+        "result": "start",
+        "description": "令第126条の3第1項第11号の適合判定を開始"
+      },
+      {
+        "id": "dec-building-type",
+        "type": "decision",
+        "title": "建築物の区分は？",
+        "decision_type": "multi",
+        "options": [
+          {
+            "value": "法第34条第2項該当",
+            "description": "高さ31mを超え非常用エレベーターを設ける建築物"
+          },
+          {
+            "value": "地下街（1000m²超）",
+            "description": "各構えの床面積の合計が1000平方メートルを超える地下街"
+          },
+          {
+            "value": "その他",
+            "description": "上記いずれにも該当しない"
+          }
+        ],
+        "description": "本号の適用対象となる建築物の区分を判定"
+      },
+      {
+        "id": "dec-central-room",
+        "type": "decision",
+        "title": "中央管理室が設置されているか？",
+        "decision_type": "binary",
+        "description": "建築物に中央管理室が設置されているかを確認"
+      },
+      {
+        "id": "dec-control-capability",
+        "type": "decision",
+        "title": "排煙設備の制御を中央管理室で行えるか？",
+        "decision_type": "binary",
+        "description": "排煙設備の制御機能が中央管理室から操作可能かを確認"
+      },
+      {
+        "id": "dec-monitor-capability",
+        "type": "decision",
+        "title": "排煙設備の作動状態を中央管理室で監視できるか？",
+        "decision_type": "binary",
+        "description": "排煙設備の作動状態の監視が中央管理室で行えるかを確認"
+      },
+      {
+        "id": "end-not-applicable",
+        "type": "terminal",
+        "title": "適用対象外",
+        "result": "end",
+        "description": "本号の適用対象外のため審査不要"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令第126条の3第1項第11号に適合"
+      },
+      {
+        "id": "end-fail-no-room",
+        "type": "terminal",
+        "title": "不適合（中央管理室なし）",
+        "result": "fail",
+        "description": "中央管理室が設置されていないため不適合"
+      },
+      {
+        "id": "end-fail-no-control",
+        "type": "terminal",
+        "title": "不適合（制御不可）",
+        "result": "fail",
+        "description": "排煙設備の制御を中央管理室で行えないため不適合"
+      },
+      {
+        "id": "end-fail-no-monitor",
+        "type": "terminal",
+        "title": "不適合（監視不可）",
+        "result": "fail",
+        "description": "排煙設備の作動状態を中央管理室で監視できないため不適合"
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge-start-to-type",
+        "from": "start",
+        "to": "dec-building-type",
+        "role": "flow"
+      },
+      {
+        "id": "edge-type-art34",
+        "from": "dec-building-type",
+        "to": "dec-central-room",
+        "role": "option",
+        "label": "法第34条第2項該当"
+      },
+      {
+        "id": "edge-type-underground",
+        "from": "dec-building-type",
+        "to": "dec-central-room",
+        "role": "option",
+        "label": "地下街（1000m²超）"
+      },
+      {
+        "id": "edge-type-other",
+        "from": "dec-building-type",
+        "to": "end-not-applicable",
+        "role": "option",
+        "label": "その他"
+      },
+      {
+        "id": "edge-room-yes",
+        "from": "dec-central-room",
+        "to": "dec-control-capability",
+        "role": "yes"
+      },
+      {
+        "id": "edge-room-no",
+        "from": "dec-central-room",
+        "to": "end-fail-no-room",
+        "role": "no"
+      },
+      {
+        "id": "edge-control-yes",
+        "from": "dec-control-capability",
+        "to": "dec-monitor-capability",
+        "role": "yes"
+      },
+      {
+        "id": "edge-control-no",
+        "from": "dec-control-capability",
+        "to": "end-fail-no-control",
+        "role": "no"
+      },
+      {
+        "id": "edge-monitor-yes",
+        "from": "dec-monitor-capability",
+        "to": "end-pass",
+        "role": "yes"
+      },
+      {
+        "id": "edge-monitor-no",
+        "from": "dec-monitor-capability",
+        "to": "end-fail-no-monitor",
+        "role": "no"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-KIJO-A126_3-P1-I11",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A34:P2"],
+      "description": "法第34条第2項（非常用昇降機の設置義務）に規定する建築物を参照"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00Z",
+    "updated_at": "2026-01-26T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

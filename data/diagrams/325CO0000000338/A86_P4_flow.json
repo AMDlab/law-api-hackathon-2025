@@ -1,0 +1,306 @@
+{
+  "id": "A86_P4_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "屋根の積雪荷重（屋根形状係数）適合判定フロー",
+    "target_subject": "屋根",
+    "description": "屋根の積雪荷重を屋根形状係数を用いて計算する方法の適合判定フロー"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "86",
+    "paragraph": "4",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造規定",
+    "積雪荷重"
+  ],
+  "text_raw": "屋根の積雪荷重は、屋根に雪止めがある場合を除き、その勾配が六十度以下の場合においては、その勾配に応じて第一項の積雪荷重に次の式によつて計算した屋根形状係数（特定行政庁が屋根ふき材、雪の性状等を考慮して規則でこれと異なる数値を定めた場合においては、その定めた数値）を乗じた数値とし、その勾配が六十度を超える場合においては、零とすることができる。μｂ＝√ｃｏｓ（１．５β）（この式において、μｂ及びβは、それぞれ次の数値を表すものとする。μｂ 屋根形状係数 β 屋根勾配（単位 度））",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "exclusion",
+          "value": "屋根に雪止めがある場合を除く"
+        }
+      ],
+      "note": "屋根に雪止めがある場合は本規定の対象外"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "operator": "AND",
+          "conditions": [
+            {
+              "ref": "info-slope",
+              "operator": "<=",
+              "value": 60
+            },
+            {
+              "ref": "info-calculated-load",
+              "operator": "==",
+              "value": "第1項積雪荷重 × μb"
+            }
+          ]
+        },
+        {
+          "operator": "AND",
+          "conditions": [
+            {
+              "ref": "info-slope",
+              "operator": ">",
+              "value": 60
+            },
+            {
+              "ref": "info-calculated-load",
+              "operator": "==",
+              "value": 0
+            }
+          ]
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "flow_diagram": {
+    "title": "令第86条第4項 屋根の積雪荷重（屋根形状係数）適合判定フロー",
+    "description": "屋根の積雪荷重が屋根形状係数を用いて適切に計算されているかを判定するフロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "令第86条第4項の適合判定を開始"
+      },
+      {
+        "id": "proc-identify-roof",
+        "type": "process",
+        "title": "建築物の屋根を特定",
+        "process_type": "undefined_input",
+        "description": "判定対象となる建築物に属する屋根を特定"
+      },
+      {
+        "id": "dec-has-snowstop",
+        "type": "decision",
+        "title": "屋根に雪止めがあるか？",
+        "decision_type": "binary",
+        "description": "屋根に雪止めがあるか否かを判定",
+        "condition": {
+          "operator": "EQ",
+          "lhs": { "var": "snowstop", "desc": "雪止めの有無" },
+          "rhs": { "value": true, "desc": "あり" }
+        }
+      },
+      {
+        "id": "proc-identify-slope",
+        "type": "process",
+        "title": "屋根勾配を特定",
+        "process_type": "undefined_input",
+        "description": "屋根の勾配（β）を読み取る"
+      },
+      {
+        "id": "dec-slope-category",
+        "type": "decision",
+        "title": "屋根勾配は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "60度以下", "description": "勾配が60度以下" },
+          { "value": "60度超", "description": "勾配が60度を超える" }
+        ],
+        "description": "屋根勾配が60度以下か60度超かを判定",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "slope", "desc": "屋根勾配" },
+          "rhs": { "value": 60, "unit": "度" }
+        }
+      },
+      {
+        "id": "proc-calc-coefficient",
+        "type": "process",
+        "title": "屋根形状係数μbを計算",
+        "process_type": "mechanical",
+        "description": "μb = √cos(1.5β)により屋根形状係数を計算。特定行政庁が規則で異なる数値を定めた場合はその値を使用。"
+      },
+      {
+        "id": "proc-calc-load-with-coeff",
+        "type": "process",
+        "title": "積雪荷重を計算（第1項積雪荷重×μb）",
+        "process_type": "mechanical",
+        "description": "屋根の積雪荷重 = 第1項積雪荷重 × 屋根形状係数（μb）",
+        "related_articles": ["令::A86:P1"]
+      },
+      {
+        "id": "dec-load-correct-coeff",
+        "type": "decision",
+        "title": "積雪荷重は第1項積雪荷重×μbと一致するか？",
+        "decision_type": "binary",
+        "description": "計算した積雪荷重が設計値と一致するか確認",
+        "condition": {
+          "operator": "EQ",
+          "lhs": { "var": "design_load", "desc": "設計上の積雪荷重" },
+          "rhs": { "var": "calculated_load", "desc": "第1項積雪荷重×μb" }
+        }
+      },
+      {
+        "id": "proc-set-load-zero",
+        "type": "process",
+        "title": "積雪荷重を零とすることができる",
+        "process_type": "mechanical",
+        "description": "勾配が60度を超える場合、積雪荷重は零とすることができる"
+      },
+      {
+        "id": "dec-load-zero-or-valid",
+        "type": "decision",
+        "title": "積雪荷重は零または適切な値か？",
+        "decision_type": "binary",
+        "description": "勾配60度超の場合、積雪荷重が零または適切な値であるか確認",
+        "condition": {
+          "operator": "EQ",
+          "lhs": { "var": "design_load", "desc": "設計上の積雪荷重" },
+          "rhs": { "value": 0, "desc": "零" }
+        }
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令第86条第4項に適合"
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "令第86条第4項に不適合"
+      },
+      {
+        "id": "end-not-applicable",
+        "type": "terminal",
+        "title": "対象外",
+        "result": "end",
+        "description": "雪止めがある屋根は本規定の対象外"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "proc-identify-roof",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "proc-identify-roof",
+        "to": "dec-has-snowstop",
+        "role": "flow"
+      },
+      {
+        "id": "e03",
+        "from": "dec-has-snowstop",
+        "to": "end-not-applicable",
+        "role": "yes",
+        "label": "あり"
+      },
+      {
+        "id": "e04",
+        "from": "dec-has-snowstop",
+        "to": "proc-identify-slope",
+        "role": "no",
+        "label": "なし"
+      },
+      {
+        "id": "e05",
+        "from": "proc-identify-slope",
+        "to": "dec-slope-category",
+        "role": "flow"
+      },
+      {
+        "id": "e06",
+        "from": "dec-slope-category",
+        "to": "proc-calc-coefficient",
+        "role": "option",
+        "label": "60度以下"
+      },
+      {
+        "id": "e07",
+        "from": "dec-slope-category",
+        "to": "proc-set-load-zero",
+        "role": "option",
+        "label": "60度超"
+      },
+      {
+        "id": "e08",
+        "from": "proc-calc-coefficient",
+        "to": "proc-calc-load-with-coeff",
+        "role": "flow"
+      },
+      {
+        "id": "e09",
+        "from": "proc-calc-load-with-coeff",
+        "to": "dec-load-correct-coeff",
+        "role": "flow"
+      },
+      {
+        "id": "e10",
+        "from": "dec-load-correct-coeff",
+        "to": "end-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e11",
+        "from": "dec-load-correct-coeff",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e12",
+        "from": "proc-set-load-zero",
+        "to": "dec-load-zero-or-valid",
+        "role": "flow"
+      },
+      {
+        "id": "e13",
+        "from": "dec-load-zero-or-valid",
+        "to": "end-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e14",
+        "from": "dec-load-zero-or-valid",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-ORDER-A86-P4",
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": ["A86:P1"],
+      "description": "第1項の積雪荷重の計算方法を参照"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T12:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

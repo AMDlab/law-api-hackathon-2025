@@ -1,0 +1,259 @@
+{
+  "id": "CHK-BSL-ORD-A116-P1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "危険物の数量の限度",
+    "target_subject": "建築物",
+    "description": "建築物に貯蔵又は処理する危険物の数量が政令で定める限度を超えないことの確認"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "116",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "危険物",
+    "用途規制"
+  ],
+  "text_raw": "法第二十七条第三項第二号の規定により政令で定める危険物の数量の限度は、次の表に定めるところによるものとする。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "use",
+          "value": "危険物を貯蔵又は処理する建築物",
+          "note": "法第27条第3項第2号に該当する建築物"
+        }
+      ],
+      "note": "危険物を貯蔵又は処理する建築物が対象"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "comparison",
+          "description": "各危険物品の数量が表に定める限度以下であること"
+        }
+      ]
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-danger-goods-identify",
+        "type": "process",
+        "title": "危険物品の特定",
+        "process_type": "undefined_input",
+        "description": "建築物に貯蔵又は処理する危険物品の種類を特定"
+      },
+      {
+        "id": "info-danger-goods-set",
+        "type": "information",
+        "title": "危険物品",
+        "subject": "建築物",
+        "property": "危険物品の集合",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "建築物に貯蔵又は処理する危険物品を特定"
+      },
+      {
+        "id": "proc-danger-goods-type",
+        "type": "process",
+        "title": "危険物品種類の特定",
+        "process_type": "undefined_input",
+        "description": "各危険物品の種類（火薬類、消防法危険物、マッチ、可燃性ガス等）を特定",
+        "iteration": "iterative"
+      },
+      {
+        "id": "info-danger-goods-type",
+        "type": "information",
+        "title": "危険物品種類",
+        "symbol": "T",
+        "subject": "危険物品",
+        "property": "種類",
+        "property_type": "classification",
+        "plurality": "multiple",
+        "description": "火薬類、消防法危険物、マッチ、可燃性ガス、圧縮ガス、液化ガス等"
+      },
+      {
+        "id": "proc-storage-type",
+        "type": "process",
+        "title": "貯蔵形態の特定",
+        "process_type": "undefined_input",
+        "description": "常時貯蔵か製造所等での処理かを特定",
+        "iteration": "iterative"
+      },
+      {
+        "id": "info-storage-type",
+        "type": "information",
+        "title": "貯蔵形態",
+        "symbol": "S",
+        "subject": "危険物品",
+        "property": "貯蔵形態",
+        "property_type": "classification",
+        "plurality": "multiple",
+        "description": "常時貯蔵又は製造所等での処理"
+      },
+      {
+        "id": "proc-quantity-check",
+        "type": "process",
+        "title": "数量の特定",
+        "process_type": "undefined_input",
+        "description": "各危険物品の数量を特定",
+        "iteration": "iterative"
+      },
+      {
+        "id": "info-quantity",
+        "type": "information",
+        "title": "数量",
+        "symbol": "Q",
+        "subject": "危険物品",
+        "property": "数量",
+        "property_type": "numeric",
+        "plurality": "multiple",
+        "description": "各危険物品の貯蔵又は処理数量"
+      },
+      {
+        "id": "proc-limit-check",
+        "type": "process",
+        "title": "数量限度判定",
+        "process_type": "mechanical",
+        "description": "種類と貯蔵形態に応じた表の限度値と比較",
+        "logic_expression": "Q ≤ Limit(T, S)",
+        "iteration": "iterative"
+      },
+      {
+        "id": "info-limit-compliance",
+        "type": "information",
+        "title": "数量限度適合",
+        "symbol": "L",
+        "subject": "危険物品",
+        "property": "数量限度適合性",
+        "property_type": "proposition",
+        "plurality": "multiple",
+        "description": "各危険物品の数量が表の限度以下か"
+      },
+      {
+        "id": "proc-final-judge",
+        "type": "process",
+        "title": "最終適合判定",
+        "process_type": "mechanical",
+        "description": "全危険物品の数量限度への適合性を総合判定",
+        "logic_expression": "ALL(L)"
+      },
+      {
+        "id": "info-final-compliance",
+        "type": "information",
+        "title": "令第116条第1項適合",
+        "symbol": "COMPLIANT",
+        "subject": "建築物",
+        "property": "令第116条第1項適合性",
+        "property_type": "proposition",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-danger-goods-identify",
+        "to": "info-danger-goods-set",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "info-danger-goods-set",
+        "to": "proc-danger-goods-type",
+        "role": "input"
+      },
+      {
+        "id": "e03",
+        "from": "proc-danger-goods-type",
+        "to": "info-danger-goods-type",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "info-danger-goods-set",
+        "to": "proc-storage-type",
+        "role": "input"
+      },
+      {
+        "id": "e05",
+        "from": "proc-storage-type",
+        "to": "info-storage-type",
+        "role": "output"
+      },
+      {
+        "id": "e06",
+        "from": "info-danger-goods-set",
+        "to": "proc-quantity-check",
+        "role": "input"
+      },
+      {
+        "id": "e07",
+        "from": "proc-quantity-check",
+        "to": "info-quantity",
+        "role": "output"
+      },
+      {
+        "id": "e08",
+        "from": "info-danger-goods-type",
+        "to": "proc-limit-check",
+        "role": "input"
+      },
+      {
+        "id": "e09",
+        "from": "info-storage-type",
+        "to": "proc-limit-check",
+        "role": "input"
+      },
+      {
+        "id": "e10",
+        "from": "info-quantity",
+        "to": "proc-limit-check",
+        "role": "input"
+      },
+      {
+        "id": "e11",
+        "from": "proc-limit-check",
+        "to": "info-limit-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e12",
+        "from": "info-limit-compliance",
+        "to": "proc-final-judge",
+        "role": "input"
+      },
+      {
+        "id": "e13",
+        "from": "proc-final-judge",
+        "to": "info-final-compliance",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "324AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": ["A27:P3:I2"],
+      "description": "法第27条第3項第2号から危険物数量限度の定義を委任"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-23T00:00:00+09:00",
+    "author": "Claude",
+    "generator": "kijo-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

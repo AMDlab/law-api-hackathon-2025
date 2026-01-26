@@ -1,0 +1,481 @@
+{
+  "id": "A55_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "組積造の壁の厚さ",
+    "target_subject": "組積造の壁",
+    "description": "組積造の壁の厚さが、建築物の階数及び壁の長さに応じた基準値以上であることを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "55",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造",
+    "組積造"
+  ],
+  "text_raw": "組積造の壁の厚さ（仕上材料の厚さを含まないものとする。以下この節において同じ。）は、その建築物の階数及びその壁の長さ（前条第二項の壁の長さをいう。以下この節において同じ。）に応じて、それぞれ次の表の数値以上としなければならない。",
+  "kijo_diagram_ref": "CHK-BSLEO-A55-P1",
+  "flow_diagram": {
+    "title": "組積造の壁の厚さ適合判定フロー",
+    "description": "組積造の壁の厚さが階数と壁の長さに応じた基準値以上であることを判定するフロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start"
+      },
+      {
+        "id": "dec-structure-type",
+        "type": "decision",
+        "title": "構造種別は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "組積造" },
+          { "value": "その他" }
+        ],
+        "description": "建築物の構造種別を判定する"
+      },
+      {
+        "id": "proc-not-applicable",
+        "type": "process",
+        "title": "適用対象外",
+        "process_type": "mechanical",
+        "description": "組積造以外の建築物は本条の適用対象外"
+      },
+      {
+        "id": "end-not-applicable",
+        "type": "terminal",
+        "title": "適用対象外",
+        "result": "pass",
+        "description": "組積造でないため本条は適用されない"
+      },
+      {
+        "id": "proc-scope-applicable",
+        "type": "process",
+        "title": "組積造該当",
+        "process_type": "mechanical",
+        "description": "組積造の建築物として本条の適用対象となる"
+      },
+      {
+        "id": "dec-has-walls",
+        "type": "decision",
+        "title": "組積造の壁があるか？",
+        "decision_type": "binary",
+        "description": "判定対象となる組積造の壁が存在するか確認する"
+      },
+      {
+        "id": "proc-no-walls",
+        "type": "process",
+        "title": "壁なし確認",
+        "process_type": "mechanical",
+        "description": "組積造の壁が存在しない"
+      },
+      {
+        "id": "end-no-walls",
+        "type": "terminal",
+        "title": "適合（壁なし）",
+        "result": "pass",
+        "description": "組積造の壁が存在しないため本条は自動的に適合"
+      },
+      {
+        "id": "proc-walls-identified",
+        "type": "process",
+        "title": "壁の特定完了",
+        "process_type": "undefined_input",
+        "description": "組積造の壁を特定した"
+      },
+      {
+        "id": "info-iteration-start",
+        "type": "information",
+        "title": "各壁の判定開始",
+        "description": "特定した組積造の壁について順次判定を行う"
+      },
+      {
+        "id": "dec-story-count",
+        "type": "decision",
+        "title": "建築物の階数は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "2以上" },
+          { "value": "1" }
+        ],
+        "description": "建築物の階数が2以上か1かを判定する"
+      },
+      {
+        "id": "dec-wall-length-2story",
+        "type": "decision",
+        "title": "壁の長さは5m以下か？",
+        "decision_type": "binary",
+        "description": "階数2以上の場合の壁の長さ判定",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "L", "desc": "壁の長さ" },
+          "rhs": { "value": 5, "unit": "m" }
+        }
+      },
+      {
+        "id": "proc-required-30-2story",
+        "type": "process",
+        "title": "必要壁厚＝30cm",
+        "process_type": "mechanical",
+        "description": "階数2以上・壁長さ5m以下の場合の必要壁厚"
+      },
+      {
+        "id": "proc-required-40-2story",
+        "type": "process",
+        "title": "必要壁厚＝40cm",
+        "process_type": "mechanical",
+        "description": "階数2以上・壁長さ5m超の場合の必要壁厚"
+      },
+      {
+        "id": "dec-wall-length-1story",
+        "type": "decision",
+        "title": "壁の長さは5m以下か？",
+        "decision_type": "binary",
+        "description": "階数1の場合の壁の長さ判定",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "L", "desc": "壁の長さ" },
+          "rhs": { "value": 5, "unit": "m" }
+        }
+      },
+      {
+        "id": "proc-required-20-1story",
+        "type": "process",
+        "title": "必要壁厚＝20cm",
+        "process_type": "mechanical",
+        "description": "階数1・壁長さ5m以下の場合の必要壁厚"
+      },
+      {
+        "id": "proc-required-30-1story",
+        "type": "process",
+        "title": "必要壁厚＝30cm",
+        "process_type": "mechanical",
+        "description": "階数1・壁長さ5m超の場合の必要壁厚"
+      },
+      {
+        "id": "dec-thickness-check-30-2",
+        "type": "decision",
+        "title": "壁の厚さ≧30cmか？",
+        "decision_type": "binary",
+        "description": "壁の厚さが30cm以上か判定（階数2以上・長さ5m以下）",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "T", "desc": "壁の厚さ" },
+          "rhs": { "value": 30, "unit": "cm" }
+        }
+      },
+      {
+        "id": "dec-thickness-check-40",
+        "type": "decision",
+        "title": "壁の厚さ≧40cmか？",
+        "decision_type": "binary",
+        "description": "壁の厚さが40cm以上か判定（階数2以上・長さ5m超）",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "T", "desc": "壁の厚さ" },
+          "rhs": { "value": 40, "unit": "cm" }
+        }
+      },
+      {
+        "id": "dec-thickness-check-20",
+        "type": "decision",
+        "title": "壁の厚さ≧20cmか？",
+        "decision_type": "binary",
+        "description": "壁の厚さが20cm以上か判定（階数1・長さ5m以下）",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "T", "desc": "壁の厚さ" },
+          "rhs": { "value": 20, "unit": "cm" }
+        }
+      },
+      {
+        "id": "dec-thickness-check-30-1",
+        "type": "decision",
+        "title": "壁の厚さ≧30cmか？",
+        "decision_type": "binary",
+        "description": "壁の厚さが30cm以上か判定（階数1・長さ5m超）",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "T", "desc": "壁の厚さ" },
+          "rhs": { "value": 30, "unit": "cm" }
+        }
+      },
+      {
+        "id": "proc-wall-pass",
+        "type": "process",
+        "title": "当該壁は適合",
+        "process_type": "mechanical",
+        "description": "この壁は必要壁厚以上である"
+      },
+      {
+        "id": "dec-more-walls",
+        "type": "decision",
+        "title": "他に判定対象の壁があるか？",
+        "decision_type": "binary",
+        "description": "まだ判定していない組積造の壁があるか確認"
+      },
+      {
+        "id": "proc-all-walls-pass",
+        "type": "process",
+        "title": "全壁の適合確認",
+        "process_type": "mechanical",
+        "description": "すべての組積造の壁が基準値以上である"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令第55条第1項に適合"
+      },
+      {
+        "id": "proc-wall-fail",
+        "type": "process",
+        "title": "当該壁は不適合",
+        "process_type": "mechanical",
+        "description": "この壁は必要壁厚未満である"
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "壁の厚さが基準値未満のため令第55条第1項に不適合"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-structure-type",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-structure-type",
+        "to": "proc-scope-applicable",
+        "role": "option",
+        "label": "組積造"
+      },
+      {
+        "id": "e03",
+        "from": "dec-structure-type",
+        "to": "proc-not-applicable",
+        "role": "option",
+        "label": "その他"
+      },
+      {
+        "id": "e04",
+        "from": "proc-not-applicable",
+        "to": "end-not-applicable",
+        "role": "flow"
+      },
+      {
+        "id": "e05",
+        "from": "proc-scope-applicable",
+        "to": "dec-has-walls",
+        "role": "flow"
+      },
+      {
+        "id": "e06",
+        "from": "dec-has-walls",
+        "to": "proc-no-walls",
+        "role": "no"
+      },
+      {
+        "id": "e07",
+        "from": "proc-no-walls",
+        "to": "end-no-walls",
+        "role": "flow"
+      },
+      {
+        "id": "e08",
+        "from": "dec-has-walls",
+        "to": "proc-walls-identified",
+        "role": "yes"
+      },
+      {
+        "id": "e09",
+        "from": "proc-walls-identified",
+        "to": "info-iteration-start",
+        "role": "flow"
+      },
+      {
+        "id": "e10",
+        "from": "info-iteration-start",
+        "to": "dec-story-count",
+        "role": "flow"
+      },
+      {
+        "id": "e11",
+        "from": "dec-story-count",
+        "to": "dec-wall-length-2story",
+        "role": "option",
+        "label": "2以上"
+      },
+      {
+        "id": "e12",
+        "from": "dec-story-count",
+        "to": "dec-wall-length-1story",
+        "role": "option",
+        "label": "1"
+      },
+      {
+        "id": "e13",
+        "from": "dec-wall-length-2story",
+        "to": "proc-required-30-2story",
+        "role": "yes"
+      },
+      {
+        "id": "e14",
+        "from": "dec-wall-length-2story",
+        "to": "proc-required-40-2story",
+        "role": "no"
+      },
+      {
+        "id": "e15",
+        "from": "proc-required-30-2story",
+        "to": "dec-thickness-check-30-2",
+        "role": "flow"
+      },
+      {
+        "id": "e16",
+        "from": "proc-required-40-2story",
+        "to": "dec-thickness-check-40",
+        "role": "flow"
+      },
+      {
+        "id": "e17",
+        "from": "dec-wall-length-1story",
+        "to": "proc-required-20-1story",
+        "role": "yes"
+      },
+      {
+        "id": "e18",
+        "from": "dec-wall-length-1story",
+        "to": "proc-required-30-1story",
+        "role": "no"
+      },
+      {
+        "id": "e19",
+        "from": "proc-required-20-1story",
+        "to": "dec-thickness-check-20",
+        "role": "flow"
+      },
+      {
+        "id": "e20",
+        "from": "proc-required-30-1story",
+        "to": "dec-thickness-check-30-1",
+        "role": "flow"
+      },
+      {
+        "id": "e21",
+        "from": "dec-thickness-check-30-2",
+        "to": "proc-wall-pass",
+        "role": "yes"
+      },
+      {
+        "id": "e22",
+        "from": "dec-thickness-check-30-2",
+        "to": "proc-wall-fail",
+        "role": "no"
+      },
+      {
+        "id": "e23",
+        "from": "dec-thickness-check-40",
+        "to": "proc-wall-pass",
+        "role": "yes"
+      },
+      {
+        "id": "e24",
+        "from": "dec-thickness-check-40",
+        "to": "proc-wall-fail",
+        "role": "no"
+      },
+      {
+        "id": "e25",
+        "from": "dec-thickness-check-20",
+        "to": "proc-wall-pass",
+        "role": "yes"
+      },
+      {
+        "id": "e26",
+        "from": "dec-thickness-check-20",
+        "to": "proc-wall-fail",
+        "role": "no"
+      },
+      {
+        "id": "e27",
+        "from": "dec-thickness-check-30-1",
+        "to": "proc-wall-pass",
+        "role": "yes"
+      },
+      {
+        "id": "e28",
+        "from": "dec-thickness-check-30-1",
+        "to": "proc-wall-fail",
+        "role": "no"
+      },
+      {
+        "id": "e29",
+        "from": "proc-wall-pass",
+        "to": "dec-more-walls",
+        "role": "flow"
+      },
+      {
+        "id": "e30",
+        "from": "dec-more-walls",
+        "to": "info-iteration-start",
+        "role": "yes"
+      },
+      {
+        "id": "e31",
+        "from": "dec-more-walls",
+        "to": "proc-all-walls-pass",
+        "role": "no"
+      },
+      {
+        "id": "e32",
+        "from": "proc-all-walls-pass",
+        "to": "end-pass",
+        "role": "flow"
+      },
+      {
+        "id": "e33",
+        "from": "proc-wall-fail",
+        "to": "end-fail",
+        "role": "flow"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": [
+        "A54:P2"
+      ],
+      "description": "令54条2項は壁の長さの定義を規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00+09:00",
+    "updated_at": "2026-01-26T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令",
+    "checklist_ref": "確認審査報告書チェックリスト"
+  }
+}

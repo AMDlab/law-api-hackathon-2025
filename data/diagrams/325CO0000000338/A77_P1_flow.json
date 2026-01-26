@@ -1,0 +1,572 @@
+{
+  "id": "A77_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "柱の構造",
+    "target_subject": "構造耐力上主要な部分である柱",
+    "description": "構造耐力上主要な部分である柱の構造要件（第1号〜第6号）を順次判定"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "77",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造",
+    "鉄筋コンクリート造",
+    "柱"
+  ],
+  "text_raw": "構造耐力上主要な部分である柱は、次に定める構造としなければならない。一 主筋は、四本以上とすること。二 主筋は、帯筋と緊結すること。三 帯筋の径は、六ミリメートル以上とし、その間隔は、十五センチメートル（柱に接着する壁、はりその他の横架材から上方又は下方に柱の小径の二倍以内の距離にある部分においては、十センチメートル）以下で、かつ、最も細い主筋の径の十五倍以下とすること。四 帯筋比（柱の軸を含むコンクリートの断面の面積に対する帯筋の断面積の和の割合として国土交通大臣が定める方法により算出した数値をいう。）は、〇・二パーセント以上とすること。五 柱の小径は、その構造耐力上主要な支点間の距離の十五分の一以上とすること。ただし、国土交通大臣が定める基準に従つた構造計算によつて構造耐力上安全であることが確かめられた場合においては、この限りでない。六 主筋の断面積の和は、コンクリートの断面積の〇・八パーセント以上とすること。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "structural",
+          "value": "構造耐力上主要な部分である柱"
+        }
+      ],
+      "note": "構造耐力上主要な部分である柱に適用"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        { "ref": "item1-compliance", "operator": "==", "value": true },
+        { "ref": "item2-compliance", "operator": "==", "value": true },
+        { "ref": "item3-compliance", "operator": "==", "value": true },
+        { "ref": "item4-compliance", "operator": "==", "value": true },
+        { "ref": "item5-compliance", "operator": "==", "value": true },
+        { "ref": "item6-compliance", "operator": "==", "value": true }
+      ]
+    },
+    "exceptions": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "type": "structural_calc",
+          "value": "国土交通大臣が定める基準に従った構造計算により構造耐力上安全であることが確かめられた場合",
+          "applies_to": "第5号"
+        }
+      ],
+      "effect": "EXEMPT"
+    }
+  },
+  "flow_diagram": {
+    "title": "令第77条第1項 柱の構造 適合判定フロー",
+    "description": "鉄筋コンクリート造の柱が第1号〜第6号の構造要件を満たすかを順次判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "構造耐力上主要な部分である柱の構造基準適合判定を開始"
+      },
+      {
+        "id": "proc-input-main-bar-count",
+        "type": "process",
+        "title": "主筋の本数を確認",
+        "process_type": "undefined_input",
+        "description": "対象柱の主筋の本数を特定する"
+      },
+      {
+        "id": "dec-item1",
+        "type": "decision",
+        "title": "主筋は4本以上か？",
+        "decision_type": "binary",
+        "description": "第1号: 主筋は四本以上とすること",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "N1", "desc": "主筋の本数" },
+          "rhs": { "value": 4, "unit": "本" }
+        },
+        "related_articles": ["令第77条第1項第1号"]
+      },
+      {
+        "id": "proc-item1-pass",
+        "type": "process",
+        "title": "第1号適合",
+        "process_type": "mechanical",
+        "description": "主筋が4本以上であることを確認"
+      },
+      {
+        "id": "proc-input-tie-connection",
+        "type": "process",
+        "title": "主筋と帯筋の緊結状況を確認",
+        "process_type": "undefined_input",
+        "description": "対象柱の主筋が帯筋と緊結されているかを特定する"
+      },
+      {
+        "id": "dec-item2",
+        "type": "decision",
+        "title": "主筋は帯筋と緊結されているか？",
+        "decision_type": "binary",
+        "description": "第2号: 主筋は帯筋と緊結すること",
+        "condition": {
+          "operator": "EQ",
+          "lhs": { "var": "T2", "desc": "主筋と帯筋の緊結" },
+          "rhs": { "value": true }
+        },
+        "related_articles": ["令第77条第1項第2号"]
+      },
+      {
+        "id": "proc-item2-pass",
+        "type": "process",
+        "title": "第2号適合",
+        "process_type": "mechanical",
+        "description": "主筋が帯筋と緊結されていることを確認"
+      },
+      {
+        "id": "proc-input-tie-bar",
+        "type": "process",
+        "title": "帯筋の径・間隔・最細主筋径を確認",
+        "process_type": "undefined_input",
+        "description": "対象柱の帯筋の径、帯筋の間隔、最も細い主筋の径を特定する"
+      },
+      {
+        "id": "dec-item3-diameter",
+        "type": "decision",
+        "title": "帯筋の径 >= 6mm か？",
+        "decision_type": "binary",
+        "description": "第3号: 帯筋の径は六ミリメートル以上",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "D3", "desc": "帯筋の径" },
+          "rhs": { "value": 6, "unit": "mm" }
+        },
+        "related_articles": ["令第77条第1項第3号"]
+      },
+      {
+        "id": "dec-item3-spacing",
+        "type": "decision",
+        "title": "帯筋の間隔 <= 15cm か？",
+        "decision_type": "binary",
+        "description": "第3号: 帯筋の間隔は十五センチメートル以下（柱に接着する壁・はり等から柱の小径の2倍以内の部分は10cm以下）",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "S3", "desc": "帯筋の間隔" },
+          "rhs": { "value": 15, "unit": "cm" }
+        },
+        "related_articles": ["令第77条第1項第3号"]
+      },
+      {
+        "id": "dec-item3-ratio",
+        "type": "decision",
+        "title": "帯筋の間隔 <= 最細主筋径 x 15 か？",
+        "decision_type": "binary",
+        "description": "第3号: 帯筋の間隔は最も細い主筋の径の十五倍以下",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "S3", "desc": "帯筋の間隔(cm)" },
+          "rhs": { "var": "Dm_x_15", "desc": "最も細い主筋の径 x 15 / 10 (cm)" }
+        },
+        "related_articles": ["令第77条第1項第3号"]
+      },
+      {
+        "id": "proc-item3-pass",
+        "type": "process",
+        "title": "第3号適合",
+        "process_type": "mechanical",
+        "description": "帯筋の径・間隔の要件を確認"
+      },
+      {
+        "id": "proc-input-tie-ratio",
+        "type": "process",
+        "title": "帯筋比を確認",
+        "process_type": "undefined_input",
+        "description": "対象柱の帯筋比（国土交通大臣が定める方法により算出）を特定する"
+      },
+      {
+        "id": "dec-item4",
+        "type": "decision",
+        "title": "帯筋比 >= 0.2% か？",
+        "decision_type": "binary",
+        "description": "第4号: 帯筋比は〇・二パーセント以上とすること",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "R4", "desc": "帯筋比" },
+          "rhs": { "value": 0.2, "unit": "%" }
+        },
+        "related_articles": ["令第77条第1項第4号"]
+      },
+      {
+        "id": "proc-item4-pass",
+        "type": "process",
+        "title": "第4号適合",
+        "process_type": "mechanical",
+        "description": "帯筋比が0.2%以上であることを確認"
+      },
+      {
+        "id": "proc-input-column-span",
+        "type": "process",
+        "title": "柱の小径・支点間距離を確認",
+        "process_type": "undefined_input",
+        "description": "対象柱の小径と構造耐力上主要な支点間の距離を特定する"
+      },
+      {
+        "id": "dec-item5-main",
+        "type": "decision",
+        "title": "柱の小径 >= 支点間距離 / 15 か？",
+        "decision_type": "binary",
+        "description": "第5号本文: 柱の小径はその構造耐力上主要な支点間の距離の十五分の一以上",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "d5", "desc": "柱の小径" },
+          "rhs": { "var": "L5_div_15", "desc": "支点間距離 / 15" }
+        },
+        "related_articles": ["令第77条第1項第5号"]
+      },
+      {
+        "id": "proc-item5-pass",
+        "type": "process",
+        "title": "第5号適合（本文）",
+        "process_type": "mechanical",
+        "description": "柱の小径が支点間距離の1/15以上であることを確認"
+      },
+      {
+        "id": "proc-input-structural-calc",
+        "type": "process",
+        "title": "構造計算による安全確認の有無を確認",
+        "process_type": "undefined_input",
+        "description": "国土交通大臣が定める基準に従った構造計算により構造耐力上安全であることが確かめられたか"
+      },
+      {
+        "id": "dec-item5-exception",
+        "type": "decision",
+        "title": "構造計算で安全が確認されているか？",
+        "decision_type": "binary",
+        "description": "第5号ただし書: 国土交通大臣が定める基準に従った構造計算により構造耐力上安全であることが確かめられた場合",
+        "condition": {
+          "operator": "EQ",
+          "lhs": { "var": "E5", "desc": "構造計算による安全確認" },
+          "rhs": { "value": true }
+        },
+        "related_articles": ["令第77条第1項第5号ただし書"]
+      },
+      {
+        "id": "proc-item5-exception-pass",
+        "type": "process",
+        "title": "第5号適合（ただし書き）",
+        "process_type": "mechanical",
+        "description": "構造計算により安全性が確認されているため第5号は適用除外"
+      },
+      {
+        "id": "proc-input-bar-concrete-area",
+        "type": "process",
+        "title": "主筋断面積・コンクリート断面積を確認",
+        "process_type": "undefined_input",
+        "description": "対象柱の主筋断面積の和とコンクリートの断面積を特定する"
+      },
+      {
+        "id": "dec-item6",
+        "type": "decision",
+        "title": "主筋断面積比 >= 0.8% か？",
+        "decision_type": "binary",
+        "description": "第6号: 主筋の断面積の和はコンクリートの断面積の〇・八パーセント以上",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "A6_ratio", "desc": "主筋断面積 / コンクリート断面積 x 100" },
+          "rhs": { "value": 0.8, "unit": "%" }
+        },
+        "related_articles": ["令第77条第1項第6号"]
+      },
+      {
+        "id": "proc-item6-pass",
+        "type": "process",
+        "title": "第6号適合",
+        "process_type": "mechanical",
+        "description": "主筋断面積比が0.8%以上であることを確認"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令第77条第1項の全ての号（第1号〜第6号）に適合"
+      },
+      {
+        "id": "end-fail-item1",
+        "type": "terminal",
+        "title": "不適合（第1号）",
+        "result": "fail",
+        "description": "第1号（主筋4本以上）に不適合"
+      },
+      {
+        "id": "end-fail-item2",
+        "type": "terminal",
+        "title": "不適合（第2号）",
+        "result": "fail",
+        "description": "第2号（主筋と帯筋の緊結）に不適合"
+      },
+      {
+        "id": "end-fail-item3",
+        "type": "terminal",
+        "title": "不適合（第3号）",
+        "result": "fail",
+        "description": "第3号（帯筋の径・間隔）に不適合"
+      },
+      {
+        "id": "end-fail-item4",
+        "type": "terminal",
+        "title": "不適合（第4号）",
+        "result": "fail",
+        "description": "第4号（帯筋比0.2%以上）に不適合"
+      },
+      {
+        "id": "end-fail-item5",
+        "type": "terminal",
+        "title": "不適合（第5号）",
+        "result": "fail",
+        "description": "第5号（柱の小径または構造計算）に不適合"
+      },
+      {
+        "id": "end-fail-item6",
+        "type": "terminal",
+        "title": "不適合（第6号）",
+        "result": "fail",
+        "description": "第6号（主筋断面積比0.8%以上）に不適合"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "proc-input-main-bar-count",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "proc-input-main-bar-count",
+        "to": "dec-item1",
+        "role": "flow"
+      },
+      {
+        "id": "e03",
+        "from": "dec-item1",
+        "to": "proc-item1-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e04",
+        "from": "dec-item1",
+        "to": "end-fail-item1",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e05",
+        "from": "proc-item1-pass",
+        "to": "proc-input-tie-connection",
+        "role": "flow"
+      },
+      {
+        "id": "e06",
+        "from": "proc-input-tie-connection",
+        "to": "dec-item2",
+        "role": "flow"
+      },
+      {
+        "id": "e07",
+        "from": "dec-item2",
+        "to": "proc-item2-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e08",
+        "from": "dec-item2",
+        "to": "end-fail-item2",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e09",
+        "from": "proc-item2-pass",
+        "to": "proc-input-tie-bar",
+        "role": "flow"
+      },
+      {
+        "id": "e10",
+        "from": "proc-input-tie-bar",
+        "to": "dec-item3-diameter",
+        "role": "flow"
+      },
+      {
+        "id": "e11",
+        "from": "dec-item3-diameter",
+        "to": "dec-item3-spacing",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e12",
+        "from": "dec-item3-diameter",
+        "to": "end-fail-item3",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e13",
+        "from": "dec-item3-spacing",
+        "to": "dec-item3-ratio",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e14",
+        "from": "dec-item3-spacing",
+        "to": "end-fail-item3",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e15",
+        "from": "dec-item3-ratio",
+        "to": "proc-item3-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e16",
+        "from": "dec-item3-ratio",
+        "to": "end-fail-item3",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e17",
+        "from": "proc-item3-pass",
+        "to": "proc-input-tie-ratio",
+        "role": "flow"
+      },
+      {
+        "id": "e18",
+        "from": "proc-input-tie-ratio",
+        "to": "dec-item4",
+        "role": "flow"
+      },
+      {
+        "id": "e19",
+        "from": "dec-item4",
+        "to": "proc-item4-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e20",
+        "from": "dec-item4",
+        "to": "end-fail-item4",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e21",
+        "from": "proc-item4-pass",
+        "to": "proc-input-column-span",
+        "role": "flow"
+      },
+      {
+        "id": "e22",
+        "from": "proc-input-column-span",
+        "to": "dec-item5-main",
+        "role": "flow"
+      },
+      {
+        "id": "e23",
+        "from": "dec-item5-main",
+        "to": "proc-item5-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e24",
+        "from": "dec-item5-main",
+        "to": "proc-input-structural-calc",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e25",
+        "from": "proc-input-structural-calc",
+        "to": "dec-item5-exception",
+        "role": "flow"
+      },
+      {
+        "id": "e26",
+        "from": "dec-item5-exception",
+        "to": "proc-item5-exception-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e27",
+        "from": "dec-item5-exception",
+        "to": "end-fail-item5",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e28",
+        "from": "proc-item5-pass",
+        "to": "proc-input-bar-concrete-area",
+        "role": "flow"
+      },
+      {
+        "id": "e29",
+        "from": "proc-item5-exception-pass",
+        "to": "proc-input-bar-concrete-area",
+        "role": "flow"
+      },
+      {
+        "id": "e30",
+        "from": "proc-input-bar-concrete-area",
+        "to": "dec-item6",
+        "role": "flow"
+      },
+      {
+        "id": "e31",
+        "from": "dec-item6",
+        "to": "proc-item6-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e32",
+        "from": "dec-item6",
+        "to": "end-fail-item6",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e33",
+        "from": "proc-item6-pass",
+        "to": "end-pass",
+        "role": "flow"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-ORDER-A77-P1",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": ["A20"],
+      "description": "構造耐力に関する法第20条からの委任"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T12:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

@@ -1,0 +1,224 @@
+{
+  "id": "CHK-BSL-KIJO-A126_3-P1-I11",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "排煙設備の中央管理",
+    "target_subject": "排煙設備",
+    "description": "法第34条第2項に規定する建築物又は床面積合計1000平方メートル超の地下街における排煙設備の制御・監視"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "126_3",
+    "paragraph": "1",
+    "item": "11"
+  },
+  "labels": [
+    "単体規定",
+    "排煙設備",
+    "中央管理"
+  ],
+  "text_raw": "法第三十四条第二項に規定する建築物又は各構えの床面積の合計が千平方メートルを超える地下街における排煙設備の制御及び作動状態の監視は、中央管理室において行うことができるものとすること。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "type": "building_category",
+          "value": "法第34条第2項に規定する建築物（高さ31mを超え非常用エレベーターを設けるもの）"
+        },
+        {
+          "type": "building_part",
+          "value": "各構えの床面積の合計が1000平方メートルを超える地下街"
+        }
+      ],
+      "note": "適用対象の判定は公共データ（法第34条第2項該当性）と設計情報による"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "requirement",
+          "value": "排煙設備の制御を中央管理室で行える"
+        },
+        {
+          "type": "requirement",
+          "value": "排煙設備の作動状態の監視を中央管理室で行える"
+        }
+      ]
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "info-smoke-exhaust-set",
+        "type": "information",
+        "title": "建築物の排煙設備",
+        "symbol": "SE",
+        "subject": "建築物",
+        "property": "排煙設備の集合",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "当該建築物又は地下街に設けられる排煙設備を特定"
+      },
+      {
+        "id": "proc-central-room-check",
+        "type": "process",
+        "title": "中央管理室の有無確認",
+        "process_type": "undefined_input",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "中央管理室が設置されているか確認"
+      },
+      {
+        "id": "info-central-room",
+        "type": "information",
+        "title": "中央管理室の有無",
+        "symbol": "CR",
+        "subject": "建築物",
+        "property": "中央管理室設置",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "中央管理室が設置されているか"
+      },
+      {
+        "id": "proc-control-check",
+        "type": "process",
+        "title": "制御機能の確認",
+        "process_type": "undefined_input",
+        "target_subject": "排煙設備",
+        "iteration": "single",
+        "description": "排煙設備の制御が中央管理室で行えるか確認"
+      },
+      {
+        "id": "info-control-capability",
+        "type": "information",
+        "title": "制御機能",
+        "symbol": "CT",
+        "subject": "排煙設備",
+        "property": "中央管理室からの制御可否",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "排煙設備の制御を中央管理室で行えるか"
+      },
+      {
+        "id": "proc-monitor-check",
+        "type": "process",
+        "title": "監視機能の確認",
+        "process_type": "undefined_input",
+        "target_subject": "排煙設備",
+        "iteration": "single",
+        "description": "排煙設備の作動状態の監視が中央管理室で行えるか確認"
+      },
+      {
+        "id": "info-monitor-capability",
+        "type": "information",
+        "title": "監視機能",
+        "symbol": "MN",
+        "subject": "排煙設備",
+        "property": "中央管理室からの監視可否",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "排煙設備の作動状態の監視を中央管理室で行えるか"
+      },
+      {
+        "id": "proc-compliance-judge",
+        "type": "process",
+        "title": "適合判定",
+        "process_type": "mechanical",
+        "target_subject": "排煙設備",
+        "iteration": "single",
+        "description": "中央管理要件の適合判定",
+        "logic_expression": "CR AND CT AND MN"
+      },
+      {
+        "id": "info-compliance",
+        "type": "information",
+        "title": "中央管理要件適合",
+        "symbol": "CM",
+        "subject": "排煙設備",
+        "property": "中央管理要件への適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "令第126条の3第1項第11号への適合"
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge-001",
+        "from": "info-smoke-exhaust-set",
+        "to": "proc-control-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-002",
+        "from": "info-smoke-exhaust-set",
+        "to": "proc-monitor-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-003",
+        "from": "proc-central-room-check",
+        "to": "info-central-room",
+        "role": "output"
+      },
+      {
+        "id": "edge-004",
+        "from": "proc-control-check",
+        "to": "info-control-capability",
+        "role": "output"
+      },
+      {
+        "id": "edge-005",
+        "from": "proc-monitor-check",
+        "to": "info-monitor-capability",
+        "role": "output"
+      },
+      {
+        "id": "edge-006",
+        "from": "info-central-room",
+        "to": "proc-compliance-judge",
+        "role": "input"
+      },
+      {
+        "id": "edge-007",
+        "from": "info-control-capability",
+        "to": "proc-compliance-judge",
+        "role": "input"
+      },
+      {
+        "id": "edge-008",
+        "from": "info-monitor-capability",
+        "to": "proc-compliance-judge",
+        "role": "input"
+      },
+      {
+        "id": "edge-009",
+        "from": "proc-compliance-judge",
+        "to": "info-compliance",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A34:P2"],
+      "description": "法第34条第2項（非常用昇降機の設置義務）に規定する建築物を参照"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-23T00:00:00Z",
+    "updated_at": "2026-01-23T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "kijo-generator",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令",
+    "source": "e-Gov法令API"
+  }
+}

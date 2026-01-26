@@ -1,0 +1,356 @@
+{
+  "id": "CHK-BSL-KIJO-A129_5-P2",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "エレベーターかごの積載荷重の基準",
+    "target_subject": "エレベーターのかご",
+    "description": "エレベーターのかごの積載荷重を実況に応じて定め、かごの種類に応じた表の数値以上とする"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "129の5",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "建築設備",
+    "昇降機"
+  ],
+  "text_raw": "エレベーターのかごの積載荷重は、当該エレベーターの実況に応じて定めなければならない。ただし、かごの種類に応じて、次の表に定める数値（用途が特殊なエレベーターで国土交通大臣が定めるものにあつては、当該用途に応じて国土交通大臣が定める数値）を下回つてはならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "building_element",
+          "value": "エレベーターを設置する建築物"
+        }
+      ],
+      "note": "エレベーターを設置する全ての建築物が対象"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "requirement",
+          "value": "実況に応じた積載荷重の設定",
+          "description": "エレベーターの実況に応じて積載荷重を定める"
+        },
+        {
+          "type": "requirement",
+          "value": "最低積載荷重以上",
+          "description": "かごの種類に応じた表の数値以上であること"
+        }
+      ]
+    },
+    "exceptions": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "type": "special_use",
+          "value": "用途が特殊なエレベーターで国土交通大臣が定めるもの",
+          "description": "当該用途に応じて国土交通大臣が定める数値を適用"
+        }
+      ],
+      "effect": "SUBSTITUTE",
+      "description": "大臣が定める数値を適用"
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-elevator-identify",
+        "type": "process",
+        "title": "エレベーターの特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から対象となるエレベーターを特定"
+      },
+      {
+        "id": "info-elevator-set",
+        "type": "information",
+        "title": "対象エレベーター",
+        "symbol": "EV",
+        "subject": "建築物",
+        "property": "エレベーターの集合",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "判定対象となるエレベーターを特定"
+      },
+      {
+        "id": "proc-car-identify",
+        "type": "process",
+        "title": "かごの特定",
+        "process_type": "undefined_input",
+        "description": "各エレベーターのかごを特定"
+      },
+      {
+        "id": "info-car-set",
+        "type": "information",
+        "title": "かご",
+        "symbol": "CAR",
+        "subject": "エレベーター",
+        "property": "かごの集合",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "各エレベーターに属するかごを特定"
+      },
+      {
+        "id": "proc-car-type-check",
+        "type": "process",
+        "title": "かご種類の特定",
+        "process_type": "undefined_input",
+        "target_subject": "かご",
+        "iteration": "iterative",
+        "description": "設計図書等から各かごの種類（乗用/乗用以外）を特定"
+      },
+      {
+        "id": "info-car-type",
+        "type": "information",
+        "title": "かごの種類",
+        "symbol": "CT",
+        "subject": "かご",
+        "property": "種類",
+        "property_type": "classification",
+        "plurality": "multiple",
+        "description": "乗用エレベーター（人荷共用含み寝台用除く）のかご、または乗用エレベーター以外のかご",
+        "remarks": "乗用エレベーター：人荷共用エレベーターを含み、寝台用エレベーターを除く"
+      },
+      {
+        "id": "proc-floor-area-read",
+        "type": "process",
+        "title": "床面積の読取り",
+        "process_type": "undefined_input",
+        "target_subject": "かご",
+        "iteration": "iterative",
+        "description": "設計図書等から各かごの床面積を読み取る"
+      },
+      {
+        "id": "info-floor-area",
+        "type": "information",
+        "title": "かごの床面積",
+        "symbol": "FA",
+        "subject": "かご",
+        "property": "床面積",
+        "property_type": "numeric",
+        "unit": "m2",
+        "plurality": "multiple",
+        "description": "各かごの床面積"
+      },
+      {
+        "id": "proc-min-load-calc",
+        "type": "process",
+        "title": "最低積載荷重の算定",
+        "process_type": "mechanical",
+        "target_subject": "かご",
+        "iteration": "iterative",
+        "description": "かごの種類と床面積から表に基づく最低積載荷重を算定",
+        "logic_expression": "W_min = f(CT, FA)",
+        "remarks": "乗用：FA≦1.5→3600×FA、1.5<FA≦3→4900×(FA-1.5)+5400、FA>3→5900×(FA-3)+13000。乗用以外：2500×FA（自動車運搬用は1500×FA）"
+      },
+      {
+        "id": "info-min-load",
+        "type": "information",
+        "title": "最低積載荷重",
+        "symbol": "Wmin",
+        "subject": "かご",
+        "property": "最低積載荷重",
+        "property_type": "numeric",
+        "unit": "N",
+        "plurality": "multiple",
+        "description": "表に定める最低積載荷重の計算値"
+      },
+      {
+        "id": "proc-design-load-read",
+        "type": "process",
+        "title": "設計積載荷重の読取り",
+        "process_type": "undefined_input",
+        "target_subject": "かご",
+        "iteration": "iterative",
+        "description": "設計図書等から各かごの設計積載荷重を読み取る"
+      },
+      {
+        "id": "info-design-load",
+        "type": "information",
+        "title": "設計積載荷重",
+        "symbol": "Wd",
+        "subject": "かご",
+        "property": "設計積載荷重",
+        "property_type": "numeric",
+        "unit": "N",
+        "plurality": "multiple",
+        "description": "実況に応じて定められた設計上の積載荷重"
+      },
+      {
+        "id": "proc-load-judge",
+        "type": "process",
+        "title": "積載荷重の適合判定",
+        "process_type": "mechanical",
+        "target_subject": "かご",
+        "iteration": "iterative",
+        "description": "設計積載荷重が最低積載荷重以上かを判定",
+        "logic_expression": "Wd ≥ Wmin"
+      },
+      {
+        "id": "info-load-result",
+        "type": "information",
+        "title": "個別かご適合",
+        "symbol": "LR",
+        "subject": "かご",
+        "property": "積載荷重適合",
+        "property_type": "proposition",
+        "plurality": "multiple",
+        "description": "各かごの積載荷重が最低値以上か"
+      },
+      {
+        "id": "proc-all-judge",
+        "type": "process",
+        "title": "全体適合判定",
+        "process_type": "mechanical",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "全てのかごが適合しているか判定（全称命題）",
+        "logic_expression": "∀car ∈ CAR: LR(car) = true"
+      },
+      {
+        "id": "info-compliance",
+        "type": "information",
+        "title": "積載荷重基準適合",
+        "symbol": "COMP",
+        "subject": "建築物",
+        "property": "積載荷重基準適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "全てのかごが積載荷重基準に適合しているか"
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge-001",
+        "from": "proc-elevator-identify",
+        "to": "info-elevator-set",
+        "role": "output"
+      },
+      {
+        "id": "edge-002",
+        "from": "info-elevator-set",
+        "to": "proc-car-identify",
+        "role": "input"
+      },
+      {
+        "id": "edge-003",
+        "from": "proc-car-identify",
+        "to": "info-car-set",
+        "role": "output"
+      },
+      {
+        "id": "edge-004",
+        "from": "info-car-set",
+        "to": "proc-car-type-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-005",
+        "from": "proc-car-type-check",
+        "to": "info-car-type",
+        "role": "output"
+      },
+      {
+        "id": "edge-006",
+        "from": "info-car-set",
+        "to": "proc-floor-area-read",
+        "role": "input"
+      },
+      {
+        "id": "edge-007",
+        "from": "proc-floor-area-read",
+        "to": "info-floor-area",
+        "role": "output"
+      },
+      {
+        "id": "edge-008",
+        "from": "info-car-type",
+        "to": "proc-min-load-calc",
+        "role": "input"
+      },
+      {
+        "id": "edge-009",
+        "from": "info-floor-area",
+        "to": "proc-min-load-calc",
+        "role": "input"
+      },
+      {
+        "id": "edge-010",
+        "from": "proc-min-load-calc",
+        "to": "info-min-load",
+        "role": "output"
+      },
+      {
+        "id": "edge-011",
+        "from": "info-car-set",
+        "to": "proc-design-load-read",
+        "role": "input"
+      },
+      {
+        "id": "edge-012",
+        "from": "proc-design-load-read",
+        "to": "info-design-load",
+        "role": "output"
+      },
+      {
+        "id": "edge-013",
+        "from": "info-min-load",
+        "to": "proc-load-judge",
+        "role": "input"
+      },
+      {
+        "id": "edge-014",
+        "from": "info-design-load",
+        "to": "proc-load-judge",
+        "role": "input"
+      },
+      {
+        "id": "edge-015",
+        "from": "proc-load-judge",
+        "to": "info-load-result",
+        "role": "output"
+      },
+      {
+        "id": "edge-016",
+        "from": "info-load-result",
+        "to": "proc-all-judge",
+        "role": "input"
+      },
+      {
+        "id": "edge-017",
+        "from": "proc-all-judge",
+        "to": "info-compliance",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": [
+        "A129_5:P1"
+      ],
+      "description": "第1項でエレベーター各部の固定荷重を規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-25T00:00:00Z",
+    "updated_at": "2026-01-25T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "kijo-generator",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令",
+    "source": "e-Gov法令API"
+  }
+}

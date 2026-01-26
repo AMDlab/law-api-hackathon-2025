@@ -1,0 +1,396 @@
+{
+  "id": "A57_P2_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "組積造の壁における開口部間隔の適合判定フロー",
+    "target_subject": "組積造の壁",
+    "description": "開口部相互間又は開口部と対隣壁中心との水平距離が壁の厚さの二倍以上であるか、または補強による適用除外に該当するかを判定"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "57",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "組積造"
+  ],
+  "text_raw": "組積造の壁の各階における開口部相互間又は開口部と対隣壁の中心との水平距離は、その壁の厚さの二倍以上としなければならない。ただし、開口部周囲を鉄骨又は鉄筋コンクリートで補強した場合においては、この限りでない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "structure",
+          "value": "組積造"
+        }
+      ],
+      "note": "組積造の壁に適用"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "numeric",
+          "value": "開口部相互間の水平距離 >= 壁の厚さ × 2"
+        },
+        {
+          "type": "numeric",
+          "value": "開口部と対隣壁中心の水平距離 >= 壁の厚さ × 2"
+        }
+      ]
+    },
+    "exceptions": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "type": "reinforcement",
+          "value": "開口部周囲を鉄骨で補強"
+        },
+        {
+          "type": "reinforcement",
+          "value": "開口部周囲を鉄筋コンクリートで補強"
+        }
+      ],
+      "effect": "EXEMPT"
+    }
+  },
+  "flow_diagram": {
+    "title": "令第57条第2項 適合判定フロー",
+    "description": "組積造の壁における開口部間隔の判定。ただし書きの適用除外または本則の距離基準を確認",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "令第57条第2項の適合判定を開始"
+      },
+      {
+        "id": "dec-masonry-wall",
+        "type": "decision",
+        "title": "組積造の壁があるか？",
+        "decision_type": "binary",
+        "description": "建築物に組積造の壁が存在するかを確認"
+      },
+      {
+        "id": "dec-has-openings",
+        "type": "decision",
+        "title": "壁に開口部があるか？",
+        "decision_type": "binary",
+        "description": "組積造の壁に開口部が存在するかを確認"
+      },
+      {
+        "id": "proc-identify-walls",
+        "type": "process",
+        "title": "組積造の壁を特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物における組積造の壁を特定する"
+      },
+      {
+        "id": "proc-identify-openings",
+        "type": "process",
+        "title": "各壁の開口部を特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から各壁における開口部を特定する"
+      },
+      {
+        "id": "proc-measure-thickness",
+        "type": "process",
+        "title": "壁の厚さを読み取る",
+        "process_type": "undefined_input",
+        "description": "設計図書等から各壁の厚さ(T)を読み取る"
+      },
+      {
+        "id": "dec-reinforcement",
+        "type": "decision",
+        "title": "開口部周囲の補強方法は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "鉄骨補強", "description": "開口部周囲を鉄骨で補強" },
+          { "value": "鉄筋コンクリート補強", "description": "開口部周囲を鉄筋コンクリートで補強" },
+          { "value": "補強なし", "description": "補強されていない" }
+        ],
+        "description": "開口部周囲が鉄骨又は鉄筋コンクリートで補強されているかを確認"
+      },
+      {
+        "id": "proc-exempt-steel",
+        "type": "process",
+        "title": "鉄骨補強による適用除外",
+        "process_type": "mechanical",
+        "description": "開口部周囲が鉄骨で補強されているため、ただし書きにより適用除外"
+      },
+      {
+        "id": "proc-exempt-rc",
+        "type": "process",
+        "title": "鉄筋コンクリート補強による適用除外",
+        "process_type": "mechanical",
+        "description": "開口部周囲が鉄筋コンクリートで補強されているため、ただし書きにより適用除外"
+      },
+      {
+        "id": "proc-measure-d1",
+        "type": "process",
+        "title": "開口部相互間の水平距離を計測",
+        "process_type": "mechanical",
+        "description": "各階における開口部相互間の水平距離(D1)を計測する"
+      },
+      {
+        "id": "proc-measure-d2",
+        "type": "process",
+        "title": "開口部と対隣壁中心の水平距離を計測",
+        "process_type": "mechanical",
+        "description": "各階における開口部と対隣壁の中心との水平距離(D2)を計測する"
+      },
+      {
+        "id": "dec-d1-check",
+        "type": "decision",
+        "title": "開口部相互間の水平距離 >= 壁の厚さ×2 か？",
+        "decision_type": "binary",
+        "description": "D1 >= 2T を満たすか判定",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "D1", "desc": "開口部相互間の水平距離" },
+          "rhs": { "var": "2T", "desc": "壁の厚さの2倍" }
+        }
+      },
+      {
+        "id": "dec-d2-check",
+        "type": "decision",
+        "title": "開口部と対隣壁中心の水平距離 >= 壁の厚さ×2 か？",
+        "decision_type": "binary",
+        "description": "D2 >= 2T を満たすか判定",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "D2", "desc": "開口部と対隣壁中心の水平距離" },
+          "rhs": { "var": "2T", "desc": "壁の厚さの2倍" }
+        }
+      },
+      {
+        "id": "proc-d1-pass",
+        "type": "process",
+        "title": "開口部相互間距離基準適合",
+        "process_type": "mechanical",
+        "description": "開口部相互間の水平距離が壁の厚さの2倍以上を満たす"
+      },
+      {
+        "id": "proc-d2-pass",
+        "type": "process",
+        "title": "対隣壁中心距離基準適合",
+        "process_type": "mechanical",
+        "description": "開口部と対隣壁中心の水平距離が壁の厚さの2倍以上を満たす"
+      },
+      {
+        "id": "dec-all-openings",
+        "type": "decision",
+        "title": "全ての開口部を確認したか？",
+        "decision_type": "binary",
+        "description": "全ての開口部について適合又は適用除外を確認"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令第57条第2項に適合"
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "令第57条第2項に不適合（水平距離が基準未満）"
+      },
+      {
+        "id": "end-not-applicable",
+        "type": "terminal",
+        "title": "適用対象外",
+        "result": "pass",
+        "description": "組積造の壁又は開口部がないため適用対象外"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e-start-to-masonry",
+        "from": "start",
+        "to": "dec-masonry-wall",
+        "role": "flow"
+      },
+      {
+        "id": "e-masonry-yes",
+        "from": "dec-masonry-wall",
+        "to": "proc-identify-walls",
+        "role": "yes",
+        "label": "あり"
+      },
+      {
+        "id": "e-masonry-no",
+        "from": "dec-masonry-wall",
+        "to": "end-not-applicable",
+        "role": "no",
+        "label": "なし"
+      },
+      {
+        "id": "e-identify-walls-to-openings",
+        "from": "proc-identify-walls",
+        "to": "dec-has-openings",
+        "role": "flow"
+      },
+      {
+        "id": "e-openings-yes",
+        "from": "dec-has-openings",
+        "to": "proc-identify-openings",
+        "role": "yes",
+        "label": "あり"
+      },
+      {
+        "id": "e-openings-no",
+        "from": "dec-has-openings",
+        "to": "end-not-applicable",
+        "role": "no",
+        "label": "なし"
+      },
+      {
+        "id": "e-identify-openings-to-thickness",
+        "from": "proc-identify-openings",
+        "to": "proc-measure-thickness",
+        "role": "flow"
+      },
+      {
+        "id": "e-thickness-to-reinforcement",
+        "from": "proc-measure-thickness",
+        "to": "dec-reinforcement",
+        "role": "flow"
+      },
+      {
+        "id": "e-reinforcement-steel",
+        "from": "dec-reinforcement",
+        "to": "proc-exempt-steel",
+        "role": "option",
+        "label": "鉄骨補強"
+      },
+      {
+        "id": "e-reinforcement-rc",
+        "from": "dec-reinforcement",
+        "to": "proc-exempt-rc",
+        "role": "option",
+        "label": "鉄筋コンクリート補強"
+      },
+      {
+        "id": "e-reinforcement-none",
+        "from": "dec-reinforcement",
+        "to": "proc-measure-d1",
+        "role": "option",
+        "label": "補強なし"
+      },
+      {
+        "id": "e-exempt-steel-to-all",
+        "from": "proc-exempt-steel",
+        "to": "dec-all-openings",
+        "role": "flow"
+      },
+      {
+        "id": "e-exempt-rc-to-all",
+        "from": "proc-exempt-rc",
+        "to": "dec-all-openings",
+        "role": "flow"
+      },
+      {
+        "id": "e-measure-d1-to-d2",
+        "from": "proc-measure-d1",
+        "to": "proc-measure-d2",
+        "role": "flow"
+      },
+      {
+        "id": "e-measure-d2-to-d1-check",
+        "from": "proc-measure-d2",
+        "to": "dec-d1-check",
+        "role": "flow"
+      },
+      {
+        "id": "e-d1-check-yes",
+        "from": "dec-d1-check",
+        "to": "proc-d1-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e-d1-check-no",
+        "from": "dec-d1-check",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e-d1-pass-to-d2-check",
+        "from": "proc-d1-pass",
+        "to": "dec-d2-check",
+        "role": "flow"
+      },
+      {
+        "id": "e-d2-check-yes",
+        "from": "dec-d2-check",
+        "to": "proc-d2-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e-d2-check-no",
+        "from": "dec-d2-check",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e-d2-pass-to-all",
+        "from": "proc-d2-pass",
+        "to": "dec-all-openings",
+        "role": "flow"
+      },
+      {
+        "id": "e-all-openings-yes",
+        "from": "dec-all-openings",
+        "to": "end-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e-all-openings-no",
+        "from": "dec-all-openings",
+        "to": "dec-reinforcement",
+        "role": "no",
+        "label": "いいえ（次の開口部へ）"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-KIJO-A57-P2",
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": [
+        "A51",
+        "A52",
+        "A55",
+        "A56",
+        "A57:P1"
+      ],
+      "description": "第57条は組積造の開口部に関する規定。第51条で適用範囲、第52条で施工、第55条で壁の厚さ、第56条で臥梁を規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00Z",
+    "updated_at": "2026-01-26T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令",
+    "checklist_ref": "建築基準法施行令第57条第2項（組積造の開口部間隔）",
+    "source": "kijo-diagram: CHK-BSL-KIJO-A57-P2"
+  }
+}

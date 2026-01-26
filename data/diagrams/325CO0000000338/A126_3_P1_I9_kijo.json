@@ -1,0 +1,437 @@
+{
+  "id": "CHK-BSL-KIJO-A126_3-P1-I9",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "排煙機の能力",
+    "target_subject": "排煙機",
+    "description": "排煙機の自動作動及び排出能力に関する基準"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "126の3",
+    "paragraph": "1",
+    "item": "9"
+  },
+  "labels": [
+    "単体規定",
+    "避難設備",
+    "排煙設備"
+  ],
+  "text_raw": "前号の排煙機は、一の排煙口の開放に伴い自動的に作動し、かつ、一分間に、百二十立方メートル以上で、かつ、防煙区画部分の床面積一平方メートルにつき一立方メートル（二以上の防煙区画部分に係る排煙機にあつては、当該防煙区画部分のうち床面積の最大のものの床面積一平方メートルにつき二立方メートル）以上の空気を排出する能力を有するものとすること。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "equipment",
+          "value": "排煙機",
+          "description": "第8号により設置が必要な排煙機"
+        }
+      ],
+      "note": "排煙口が防煙区画部分の床面積の50分の1以上の開口面積を有し直接外気に接する場合を除き排煙機設置が必要（第8号）"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "requirement",
+          "value": "自動作動",
+          "description": "一の排煙口の開放に伴い自動的に作動すること"
+        },
+        {
+          "type": "requirement",
+          "value": "最低排出能力",
+          "description": "一分間に120立方メートル以上の排出能力"
+        },
+        {
+          "type": "requirement",
+          "value": "面積比例排出能力",
+          "description": "防煙区画部分の床面積1平方メートルにつき1立方メートル（2以上の区画の場合は最大床面積1平方メートルにつき2立方メートル）以上の排出能力"
+        }
+      ]
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-fan-identify",
+        "type": "process",
+        "title": "排煙機の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から排煙機を特定"
+      },
+      {
+        "id": "info-fan-set",
+        "type": "information",
+        "title": "排煙機",
+        "symbol": "F",
+        "subject": "排煙設備",
+        "property": "排煙機の集合",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "建築物に設置される排煙機"
+      },
+      {
+        "id": "proc-zone-identify",
+        "type": "process",
+        "title": "対象防煙区画部分の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から排煙機が対象とする防煙区画部分を特定"
+      },
+      {
+        "id": "info-zone-set",
+        "type": "information",
+        "title": "対象防煙区画部分",
+        "symbol": "Z",
+        "subject": "排煙機",
+        "property": "対象防煙区画部分の集合",
+        "property_type": "set_definition",
+        "plurality": "multiple",
+        "description": "各排煙機が対象とする防煙区画部分"
+      },
+      {
+        "id": "proc-zone-count",
+        "type": "process",
+        "title": "対象区画数の算定",
+        "process_type": "mechanical",
+        "target_subject": "排煙機",
+        "iteration": "iterative",
+        "description": "各排煙機が対象とする防煙区画部分の数を算定"
+      },
+      {
+        "id": "info-zone-count",
+        "type": "information",
+        "title": "対象区画数",
+        "symbol": "N",
+        "subject": "排煙機",
+        "property": "対象防煙区画部分数",
+        "property_type": "numeric",
+        "unit": "箇所",
+        "plurality": "multiple",
+        "description": "各排煙機が対象とする防煙区画部分の数"
+      },
+      {
+        "id": "proc-area-identify",
+        "type": "process",
+        "title": "防煙区画部分の床面積の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から各防煙区画部分の床面積を特定"
+      },
+      {
+        "id": "info-zone-area",
+        "type": "information",
+        "title": "防煙区画部分の床面積",
+        "symbol": "A",
+        "subject": "防煙区画部分",
+        "property": "床面積",
+        "property_type": "numeric",
+        "unit": "m2",
+        "plurality": "multiple",
+        "description": "各防煙区画部分の床面積"
+      },
+      {
+        "id": "proc-max-area-calc",
+        "type": "process",
+        "title": "最大床面積の算定",
+        "process_type": "mechanical",
+        "target_subject": "排煙機",
+        "iteration": "iterative",
+        "description": "2以上の防煙区画部分に係る排煙機について、対象区画のうち最大の床面積を算定",
+        "logic_expression": "Amax = max(A) for zones served by each fan"
+      },
+      {
+        "id": "info-max-area",
+        "type": "information",
+        "title": "最大床面積",
+        "symbol": "Amax",
+        "subject": "排煙機",
+        "property": "対象区画の最大床面積",
+        "property_type": "numeric",
+        "unit": "m2",
+        "plurality": "multiple",
+        "description": "各排煙機が対象とする防煙区画部分のうち最大の床面積"
+      },
+      {
+        "id": "proc-required-capacity-calc",
+        "type": "process",
+        "title": "必要排出能力の算定",
+        "process_type": "mechanical",
+        "target_subject": "排煙機",
+        "iteration": "iterative",
+        "description": "各排煙機の必要排出能力を算定。単一区画の場合はA×1、2以上の区画の場合はAmax×2、かつ120m3/min以上",
+        "logic_expression": "Qreq = max(120, (N=1 ? A×1 : Amax×2))"
+      },
+      {
+        "id": "info-required-capacity",
+        "type": "information",
+        "title": "必要排出能力",
+        "symbol": "Qreq",
+        "subject": "排煙機",
+        "property": "必要排出能力",
+        "property_type": "numeric",
+        "unit": "m3/min",
+        "plurality": "multiple",
+        "description": "各排煙機に必要な一分間あたりの空気排出能力"
+      },
+      {
+        "id": "proc-capacity-identify",
+        "type": "process",
+        "title": "排出能力の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から各排煙機の排出能力を特定"
+      },
+      {
+        "id": "info-actual-capacity",
+        "type": "information",
+        "title": "排煙機の排出能力",
+        "symbol": "Q",
+        "subject": "排煙機",
+        "property": "排出能力",
+        "property_type": "numeric",
+        "unit": "m3/min",
+        "plurality": "multiple",
+        "description": "各排煙機の一分間あたりの空気排出能力"
+      },
+      {
+        "id": "proc-capacity-judge",
+        "type": "process",
+        "title": "排出能力判定",
+        "process_type": "mechanical",
+        "target_subject": "排煙機",
+        "iteration": "iterative",
+        "description": "各排煙機の排出能力が必要排出能力以上であることを判定",
+        "logic_expression": "Q >= Qreq for all fans"
+      },
+      {
+        "id": "info-capacity-result",
+        "type": "information",
+        "title": "排出能力適合",
+        "symbol": "RC",
+        "subject": "排煙機",
+        "property": "排出能力適合",
+        "property_type": "proposition",
+        "plurality": "multiple",
+        "description": "各排煙機の排出能力が基準に適合するか"
+      },
+      {
+        "id": "proc-auto-check",
+        "type": "process",
+        "title": "自動作動機構の確認",
+        "process_type": "undefined_input",
+        "description": "設計図書等から排煙機が排煙口の開放に伴い自動的に作動する機構を有することを確認"
+      },
+      {
+        "id": "info-auto-result",
+        "type": "information",
+        "title": "自動作動機構",
+        "symbol": "AT",
+        "subject": "排煙機",
+        "property": "自動作動機構",
+        "property_type": "proposition",
+        "plurality": "multiple",
+        "description": "各排煙機が排煙口の開放に伴い自動的に作動するか"
+      },
+      {
+        "id": "proc-final-judge",
+        "type": "process",
+        "title": "9号基準総合判定",
+        "process_type": "mechanical",
+        "target_subject": "排煙設備",
+        "iteration": "single",
+        "description": "全ての排煙機について自動作動及び排出能力の基準に適合することを判定",
+        "logic_expression": "(RC AND AT) for all fans"
+      },
+      {
+        "id": "info-final-result",
+        "type": "information",
+        "title": "9号基準適合",
+        "symbol": "R",
+        "subject": "排煙設備",
+        "property": "9号基準適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "排煙機の能力に関する基準に適合するか"
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge-001",
+        "from": "proc-fan-identify",
+        "to": "info-fan-set",
+        "role": "output"
+      },
+      {
+        "id": "edge-002",
+        "from": "info-fan-set",
+        "to": "proc-zone-identify",
+        "role": "input"
+      },
+      {
+        "id": "edge-003",
+        "from": "proc-zone-identify",
+        "to": "info-zone-set",
+        "role": "output"
+      },
+      {
+        "id": "edge-004",
+        "from": "info-zone-set",
+        "to": "proc-zone-count",
+        "role": "input"
+      },
+      {
+        "id": "edge-005",
+        "from": "proc-zone-count",
+        "to": "info-zone-count",
+        "role": "output"
+      },
+      {
+        "id": "edge-006",
+        "from": "info-zone-set",
+        "to": "proc-area-identify",
+        "role": "input"
+      },
+      {
+        "id": "edge-007",
+        "from": "proc-area-identify",
+        "to": "info-zone-area",
+        "role": "output"
+      },
+      {
+        "id": "edge-008",
+        "from": "info-zone-area",
+        "to": "proc-max-area-calc",
+        "role": "input"
+      },
+      {
+        "id": "edge-009",
+        "from": "info-zone-count",
+        "to": "proc-max-area-calc",
+        "role": "input"
+      },
+      {
+        "id": "edge-010",
+        "from": "proc-max-area-calc",
+        "to": "info-max-area",
+        "role": "output"
+      },
+      {
+        "id": "edge-011",
+        "from": "info-zone-area",
+        "to": "proc-required-capacity-calc",
+        "role": "input"
+      },
+      {
+        "id": "edge-012",
+        "from": "info-zone-count",
+        "to": "proc-required-capacity-calc",
+        "role": "input"
+      },
+      {
+        "id": "edge-013",
+        "from": "info-max-area",
+        "to": "proc-required-capacity-calc",
+        "role": "input"
+      },
+      {
+        "id": "edge-014",
+        "from": "proc-required-capacity-calc",
+        "to": "info-required-capacity",
+        "role": "output"
+      },
+      {
+        "id": "edge-015",
+        "from": "info-fan-set",
+        "to": "proc-capacity-identify",
+        "role": "input"
+      },
+      {
+        "id": "edge-016",
+        "from": "proc-capacity-identify",
+        "to": "info-actual-capacity",
+        "role": "output"
+      },
+      {
+        "id": "edge-017",
+        "from": "info-actual-capacity",
+        "to": "proc-capacity-judge",
+        "role": "input"
+      },
+      {
+        "id": "edge-018",
+        "from": "info-required-capacity",
+        "to": "proc-capacity-judge",
+        "role": "input"
+      },
+      {
+        "id": "edge-019",
+        "from": "proc-capacity-judge",
+        "to": "info-capacity-result",
+        "role": "output"
+      },
+      {
+        "id": "edge-020",
+        "from": "info-fan-set",
+        "to": "proc-auto-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-021",
+        "from": "proc-auto-check",
+        "to": "info-auto-result",
+        "role": "output"
+      },
+      {
+        "id": "edge-022",
+        "from": "info-capacity-result",
+        "to": "proc-final-judge",
+        "role": "input"
+      },
+      {
+        "id": "edge-023",
+        "from": "info-auto-result",
+        "to": "proc-final-judge",
+        "role": "input"
+      },
+      {
+        "id": "edge-024",
+        "from": "proc-final-judge",
+        "to": "info-final-result",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": [
+        "A126_3:P1:I8"
+      ],
+      "description": "排煙機設置の要否（第8号）"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": [
+        "A126_3:P1:I1"
+      ],
+      "description": "防煙区画部分の定義（第1号）"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-23T00:00:00Z",
+    "updated_at": "2026-01-23T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "kijo-generator",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令",
+    "source": "e-Gov法令API"
+  }
+}

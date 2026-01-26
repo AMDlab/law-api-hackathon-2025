@@ -1,0 +1,401 @@
+{
+  "id": "A73_P2_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "主筋等の継手の重ね長さ適合判定フロー",
+    "target_subject": "主筋等の継手",
+    "description": "主筋又は耐力壁の鉄筋（主筋等）の継手の重ね長さが基準に適合するかを判定するフローチャート"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "73",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造強度",
+    "鉄筋コンクリート造"
+  ],
+  "text_raw": "主筋又は耐力壁の鉄筋（以下この項において「主筋等」という。）の継手の重ね長さは、継手を構造部材における引張力の最も小さい部分に設ける場合にあつては、主筋等の径（径の異なる主筋等をつなぐ場合にあつては、細い主筋等の径。以下この項において同じ。）の二十五倍以上とし、継手を引張力の最も小さい部分以外の部分に設ける場合にあつては、主筋等の径の四十倍以上としなければならない。ただし、国土交通大臣が定めた構造方法を用いる継手にあつては、この限りでない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "building_standard",
+          "value": "鉄筋コンクリート造の建築物"
+        },
+        {
+          "type": "element",
+          "value": "主筋又は耐力壁の鉄筋（主筋等）の継手"
+        }
+      ],
+      "note": "鉄筋コンクリート造の主筋等の継手に適用"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "type": "numeric",
+          "description": "引張力最小部分に設ける場合：重ね長さ ≧ 主筋等の径 × 25"
+        },
+        {
+          "type": "numeric",
+          "description": "引張力最小部分以外に設ける場合：重ね長さ ≧ 主筋等の径 × 40"
+        }
+      ]
+    },
+    "exceptions": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "type": "certification",
+          "value": "国土交通大臣が定めた構造方法を用いる継手"
+        }
+      ],
+      "effect": "EXEMPT",
+      "description": "国土交通大臣が定めた構造方法を用いる継手にあつては、この限りでない"
+    }
+  },
+  "flow_diagram": {
+    "title": "主筋等の継手の重ね長さ適合判定フロー",
+    "description": "主筋等の継手について、設置位置に応じた重ね長さの要件を満たしているか、または大臣認定構造方法を使用しているかを判定する",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "主筋等の継手の重ね長さ判定を開始"
+      },
+      {
+        "id": "dec-has-joints",
+        "type": "decision",
+        "title": "主筋等の継手があるか？",
+        "decision_type": "binary",
+        "description": "構造部材に主筋又は耐力壁の鉄筋の継手が存在するか確認"
+      },
+      {
+        "id": "proc-identify-joint",
+        "type": "process",
+        "title": "継手の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から継手の位置・仕様を特定する"
+      },
+      {
+        "id": "dec-minister-method",
+        "type": "decision",
+        "title": "大臣認定構造方法を使用しているか？",
+        "decision_type": "binary",
+        "description": "国土交通大臣が定めた構造方法を用いる継手であるか確認"
+      },
+      {
+        "id": "proc-minister-exempt",
+        "type": "process",
+        "title": "大臣認定構造方法使用（例外適用）",
+        "process_type": "human_judgment",
+        "description": "大臣が定めた構造方法を用いているため、重ね長さ規定は適用除外"
+      },
+      {
+        "id": "dec-joint-position",
+        "type": "decision",
+        "title": "継手の設置位置は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "引張力最小部分", "description": "構造部材における引張力の最も小さい部分" },
+          { "value": "その他の部分", "description": "引張力の最も小さい部分以外の部分" }
+        ],
+        "description": "継手が構造部材における引張力の最も小さい部分に設けられているか、それ以外の部分に設けられているかを判定"
+      },
+      {
+        "id": "proc-read-diameter-min",
+        "type": "process",
+        "title": "主筋等の径を読み取り（引張力最小部分）",
+        "process_type": "undefined_input",
+        "description": "設計図書から主筋等の径を読み取る。径の異なる主筋等をつなぐ場合は細い方の径を使用"
+      },
+      {
+        "id": "proc-read-diameter-other",
+        "type": "process",
+        "title": "主筋等の径を読み取り（その他部分）",
+        "process_type": "undefined_input",
+        "description": "設計図書から主筋等の径を読み取る。径の異なる主筋等をつなぐ場合は細い方の径を使用"
+      },
+      {
+        "id": "proc-read-lap-length-min",
+        "type": "process",
+        "title": "重ね長さを読み取り（引張力最小部分）",
+        "process_type": "undefined_input",
+        "description": "設計図書から継手の重ね長さを読み取る"
+      },
+      {
+        "id": "proc-read-lap-length-other",
+        "type": "process",
+        "title": "重ね長さを読み取り（その他部分）",
+        "process_type": "undefined_input",
+        "description": "設計図書から継手の重ね長さを読み取る"
+      },
+      {
+        "id": "dec-diff-diameter",
+        "type": "decision",
+        "title": "径の異なる主筋等をつないでいるか？",
+        "decision_type": "binary",
+        "description": "継手が径の異なる主筋等をつないでいるか確認。異なる場合は細い方の径を使用"
+      },
+      {
+        "id": "proc-calc-req-25",
+        "type": "process",
+        "title": "必要重ね長さ計算（径×25倍）",
+        "process_type": "mechanical",
+        "description": "引張力最小部分の場合：必要重ね長さ = 主筋等の径 × 25"
+      },
+      {
+        "id": "proc-calc-req-40",
+        "type": "process",
+        "title": "必要重ね長さ計算（径×40倍）",
+        "process_type": "mechanical",
+        "description": "引張力最小部分以外の場合：必要重ね長さ = 主筋等の径 × 40"
+      },
+      {
+        "id": "dec-lap-length-25",
+        "type": "decision",
+        "title": "重ね長さ ≧ 径×25か？",
+        "decision_type": "binary",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "L", "desc": "重ね長さ" },
+          "rhs": { "var": "D×25", "desc": "主筋等の径×25", "unit": "mm" }
+        },
+        "description": "実際の重ね長さが主筋等の径の25倍以上であるか判定"
+      },
+      {
+        "id": "dec-lap-length-40",
+        "type": "decision",
+        "title": "重ね長さ ≧ 径×40か？",
+        "decision_type": "binary",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "L", "desc": "重ね長さ" },
+          "rhs": { "var": "D×40", "desc": "主筋等の径×40", "unit": "mm" }
+        },
+        "description": "実際の重ね長さが主筋等の径の40倍以上であるか判定"
+      },
+      {
+        "id": "dec-more-joints",
+        "type": "decision",
+        "title": "他に未判定の継手があるか？",
+        "decision_type": "binary",
+        "description": "すべての継手について判定が完了したか確認"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "すべての継手について重ね長さ要件に適合",
+        "related_articles": ["令第73条第2項"]
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "重ね長さが不足している継手がある",
+        "related_articles": ["令第73条第2項"]
+      },
+      {
+        "id": "end-na",
+        "type": "terminal",
+        "title": "適用対象外",
+        "result": "pass",
+        "description": "主筋等の継手がないため本規定は適用されない"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e-start-has-joints",
+        "from": "start",
+        "to": "dec-has-joints",
+        "role": "flow"
+      },
+      {
+        "id": "e-has-joints-no",
+        "from": "dec-has-joints",
+        "to": "end-na",
+        "role": "no",
+        "label": "なし"
+      },
+      {
+        "id": "e-has-joints-yes",
+        "from": "dec-has-joints",
+        "to": "proc-identify-joint",
+        "role": "yes",
+        "label": "あり"
+      },
+      {
+        "id": "e-identify-to-minister",
+        "from": "proc-identify-joint",
+        "to": "dec-minister-method",
+        "role": "flow"
+      },
+      {
+        "id": "e-minister-yes",
+        "from": "dec-minister-method",
+        "to": "proc-minister-exempt",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e-minister-exempt-more",
+        "from": "proc-minister-exempt",
+        "to": "dec-more-joints",
+        "role": "flow"
+      },
+      {
+        "id": "e-minister-no",
+        "from": "dec-minister-method",
+        "to": "dec-joint-position",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e-position-min",
+        "from": "dec-joint-position",
+        "to": "proc-read-diameter-min",
+        "role": "option",
+        "label": "引張力最小部分"
+      },
+      {
+        "id": "e-position-other",
+        "from": "dec-joint-position",
+        "to": "proc-read-diameter-other",
+        "role": "option",
+        "label": "その他の部分"
+      },
+      {
+        "id": "e-diameter-min-to-diff",
+        "from": "proc-read-diameter-min",
+        "to": "dec-diff-diameter",
+        "role": "flow"
+      },
+      {
+        "id": "e-diameter-other-to-lap",
+        "from": "proc-read-diameter-other",
+        "to": "proc-read-lap-length-other",
+        "role": "flow"
+      },
+      {
+        "id": "e-diff-yes",
+        "from": "dec-diff-diameter",
+        "to": "proc-read-lap-length-min",
+        "role": "yes",
+        "label": "はい（細い方の径を使用）"
+      },
+      {
+        "id": "e-diff-no",
+        "from": "dec-diff-diameter",
+        "to": "proc-read-lap-length-min",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e-lap-min-to-calc",
+        "from": "proc-read-lap-length-min",
+        "to": "proc-calc-req-25",
+        "role": "flow"
+      },
+      {
+        "id": "e-lap-other-to-calc",
+        "from": "proc-read-lap-length-other",
+        "to": "proc-calc-req-40",
+        "role": "flow"
+      },
+      {
+        "id": "e-calc-25-to-dec",
+        "from": "proc-calc-req-25",
+        "to": "dec-lap-length-25",
+        "role": "flow"
+      },
+      {
+        "id": "e-calc-40-to-dec",
+        "from": "proc-calc-req-40",
+        "to": "dec-lap-length-40",
+        "role": "flow"
+      },
+      {
+        "id": "e-dec-25-yes",
+        "from": "dec-lap-length-25",
+        "to": "dec-more-joints",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e-dec-25-no",
+        "from": "dec-lap-length-25",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e-dec-40-yes",
+        "from": "dec-lap-length-40",
+        "to": "dec-more-joints",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e-dec-40-no",
+        "from": "dec-lap-length-40",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e-more-joints-yes",
+        "from": "dec-more-joints",
+        "to": "proc-identify-joint",
+        "role": "yes",
+        "label": "あり"
+      },
+      {
+        "id": "e-more-joints-no",
+        "from": "dec-more-joints",
+        "to": "end-pass",
+        "role": "no",
+        "label": "なし"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-KIJO-A73-P2",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": ["A20:P1"],
+      "description": "構造耐力に関する技術的基準は法第20条に基づき施行令で規定"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": ["A73:P4"],
+      "description": "第4項で軽量骨材使用時の読替規定（25倍→30倍、40倍→50倍）あり"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00Z",
+    "updated_at": "2026-01-26T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令",
+    "checklist_ref": "建築基準法施行令第73条第2項（鉄筋の継手重ね長さ）"
+  }
+}

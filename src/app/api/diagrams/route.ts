@@ -83,7 +83,12 @@ export async function GET() {
 
     for (const record of records) {
       const lawId = record.lawId;
-      if (!isValidLawId(lawId) || !isValidArticleId(record.diagramKey)) {
+      // diagramKey format: "{lawId}/{articleId}" e.g., "325CO0000000338/A19_P2_kijo"
+      const articleId = record.diagramKey.includes("/")
+        ? record.diagramKey.split("/")[1]
+        : record.diagramKey;
+
+      if (!isValidLawId(lawId) || !isValidArticleId(articleId)) {
         console.warn(`Skipping invalid diagram record: ${record.diagramKey}`);
         continue;
       }
@@ -98,12 +103,12 @@ export async function GET() {
 
       const info = diagramMap.get(lawId)!;
       info.files.push({
-        filename: `${record.diagramKey}.json`,
-        displayTitle: parseDisplayTitle(record.diagramKey),
-        diagramId: record.diagramKey,
-        baseId: record.baseId || getBaseArticleId(record.diagramKey),
+        filename: `${articleId}.json`,
+        displayTitle: parseDisplayTitle(articleId),
+        diagramId: articleId,
+        baseId: record.baseId || getBaseArticleId(articleId),
         type: record.diagramType,
-        path: `/api/diagrams/${lawId}/${record.diagramKey}`,
+        path: `/api/diagrams/${lawId}/${articleId}`,
       });
     }
 

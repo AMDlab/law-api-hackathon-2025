@@ -1,0 +1,261 @@
+{
+  "id": "A118_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "客席からの出口の戸",
+    "target_subject": "出口の戸",
+    "description": "劇場等における客席からの出口の戸の開き方向"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "118",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "避難",
+    "客席",
+    "出口の戸"
+  ],
+  "text_raw": "劇場、映画館、演芸場、観覧場、公会堂又は集会場における客席からの出口の戸は、内開きとしてはならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "use",
+          "description": "劇場、映画館、演芸場、観覧場、公会堂又は集会場"
+        }
+      ],
+      "note": "特定の興行場・集会施設用途に限定"
+    },
+    "judgment_rule": {
+      "operator": "FOR_ALL",
+      "conditions": [
+        {
+          "description": "客席からの出口の戸が内開きでない"
+        }
+      ]
+    }
+  },
+  "flow_diagram": {
+    "title": "令第118条 客席からの出口の戸 適合判定フロー",
+    "description": "劇場等における客席からの出口の戸が内開きでないことを確認するフロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "令第118条の適合判定を開始"
+      },
+      {
+        "id": "dec-use",
+        "type": "decision",
+        "title": "建築物の用途は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "劇場", "description": "劇場" },
+          { "value": "映画館", "description": "映画館" },
+          { "value": "演芸場", "description": "演芸場" },
+          { "value": "観覧場", "description": "観覧場" },
+          { "value": "公会堂", "description": "公会堂" },
+          { "value": "集会場", "description": "集会場" },
+          { "value": "その他", "description": "上記以外の用途" }
+        ],
+        "description": "設計図書等から建築物の用途を確認する"
+      },
+      {
+        "id": "proc-identify-doors",
+        "type": "process",
+        "title": "客席からの出口の戸を特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から客席からの出口に設けられた全ての戸を特定する"
+      },
+      {
+        "id": "dec-doors-exist",
+        "type": "decision",
+        "title": "客席からの出口の戸があるか？",
+        "decision_type": "binary",
+        "description": "客席からの出口に戸が設けられているか確認"
+      },
+      {
+        "id": "dec-unchecked-door",
+        "type": "decision",
+        "title": "未確認の戸があるか？",
+        "decision_type": "binary",
+        "description": "まだ開き方向を確認していない戸があるか"
+      },
+      {
+        "id": "proc-check-swing",
+        "type": "process",
+        "title": "戸の開き方向を確認",
+        "process_type": "undefined_input",
+        "description": "設計図書等から当該戸の開き方向を確認する"
+      },
+      {
+        "id": "dec-inward",
+        "type": "decision",
+        "title": "戸が内開きか？",
+        "decision_type": "binary",
+        "description": "当該戸が内開きであるか判定",
+        "condition": {
+          "operator": "EQ",
+          "lhs": { "var": "D", "desc": "戸の開き方向" },
+          "rhs": { "value": "内開き", "desc": "内開き" }
+        }
+      },
+      {
+        "id": "end-pass-not-applicable",
+        "type": "terminal",
+        "title": "適合（適用対象外）",
+        "result": "pass",
+        "description": "本条の適用対象となる用途に該当しないため適合"
+      },
+      {
+        "id": "end-pass-no-doors",
+        "type": "terminal",
+        "title": "適合（客席出口の戸なし）",
+        "result": "pass",
+        "description": "客席からの出口に戸がないため適合"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "全ての客席からの出口の戸が内開きでないため適合"
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "内開きの戸が存在するため不適合"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-use",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-use",
+        "to": "proc-identify-doors",
+        "role": "option",
+        "label": "劇場"
+      },
+      {
+        "id": "e03",
+        "from": "dec-use",
+        "to": "proc-identify-doors",
+        "role": "option",
+        "label": "映画館"
+      },
+      {
+        "id": "e04",
+        "from": "dec-use",
+        "to": "proc-identify-doors",
+        "role": "option",
+        "label": "演芸場"
+      },
+      {
+        "id": "e05",
+        "from": "dec-use",
+        "to": "proc-identify-doors",
+        "role": "option",
+        "label": "観覧場"
+      },
+      {
+        "id": "e06",
+        "from": "dec-use",
+        "to": "proc-identify-doors",
+        "role": "option",
+        "label": "公会堂"
+      },
+      {
+        "id": "e07",
+        "from": "dec-use",
+        "to": "proc-identify-doors",
+        "role": "option",
+        "label": "集会場"
+      },
+      {
+        "id": "e08",
+        "from": "dec-use",
+        "to": "end-pass-not-applicable",
+        "role": "option",
+        "label": "その他"
+      },
+      {
+        "id": "e09",
+        "from": "proc-identify-doors",
+        "to": "dec-doors-exist",
+        "role": "flow"
+      },
+      {
+        "id": "e10",
+        "from": "dec-doors-exist",
+        "to": "dec-unchecked-door",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e11",
+        "from": "dec-doors-exist",
+        "to": "end-pass-no-doors",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e12",
+        "from": "dec-unchecked-door",
+        "to": "proc-check-swing",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e13",
+        "from": "dec-unchecked-door",
+        "to": "end-pass",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e14",
+        "from": "proc-check-swing",
+        "to": "dec-inward",
+        "role": "flow"
+      },
+      {
+        "id": "e15",
+        "from": "dec-inward",
+        "to": "end-fail",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e16",
+        "from": "dec-inward",
+        "to": "dec-unchecked-door",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-ORD-A118-P1",
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00+09:00",
+    "author": "Claude",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

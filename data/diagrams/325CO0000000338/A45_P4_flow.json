@@ -1,0 +1,342 @@
+{
+  "id": "A45_P4_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "筋かいの欠込み禁止（令第45条第4項）",
+    "target_subject": "筋かい",
+    "description": "筋かいに欠込みがないこと、または例外としてたすき掛けのためにやむを得ない場合で必要な補強が行われていることを判定するフロー"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "45",
+    "paragraph": "4",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造",
+    "木造",
+    "筋かい"
+  ],
+  "text_raw": "筋かいには、欠込みをしてはならない。ただし、筋かいをたすき掛けにするためにやむを得ない場合において、必要な補強を行つたときは、この限りでない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "building_element",
+          "value": "筋かいを有する建築物"
+        }
+      ],
+      "note": "筋かいを有する木造建築物に適用"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "ref": "info-notch-existence",
+          "operator": "==",
+          "value": false,
+          "note": "欠込みなし"
+        },
+        {
+          "operator": "AND",
+          "conditions": [
+            {
+              "ref": "info-cross-bracing-purpose",
+              "operator": "==",
+              "value": true
+            },
+            {
+              "ref": "info-reinforcement-done",
+              "operator": "==",
+              "value": true
+            }
+          ],
+          "note": "たすき掛け目的かつ補強あり"
+        }
+      ]
+    },
+    "exceptions": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "purpose",
+          "value": "たすき掛けにするためにやむを得ない場合"
+        },
+        {
+          "type": "measure",
+          "value": "必要な補強を行った"
+        }
+      ],
+      "effect": "EXEMPT"
+    }
+  },
+  "flow_diagram": {
+    "title": "令第45条第4項 筋かいの欠込み禁止 適合判定フロー",
+    "description": "各筋かいについて欠込みの有無と例外条件を確認し、建築物全体の適合を判定する",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "令第45条第4項の適合判定を開始"
+      },
+      {
+        "id": "proc-identify-braces",
+        "type": "process",
+        "title": "筋かいの特定",
+        "process_type": "undefined_input",
+        "description": "設計図書から建築物に設けられた筋かいを特定する"
+      },
+      {
+        "id": "dec-braces-exist",
+        "type": "decision",
+        "title": "筋かいはあるか？",
+        "decision_type": "binary",
+        "description": "建築物に筋かいが設けられているか確認"
+      },
+      {
+        "id": "proc-set-target",
+        "type": "process",
+        "title": "判定対象の筋かいを設定",
+        "process_type": "mechanical",
+        "description": "各筋かいについて順次判定を行う（ループ開始）"
+      },
+      {
+        "id": "dec-notch-exists",
+        "type": "decision",
+        "title": "欠込みがあるか？",
+        "decision_type": "binary",
+        "description": "当該筋かいに欠込みがあるか確認する",
+        "condition": {
+          "operator": "EQ",
+          "lhs": { "var": "N", "desc": "欠込みの有無" },
+          "rhs": { "value": true, "desc": "欠込みあり" }
+        }
+      },
+      {
+        "id": "proc-no-notch",
+        "type": "process",
+        "title": "欠込みなし（本則適合）",
+        "process_type": "mechanical",
+        "description": "当該筋かいは欠込みがないため本則に適合"
+      },
+      {
+        "id": "dec-cross-bracing",
+        "type": "decision",
+        "title": "たすき掛け目的でやむを得ない場合か？",
+        "decision_type": "binary",
+        "description": "欠込みがたすき掛けにするためにやむを得ない場合に該当するか確認",
+        "condition": {
+          "operator": "EQ",
+          "lhs": { "var": "CB", "desc": "たすき掛け目的でやむを得ない場合" },
+          "rhs": { "value": true, "desc": "該当する" }
+        }
+      },
+      {
+        "id": "proc-exception-condition-met",
+        "type": "process",
+        "title": "ただし書き条件1充足",
+        "process_type": "mechanical",
+        "description": "たすき掛け目的でやむを得ない場合に該当"
+      },
+      {
+        "id": "dec-reinforcement",
+        "type": "decision",
+        "title": "必要な補強が行われているか？",
+        "decision_type": "binary",
+        "description": "欠込み部分に必要な補強が行われているか確認",
+        "condition": {
+          "operator": "EQ",
+          "lhs": { "var": "R", "desc": "必要な補強の実施" },
+          "rhs": { "value": true, "desc": "補強あり" }
+        }
+      },
+      {
+        "id": "proc-exception-applied",
+        "type": "process",
+        "title": "ただし書き例外適用",
+        "process_type": "mechanical",
+        "description": "たすき掛け目的かつ補強ありのため、ただし書きにより適合"
+      },
+      {
+        "id": "proc-brace-compliant",
+        "type": "process",
+        "title": "当該筋かい適合",
+        "process_type": "mechanical",
+        "description": "当該筋かいは令第45条第4項に適合"
+      },
+      {
+        "id": "dec-more-braces",
+        "type": "decision",
+        "title": "未判定の筋かいがあるか？",
+        "decision_type": "binary",
+        "description": "まだ判定していない筋かいがあるか確認"
+      },
+      {
+        "id": "proc-all-compliant",
+        "type": "process",
+        "title": "全筋かい適合確認",
+        "process_type": "mechanical",
+        "description": "すべての筋かいが令第45条第4項に適合"
+      },
+      {
+        "id": "terminal-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令第45条第4項に適合",
+        "related_articles": ["令第45条第4項"]
+      },
+      {
+        "id": "terminal-pass-no-braces",
+        "type": "terminal",
+        "title": "適合（対象外）",
+        "result": "pass",
+        "description": "筋かいがないため令第45条第4項の適用対象外"
+      },
+      {
+        "id": "terminal-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "令第45条第4項に不適合：欠込みがあり、ただし書きの例外条件を満たさない",
+        "related_articles": ["令第45条第4項"]
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "proc-identify-braces",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "proc-identify-braces",
+        "to": "dec-braces-exist",
+        "role": "flow"
+      },
+      {
+        "id": "e03",
+        "from": "dec-braces-exist",
+        "to": "proc-set-target",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e04",
+        "from": "dec-braces-exist",
+        "to": "terminal-pass-no-braces",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e05",
+        "from": "proc-set-target",
+        "to": "dec-notch-exists",
+        "role": "flow"
+      },
+      {
+        "id": "e06",
+        "from": "dec-notch-exists",
+        "to": "proc-no-notch",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e07",
+        "from": "dec-notch-exists",
+        "to": "dec-cross-bracing",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e08",
+        "from": "proc-no-notch",
+        "to": "proc-brace-compliant",
+        "role": "flow"
+      },
+      {
+        "id": "e09",
+        "from": "dec-cross-bracing",
+        "to": "proc-exception-condition-met",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e10",
+        "from": "dec-cross-bracing",
+        "to": "terminal-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e11",
+        "from": "proc-exception-condition-met",
+        "to": "dec-reinforcement",
+        "role": "flow"
+      },
+      {
+        "id": "e12",
+        "from": "dec-reinforcement",
+        "to": "proc-exception-applied",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e13",
+        "from": "dec-reinforcement",
+        "to": "terminal-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e14",
+        "from": "proc-exception-applied",
+        "to": "proc-brace-compliant",
+        "role": "flow"
+      },
+      {
+        "id": "e15",
+        "from": "proc-brace-compliant",
+        "to": "dec-more-braces",
+        "role": "flow"
+      },
+      {
+        "id": "e16",
+        "from": "dec-more-braces",
+        "to": "proc-set-target",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e17",
+        "from": "dec-more-braces",
+        "to": "proc-all-compliant",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e18",
+        "from": "proc-all-compliant",
+        "to": "terminal-pass",
+        "role": "flow"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-ORDER-A45-P4",
+  "related_laws": [],
+  "metadata": {
+    "created_at": "2026-01-26T12:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

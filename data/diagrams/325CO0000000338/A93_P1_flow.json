@@ -1,0 +1,434 @@
+{
+  "id": "A93_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "地盤及び基礎ぐいの許容応力度・支持力の決定",
+    "target_subject": "地盤・基礎ぐい",
+    "description": "地盤の許容応力度及び基礎ぐいの許容支持力を、国土交通大臣が定める方法による地盤調査の結果に基づいて定めることを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "93",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造規定",
+    "地盤",
+    "基礎"
+  ],
+  "text_raw": "地盤の許容応力度及び基礎ぐいの許容支持力は、国土交通大臣が定める方法によつて、地盤調査を行い、その結果に基づいて定めなければならない。ただし、次の表に掲げる地盤の許容応力度については、地盤の種類に応じて、それぞれ次の表の数値によることができる。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "building_component",
+          "value": "地盤及び基礎ぐいを有する建築物"
+        }
+      ],
+      "note": "地盤及び基礎ぐいを有するすべての建築物が対象"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "description": "地盤調査に基づく許容応力度・支持力の設定",
+          "ref": "info-allowable-capacity-compliance",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "description": "ただし書き適用（表の数値による許容応力度）",
+          "ref": "info-table-value-compliance",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    },
+    "exceptions": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "proviso",
+          "value": "表に掲げる地盤の種類に該当する場合"
+        }
+      ],
+      "effect": "表の数値を許容応力度として採用可能"
+    }
+  },
+  "flow_diagram": {
+    "title": "令93条1項 適合判定フロー",
+    "description": "地盤の許容応力度及び基礎ぐいの許容支持力の決定方法の適合判定フロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "令93条1項の適合判定を開始"
+      },
+      {
+        "id": "proc-get-ground-type",
+        "type": "process",
+        "title": "地盤種類の取得",
+        "process_type": "undefined_input",
+        "description": "地盤調査報告書等から敷地の地盤種類を取得する"
+      },
+      {
+        "id": "dec-ground-type",
+        "type": "decision",
+        "title": "地盤種類は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "岩盤", "description": "岩盤（長期1000kN/m2）" },
+          { "value": "固結した砂", "description": "固結した砂（長期500kN/m2）" },
+          { "value": "土丹盤", "description": "土丹盤（長期300kN/m2）" },
+          { "value": "密実な礫層", "description": "密実な礫層（長期300kN/m2）" },
+          { "value": "密実な砂質地盤", "description": "密実な砂質地盤（長期200kN/m2）" },
+          { "value": "砂質地盤", "description": "砂質地盤（液状化おそれなし、長期50kN/m2）" },
+          { "value": "堅い粘土質地盤", "description": "堅い粘土質地盤（長期100kN/m2）" },
+          { "value": "粘土質地盤", "description": "粘土質地盤（長期20kN/m2）" },
+          { "value": "堅いローム層", "description": "堅いローム層（長期100kN/m2）" },
+          { "value": "ローム層", "description": "ローム層（長期50kN/m2）" },
+          { "value": "その他", "description": "表に該当しない地盤種類" }
+        ],
+        "description": "地盤種類が表に該当するか、その他かを判定"
+      },
+      {
+        "id": "proc-get-table-value",
+        "type": "process",
+        "title": "表の許容応力度を特定",
+        "process_type": "mechanical",
+        "description": "地盤種類に応じた表の許容応力度（長期・短期）を特定する"
+      },
+      {
+        "id": "proc-get-set-stress",
+        "type": "process",
+        "title": "設定許容応力度の取得",
+        "process_type": "undefined_input",
+        "description": "構造計算書等から設定された地盤の許容応力度を取得する"
+      },
+      {
+        "id": "dec-stress-vs-table",
+        "type": "decision",
+        "title": "設定値 ≤ 表の値か？",
+        "decision_type": "binary",
+        "description": "設定された許容応力度が表の数値以下であるか判定",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "As", "desc": "設定許容応力度" },
+          "rhs": { "var": "Tv", "desc": "表の許容応力度" }
+        }
+      },
+      {
+        "id": "pass-table",
+        "type": "terminal",
+        "title": "適合（ただし書き）",
+        "result": "pass",
+        "description": "ただし書きにより表の数値を採用して適合"
+      },
+      {
+        "id": "proc-get-survey-method",
+        "type": "process",
+        "title": "地盤調査方法の取得",
+        "process_type": "undefined_input",
+        "description": "実施された地盤調査の方法を取得する"
+      },
+      {
+        "id": "dec-survey-method-compliance",
+        "type": "decision",
+        "title": "調査方法が基準に適合するか？",
+        "decision_type": "binary",
+        "description": "地盤調査の方法が国土交通大臣が定める方法（平成13年国土交通省告示第1113号）に適合するか判定",
+        "related_articles": ["告示::H13_1113"]
+      },
+      {
+        "id": "proc-get-survey-result",
+        "type": "process",
+        "title": "地盤調査結果の取得",
+        "process_type": "undefined_input",
+        "description": "地盤調査報告書から調査結果（N値、地盤反力係数等）を取得する"
+      },
+      {
+        "id": "proc-get-set-stress-2",
+        "type": "process",
+        "title": "設定許容応力度の取得",
+        "process_type": "undefined_input",
+        "description": "構造計算書等から設定された地盤の許容応力度を取得する"
+      },
+      {
+        "id": "dec-stress-derivation",
+        "type": "decision",
+        "title": "許容応力度が調査結果から適切に導出されているか？",
+        "decision_type": "binary",
+        "description": "設定された許容応力度が地盤調査結果に基づいて適切に導出されているか確認",
+        "process_type": "human_judgment"
+      },
+      {
+        "id": "dec-pile-exists",
+        "type": "decision",
+        "title": "基礎ぐいを使用するか？",
+        "decision_type": "binary",
+        "description": "建築計画において基礎ぐいを使用するか判定"
+      },
+      {
+        "id": "proc-get-pile-capacity",
+        "type": "process",
+        "title": "設定許容支持力の取得",
+        "process_type": "undefined_input",
+        "description": "構造計算書等から設定された基礎ぐいの許容支持力を取得する"
+      },
+      {
+        "id": "dec-pile-derivation",
+        "type": "decision",
+        "title": "許容支持力が調査結果から適切に導出されているか？",
+        "decision_type": "binary",
+        "description": "設定された許容支持力が地盤調査結果に基づいて適切に導出されているか確認",
+        "process_type": "human_judgment"
+      },
+      {
+        "id": "pass-survey",
+        "type": "terminal",
+        "title": "適合（本文）",
+        "result": "pass",
+        "description": "国土交通大臣が定める方法による地盤調査と、その結果に基づく許容応力度・支持力の設定により適合"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "令93条1項に不適合"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "proc-get-ground-type",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "proc-get-ground-type",
+        "to": "dec-ground-type",
+        "role": "flow"
+      },
+      {
+        "id": "e03",
+        "from": "dec-ground-type",
+        "to": "proc-get-table-value",
+        "role": "option",
+        "label": "岩盤"
+      },
+      {
+        "id": "e04",
+        "from": "dec-ground-type",
+        "to": "proc-get-table-value",
+        "role": "option",
+        "label": "固結した砂"
+      },
+      {
+        "id": "e05",
+        "from": "dec-ground-type",
+        "to": "proc-get-table-value",
+        "role": "option",
+        "label": "土丹盤"
+      },
+      {
+        "id": "e06",
+        "from": "dec-ground-type",
+        "to": "proc-get-table-value",
+        "role": "option",
+        "label": "密実な礫層"
+      },
+      {
+        "id": "e07",
+        "from": "dec-ground-type",
+        "to": "proc-get-table-value",
+        "role": "option",
+        "label": "密実な砂質地盤"
+      },
+      {
+        "id": "e08",
+        "from": "dec-ground-type",
+        "to": "proc-get-table-value",
+        "role": "option",
+        "label": "砂質地盤"
+      },
+      {
+        "id": "e09",
+        "from": "dec-ground-type",
+        "to": "proc-get-table-value",
+        "role": "option",
+        "label": "堅い粘土質地盤"
+      },
+      {
+        "id": "e10",
+        "from": "dec-ground-type",
+        "to": "proc-get-table-value",
+        "role": "option",
+        "label": "粘土質地盤"
+      },
+      {
+        "id": "e11",
+        "from": "dec-ground-type",
+        "to": "proc-get-table-value",
+        "role": "option",
+        "label": "堅いローム層"
+      },
+      {
+        "id": "e12",
+        "from": "dec-ground-type",
+        "to": "proc-get-table-value",
+        "role": "option",
+        "label": "ローム層"
+      },
+      {
+        "id": "e13",
+        "from": "dec-ground-type",
+        "to": "proc-get-survey-method",
+        "role": "option",
+        "label": "その他"
+      },
+      {
+        "id": "e14",
+        "from": "proc-get-table-value",
+        "to": "proc-get-set-stress",
+        "role": "flow"
+      },
+      {
+        "id": "e15",
+        "from": "proc-get-set-stress",
+        "to": "dec-stress-vs-table",
+        "role": "flow"
+      },
+      {
+        "id": "e16",
+        "from": "dec-stress-vs-table",
+        "to": "pass-table",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e17",
+        "from": "dec-stress-vs-table",
+        "to": "proc-get-survey-method",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e18",
+        "from": "proc-get-survey-method",
+        "to": "dec-survey-method-compliance",
+        "role": "flow"
+      },
+      {
+        "id": "e19",
+        "from": "dec-survey-method-compliance",
+        "to": "proc-get-survey-result",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e20",
+        "from": "dec-survey-method-compliance",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e21",
+        "from": "proc-get-survey-result",
+        "to": "proc-get-set-stress-2",
+        "role": "flow"
+      },
+      {
+        "id": "e22",
+        "from": "proc-get-set-stress-2",
+        "to": "dec-stress-derivation",
+        "role": "flow"
+      },
+      {
+        "id": "e23",
+        "from": "dec-stress-derivation",
+        "to": "dec-pile-exists",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e24",
+        "from": "dec-stress-derivation",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e25",
+        "from": "dec-pile-exists",
+        "to": "proc-get-pile-capacity",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e26",
+        "from": "dec-pile-exists",
+        "to": "pass-survey",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e27",
+        "from": "proc-get-pile-capacity",
+        "to": "dec-pile-derivation",
+        "role": "flow"
+      },
+      {
+        "id": "e28",
+        "from": "dec-pile-derivation",
+        "to": "pass-survey",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e29",
+        "from": "dec-pile-derivation",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-ORDER-A93-P1",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": ["A20"],
+      "description": "法第20条（構造耐力）の委任を受けた構造規定"
+    },
+    {
+      "law_id": "H13_1113",
+      "law_name": "地盤の許容応力度及び基礎ぐいの許容支持力を求めるための地盤調査の方法並びにその結果に基づき地盤の許容応力度及び基礎ぐいの許容支持力を定める方法等を定める件",
+      "law_type": "notice",
+      "relationship": "defines_detail",
+      "articles": [],
+      "description": "国土交通大臣が定める地盤調査の方法及び許容応力度・支持力の算定方法"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T12:00:00+09:00",
+    "updated_at": "2026-01-26T12:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

@@ -1,0 +1,343 @@
+{
+  "id": "CHK-BSL-ORD-A120-P1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "直通階段の設置",
+    "target_subject": "居室",
+    "description": "避難階以外の階の居室から直通階段までの歩行距離基準"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "120",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "避難",
+    "直通階段",
+    "歩行距離"
+  ],
+  "text_raw": "建築物の避難階以外の階（地下街におけるものを除く。次条第一項において同じ。）においては、避難階又は地上に通ずる直通階段（傾斜路を含む。以下同じ。）を次の表の上欄に掲げる居室の種類の区分に応じ当該各居室からその一に至る歩行距離が同表の中欄又は下欄に掲げる場合の区分に応じそれぞれ同表の中欄又は下欄に掲げる数値以下となるように設けなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        { "type": "building_part", "value": "避難階以外の階" },
+        { "type": "exclusion", "value": "地下街を除く" }
+      ],
+      "note": "避難階以外の階（地下街におけるものを除く）"
+    },
+    "judgment_rule": {
+      "operator": "<=",
+      "lhs": { "type": "variable", "ref": "D", "description": "歩行距離" },
+      "rhs": { "type": "variable", "ref": "D_max", "description": "歩行距離の上限値（居室種類・構造により決定）" }
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-floor-identify",
+        "type": "process",
+        "title": "階の特定",
+        "process_type": "undefined_input",
+        "description": "建築物の避難階以外の階を特定（地下街を除く）"
+      },
+      {
+        "id": "info-floor-set",
+        "type": "information",
+        "title": "避難階以外の階",
+        "subject": "建築物",
+        "property": "避難階以外の階の集合",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "地下街におけるものを除く"
+      },
+      {
+        "id": "proc-room-identify",
+        "type": "process",
+        "title": "居室の特定",
+        "process_type": "undefined_input",
+        "description": "各階に属する居室を特定"
+      },
+      {
+        "id": "info-room-set",
+        "type": "information",
+        "title": "階に属する居室",
+        "subject": "階",
+        "property": "居室の集合",
+        "property_type": "set_definition",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-room-type-identify",
+        "type": "process",
+        "title": "居室種類の特定",
+        "process_type": "undefined_input",
+        "description": "居室が(一)(二)(三)のいずれに該当するか特定",
+        "iteration": "iterative"
+      },
+      {
+        "id": "info-room-type",
+        "type": "information",
+        "title": "居室の種類",
+        "symbol": "RT",
+        "subject": "居室",
+        "property": "居室種類区分",
+        "property_type": "classification",
+        "plurality": "multiple",
+        "description": "(一)無窓居室又は法別表第一(い)(四)項の特殊建築物の居室、(二)法別表第一(い)(二)項の特殊建築物の居室、(三)その他の居室",
+        "remarks": "(一)令第116条の2第1項第1号に該当する窓その他の開口部を有しない居室（国土交通大臣が定める基準に適合するものを除く）又は法別表第一(い)欄(四)項に掲げる用途（百貨店、マーケット、展示場、キャバレー、遊技場等）に供する特殊建築物の主たる用途に供する居室、(二)法別表第一(い)欄(二)項に掲げる用途（病院、診療所、ホテル、旅館、共同住宅等）に供する特殊建築物の主たる用途に供する居室、(三)上記以外の居室"
+      },
+      {
+        "id": "proc-structure-identify",
+        "type": "process",
+        "title": "主要構造部の種類の特定",
+        "process_type": "undefined_input",
+        "description": "主要構造部が準耐火構造又は不燃材料かどうかを特定"
+      },
+      {
+        "id": "info-structure-type",
+        "type": "information",
+        "title": "主要構造部の種類",
+        "symbol": "ST",
+        "subject": "建築物",
+        "property": "主要構造部種類区分",
+        "property_type": "classification",
+        "plurality": "single",
+        "description": "準耐火構造（特定主要構造部が耐火構造を含む）又は不燃材料か、その他か"
+      },
+      {
+        "id": "proc-limit-calc",
+        "type": "process",
+        "title": "歩行距離上限値の算定",
+        "process_type": "mechanical",
+        "description": "居室種類と構造に基づき歩行距離の上限値を決定",
+        "logic_expression": "IF RT=(一) THEN D_max=30 ELSE IF RT=(二) AND ST=準耐火等 THEN D_max=50 ELSE IF RT=(二) AND ST=その他 THEN D_max=30 ELSE IF RT=(三) AND ST=準耐火等 THEN D_max=50 ELSE D_max=40",
+        "iteration": "iterative"
+      },
+      {
+        "id": "info-distance-limit",
+        "type": "information",
+        "title": "歩行距離上限値",
+        "symbol": "D_max",
+        "subject": "居室",
+        "property": "歩行距離上限値",
+        "property_type": "numeric",
+        "unit": "m",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-stair-identify",
+        "type": "process",
+        "title": "直通階段の特定",
+        "process_type": "undefined_input",
+        "description": "避難階又は地上に通ずる直通階段（傾斜路を含む）を特定"
+      },
+      {
+        "id": "info-stair-set",
+        "type": "information",
+        "title": "直通階段",
+        "subject": "建築物",
+        "property": "直通階段の集合",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "避難階又は地上に通ずる直通階段（傾斜路を含む）"
+      },
+      {
+        "id": "proc-distance-measure",
+        "type": "process",
+        "title": "歩行距離の測定",
+        "process_type": "undefined_input",
+        "description": "各居室から最も近い直通階段までの歩行距離を測定",
+        "iteration": "iterative"
+      },
+      {
+        "id": "info-distance",
+        "type": "information",
+        "title": "歩行距離",
+        "symbol": "D",
+        "subject": "居室",
+        "property": "直通階段までの歩行距離",
+        "property_type": "numeric",
+        "unit": "m",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-distance-judge",
+        "type": "process",
+        "title": "歩行距離判定",
+        "process_type": "mechanical",
+        "description": "歩行距離が上限値以下か判定",
+        "logic_expression": "D <= D_max",
+        "iteration": "iterative"
+      },
+      {
+        "id": "info-distance-compliance",
+        "type": "information",
+        "title": "歩行距離適合",
+        "symbol": "DC",
+        "subject": "居室",
+        "property": "歩行距離適合性",
+        "property_type": "proposition",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-final-judge",
+        "type": "process",
+        "title": "最終適合判定",
+        "process_type": "mechanical",
+        "description": "全居室の歩行距離適合性を総合判定",
+        "logic_expression": "ALL(DC)"
+      },
+      {
+        "id": "info-final-compliance",
+        "type": "information",
+        "title": "令第120条第1項適合",
+        "symbol": "COMPLIANT",
+        "subject": "建築物",
+        "property": "令第120条第1項適合性",
+        "property_type": "proposition",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-floor-identify",
+        "to": "info-floor-set",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "info-floor-set",
+        "to": "proc-room-identify",
+        "role": "input"
+      },
+      {
+        "id": "e03",
+        "from": "proc-room-identify",
+        "to": "info-room-set",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "info-room-set",
+        "to": "proc-room-type-identify",
+        "role": "input"
+      },
+      {
+        "id": "e05",
+        "from": "proc-room-type-identify",
+        "to": "info-room-type",
+        "role": "output"
+      },
+      {
+        "id": "e06",
+        "from": "proc-structure-identify",
+        "to": "info-structure-type",
+        "role": "output"
+      },
+      {
+        "id": "e07",
+        "from": "info-room-type",
+        "to": "proc-limit-calc",
+        "role": "input"
+      },
+      {
+        "id": "e08",
+        "from": "info-structure-type",
+        "to": "proc-limit-calc",
+        "role": "input"
+      },
+      {
+        "id": "e09",
+        "from": "proc-limit-calc",
+        "to": "info-distance-limit",
+        "role": "output"
+      },
+      {
+        "id": "e10",
+        "from": "proc-stair-identify",
+        "to": "info-stair-set",
+        "role": "output"
+      },
+      {
+        "id": "e11",
+        "from": "info-room-set",
+        "to": "proc-distance-measure",
+        "role": "input"
+      },
+      {
+        "id": "e12",
+        "from": "info-stair-set",
+        "to": "proc-distance-measure",
+        "role": "input"
+      },
+      {
+        "id": "e13",
+        "from": "proc-distance-measure",
+        "to": "info-distance",
+        "role": "output"
+      },
+      {
+        "id": "e14",
+        "from": "info-distance",
+        "to": "proc-distance-judge",
+        "role": "input"
+      },
+      {
+        "id": "e15",
+        "from": "info-distance-limit",
+        "to": "proc-distance-judge",
+        "role": "input"
+      },
+      {
+        "id": "e16",
+        "from": "proc-distance-judge",
+        "to": "info-distance-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e17",
+        "from": "info-distance-compliance",
+        "to": "proc-final-judge",
+        "role": "input"
+      },
+      {
+        "id": "e18",
+        "from": "proc-final-judge",
+        "to": "info-final-compliance",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": ["A116_2:P1:I1"],
+      "description": "無窓居室の定義（令116条の2第1項第1号）"
+    },
+    {
+      "law_id": "322AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["別表第一"],
+      "description": "特殊建築物の用途区分（法別表第一(い)欄(二)項、(四)項）"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-23T00:00:00+09:00",
+    "author": "Claude",
+    "generator": "kijo-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

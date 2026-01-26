@@ -1,0 +1,352 @@
+{
+  "id": "A99_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "材料強度の補則",
+    "target_subject": "構造耐力上主要な部分の材料",
+    "description": "構造耐力上主要な部分の材料の材料強度が国土交通大臣の定める数値に適合するかを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "99",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造関係規定",
+    "材料強度"
+  ],
+  "text_raw": "第九十五条から前条までに定めるもののほか、構造耐力上主要な部分の材料の材料強度は、材料の種類及び品質に応じ、国土交通大臣が地震に対して建築物の安全を確保するために必要なものとして定める数値によらなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "reference",
+          "value": "令第95条から第98条までの規定の補則として適用"
+        }
+      ],
+      "note": "第95条から第98条までに定める材料以外の材料に適用"
+    },
+    "judgment_rule": {
+      "operator": "==",
+      "lhs": {
+        "ref": "info-material-strength",
+        "description": "材料強度"
+      },
+      "rhs": {
+        "ref": "国土交通大臣が定める数値",
+        "description": "材料の種類及び品質に応じた基準値"
+      }
+    },
+    "exceptions": null
+  },
+  "flow_diagram": {
+    "title": "令第99条第1項 材料強度の補則 適合判定フロー",
+    "description": "構造耐力上主要な部分の材料の材料強度が国土交通大臣の定める数値に適合するかを判定するフローチャート",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "令第99条第1項の適合判定を開始"
+      },
+      {
+        "id": "info-materials-set",
+        "type": "information",
+        "title": "構造耐力上主要な部分の材料",
+        "symbol": "M",
+        "subject": "建築物",
+        "property": "構造耐力上主要な部分の材料の集合",
+        "property_type": "set_definition",
+        "description": "判定対象となる建築物における構造耐力上主要な部分に使用される材料を特定"
+      },
+      {
+        "id": "dec-materials-exist",
+        "type": "decision",
+        "title": "構造耐力上主要な部分の材料があるか？",
+        "decision_type": "binary",
+        "description": "判定対象の材料が存在するかを確認"
+      },
+      {
+        "id": "proc-select-material",
+        "type": "process",
+        "title": "材料の選択",
+        "process_type": "mechanical",
+        "description": "判定対象の材料を1つ選択（未判定の材料から順次選択）"
+      },
+      {
+        "id": "proc-identify-type",
+        "type": "process",
+        "title": "材料の種類を特定",
+        "process_type": "undefined_input",
+        "description": "選択した材料の種類（鋼材、コンクリート、木材等）を特定"
+      },
+      {
+        "id": "info-material-type",
+        "type": "information",
+        "title": "材料の種類",
+        "symbol": "T",
+        "subject": "材料",
+        "property": "種類",
+        "property_type": "classification",
+        "description": "特定された材料の種類"
+      },
+      {
+        "id": "proc-identify-quality",
+        "type": "process",
+        "title": "材料の品質を特定",
+        "process_type": "undefined_input",
+        "description": "選択した材料の品質（規格、等級等）を特定"
+      },
+      {
+        "id": "info-material-quality",
+        "type": "information",
+        "title": "材料の品質",
+        "symbol": "Q",
+        "subject": "材料",
+        "property": "品質",
+        "property_type": "classification",
+        "description": "特定された材料の品質"
+      },
+      {
+        "id": "proc-identify-strength",
+        "type": "process",
+        "title": "材料強度を特定",
+        "process_type": "undefined_input",
+        "description": "選択した材料の材料強度を特定"
+      },
+      {
+        "id": "info-material-strength",
+        "type": "information",
+        "title": "材料強度",
+        "symbol": "S",
+        "subject": "材料",
+        "property": "材料強度",
+        "property_type": "numeric",
+        "description": "特定された材料の材料強度（N/mm2）"
+      },
+      {
+        "id": "proc-get-standard",
+        "type": "process",
+        "title": "大臣定め数値を取得",
+        "process_type": "mechanical",
+        "description": "材料の種類(T)及び品質(Q)に応じた国土交通大臣が定める数値を取得"
+      },
+      {
+        "id": "info-standard-value",
+        "type": "information",
+        "title": "大臣定め数値",
+        "symbol": "Std",
+        "subject": "基準",
+        "property": "大臣定め数値",
+        "property_type": "numeric",
+        "description": "材料の種類及び品質に応じた国土交通大臣が定める基準数値"
+      },
+      {
+        "id": "dec-strength-compliance",
+        "type": "decision",
+        "title": "材料強度が大臣定め数値に適合するか？",
+        "decision_type": "binary",
+        "description": "材料強度(S)が大臣定め数値(Std)に適合しているかを判定",
+        "condition": {
+          "operator": "EQ",
+          "lhs": {
+            "var": "S",
+            "desc": "材料強度"
+          },
+          "rhs": {
+            "var": "Std",
+            "desc": "大臣定め数値"
+          }
+        }
+      },
+      {
+        "id": "dec-more-materials",
+        "type": "decision",
+        "title": "未判定の材料があるか？",
+        "decision_type": "binary",
+        "description": "まだ判定していない材料が残っているかを確認"
+      },
+      {
+        "id": "terminal-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "全ての材料の材料強度が大臣定め数値に適合",
+        "related_articles": ["令99条1項"]
+      },
+      {
+        "id": "terminal-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "材料強度が大臣定め数値に適合しない材料が存在",
+        "related_articles": ["令99条1項"]
+      },
+      {
+        "id": "terminal-not-applicable",
+        "type": "terminal",
+        "title": "該当なし",
+        "result": "pass",
+        "description": "構造耐力上主要な部分の材料が存在しない場合は適用対象外"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "info-materials-set",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "info-materials-set",
+        "to": "dec-materials-exist",
+        "role": "flow"
+      },
+      {
+        "id": "e03",
+        "from": "dec-materials-exist",
+        "to": "proc-select-material",
+        "role": "yes",
+        "label": "あり"
+      },
+      {
+        "id": "e04",
+        "from": "dec-materials-exist",
+        "to": "terminal-not-applicable",
+        "role": "no",
+        "label": "なし"
+      },
+      {
+        "id": "e05",
+        "from": "proc-select-material",
+        "to": "proc-identify-type",
+        "role": "flow"
+      },
+      {
+        "id": "e06",
+        "from": "proc-identify-type",
+        "to": "info-material-type",
+        "role": "output"
+      },
+      {
+        "id": "e07",
+        "from": "info-material-type",
+        "to": "proc-identify-quality",
+        "role": "flow"
+      },
+      {
+        "id": "e08",
+        "from": "proc-identify-quality",
+        "to": "info-material-quality",
+        "role": "output"
+      },
+      {
+        "id": "e09",
+        "from": "info-material-quality",
+        "to": "proc-identify-strength",
+        "role": "flow"
+      },
+      {
+        "id": "e10",
+        "from": "proc-identify-strength",
+        "to": "info-material-strength",
+        "role": "output"
+      },
+      {
+        "id": "e11",
+        "from": "info-material-strength",
+        "to": "proc-get-standard",
+        "role": "flow"
+      },
+      {
+        "id": "e12",
+        "from": "info-material-type",
+        "to": "proc-get-standard",
+        "role": "input"
+      },
+      {
+        "id": "e13",
+        "from": "info-material-quality",
+        "to": "proc-get-standard",
+        "role": "input"
+      },
+      {
+        "id": "e14",
+        "from": "proc-get-standard",
+        "to": "info-standard-value",
+        "role": "output"
+      },
+      {
+        "id": "e15",
+        "from": "info-standard-value",
+        "to": "dec-strength-compliance",
+        "role": "flow"
+      },
+      {
+        "id": "e16",
+        "from": "info-material-strength",
+        "to": "dec-strength-compliance",
+        "role": "input"
+      },
+      {
+        "id": "e17",
+        "from": "dec-strength-compliance",
+        "to": "dec-more-materials",
+        "role": "yes",
+        "label": "適合"
+      },
+      {
+        "id": "e18",
+        "from": "dec-strength-compliance",
+        "to": "terminal-fail",
+        "role": "no",
+        "label": "不適合"
+      },
+      {
+        "id": "e19",
+        "from": "dec-more-materials",
+        "to": "proc-select-material",
+        "role": "yes",
+        "label": "あり"
+      },
+      {
+        "id": "e20",
+        "from": "dec-more-materials",
+        "to": "terminal-pass",
+        "role": "no",
+        "label": "なし"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-ORDER-A99-P1",
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": [
+        "A95",
+        "A96",
+        "A97",
+        "A98"
+      ],
+      "description": "第95条から第98条までに定める材料強度の補則"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

@@ -1,0 +1,346 @@
+{
+  "id": "CHK-BSL-ORDER-A110-2-P1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "延焼するおそれがある外壁の開口部の判定",
+    "target_subject": "外壁の開口部",
+    "description": "法第27条第1項の政令で定める外壁の開口部に該当するか判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "110の2",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "定義",
+    "防火",
+    "外壁開口部",
+    "延焼"
+  ],
+  "text_raw": "法第二十七条第一項の政令で定める外壁の開口部は、次に掲げるものとする。一 延焼のおそれのある部分であるもの（法第八十六条の四各号のいずれかに該当する建築物の外壁の開口部を除く。）二 他の外壁の開口部から通常の火災時における火炎が到達するおそれがあるものとして国土交通大臣が定めるもの（前号に掲げるものを除く。）",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "reference",
+          "value": "法第27条第1項の適用対象建築物"
+        }
+      ],
+      "note": "法第27条第1項の耐火建築物等としなければならない特殊建築物の外壁開口部を対象"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "ref": "info-item1-applicable",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "ref": "info-item2-applicable",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-building-identify",
+        "type": "process",
+        "title": "建築物の特定",
+        "process_type": "undefined_input",
+        "description": "判定対象の建築物を特定"
+      },
+      {
+        "id": "info-building",
+        "type": "information",
+        "title": "建築物",
+        "symbol": "B",
+        "subject": "建築物",
+        "property": "存在",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "判定対象の建築物"
+      },
+      {
+        "id": "proc-opening-identify",
+        "type": "process",
+        "title": "外壁開口部の特定",
+        "process_type": "undefined_input",
+        "description": "建築物に属する外壁の開口部を特定"
+      },
+      {
+        "id": "info-openings",
+        "type": "information",
+        "title": "外壁の開口部",
+        "symbol": "O",
+        "subject": "建築物",
+        "property": "外壁開口部の集合",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "建築物に属する外壁の開口部の集合"
+      },
+      {
+        "id": "proc-ensho-check",
+        "type": "process",
+        "title": "延焼のおそれのある部分の判定",
+        "process_type": "mechanical",
+        "description": "各開口部が延焼のおそれのある部分に該当するか判定",
+        "iteration": "iterative"
+      },
+      {
+        "id": "info-ensho-part",
+        "type": "information",
+        "title": "延焼のおそれのある部分該当",
+        "symbol": "E",
+        "subject": "外壁の開口部",
+        "property": "延焼のおそれのある部分に該当",
+        "property_type": "proposition",
+        "plurality": "multiple",
+        "description": "各開口部が延焼のおそれのある部分に位置するか"
+      },
+      {
+        "id": "proc-law86-4-check",
+        "type": "process",
+        "title": "法86条の4該当判定",
+        "process_type": "mechanical",
+        "description": "建築物が法第86条の4各号のいずれかに該当するか判定"
+      },
+      {
+        "id": "info-law86-4-applicable",
+        "type": "information",
+        "title": "法86条の4該当",
+        "symbol": "X",
+        "subject": "建築物",
+        "property": "法第86条の4各号該当",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "建築物が法第86条の4各号のいずれかに該当するか",
+        "related_articles": ["法::A86_4"]
+      },
+      {
+        "id": "proc-item1-judgment",
+        "type": "process",
+        "title": "第1号該当判定",
+        "process_type": "mechanical",
+        "description": "延焼のおそれのある部分であり、かつ法86条の4に該当しない場合に第1号に該当",
+        "logic_expression": "E AND NOT X"
+      },
+      {
+        "id": "info-item1-applicable",
+        "type": "information",
+        "title": "第1号該当",
+        "symbol": "I1",
+        "subject": "外壁の開口部",
+        "property": "第1号該当",
+        "property_type": "proposition",
+        "plurality": "multiple",
+        "description": "延焼のおそれのある部分であるもの（法86条の4該当建築物を除く）"
+      },
+      {
+        "id": "proc-minister-standard-check",
+        "type": "process",
+        "title": "大臣基準適合判定",
+        "process_type": "human_judgment",
+        "description": "他の外壁開口部から火炎が到達するおそれがあるものとして国土交通大臣が定める基準に適合するか判定",
+        "iteration": "iterative"
+      },
+      {
+        "id": "info-minister-standard",
+        "type": "information",
+        "title": "大臣基準該当",
+        "symbol": "M",
+        "subject": "外壁の開口部",
+        "property": "大臣基準該当",
+        "property_type": "proposition",
+        "plurality": "multiple",
+        "description": "他の外壁開口部から火炎が到達するおそれがあるものとして国土交通大臣が定める基準に該当"
+      },
+      {
+        "id": "proc-item2-judgment",
+        "type": "process",
+        "title": "第2号該当判定",
+        "process_type": "mechanical",
+        "description": "大臣基準に該当し、かつ第1号に該当しない場合に第2号に該当",
+        "logic_expression": "M AND NOT I1"
+      },
+      {
+        "id": "info-item2-applicable",
+        "type": "information",
+        "title": "第2号該当",
+        "symbol": "I2",
+        "subject": "外壁の開口部",
+        "property": "第2号該当",
+        "property_type": "proposition",
+        "plurality": "multiple",
+        "description": "他の外壁開口部から火炎到達のおそれがあるもの（第1号を除く）"
+      },
+      {
+        "id": "proc-final-judgment",
+        "type": "process",
+        "title": "政令で定める開口部判定",
+        "process_type": "mechanical",
+        "description": "第1号または第2号のいずれかに該当するか判定",
+        "logic_expression": "I1 OR I2"
+      },
+      {
+        "id": "info-final",
+        "type": "information",
+        "title": "政令で定める外壁開口部該当",
+        "symbol": "R",
+        "subject": "外壁の開口部",
+        "property": "法27条1項の政令で定める外壁開口部該当",
+        "property_type": "proposition",
+        "plurality": "multiple",
+        "description": "令第110条の2第1項に定める外壁の開口部に該当するか"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-building-identify",
+        "to": "info-building",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "info-building",
+        "to": "proc-opening-identify",
+        "role": "input"
+      },
+      {
+        "id": "e03",
+        "from": "proc-opening-identify",
+        "to": "info-openings",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "info-openings",
+        "to": "proc-ensho-check",
+        "role": "input"
+      },
+      {
+        "id": "e05",
+        "from": "proc-ensho-check",
+        "to": "info-ensho-part",
+        "role": "output"
+      },
+      {
+        "id": "e06",
+        "from": "info-building",
+        "to": "proc-law86-4-check",
+        "role": "input"
+      },
+      {
+        "id": "e07",
+        "from": "proc-law86-4-check",
+        "to": "info-law86-4-applicable",
+        "role": "output"
+      },
+      {
+        "id": "e08",
+        "from": "info-ensho-part",
+        "to": "proc-item1-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e09",
+        "from": "info-law86-4-applicable",
+        "to": "proc-item1-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e10",
+        "from": "proc-item1-judgment",
+        "to": "info-item1-applicable",
+        "role": "output"
+      },
+      {
+        "id": "e11",
+        "from": "info-openings",
+        "to": "proc-minister-standard-check",
+        "role": "input"
+      },
+      {
+        "id": "e12",
+        "from": "proc-minister-standard-check",
+        "to": "info-minister-standard",
+        "role": "output"
+      },
+      {
+        "id": "e13",
+        "from": "info-minister-standard",
+        "to": "proc-item2-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e14",
+        "from": "info-item1-applicable",
+        "to": "proc-item2-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e15",
+        "from": "proc-item2-judgment",
+        "to": "info-item2-applicable",
+        "role": "output"
+      },
+      {
+        "id": "e16",
+        "from": "info-item1-applicable",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e17",
+        "from": "info-item2-applicable",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e18",
+        "from": "proc-final-judgment",
+        "to": "info-final",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": [
+        "A27:P1"
+      ],
+      "description": "法第27条第1項で定められる外壁開口部の定義を委任"
+    },
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": [
+        "A86_4"
+      ],
+      "description": "第1号の適用除外に係る法第86条の4"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-23T12:00:00Z",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

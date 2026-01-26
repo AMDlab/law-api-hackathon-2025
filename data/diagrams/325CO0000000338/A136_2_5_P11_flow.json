@@ -1,0 +1,343 @@
+{
+  "id": "A136_2_5_P11_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "敷地面積最低限度の適用除外判定フロー",
+    "target_subject": "建築物の敷地",
+    "description": "事業施行による敷地面積減少時の最低限度制限の適用除外対象を判定するフロー"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "136_2_5",
+    "paragraph": "11",
+    "item": null
+  },
+  "labels": [
+    "集団規定",
+    "地区計画等"
+  ],
+  "text_raw": "法第六十八条の二第一項の規定に基づく条例で建築物の敷地面積の最低限度に関する制限を定める場合においては、当該条例に、法第八十六条の九第一項各号に掲げる事業の施行による建築物の敷地面積の減少により、当該事業の施行の際現に建築物の敷地として使用されている土地で当該制限に適合しなくなるもの及び当該事業の施行の際現に存する所有権その他の権利に基づいて建築物の敷地として使用するならば当該制限に適合しないこととなる土地のうち、次に掲げる土地以外のものについて、その全部を一の敷地として使用する場合の適用の除外に関する規定を定めるものとする。一　法第八十六条の九第一項各号に掲げる事業の施行により面積が減少した際、当該面積の減少がなくとも建築物の敷地面積の最低限度に関する制限に違反していた建築物の敷地及び所有権その他の権利に基づいて建築物の敷地として使用するならば当該制限に違反することとなつた土地　二　当該条例で定める建築物の敷地面積の最低限度に関する制限に適合するに至つた建築物の敷地及び所有権その他の権利に基づいて建築物の敷地として使用するならば当該制限に適合することとなるに至つた土地",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "ordinance",
+          "value": "法第68条の2第1項に基づく条例で敷地面積の最低限度を定める場合"
+        },
+        {
+          "type": "project",
+          "value": "法第86条の9第1項各号に掲げる事業の施行による敷地面積の減少"
+        }
+      ],
+      "note": "条例で敷地面積最低限度を定める場合に適用除外規定を定めることを義務付ける条文"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-exemption-applicable",
+          "operator": "==",
+          "value": true,
+          "note": "適用除外対象に該当する"
+        }
+      ]
+    },
+    "exceptions": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "ref": "info-exception-1",
+          "note": "事業施行前から既に制限に違反していた土地"
+        },
+        {
+          "ref": "info-exception-2",
+          "note": "その後制限に適合するに至った土地"
+        }
+      ],
+      "effect": "NOT_EXEMPT"
+    }
+  },
+  "flow_diagram": {
+    "title": "敷地面積最低限度の適用除外判定フロー",
+    "description": "令第136条の2の5第11項に基づき、事業施行による敷地面積減少時の適用除外対象かを判定する",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "敷地面積最低限度の適用除外判定を開始"
+      },
+      {
+        "id": "dec-project-execution",
+        "type": "decision",
+        "title": "法第86条の9第1項各号事業の施行により敷地面積が減少したか？",
+        "decision_type": "binary",
+        "description": "法第86条の9第1項各号に掲げる事業の施行により敷地面積が減少したかを確認"
+      },
+      {
+        "id": "proc-get-site-area",
+        "type": "process",
+        "title": "敷地面積（A）を取得",
+        "process_type": "undefined_input",
+        "description": "設計図書等から敷地面積を読み取る"
+      },
+      {
+        "id": "proc-get-min-area",
+        "type": "process",
+        "title": "条例の敷地面積最低限度（Amin）を取得",
+        "process_type": "undefined_input",
+        "description": "条例から敷地面積の最低限度を確認する"
+      },
+      {
+        "id": "dec-area-compliance",
+        "type": "decision",
+        "title": "敷地面積（A）は最低限度（Amin）以上か？",
+        "decision_type": "binary",
+        "description": "A >= Amin かを判定",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "A", "desc": "敷地面積" },
+          "rhs": { "var": "Amin", "desc": "敷地面積最低限度", "unit": "m2" }
+        }
+      },
+      {
+        "id": "dec-current-use",
+        "type": "decision",
+        "title": "事業施行時に建築物の敷地として使用されていたか？",
+        "decision_type": "binary",
+        "description": "当該事業の施行の際現に建築物の敷地として使用されていた土地"
+      },
+      {
+        "id": "dec-rights-use",
+        "type": "decision",
+        "title": "権利に基づき敷地として使用するならば制限に適合しないこととなるか？",
+        "decision_type": "binary",
+        "description": "当該事業の施行の際現に存する所有権その他の権利に基づいて建築物の敷地として使用するならば当該制限に適合しないこととなる土地"
+      },
+      {
+        "id": "dec-pre-violation",
+        "type": "decision",
+        "title": "事業施行前から敷地面積最低限度の制限に違反していたか？",
+        "decision_type": "binary",
+        "description": "法第86条の9第1項各号事業の施行により面積が減少した際、当該面積の減少がなくとも敷地面積最低限度に関する制限に違反していた（第一号該当）"
+      },
+      {
+        "id": "proc-exception-1",
+        "type": "process",
+        "title": "第一号に該当（除外対象外）",
+        "process_type": "mechanical",
+        "description": "事業施行前から制限に違反していた土地は適用除外の対象外"
+      },
+      {
+        "id": "dec-subsequent-compliance",
+        "type": "decision",
+        "title": "その後、敷地面積最低限度の制限に適合するに至ったか？",
+        "decision_type": "binary",
+        "description": "条例で定める敷地面積最低限度に関する制限に適合するに至った（第二号該当）"
+      },
+      {
+        "id": "proc-exception-2",
+        "type": "process",
+        "title": "第二号に該当（除外対象外）",
+        "process_type": "mechanical",
+        "description": "その後制限に適合するに至った土地は適用除外の対象外"
+      },
+      {
+        "id": "dec-full-site-use",
+        "type": "decision",
+        "title": "土地の全部を一の敷地として使用するか？",
+        "decision_type": "binary",
+        "description": "土地の全部を一の敷地として使用する場合のみ適用除外の対象"
+      },
+      {
+        "id": "terminal-exempt",
+        "type": "terminal",
+        "title": "適用除外対象",
+        "result": "pass",
+        "description": "敷地面積最低限度に関する制限の適用除外対象となる"
+      },
+      {
+        "id": "terminal-not-exempt",
+        "type": "terminal",
+        "title": "適用除外対象外",
+        "result": "fail",
+        "description": "敷地面積最低限度に関する制限の適用除外対象とならない"
+      },
+      {
+        "id": "terminal-compliant",
+        "type": "terminal",
+        "title": "制限に適合（適用除外不要）",
+        "result": "pass",
+        "description": "敷地面積が最低限度以上であり、適用除外の必要なし"
+      },
+      {
+        "id": "terminal-not-applicable",
+        "type": "terminal",
+        "title": "本規定の対象外",
+        "result": "end",
+        "description": "事業施行による敷地面積減少がないため本規定の対象外"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e001",
+        "from": "start",
+        "to": "dec-project-execution",
+        "role": "flow"
+      },
+      {
+        "id": "e002",
+        "from": "dec-project-execution",
+        "to": "proc-get-site-area",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e003",
+        "from": "dec-project-execution",
+        "to": "terminal-not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e004",
+        "from": "proc-get-site-area",
+        "to": "proc-get-min-area",
+        "role": "flow"
+      },
+      {
+        "id": "e005",
+        "from": "proc-get-min-area",
+        "to": "dec-area-compliance",
+        "role": "flow"
+      },
+      {
+        "id": "e006",
+        "from": "dec-area-compliance",
+        "to": "terminal-compliant",
+        "role": "yes",
+        "label": "はい（A >= Amin）"
+      },
+      {
+        "id": "e007",
+        "from": "dec-area-compliance",
+        "to": "dec-current-use",
+        "role": "no",
+        "label": "いいえ（A < Amin）"
+      },
+      {
+        "id": "e008",
+        "from": "dec-current-use",
+        "to": "dec-pre-violation",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e009",
+        "from": "dec-current-use",
+        "to": "dec-rights-use",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e010",
+        "from": "dec-rights-use",
+        "to": "dec-pre-violation",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e011",
+        "from": "dec-rights-use",
+        "to": "terminal-not-exempt",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e012",
+        "from": "dec-pre-violation",
+        "to": "proc-exception-1",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e013",
+        "from": "dec-pre-violation",
+        "to": "dec-subsequent-compliance",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e014",
+        "from": "proc-exception-1",
+        "to": "terminal-not-exempt",
+        "role": "flow"
+      },
+      {
+        "id": "e015",
+        "from": "dec-subsequent-compliance",
+        "to": "proc-exception-2",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e016",
+        "from": "dec-subsequent-compliance",
+        "to": "dec-full-site-use",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e017",
+        "from": "proc-exception-2",
+        "to": "terminal-not-exempt",
+        "role": "flow"
+      },
+      {
+        "id": "e018",
+        "from": "dec-full-site-use",
+        "to": "terminal-exempt",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e019",
+        "from": "dec-full-site-use",
+        "to": "terminal-not-exempt",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSO-A136_2_5-P11",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": ["A68_2:P1"],
+      "description": "地区計画等の区域内における条例による制限の根拠規定"
+    },
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A86_9:P1"],
+      "description": "適用除外の対象となる事業の規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-01-26T00:00:00Z",
+    "generator": "claude-code-flow-generator",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令",
+    "checklist_ref": "確認審査報告書チェックリスト"
+  }
+}

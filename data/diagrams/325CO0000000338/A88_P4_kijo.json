@@ -1,0 +1,444 @@
+{
+  "id": "CHK-BSL-KIJO-A88-P4",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "地下部分の地震力算定",
+    "target_subject": "建築物の地下部分",
+    "description": "建築物の地下部分の各部分に作用する地震力を所定の式に適合する水平震度により算定"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "88",
+    "paragraph": "4",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造関係規定",
+    "地震力"
+  ],
+  "text_raw": "建築物の地下部分の各部分に作用する地震力は、当該部分の固定荷重と積載荷重との和に次の式に適合する水平震度を乗じて計算しなければならない。ただし、地震時における建築物の振動の性状を適切に評価して計算をすることができる場合においては、当該計算によることができる。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "building_element",
+          "value": "建築物の地下部分を有するもの"
+        }
+      ],
+      "note": "地下部分を有する建築物に適用"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "calculation",
+          "value": "地震力 = (固定荷重 + 積載荷重) × 水平震度",
+          "description": "地下部分の各部分に作用する地震力の計算式"
+        },
+        {
+          "type": "formula",
+          "value": "k >= 0.1 × (1 - (H/40)) × Z",
+          "description": "水平震度の適合式"
+        }
+      ]
+    },
+    "exceptions": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "type": "calculation_method",
+          "value": "地震時における建築物の振動の性状を適切に評価して計算をすることができる場合"
+        }
+      ],
+      "effect": "ALTERNATIVE",
+      "description": "適切な振動評価計算ができる場合は、当該計算によることができる"
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "info-parts-set",
+        "type": "information",
+        "title": "地下部分の集合",
+        "symbol": "PS",
+        "subject": "建築物",
+        "property": "地下部分の集合",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "判定対象となる建築物に属する地下部分を特定"
+      },
+      {
+        "id": "proc-parts-identify",
+        "type": "process",
+        "title": "地下部分の特定",
+        "process_type": "undefined_input",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "設計図書等から建築物の地下部分を特定"
+      },
+      {
+        "id": "info-depth",
+        "type": "information",
+        "title": "地盤面からの深さ",
+        "symbol": "H",
+        "subject": "地下部分",
+        "property": "地盤面からの深さ",
+        "property_type": "numeric",
+        "unit": "m",
+        "plurality": "multiple",
+        "description": "建築物の地下部分の各部分の地盤面からの深さ（20を超えるときは20とする）"
+      },
+      {
+        "id": "proc-depth-identify",
+        "type": "process",
+        "title": "深さの特定",
+        "process_type": "undefined_input",
+        "target_subject": "地下部分",
+        "iteration": "iterative",
+        "description": "各地下部分の地盤面からの深さを読み取る"
+      },
+      {
+        "id": "info-fixed-load",
+        "type": "information",
+        "title": "固定荷重",
+        "symbol": "G",
+        "subject": "地下部分",
+        "property": "固定荷重",
+        "property_type": "numeric",
+        "unit": "N",
+        "plurality": "multiple",
+        "description": "各地下部分の固定荷重"
+      },
+      {
+        "id": "proc-fixed-load-identify",
+        "type": "process",
+        "title": "固定荷重の特定",
+        "process_type": "undefined_input",
+        "target_subject": "地下部分",
+        "iteration": "iterative",
+        "description": "各地下部分の固定荷重を読み取る"
+      },
+      {
+        "id": "info-live-load",
+        "type": "information",
+        "title": "積載荷重",
+        "symbol": "P",
+        "subject": "地下部分",
+        "property": "積載荷重",
+        "property_type": "numeric",
+        "unit": "N",
+        "plurality": "multiple",
+        "description": "各地下部分の積載荷重"
+      },
+      {
+        "id": "proc-live-load-identify",
+        "type": "process",
+        "title": "積載荷重の特定",
+        "process_type": "undefined_input",
+        "target_subject": "地下部分",
+        "iteration": "iterative",
+        "description": "各地下部分の積載荷重を読み取る"
+      },
+      {
+        "id": "info-zone-factor",
+        "type": "information",
+        "title": "地域係数Z",
+        "symbol": "Z",
+        "subject": "建築物",
+        "property": "地域係数",
+        "property_type": "numeric",
+        "plurality": "single",
+        "description": "第1項に規定するZの数値。その地方における過去の地震の記録に基づく震害の程度及び地震活動の状況その他地震の性状に応じて1.0から0.7までの範囲内において国土交通大臣が定める数値",
+        "related_articles": [
+          "令::A88:P1"
+        ]
+      },
+      {
+        "id": "proc-zone-factor-identify",
+        "type": "process",
+        "title": "地域係数の特定",
+        "process_type": "undefined_input",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "建築物の所在地に応じた地域係数Zを特定"
+      },
+      {
+        "id": "proc-min-seismic-calc",
+        "type": "process",
+        "title": "最低水平震度の計算",
+        "process_type": "mechanical",
+        "target_subject": "地下部分",
+        "iteration": "iterative",
+        "description": "各地下部分について、式に適合する最低水平震度を計算",
+        "logic_expression": "k_min = 0.1 × (1 - (H/40)) × Z",
+        "remarks": "Hは深さ（20を超えるときは20）"
+      },
+      {
+        "id": "info-min-seismic",
+        "type": "information",
+        "title": "最低水平震度",
+        "symbol": "k_min",
+        "subject": "地下部分",
+        "property": "最低水平震度",
+        "property_type": "numeric",
+        "plurality": "multiple",
+        "description": "各地下部分に必要な最低水平震度（式による計算値）"
+      },
+      {
+        "id": "info-applied-seismic",
+        "type": "information",
+        "title": "適用水平震度",
+        "symbol": "k",
+        "subject": "地下部分",
+        "property": "水平震度",
+        "property_type": "numeric",
+        "plurality": "multiple",
+        "description": "各地下部分に適用する水平震度"
+      },
+      {
+        "id": "proc-applied-seismic-identify",
+        "type": "process",
+        "title": "適用水平震度の特定",
+        "process_type": "undefined_input",
+        "target_subject": "地下部分",
+        "iteration": "iterative",
+        "description": "設計図書等から各地下部分の適用水平震度を読み取る"
+      },
+      {
+        "id": "proc-seismic-check",
+        "type": "process",
+        "title": "水平震度の適合判定",
+        "process_type": "mechanical",
+        "target_subject": "地下部分",
+        "iteration": "iterative",
+        "description": "適用水平震度が最低水平震度以上か判定",
+        "logic_expression": "k >= k_min"
+      },
+      {
+        "id": "info-seismic-compliance",
+        "type": "information",
+        "title": "水平震度適合判定結果",
+        "symbol": "C_k",
+        "subject": "地下部分",
+        "property": "水平震度の適合",
+        "property_type": "proposition",
+        "plurality": "multiple",
+        "description": "各地下部分の水平震度が式に適合しているか否か"
+      },
+      {
+        "id": "proc-force-calc",
+        "type": "process",
+        "title": "地震力の計算",
+        "process_type": "mechanical",
+        "target_subject": "地下部分",
+        "iteration": "iterative",
+        "description": "各地下部分の地震力を計算",
+        "logic_expression": "F = (G + P) × k"
+      },
+      {
+        "id": "info-seismic-force",
+        "type": "information",
+        "title": "地震力",
+        "symbol": "F",
+        "subject": "地下部分",
+        "property": "地震力",
+        "property_type": "numeric",
+        "unit": "N",
+        "plurality": "multiple",
+        "description": "各地下部分に作用する地震力"
+      },
+      {
+        "id": "proc-total-judgment",
+        "type": "process",
+        "title": "適合判定",
+        "process_type": "mechanical",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "すべての地下部分について水平震度が適合しているか総合判定",
+        "logic_expression": "ALL(C_k) = true"
+      },
+      {
+        "id": "info-compliance-result",
+        "type": "information",
+        "title": "地下部分地震力適合判定結果",
+        "symbol": "R",
+        "subject": "建築物",
+        "property": "令第88条第4項への適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "建築物の地下部分の地震力算定が所定の水平震度で計算されているか否か"
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge-001",
+        "from": "proc-parts-identify",
+        "to": "info-parts-set",
+        "role": "output"
+      },
+      {
+        "id": "edge-002",
+        "from": "info-parts-set",
+        "to": "proc-depth-identify",
+        "role": "input"
+      },
+      {
+        "id": "edge-003",
+        "from": "proc-depth-identify",
+        "to": "info-depth",
+        "role": "output"
+      },
+      {
+        "id": "edge-004",
+        "from": "info-parts-set",
+        "to": "proc-fixed-load-identify",
+        "role": "input"
+      },
+      {
+        "id": "edge-005",
+        "from": "proc-fixed-load-identify",
+        "to": "info-fixed-load",
+        "role": "output"
+      },
+      {
+        "id": "edge-006",
+        "from": "info-parts-set",
+        "to": "proc-live-load-identify",
+        "role": "input"
+      },
+      {
+        "id": "edge-007",
+        "from": "proc-live-load-identify",
+        "to": "info-live-load",
+        "role": "output"
+      },
+      {
+        "id": "edge-008",
+        "from": "proc-zone-factor-identify",
+        "to": "info-zone-factor",
+        "role": "output"
+      },
+      {
+        "id": "edge-009",
+        "from": "info-depth",
+        "to": "proc-min-seismic-calc",
+        "role": "input"
+      },
+      {
+        "id": "edge-010",
+        "from": "info-zone-factor",
+        "to": "proc-min-seismic-calc",
+        "role": "input"
+      },
+      {
+        "id": "edge-011",
+        "from": "proc-min-seismic-calc",
+        "to": "info-min-seismic",
+        "role": "output"
+      },
+      {
+        "id": "edge-012",
+        "from": "info-parts-set",
+        "to": "proc-applied-seismic-identify",
+        "role": "input"
+      },
+      {
+        "id": "edge-013",
+        "from": "proc-applied-seismic-identify",
+        "to": "info-applied-seismic",
+        "role": "output"
+      },
+      {
+        "id": "edge-014",
+        "from": "info-min-seismic",
+        "to": "proc-seismic-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-015",
+        "from": "info-applied-seismic",
+        "to": "proc-seismic-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-016",
+        "from": "proc-seismic-check",
+        "to": "info-seismic-compliance",
+        "role": "output"
+      },
+      {
+        "id": "edge-017",
+        "from": "info-fixed-load",
+        "to": "proc-force-calc",
+        "role": "input"
+      },
+      {
+        "id": "edge-018",
+        "from": "info-live-load",
+        "to": "proc-force-calc",
+        "role": "input"
+      },
+      {
+        "id": "edge-019",
+        "from": "info-applied-seismic",
+        "to": "proc-force-calc",
+        "role": "input"
+      },
+      {
+        "id": "edge-020",
+        "from": "proc-force-calc",
+        "to": "info-seismic-force",
+        "role": "output"
+      },
+      {
+        "id": "edge-021",
+        "from": "info-seismic-compliance",
+        "to": "proc-total-judgment",
+        "role": "input"
+      },
+      {
+        "id": "edge-022",
+        "from": "proc-total-judgment",
+        "to": "info-compliance-result",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": [
+        "A20:P1"
+      ],
+      "description": "法第20条に基づく構造耐力の技術的基準を規定"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": [
+        "A88:P1"
+      ],
+      "description": "第1項で規定するZ（地域係数）の数値を参照"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-23T00:00:00Z",
+    "updated_at": "2026-01-23T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "kijo-generator",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令",
+    "checklist_ref": "建築基準法施行令第88条第4項（地下部分の地震力）",
+    "source": "e-Gov法令API"
+  }
+}

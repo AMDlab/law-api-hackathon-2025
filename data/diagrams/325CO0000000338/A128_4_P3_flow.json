@@ -1,0 +1,245 @@
+{
+  "id": "A128_4_P3_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "延べ面積1000㎡超の建築物の内装制限適用判定フロー",
+    "target_subject": "建築物",
+    "description": "法第35条の2に基づく延べ面積1000㎡超の建築物の内装制限適用対象を判定するフローチャート"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "128_4",
+    "paragraph": "3",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "内装制限"
+  ],
+  "text_raw": "法第三十五条の二の規定により政令で定める延べ面積が千平方メートルを超える建築物は、階数が二で延べ面積が千平方メートルを超えるもの又は階数が一で延べ面積が三千平方メートルを超えるもの（学校等の用途に供するものを除く。）以外のものとする。",
+  "kijo_diagram_ref": "CHK-BSL-KIJO-A128_4-P3",
+  "flow_diagram": {
+    "title": "延べ面積1000㎡超建築物の内装制限適用判定",
+    "description": "階数・延べ面積・用途により内装制限の適用対象を判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start"
+      },
+      {
+        "id": "dec-floor-count",
+        "type": "decision",
+        "title": "階数は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "1", "description": "1階建て" },
+          { "value": "2", "description": "2階建て" },
+          { "value": "3以上", "description": "3階建て以上" }
+        ],
+        "description": "建築物の階数を確認"
+      },
+      {
+        "id": "dec-area-1000",
+        "type": "decision",
+        "title": "延べ面積>1000㎡か？",
+        "decision_type": "binary",
+        "description": "延べ面積が1000㎡を超えるかを判定（階数2の場合）",
+        "condition": {
+          "operator": "GT",
+          "lhs": { "var": "A", "desc": "延べ面積" },
+          "rhs": { "value": 1000, "unit": "㎡" }
+        }
+      },
+      {
+        "id": "dec-area-3000",
+        "type": "decision",
+        "title": "延べ面積>3000㎡か？",
+        "decision_type": "binary",
+        "description": "延べ面積が3000㎡を超えるかを判定（階数1の場合）",
+        "condition": {
+          "operator": "GT",
+          "lhs": { "var": "A", "desc": "延べ面積" },
+          "rhs": { "value": 3000, "unit": "㎡" }
+        }
+      },
+      {
+        "id": "proc-condition1-met",
+        "type": "process",
+        "title": "条件1該当（階数2・延べ面積1000㎡超）",
+        "process_type": "mechanical",
+        "description": "階数が2で延べ面積が1000㎡を超える条件に該当"
+      },
+      {
+        "id": "proc-condition2-met",
+        "type": "process",
+        "title": "条件2該当（階数1・延べ面積3000㎡超）",
+        "process_type": "mechanical",
+        "description": "階数が1で延べ面積が3000㎡を超える条件に該当"
+      },
+      {
+        "id": "dec-school-use",
+        "type": "decision",
+        "title": "学校等の用途か？",
+        "decision_type": "binary",
+        "description": "小学校、中学校、義務教育学校、高等学校、中等教育学校の用途に供するものか",
+        "related_articles": ["令第126条"]
+      },
+      {
+        "id": "proc-school-exemption",
+        "type": "process",
+        "title": "学校等除外適用",
+        "process_type": "mechanical",
+        "description": "学校等の用途のため、本項の内装制限適用対象から除外"
+      },
+      {
+        "id": "proc-subject-confirmed",
+        "type": "process",
+        "title": "内装制限適用対象確定",
+        "process_type": "mechanical",
+        "description": "延べ面積1000㎡超の建築物として内装制限の適用対象であることを確定"
+      },
+      {
+        "id": "end-subject",
+        "type": "terminal",
+        "title": "内装制限適用対象",
+        "result": "pass",
+        "description": "法第35条の2に基づく内装制限の適用を受ける"
+      },
+      {
+        "id": "end-not-subject",
+        "type": "terminal",
+        "title": "本項の適用対象外",
+        "result": "end",
+        "description": "令第128条の4第3項の適用対象外（他の項で判定要）"
+      },
+      {
+        "id": "end-exempt",
+        "type": "terminal",
+        "title": "適用除外（学校等）",
+        "result": "end",
+        "description": "学校等の用途のため、本項による内装制限は適用されない"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e-start",
+        "from": "start",
+        "to": "dec-floor-count",
+        "role": "flow"
+      },
+      {
+        "id": "e-floor-1",
+        "from": "dec-floor-count",
+        "to": "dec-area-3000",
+        "role": "option",
+        "label": "1"
+      },
+      {
+        "id": "e-floor-2",
+        "from": "dec-floor-count",
+        "to": "dec-area-1000",
+        "role": "option",
+        "label": "2"
+      },
+      {
+        "id": "e-floor-3plus",
+        "from": "dec-floor-count",
+        "to": "end-not-subject",
+        "role": "option",
+        "label": "3以上"
+      },
+      {
+        "id": "e-area-1000-yes",
+        "from": "dec-area-1000",
+        "to": "proc-condition1-met",
+        "role": "yes"
+      },
+      {
+        "id": "e-area-1000-no",
+        "from": "dec-area-1000",
+        "to": "end-not-subject",
+        "role": "no"
+      },
+      {
+        "id": "e-area-3000-yes",
+        "from": "dec-area-3000",
+        "to": "proc-condition2-met",
+        "role": "yes"
+      },
+      {
+        "id": "e-area-3000-no",
+        "from": "dec-area-3000",
+        "to": "end-not-subject",
+        "role": "no"
+      },
+      {
+        "id": "e-condition1-to-school",
+        "from": "proc-condition1-met",
+        "to": "dec-school-use",
+        "role": "flow"
+      },
+      {
+        "id": "e-condition2-to-school",
+        "from": "proc-condition2-met",
+        "to": "dec-school-use",
+        "role": "flow"
+      },
+      {
+        "id": "e-school-yes",
+        "from": "dec-school-use",
+        "to": "proc-school-exemption",
+        "role": "yes"
+      },
+      {
+        "id": "e-school-no",
+        "from": "dec-school-use",
+        "to": "proc-subject-confirmed",
+        "role": "no"
+      },
+      {
+        "id": "e-exemption-to-end",
+        "from": "proc-school-exemption",
+        "to": "end-exempt",
+        "role": "flow"
+      },
+      {
+        "id": "e-subject-to-end",
+        "from": "proc-subject-confirmed",
+        "to": "end-subject",
+        "role": "flow"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": ["A35_2"],
+      "description": "法第35条の2は内装制限の対象建築物を規定し、政令で定める建築物に委任"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": ["A126:P1"],
+      "description": "令第126条で学校等の定義を規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00Z",
+    "updated_at": "2026-01-26T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令",
+    "checklist_ref": "令第128条の4第3項（延べ面積1000㎡超の建築物の内装制限）"
+  }
+}

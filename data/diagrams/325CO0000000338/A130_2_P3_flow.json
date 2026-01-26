@@ -1,0 +1,276 @@
+{
+  "id": "A130_2_P3_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "特定用途制限地域における許可による条例制限適用除外判定",
+    "target_subject": "建築物",
+    "description": "特定用途制限地域において、地方公共団体の長の許可を受けた建築物について、条例で定める用途制限の適用除外となるかを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "130の2",
+    "paragraph": "3",
+    "item": null
+  },
+  "labels": [
+    "集団規定",
+    "用途規制",
+    "特定用途制限地域",
+    "許可",
+    "適用除外"
+  ],
+  "text_raw": "法第四十九条の二の規定に基づく条例には、当該地方公共団体の長が、当該地域の良好な環境を害するおそれがないと認め、又は公益上やむを得ないと認めて許可したものについて、当該条例に定める制限の適用の除外に関する規定を定めるものとする。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "特定用途制限地域内"
+        },
+        {
+          "type": "applicability_condition",
+          "value": "条例による用途制限が適用される建築物"
+        }
+      ]
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "ref": "info-permit-env",
+          "operator": "==",
+          "value": true,
+          "note": "良好な環境を害するおそれがないと認められて許可"
+        },
+        {
+          "ref": "info-permit-public",
+          "operator": "==",
+          "value": true,
+          "note": "公益上やむを得ないと認められて許可"
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "flow_diagram": {
+    "title": "令第130条の2第3項 許可による条例制限適用除外判定フロー",
+    "description": "特定用途制限地域内の建築物について、地方公共団体の長の許可による条例制限の適用除外の可否を判定するフロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "特定用途制限地域内で条例による用途制限の対象となる建築物について判定を開始"
+      },
+      {
+        "id": "dec-in-area",
+        "type": "decision",
+        "title": "特定用途制限地域内か？",
+        "decision_type": "binary",
+        "description": "建築物が特定用途制限地域内に位置するかを確認"
+      },
+      {
+        "id": "dec-subject-to-ordinance",
+        "type": "decision",
+        "title": "条例による用途制限の対象か？",
+        "decision_type": "binary",
+        "description": "当該建築物が法第49条の2に基づく条例による用途制限の対象となるかを確認"
+      },
+      {
+        "id": "dec-has-permit",
+        "type": "decision",
+        "title": "地方公共団体の長の許可を受けているか？",
+        "decision_type": "binary",
+        "description": "当該建築計画について地方公共団体の長の許可を受けているかを確認"
+      },
+      {
+        "id": "dec-permit-reason",
+        "type": "decision",
+        "title": "許可理由は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "環境配慮", "description": "当該地域の良好な環境を害するおそれがないと認められた" },
+          { "value": "公益上やむを得ない", "description": "公益上やむを得ないと認められた" },
+          { "value": "その他", "description": "上記以外の理由" }
+        ],
+        "description": "許可の理由が「良好な環境を害するおそれがない」又は「公益上やむを得ない」のいずれかを確認"
+      },
+      {
+        "id": "proc-env-permit",
+        "type": "process",
+        "title": "環境配慮による許可あり",
+        "process_type": "mechanical",
+        "description": "当該地域の良好な環境を害するおそれがないと認められて許可を取得"
+      },
+      {
+        "id": "proc-public-permit",
+        "type": "process",
+        "title": "公益上の許可あり",
+        "process_type": "mechanical",
+        "description": "公益上やむを得ないと認められて許可を取得"
+      },
+      {
+        "id": "dec-exemption-applicable",
+        "type": "decision",
+        "title": "条例に適用除外規定があるか？",
+        "decision_type": "binary",
+        "description": "当該地方公共団体の条例に許可による適用除外規定が定められているかを確認"
+      },
+      {
+        "id": "end-exempt",
+        "type": "terminal",
+        "title": "適用除外",
+        "result": "pass",
+        "description": "地方公共団体の長の許可により、条例で定める用途制限の適用が除外される"
+      },
+      {
+        "id": "end-not-applicable",
+        "type": "terminal",
+        "title": "本規定の対象外",
+        "result": "end",
+        "description": "特定用途制限地域外または条例の対象外のため、本規定は適用されない"
+      },
+      {
+        "id": "end-no-permit",
+        "type": "terminal",
+        "title": "適用除外なし（許可なし）",
+        "result": "fail",
+        "description": "許可を受けていないため、条例による用途制限がそのまま適用される"
+      },
+      {
+        "id": "end-invalid-reason",
+        "type": "terminal",
+        "title": "適用除外なし（許可理由不適）",
+        "result": "fail",
+        "description": "許可理由が適用除外の要件を満たさないため、条例による用途制限がそのまま適用される"
+      },
+      {
+        "id": "end-no-exemption-clause",
+        "type": "terminal",
+        "title": "適用除外なし（条例規定なし）",
+        "result": "fail",
+        "description": "条例に適用除外規定がないため、許可があっても条例による用途制限がそのまま適用される"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e-start-area",
+        "from": "start",
+        "to": "dec-in-area",
+        "role": "flow"
+      },
+      {
+        "id": "e-area-yes",
+        "from": "dec-in-area",
+        "to": "dec-subject-to-ordinance",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e-area-no",
+        "from": "dec-in-area",
+        "to": "end-not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e-ordinance-yes",
+        "from": "dec-subject-to-ordinance",
+        "to": "dec-has-permit",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e-ordinance-no",
+        "from": "dec-subject-to-ordinance",
+        "to": "end-not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e-permit-yes",
+        "from": "dec-has-permit",
+        "to": "dec-permit-reason",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e-permit-no",
+        "from": "dec-has-permit",
+        "to": "end-no-permit",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e-reason-env",
+        "from": "dec-permit-reason",
+        "to": "proc-env-permit",
+        "role": "option",
+        "label": "環境配慮"
+      },
+      {
+        "id": "e-reason-public",
+        "from": "dec-permit-reason",
+        "to": "proc-public-permit",
+        "role": "option",
+        "label": "公益上やむを得ない"
+      },
+      {
+        "id": "e-reason-other",
+        "from": "dec-permit-reason",
+        "to": "end-invalid-reason",
+        "role": "option",
+        "label": "その他"
+      },
+      {
+        "id": "e-env-exemption",
+        "from": "proc-env-permit",
+        "to": "dec-exemption-applicable",
+        "role": "flow"
+      },
+      {
+        "id": "e-public-exemption",
+        "from": "proc-public-permit",
+        "to": "dec-exemption-applicable",
+        "role": "flow"
+      },
+      {
+        "id": "e-exemption-yes",
+        "from": "dec-exemption-applicable",
+        "to": "end-exempt",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e-exemption-no",
+        "from": "dec-exemption-applicable",
+        "to": "end-no-exemption-clause",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-ORD-A130_2-P3",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": ["A49_2"],
+      "description": "法第49条の2は特定用途制限地域における建築物の用途制限を条例で定めることを規定。本項は許可による条例制限の適用除外規定を条例で定めることを求める"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

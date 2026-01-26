@@ -1,0 +1,316 @@
+{
+  "id": "A25_P3_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "階段の中間手すり",
+    "target_subject": "階段",
+    "description": "幅が3mを超える階段に中間手すりを設けることを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "25",
+    "paragraph": "3",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "階段"
+  ],
+  "text_raw": "階段の幅が三メートルをこえる場合においては、中間に手すりを設けなければならない。ただし、けあげが十五センチメートル以下で、かつ、踏面が三十センチメートル以上のものにあつては、この限りでない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-stair-width",
+          "operator": ">",
+          "value": 3,
+          "unit": "m"
+        }
+      ],
+      "note": "階段の幅が3mを超える場合に適用"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "ref": "info-exempt",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "ref": "info-middle-handrail",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    },
+    "exceptions": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-riser-height",
+          "operator": "<=",
+          "value": 15,
+          "unit": "cm"
+        },
+        {
+          "ref": "info-tread-depth",
+          "operator": ">=",
+          "value": 30,
+          "unit": "cm"
+        }
+      ],
+      "effect": "EXEMPT"
+    }
+  },
+  "kijo_diagram_ref": "CHK-BSO-A25-P3",
+  "flow_diagram": {
+    "title": "令25条3項 階段の中間手すり適合判定フロー",
+    "description": "幅が3mを超える階段に中間手すりを設けることを判定するフロー",
+    "nodes": [
+      {
+        "id": "term-start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "令25条3項の適合判定を開始"
+      },
+      {
+        "id": "proc-identify-stair",
+        "type": "process",
+        "title": "階段の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から判定対象となる階段を特定する"
+      },
+      {
+        "id": "proc-measure-width",
+        "type": "process",
+        "title": "階段幅の確認",
+        "process_type": "undefined_input",
+        "description": "設計図書等から階段の幅を読み取る"
+      },
+      {
+        "id": "dec-width",
+        "type": "decision",
+        "title": "階段幅は3mを超えるか？",
+        "decision_type": "binary",
+        "description": "階段の幅が3mを超えるかどうかを判定",
+        "condition": {
+          "operator": "GT",
+          "lhs": { "var": "W", "desc": "階段の幅" },
+          "rhs": { "value": 3, "unit": "m" }
+        }
+      },
+      {
+        "id": "proc-out-of-scope",
+        "type": "process",
+        "title": "本項適用対象外",
+        "process_type": "mechanical",
+        "description": "階段幅が3m以下のため、本項の適用対象外"
+      },
+      {
+        "id": "proc-measure-riser",
+        "type": "process",
+        "title": "けあげの確認",
+        "process_type": "undefined_input",
+        "description": "設計図書等から階段のけあげ寸法を読み取る"
+      },
+      {
+        "id": "dec-riser",
+        "type": "decision",
+        "title": "けあげは15cm以下か？",
+        "decision_type": "binary",
+        "description": "けあげが15cm以下かどうかを判定",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "R", "desc": "けあげ" },
+          "rhs": { "value": 15, "unit": "cm" }
+        }
+      },
+      {
+        "id": "proc-measure-tread",
+        "type": "process",
+        "title": "踏面の確認",
+        "process_type": "undefined_input",
+        "description": "設計図書等から階段の踏面寸法を読み取る"
+      },
+      {
+        "id": "dec-tread",
+        "type": "decision",
+        "title": "踏面は30cm以上か？",
+        "decision_type": "binary",
+        "description": "踏面が30cm以上かどうかを判定",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "T", "desc": "踏面" },
+          "rhs": { "value": 30, "unit": "cm" }
+        }
+      },
+      {
+        "id": "proc-exempt",
+        "type": "process",
+        "title": "適用除外に該当",
+        "process_type": "mechanical",
+        "description": "けあげ15cm以下かつ踏面30cm以上のため、ただし書きによる適用除外に該当"
+      },
+      {
+        "id": "proc-check-handrail",
+        "type": "process",
+        "title": "中間手すり設置確認",
+        "process_type": "undefined_input",
+        "description": "設計図書等から階段に中間手すりが設けられているかを確認する"
+      },
+      {
+        "id": "dec-handrail",
+        "type": "decision",
+        "title": "中間手すりが設置されているか？",
+        "decision_type": "binary",
+        "description": "階段に中間手すりが設けられているかを判定"
+      },
+      {
+        "id": "proc-handrail-ok",
+        "type": "process",
+        "title": "中間手すり設置済み",
+        "process_type": "mechanical",
+        "description": "中間手すりが設置されていることを確認"
+      },
+      {
+        "id": "term-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令25条3項に適合"
+      },
+      {
+        "id": "term-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "令25条3項に不適合（幅3m超の階段に中間手すりが設置されていない）"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "term-start",
+        "to": "proc-identify-stair",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "proc-identify-stair",
+        "to": "proc-measure-width",
+        "role": "flow"
+      },
+      {
+        "id": "e03",
+        "from": "proc-measure-width",
+        "to": "dec-width",
+        "role": "flow"
+      },
+      {
+        "id": "e04",
+        "from": "dec-width",
+        "to": "proc-out-of-scope",
+        "role": "no",
+        "label": "3m以下"
+      },
+      {
+        "id": "e05",
+        "from": "proc-out-of-scope",
+        "to": "term-pass",
+        "role": "flow"
+      },
+      {
+        "id": "e06",
+        "from": "dec-width",
+        "to": "proc-measure-riser",
+        "role": "yes",
+        "label": "3m超"
+      },
+      {
+        "id": "e07",
+        "from": "proc-measure-riser",
+        "to": "dec-riser",
+        "role": "flow"
+      },
+      {
+        "id": "e08",
+        "from": "dec-riser",
+        "to": "proc-measure-tread",
+        "role": "yes",
+        "label": "15cm以下"
+      },
+      {
+        "id": "e09",
+        "from": "proc-measure-tread",
+        "to": "dec-tread",
+        "role": "flow"
+      },
+      {
+        "id": "e10",
+        "from": "dec-tread",
+        "to": "proc-exempt",
+        "role": "yes",
+        "label": "30cm以上"
+      },
+      {
+        "id": "e11",
+        "from": "proc-exempt",
+        "to": "term-pass",
+        "role": "flow"
+      },
+      {
+        "id": "e12",
+        "from": "dec-riser",
+        "to": "proc-check-handrail",
+        "role": "no",
+        "label": "15cm超"
+      },
+      {
+        "id": "e13",
+        "from": "dec-tread",
+        "to": "proc-check-handrail",
+        "role": "no",
+        "label": "30cm未満"
+      },
+      {
+        "id": "e14",
+        "from": "proc-check-handrail",
+        "to": "dec-handrail",
+        "role": "flow"
+      },
+      {
+        "id": "e15",
+        "from": "dec-handrail",
+        "to": "proc-handrail-ok",
+        "role": "yes",
+        "label": "設置あり"
+      },
+      {
+        "id": "e16",
+        "from": "proc-handrail-ok",
+        "to": "term-pass",
+        "role": "flow"
+      },
+      {
+        "id": "e17",
+        "from": "dec-handrail",
+        "to": "term-fail",
+        "role": "no",
+        "label": "設置なし"
+      }
+    ]
+  },
+  "metadata": {
+    "created_at": "2026-01-26T12:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

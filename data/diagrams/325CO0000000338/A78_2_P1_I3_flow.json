@@ -1,0 +1,522 @@
+{
+  "id": "A78_2_P1_I3_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "耐力壁の鉄筋配置間隔検証フロー",
+    "target_subject": "耐力壁",
+    "description": "耐力壁における径9mm以上の鉄筋の縦横配置間隔が基準値以下であることを検証するフロー"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "78の2",
+    "paragraph": "1",
+    "item": "3"
+  },
+  "labels": ["単体規定", "構造関連", "鉄筋コンクリート造"],
+  "text_raw": "径九ミリメートル以上の鉄筋を縦横に三十センチメートル（複配筋として配置する場合においては、四十五センチメートル）以下の間隔で配置すること。ただし、平家建ての建築物にあつては、その間隔を三十五センチメートル（複配筋として配置する場合においては、五十センチメートル）以下とすることができる。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "structural_type",
+          "value": "鉄筋コンクリート造"
+        },
+        {
+          "type": "structural_part",
+          "value": "耐力壁"
+        }
+      ],
+      "note": "令第78条の2第1項に基づく鉄筋コンクリート造の耐力壁"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "property": "鉄筋径",
+          "operator": "GE",
+          "value": "9mm"
+        },
+        {
+          "property": "鉄筋配置間隔",
+          "operator": "LE",
+          "value": {
+            "type": "conditional",
+            "base": "30cm（複配筋の場合は45cm）",
+            "exception": "平家建ての場合は35cm（複配筋の場合は50cm）"
+          }
+        }
+      ]
+    },
+    "exceptions": {
+      "operator": "IF",
+      "conditions": [
+        {
+          "property": "階数",
+          "operator": "EQ",
+          "value": "1（平家建て）"
+        }
+      ],
+      "effect": "間隔上限の緩和（30cm→35cm、45cm→50cm）"
+    }
+  },
+  "flow_diagram": {
+    "title": "耐力壁の鉄筋配置間隔検証フロー",
+    "description": "令第78条の2第1項第3号に基づく耐力壁の鉄筋配置要件の適合判定フロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "耐力壁の鉄筋配置間隔検証を開始"
+      },
+      {
+        "id": "proc-get-walls",
+        "type": "process",
+        "title": "耐力壁の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物に属する耐力壁を特定する"
+      },
+      {
+        "id": "dec-has-walls",
+        "type": "decision",
+        "title": "耐力壁があるか？",
+        "decision_type": "binary",
+        "description": "判定対象となる耐力壁が存在するかを確認"
+      },
+      {
+        "id": "proc-get-rebar",
+        "type": "process",
+        "title": "鉄筋の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から耐力壁に配置された鉄筋を読み取る"
+      },
+      {
+        "id": "info-rebar-diameter",
+        "type": "information",
+        "title": "鉄筋の径",
+        "symbol": "D",
+        "subject": "鉄筋",
+        "property": "径",
+        "property_type": "numeric",
+        "description": "耐力壁に配置される鉄筋の径（mm）"
+      },
+      {
+        "id": "dec-diameter",
+        "type": "decision",
+        "title": "鉄筋径 ≥ 9mm か？",
+        "decision_type": "binary",
+        "description": "鉄筋の径が9mm以上であることを確認",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "D", "desc": "鉄筋の径" },
+          "rhs": { "value": 9, "unit": "mm" }
+        }
+      },
+      {
+        "id": "proc-get-spacing",
+        "type": "process",
+        "title": "鉄筋配置間隔の読み取り",
+        "process_type": "undefined_input",
+        "description": "設計図書等から耐力壁における鉄筋の縦横配置間隔を読み取る"
+      },
+      {
+        "id": "info-spacing",
+        "type": "information",
+        "title": "鉄筋の縦横配置間隔",
+        "symbol": "S",
+        "subject": "耐力壁",
+        "property": "鉄筋配置間隔",
+        "property_type": "numeric",
+        "description": "耐力壁における鉄筋の縦横配置間隔（cm）"
+      },
+      {
+        "id": "proc-get-double",
+        "type": "process",
+        "title": "複配筋有無の確認",
+        "process_type": "undefined_input",
+        "description": "設計図書等から耐力壁が複配筋として配置されているかを読み取る"
+      },
+      {
+        "id": "proc-get-stories",
+        "type": "process",
+        "title": "階数の確認",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の階数を読み取る"
+      },
+      {
+        "id": "dec-stories",
+        "type": "decision",
+        "title": "平家建てか？",
+        "decision_type": "binary",
+        "description": "建築物が平家建て（1階建て）であるかを確認",
+        "condition": {
+          "operator": "EQ",
+          "lhs": { "var": "N", "desc": "建築物の階数" },
+          "rhs": { "value": 1 }
+        }
+      },
+      {
+        "id": "dec-double-non-hiraya",
+        "type": "decision",
+        "title": "複配筋か？（2階建て以上）",
+        "decision_type": "binary",
+        "description": "2階建て以上の建築物における複配筋配置の確認"
+      },
+      {
+        "id": "dec-double-hiraya",
+        "type": "decision",
+        "title": "複配筋か？（平家建て）",
+        "decision_type": "binary",
+        "description": "平家建ての建築物における複配筋配置の確認"
+      },
+      {
+        "id": "info-limit-30",
+        "type": "information",
+        "title": "上限値：30cm",
+        "symbol": "S_MAX",
+        "subject": "耐力壁",
+        "property": "配置間隔上限",
+        "property_type": "numeric",
+        "description": "2階建て以上・単配筋の場合の上限値"
+      },
+      {
+        "id": "info-limit-45",
+        "type": "information",
+        "title": "上限値：45cm",
+        "symbol": "S_MAX",
+        "subject": "耐力壁",
+        "property": "配置間隔上限",
+        "property_type": "numeric",
+        "description": "2階建て以上・複配筋の場合の上限値"
+      },
+      {
+        "id": "info-limit-35",
+        "type": "information",
+        "title": "上限値：35cm",
+        "symbol": "S_MAX",
+        "subject": "耐力壁",
+        "property": "配置間隔上限",
+        "property_type": "numeric",
+        "description": "平家建て・単配筋の場合の上限値（ただし書適用）"
+      },
+      {
+        "id": "info-limit-50",
+        "type": "information",
+        "title": "上限値：50cm",
+        "symbol": "S_MAX",
+        "subject": "耐力壁",
+        "property": "配置間隔上限",
+        "property_type": "numeric",
+        "description": "平家建て・複配筋の場合の上限値（ただし書適用）"
+      },
+      {
+        "id": "dec-spacing-30",
+        "type": "decision",
+        "title": "配置間隔 ≤ 30cm か？",
+        "decision_type": "binary",
+        "description": "鉄筋配置間隔が30cm以下であることを確認",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "S", "desc": "鉄筋配置間隔" },
+          "rhs": { "value": 30, "unit": "cm" }
+        }
+      },
+      {
+        "id": "dec-spacing-45",
+        "type": "decision",
+        "title": "配置間隔 ≤ 45cm か？",
+        "decision_type": "binary",
+        "description": "鉄筋配置間隔が45cm以下であることを確認",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "S", "desc": "鉄筋配置間隔" },
+          "rhs": { "value": 45, "unit": "cm" }
+        }
+      },
+      {
+        "id": "dec-spacing-35",
+        "type": "decision",
+        "title": "配置間隔 ≤ 35cm か？",
+        "decision_type": "binary",
+        "description": "鉄筋配置間隔が35cm以下であることを確認（平家建てただし書）",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "S", "desc": "鉄筋配置間隔" },
+          "rhs": { "value": 35, "unit": "cm" }
+        }
+      },
+      {
+        "id": "dec-spacing-50",
+        "type": "decision",
+        "title": "配置間隔 ≤ 50cm か？",
+        "decision_type": "binary",
+        "description": "鉄筋配置間隔が50cm以下であることを確認（平家建て複配筋ただし書）",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "S", "desc": "鉄筋配置間隔" },
+          "rhs": { "value": 50, "unit": "cm" }
+        }
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令第78条の2第1項第3号に適合"
+      },
+      {
+        "id": "end-fail-diameter",
+        "type": "terminal",
+        "title": "不適合（鉄筋径不足）",
+        "result": "fail",
+        "description": "鉄筋径が9mm未満のため不適合"
+      },
+      {
+        "id": "end-fail-spacing",
+        "type": "terminal",
+        "title": "不適合（配置間隔超過）",
+        "result": "fail",
+        "description": "鉄筋配置間隔が基準値を超過のため不適合"
+      },
+      {
+        "id": "end-not-applicable",
+        "type": "terminal",
+        "title": "対象外",
+        "result": "end",
+        "description": "耐力壁がないため対象外"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e001",
+        "from": "start",
+        "to": "proc-get-walls",
+        "role": "flow"
+      },
+      {
+        "id": "e002",
+        "from": "proc-get-walls",
+        "to": "dec-has-walls",
+        "role": "flow"
+      },
+      {
+        "id": "e003",
+        "from": "dec-has-walls",
+        "to": "proc-get-rebar",
+        "role": "yes",
+        "label": "あり"
+      },
+      {
+        "id": "e004",
+        "from": "dec-has-walls",
+        "to": "end-not-applicable",
+        "role": "no",
+        "label": "なし"
+      },
+      {
+        "id": "e005",
+        "from": "proc-get-rebar",
+        "to": "info-rebar-diameter",
+        "role": "flow"
+      },
+      {
+        "id": "e006",
+        "from": "info-rebar-diameter",
+        "to": "dec-diameter",
+        "role": "flow"
+      },
+      {
+        "id": "e007",
+        "from": "dec-diameter",
+        "to": "proc-get-spacing",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e008",
+        "from": "dec-diameter",
+        "to": "end-fail-diameter",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e009",
+        "from": "proc-get-spacing",
+        "to": "info-spacing",
+        "role": "flow"
+      },
+      {
+        "id": "e010",
+        "from": "info-spacing",
+        "to": "proc-get-double",
+        "role": "flow"
+      },
+      {
+        "id": "e011",
+        "from": "proc-get-double",
+        "to": "proc-get-stories",
+        "role": "flow"
+      },
+      {
+        "id": "e012",
+        "from": "proc-get-stories",
+        "to": "dec-stories",
+        "role": "flow"
+      },
+      {
+        "id": "e013",
+        "from": "dec-stories",
+        "to": "dec-double-hiraya",
+        "role": "yes",
+        "label": "はい（平家建て）"
+      },
+      {
+        "id": "e014",
+        "from": "dec-stories",
+        "to": "dec-double-non-hiraya",
+        "role": "no",
+        "label": "いいえ（2階建て以上）"
+      },
+      {
+        "id": "e015",
+        "from": "dec-double-non-hiraya",
+        "to": "info-limit-45",
+        "role": "yes",
+        "label": "複配筋"
+      },
+      {
+        "id": "e016",
+        "from": "dec-double-non-hiraya",
+        "to": "info-limit-30",
+        "role": "no",
+        "label": "単配筋"
+      },
+      {
+        "id": "e017",
+        "from": "dec-double-hiraya",
+        "to": "info-limit-50",
+        "role": "yes",
+        "label": "複配筋"
+      },
+      {
+        "id": "e018",
+        "from": "dec-double-hiraya",
+        "to": "info-limit-35",
+        "role": "no",
+        "label": "単配筋"
+      },
+      {
+        "id": "e019",
+        "from": "info-limit-30",
+        "to": "dec-spacing-30",
+        "role": "flow"
+      },
+      {
+        "id": "e020",
+        "from": "info-limit-45",
+        "to": "dec-spacing-45",
+        "role": "flow"
+      },
+      {
+        "id": "e021",
+        "from": "info-limit-35",
+        "to": "dec-spacing-35",
+        "role": "flow"
+      },
+      {
+        "id": "e022",
+        "from": "info-limit-50",
+        "to": "dec-spacing-50",
+        "role": "flow"
+      },
+      {
+        "id": "e023",
+        "from": "dec-spacing-30",
+        "to": "end-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e024",
+        "from": "dec-spacing-30",
+        "to": "end-fail-spacing",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e025",
+        "from": "dec-spacing-45",
+        "to": "end-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e026",
+        "from": "dec-spacing-45",
+        "to": "end-fail-spacing",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e027",
+        "from": "dec-spacing-35",
+        "to": "end-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e028",
+        "from": "dec-spacing-35",
+        "to": "end-fail-spacing",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e029",
+        "from": "dec-spacing-50",
+        "to": "end-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e030",
+        "from": "dec-spacing-50",
+        "to": "end-fail-spacing",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-REG-A78-2-P1-I3",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": ["A20"],
+      "description": "法第20条（構造耐力）に基づく委任規定"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": ["A78_2:P1:I1", "A78_2:P1:I2", "A78_2:P1:I4"],
+      "description": "同項の他の号（厚さ、開口部補強筋、接合部）との関連"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00Z",
+    "updated_at": "2026-01-26T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

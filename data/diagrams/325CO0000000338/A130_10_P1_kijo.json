@@ -1,0 +1,439 @@
+{
+  "id": "CHK-BSL-KIJO-A130_10-P1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "高さ制限緩和に係る敷地内空地の判定",
+    "target_subject": "敷地",
+    "description": "法第55条第2項の規定により政令で定める空地の面積割合の適合判定"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "130_10",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "集団規定",
+    "高さ制限",
+    "緩和規定"
+  ],
+  "text_raw": "法第五十五条第二項の規定により政令で定める空地は、法第五十三条の規定により建蔽率の最高限度が定められている場合においては、当該空地の面積の敷地面積に対する割合が一から当該最高限度を減じた数値に十分の一を加えた数値以上であるものとし、同条の規定により建蔽率の最高限度が定められていない場合においては、当該空地の面積の敷地面積に対する割合が十分の一以上であるものとする。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "第一種低層住居専用地域等",
+          "note": "法第55条第1項の適用区域"
+        },
+        {
+          "type": "application",
+          "value": "法第55条第2項の高さ制限緩和を受けようとする場合"
+        }
+      ],
+      "note": "高さ制限緩和の適用を受ける建築計画が対象"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "type": "numeric",
+          "operator": ">=",
+          "lhs": {
+            "ref": "info-open-space-ratio",
+            "description": "空地面積/敷地面積"
+          },
+          "rhs": {
+            "expression": "(1 - 建蔽率最高限度) + 0.1",
+            "description": "建蔽率最高限度が定められている場合"
+          }
+        },
+        {
+          "type": "numeric",
+          "operator": ">=",
+          "lhs": {
+            "ref": "info-open-space-ratio",
+            "description": "空地面積/敷地面積"
+          },
+          "rhs": {
+            "value": 0.1,
+            "description": "建蔽率最高限度が定められていない場合"
+          }
+        }
+      ]
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "info-site",
+        "type": "information",
+        "title": "敷地",
+        "subject": "敷地",
+        "property": "特定",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "高さ制限緩和の適用を受けようとする建築物の敷地を特定"
+      },
+      {
+        "id": "proc-site-input",
+        "type": "process",
+        "title": "敷地の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から対象建築物の敷地を特定する"
+      },
+      {
+        "id": "info-site-area",
+        "type": "information",
+        "title": "敷地面積",
+        "symbol": "S",
+        "subject": "敷地",
+        "property": "面積",
+        "property_type": "numeric",
+        "unit": "m2",
+        "plurality": "single",
+        "description": "敷地の面積"
+      },
+      {
+        "id": "proc-site-area-input",
+        "type": "process",
+        "title": "敷地面積の取得",
+        "process_type": "undefined_input",
+        "description": "設計図書等から敷地面積を読み取る"
+      },
+      {
+        "id": "info-open-space-area",
+        "type": "information",
+        "title": "空地面積",
+        "symbol": "O",
+        "subject": "敷地",
+        "property": "空地の面積",
+        "property_type": "numeric",
+        "unit": "m2",
+        "plurality": "single",
+        "description": "敷地内の空地の面積"
+      },
+      {
+        "id": "proc-open-space-input",
+        "type": "process",
+        "title": "空地面積の取得",
+        "process_type": "undefined_input",
+        "description": "設計図書等から敷地内の空地面積を読み取る"
+      },
+      {
+        "id": "info-open-space-ratio",
+        "type": "information",
+        "title": "空地面積割合",
+        "symbol": "R",
+        "subject": "敷地",
+        "property": "空地面積の敷地面積に対する割合",
+        "property_type": "numeric",
+        "unit": "割合",
+        "plurality": "single",
+        "description": "空地面積を敷地面積で除した値"
+      },
+      {
+        "id": "proc-ratio-calc",
+        "type": "process",
+        "title": "空地面積割合の計算",
+        "process_type": "mechanical",
+        "logic_expression": "R = O / S",
+        "description": "空地面積を敷地面積で除して割合を算出"
+      },
+      {
+        "id": "info-bcr-defined",
+        "type": "information",
+        "title": "建蔽率最高限度の有無",
+        "symbol": "D",
+        "subject": "敷地",
+        "property": "建蔽率最高限度の指定有無",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "法第53条により建蔽率の最高限度が定められているか否か"
+      },
+      {
+        "id": "proc-bcr-defined-check",
+        "type": "process",
+        "title": "建蔽率最高限度有無の判定",
+        "process_type": "mechanical",
+        "description": "敷地が所在する区域において法第53条により建蔽率の最高限度が定められているかを確認",
+        "remarks": "都市計画情報から判定"
+      },
+      {
+        "id": "info-bcr-max",
+        "type": "information",
+        "title": "建蔽率最高限度",
+        "symbol": "C",
+        "subject": "敷地",
+        "property": "建蔽率の最高限度",
+        "property_type": "numeric",
+        "unit": "割合",
+        "plurality": "single",
+        "description": "法第53条に基づく建蔽率の最高限度（0.3〜0.8等）",
+        "related_articles": [
+          "法::A53:P1"
+        ]
+      },
+      {
+        "id": "proc-bcr-max-input",
+        "type": "process",
+        "title": "建蔽率最高限度の取得",
+        "process_type": "mechanical",
+        "description": "都市計画情報から敷地に適用される建蔽率の最高限度を取得"
+      },
+      {
+        "id": "info-required-ratio-with-bcr",
+        "type": "information",
+        "title": "必要空地割合（建蔽率指定あり）",
+        "symbol": "Rreq1",
+        "subject": "敷地",
+        "property": "必要な空地面積割合",
+        "property_type": "numeric",
+        "unit": "割合",
+        "plurality": "single",
+        "description": "建蔽率最高限度が定められている場合の必要割合（(1-C)+0.1）"
+      },
+      {
+        "id": "proc-required-ratio-calc",
+        "type": "process",
+        "title": "必要空地割合の計算",
+        "process_type": "mechanical",
+        "logic_expression": "Rreq1 = (1 - C) + 0.1",
+        "description": "一から建蔽率最高限度を減じた数値に十分の一を加えた数値を算出"
+      },
+      {
+        "id": "info-compliance-with-bcr",
+        "type": "information",
+        "title": "空地割合適合（建蔽率指定あり）",
+        "symbol": "P1",
+        "subject": "敷地",
+        "property": "空地面積割合の適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "空地面積割合が必要割合以上か（建蔽率最高限度あり）"
+      },
+      {
+        "id": "proc-compliance-check-with-bcr",
+        "type": "process",
+        "title": "空地割合判定（建蔽率指定あり）",
+        "process_type": "mechanical",
+        "logic_expression": "R >= Rreq1",
+        "description": "空地面積割合が(1-建蔽率最高限度)+0.1以上か判定"
+      },
+      {
+        "id": "info-compliance-without-bcr",
+        "type": "information",
+        "title": "空地割合適合（建蔽率指定なし）",
+        "symbol": "P2",
+        "subject": "敷地",
+        "property": "空地面積割合の適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "空地面積割合が0.1以上か（建蔽率最高限度なし）"
+      },
+      {
+        "id": "proc-compliance-check-without-bcr",
+        "type": "process",
+        "title": "空地割合判定（建蔽率指定なし）",
+        "process_type": "mechanical",
+        "logic_expression": "R >= 0.1",
+        "description": "空地面積割合が十分の一以上か判定"
+      },
+      {
+        "id": "info-final-compliance",
+        "type": "information",
+        "title": "令130条の10第1項適合",
+        "symbol": "PASS",
+        "subject": "敷地",
+        "property": "空地要件の適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "高さ制限緩和に係る空地の面積割合基準に適合"
+      },
+      {
+        "id": "proc-final-judgment",
+        "type": "process",
+        "title": "総合判定",
+        "process_type": "mechanical",
+        "logic_expression": "(D AND P1) OR (NOT D AND P2)",
+        "description": "建蔽率最高限度の有無に応じた適合判定"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e001",
+        "from": "proc-site-input",
+        "to": "info-site",
+        "role": "output"
+      },
+      {
+        "id": "e002",
+        "from": "info-site",
+        "to": "proc-site-area-input",
+        "role": "input"
+      },
+      {
+        "id": "e003",
+        "from": "proc-site-area-input",
+        "to": "info-site-area",
+        "role": "output"
+      },
+      {
+        "id": "e004",
+        "from": "info-site",
+        "to": "proc-open-space-input",
+        "role": "input"
+      },
+      {
+        "id": "e005",
+        "from": "proc-open-space-input",
+        "to": "info-open-space-area",
+        "role": "output"
+      },
+      {
+        "id": "e006",
+        "from": "info-site-area",
+        "to": "proc-ratio-calc",
+        "role": "input"
+      },
+      {
+        "id": "e007",
+        "from": "info-open-space-area",
+        "to": "proc-ratio-calc",
+        "role": "input"
+      },
+      {
+        "id": "e008",
+        "from": "proc-ratio-calc",
+        "to": "info-open-space-ratio",
+        "role": "output"
+      },
+      {
+        "id": "e009",
+        "from": "info-site",
+        "to": "proc-bcr-defined-check",
+        "role": "input"
+      },
+      {
+        "id": "e010",
+        "from": "proc-bcr-defined-check",
+        "to": "info-bcr-defined",
+        "role": "output"
+      },
+      {
+        "id": "e011",
+        "from": "info-site",
+        "to": "proc-bcr-max-input",
+        "role": "input"
+      },
+      {
+        "id": "e012",
+        "from": "proc-bcr-max-input",
+        "to": "info-bcr-max",
+        "role": "output"
+      },
+      {
+        "id": "e013",
+        "from": "info-bcr-max",
+        "to": "proc-required-ratio-calc",
+        "role": "input"
+      },
+      {
+        "id": "e014",
+        "from": "proc-required-ratio-calc",
+        "to": "info-required-ratio-with-bcr",
+        "role": "output"
+      },
+      {
+        "id": "e015",
+        "from": "info-open-space-ratio",
+        "to": "proc-compliance-check-with-bcr",
+        "role": "input"
+      },
+      {
+        "id": "e016",
+        "from": "info-required-ratio-with-bcr",
+        "to": "proc-compliance-check-with-bcr",
+        "role": "input"
+      },
+      {
+        "id": "e017",
+        "from": "proc-compliance-check-with-bcr",
+        "to": "info-compliance-with-bcr",
+        "role": "output"
+      },
+      {
+        "id": "e018",
+        "from": "info-open-space-ratio",
+        "to": "proc-compliance-check-without-bcr",
+        "role": "input"
+      },
+      {
+        "id": "e019",
+        "from": "proc-compliance-check-without-bcr",
+        "to": "info-compliance-without-bcr",
+        "role": "output"
+      },
+      {
+        "id": "e020",
+        "from": "info-bcr-defined",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e021",
+        "from": "info-compliance-with-bcr",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e022",
+        "from": "info-compliance-without-bcr",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e023",
+        "from": "proc-final-judgment",
+        "to": "info-final-compliance",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": [
+        "A55:P2"
+      ],
+      "description": "法第55条第2項が本条に空地の定義を委任"
+    },
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": [
+        "A53:P1"
+      ],
+      "description": "建蔽率の最高限度の規定を参照"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00Z",
+    "updated_at": "2026-01-26T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "kijo-generator",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令",
+    "checklist_ref": "確認審査報告書チェックリスト",
+    "source": "e-Gov法令API"
+  }
+}

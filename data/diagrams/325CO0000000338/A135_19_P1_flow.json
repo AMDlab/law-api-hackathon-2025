@@ -1,0 +1,432 @@
+{
+  "id": "A135_19_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "容積率算定除外部分の判定フロー",
+    "target_subject": "建築物の部分",
+    "description": "容積率の算定に当たり建築物から除かれる部分の適合判定フロー"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "135_19",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "集団規定",
+    "容積率"
+  ],
+  "text_raw": "法第五十二条第十二項の政令で定める建築物の部分は、次に掲げるものとする。\n一 ひさしその他これに類する建築物の部分で、次に掲げる要件に該当するもの\n  イ 高さが五メートル以下であること。\n  ロ 当該部分の水平投影の前面道路に面する長さを敷地の前面道路に接する部分の水平投影の長さで除した数値が五分の一以下であること。\n  ハ 当該部分から前面道路の境界線までの水平距離のうち最小のものが一メートル以上であること。\n二 建築物の地盤面下の部分\n三 道路に沿つて設けられる高さが二メートル以下の門又は塀（高さが一・二メートルを超えるものにあつては、当該一・二メートルを超える部分が網状その他これに類する形状であるものに限る。）\n四 隣地境界線に沿つて設けられる高さが二メートル以下の門又は塀\n五 歩廊、渡り廊下その他これらに類する建築物の部分で、特定行政庁がその地方の気候若しくは風土の特殊性又は土地の状況を考慮して規則で定めたもの",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "legal_reference",
+          "value": "法第52条第12項の適用時"
+        }
+      ],
+      "note": "容積率算定（法第52条第12項）において除外される部分を規定"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "type": "definition",
+          "value": "第一号：ひさし等（イ・ロ・ハの要件全てを満たすもの）"
+        },
+        {
+          "type": "definition",
+          "value": "第二号：建築物の地盤面下の部分"
+        },
+        {
+          "type": "definition",
+          "value": "第三号：道路沿いの門・塀（高さ2m以下）"
+        },
+        {
+          "type": "definition",
+          "value": "第四号：隣地境界線沿いの門・塀（高さ2m以下）"
+        },
+        {
+          "type": "definition",
+          "value": "第五号：歩廊、渡り廊下等（特定行政庁規則による）"
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "flow_diagram": {
+    "title": "容積率算定除外部分の判定フロー",
+    "description": "建築物の部分が容積率の算定に当たり除外されるか否かを判定するフロー図",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "容積率算定除外判定の開始"
+      },
+      {
+        "id": "dec-part-type",
+        "type": "decision",
+        "title": "部分の種類は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "ひさし等", "description": "ひさしその他これに類する建築物の部分" },
+          { "value": "地盤面下部分", "description": "建築物の地盤面下の部分" },
+          { "value": "道路沿い門・塀", "description": "道路に沿って設けられる門又は塀" },
+          { "value": "隣地沿い門・塀", "description": "隣地境界線に沿って設けられる門又は塀" },
+          { "value": "歩廊等", "description": "歩廊、渡り廊下その他これらに類する建築物の部分" },
+          { "value": "その他", "description": "上記のいずれにも該当しない部分" }
+        ],
+        "description": "判定対象となる建築物の部分の種類を分類"
+      },
+      {
+        "id": "proc-item2-underground",
+        "type": "process",
+        "title": "第二号該当（地盤面下部分）",
+        "process_type": "mechanical",
+        "description": "地盤面下の部分として第二号に該当"
+      },
+      {
+        "id": "dec-eaves-height",
+        "type": "decision",
+        "title": "高さは5m以下か？",
+        "decision_type": "binary",
+        "description": "ひさし等の高さが5m以下であるかを判定（第一号イ）",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "H", "desc": "ひさし等の高さ" },
+          "rhs": { "value": 5, "unit": "m" }
+        }
+      },
+      {
+        "id": "dec-eaves-ratio",
+        "type": "decision",
+        "title": "道路面長さ比率は1/5以下か？",
+        "decision_type": "binary",
+        "description": "当該部分の水平投影の前面道路に面する長さを敷地の前面道路に接する部分の水平投影の長さで除した数値が1/5以下であるかを判定（第一号ロ）",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "R", "desc": "道路面長さ比率（L1/L2）" },
+          "rhs": { "value": 0.2 }
+        }
+      },
+      {
+        "id": "dec-eaves-distance",
+        "type": "decision",
+        "title": "道路境界線までの最小距離は1m以上か？",
+        "decision_type": "binary",
+        "description": "当該部分から前面道路の境界線までの水平距離のうち最小のものが1m以上であるかを判定（第一号ハ）",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "D", "desc": "道路境界線までの最小距離" },
+          "rhs": { "value": 1, "unit": "m" }
+        }
+      },
+      {
+        "id": "proc-item1-eaves",
+        "type": "process",
+        "title": "第一号該当（ひさし等）",
+        "process_type": "mechanical",
+        "description": "ひさし等として第一号（イ・ロ・ハ全て満たす）に該当"
+      },
+      {
+        "id": "dec-road-fence-height",
+        "type": "decision",
+        "title": "高さは2m以下か？",
+        "decision_type": "binary",
+        "description": "道路沿い門・塀の高さが2m以下であるかを判定",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "H", "desc": "門・塀の高さ" },
+          "rhs": { "value": 2, "unit": "m" }
+        }
+      },
+      {
+        "id": "dec-road-fence-over-12",
+        "type": "decision",
+        "title": "高さは1.2m以下か？",
+        "decision_type": "binary",
+        "description": "門・塀の高さが1.2m以下であるかを判定",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "H", "desc": "門・塀の高さ" },
+          "rhs": { "value": 1.2, "unit": "m" }
+        }
+      },
+      {
+        "id": "dec-road-fence-net-shape",
+        "type": "decision",
+        "title": "1.2m超部分は網状か？",
+        "decision_type": "binary",
+        "description": "高さ1.2mを超える部分が網状その他これに類する形状であるかを判定",
+        "condition": {
+          "operator": "EQ",
+          "lhs": { "var": "N", "desc": "1.2m超部分の網状形状該当性" },
+          "rhs": { "value": true }
+        }
+      },
+      {
+        "id": "proc-item3-road-fence",
+        "type": "process",
+        "title": "第三号該当（道路沿い門・塀）",
+        "process_type": "mechanical",
+        "description": "道路沿いの門・塀として第三号に該当"
+      },
+      {
+        "id": "dec-neighbor-fence-height",
+        "type": "decision",
+        "title": "高さは2m以下か？",
+        "decision_type": "binary",
+        "description": "隣地沿い門・塀の高さが2m以下であるかを判定",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "H", "desc": "門・塀の高さ" },
+          "rhs": { "value": 2, "unit": "m" }
+        }
+      },
+      {
+        "id": "proc-item4-neighbor-fence",
+        "type": "process",
+        "title": "第四号該当（隣地沿い門・塀）",
+        "process_type": "mechanical",
+        "description": "隣地境界線沿いの門・塀として第四号に該当"
+      },
+      {
+        "id": "dec-corridor-admin-rule",
+        "type": "decision",
+        "title": "特定行政庁規則で定めたものに該当するか？",
+        "decision_type": "binary",
+        "description": "歩廊、渡り廊下等が特定行政庁がその地方の気候若しくは風土の特殊性又は土地の状況を考慮して規則で定めたものに該当するかを判定",
+        "condition": {
+          "operator": "EQ",
+          "lhs": { "var": "A", "desc": "特定行政庁規則適合性" },
+          "rhs": { "value": true }
+        }
+      },
+      {
+        "id": "proc-item5-corridor",
+        "type": "process",
+        "title": "第五号該当（歩廊等）",
+        "process_type": "mechanical",
+        "description": "歩廊、渡り廊下等として第五号に該当"
+      },
+      {
+        "id": "end-excluded",
+        "type": "terminal",
+        "title": "容積率算定から除外",
+        "result": "pass",
+        "description": "当該部分は容積率の算定に当たり建築物から除かれる"
+      },
+      {
+        "id": "end-not-excluded",
+        "type": "terminal",
+        "title": "容積率算定に算入",
+        "result": "fail",
+        "description": "当該部分は容積率の算定に当たり建築物から除かれない（算入される）"
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge-start-to-part-type",
+        "from": "start",
+        "to": "dec-part-type",
+        "role": "flow"
+      },
+      {
+        "id": "edge-part-type-eaves",
+        "from": "dec-part-type",
+        "to": "dec-eaves-height",
+        "role": "option",
+        "label": "ひさし等"
+      },
+      {
+        "id": "edge-part-type-underground",
+        "from": "dec-part-type",
+        "to": "proc-item2-underground",
+        "role": "option",
+        "label": "地盤面下部分"
+      },
+      {
+        "id": "edge-part-type-road-fence",
+        "from": "dec-part-type",
+        "to": "dec-road-fence-height",
+        "role": "option",
+        "label": "道路沿い門・塀"
+      },
+      {
+        "id": "edge-part-type-neighbor-fence",
+        "from": "dec-part-type",
+        "to": "dec-neighbor-fence-height",
+        "role": "option",
+        "label": "隣地沿い門・塀"
+      },
+      {
+        "id": "edge-part-type-corridor",
+        "from": "dec-part-type",
+        "to": "dec-corridor-admin-rule",
+        "role": "option",
+        "label": "歩廊等"
+      },
+      {
+        "id": "edge-part-type-other",
+        "from": "dec-part-type",
+        "to": "end-not-excluded",
+        "role": "option",
+        "label": "その他"
+      },
+      {
+        "id": "edge-underground-to-excluded",
+        "from": "proc-item2-underground",
+        "to": "end-excluded",
+        "role": "flow"
+      },
+      {
+        "id": "edge-eaves-height-yes",
+        "from": "dec-eaves-height",
+        "to": "dec-eaves-ratio",
+        "role": "yes"
+      },
+      {
+        "id": "edge-eaves-height-no",
+        "from": "dec-eaves-height",
+        "to": "end-not-excluded",
+        "role": "no"
+      },
+      {
+        "id": "edge-eaves-ratio-yes",
+        "from": "dec-eaves-ratio",
+        "to": "dec-eaves-distance",
+        "role": "yes"
+      },
+      {
+        "id": "edge-eaves-ratio-no",
+        "from": "dec-eaves-ratio",
+        "to": "end-not-excluded",
+        "role": "no"
+      },
+      {
+        "id": "edge-eaves-distance-yes",
+        "from": "dec-eaves-distance",
+        "to": "proc-item1-eaves",
+        "role": "yes"
+      },
+      {
+        "id": "edge-eaves-distance-no",
+        "from": "dec-eaves-distance",
+        "to": "end-not-excluded",
+        "role": "no"
+      },
+      {
+        "id": "edge-item1-eaves-to-excluded",
+        "from": "proc-item1-eaves",
+        "to": "end-excluded",
+        "role": "flow"
+      },
+      {
+        "id": "edge-road-fence-height-yes",
+        "from": "dec-road-fence-height",
+        "to": "dec-road-fence-over-12",
+        "role": "yes"
+      },
+      {
+        "id": "edge-road-fence-height-no",
+        "from": "dec-road-fence-height",
+        "to": "end-not-excluded",
+        "role": "no"
+      },
+      {
+        "id": "edge-road-fence-over-12-yes",
+        "from": "dec-road-fence-over-12",
+        "to": "proc-item3-road-fence",
+        "role": "yes"
+      },
+      {
+        "id": "edge-road-fence-over-12-no",
+        "from": "dec-road-fence-over-12",
+        "to": "dec-road-fence-net-shape",
+        "role": "no"
+      },
+      {
+        "id": "edge-road-fence-net-shape-yes",
+        "from": "dec-road-fence-net-shape",
+        "to": "proc-item3-road-fence",
+        "role": "yes"
+      },
+      {
+        "id": "edge-road-fence-net-shape-no",
+        "from": "dec-road-fence-net-shape",
+        "to": "end-not-excluded",
+        "role": "no"
+      },
+      {
+        "id": "edge-item3-road-fence-to-excluded",
+        "from": "proc-item3-road-fence",
+        "to": "end-excluded",
+        "role": "flow"
+      },
+      {
+        "id": "edge-neighbor-fence-height-yes",
+        "from": "dec-neighbor-fence-height",
+        "to": "proc-item4-neighbor-fence",
+        "role": "yes"
+      },
+      {
+        "id": "edge-neighbor-fence-height-no",
+        "from": "dec-neighbor-fence-height",
+        "to": "end-not-excluded",
+        "role": "no"
+      },
+      {
+        "id": "edge-item4-neighbor-fence-to-excluded",
+        "from": "proc-item4-neighbor-fence",
+        "to": "end-excluded",
+        "role": "flow"
+      },
+      {
+        "id": "edge-corridor-admin-rule-yes",
+        "from": "dec-corridor-admin-rule",
+        "to": "proc-item5-corridor",
+        "role": "yes"
+      },
+      {
+        "id": "edge-corridor-admin-rule-no",
+        "from": "dec-corridor-admin-rule",
+        "to": "end-not-excluded",
+        "role": "no"
+      },
+      {
+        "id": "edge-item5-corridor-to-excluded",
+        "from": "proc-item5-corridor",
+        "to": "end-excluded",
+        "role": "flow"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-KIJO-A135_19-P1",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": [
+        "A52:P12"
+      ],
+      "description": "法第52条第12項が本条を委任元として、容積率算定から除外される建築物の部分を政令に委任"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00Z",
+    "updated_at": "2026-01-26T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令",
+    "checklist_ref": "建築基準法施行令第135条の19第1項（容積率算定除外部分）"
+  }
+}

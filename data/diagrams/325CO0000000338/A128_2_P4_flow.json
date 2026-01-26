@@ -1,0 +1,297 @@
+{
+  "id": "A128_2_P4_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "通路の渡り廊下横断と開口寸法",
+    "target_subject": "通路",
+    "description": "敷地内通路が渡り廊下を横切る場合の条件と開口部寸法の要件"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "128_2",
+    "paragraph": "4",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "避難規定",
+    "敷地内通路"
+  ],
+  "text_raw": "前三項の規定にかかわらず、通路は、次の各号の規定に該当する渡り廊下を横切ることができる。ただし、通路が横切る部分における渡り廊下の開口の幅は二・五メートル以上、高さは三メートル以上としなければならない。一　幅が三メートル以下であること。二　通行又は運搬以外の用途に供しないこと。",
+  "kijo_diagram_ref": "CHK-BSL-ORD-A128_2-P4",
+  "flow_diagram": {
+    "title": "令第128条の2第4項 通路の渡り廊下横断判定フロー",
+    "description": "敷地内通路が渡り廊下を横切る場合の適合判定フロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "通路の渡り廊下横断に関する適合判定を開始"
+      },
+      {
+        "id": "dec-has-crossing",
+        "type": "decision",
+        "title": "通路は渡り廊下を横切るか？",
+        "decision_type": "binary",
+        "description": "通路が渡り廊下を横切る場合に本項が適用される"
+      },
+      {
+        "id": "proc-no-crossing",
+        "type": "process",
+        "title": "本項適用外",
+        "process_type": "mechanical",
+        "description": "通路が渡り廊下を横切らない場合は本項の適用なし"
+      },
+      {
+        "id": "dec-corridor-width",
+        "type": "decision",
+        "title": "渡り廊下の幅は3m以下か？",
+        "decision_type": "binary",
+        "description": "第1号：渡り廊下の幅が3m以下であること",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "W", "desc": "渡り廊下の幅" },
+          "rhs": { "value": 3, "unit": "m" }
+        }
+      },
+      {
+        "id": "proc-item1-pass",
+        "type": "process",
+        "title": "第1号適合",
+        "process_type": "mechanical",
+        "description": "渡り廊下の幅が3m以下で第1号に適合"
+      },
+      {
+        "id": "dec-usage",
+        "type": "decision",
+        "title": "渡り廊下の用途は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "通行・運搬のみ", "description": "通行又は運搬のみの用途" },
+          { "value": "その他用途あり", "description": "通行又は運搬以外の用途にも供している" }
+        ],
+        "description": "第2号：通行又は運搬以外の用途に供しないこと"
+      },
+      {
+        "id": "proc-item2-pass",
+        "type": "process",
+        "title": "第2号適合",
+        "process_type": "mechanical",
+        "description": "通行・運搬のみの用途で第2号に適合"
+      },
+      {
+        "id": "proc-items-pass",
+        "type": "process",
+        "title": "各号適合（横切り可能）",
+        "process_type": "mechanical",
+        "description": "第1号・第2号の両方を満たし、渡り廊下を横切ることができる"
+      },
+      {
+        "id": "dec-opening-width",
+        "type": "decision",
+        "title": "開口の幅は2.5m以上か？",
+        "decision_type": "binary",
+        "description": "ただし書き：通路が横切る部分における開口の幅が2.5m以上であること",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "OW", "desc": "開口の幅" },
+          "rhs": { "value": 2.5, "unit": "m" }
+        }
+      },
+      {
+        "id": "proc-opening-width-pass",
+        "type": "process",
+        "title": "開口幅適合",
+        "process_type": "mechanical",
+        "description": "開口の幅が2.5m以上で適合"
+      },
+      {
+        "id": "dec-opening-height",
+        "type": "decision",
+        "title": "開口の高さは3m以上か？",
+        "decision_type": "binary",
+        "description": "ただし書き：通路が横切る部分における開口の高さが3m以上であること",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "OH", "desc": "開口の高さ" },
+          "rhs": { "value": 3, "unit": "m" }
+        }
+      },
+      {
+        "id": "proc-opening-height-pass",
+        "type": "process",
+        "title": "開口高さ適合",
+        "process_type": "mechanical",
+        "description": "開口の高さが3m以上で適合"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "渡り廊下が各号を満たし、開口寸法も要件を満たすため適合"
+      },
+      {
+        "id": "end-fail-width",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "渡り廊下の幅が3mを超えるため横切り不可"
+      },
+      {
+        "id": "end-fail-usage",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "通行・運搬以外の用途があるため横切り不可"
+      },
+      {
+        "id": "end-fail-opening-width",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "開口の幅が2.5m未満のため不適合"
+      },
+      {
+        "id": "end-fail-opening-height",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "開口の高さが3m未満のため不適合"
+      },
+      {
+        "id": "end-not-applicable",
+        "type": "terminal",
+        "title": "適用外",
+        "result": "end",
+        "description": "通路が渡り廊下を横切らないため本項は適用されない"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-has-crossing",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-has-crossing",
+        "to": "dec-corridor-width",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "dec-has-crossing",
+        "to": "proc-no-crossing",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e04",
+        "from": "proc-no-crossing",
+        "to": "end-not-applicable",
+        "role": "flow"
+      },
+      {
+        "id": "e05",
+        "from": "dec-corridor-width",
+        "to": "proc-item1-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e06",
+        "from": "dec-corridor-width",
+        "to": "end-fail-width",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e07",
+        "from": "proc-item1-pass",
+        "to": "dec-usage",
+        "role": "flow"
+      },
+      {
+        "id": "e08",
+        "from": "dec-usage",
+        "to": "proc-item2-pass",
+        "role": "option",
+        "label": "通行・運搬のみ"
+      },
+      {
+        "id": "e09",
+        "from": "dec-usage",
+        "to": "end-fail-usage",
+        "role": "option",
+        "label": "その他用途あり"
+      },
+      {
+        "id": "e10",
+        "from": "proc-item2-pass",
+        "to": "proc-items-pass",
+        "role": "flow"
+      },
+      {
+        "id": "e11",
+        "from": "proc-items-pass",
+        "to": "dec-opening-width",
+        "role": "flow"
+      },
+      {
+        "id": "e12",
+        "from": "dec-opening-width",
+        "to": "proc-opening-width-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e13",
+        "from": "dec-opening-width",
+        "to": "end-fail-opening-width",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e14",
+        "from": "proc-opening-width-pass",
+        "to": "dec-opening-height",
+        "role": "flow"
+      },
+      {
+        "id": "e15",
+        "from": "dec-opening-height",
+        "to": "proc-opening-height-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e16",
+        "from": "dec-opening-height",
+        "to": "end-fail-opening-height",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e17",
+        "from": "proc-opening-height-pass",
+        "to": "end-pass",
+        "role": "flow"
+      }
+    ]
+  },
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00+09:00",
+    "author": "Claude",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

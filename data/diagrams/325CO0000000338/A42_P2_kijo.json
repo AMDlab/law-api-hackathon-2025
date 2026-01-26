@@ -1,0 +1,384 @@
+{
+  "id": "CHK-ORD-A42-P2",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "土台の基礎への緊結",
+    "target_subject": "土台",
+    "description": "土台が基礎に緊結されているかを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "42",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造"
+  ],
+  "text_raw": "土台は、基礎に緊結しなければならない。ただし、平家建ての建築物で延べ面積が五十平方メートル以内のものについては、この限りでない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "note": "全ての建築物に適用（土台を有する場合）"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "ref": "info-exempt",
+          "operator": "==",
+          "value": true,
+          "note": "ただし書き適用除外に該当"
+        },
+        {
+          "ref": "info-fastening-compliance",
+          "operator": "==",
+          "value": true,
+          "note": "土台が基礎に緊結されている"
+        }
+      ]
+    },
+    "exceptions": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "building_structure",
+          "value": "平家建て"
+        },
+        {
+          "type": "numeric",
+          "property": "延べ面積",
+          "operator": "<=",
+          "value": 50,
+          "unit": "m2"
+        }
+      ],
+      "effect": "EXEMPT"
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "info-building",
+        "type": "information",
+        "title": "建築物",
+        "subject": "建築物",
+        "property": "特定",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "判定対象となる建築物を特定"
+      },
+      {
+        "id": "proc-building-input",
+        "type": "process",
+        "title": "建築物の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から対象建築物を特定する"
+      },
+      {
+        "id": "info-dodai-set",
+        "type": "information",
+        "title": "建築物の土台",
+        "subject": "建築物",
+        "property": "土台の集合",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "建築物に属する土台を特定"
+      },
+      {
+        "id": "proc-dodai-identify",
+        "type": "process",
+        "title": "土台の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の土台を特定する"
+      },
+      {
+        "id": "info-story-count",
+        "type": "information",
+        "title": "階数",
+        "subject": "建築物",
+        "property": "階数",
+        "property_type": "numeric",
+        "unit": "階",
+        "plurality": "single",
+        "description": "建築物の階数"
+      },
+      {
+        "id": "proc-story-count",
+        "type": "process",
+        "title": "階数の確認",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の階数を読み取る"
+      },
+      {
+        "id": "info-is-hiraya",
+        "type": "information",
+        "title": "平家建て該当",
+        "symbol": "H",
+        "subject": "建築物",
+        "property": "平家建てか否か",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "建築物が平家建てであるか"
+      },
+      {
+        "id": "proc-hiraya-check",
+        "type": "process",
+        "title": "平家建て判定",
+        "process_type": "mechanical",
+        "logic_expression": "階数 == 1",
+        "description": "階数が1であれば平家建てと判定"
+      },
+      {
+        "id": "info-total-area",
+        "type": "information",
+        "title": "延べ面積",
+        "symbol": "A",
+        "subject": "建築物",
+        "property": "延べ面積",
+        "property_type": "numeric",
+        "unit": "m2",
+        "plurality": "single",
+        "description": "建築物の延べ面積"
+      },
+      {
+        "id": "proc-total-area",
+        "type": "process",
+        "title": "延べ面積の確認",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の延べ面積を読み取る"
+      },
+      {
+        "id": "info-area-50-or-less",
+        "type": "information",
+        "title": "50m2以内",
+        "symbol": "A50",
+        "subject": "建築物",
+        "property": "延べ面積が50m2以内か",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "延べ面積が五十平方メートル以内"
+      },
+      {
+        "id": "proc-area-check",
+        "type": "process",
+        "title": "面積判定",
+        "process_type": "mechanical",
+        "logic_expression": "A <= 50",
+        "description": "延べ面積が50m2以内かを判定"
+      },
+      {
+        "id": "info-exempt",
+        "type": "information",
+        "title": "ただし書き適用",
+        "symbol": "EX",
+        "subject": "建築物",
+        "property": "ただし書き適用除外",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "平家建てで延べ面積50m2以内のため適用除外"
+      },
+      {
+        "id": "proc-exempt-check",
+        "type": "process",
+        "title": "適用除外判定",
+        "process_type": "mechanical",
+        "logic_expression": "H AND A50",
+        "description": "平家建てかつ延べ面積50m2以内であれば適用除外"
+      },
+      {
+        "id": "info-fastening-status",
+        "type": "information",
+        "title": "土台の緊結状態",
+        "subject": "土台",
+        "property": "基礎への緊結状態",
+        "property_type": "visual",
+        "plurality": "multiple",
+        "description": "各土台が基礎に緊結されているかの状態"
+      },
+      {
+        "id": "proc-fastening-input",
+        "type": "process",
+        "title": "緊結状態の確認",
+        "process_type": "undefined_input",
+        "description": "設計図書等から土台と基礎の緊結状態を確認する"
+      },
+      {
+        "id": "info-fastening-compliance",
+        "type": "information",
+        "title": "緊結要件適合",
+        "symbol": "F",
+        "subject": "土台",
+        "property": "基礎に緊結されている",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "土台が基礎に緊結されている"
+      },
+      {
+        "id": "proc-fastening-judgment",
+        "type": "process",
+        "title": "緊結適合判定",
+        "process_type": "human_judgment",
+        "iteration": "iterative",
+        "description": "全ての土台が基礎に緊結されているかを判定"
+      },
+      {
+        "id": "info-final-compliance",
+        "type": "information",
+        "title": "令42条2項適合",
+        "symbol": "PASS",
+        "subject": "建築物",
+        "property": "土台基礎緊結の適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "令第42条第2項の適合判定結果"
+      },
+      {
+        "id": "proc-final-judgment",
+        "type": "process",
+        "title": "総合判定",
+        "process_type": "mechanical",
+        "logic_expression": "EX OR F",
+        "description": "ただし書き適用または緊結要件適合で適合と判定"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e001",
+        "from": "proc-building-input",
+        "to": "info-building",
+        "role": "output"
+      },
+      {
+        "id": "e002",
+        "from": "info-building",
+        "to": "proc-dodai-identify",
+        "role": "input"
+      },
+      {
+        "id": "e003",
+        "from": "proc-dodai-identify",
+        "to": "info-dodai-set",
+        "role": "output"
+      },
+      {
+        "id": "e004",
+        "from": "info-building",
+        "to": "proc-story-count",
+        "role": "input"
+      },
+      {
+        "id": "e005",
+        "from": "proc-story-count",
+        "to": "info-story-count",
+        "role": "output"
+      },
+      {
+        "id": "e006",
+        "from": "info-story-count",
+        "to": "proc-hiraya-check",
+        "role": "input"
+      },
+      {
+        "id": "e007",
+        "from": "proc-hiraya-check",
+        "to": "info-is-hiraya",
+        "role": "output"
+      },
+      {
+        "id": "e008",
+        "from": "info-building",
+        "to": "proc-total-area",
+        "role": "input"
+      },
+      {
+        "id": "e009",
+        "from": "proc-total-area",
+        "to": "info-total-area",
+        "role": "output"
+      },
+      {
+        "id": "e010",
+        "from": "info-total-area",
+        "to": "proc-area-check",
+        "role": "input"
+      },
+      {
+        "id": "e011",
+        "from": "proc-area-check",
+        "to": "info-area-50-or-less",
+        "role": "output"
+      },
+      {
+        "id": "e012",
+        "from": "info-is-hiraya",
+        "to": "proc-exempt-check",
+        "role": "input"
+      },
+      {
+        "id": "e013",
+        "from": "info-area-50-or-less",
+        "to": "proc-exempt-check",
+        "role": "input"
+      },
+      {
+        "id": "e014",
+        "from": "proc-exempt-check",
+        "to": "info-exempt",
+        "role": "output"
+      },
+      {
+        "id": "e015",
+        "from": "info-dodai-set",
+        "to": "proc-fastening-input",
+        "role": "input"
+      },
+      {
+        "id": "e016",
+        "from": "proc-fastening-input",
+        "to": "info-fastening-status",
+        "role": "output"
+      },
+      {
+        "id": "e017",
+        "from": "info-fastening-status",
+        "to": "proc-fastening-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e018",
+        "from": "proc-fastening-judgment",
+        "to": "info-fastening-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e019",
+        "from": "info-exempt",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e020",
+        "from": "info-fastening-compliance",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e021",
+        "from": "proc-final-judgment",
+        "to": "info-final-compliance",
+        "role": "output"
+      }
+    ]
+  },
+  "metadata": {
+    "created_at": "2026-01-23T00:00:00Z",
+    "generator": "claude-code-kijo-generator",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令",
+    "checklist_ref": "確認審査報告書チェックリスト"
+  }
+}

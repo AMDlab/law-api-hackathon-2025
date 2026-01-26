@@ -1,0 +1,277 @@
+{
+  "id": "CHK-BSO-A59_2-P1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "補強を要する組積造",
+    "target_subject": "建築物",
+    "description": "高さ13mを超える又は軒の高さが9mを超える建築物が国土交通大臣が定める構造方法により補強されていることを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "59の2",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造関係規定",
+    "組積造"
+  ],
+  "text_raw": "高さ十三メートル又は軒の高さが九メートルを超える建築物にあつては、国土交通大臣が定める構造方法により、鉄筋、鉄骨又は鉄筋コンクリートによつて補強しなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "type": "building_dimension",
+          "value": "高さ13mを超える"
+        },
+        {
+          "type": "building_dimension",
+          "value": "軒の高さ9mを超える"
+        }
+      ],
+      "note": "高さ13m超又は軒の高さ9m超の建築物が対象"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-reinforcement-compliance",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-height-check",
+        "type": "process",
+        "title": "建築物の高さの特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の高さを読み取る"
+      },
+      {
+        "id": "info-height",
+        "type": "information",
+        "title": "建築物の高さ",
+        "symbol": "H",
+        "subject": "建築物",
+        "property": "高さ",
+        "property_type": "numeric",
+        "unit": "m",
+        "description": "建築物の高さ（令第2条第1項第6号に規定する高さ）",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-eaves-height-check",
+        "type": "process",
+        "title": "建築物の軒の高さの特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の軒の高さを読み取る"
+      },
+      {
+        "id": "info-eaves-height",
+        "type": "information",
+        "title": "建築物の軒の高さ",
+        "symbol": "He",
+        "subject": "建築物",
+        "property": "軒の高さ",
+        "property_type": "numeric",
+        "unit": "m",
+        "description": "建築物の軒の高さ（令第2条第1項第7号に規定する軒の高さ）",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-scope-judgment",
+        "type": "process",
+        "title": "規定適用判定",
+        "process_type": "mechanical",
+        "target_subject": "建築物",
+        "description": "高さ13mを超える又は軒の高さが9mを超えるか判定し、本規定の適用対象かを判定する",
+        "logic_expression": "(H > 13) OR (He > 9)"
+      },
+      {
+        "id": "info-scope-applicable",
+        "type": "information",
+        "title": "規定適用対象",
+        "symbol": "S",
+        "subject": "建築物",
+        "property": "令第59条の2第1項適用対象",
+        "property_type": "proposition",
+        "description": "高さ13m超又は軒の高さ9m超の要件を満たし、本規定の適用対象であるか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-reinforcement-method",
+        "type": "process",
+        "title": "補強方法の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の補強方法（鉄筋、鉄骨又は鉄筋コンクリートによる補強）を読み取る"
+      },
+      {
+        "id": "info-reinforcement-method",
+        "type": "information",
+        "title": "補強方法",
+        "symbol": "R",
+        "subject": "建築物",
+        "property": "補強方法",
+        "property_type": "classification",
+        "description": "鉄筋、鉄骨又は鉄筋コンクリートによる補強方法の種別",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-structure-detail",
+        "type": "process",
+        "title": "構造方法詳細の確認",
+        "process_type": "human_judgment",
+        "target_subject": "建築物",
+        "description": "国土交通大臣が定める構造方法の詳細仕様を設計図書等から確認する",
+        "remarks": "平成12年建設省告示第1355号等の構造方法への適合確認"
+      },
+      {
+        "id": "info-structure-detail",
+        "type": "information",
+        "title": "構造方法詳細",
+        "symbol": "D",
+        "subject": "建築物",
+        "property": "構造方法詳細",
+        "property_type": "visual",
+        "description": "国土交通大臣が定める構造方法の詳細仕様（配筋方法、補強材の仕様等）",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-reinforcement-judgment",
+        "type": "process",
+        "title": "補強適合判定",
+        "process_type": "human_judgment",
+        "target_subject": "建築物",
+        "description": "国土交通大臣が定める構造方法により、鉄筋、鉄骨又は鉄筋コンクリートによって適切に補強されているか判定する",
+        "logic_expression": "R ∈ {鉄筋, 鉄骨, 鉄筋コンクリート} AND D適合"
+      },
+      {
+        "id": "info-reinforcement-compliance",
+        "type": "information",
+        "title": "補強の適合",
+        "symbol": "Cr",
+        "subject": "建築物",
+        "property": "補強の適合",
+        "property_type": "proposition",
+        "description": "国土交通大臣が定める構造方法による補強要件に適合するか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-final-judgment",
+        "type": "process",
+        "title": "令第59条の2第1項適合判定",
+        "process_type": "mechanical",
+        "target_subject": "建築物",
+        "description": "規定適用対象の場合は補強要件への適合を確認、適用対象外の場合は自動的に適合とする",
+        "logic_expression": "(¬S) OR (S AND Cr)"
+      },
+      {
+        "id": "info-final-compliance",
+        "type": "information",
+        "title": "令第59条の2第1項適合",
+        "subject": "建築物",
+        "property": "令第59条の2第1項適合",
+        "property_type": "proposition",
+        "description": "建築物が令第59条の2第1項の規定に適合するか",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-height-check",
+        "to": "info-height",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "proc-eaves-height-check",
+        "to": "info-eaves-height",
+        "role": "output"
+      },
+      {
+        "id": "e03",
+        "from": "info-height",
+        "to": "proc-scope-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e04",
+        "from": "info-eaves-height",
+        "to": "proc-scope-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e05",
+        "from": "proc-scope-judgment",
+        "to": "info-scope-applicable",
+        "role": "output"
+      },
+      {
+        "id": "e06",
+        "from": "proc-reinforcement-method",
+        "to": "info-reinforcement-method",
+        "role": "output"
+      },
+      {
+        "id": "e07",
+        "from": "proc-structure-detail",
+        "to": "info-structure-detail",
+        "role": "output"
+      },
+      {
+        "id": "e08",
+        "from": "info-reinforcement-method",
+        "to": "proc-reinforcement-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e09",
+        "from": "info-structure-detail",
+        "to": "proc-reinforcement-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e10",
+        "from": "proc-reinforcement-judgment",
+        "to": "info-reinforcement-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e11",
+        "from": "info-scope-applicable",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e12",
+        "from": "info-reinforcement-compliance",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e13",
+        "from": "proc-final-judgment",
+        "to": "info-final-compliance",
+        "role": "output"
+      }
+    ]
+  },
+  "metadata": {
+    "created_at": "2026-01-23T16:15:00+09:00",
+    "updated_at": "2026-01-23T16:15:00+09:00",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

@@ -1,0 +1,310 @@
+{
+  "id": "CHK-BSO-A28-P1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "便所の採光及び換気",
+    "target_subject": "便所",
+    "description": "便所に採光及び換気のため直接外気に接する窓が設けられていることを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "28",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "衛生"
+  ],
+  "text_raw": "便所には、採光及び換気のため直接外気に接する窓を設けなければならない。ただし、水洗便所で、これに代わる設備をした場合においては、この限りでない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "EXISTS",
+      "conditions": [
+        {
+          "type": "subject",
+          "value": "便所"
+        }
+      ],
+      "note": "建築物に便所が存在する場合に適用"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "ref": "info-window-exists",
+          "operator": "==",
+          "value": true,
+          "note": "直接外気に接する窓がある"
+        },
+        {
+          "ref": "info-exempt",
+          "operator": "==",
+          "value": true,
+          "note": "ただし書きによる適用除外"
+        }
+      ]
+    },
+    "exceptions": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-flush-toilet",
+          "operator": "==",
+          "value": true,
+          "note": "水洗便所であること"
+        },
+        {
+          "ref": "info-alt-equipment",
+          "operator": "==",
+          "value": true,
+          "note": "採光・換気に代わる設備があること"
+        }
+      ],
+      "effect": "EXEMPT"
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-toilets-set",
+        "type": "process",
+        "title": "便所の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から判定対象となる便所を特定する"
+      },
+      {
+        "id": "info-toilets-set",
+        "type": "information",
+        "title": "建築物の便所",
+        "subject": "建築物",
+        "property": "便所の集合",
+        "property_type": "set_definition",
+        "description": "判定対象となる建築物に属する便所を特定",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-toilet-type",
+        "type": "process",
+        "title": "便所種類の特定",
+        "process_type": "undefined_input",
+        "target_subject": "便所",
+        "iteration": "iterative",
+        "description": "設計図書等から便所の種類（水洗便所か否か）を読み取る"
+      },
+      {
+        "id": "info-flush-toilet",
+        "type": "information",
+        "title": "水洗便所",
+        "symbol": "F",
+        "subject": "便所",
+        "property": "水洗便所への該当",
+        "property_type": "proposition",
+        "description": "当該便所が水洗便所であるか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-window-check",
+        "type": "process",
+        "title": "窓の有無の確認",
+        "process_type": "undefined_input",
+        "target_subject": "便所",
+        "iteration": "iterative",
+        "description": "設計図書等から便所に直接外気に接する窓が設けられているかを確認する"
+      },
+      {
+        "id": "info-window-exists",
+        "type": "information",
+        "title": "直接外気に接する窓の有無",
+        "symbol": "W",
+        "subject": "便所",
+        "property": "直接外気に接する窓の有無",
+        "property_type": "proposition",
+        "description": "採光及び換気のため直接外気に接する窓が設けられているか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-alt-equipment",
+        "type": "process",
+        "title": "代替設備の確認",
+        "process_type": "undefined_input",
+        "target_subject": "便所",
+        "iteration": "iterative",
+        "description": "設計図書等から採光及び換気に代わる設備があるかを確認する"
+      },
+      {
+        "id": "info-alt-equipment",
+        "type": "information",
+        "title": "代替設備の有無",
+        "symbol": "E",
+        "subject": "便所",
+        "property": "採光・換気代替設備の有無",
+        "property_type": "proposition",
+        "description": "採光及び換気に代わる設備（照明、換気扇等）が設置されているか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-exempt-check",
+        "type": "process",
+        "title": "適用除外判定",
+        "process_type": "mechanical",
+        "target_subject": "便所",
+        "iteration": "iterative",
+        "description": "ただし書きの適用除外（水洗便所かつ代替設備あり）に該当するか判定",
+        "logic_expression": "F AND E"
+      },
+      {
+        "id": "info-exempt",
+        "type": "information",
+        "title": "適用除外該当",
+        "symbol": "X",
+        "subject": "便所",
+        "property": "適用除外への該当",
+        "property_type": "proposition",
+        "description": "ただし書きによる適用除外に該当するか（水洗便所かつ代替設備あり）",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-final-judgment",
+        "type": "process",
+        "title": "適合判定",
+        "process_type": "mechanical",
+        "target_subject": "便所",
+        "iteration": "iterative",
+        "description": "各便所について、直接外気に接する窓があるか、または適用除外に該当するかを確認",
+        "logic_expression": "W OR X"
+      },
+      {
+        "id": "info-compliance",
+        "type": "information",
+        "title": "令28条1項適合",
+        "symbol": "C",
+        "subject": "便所",
+        "property": "令28条1項適合",
+        "property_type": "proposition",
+        "description": "令第28条第1項の規定に適合するか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-all-check",
+        "type": "process",
+        "title": "全便所適合確認",
+        "process_type": "mechanical",
+        "description": "全ての便所が令28条1項に適合することを確認",
+        "logic_expression": "∀toilet ∈ Toilets: C(toilet) = true"
+      },
+      {
+        "id": "info-final",
+        "type": "information",
+        "title": "建築物の令28条1項適合",
+        "subject": "建築物",
+        "property": "令28条1項適合",
+        "property_type": "proposition",
+        "description": "建築物全体として令第28条第1項の規定に適合するか",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-toilets-set",
+        "to": "info-toilets-set",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "info-toilets-set",
+        "to": "proc-toilet-type",
+        "role": "input"
+      },
+      {
+        "id": "e03",
+        "from": "proc-toilet-type",
+        "to": "info-flush-toilet",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "info-toilets-set",
+        "to": "proc-window-check",
+        "role": "input"
+      },
+      {
+        "id": "e05",
+        "from": "proc-window-check",
+        "to": "info-window-exists",
+        "role": "output"
+      },
+      {
+        "id": "e06",
+        "from": "info-toilets-set",
+        "to": "proc-alt-equipment",
+        "role": "input"
+      },
+      {
+        "id": "e07",
+        "from": "proc-alt-equipment",
+        "to": "info-alt-equipment",
+        "role": "output"
+      },
+      {
+        "id": "e08",
+        "from": "info-flush-toilet",
+        "to": "proc-exempt-check",
+        "role": "input"
+      },
+      {
+        "id": "e09",
+        "from": "info-alt-equipment",
+        "to": "proc-exempt-check",
+        "role": "input"
+      },
+      {
+        "id": "e10",
+        "from": "proc-exempt-check",
+        "to": "info-exempt",
+        "role": "output"
+      },
+      {
+        "id": "e11",
+        "from": "info-window-exists",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e12",
+        "from": "info-exempt",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e13",
+        "from": "proc-final-judgment",
+        "to": "info-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e14",
+        "from": "info-compliance",
+        "to": "proc-all-check",
+        "role": "input"
+      },
+      {
+        "id": "e15",
+        "from": "proc-all-check",
+        "to": "info-final",
+        "role": "output"
+      }
+    ]
+  },
+  "metadata": {
+    "created_at": "2026-01-23T18:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

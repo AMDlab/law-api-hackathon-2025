@@ -1,0 +1,224 @@
+{
+  "id": "CHK-BSO-A38-P2",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "基礎の構造方法の統一",
+    "target_subject": "建築物",
+    "description": "建築物において異なる構造方法による基礎を併用していないことを確認する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "38",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造関係",
+    "基礎"
+  ],
+  "text_raw": "建築物には、異なる構造方法による基礎を併用してはならない。",
+  "compliance_logic": {
+    "judgment_rule": {
+      "operator": "==",
+      "conditions": [
+        {
+          "ref": "info-compliance",
+          "operator": "==",
+          "value": true,
+          "note": "異なる構造方法による基礎を併用していない"
+        }
+      ]
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "info-building",
+        "type": "information",
+        "title": "建築物",
+        "subject": "建築物",
+        "property": "特定",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "判定対象となる建築物を特定"
+      },
+      {
+        "id": "proc-building-input",
+        "type": "process",
+        "title": "建築物の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から判定対象となる建築物を特定する"
+      },
+      {
+        "id": "info-foundations-set",
+        "type": "information",
+        "title": "建築物の基礎",
+        "subject": "建築物",
+        "property": "基礎の集合",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "当該建築物に属する基礎を特定"
+      },
+      {
+        "id": "proc-foundations-set",
+        "type": "process",
+        "title": "基礎の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物に属する基礎を特定する"
+      },
+      {
+        "id": "info-foundation-method",
+        "type": "information",
+        "title": "各基礎の構造方法",
+        "subject": "基礎",
+        "property": "構造方法",
+        "property_type": "classification",
+        "plurality": "multiple",
+        "description": "各基礎の構造方法（直接基礎、杭基礎等）"
+      },
+      {
+        "id": "proc-method-input",
+        "type": "process",
+        "title": "構造方法の特定",
+        "process_type": "undefined_input",
+        "iteration": "iterative",
+        "description": "設計図書等から各基礎の構造方法を読み取る"
+      },
+      {
+        "id": "info-method-count",
+        "type": "information",
+        "title": "構造方法の種類数",
+        "subject": "建築物",
+        "property": "採用されている基礎の構造方法の種類数",
+        "property_type": "numeric",
+        "unit": "種類",
+        "plurality": "single",
+        "description": "建築物において採用されている基礎の構造方法が何種類あるか"
+      },
+      {
+        "id": "proc-method-count",
+        "type": "process",
+        "title": "構造方法種類数の集計",
+        "process_type": "mechanical",
+        "description": "各基礎の構造方法を集計し、何種類の構造方法が採用されているかをカウントする"
+      },
+      {
+        "id": "info-no-combination",
+        "type": "information",
+        "title": "併用の有無",
+        "symbol": "C1",
+        "subject": "建築物",
+        "property": "異なる構造方法の基礎を併用しているか",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "構造方法が2種類以上であれば併用している（禁止事項に該当）"
+      },
+      {
+        "id": "proc-combination-check",
+        "type": "process",
+        "title": "併用判定",
+        "process_type": "mechanical",
+        "logic_expression": "N > 1",
+        "description": "構造方法の種類数が1より大きければ併用と判定"
+      },
+      {
+        "id": "info-compliance",
+        "type": "information",
+        "title": "令38条2項適合",
+        "symbol": "PASS",
+        "subject": "建築物",
+        "property": "基礎併用禁止適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "異なる構造方法による基礎を併用していない（併用していなければ適合）"
+      },
+      {
+        "id": "proc-final-judgment",
+        "type": "process",
+        "title": "適合判定",
+        "process_type": "mechanical",
+        "logic_expression": "NOT C1",
+        "description": "併用していなければ（NOT 併用）適合と判定"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e001",
+        "from": "proc-building-input",
+        "to": "info-building",
+        "role": "output"
+      },
+      {
+        "id": "e002",
+        "from": "info-building",
+        "to": "proc-foundations-set",
+        "role": "input"
+      },
+      {
+        "id": "e003",
+        "from": "proc-foundations-set",
+        "to": "info-foundations-set",
+        "role": "output"
+      },
+      {
+        "id": "e004",
+        "from": "info-foundations-set",
+        "to": "proc-method-input",
+        "role": "input"
+      },
+      {
+        "id": "e005",
+        "from": "proc-method-input",
+        "to": "info-foundation-method",
+        "role": "output"
+      },
+      {
+        "id": "e006",
+        "from": "info-foundation-method",
+        "to": "proc-method-count",
+        "role": "input"
+      },
+      {
+        "id": "e007",
+        "from": "proc-method-count",
+        "to": "info-method-count",
+        "role": "output"
+      },
+      {
+        "id": "e008",
+        "from": "info-method-count",
+        "to": "proc-combination-check",
+        "role": "input"
+      },
+      {
+        "id": "e009",
+        "from": "proc-combination-check",
+        "to": "info-no-combination",
+        "role": "output"
+      },
+      {
+        "id": "e010",
+        "from": "info-no-combination",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e011",
+        "from": "proc-final-judgment",
+        "to": "info-compliance",
+        "role": "output"
+      }
+    ]
+  },
+  "metadata": {
+    "created_at": "2026-01-23T00:00:00Z",
+    "generator": "claude-code-kijo-generator",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令",
+    "checklist_ref": "確認審査報告書チェックリスト"
+  }
+}

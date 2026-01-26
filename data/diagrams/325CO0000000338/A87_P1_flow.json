@@ -1,0 +1,291 @@
+{
+  "id": "A87_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "風圧力の計算",
+    "target_subject": "建築物",
+    "description": "風圧力は速度圧に風力係数を乗じて計算する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "87",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造",
+    "風圧力"
+  ],
+  "text_raw": "風圧力は、速度圧に風力係数を乗じて計算しなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "application",
+          "value": "構造計算を行う建築物"
+        }
+      ],
+      "note": "構造計算において風圧力を考慮する場合に適用"
+    },
+    "judgment_rule": {
+      "operator": "==",
+      "lhs": {
+        "ref": "info-wind-load",
+        "description": "風圧力"
+      },
+      "rhs": {
+        "expression": "q * Cf",
+        "description": "速度圧 * 風力係数"
+      }
+    },
+    "exceptions": null
+  },
+  "flow_diagram": {
+    "title": "風圧力計算の適合判定フロー",
+    "description": "令第87条第1項に基づく風圧力計算方法の適合判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "風圧力計算の適合判定開始"
+      },
+      {
+        "id": "dec-scope",
+        "type": "decision",
+        "title": "構造計算を行う建築物か？",
+        "decision_type": "binary",
+        "description": "当該建築物が構造計算において風圧力を考慮する必要があるか判定"
+      },
+      {
+        "id": "proc-velocity-pressure",
+        "type": "process",
+        "title": "速度圧の算出",
+        "process_type": "sub_diagram_reference",
+        "description": "令第87条第2項の式に基づき速度圧qを計算する",
+        "related_articles": ["令::A87:P2"]
+      },
+      {
+        "id": "info-velocity-pressure",
+        "type": "information",
+        "title": "速度圧 q",
+        "symbol": "q",
+        "subject": "建築物",
+        "property": "速度圧",
+        "property_type": "numeric",
+        "description": "令第87条第2項の式により算出された速度圧（N/m2）"
+      },
+      {
+        "id": "dec-velocity-pressure-valid",
+        "type": "decision",
+        "title": "速度圧qは有効な値か？",
+        "decision_type": "binary",
+        "description": "速度圧が正の数値として算出されているか確認",
+        "condition": {
+          "operator": "GT",
+          "lhs": { "var": "q", "desc": "速度圧" },
+          "rhs": { "value": 0, "unit": "N/m2" }
+        }
+      },
+      {
+        "id": "proc-wind-coefficient",
+        "type": "process",
+        "title": "風力係数の決定",
+        "process_type": "sub_diagram_reference",
+        "description": "令第87条第4項に基づき風力係数Cfを決定する",
+        "related_articles": ["令::A87:P4"]
+      },
+      {
+        "id": "info-wind-coefficient",
+        "type": "information",
+        "title": "風力係数 Cf",
+        "symbol": "Cf",
+        "subject": "建築物",
+        "property": "風力係数",
+        "property_type": "numeric",
+        "description": "風洞試験または国土交通大臣が定める数値による風力係数"
+      },
+      {
+        "id": "dec-wind-coefficient-valid",
+        "type": "decision",
+        "title": "風力係数Cfは有効な値か？",
+        "decision_type": "binary",
+        "description": "風力係数が適正に決定されているか確認"
+      },
+      {
+        "id": "proc-wind-load-calc",
+        "type": "process",
+        "title": "風圧力の計算 W = q × Cf",
+        "process_type": "mechanical",
+        "description": "速度圧qと風力係数Cfを乗じて風圧力Wを算出"
+      },
+      {
+        "id": "info-wind-load",
+        "type": "information",
+        "title": "風圧力 W",
+        "symbol": "W",
+        "subject": "建築物",
+        "property": "風圧力",
+        "property_type": "numeric",
+        "description": "速度圧に風力係数を乗じて得られた風圧力（N/m2）"
+      },
+      {
+        "id": "dec-calculation-method",
+        "type": "decision",
+        "title": "W = q × Cf の計算式に従っているか？",
+        "decision_type": "binary",
+        "description": "風圧力が速度圧と風力係数の積として正しく計算されているか判定",
+        "condition": {
+          "operator": "EQ",
+          "lhs": { "var": "W", "desc": "風圧力" },
+          "rhs": { "var": "q * Cf", "desc": "速度圧×風力係数" }
+        }
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令第87条第1項に適合"
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "令第87条第1項に不適合"
+      },
+      {
+        "id": "end-not-applicable",
+        "type": "terminal",
+        "title": "対象外",
+        "result": "end",
+        "description": "当該条項の適用対象外"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-scope",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-scope",
+        "to": "proc-velocity-pressure",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "dec-scope",
+        "to": "end-not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e04",
+        "from": "proc-velocity-pressure",
+        "to": "info-velocity-pressure",
+        "role": "output"
+      },
+      {
+        "id": "e05",
+        "from": "info-velocity-pressure",
+        "to": "dec-velocity-pressure-valid",
+        "role": "flow"
+      },
+      {
+        "id": "e06",
+        "from": "dec-velocity-pressure-valid",
+        "to": "proc-wind-coefficient",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e07",
+        "from": "dec-velocity-pressure-valid",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e08",
+        "from": "proc-wind-coefficient",
+        "to": "info-wind-coefficient",
+        "role": "output"
+      },
+      {
+        "id": "e09",
+        "from": "info-wind-coefficient",
+        "to": "dec-wind-coefficient-valid",
+        "role": "flow"
+      },
+      {
+        "id": "e10",
+        "from": "dec-wind-coefficient-valid",
+        "to": "proc-wind-load-calc",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e11",
+        "from": "dec-wind-coefficient-valid",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e12",
+        "from": "proc-wind-load-calc",
+        "to": "info-wind-load",
+        "role": "output"
+      },
+      {
+        "id": "e13",
+        "from": "info-wind-load",
+        "to": "dec-calculation-method",
+        "role": "flow"
+      },
+      {
+        "id": "e14",
+        "from": "dec-calculation-method",
+        "to": "end-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e15",
+        "from": "dec-calculation-method",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-ORDER-A87-P1",
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "defines_detail",
+      "articles": ["A87:P2", "A87:P3", "A87:P4"],
+      "description": "第2項で速度圧の計算式、第3項で速度圧の減算規定、第4項で風力係数を定義"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T12:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

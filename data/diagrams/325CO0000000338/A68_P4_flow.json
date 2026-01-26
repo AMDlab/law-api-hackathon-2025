@@ -1,0 +1,272 @@
+{
+  "id": "A68_P4_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "ボルト孔の径の制限",
+    "target_subject": "ボルト孔",
+    "description": "ボルト孔の径とボルトの径の差が基準値以下であるかを判定する適合フロー"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "68",
+    "paragraph": "4",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造関係規定",
+    "鉄骨造"
+  ],
+  "text_raw": "ボルト孔の径は、ボルトの径より一ミリメートルを超えて大きくしてはならない。ただし、ボルトの径が二十ミリメートル以上であり、かつ、構造耐力上支障がない場合においては、ボルト孔の径をボルトの径より一・五ミリメートルまで大きくすることができる。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "subject",
+          "value": "ボルト接合を用いる構造"
+        }
+      ],
+      "note": "ボルト接合（高力ボルト接合を除く）を用いる建築物に適用"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "ref": "主文基準",
+          "condition": "Dh <= Db + 1",
+          "note": "ボルト孔の径 <= ボルトの径 + 1mm"
+        },
+        {
+          "operator": "AND",
+          "conditions": [
+            { "ref": "ボルト径条件", "condition": "Db >= 20" },
+            { "ref": "構造安全性", "condition": "構造耐力上支障なし" },
+            { "ref": "緩和基準", "condition": "Dh <= Db + 1.5" }
+          ],
+          "note": "ただし書きによる緩和条件"
+        }
+      ]
+    }
+  },
+  "flow_diagram": {
+    "title": "令68条4項 ボルト孔の径の制限 適合判定フロー",
+    "description": "ボルト孔の径がボルトの径に対する制限を満たすかを判定するフロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "ボルト孔の径の制限の適合判定を開始"
+      },
+      {
+        "id": "proc-input-bolt",
+        "type": "process",
+        "title": "ボルトの径を特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等からボルトの径（Db）を読み取る"
+      },
+      {
+        "id": "proc-input-hole",
+        "type": "process",
+        "title": "ボルト孔の径を特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等からボルト孔の径（Dh）を読み取る"
+      },
+      {
+        "id": "proc-calc-diff",
+        "type": "process",
+        "title": "径の差を算出",
+        "process_type": "mechanical",
+        "description": "ボルト孔の径とボルトの径の差（Dh - Db）を計算"
+      },
+      {
+        "id": "dec-main-rule",
+        "type": "decision",
+        "title": "孔径とボルト径の差 <= 1mm？",
+        "decision_type": "binary",
+        "description": "主文基準: ボルト孔の径がボルトの径より1mmを超えて大きくないか（Dh <= Db + 1）",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "Dh - Db", "desc": "ボルト孔とボルトの径の差" },
+          "rhs": { "value": 1, "unit": "mm" }
+        }
+      },
+      {
+        "id": "proc-main-pass",
+        "type": "process",
+        "title": "主文基準適合",
+        "process_type": "mechanical",
+        "description": "主文の基準（差が1mm以下）を満たす"
+      },
+      {
+        "id": "dec-bolt-diameter-threshold",
+        "type": "decision",
+        "title": "ボルトの径 >= 20mm？",
+        "decision_type": "binary",
+        "description": "ただし書き適用の前提条件1: ボルトの径が20mm以上であるか（Db >= 20）",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "Db", "desc": "ボルトの径" },
+          "rhs": { "value": 20, "unit": "mm" }
+        }
+      },
+      {
+        "id": "dec-structural-safety",
+        "type": "decision",
+        "title": "構造耐力上支障がないか？",
+        "decision_type": "binary",
+        "description": "ただし書き適用の前提条件2: 構造耐力上支障がないことの確認",
+        "related_articles": ["令68条4項ただし書き"]
+      },
+      {
+        "id": "dec-exception-rule",
+        "type": "decision",
+        "title": "孔径とボルト径の差 <= 1.5mm？",
+        "decision_type": "binary",
+        "description": "ただし書き基準: ボルト孔の径がボルトの径より1.5mmまでの超過に収まっているか（Dh <= Db + 1.5）",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "Dh - Db", "desc": "ボルト孔とボルトの径の差" },
+          "rhs": { "value": 1.5, "unit": "mm" }
+        }
+      },
+      {
+        "id": "proc-exception-pass",
+        "type": "process",
+        "title": "ただし書き基準適合",
+        "process_type": "mechanical",
+        "description": "ただし書きの全条件を満たす"
+      },
+      {
+        "id": "terminal-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令68条4項に適合"
+      },
+      {
+        "id": "terminal-fail-main",
+        "type": "terminal",
+        "title": "不適合（主文基準超過・緩和条件不適合）",
+        "result": "fail",
+        "description": "主文基準を満たさず、ただし書きの緩和条件も適用できない"
+      },
+      {
+        "id": "terminal-fail-exception",
+        "type": "terminal",
+        "title": "不適合（ただし書き基準超過）",
+        "result": "fail",
+        "description": "ただし書きの条件を満たしたが、1.5mm基準を超過"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "proc-input-bolt",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "proc-input-bolt",
+        "to": "proc-input-hole",
+        "role": "flow"
+      },
+      {
+        "id": "e03",
+        "from": "proc-input-hole",
+        "to": "proc-calc-diff",
+        "role": "flow"
+      },
+      {
+        "id": "e04",
+        "from": "proc-calc-diff",
+        "to": "dec-main-rule",
+        "role": "flow"
+      },
+      {
+        "id": "e05",
+        "from": "dec-main-rule",
+        "to": "proc-main-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e06",
+        "from": "proc-main-pass",
+        "to": "terminal-pass",
+        "role": "flow"
+      },
+      {
+        "id": "e07",
+        "from": "dec-main-rule",
+        "to": "dec-bolt-diameter-threshold",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e08",
+        "from": "dec-bolt-diameter-threshold",
+        "to": "dec-structural-safety",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e09",
+        "from": "dec-bolt-diameter-threshold",
+        "to": "terminal-fail-main",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e10",
+        "from": "dec-structural-safety",
+        "to": "dec-exception-rule",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e11",
+        "from": "dec-structural-safety",
+        "to": "terminal-fail-main",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e12",
+        "from": "dec-exception-rule",
+        "to": "proc-exception-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e13",
+        "from": "proc-exception-pass",
+        "to": "terminal-pass",
+        "role": "flow"
+      },
+      {
+        "id": "e14",
+        "from": "dec-exception-rule",
+        "to": "terminal-fail-exception",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-ORDER-A68-P4",
+  "related_laws": [],
+  "metadata": {
+    "created_at": "2026-01-26T12:00:00Z",
+    "updated_at": "2026-01-26T12:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

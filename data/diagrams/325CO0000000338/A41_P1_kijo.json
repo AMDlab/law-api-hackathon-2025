@@ -1,0 +1,222 @@
+{
+  "id": "CHK-BSL-ORDER-A41-P1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "木材の品質",
+    "target_subject": "構造耐力上主要な部分に使用する木材",
+    "description": "構造耐力上主要な部分に使用する木材の品質が耐力上の欠点がないことを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "41",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造関係規定",
+    "木造"
+  ],
+  "text_raw": "構造耐力上主要な部分に使用する木材の品質は、節、腐れ、繊維の傾斜、丸身等による耐力上の欠点がないものでなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "building_part",
+          "value": "構造耐力上主要な部分に木材を使用する建築物"
+        }
+      ],
+      "note": "構造耐力上主要な部分に木材を使用する場合に適用"
+    },
+    "judgment_rule": {
+      "operator": "FORALL",
+      "conditions": [
+        {
+          "ref": "info-defect-free",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-identify-structural-parts",
+        "type": "process",
+        "title": "構造耐力上主要な部分の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書から構造耐力上主要な部分を特定する"
+      },
+      {
+        "id": "info-structural-parts",
+        "type": "information",
+        "title": "構造耐力上主要な部分",
+        "symbol": "S",
+        "subject": "建築物",
+        "property": "構造耐力上主要な部分の集合",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "基礎、基礎ぐい、壁、柱、小屋組、土台、斜材、床版、屋根版、横架材で、建築物の自重、積載荷重、積雪荷重、風圧、土圧、水圧、地震その他の震動及び衝撃を支えるもの"
+      },
+      {
+        "id": "proc-identify-timber",
+        "type": "process",
+        "title": "木材使用部分の特定",
+        "process_type": "undefined_input",
+        "description": "構造耐力上主要な部分のうち木材を使用している部分を特定する"
+      },
+      {
+        "id": "info-timber-parts",
+        "type": "information",
+        "title": "木材を使用する構造耐力上主要な部分",
+        "symbol": "T",
+        "subject": "構造耐力上主要な部分",
+        "property": "木材使用部分の集合",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "構造耐力上主要な部分のうち木材を使用しているもの"
+      },
+      {
+        "id": "proc-check-quality",
+        "type": "process",
+        "title": "木材品質の確認",
+        "process_type": "human_judgment",
+        "target_subject": "木材",
+        "iteration": "iterative",
+        "description": "各木材について節、腐れ、繊維の傾斜、丸身等による耐力上の欠点がないかを確認する"
+      },
+      {
+        "id": "info-timber-quality",
+        "type": "information",
+        "title": "各木材の品質",
+        "symbol": "Q",
+        "subject": "木材",
+        "property": "耐力上の欠点の有無",
+        "property_type": "visual",
+        "plurality": "multiple",
+        "description": "節、腐れ、繊維の傾斜、丸身等による耐力上の欠点の有無。目視や書類確認により判断される。"
+      },
+      {
+        "id": "proc-defect-judgment",
+        "type": "process",
+        "title": "耐力上の欠点判定",
+        "process_type": "human_judgment",
+        "target_subject": "木材",
+        "iteration": "iterative",
+        "description": "各木材の品質が耐力上の欠点に該当するかを判定する",
+        "logic_expression": "欠点なし = Q[i] ∈ {耐力上の欠点なし}"
+      },
+      {
+        "id": "info-defect-free",
+        "type": "information",
+        "title": "耐力上の欠点がない",
+        "symbol": "D",
+        "subject": "木材",
+        "property": "耐力上の欠点がないこと",
+        "property_type": "proposition",
+        "plurality": "multiple",
+        "description": "各木材について、節、腐れ、繊維の傾斜、丸身等による耐力上の欠点がないか"
+      },
+      {
+        "id": "proc-final-judgment",
+        "type": "process",
+        "title": "全木材適合判定",
+        "process_type": "mechanical",
+        "description": "すべての木材について耐力上の欠点がないことを判定する",
+        "logic_expression": "∀i: D[i] = true"
+      },
+      {
+        "id": "info-final",
+        "type": "information",
+        "title": "令第41条適合",
+        "symbol": "R",
+        "subject": "建築物",
+        "property": "令第41条適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "構造耐力上主要な部分に使用する木材の品質が令第41条の基準に適合するか"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-identify-structural-parts",
+        "to": "info-structural-parts",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "info-structural-parts",
+        "to": "proc-identify-timber",
+        "role": "input"
+      },
+      {
+        "id": "e03",
+        "from": "proc-identify-timber",
+        "to": "info-timber-parts",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "info-timber-parts",
+        "to": "proc-check-quality",
+        "role": "input"
+      },
+      {
+        "id": "e05",
+        "from": "proc-check-quality",
+        "to": "info-timber-quality",
+        "role": "output"
+      },
+      {
+        "id": "e06",
+        "from": "info-timber-quality",
+        "to": "proc-defect-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e07",
+        "from": "proc-defect-judgment",
+        "to": "info-defect-free",
+        "role": "output"
+      },
+      {
+        "id": "e08",
+        "from": "info-defect-free",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e09",
+        "from": "proc-final-judgment",
+        "to": "info-final",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": [
+        "A20"
+      ],
+      "description": "法第20条（構造耐力）の委任に基づく構造方法の技術的基準"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-23T12:00:00Z",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

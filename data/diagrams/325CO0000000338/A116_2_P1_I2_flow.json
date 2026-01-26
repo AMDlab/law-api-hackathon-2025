@@ -1,0 +1,281 @@
+{
+  "id": "CHK-BSL-FLOW-A116_2-P1-I2",
+  "version": "3.2",
+  "page_title": {
+    "title": "排煙上有効な開口部の有無判定フロー",
+    "target_subject": "居室",
+    "description": "居室が排煙上有効な開口部を有しない居室に該当するか否かの判定フロー"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "116_2",
+    "paragraph": "1",
+    "item": "2"
+  },
+  "labels": [
+    "単体規定",
+    "避難施設",
+    "排煙設備"
+  ],
+  "text_raw": "開放できる部分（天井又は壁（床面から天井までの垂直距離に応じて国土交通大臣が定める部分に限る。）にある部分に限る。）の面積の合計が、当該居室の床面積の五十分の一（火災時に生ずる煙を有効に排出することができるものとして国土交通大臣が定めた構造方法を用いる給気口及び排気口を有する場合にあつては、給気口の開口面積、排気口の高さ及び居室の床面積に応じて国土交通大臣が定める方法により算出した割合）以上のもの",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "building_element",
+          "value": "居室の窓その他の開口部"
+        }
+      ],
+      "note": "法第35条の適用を受ける居室が対象"
+    },
+    "judgment_rule": {
+      "operator": "GE",
+      "lhs": {
+        "type": "calculation",
+        "value": "開放できる部分の面積の合計"
+      },
+      "rhs": {
+        "type": "calculation",
+        "value": "居室の床面積 × 1/50（又は大臣が定める方法により算出した割合）"
+      }
+    },
+    "exceptions": null
+  },
+  "flow_diagram": {
+    "title": "排煙上有効な開口部の有無判定フロー",
+    "description": "居室が排煙上有効な開口部を有するか否かを判定するフローチャート",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "排煙上有効な開口部の有無判定を開始"
+      },
+      {
+        "id": "proc-identify-rooms",
+        "type": "process",
+        "title": "対象居室の特定",
+        "process_type": "undefined_input",
+        "description": "判定対象となる建築物に属する居室を特定する"
+      },
+      {
+        "id": "proc-measure-room-area",
+        "type": "process",
+        "title": "居室の床面積を算定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から居室の床面積（Ar）を読み取る"
+      },
+      {
+        "id": "proc-identify-openings",
+        "type": "process",
+        "title": "開口部の特定",
+        "process_type": "undefined_input",
+        "description": "居室に属する窓その他の開口部を特定する"
+      },
+      {
+        "id": "proc-calc-openable-area",
+        "type": "process",
+        "title": "開放できる部分の面積を算定",
+        "process_type": "undefined_input",
+        "description": "天井又は壁（国土交通大臣が定める部分）にある開放できる部分の面積（Ao）を算定",
+        "related_articles": [
+          "告示::昭和44年建設省告示第1730号"
+        ]
+      },
+      {
+        "id": "proc-sum-openable",
+        "type": "process",
+        "title": "開放できる部分の面積を合計",
+        "process_type": "mechanical",
+        "description": "開放できる部分の面積の合計（So = ΣAo）を算出"
+      },
+      {
+        "id": "dec-smoke-exhaust",
+        "type": "decision",
+        "title": "大臣が定める排煙設備を有するか？",
+        "decision_type": "binary",
+        "description": "火災時に煙を有効に排出できる国土交通大臣が定めた構造方法を用いる給気口及び排気口の有無を判定",
+        "related_articles": [
+          "告示::平成12年建設省告示第1436号"
+        ]
+      },
+      {
+        "id": "proc-intake-exhaust",
+        "type": "process",
+        "title": "給気口開口面積・排気口高さを特定",
+        "process_type": "undefined_input",
+        "description": "給気口の開口面積（Ai）及び排気口の高さ（He）を読み取る"
+      },
+      {
+        "id": "proc-calc-special-ratio",
+        "type": "process",
+        "title": "大臣が定める方法により必要割合を算定",
+        "process_type": "mechanical",
+        "description": "給気口の開口面積、排気口の高さ及び居室の床面積に応じて必要割合（Rr）を算出"
+      },
+      {
+        "id": "info-standard-ratio",
+        "type": "information",
+        "title": "必要割合 = 1/50",
+        "symbol": "Rr",
+        "subject": "居室",
+        "property": "必要開口割合",
+        "property_type": "numeric",
+        "description": "通常の必要割合は床面積の1/50"
+      },
+      {
+        "id": "dec-compliance",
+        "type": "decision",
+        "title": "So >= Ar × Rr か？",
+        "decision_type": "binary",
+        "description": "開放できる部分の面積合計（So）が居室床面積（Ar）×必要割合（Rr）以上か判定",
+        "condition": {
+          "operator": "GTE",
+          "lhs": {
+            "var": "So",
+            "desc": "開放できる部分の面積合計"
+          },
+          "rhs": {
+            "var": "Ar × Rr",
+            "desc": "居室床面積 × 必要割合"
+          }
+        }
+      },
+      {
+        "id": "end-has-opening",
+        "type": "terminal",
+        "title": "排煙上有効な開口部を有する",
+        "result": "pass",
+        "description": "居室は排煙上有効な開口部を有する居室に該当（令第116条の2第1項第2号に適合）"
+      },
+      {
+        "id": "end-no-opening",
+        "type": "terminal",
+        "title": "排煙上有効な開口部を有しない居室",
+        "result": "fail",
+        "description": "居室は排煙上有効な開口部を有しない居室に該当（法第35条の「無窓居室」として排煙設備等の規制対象）"
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge-001",
+        "from": "start",
+        "to": "proc-identify-rooms",
+        "role": "flow"
+      },
+      {
+        "id": "edge-002",
+        "from": "proc-identify-rooms",
+        "to": "proc-measure-room-area",
+        "role": "flow"
+      },
+      {
+        "id": "edge-003",
+        "from": "proc-measure-room-area",
+        "to": "proc-identify-openings",
+        "role": "flow"
+      },
+      {
+        "id": "edge-004",
+        "from": "proc-identify-openings",
+        "to": "proc-calc-openable-area",
+        "role": "flow"
+      },
+      {
+        "id": "edge-005",
+        "from": "proc-calc-openable-area",
+        "to": "proc-sum-openable",
+        "role": "flow"
+      },
+      {
+        "id": "edge-006",
+        "from": "proc-sum-openable",
+        "to": "dec-smoke-exhaust",
+        "role": "flow"
+      },
+      {
+        "id": "edge-007",
+        "from": "dec-smoke-exhaust",
+        "to": "proc-intake-exhaust",
+        "role": "yes",
+        "label": "有"
+      },
+      {
+        "id": "edge-008",
+        "from": "dec-smoke-exhaust",
+        "to": "info-standard-ratio",
+        "role": "no",
+        "label": "無"
+      },
+      {
+        "id": "edge-009",
+        "from": "proc-intake-exhaust",
+        "to": "proc-calc-special-ratio",
+        "role": "flow"
+      },
+      {
+        "id": "edge-010",
+        "from": "proc-calc-special-ratio",
+        "to": "dec-compliance",
+        "role": "flow"
+      },
+      {
+        "id": "edge-011",
+        "from": "info-standard-ratio",
+        "to": "dec-compliance",
+        "role": "flow"
+      },
+      {
+        "id": "edge-012",
+        "from": "dec-compliance",
+        "to": "end-has-opening",
+        "role": "yes",
+        "label": "満たす"
+      },
+      {
+        "id": "edge-013",
+        "from": "dec-compliance",
+        "to": "end-no-opening",
+        "role": "no",
+        "label": "満たさない"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-KIJO-A116_2-P1-I2",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": [
+        "A35"
+      ],
+      "description": "法第35条の規定により政令で定める窓その他の開口部を有しない居室を規定"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": [
+        "A20"
+      ],
+      "description": "第20条で採光に有効な部分の面積計算方法を規定（第1号関連）"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00Z",
+    "updated_at": "2026-01-26T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令",
+    "checklist_ref": "建築基準法施行令第116条の2第1項第2号（排煙上の無窓居室）"
+  }
+}

@@ -1,0 +1,354 @@
+{
+  "id": "A33_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "漏水検査",
+    "target_subject": "改良便槽・屎尿浄化槽・合併処理浄化槽",
+    "description": "改良便槽、屎尿浄化槽及び合併処理浄化槽が満水して24時間以上漏水しないことを確認する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "33",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "建築設備",
+    "便所"
+  ],
+  "text_raw": "第三十一条の改良便槽並びに前条の屎尿浄化槽及び合併処理浄化槽は、満水して二十四時間以上漏水しないことを確かめなければならない。",
+  "compliance_logic": {
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-leak-test-result",
+          "operator": "==",
+          "value": true,
+          "note": "満水して24時間以上漏水しないことが確認された"
+        }
+      ]
+    }
+  },
+  "kijo_diagram_ref": "CHK-BSO-A33-P1",
+  "flow_diagram": {
+    "title": "令33条1項 漏水検査フロー",
+    "description": "改良便槽、屎尿浄化槽又は合併処理浄化槽の漏水検査適合判定フロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "漏水検査開始",
+        "result": "start",
+        "description": "令33条1項の漏水検査を開始"
+      },
+      {
+        "id": "dec-facility-type",
+        "type": "decision",
+        "title": "対象設備の種類は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "改良便槽", "description": "令31条の改良便槽" },
+          { "value": "屎尿浄化槽", "description": "令32条の屎尿浄化槽" },
+          { "value": "合併処理浄化槽", "description": "令32条の合併処理浄化槽" },
+          { "value": "該当なし", "description": "上記いずれにも該当しない" }
+        ],
+        "description": "検査対象となる設備の種類を特定",
+        "related_articles": ["令::A31", "令::A32"]
+      },
+      {
+        "id": "proc-facility-identified",
+        "type": "process",
+        "title": "対象設備特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から検査対象設備を特定"
+      },
+      {
+        "id": "dec-full-water",
+        "type": "decision",
+        "title": "満水状態にできるか？",
+        "decision_type": "binary",
+        "description": "対象設備を満水状態にできることを確認"
+      },
+      {
+        "id": "proc-full-water-done",
+        "type": "process",
+        "title": "満水状態確認完了",
+        "process_type": "human_judgment",
+        "description": "対象設備が満水状態にあることを確認"
+      },
+      {
+        "id": "dec-duration-recorded",
+        "type": "decision",
+        "title": "検査時間が記録されているか？",
+        "decision_type": "binary",
+        "description": "検査継続時間の記録があるかを確認"
+      },
+      {
+        "id": "proc-duration-input",
+        "type": "process",
+        "title": "検査時間記録確認",
+        "process_type": "undefined_input",
+        "description": "検査記録から検査継続時間を取得"
+      },
+      {
+        "id": "dec-duration-24h",
+        "type": "decision",
+        "title": "検査時間は24時間以上か？",
+        "decision_type": "binary",
+        "description": "検査継続時間が24時間以上であるかを判定",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "test_duration", "desc": "検査継続時間" },
+          "rhs": { "value": 24, "unit": "時間" }
+        }
+      },
+      {
+        "id": "proc-duration-ok",
+        "type": "process",
+        "title": "24時間以上検査実施済み",
+        "process_type": "mechanical",
+        "description": "検査継続時間が24時間以上であることを確認"
+      },
+      {
+        "id": "dec-leak-check-done",
+        "type": "decision",
+        "title": "漏水確認を実施したか？",
+        "decision_type": "binary",
+        "description": "満水状態での漏水確認検査を実施したかを確認"
+      },
+      {
+        "id": "proc-leak-check-done",
+        "type": "process",
+        "title": "漏水確認実施完了",
+        "process_type": "human_judgment",
+        "description": "目視等による漏水確認検査を実施"
+      },
+      {
+        "id": "dec-leak-presence",
+        "type": "decision",
+        "title": "漏水は発生したか？",
+        "decision_type": "binary",
+        "description": "検査期間中に漏水が発生したかを判定"
+      },
+      {
+        "id": "proc-no-leak",
+        "type": "process",
+        "title": "漏水なし確認済み",
+        "process_type": "mechanical",
+        "description": "検査期間中に漏水がなかったことを確認"
+      },
+      {
+        "id": "dec-final-judgment",
+        "type": "decision",
+        "title": "24時間以上漏水なしか？",
+        "decision_type": "binary",
+        "description": "24時間以上満水状態を維持し、かつ漏水がなかったことを総合判定"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令33条1項に適合：満水して24時間以上漏水しないことが確認された"
+      },
+      {
+        "id": "end-fail-no-target",
+        "type": "terminal",
+        "title": "対象外",
+        "result": "end",
+        "description": "本条の検査対象設備に該当しない"
+      },
+      {
+        "id": "end-fail-no-fullwater",
+        "type": "terminal",
+        "title": "不適合（満水不可）",
+        "result": "fail",
+        "description": "満水状態にできないため不適合"
+      },
+      {
+        "id": "end-fail-no-record",
+        "type": "terminal",
+        "title": "不適合（記録なし）",
+        "result": "fail",
+        "description": "検査時間の記録がないため判定不可"
+      },
+      {
+        "id": "end-fail-duration",
+        "type": "terminal",
+        "title": "不適合（時間不足）",
+        "result": "fail",
+        "description": "検査時間が24時間未満のため不適合"
+      },
+      {
+        "id": "end-fail-no-check",
+        "type": "terminal",
+        "title": "不適合（未検査）",
+        "result": "fail",
+        "description": "漏水確認検査が実施されていないため判定不可"
+      },
+      {
+        "id": "end-fail-leak",
+        "type": "terminal",
+        "title": "不適合（漏水あり）",
+        "result": "fail",
+        "description": "検査期間中に漏水が発生したため不適合"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e-start",
+        "from": "start",
+        "to": "dec-facility-type",
+        "role": "flow"
+      },
+      {
+        "id": "e-facility-kaishu",
+        "from": "dec-facility-type",
+        "to": "proc-facility-identified",
+        "role": "option",
+        "label": "改良便槽"
+      },
+      {
+        "id": "e-facility-shinyo",
+        "from": "dec-facility-type",
+        "to": "proc-facility-identified",
+        "role": "option",
+        "label": "屎尿浄化槽"
+      },
+      {
+        "id": "e-facility-gappei",
+        "from": "dec-facility-type",
+        "to": "proc-facility-identified",
+        "role": "option",
+        "label": "合併処理浄化槽"
+      },
+      {
+        "id": "e-facility-none",
+        "from": "dec-facility-type",
+        "to": "end-fail-no-target",
+        "role": "option",
+        "label": "該当なし"
+      },
+      {
+        "id": "e-to-fullwater",
+        "from": "proc-facility-identified",
+        "to": "dec-full-water",
+        "role": "flow"
+      },
+      {
+        "id": "e-fullwater-yes",
+        "from": "dec-full-water",
+        "to": "proc-full-water-done",
+        "role": "yes"
+      },
+      {
+        "id": "e-fullwater-no",
+        "from": "dec-full-water",
+        "to": "end-fail-no-fullwater",
+        "role": "no"
+      },
+      {
+        "id": "e-to-duration-check",
+        "from": "proc-full-water-done",
+        "to": "dec-duration-recorded",
+        "role": "flow"
+      },
+      {
+        "id": "e-duration-recorded-yes",
+        "from": "dec-duration-recorded",
+        "to": "proc-duration-input",
+        "role": "yes"
+      },
+      {
+        "id": "e-duration-recorded-no",
+        "from": "dec-duration-recorded",
+        "to": "end-fail-no-record",
+        "role": "no"
+      },
+      {
+        "id": "e-to-duration-24h",
+        "from": "proc-duration-input",
+        "to": "dec-duration-24h",
+        "role": "flow"
+      },
+      {
+        "id": "e-duration-24h-yes",
+        "from": "dec-duration-24h",
+        "to": "proc-duration-ok",
+        "role": "yes"
+      },
+      {
+        "id": "e-duration-24h-no",
+        "from": "dec-duration-24h",
+        "to": "end-fail-duration",
+        "role": "no"
+      },
+      {
+        "id": "e-to-leak-check",
+        "from": "proc-duration-ok",
+        "to": "dec-leak-check-done",
+        "role": "flow"
+      },
+      {
+        "id": "e-leak-check-yes",
+        "from": "dec-leak-check-done",
+        "to": "proc-leak-check-done",
+        "role": "yes"
+      },
+      {
+        "id": "e-leak-check-no",
+        "from": "dec-leak-check-done",
+        "to": "end-fail-no-check",
+        "role": "no"
+      },
+      {
+        "id": "e-to-leak-presence",
+        "from": "proc-leak-check-done",
+        "to": "dec-leak-presence",
+        "role": "flow"
+      },
+      {
+        "id": "e-leak-yes",
+        "from": "dec-leak-presence",
+        "to": "end-fail-leak",
+        "role": "yes"
+      },
+      {
+        "id": "e-leak-no",
+        "from": "dec-leak-presence",
+        "to": "proc-no-leak",
+        "role": "no"
+      },
+      {
+        "id": "e-to-final",
+        "from": "proc-no-leak",
+        "to": "dec-final-judgment",
+        "role": "flow"
+      },
+      {
+        "id": "e-final-yes",
+        "from": "dec-final-judgment",
+        "to": "end-pass",
+        "role": "yes"
+      },
+      {
+        "id": "e-final-no",
+        "from": "dec-final-judgment",
+        "to": "end-fail-leak",
+        "role": "no"
+      }
+    ]
+  },
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00Z",
+    "generator": "claude-code-flow-generator",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令",
+    "checklist_ref": "確認審査報告書チェックリスト"
+  }
+}

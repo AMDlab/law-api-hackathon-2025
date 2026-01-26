@@ -1,0 +1,237 @@
+{
+  "id": "CHK-BSO-A65-P1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "圧縮材の有効細長比",
+    "target_subject": "圧縮材",
+    "description": "構造耐力上主要な部分である鋼材の圧縮材の有効細長比が、柱にあっては200以下、柱以外にあっては250以下であることを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "65",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造",
+    "鋼構造"
+  ],
+  "text_raw": "構造耐力上主要な部分である鋼材の圧縮材（圧縮力を負担する部材をいう。以下同じ。）の有効細長比は、柱にあつては二百以下、柱以外のものにあつては二百五十以下としなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "structural_element",
+          "value": "構造耐力上主要な部分である鋼材の圧縮材"
+        }
+      ],
+      "note": "圧縮力を負担する部材"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "operator": "IF_THEN",
+          "condition": {
+            "ref": "info-member-category",
+            "operator": "==",
+            "value": "柱"
+          },
+          "then": {
+            "ref": "info-slenderness",
+            "operator": "<=",
+            "value": 200
+          }
+        },
+        {
+          "operator": "IF_THEN",
+          "condition": {
+            "ref": "info-member-category",
+            "operator": "==",
+            "value": "柱以外"
+          },
+          "then": {
+            "ref": "info-slenderness",
+            "operator": "<=",
+            "value": 250
+          }
+        }
+      ]
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-identify-compression-members",
+        "type": "process",
+        "title": "圧縮材の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から構造耐力上主要な部分である鋼材の圧縮材を特定する"
+      },
+      {
+        "id": "info-compression-members-set",
+        "type": "information",
+        "title": "圧縮材の集合",
+        "subject": "建築物",
+        "property": "圧縮材の集合",
+        "property_type": "set_definition",
+        "description": "構造耐力上主要な部分である鋼材の圧縮材（圧縮力を負担する部材）を特定",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-identify-category",
+        "type": "process",
+        "title": "部材区分の判定",
+        "process_type": "undefined_input",
+        "target_subject": "圧縮材",
+        "iteration": "iterative",
+        "description": "各圧縮材が柱であるか柱以外であるかを判定する"
+      },
+      {
+        "id": "info-member-category",
+        "type": "information",
+        "title": "部材の区分",
+        "symbol": "C",
+        "subject": "圧縮材",
+        "property": "柱/柱以外の区分",
+        "property_type": "classification",
+        "description": "圧縮材が柱であるか柱以外であるか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-read-slenderness",
+        "type": "process",
+        "title": "有効細長比の読み取り",
+        "process_type": "undefined_input",
+        "target_subject": "圧縮材",
+        "iteration": "iterative",
+        "description": "設計図書等から各圧縮材の有効細長比を読み取る"
+      },
+      {
+        "id": "info-slenderness",
+        "type": "information",
+        "title": "有効細長比",
+        "symbol": "L",
+        "subject": "圧縮材",
+        "property": "有効細長比",
+        "property_type": "numeric",
+        "description": "各圧縮材の有効細長比の値",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-threshold-check",
+        "type": "process",
+        "title": "上限値との比較",
+        "process_type": "mechanical",
+        "target_subject": "圧縮材",
+        "iteration": "iterative",
+        "description": "部材区分に応じた有効細長比の上限値（柱:200、柱以外:250）との比較を行う",
+        "logic_expression": "IF C = '柱' THEN L <= 200 ELSE L <= 250"
+      },
+      {
+        "id": "info-individual-compliance",
+        "type": "information",
+        "title": "各圧縮材の適合",
+        "symbol": "R",
+        "subject": "圧縮材",
+        "property": "有効細長比上限適合",
+        "property_type": "proposition",
+        "description": "各圧縮材の有効細長比が上限値以下であるか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-all-check",
+        "type": "process",
+        "title": "全部材適合判定",
+        "process_type": "mechanical",
+        "description": "すべての圧縮材が有効細長比の上限値を満たすか判定",
+        "logic_expression": "ALL(R)"
+      },
+      {
+        "id": "info-compliance",
+        "type": "information",
+        "title": "令65条1項適合",
+        "subject": "建築物",
+        "property": "令65条1項適合",
+        "property_type": "proposition",
+        "description": "建築物が令第65条第1項（圧縮材の有効細長比）に適合するか",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-identify-compression-members",
+        "to": "info-compression-members-set",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "info-compression-members-set",
+        "to": "proc-identify-category",
+        "role": "input"
+      },
+      {
+        "id": "e03",
+        "from": "proc-identify-category",
+        "to": "info-member-category",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "info-compression-members-set",
+        "to": "proc-read-slenderness",
+        "role": "input"
+      },
+      {
+        "id": "e05",
+        "from": "proc-read-slenderness",
+        "to": "info-slenderness",
+        "role": "output"
+      },
+      {
+        "id": "e06",
+        "from": "info-member-category",
+        "to": "proc-threshold-check",
+        "role": "input"
+      },
+      {
+        "id": "e07",
+        "from": "info-slenderness",
+        "to": "proc-threshold-check",
+        "role": "input"
+      },
+      {
+        "id": "e08",
+        "from": "proc-threshold-check",
+        "to": "info-individual-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e09",
+        "from": "info-individual-compliance",
+        "to": "proc-all-check",
+        "role": "input"
+      },
+      {
+        "id": "e10",
+        "from": "proc-all-check",
+        "to": "info-compliance",
+        "role": "output"
+      }
+    ]
+  },
+  "metadata": {
+    "created_at": "2026-01-23T00:00:00+09:00",
+    "updated_at": "2026-01-23T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

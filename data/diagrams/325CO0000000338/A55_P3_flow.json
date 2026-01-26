@@ -1,0 +1,379 @@
+{
+  "id": "A55_P3_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "組積造間仕切壁の厚さ緩和",
+    "target_subject": "組積造の間仕切壁",
+    "description": "組積造の間仕切壁の厚さが前二項規定より10cm以下の減少が許容され、かつ20cmを超えることを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "55",
+    "paragraph": "3",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造",
+    "組積造"
+  ],
+  "text_raw": "組積造の間仕切壁の壁の厚さは、前二項の規定による壁の厚さより十センチメートル以下を減らすことができる。ただし、二十センチメートル以下としてはならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "structure",
+          "value": "組積造の建築物"
+        },
+        {
+          "type": "element",
+          "value": "間仕切壁"
+        }
+      ],
+      "note": "組積造の建築物における間仕切壁に適用"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-reduction-valid",
+          "operator": "==",
+          "value": true,
+          "description": "前二項規定からの減少量が10cm以下"
+        },
+        {
+          "ref": "info-min-thickness-check",
+          "operator": "==",
+          "value": true,
+          "description": "壁の厚さが20cmより大きい"
+        }
+      ]
+    }
+  },
+  "flow_diagram": {
+    "title": "令第55条第3項 組積造間仕切壁の厚さ緩和判定フロー",
+    "description": "組積造の間仕切壁について、壁の厚さが前二項規定より10cm以下の減少かつ20cm超であることを判定する",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "令第55条第3項の適合判定を開始"
+      },
+      {
+        "id": "dec-structure-type",
+        "type": "decision",
+        "title": "組積造の建築物か？",
+        "decision_type": "binary",
+        "description": "判定対象の建築物が組積造であるかを確認"
+      },
+      {
+        "id": "dec-has-partition-walls",
+        "type": "decision",
+        "title": "間仕切壁が存在するか？",
+        "decision_type": "binary",
+        "description": "建築物に組積造の間仕切壁が存在するかを確認"
+      },
+      {
+        "id": "proc-identify-walls",
+        "type": "process",
+        "title": "間仕切壁の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から組積造の間仕切壁を全て特定する"
+      },
+      {
+        "id": "dec-walls-remaining",
+        "type": "decision",
+        "title": "未判定の間仕切壁があるか？",
+        "decision_type": "binary",
+        "description": "まだ判定していない間仕切壁が残っているかを確認（ループ制御）"
+      },
+      {
+        "id": "proc-get-wall-thickness",
+        "type": "process",
+        "title": "壁の厚さを取得",
+        "process_type": "undefined_input",
+        "description": "設計図書等から当該間仕切壁の厚さTを読み取る"
+      },
+      {
+        "id": "dec-wall-thickness-valid",
+        "type": "decision",
+        "title": "壁の厚さは有効な数値か？",
+        "decision_type": "binary",
+        "description": "取得した壁の厚さが有効な正の数値であることを確認"
+      },
+      {
+        "id": "proc-calc-base-thickness",
+        "type": "process",
+        "title": "基準厚さを算定",
+        "process_type": "sub_diagram_reference",
+        "description": "令第55条第1項及び第2項に基づく基準厚さTbを算定する",
+        "related_articles": ["令::A55:P1", "令::A55:P2"]
+      },
+      {
+        "id": "dec-base-thickness-valid",
+        "type": "decision",
+        "title": "基準厚さは算定できたか？",
+        "decision_type": "binary",
+        "description": "令第55条第1項・第2項に基づく基準厚さが正しく算定されたことを確認"
+      },
+      {
+        "id": "dec-reduction-check",
+        "type": "decision",
+        "title": "減少量は10cm以下か？",
+        "decision_type": "binary",
+        "description": "壁の厚さTが基準厚さTbから10cm以下の減少か判定: (Tb - T) <= 10",
+        "condition": {
+          "operator": "LTE",
+          "lhs": {
+            "var": "reduction",
+            "desc": "基準厚さからの減少量 (Tb - T)"
+          },
+          "rhs": {
+            "value": 10,
+            "unit": "cm"
+          }
+        }
+      },
+      {
+        "id": "proc-reduction-ok",
+        "type": "process",
+        "title": "減少量条件適合",
+        "process_type": "mechanical",
+        "description": "本文の減少量条件（10cm以下）を満たしている"
+      },
+      {
+        "id": "dec-min-thickness-check",
+        "type": "decision",
+        "title": "壁の厚さは20cmを超えるか？",
+        "decision_type": "binary",
+        "description": "壁の厚さTが20cmより大きいか判定（ただし書き）: T > 20",
+        "condition": {
+          "operator": "GT",
+          "lhs": {
+            "var": "T",
+            "desc": "間仕切壁の厚さ"
+          },
+          "rhs": {
+            "value": 20,
+            "unit": "cm"
+          }
+        }
+      },
+      {
+        "id": "proc-wall-compliant",
+        "type": "process",
+        "title": "当該間仕切壁適合",
+        "process_type": "mechanical",
+        "description": "当該間仕切壁は減少量条件及び最低厚さ条件を満たし適合"
+      },
+      {
+        "id": "proc-all-compliant",
+        "type": "process",
+        "title": "全間仕切壁適合確認",
+        "process_type": "mechanical",
+        "description": "全ての間仕切壁について適合が確認された"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令第55条第3項に適合"
+      },
+      {
+        "id": "end-fail-reduction",
+        "type": "terminal",
+        "title": "不適合（減少量超過）",
+        "result": "fail",
+        "description": "壁の厚さの減少量が10cmを超えており不適合"
+      },
+      {
+        "id": "end-fail-min-thickness",
+        "type": "terminal",
+        "title": "不適合（最低厚さ未満）",
+        "result": "fail",
+        "description": "壁の厚さが20cm以下であり、ただし書きに違反し不適合"
+      },
+      {
+        "id": "end-fail-invalid-data",
+        "type": "terminal",
+        "title": "不適合（データ不備）",
+        "result": "fail",
+        "description": "壁の厚さまたは基準厚さのデータが取得できず判定不能"
+      },
+      {
+        "id": "end-not-applicable",
+        "type": "terminal",
+        "title": "対象外",
+        "result": "end",
+        "description": "組積造でない、または間仕切壁が存在しないため本条項の適用対象外"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-structure-type",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-structure-type",
+        "to": "dec-has-partition-walls",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "dec-structure-type",
+        "to": "end-not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e04",
+        "from": "dec-has-partition-walls",
+        "to": "proc-identify-walls",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e05",
+        "from": "dec-has-partition-walls",
+        "to": "end-not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e06",
+        "from": "proc-identify-walls",
+        "to": "dec-walls-remaining",
+        "role": "flow"
+      },
+      {
+        "id": "e07",
+        "from": "dec-walls-remaining",
+        "to": "proc-get-wall-thickness",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e08",
+        "from": "dec-walls-remaining",
+        "to": "proc-all-compliant",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e09",
+        "from": "proc-get-wall-thickness",
+        "to": "dec-wall-thickness-valid",
+        "role": "flow"
+      },
+      {
+        "id": "e10",
+        "from": "dec-wall-thickness-valid",
+        "to": "proc-calc-base-thickness",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e11",
+        "from": "dec-wall-thickness-valid",
+        "to": "end-fail-invalid-data",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e12",
+        "from": "proc-calc-base-thickness",
+        "to": "dec-base-thickness-valid",
+        "role": "flow"
+      },
+      {
+        "id": "e13",
+        "from": "dec-base-thickness-valid",
+        "to": "dec-reduction-check",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e14",
+        "from": "dec-base-thickness-valid",
+        "to": "end-fail-invalid-data",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e15",
+        "from": "dec-reduction-check",
+        "to": "proc-reduction-ok",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e16",
+        "from": "dec-reduction-check",
+        "to": "end-fail-reduction",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e17",
+        "from": "proc-reduction-ok",
+        "to": "dec-min-thickness-check",
+        "role": "flow"
+      },
+      {
+        "id": "e18",
+        "from": "dec-min-thickness-check",
+        "to": "proc-wall-compliant",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e19",
+        "from": "dec-min-thickness-check",
+        "to": "end-fail-min-thickness",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e20",
+        "from": "proc-wall-compliant",
+        "to": "dec-walls-remaining",
+        "role": "flow"
+      },
+      {
+        "id": "e21",
+        "from": "proc-all-compliant",
+        "to": "end-pass",
+        "role": "flow"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSO-A55-P3",
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": ["A55:P1", "A55:P2"],
+      "description": "第1項及び第2項で定める壁の厚さの基準値を参照"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T12:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

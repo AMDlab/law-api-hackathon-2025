@@ -1,0 +1,219 @@
+{
+  "id": "A129_12_P3_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "エスカレーター踏段の積載荷重",
+    "target_subject": "エスカレーター",
+    "description": "エスカレーターの踏段の積載荷重の算定と適合判定フロー"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "129の12",
+    "paragraph": "3",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "エスカレーター",
+    "構造"
+  ],
+  "text_raw": "エスカレーターの踏段の積載荷重は、次の式によつて計算した数値以上としなければならない。\nＰ＝２，６００Ａ\n（この式において、Ｐ及びＡは、それぞれ次の数値を表すものとする。\nＰ　エスカレーターの積載荷重（単位　ニュートン）\nＡ　エスカレーターの踏段面の水平投影面積（単位　平方メートル））",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "building_equipment",
+          "value": "エスカレーターを設ける場合"
+        }
+      ],
+      "note": "建築物に設けるエスカレーターに適用"
+    },
+    "judgment_rule": {
+      "operator": "GE",
+      "lhs": {
+        "type": "design_value",
+        "value": "P",
+        "description": "設計積載荷重（ニュートン）"
+      },
+      "rhs": {
+        "type": "calculated_value",
+        "value": "2600 × A",
+        "description": "必要積載荷重（Aは踏段面の水平投影面積）"
+      }
+    }
+  },
+  "flow_diagram": {
+    "title": "エスカレーター踏段積載荷重の適合判定フロー",
+    "description": "令第129条の12第3項に基づくエスカレーター踏段積載荷重の適合判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "エスカレーター踏段積載荷重の適合判定を開始"
+      },
+      {
+        "id": "decision-has-escalator",
+        "type": "decision",
+        "title": "エスカレーターを設けるか？",
+        "decision_type": "binary",
+        "description": "建築物にエスカレーターを設けるかどうかを確認",
+        "condition": {
+          "operator": "EQ",
+          "lhs": {
+            "var": "has_escalator",
+            "desc": "エスカレーター設置の有無"
+          },
+          "rhs": {
+            "value": true,
+            "desc": "設置する"
+          }
+        }
+      },
+      {
+        "id": "process-identify-escalator",
+        "type": "process",
+        "title": "対象エスカレーターを特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から対象となるエスカレーターを特定する"
+      },
+      {
+        "id": "process-get-area",
+        "type": "process",
+        "title": "踏段面水平投影面積(A)を取得",
+        "process_type": "undefined_input",
+        "description": "設計図書等からエスカレーターの踏段面の水平投影面積を読み取る"
+      },
+      {
+        "id": "process-get-design-load",
+        "type": "process",
+        "title": "設計積載荷重(P)を取得",
+        "process_type": "undefined_input",
+        "description": "設計図書等からエスカレーターの設計積載荷重を読み取る"
+      },
+      {
+        "id": "process-calc-required-load",
+        "type": "process",
+        "title": "必要積載荷重(Pr)を算出\nPr = 2,600 × A",
+        "process_type": "mechanical",
+        "description": "踏段面水平投影面積から必要積載荷重を算出（Pr = 2,600A）"
+      },
+      {
+        "id": "decision-load-sufficient",
+        "type": "decision",
+        "title": "P ≥ Pr か？",
+        "decision_type": "binary",
+        "description": "設計積載荷重が必要積載荷重以上かどうかを判定",
+        "condition": {
+          "operator": "GTE",
+          "lhs": {
+            "var": "P",
+            "desc": "設計積載荷重"
+          },
+          "rhs": {
+            "var": "Pr",
+            "desc": "必要積載荷重（2,600×A）",
+            "unit": "N"
+          }
+        }
+      },
+      {
+        "id": "end-not-applicable",
+        "type": "terminal",
+        "title": "規定対象外",
+        "result": "pass",
+        "description": "エスカレーターを設けないため、本規定は適用されない"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "設計積載荷重が必要積載荷重以上であり、令第129条の12第3項に適合",
+        "related_articles": ["令第129条の12第3項"]
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "設計積載荷重が必要積載荷重未満であり、令第129条の12第3項に不適合",
+        "related_articles": ["令第129条の12第3項"]
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge-start-to-has-escalator",
+        "from": "start",
+        "to": "decision-has-escalator",
+        "role": "flow"
+      },
+      {
+        "id": "edge-has-escalator-yes",
+        "from": "decision-has-escalator",
+        "to": "process-identify-escalator",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "edge-has-escalator-no",
+        "from": "decision-has-escalator",
+        "to": "end-not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "edge-identify-to-area",
+        "from": "process-identify-escalator",
+        "to": "process-get-area",
+        "role": "flow"
+      },
+      {
+        "id": "edge-area-to-design-load",
+        "from": "process-get-area",
+        "to": "process-get-design-load",
+        "role": "flow"
+      },
+      {
+        "id": "edge-design-load-to-calc",
+        "from": "process-get-design-load",
+        "to": "process-calc-required-load",
+        "role": "flow"
+      },
+      {
+        "id": "edge-calc-to-decision",
+        "from": "process-calc-required-load",
+        "to": "decision-load-sufficient",
+        "role": "flow"
+      },
+      {
+        "id": "edge-load-sufficient-yes",
+        "from": "decision-load-sufficient",
+        "to": "end-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "edge-load-sufficient-no",
+        "from": "decision-load-sufficient",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-KIJO-A129_12-P3",
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00Z",
+    "updated_at": "2026-01-26T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

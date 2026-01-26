@@ -1,0 +1,355 @@
+{
+  "id": "CHK-BSL-FLOW-A136_2_5-P6",
+  "version": "3.2",
+  "page_title": {
+    "title": "特定建築物地区整備計画区域の条例制限一括適用確認",
+    "target_subject": "条例",
+    "description": "特定建築物地区整備計画区域における条例が第12号・第13号・第2項の制限を全て定めているか確認"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "136_2_5",
+    "paragraph": "6",
+    "item": null
+  },
+  "labels": [
+    "集団規定",
+    "地区計画"
+  ],
+  "text_raw": "特定建築物地区整備計画の区域内において法第六十八条の二第一項の規定に基づく条例で第一項第十二号若しくは第十三号の制限又は第二項に規定する高さの最低限度が五メートルとされる制限を定めようとするときは、これらを全て定めるものとする。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "特定建築物地区整備計画の区域内"
+        },
+        {
+          "type": "regulation",
+          "value": "法第68条の2第1項に基づく条例による制限が定められている"
+        }
+      ],
+      "note": "特定建築物地区整備計画区域内で条例による制限がある場合に適用"
+    },
+    "judgment_rule": {
+      "operator": "IF_THEN",
+      "conditions": [
+        {
+          "type": "trigger",
+          "operator": "OR",
+          "conditions": [
+            {
+              "type": "regulation",
+              "value": "第1項第12号（特定地区防災施設に係る間口率の最低限度）の制限を定める"
+            },
+            {
+              "type": "regulation",
+              "value": "第1項第13号（防火上必要な構造制限）の制限を定める"
+            },
+            {
+              "type": "regulation",
+              "value": "第2項（高さの最低限度5m）の制限を定める"
+            }
+          ]
+        },
+        {
+          "type": "requirement",
+          "value": "上記3種類の制限を全て定めなければならない"
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "flow_diagram": {
+    "title": "令第136条の2の5第6項 条例制限一括適用判定フロー",
+    "description": "特定建築物地区整備計画区域において、条例で第12号・第13号・第2項の制限のいずれかを定める場合は全てを定めなければならないことを確認する",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "条例制限一括適用確認の開始"
+      },
+      {
+        "id": "decision-001",
+        "type": "decision",
+        "title": "敷地は特定建築物地区整備計画の区域内か？",
+        "decision_type": "binary",
+        "description": "申請敷地が特定建築物地区整備計画の区域内にあるか確認",
+        "condition": {
+          "operator": "EQ",
+          "lhs": {
+            "var": "Z",
+            "desc": "敷地の地区計画区域区分"
+          },
+          "rhs": {
+            "value": "特定建築物地区整備計画の区域内",
+            "desc": "特定建築物地区整備計画の区域内"
+          }
+        }
+      },
+      {
+        "id": "decision-002",
+        "type": "decision",
+        "title": "条例で第12号制限（間口率の最低限度）が定められているか？",
+        "decision_type": "binary",
+        "description": "特定地区防災施設に係る間口率の最低限度（7/10以上9/10以下）の制限が条例で定められているか確認",
+        "condition": {
+          "operator": "EQ",
+          "lhs": {
+            "var": "R12",
+            "desc": "第12号制限の有無"
+          },
+          "rhs": {
+            "value": true,
+            "desc": "制限が定められている"
+          }
+        }
+      },
+      {
+        "id": "decision-003",
+        "type": "decision",
+        "title": "条例で第13号制限（防火上必要な構造制限）が定められているか？",
+        "decision_type": "binary",
+        "description": "建築物の構造に関する防火上必要な制限（耐火建築物等・準耐火建築物等、5m未満の壁構造等）が条例で定められているか確認",
+        "condition": {
+          "operator": "EQ",
+          "lhs": {
+            "var": "R13",
+            "desc": "第13号制限の有無"
+          },
+          "rhs": {
+            "value": true,
+            "desc": "制限が定められている"
+          }
+        }
+      },
+      {
+        "id": "decision-004",
+        "type": "decision",
+        "title": "条例で第2項制限（高さの最低限度5m）が定められているか？",
+        "decision_type": "binary",
+        "description": "特定地区防災施設からの高さの最低限度が5メートルとされる制限が条例で定められているか確認",
+        "condition": {
+          "operator": "EQ",
+          "lhs": {
+            "var": "H5",
+            "desc": "第2項制限の有無"
+          },
+          "rhs": {
+            "value": true,
+            "desc": "制限が定められている"
+          }
+        }
+      },
+      {
+        "id": "decision-005",
+        "type": "decision",
+        "title": "いずれかの制限が定められているか？",
+        "decision_type": "binary",
+        "description": "第12号・第13号・第2項のいずれかの制限が定められているか確認（本項の適用条件）",
+        "condition": {
+          "operator": "EQ",
+          "lhs": {
+            "var": "any_defined",
+            "desc": "いずれかの制限が定められているか"
+          },
+          "rhs": {
+            "value": true,
+            "desc": "いずれかが定められている"
+          }
+        }
+      },
+      {
+        "id": "decision-006",
+        "type": "decision",
+        "title": "3種類の制限が全て定められているか？",
+        "decision_type": "binary",
+        "description": "第12号・第13号・第2項の3種類の制限が全て条例で定められているか確認",
+        "condition": {
+          "operator": "EQ",
+          "lhs": {
+            "var": "all_defined",
+            "desc": "3種類の制限全て定められているか"
+          },
+          "rhs": {
+            "value": true,
+            "desc": "全て定められている"
+          }
+        }
+      },
+      {
+        "id": "process-001",
+        "type": "process",
+        "title": "制限の有無を集計",
+        "process_type": "mechanical",
+        "description": "第12号・第13号・第2項の各制限の有無を集計し、いずれかが定められているか、全て定められているかを判定"
+      },
+      {
+        "id": "terminal-out-of-scope",
+        "type": "terminal",
+        "title": "本項は適用外",
+        "result": "pass",
+        "description": "特定建築物地区整備計画の区域外のため、本項の規定は適用されない"
+      },
+      {
+        "id": "terminal-not-applicable",
+        "type": "terminal",
+        "title": "本項は適用外（制限なし）",
+        "result": "pass",
+        "description": "第12号・第13号・第2項のいずれの制限も定められていないため、本項の規定は適用されない"
+      },
+      {
+        "id": "terminal-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "3種類の制限が全て定められており、本項の要件を満たしている"
+      },
+      {
+        "id": "terminal-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "第12号・第13号・第2項のいずれかの制限を定めているが、3種類全てが定められていないため不適合"
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge-001",
+        "from": "start",
+        "to": "decision-001",
+        "role": "flow"
+      },
+      {
+        "id": "edge-002",
+        "from": "decision-001",
+        "to": "decision-002",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "edge-003",
+        "from": "decision-001",
+        "to": "terminal-out-of-scope",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "edge-004",
+        "from": "decision-002",
+        "to": "decision-003",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "edge-005",
+        "from": "decision-002",
+        "to": "decision-003",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "edge-006",
+        "from": "decision-003",
+        "to": "decision-004",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "edge-007",
+        "from": "decision-003",
+        "to": "decision-004",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "edge-008",
+        "from": "decision-004",
+        "to": "process-001",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "edge-009",
+        "from": "decision-004",
+        "to": "process-001",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "edge-010",
+        "from": "process-001",
+        "to": "decision-005",
+        "role": "flow"
+      },
+      {
+        "id": "edge-011",
+        "from": "decision-005",
+        "to": "decision-006",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "edge-012",
+        "from": "decision-005",
+        "to": "terminal-not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "edge-013",
+        "from": "decision-006",
+        "to": "terminal-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "edge-014",
+        "from": "decision-006",
+        "to": "terminal-fail",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-KIJO-A136_2_5-P6",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": [
+        "A68_2:P1"
+      ],
+      "description": "法第68条の2第1項は地区計画等の区域内における条例による建築物の制限の根拠規定"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "defines_detail",
+      "articles": [
+        "A136_2_5:P1:I12",
+        "A136_2_5:P1:I13",
+        "A136_2_5:P2"
+      ],
+      "description": "第1項第12号は特定地区防災施設に係る間口率、第13号は防火上必要な構造制限、第2項は高さ5mの最低限度を規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00Z",
+    "updated_at": "2026-01-26T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令",
+    "checklist_ref": "建築基準法施行令第136条の2の5第6項（地区計画条例の一括適用）"
+  }
+}

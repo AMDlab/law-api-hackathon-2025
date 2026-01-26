@@ -1,0 +1,268 @@
+{
+  "id": "CHK-BSL-ORDER-A75-P1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "コンクリートの養生",
+    "target_subject": "コンクリート",
+    "description": "コンクリート打込み中及び打込み後5日間の温度管理と養生状態を判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "75",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造",
+    "コンクリート",
+    "養生"
+  ],
+  "text_raw": "コンクリート打込み中及び打込み後五日間は、コンクリートの温度が二度を下らないようにし、かつ、乾燥、震動等によつてコンクリートの凝結及び硬化が妨げられないように養生しなければならない。ただし、コンクリートの凝結及び硬化を促進するための特別の措置を講ずる場合においては、この限りでない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "material",
+          "value": "コンクリートを使用する建築物"
+        },
+        {
+          "type": "period",
+          "value": "打込み中及び打込み後5日間"
+        }
+      ],
+      "note": "コンクリート構造の建築物が対象"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-temp-compliance",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "ref": "info-curing-compliance",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    },
+    "exceptions": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "type": "special_measure",
+          "value": "凝結及び硬化を促進するための特別の措置"
+        }
+      ],
+      "effect": "EXEMPT"
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-temp-check",
+        "type": "process",
+        "title": "温度の確認",
+        "process_type": "undefined_input",
+        "description": "コンクリート打込み中及び打込み後5日間のコンクリート温度を確認"
+      },
+      {
+        "id": "info-temp",
+        "type": "information",
+        "title": "コンクリート温度",
+        "symbol": "T",
+        "subject": "コンクリート",
+        "property": "温度",
+        "property_type": "numeric",
+        "unit": "度",
+        "plurality": "single",
+        "description": "打込み中及び打込み後5日間におけるコンクリートの温度"
+      },
+      {
+        "id": "proc-temp-judgment",
+        "type": "process",
+        "title": "温度基準判定",
+        "process_type": "mechanical",
+        "description": "コンクリート温度が2度以上を維持しているかを判定",
+        "logic_expression": "T >= 2"
+      },
+      {
+        "id": "info-temp-compliance",
+        "type": "information",
+        "title": "温度基準適合",
+        "symbol": "C1",
+        "subject": "コンクリート",
+        "property": "温度基準適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "温度が2度を下らないか"
+      },
+      {
+        "id": "proc-curing-check",
+        "type": "process",
+        "title": "養生状態の確認",
+        "process_type": "undefined_input",
+        "description": "乾燥、震動等によるコンクリートの凝結及び硬化への影響を確認"
+      },
+      {
+        "id": "info-curing-status",
+        "type": "information",
+        "title": "養生状態",
+        "symbol": "S",
+        "subject": "コンクリート",
+        "property": "養生状態",
+        "property_type": "visual",
+        "plurality": "single",
+        "description": "乾燥、震動等からの保護状態（凝結及び硬化が妨げられていないか）"
+      },
+      {
+        "id": "proc-curing-judgment",
+        "type": "process",
+        "title": "養生基準判定",
+        "process_type": "human_judgment",
+        "description": "乾燥、震動等によってコンクリートの凝結及び硬化が妨げられていないかを判定"
+      },
+      {
+        "id": "info-curing-compliance",
+        "type": "information",
+        "title": "養生基準適合",
+        "symbol": "C2",
+        "subject": "コンクリート",
+        "property": "養生基準適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "凝結及び硬化が妨げられないように養生されているか"
+      },
+      {
+        "id": "proc-special-measure-check",
+        "type": "process",
+        "title": "特別措置の確認",
+        "process_type": "undefined_input",
+        "description": "コンクリートの凝結及び硬化を促進するための特別の措置の有無を確認"
+      },
+      {
+        "id": "info-special-measure",
+        "type": "information",
+        "title": "特別措置の有無",
+        "symbol": "M",
+        "subject": "コンクリート",
+        "property": "特別措置の有無",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "凝結及び硬化を促進するための特別の措置を講じているか"
+      },
+      {
+        "id": "proc-final-judgment",
+        "type": "process",
+        "title": "令75条適合判定",
+        "process_type": "mechanical",
+        "description": "コンクリート養生基準への適合を判定（特別措置がある場合は適用除外）",
+        "logic_expression": "M OR (C1 AND C2)"
+      },
+      {
+        "id": "info-final",
+        "type": "information",
+        "title": "令75条第1項適合",
+        "symbol": "R",
+        "subject": "コンクリート",
+        "property": "令75条第1項適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "コンクリートの養生基準に適合するか"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-temp-check",
+        "to": "info-temp",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "info-temp",
+        "to": "proc-temp-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e03",
+        "from": "proc-temp-judgment",
+        "to": "info-temp-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "proc-curing-check",
+        "to": "info-curing-status",
+        "role": "output"
+      },
+      {
+        "id": "e05",
+        "from": "info-curing-status",
+        "to": "proc-curing-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e06",
+        "from": "proc-curing-judgment",
+        "to": "info-curing-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e07",
+        "from": "proc-special-measure-check",
+        "to": "info-special-measure",
+        "role": "output"
+      },
+      {
+        "id": "e08",
+        "from": "info-temp-compliance",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e09",
+        "from": "info-curing-compliance",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e10",
+        "from": "info-special-measure",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e11",
+        "from": "proc-final-judgment",
+        "to": "info-final",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": [
+        "A20"
+      ],
+      "description": "法第20条の構造耐力に関する規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-23T12:00:00Z",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

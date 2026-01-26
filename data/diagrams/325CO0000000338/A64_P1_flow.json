@@ -1,0 +1,282 @@
+{
+  "id": "A64_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "鉄骨造の構造耐力上主要な部分の材料",
+    "target_subject": "鉄骨造の建築物",
+    "description": "鉄骨造の建築物の構造耐力上主要な部分の材料が炭素鋼、ステンレス鋼又は鋳鉄であることを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "64",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造",
+    "鉄骨造",
+    "材料"
+  ],
+  "text_raw": "鉄骨造の建築物の構造耐力上主要な部分の材料は、炭素鋼若しくはステンレス鋼（この節において「鋼材」という。）又は鋳鉄としなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "structure",
+          "value": "鉄骨造"
+        }
+      ],
+      "note": "鉄骨造の建築物が対象"
+    },
+    "judgment_rule": {
+      "operator": "FORALL",
+      "conditions": [
+        {
+          "ref": "info-material-compliance",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    }
+  },
+  "flow_diagram": {
+    "title": "令64条1項 適合判定フロー",
+    "description": "鉄骨造の建築物の構造耐力上主要な部分の材料適合判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start"
+      },
+      {
+        "id": "dec-structure-type",
+        "type": "decision",
+        "title": "建築物の構造種別は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "鉄骨造", "description": "鉄骨造の建築物" },
+          { "value": "その他", "description": "鉄骨造以外の建築物" }
+        ],
+        "description": "設計図書等から建築物の構造種別を特定し判定"
+      },
+      {
+        "id": "info-out-of-scope",
+        "type": "information",
+        "title": "適用範囲外",
+        "subject": "建築物",
+        "property": "本条適用対象外",
+        "property_type": "proposition",
+        "description": "鉄骨造以外のため本条は適用されない"
+      },
+      {
+        "id": "proc-structural-parts",
+        "type": "process",
+        "title": "構造耐力上主要な部分を特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から構造耐力上主要な部分（基礎、基礎ぐい、壁、柱、小屋組、土台、斜材、床版、屋根版、横架材）を特定する"
+      },
+      {
+        "id": "dec-parts-remaining",
+        "type": "decision",
+        "title": "未確認の構造耐力上主要な部分があるか？",
+        "decision_type": "binary",
+        "description": "すべての構造耐力上主要な部分の材料を確認したか判定"
+      },
+      {
+        "id": "proc-material-identify",
+        "type": "process",
+        "title": "部分の材料を特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から当該部分の材料を特定する"
+      },
+      {
+        "id": "dec-material-type",
+        "type": "decision",
+        "title": "材料は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "炭素鋼", "description": "炭素鋼（鋼材）" },
+          { "value": "ステンレス鋼", "description": "ステンレス鋼（鋼材）" },
+          { "value": "鋳鉄", "description": "鋳鉄" },
+          { "value": "その他", "description": "上記以外の材料" }
+        ],
+        "description": "構造耐力上主要な部分の材料種別を判定"
+      },
+      {
+        "id": "info-material-ok",
+        "type": "information",
+        "title": "材料適合",
+        "subject": "構造耐力上主要な部分",
+        "property": "材料適合",
+        "property_type": "proposition",
+        "description": "当該部分の材料が炭素鋼、ステンレス鋼又は鋳鉄である"
+      },
+      {
+        "id": "info-material-ng",
+        "type": "information",
+        "title": "材料不適合",
+        "subject": "構造耐力上主要な部分",
+        "property": "材料不適合",
+        "property_type": "proposition",
+        "description": "当該部分の材料が炭素鋼、ステンレス鋼又は鋳鉄ではない"
+      },
+      {
+        "id": "info-all-parts-ok",
+        "type": "information",
+        "title": "全部分材料適合",
+        "subject": "建築物",
+        "property": "全構造耐力上主要部分の材料適合",
+        "property_type": "proposition",
+        "description": "すべての構造耐力上主要な部分が適合材料を使用している"
+      },
+      {
+        "id": "end-pass-out-of-scope",
+        "type": "terminal",
+        "title": "適用対象外のため終了",
+        "result": "pass",
+        "description": "鉄骨造以外のため本条の適用対象外"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "すべての構造耐力上主要な部分の材料が炭素鋼、ステンレス鋼又は鋳鉄である"
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "構造耐力上主要な部分に炭素鋼、ステンレス鋼又は鋳鉄以外の材料が使用されている"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-structure-type",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-structure-type",
+        "to": "proc-structural-parts",
+        "role": "option",
+        "label": "鉄骨造"
+      },
+      {
+        "id": "e03",
+        "from": "dec-structure-type",
+        "to": "info-out-of-scope",
+        "role": "option",
+        "label": "その他"
+      },
+      {
+        "id": "e04",
+        "from": "info-out-of-scope",
+        "to": "end-pass-out-of-scope",
+        "role": "flow"
+      },
+      {
+        "id": "e05",
+        "from": "proc-structural-parts",
+        "to": "dec-parts-remaining",
+        "role": "flow"
+      },
+      {
+        "id": "e06",
+        "from": "dec-parts-remaining",
+        "to": "proc-material-identify",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e07",
+        "from": "dec-parts-remaining",
+        "to": "info-all-parts-ok",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e08",
+        "from": "proc-material-identify",
+        "to": "dec-material-type",
+        "role": "flow"
+      },
+      {
+        "id": "e09",
+        "from": "dec-material-type",
+        "to": "info-material-ok",
+        "role": "option",
+        "label": "炭素鋼"
+      },
+      {
+        "id": "e10",
+        "from": "dec-material-type",
+        "to": "info-material-ok",
+        "role": "option",
+        "label": "ステンレス鋼"
+      },
+      {
+        "id": "e11",
+        "from": "dec-material-type",
+        "to": "info-material-ok",
+        "role": "option",
+        "label": "鋳鉄"
+      },
+      {
+        "id": "e12",
+        "from": "dec-material-type",
+        "to": "info-material-ng",
+        "role": "option",
+        "label": "その他"
+      },
+      {
+        "id": "e13",
+        "from": "info-material-ok",
+        "to": "dec-parts-remaining",
+        "role": "flow"
+      },
+      {
+        "id": "e14",
+        "from": "info-material-ng",
+        "to": "end-fail",
+        "role": "flow"
+      },
+      {
+        "id": "e15",
+        "from": "info-all-parts-ok",
+        "to": "end-pass",
+        "role": "flow"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSO-A64-P1",
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": [
+        "A1:I3"
+      ],
+      "description": "構造耐力上主要な部分の定義"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00+09:00",
+    "updated_at": "2026-01-26T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

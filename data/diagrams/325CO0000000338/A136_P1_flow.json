@@ -1,0 +1,458 @@
+{
+  "id": "A136_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "敷地内の空地の基準",
+    "target_subject": "敷地",
+    "description": "法第59条の2第1項で政令に委任された空地の基準を判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "136",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "集団規定",
+    "総合設計",
+    "空地"
+  ],
+  "text_raw": "法第五十九条の二第一項の規定により政令で定める空地は、法第五十三条の規定により建蔽率の最高限度が定められている場合においては、当該最高限度に応じて、当該空地の面積の敷地面積に対する割合が次の表に定める数値以上であるものとし、同条の規定により建蔽率の最高限度が定められていない場合においては、当該空地の面積の敷地面積に対する割合が十分の二以上であるものとする。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "reference",
+          "value": "法第59条の2第1項の適用を受ける建築物"
+        }
+      ],
+      "note": "敷地に適用される建蔽率の最高限度（法53条）は都市計画情報として処理に内包"
+    },
+    "judgment_rule": {
+      "operator": ">=",
+      "lhs": {
+        "ref": "info-open-space-ratio",
+        "description": "空地面積/敷地面積"
+      },
+      "rhs": {
+        "ref": "required-ratio",
+        "description": "建蔽率最高限度に応じた必要空地率"
+      }
+    },
+    "exceptions": null
+  },
+  "flow_diagram": {
+    "title": "令第136条第1項 空地基準適合判定フロー",
+    "description": "総合設計制度における敷地内空地の基準適合を判定するフローチャート",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "令第136条第1項の空地基準判定を開始"
+      },
+      {
+        "id": "proc-input-site-area",
+        "type": "process",
+        "title": "敷地面積の入力",
+        "process_type": "undefined_input",
+        "description": "設計図書等から敷地面積を読み取る"
+      },
+      {
+        "id": "info-site-area",
+        "type": "information",
+        "title": "敷地面積 (A)",
+        "symbol": "A",
+        "subject": "敷地",
+        "property": "面積",
+        "property_type": "numeric",
+        "description": "敷地の面積（m2）"
+      },
+      {
+        "id": "proc-input-open-space",
+        "type": "process",
+        "title": "空地面積の入力",
+        "process_type": "undefined_input",
+        "description": "設計図書等から敷地内の空地面積を読み取る"
+      },
+      {
+        "id": "info-open-space-area",
+        "type": "information",
+        "title": "空地面積 (S)",
+        "symbol": "S",
+        "subject": "敷地",
+        "property": "空地の面積",
+        "property_type": "numeric",
+        "description": "敷地内の空地の面積（m2）"
+      },
+      {
+        "id": "proc-calc-ratio",
+        "type": "process",
+        "title": "空地割合の算出 R = S / A",
+        "process_type": "mechanical",
+        "description": "空地面積を敷地面積で除して空地割合を算出"
+      },
+      {
+        "id": "info-open-space-ratio",
+        "type": "information",
+        "title": "空地割合 (R)",
+        "symbol": "R",
+        "subject": "敷地",
+        "property": "空地の面積の敷地面積に対する割合",
+        "property_type": "numeric",
+        "description": "空地面積/敷地面積"
+      },
+      {
+        "id": "dec-bcr-defined",
+        "type": "decision",
+        "title": "建蔽率の最高限度が定められているか？",
+        "decision_type": "binary",
+        "description": "法第53条により建蔽率の最高限度が定められているか確認",
+        "condition": {
+          "operator": "NE",
+          "lhs": {
+            "var": "bcr_max",
+            "desc": "建蔽率の最高限度"
+          },
+          "rhs": {
+            "value": null,
+            "desc": "未定義"
+          }
+        },
+        "related_articles": ["法第53条"]
+      },
+      {
+        "id": "dec-bcr-range",
+        "type": "decision",
+        "title": "建蔽率の最高限度は？",
+        "decision_type": "multi",
+        "description": "建蔽率の最高限度の範囲により必要空地率が異なる",
+        "options": [
+          {
+            "value": "5/10以下",
+            "description": "建蔽率の最高限度が5/10以下の場合"
+          },
+          {
+            "value": "5/10超5.5/10以下",
+            "description": "建蔽率の最高限度が5/10を超え5.5/10以下の場合"
+          },
+          {
+            "value": "5.5/10超",
+            "description": "建蔽率の最高限度が5.5/10を超える場合"
+          }
+        ],
+        "related_articles": ["令第136条第1項表"]
+      },
+      {
+        "id": "proc-req-ratio-low",
+        "type": "process",
+        "title": "必要空地率 = 1 - 建蔽率 + 1.5/10",
+        "process_type": "mechanical",
+        "description": "建蔽率5/10以下の場合の必要空地率を算出"
+      },
+      {
+        "id": "proc-req-ratio-mid",
+        "type": "process",
+        "title": "必要空地率 = 6.5/10",
+        "process_type": "mechanical",
+        "description": "建蔽率5/10超5.5/10以下の場合の必要空地率"
+      },
+      {
+        "id": "proc-req-ratio-high",
+        "type": "process",
+        "title": "必要空地率 = 1 - 建蔽率 + 2/10",
+        "process_type": "mechanical",
+        "description": "建蔽率5.5/10超の場合の必要空地率を算出"
+      },
+      {
+        "id": "proc-req-ratio-none",
+        "type": "process",
+        "title": "必要空地率 = 2/10",
+        "process_type": "mechanical",
+        "description": "建蔽率最高限度が定められていない場合の必要空地率"
+      },
+      {
+        "id": "dec-check-low",
+        "type": "decision",
+        "title": "R >= 1 - 建蔽率 + 1.5/10 か？",
+        "decision_type": "binary",
+        "description": "空地割合が必要空地率以上か判定（建蔽率5/10以下）",
+        "condition": {
+          "operator": "GTE",
+          "lhs": {
+            "var": "R",
+            "desc": "空地割合"
+          },
+          "rhs": {
+            "var": "required_ratio",
+            "desc": "1 - 建蔽率 + 0.15"
+          }
+        }
+      },
+      {
+        "id": "dec-check-mid",
+        "type": "decision",
+        "title": "R >= 6.5/10 か？",
+        "decision_type": "binary",
+        "description": "空地割合が6.5/10以上か判定（建蔽率5/10超5.5/10以下）",
+        "condition": {
+          "operator": "GTE",
+          "lhs": {
+            "var": "R",
+            "desc": "空地割合"
+          },
+          "rhs": {
+            "value": 0.65,
+            "desc": "6.5/10"
+          }
+        }
+      },
+      {
+        "id": "dec-check-high",
+        "type": "decision",
+        "title": "R >= 1 - 建蔽率 + 2/10 か？",
+        "decision_type": "binary",
+        "description": "空地割合が必要空地率以上か判定（建蔽率5.5/10超）",
+        "condition": {
+          "operator": "GTE",
+          "lhs": {
+            "var": "R",
+            "desc": "空地割合"
+          },
+          "rhs": {
+            "var": "required_ratio",
+            "desc": "1 - 建蔽率 + 0.2"
+          }
+        }
+      },
+      {
+        "id": "dec-check-none",
+        "type": "decision",
+        "title": "R >= 2/10 か？",
+        "decision_type": "binary",
+        "description": "空地割合が2/10以上か判定（建蔽率最高限度なし）",
+        "condition": {
+          "operator": "GTE",
+          "lhs": {
+            "var": "R",
+            "desc": "空地割合"
+          },
+          "rhs": {
+            "value": 0.2,
+            "desc": "2/10"
+          }
+        }
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令第136条第1項の空地基準に適合"
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "令第136条第1項の空地基準に不適合"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "proc-input-site-area",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "proc-input-site-area",
+        "to": "info-site-area",
+        "role": "output"
+      },
+      {
+        "id": "e03",
+        "from": "info-site-area",
+        "to": "proc-input-open-space",
+        "role": "flow"
+      },
+      {
+        "id": "e04",
+        "from": "proc-input-open-space",
+        "to": "info-open-space-area",
+        "role": "output"
+      },
+      {
+        "id": "e05",
+        "from": "info-open-space-area",
+        "to": "proc-calc-ratio",
+        "role": "input"
+      },
+      {
+        "id": "e05b",
+        "from": "info-site-area",
+        "to": "proc-calc-ratio",
+        "role": "input"
+      },
+      {
+        "id": "e06",
+        "from": "proc-calc-ratio",
+        "to": "info-open-space-ratio",
+        "role": "output"
+      },
+      {
+        "id": "e07",
+        "from": "info-open-space-ratio",
+        "to": "dec-bcr-defined",
+        "role": "flow"
+      },
+      {
+        "id": "e08",
+        "from": "dec-bcr-defined",
+        "to": "dec-bcr-range",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e09",
+        "from": "dec-bcr-defined",
+        "to": "proc-req-ratio-none",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e10",
+        "from": "dec-bcr-range",
+        "to": "proc-req-ratio-low",
+        "role": "option",
+        "label": "5/10以下"
+      },
+      {
+        "id": "e11",
+        "from": "dec-bcr-range",
+        "to": "proc-req-ratio-mid",
+        "role": "option",
+        "label": "5/10超5.5/10以下"
+      },
+      {
+        "id": "e12",
+        "from": "dec-bcr-range",
+        "to": "proc-req-ratio-high",
+        "role": "option",
+        "label": "5.5/10超"
+      },
+      {
+        "id": "e13",
+        "from": "proc-req-ratio-low",
+        "to": "dec-check-low",
+        "role": "flow"
+      },
+      {
+        "id": "e14",
+        "from": "proc-req-ratio-mid",
+        "to": "dec-check-mid",
+        "role": "flow"
+      },
+      {
+        "id": "e15",
+        "from": "proc-req-ratio-high",
+        "to": "dec-check-high",
+        "role": "flow"
+      },
+      {
+        "id": "e16",
+        "from": "proc-req-ratio-none",
+        "to": "dec-check-none",
+        "role": "flow"
+      },
+      {
+        "id": "e17",
+        "from": "dec-check-low",
+        "to": "end-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e18",
+        "from": "dec-check-low",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e19",
+        "from": "dec-check-mid",
+        "to": "end-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e20",
+        "from": "dec-check-mid",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e21",
+        "from": "dec-check-high",
+        "to": "end-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e22",
+        "from": "dec-check-high",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e23",
+        "from": "dec-check-none",
+        "to": "end-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e24",
+        "from": "dec-check-none",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-ORDER-A136-P1",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": ["A59_2:P1"],
+      "description": "法第59条の2第1項の総合設計制度における空地基準の委任元"
+    },
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A53"],
+      "description": "建蔽率の最高限度を定める規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

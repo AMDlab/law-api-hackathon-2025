@@ -1,0 +1,299 @@
+{
+  "id": "A77_2_P2_I1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "プレキャスト床版の接合部による応力伝達",
+    "target_subject": "プレキャスト鉄筋コンクリート床版の接合部",
+    "description": "プレキャスト鉄筋コンクリートで造られた床版における周囲のはり等との接合部が存在応力を伝えることができる構造であることの適合判定フロー"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "77の2",
+    "paragraph": "2",
+    "item": "1"
+  },
+  "labels": ["単体規定", "構造規定", "床版", "プレキャストコンクリート"],
+  "text_raw": "周囲のはり等との接合部は、その部分の存在応力を伝えることができるものとすること。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "structural_element",
+          "value": "構造耐力上主要な部分である床版"
+        },
+        {
+          "type": "material",
+          "value": "プレキャスト鉄筋コンクリート"
+        }
+      ],
+      "note": "構造耐力上主要な部分である床版のうち、プレキャスト鉄筋コンクリートで造られたものに適用"
+    },
+    "judgment_rule": {
+      "operator": "ALL",
+      "conditions": [
+        {
+          "type": "structural_performance",
+          "description": "周囲のはり等との接合部が、その部分の存在応力を伝えることができる構造であること"
+        }
+      ]
+    }
+  },
+  "flow_diagram": {
+    "title": "令第77条の2第2項第1号 適合判定フロー",
+    "description": "プレキャスト鉄筋コンクリート床版の接合部が存在応力を伝達できる構造であるかの適合判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "令第77条の2第2項第1号の適合判定を開始"
+      },
+      {
+        "id": "dec-precast-slab-exists",
+        "type": "decision",
+        "title": "プレキャスト鉄筋コンクリート床版があるか？",
+        "decision_type": "binary",
+        "description": "構造耐力上主要な部分である床版のうち、プレキャスト鉄筋コンクリートで造られたものが存在するか",
+        "related_articles": ["令::A77_2:P2"]
+      },
+      {
+        "id": "proc-identify-slabs",
+        "type": "process",
+        "title": "プレキャスト床版の特定",
+        "process_type": "undefined_input",
+        "description": "構造耐力上主要な部分である床版のうち、プレキャスト鉄筋コンクリートで造られた床版を特定する"
+      },
+      {
+        "id": "dec-joints-exists",
+        "type": "decision",
+        "title": "周囲のはり等との接合部があるか？",
+        "decision_type": "binary",
+        "description": "特定したプレキャスト床版に周囲のはり等との接合部が存在するか"
+      },
+      {
+        "id": "proc-identify-joints",
+        "type": "process",
+        "title": "接合部の特定",
+        "process_type": "undefined_input",
+        "description": "各プレキャスト床版における周囲のはり等との接合部を特定する"
+      },
+      {
+        "id": "proc-identify-stress",
+        "type": "process",
+        "title": "存在応力の特定",
+        "process_type": "undefined_input",
+        "description": "構造計算書等から各接合部における存在応力を読み取る"
+      },
+      {
+        "id": "proc-identify-structure",
+        "type": "process",
+        "title": "接合部構造の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から各接合部の構造方法（接合金物、アンカーボルト、配筋、グラウト等）を読み取る"
+      },
+      {
+        "id": "dec-transmission-capacity",
+        "type": "decision",
+        "title": "接合部が存在応力を伝達できる構造か？",
+        "decision_type": "binary",
+        "description": "接合部の構造が存在応力を伝えることができるものであるかを判定（接合金物、十分な定着長さ、グラウト充填等）",
+        "condition": {
+          "operator": "GTE",
+          "lhs": {
+            "var": "TransmitCapacity",
+            "desc": "接合部の応力伝達能力"
+          },
+          "rhs": {
+            "var": "ExistingStress",
+            "desc": "存在応力"
+          }
+        }
+      },
+      {
+        "id": "proc-joint-compliant",
+        "type": "process",
+        "title": "当該接合部は適合",
+        "process_type": "mechanical",
+        "description": "当該接合部は存在応力を伝達できる構造であることを確認"
+      },
+      {
+        "id": "dec-more-joints",
+        "type": "decision",
+        "title": "未確認の接合部があるか？",
+        "decision_type": "binary",
+        "description": "まだ確認していない接合部が残っているか"
+      },
+      {
+        "id": "proc-all-joints-check",
+        "type": "process",
+        "title": "全接合部の適合を確認",
+        "process_type": "mechanical",
+        "description": "すべてのプレキャスト床版の接合部が存在応力を伝えることができる構造であることを確認"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令第77条の2第2項第1号に適合",
+        "related_articles": ["令::A77_2:P2:I1"]
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "接合部が存在応力を伝達できる構造でないため不適合",
+        "related_articles": ["令::A77_2:P2:I1"]
+      },
+      {
+        "id": "end-not-applicable",
+        "type": "terminal",
+        "title": "適用外",
+        "result": "pass",
+        "description": "プレキャスト鉄筋コンクリート床版がないため本号は適用外"
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge-start-check",
+        "from": "start",
+        "to": "dec-precast-slab-exists",
+        "role": "flow"
+      },
+      {
+        "id": "edge-slab-yes",
+        "from": "dec-precast-slab-exists",
+        "to": "proc-identify-slabs",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "edge-slab-no",
+        "from": "dec-precast-slab-exists",
+        "to": "end-not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "edge-slabs-identified",
+        "from": "proc-identify-slabs",
+        "to": "dec-joints-exists",
+        "role": "flow"
+      },
+      {
+        "id": "edge-joints-yes",
+        "from": "dec-joints-exists",
+        "to": "proc-identify-joints",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "edge-joints-no",
+        "from": "dec-joints-exists",
+        "to": "end-not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "edge-joints-identified",
+        "from": "proc-identify-joints",
+        "to": "proc-identify-stress",
+        "role": "flow"
+      },
+      {
+        "id": "edge-stress-to-structure",
+        "from": "proc-identify-stress",
+        "to": "proc-identify-structure",
+        "role": "flow"
+      },
+      {
+        "id": "edge-structure-to-check",
+        "from": "proc-identify-structure",
+        "to": "dec-transmission-capacity",
+        "role": "flow"
+      },
+      {
+        "id": "edge-transmission-yes",
+        "from": "dec-transmission-capacity",
+        "to": "proc-joint-compliant",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "edge-transmission-no",
+        "from": "dec-transmission-capacity",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "edge-compliant-to-more",
+        "from": "proc-joint-compliant",
+        "to": "dec-more-joints",
+        "role": "flow"
+      },
+      {
+        "id": "edge-more-yes",
+        "from": "dec-more-joints",
+        "to": "proc-identify-stress",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "edge-more-no",
+        "from": "dec-more-joints",
+        "to": "proc-all-joints-check",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "edge-all-check-pass",
+        "from": "proc-all-joints-check",
+        "to": "end-pass",
+        "role": "flow"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BO-A77_2-P2-I1",
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "defines_detail",
+      "articles": ["A77_2:P1"],
+      "description": "床版の一般的構造規定（本項の前提条件）"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "defines_detail",
+      "articles": ["A77_2:P2:I2"],
+      "description": "プレキャスト床版の部材相互緊結要件"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": ["A82:I4"],
+      "description": "第1項ただし書きにおける構造計算による適用除外の条件"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令",
+    "checklist_ref": "確認審査報告書チェックリスト",
+    "source": "kijo-diagram"
+  }
+}

@@ -1,0 +1,213 @@
+{
+  "id": "A113_P1_I2_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "防火壁等の自立構造要件 適合判定フロー",
+    "target_subject": "防火壁又は防火床",
+    "description": "通常の火災による建築物他部分の倒壊応力が伝えられた場合に倒壊しない構造方法の適合判定"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "113",
+    "paragraph": "1",
+    "item": "2"
+  },
+  "labels": [
+    "単体規定",
+    "防火",
+    "防火壁",
+    "防火床",
+    "構造方法"
+  ],
+  "text_raw": "通常の火災による当該防火壁又は防火床以外の建築物の部分の倒壊によつて生ずる応力が伝えられた場合に倒壊しないものとして国土交通大臣が定めた構造方法を用いるものとすること。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        { "type": "subject", "value": "防火壁又は防火床を有する建築物" }
+      ],
+      "note": "令第113条第1項柱書の適用対象（防火壁及び防火床）"
+    },
+    "judgment_rule": {
+      "operator": "ALL",
+      "conditions": [
+        {
+          "subject": "防火壁又は防火床",
+          "property": "国土交通大臣が定めた構造方法（自立構造）",
+          "operator": "=",
+          "rhs": { "value": true }
+        }
+      ]
+    }
+  },
+  "flow_diagram": {
+    "title": "令第113条第1項第2号 適合判定フロー",
+    "description": "防火壁又は防火床の自立構造要件の適合判定フローチャート",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "令第113条第1項第2号の適合判定を開始"
+      },
+      {
+        "id": "decision-firewall-exists",
+        "type": "decision",
+        "title": "防火壁又は防火床があるか？",
+        "decision_type": "binary",
+        "description": "建築物に防火壁又は防火床が存在するか確認"
+      },
+      {
+        "id": "process-identify-firewall",
+        "type": "process",
+        "title": "防火壁・防火床の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から全ての防火壁又は防火床を特定する"
+      },
+      {
+        "id": "info-firewall-list",
+        "type": "information",
+        "title": "防火壁・防火床リスト",
+        "subject": "建築物",
+        "property": "防火壁又は防火床の集合",
+        "property_type": "set_definition",
+        "description": "判定対象となる防火壁又は防火床の一覧"
+      },
+      {
+        "id": "process-check-structure",
+        "type": "process",
+        "title": "構造方法の確認",
+        "process_type": "undefined_input",
+        "description": "各防火壁又は防火床の構造方法を設計図書等から確認する"
+      },
+      {
+        "id": "decision-minister-standard",
+        "type": "decision",
+        "title": "国土交通大臣が定めた構造方法に適合するか？",
+        "decision_type": "binary",
+        "description": "平成12年建設省告示第1399号等の自立構造要件への適合を判定",
+        "related_articles": [
+          "告示::平成12年建設省告示第1399号"
+        ]
+      },
+      {
+        "id": "decision-all-checked",
+        "type": "decision",
+        "title": "全ての防火壁・防火床を確認したか？",
+        "decision_type": "binary",
+        "description": "未確認の防火壁又は防火床が残っているか確認"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令第113条第1項第2号に適合"
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "令第113条第1項第2号に不適合（国土交通大臣が定めた構造方法を用いていない）"
+      },
+      {
+        "id": "end-not-applicable",
+        "type": "terminal",
+        "title": "該当なし",
+        "result": "end",
+        "description": "防火壁又は防火床がないため本号は適用対象外"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "decision-firewall-exists",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "decision-firewall-exists",
+        "to": "process-identify-firewall",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "decision-firewall-exists",
+        "to": "end-not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e04",
+        "from": "process-identify-firewall",
+        "to": "info-firewall-list",
+        "role": "flow"
+      },
+      {
+        "id": "e05",
+        "from": "info-firewall-list",
+        "to": "process-check-structure",
+        "role": "flow"
+      },
+      {
+        "id": "e06",
+        "from": "process-check-structure",
+        "to": "decision-minister-standard",
+        "role": "flow"
+      },
+      {
+        "id": "e07",
+        "from": "decision-minister-standard",
+        "to": "decision-all-checked",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e08",
+        "from": "decision-minister-standard",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e09",
+        "from": "decision-all-checked",
+        "to": "end-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e10",
+        "from": "decision-all-checked",
+        "to": "process-check-structure",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-ORD-A113-P1-I2",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": ["A26"],
+      "description": "法第26条に基づく防火壁の設置義務（延べ面積1000平方メートル超の建築物）"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00+09:00",
+    "author": "Claude",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

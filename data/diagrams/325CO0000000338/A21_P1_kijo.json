@@ -1,0 +1,198 @@
+{
+  "id": "CHK-BSO-A21-P1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "居室の天井の高さ",
+    "target_subject": "居室",
+    "description": "居室の天井の高さが2.1メートル以上であることを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "21",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "衛生"
+  ],
+  "text_raw": "居室の天井の高さは、二・一メートル以上でなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "room_type",
+          "value": "居室"
+        }
+      ],
+      "note": "居室に適用される規定"
+    },
+    "judgment_rule": {
+      "operator": ">=",
+      "lhs": {
+        "ref": "info-ceiling-height",
+        "description": "天井の高さ"
+      },
+      "rhs": {
+        "type": "constant",
+        "value": 2.1,
+        "unit": "m"
+      }
+    },
+    "exceptions": null
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-rooms-set",
+        "type": "process",
+        "title": "判定対象居室の特定",
+        "process_type": "undefined_input",
+        "description": "建築物に属する居室を特定する"
+      },
+      {
+        "id": "info-rooms-set",
+        "type": "information",
+        "title": "建築物の居室",
+        "subject": "建築物",
+        "property": "居室の集合",
+        "property_type": "set_definition",
+        "description": "判定対象となる建築物に属する居室を特定",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-ceiling-height",
+        "type": "process",
+        "title": "天井の高さの特定",
+        "process_type": "undefined_input",
+        "target_subject": "居室",
+        "iteration": "iterative",
+        "description": "設計図書等から各居室の天井の高さを読み取る。一室で天井の高さの異なる部分がある場合は平均の高さとする（令21条2項）",
+        "related_articles": [
+          "令::A21:P2"
+        ]
+      },
+      {
+        "id": "info-ceiling-height",
+        "type": "information",
+        "title": "居室の天井の高さ",
+        "symbol": "H",
+        "subject": "居室",
+        "property": "天井の高さ",
+        "property_type": "numeric",
+        "unit": "m",
+        "description": "室の床面から測った天井の高さ。一室で天井の高さの異なる部分がある場合はその平均の高さ",
+        "related_articles": [
+          "令::A21:P2"
+        ],
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-height-check",
+        "type": "process",
+        "title": "天井の高さ判定",
+        "process_type": "mechanical",
+        "target_subject": "居室",
+        "iteration": "iterative",
+        "description": "天井の高さが2.1メートル以上であることを確認",
+        "logic_expression": "H ≥ 2.1"
+      },
+      {
+        "id": "info-height-ok",
+        "type": "information",
+        "title": "天井の高さ基準適合",
+        "symbol": "Ok",
+        "subject": "居室",
+        "property": "天井の高さ基準適合",
+        "property_type": "proposition",
+        "description": "天井の高さが2.1メートル以上の基準を満たすか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-all-check",
+        "type": "process",
+        "title": "全居室適合確認",
+        "process_type": "mechanical",
+        "description": "全ての居室が天井の高さ基準に適合することを確認",
+        "logic_expression": "∀room ∈ Rooms: Ok(room) = true"
+      },
+      {
+        "id": "info-final",
+        "type": "information",
+        "title": "令21条1項適合",
+        "subject": "建築物",
+        "property": "令21条1項適合",
+        "property_type": "proposition",
+        "description": "建築物全体として令21条1項の規定に適合するか",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-rooms-set",
+        "to": "info-rooms-set",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "info-rooms-set",
+        "to": "proc-ceiling-height",
+        "role": "input"
+      },
+      {
+        "id": "e03",
+        "from": "proc-ceiling-height",
+        "to": "info-ceiling-height",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "info-ceiling-height",
+        "to": "proc-height-check",
+        "role": "input"
+      },
+      {
+        "id": "e05",
+        "from": "proc-height-check",
+        "to": "info-height-ok",
+        "role": "output"
+      },
+      {
+        "id": "e06",
+        "from": "info-height-ok",
+        "to": "proc-all-check",
+        "role": "input"
+      },
+      {
+        "id": "e07",
+        "from": "proc-all-check",
+        "to": "info-final",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": [
+        "A28"
+      ],
+      "description": "居住環境に関する基準として法28条から委任"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-01-23T18:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

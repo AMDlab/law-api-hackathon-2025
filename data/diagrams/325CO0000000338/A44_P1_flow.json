@@ -1,0 +1,237 @@
+{
+  "id": "A44_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "はり等の横架材の欠込み",
+    "target_subject": "横架材",
+    "description": "はり、けたその他の横架材の中央部附近の下側に耐力上支障のある欠込みがないことを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "44",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造"
+  ],
+  "text_raw": "はり、けたその他の横架材には、その中央部附近の下側に耐力上支障のある欠込みをしてはならない。",
+  "compliance_logic": {
+    "judgment_rule": {
+      "operator": "NOT",
+      "conditions": [
+        {
+          "ref": "info-notch-existence",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "note": "中央部附近の下側に耐力上支障のある欠込みが存在しないこと"
+    }
+  },
+  "kijo_diagram_ref": "CHK-BSO-A44-P1",
+  "flow_diagram": {
+    "title": "令第44条第1項 横架材の欠込み規制の適合判定フロー",
+    "description": "横架材（はり、けた等）の中央部附近下側に耐力上支障のある欠込みがないことを判定するフローチャート",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "令第44条第1項の適合判定を開始"
+      },
+      {
+        "id": "proc-identify-yokazai",
+        "type": "process",
+        "title": "横架材の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物内のはり、けたその他の横架材を特定する"
+      },
+      {
+        "id": "dec-yokazai-exists",
+        "type": "decision",
+        "title": "横架材があるか？",
+        "decision_type": "binary",
+        "description": "建築物に横架材（はり、けた等）が存在するか確認"
+      },
+      {
+        "id": "proc-check-notch",
+        "type": "process",
+        "title": "欠込みの確認",
+        "process_type": "human_judgment",
+        "description": "各横架材について欠込みの有無を確認する"
+      },
+      {
+        "id": "dec-has-notch",
+        "type": "decision",
+        "title": "欠込みがあるか？",
+        "decision_type": "binary",
+        "description": "横架材に欠込みがあるか確認（全ての横架材について）"
+      },
+      {
+        "id": "dec-notch-location",
+        "type": "decision",
+        "title": "欠込みは中央部附近の下側か？",
+        "decision_type": "binary",
+        "description": "欠込みの位置が中央部附近の下側にあるか確認"
+      },
+      {
+        "id": "proc-strength-check",
+        "type": "process",
+        "title": "耐力上支障の判定",
+        "process_type": "human_judgment",
+        "description": "欠込みが耐力上支障のあるものか専門的に判定する"
+      },
+      {
+        "id": "dec-strength-impact",
+        "type": "decision",
+        "title": "耐力上支障があるか？",
+        "decision_type": "binary",
+        "description": "欠込みが横架材の耐力に支障を与えるか判定"
+      },
+      {
+        "id": "proc-violation-found",
+        "type": "process",
+        "title": "違反欠込み確認",
+        "process_type": "mechanical",
+        "description": "中央部附近下側に耐力上支障のある欠込みが存在することを確認"
+      },
+      {
+        "id": "dec-other-yokazai",
+        "type": "decision",
+        "title": "他に確認すべき横架材があるか？",
+        "decision_type": "binary",
+        "description": "まだ確認していない横架材が残っているか"
+      },
+      {
+        "id": "terminal-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令第44条第1項に適合（耐力上支障のある欠込みなし）"
+      },
+      {
+        "id": "terminal-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "令第44条第1項に不適合（中央部附近下側に耐力上支障のある欠込みあり）"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "proc-identify-yokazai",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "proc-identify-yokazai",
+        "to": "dec-yokazai-exists",
+        "role": "flow"
+      },
+      {
+        "id": "e03",
+        "from": "dec-yokazai-exists",
+        "to": "proc-check-notch",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e04",
+        "from": "dec-yokazai-exists",
+        "to": "terminal-pass",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e05",
+        "from": "proc-check-notch",
+        "to": "dec-has-notch",
+        "role": "flow"
+      },
+      {
+        "id": "e06",
+        "from": "dec-has-notch",
+        "to": "dec-notch-location",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e07",
+        "from": "dec-has-notch",
+        "to": "dec-other-yokazai",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e08",
+        "from": "dec-notch-location",
+        "to": "proc-strength-check",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e09",
+        "from": "dec-notch-location",
+        "to": "dec-other-yokazai",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e10",
+        "from": "proc-strength-check",
+        "to": "dec-strength-impact",
+        "role": "flow"
+      },
+      {
+        "id": "e11",
+        "from": "dec-strength-impact",
+        "to": "proc-violation-found",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e12",
+        "from": "dec-strength-impact",
+        "to": "dec-other-yokazai",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e13",
+        "from": "proc-violation-found",
+        "to": "terminal-fail",
+        "role": "flow"
+      },
+      {
+        "id": "e14",
+        "from": "dec-other-yokazai",
+        "to": "proc-check-notch",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e15",
+        "from": "dec-other-yokazai",
+        "to": "terminal-pass",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00+09:00",
+    "updated_at": "2026-01-26T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

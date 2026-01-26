@@ -1,0 +1,264 @@
+{
+  "id": "CHK-BSL-ORD-A119-P1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "廊下の幅",
+    "target_subject": "廊下",
+    "description": "建築物の用途と廊下配置に応じた幅員基準"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "119",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "避難",
+    "廊下"
+  ],
+  "text_raw": "廊下の幅は、それぞれ次の表に掲げる数値以上としなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "note": "表に掲げる用途の建築物における廊下が対象"
+    },
+    "judgment_rule": {
+      "operator": "ALL",
+      "conditions": [
+        {
+          "description": "各廊下の幅が用途・配置に応じた基準値以上"
+        }
+      ]
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-use-identify",
+        "type": "process",
+        "title": "建築物用途の特定",
+        "process_type": "undefined_input",
+        "description": "建築物の用途が表に掲げる用途に該当するか特定"
+      },
+      {
+        "id": "info-use-category",
+        "type": "information",
+        "title": "廊下用途区分",
+        "symbol": "U",
+        "subject": "建築物",
+        "property": "廊下用途区分",
+        "property_type": "classification",
+        "description": "学校用、病院等用、又は該当なし",
+        "remarks": "学校用: 小学校、中学校、義務教育学校、高等学校又は中等教育学校における児童用又は生徒用 / 病院等用: 病院における患者用、共同住宅（住戸等床面積合計100㎡超）の共用、居室床面積合計200㎡超（地階は100㎡）の階",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-corridor-identify",
+        "type": "process",
+        "title": "廊下の特定",
+        "process_type": "undefined_input",
+        "description": "建築物内の廊下を特定"
+      },
+      {
+        "id": "info-corridor-set",
+        "type": "information",
+        "title": "廊下",
+        "subject": "建築物",
+        "property": "廊下の集合",
+        "property_type": "set_definition",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-arrangement-check",
+        "type": "process",
+        "title": "廊下配置の確認",
+        "process_type": "undefined_input",
+        "description": "各廊下が両側に居室があるか確認",
+        "iteration": "iterative"
+      },
+      {
+        "id": "info-arrangement",
+        "type": "information",
+        "title": "廊下配置区分",
+        "symbol": "ARR",
+        "subject": "廊下",
+        "property": "配置区分",
+        "property_type": "classification",
+        "description": "両側に居室がある廊下又はその他の廊下",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-req-width-judge",
+        "type": "process",
+        "title": "必要幅員の決定",
+        "process_type": "mechanical",
+        "description": "用途区分と配置区分から必要幅員を決定",
+        "logic_expression": "IF U=学校用 THEN (IF ARR=両側居室 THEN 2.3m ELSE 1.8m) ELSE IF U=病院等用 THEN (IF ARR=両側居室 THEN 1.6m ELSE 1.2m)",
+        "iteration": "iterative"
+      },
+      {
+        "id": "info-req-width",
+        "type": "information",
+        "title": "必要幅員",
+        "symbol": "W_req",
+        "subject": "廊下",
+        "property": "必要幅員",
+        "property_type": "numeric",
+        "unit": "m",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-width-measure",
+        "type": "process",
+        "title": "廊下幅員の確認",
+        "process_type": "undefined_input",
+        "description": "各廊下の幅員を確認",
+        "iteration": "iterative"
+      },
+      {
+        "id": "info-corridor-width",
+        "type": "information",
+        "title": "廊下幅員",
+        "symbol": "W",
+        "subject": "廊下",
+        "property": "幅員",
+        "property_type": "numeric",
+        "unit": "m",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-width-compare",
+        "type": "process",
+        "title": "幅員比較",
+        "process_type": "mechanical",
+        "description": "廊下幅員が必要幅員以上か比較",
+        "logic_expression": "W >= W_req",
+        "iteration": "iterative"
+      },
+      {
+        "id": "info-width-compliance",
+        "type": "information",
+        "title": "幅員適合",
+        "symbol": "WC",
+        "subject": "廊下",
+        "property": "幅員適合",
+        "property_type": "proposition",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-final-judge",
+        "type": "process",
+        "title": "最終適合判定",
+        "process_type": "mechanical",
+        "description": "全廊下の幅員適合性を総合判定",
+        "logic_expression": "ALL(WC)"
+      },
+      {
+        "id": "info-final-compliance",
+        "type": "information",
+        "title": "令第119条適合",
+        "symbol": "COMPLIANT",
+        "subject": "建築物",
+        "property": "令第119条適合性",
+        "property_type": "proposition",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-use-identify",
+        "to": "info-use-category",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "proc-corridor-identify",
+        "to": "info-corridor-set",
+        "role": "output"
+      },
+      {
+        "id": "e03",
+        "from": "info-corridor-set",
+        "to": "proc-arrangement-check",
+        "role": "input"
+      },
+      {
+        "id": "e04",
+        "from": "proc-arrangement-check",
+        "to": "info-arrangement",
+        "role": "output"
+      },
+      {
+        "id": "e05",
+        "from": "info-use-category",
+        "to": "proc-req-width-judge",
+        "role": "input"
+      },
+      {
+        "id": "e06",
+        "from": "info-arrangement",
+        "to": "proc-req-width-judge",
+        "role": "input"
+      },
+      {
+        "id": "e07",
+        "from": "proc-req-width-judge",
+        "to": "info-req-width",
+        "role": "output"
+      },
+      {
+        "id": "e08",
+        "from": "info-corridor-set",
+        "to": "proc-width-measure",
+        "role": "input"
+      },
+      {
+        "id": "e09",
+        "from": "proc-width-measure",
+        "to": "info-corridor-width",
+        "role": "output"
+      },
+      {
+        "id": "e10",
+        "from": "info-corridor-width",
+        "to": "proc-width-compare",
+        "role": "input"
+      },
+      {
+        "id": "e11",
+        "from": "info-req-width",
+        "to": "proc-width-compare",
+        "role": "input"
+      },
+      {
+        "id": "e12",
+        "from": "proc-width-compare",
+        "to": "info-width-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e13",
+        "from": "info-width-compliance",
+        "to": "proc-final-judge",
+        "role": "input"
+      },
+      {
+        "id": "e14",
+        "from": "proc-final-judge",
+        "to": "info-final-compliance",
+        "role": "output"
+      }
+    ]
+  },
+  "metadata": {
+    "created_at": "2026-01-23T00:00:00+09:00",
+    "author": "Claude",
+    "generator": "kijo-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

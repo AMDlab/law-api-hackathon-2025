@@ -1,0 +1,258 @@
+{
+  "id": "CHK-BSO-A130_5_4-P1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "第一種中高層住居専用地域における公益上必要な建築物の判定",
+    "target_subject": "建築物",
+    "description": "法別表第二(は)項第七号に基づき、政令で定める公益上必要な建築物に該当するかを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "130の5の4",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": ["集団規定", "用途制限", "第一種中高層住居専用地域"],
+  "text_raw": "法別表第二（は）項第七号（法第八十七条第二項又は第三項において法第四十八条第三項の規定を準用する場合を含む。）の規定により政令で定める建築物は、次に掲げるものとする。\n一　税務署、警察署、保健所、消防署その他これらに類するもの（法別表第二（い）項第九号に掲げるもの及び五階以上の部分をこれらの用途に供するものを除く。）\n二　第百三十条の四第五号イからハまでの一に掲げる施設である建築物で国土交通大臣が指定するもの（法別表第二（い）項第九号に掲げるもの及び五階以上の部分をこれらの用途に供するものを除く。）",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        { "type": "location", "value": "第一種中高層住居専用地域内" },
+        { "type": "reference", "value": "法別表第二(は)項第七号の適用判定" }
+      ],
+      "note": "法48条3項の用途制限における公益上必要な建築物の該当性判定"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        { "note": "一号: 税務署、警察署、保健所、消防署等（法別表第二(い)項第九号除く、5階以上除く）", "ref": "info-item1-compliance" },
+        { "note": "二号: 令130条の4第5号イ～ハの公益事業施設で国土交通大臣指定（同上除外）", "ref": "info-item2-compliance" }
+      ]
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-use-check",
+        "type": "process",
+        "title": "建築物の用途の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の用途を特定する"
+      },
+      {
+        "id": "info-building-use",
+        "type": "information",
+        "title": "建築物の用途",
+        "symbol": "U",
+        "subject": "建築物",
+        "property": "用途",
+        "property_type": "classification",
+        "description": "建築物の用途種別",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-floor-check",
+        "type": "process",
+        "title": "該当用途部分の階数確認",
+        "process_type": "undefined_input",
+        "description": "設計図書等から該当用途部分が何階にあるかを確認する"
+      },
+      {
+        "id": "info-floor-level",
+        "type": "information",
+        "title": "該当用途部分の最高階",
+        "symbol": "F",
+        "subject": "建築物",
+        "property": "該当用途部分の最高階",
+        "property_type": "numeric",
+        "unit": "階",
+        "description": "当該用途に供する部分が存在する最上階の階数",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-item9-exclusion-check",
+        "type": "process",
+        "title": "法別表第二(い)項第九号該当確認",
+        "process_type": "sub_diagram_reference",
+        "sub_diagram_ref": "CHK-BSO-A130_4-P1",
+        "description": "令130条の4第1項（法別表第二(い)項第九号に掲げる公益上必要な建築物）に該当するかを確認する"
+      },
+      {
+        "id": "info-item9-status",
+        "type": "information",
+        "title": "法別表第二(い)項第九号該当",
+        "symbol": "E",
+        "subject": "建築物",
+        "property": "法別表第二(い)項第九号該当",
+        "property_type": "proposition",
+        "description": "法別表第二(い)項第九号に掲げる公益上必要な建築物に該当するか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-exclusion-judge",
+        "type": "process",
+        "title": "除外条件判定",
+        "process_type": "mechanical",
+        "description": "法別表第二(い)項第九号該当又は5階以上部分への用途供用で除外されるか判定",
+        "logic_expression": "NOT(E) AND (F < 5)"
+      },
+      {
+        "id": "info-exclusion-ok",
+        "type": "information",
+        "title": "除外条件非該当",
+        "symbol": "X",
+        "subject": "建築物",
+        "property": "除外条件非該当",
+        "property_type": "proposition",
+        "description": "除外条件（法別表第二(い)項第九号該当又は5階以上）に該当しない",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-item1-check",
+        "type": "process",
+        "title": "一号該当判定",
+        "process_type": "mechanical",
+        "description": "税務署、警察署、保健所、消防署その他これらに類するものか判定",
+        "logic_expression": "U ∈ {税務署, 警察署, 保健所, 消防署, その他類似施設}",
+        "remarks": "一号: 税務署、警察署、保健所、消防署その他これらに類するもの"
+      },
+      {
+        "id": "info-item1-use-match",
+        "type": "information",
+        "title": "一号用途該当",
+        "symbol": "U1",
+        "subject": "建築物",
+        "property": "一号用途該当",
+        "property_type": "proposition",
+        "description": "税務署、警察署、保健所、消防署その他これらに類するものに該当するか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-item1-final",
+        "type": "process",
+        "title": "一号最終判定",
+        "process_type": "mechanical",
+        "description": "一号用途該当かつ除外条件非該当か判定",
+        "logic_expression": "U1 AND X"
+      },
+      {
+        "id": "info-item1-compliance",
+        "type": "information",
+        "title": "一号該当",
+        "symbol": "C1",
+        "subject": "建築物",
+        "property": "一号該当",
+        "property_type": "proposition",
+        "description": "令130条の5の4第1項一号に該当するか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-minister-designation-check",
+        "type": "process",
+        "title": "国土交通大臣指定の確認",
+        "process_type": "undefined_input",
+        "description": "令130条の4第5号イ～ハの公益事業施設で国土交通大臣が指定する建築物に該当するかを確認"
+      },
+      {
+        "id": "info-minister-designation",
+        "type": "information",
+        "title": "国土交通大臣指定",
+        "symbol": "D",
+        "subject": "建築物",
+        "property": "国土交通大臣指定の有無",
+        "property_type": "proposition",
+        "description": "令130条の4第5号イ～ハの施設で国土交通大臣が指定する建築物に該当するか（イ:電気通信事業、ロ:電気事業、ハ:ガス事業）",
+        "plurality": "single",
+        "related_articles": ["令::A130_4:P1:I5"]
+      },
+      {
+        "id": "proc-item2-final",
+        "type": "process",
+        "title": "二号最終判定",
+        "process_type": "mechanical",
+        "description": "国土交通大臣指定かつ除外条件非該当か判定",
+        "logic_expression": "D AND X"
+      },
+      {
+        "id": "info-item2-compliance",
+        "type": "information",
+        "title": "二号該当",
+        "symbol": "C2",
+        "subject": "建築物",
+        "property": "二号該当",
+        "property_type": "proposition",
+        "description": "令130条の5の4第1項二号に該当するか",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-final-judgment",
+        "type": "process",
+        "title": "公益上必要な建築物判定",
+        "process_type": "mechanical",
+        "description": "一号又は二号のいずれかに該当するかを判定",
+        "logic_expression": "C1 OR C2"
+      },
+      {
+        "id": "info-compliance",
+        "type": "information",
+        "title": "令130条の5の4第1項適合",
+        "symbol": "C",
+        "subject": "建築物",
+        "property": "令130条の5の4第1項適合",
+        "property_type": "proposition",
+        "description": "政令で定める公益上必要な建築物（第一種中高層住居専用地域）に該当するか",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "proc-use-check", "to": "info-building-use", "role": "output" },
+      { "id": "e02", "from": "proc-floor-check", "to": "info-floor-level", "role": "output" },
+      { "id": "e03", "from": "info-building-use", "to": "proc-item9-exclusion-check", "role": "input" },
+      { "id": "e04", "from": "proc-item9-exclusion-check", "to": "info-item9-status", "role": "output" },
+      { "id": "e05", "from": "info-item9-status", "to": "proc-exclusion-judge", "role": "input" },
+      { "id": "e06", "from": "info-floor-level", "to": "proc-exclusion-judge", "role": "input" },
+      { "id": "e07", "from": "proc-exclusion-judge", "to": "info-exclusion-ok", "role": "output" },
+      { "id": "e08", "from": "info-building-use", "to": "proc-item1-check", "role": "input" },
+      { "id": "e09", "from": "proc-item1-check", "to": "info-item1-use-match", "role": "output" },
+      { "id": "e10", "from": "info-item1-use-match", "to": "proc-item1-final", "role": "input" },
+      { "id": "e11", "from": "info-exclusion-ok", "to": "proc-item1-final", "role": "input" },
+      { "id": "e12", "from": "proc-item1-final", "to": "info-item1-compliance", "role": "output" },
+      { "id": "e13", "from": "proc-minister-designation-check", "to": "info-minister-designation", "role": "output" },
+      { "id": "e14", "from": "info-minister-designation", "to": "proc-item2-final", "role": "input" },
+      { "id": "e15", "from": "info-exclusion-ok", "to": "proc-item2-final", "role": "input" },
+      { "id": "e16", "from": "proc-item2-final", "to": "info-item2-compliance", "role": "output" },
+      { "id": "e17", "from": "info-item1-compliance", "to": "proc-final-judgment", "role": "input" },
+      { "id": "e18", "from": "info-item2-compliance", "to": "proc-final-judgment", "role": "input" },
+      { "id": "e19", "from": "proc-final-judgment", "to": "info-compliance", "role": "output" }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": ["別表第二(は)第七号", "A48:P3"],
+      "description": "法別表第二(は)項第七号から政令への委任規定"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": ["A130_4:P1:I5"],
+      "description": "二号における公益事業施設の参照（イ:電気通信事業、ロ:電気事業、ハ:ガス事業）"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-25T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

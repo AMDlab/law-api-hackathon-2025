@@ -1,0 +1,561 @@
+{
+  "id": "A128_5_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "特殊建築物の内装制限判定",
+    "target_subject": "特殊建築物",
+    "description": "令第128条の4第1項第1号に掲げる特殊建築物における居室及び通路の内装仕上げ要件の判定"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "128_5",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "内装制限"
+  ],
+  "text_raw": "前条第一項第一号に掲げる特殊建築物は、当該各用途に供する居室（法別表第一（い）欄（二）項に掲げる用途に供する特殊建築物が主要構造部を準耐火構造とした建築物（特定主要構造部を耐火構造とした建築物を含む。第四項において同じ。）である場合にあつては、当該用途に供する特殊建築物の部分で床面積の合計百平方メートル（共同住宅の住戸にあつては、二百平方メートル）以内ごとに準耐火構造の床若しくは壁又は法第二条第九号の二ロに規定する防火設備で区画されている部分の居室を除く。）の壁（床面からの高さが一・二メートル以下の部分を除く。第四項において同じ。）及び天井（天井のない場合においては、屋根。以下この条において同じ。）の室内に面する部分（回り縁、窓台その他これらに類する部分を除く。以下この条において同じ。）の仕上げを第一号に掲げる仕上げと、当該各用途に供する居室から地上に通ずる主たる廊下、階段その他の通路の壁及び天井の室内に面する部分の仕上げを第二号に掲げる仕上げとしなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "building_type",
+          "value": "令第128条の4第1項第1号に掲げる特殊建築物"
+        }
+      ],
+      "note": "内装制限を受ける特殊建築物（法別表第一(い)欄(一)項・(二)項・(四)項の用途で一定規模以上のもの）"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "requirement",
+          "value": "居室の内装仕上げ",
+          "description": "居室の壁（床面から1.2m超）及び天井の室内に面する部分は難燃材料または国土交通大臣が定める方法"
+        },
+        {
+          "type": "requirement",
+          "value": "通路の内装仕上げ",
+          "description": "居室から地上に通ずる主たる廊下、階段その他の通路の壁及び天井の室内に面する部分は準不燃材料または国土交通大臣が定める方法"
+        }
+      ]
+    },
+    "exceptions": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "building_type",
+          "value": "法別表第一(い)欄(二)項用途の特殊建築物"
+        },
+        {
+          "type": "building_standard",
+          "value": "主要構造部が準耐火構造（特定主要構造部が耐火構造を含む）"
+        },
+        {
+          "type": "compartment",
+          "value": "床面積100㎡（共同住宅住戸は200㎡）以内ごとに準耐火構造の床・壁または防火設備で区画"
+        }
+      ],
+      "effect": "EXEMPT",
+      "description": "区画された部分の居室は内装制限の適用除外"
+    }
+  },
+  "kijo_diagram_ref": "CHK-BSL-KIJO-A128_5-P1",
+  "flow_diagram": {
+    "title": "特殊建築物の内装制限適合判定フロー",
+    "description": "令第128条の4第1項第1号に掲げる特殊建築物における居室及び通路の内装仕上げが基準に適合するか判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start"
+      },
+      {
+        "id": "dec-building-usage",
+        "type": "decision",
+        "title": "建築物の用途は令第128条の4第1項第1号に該当するか？",
+        "decision_type": "binary",
+        "description": "建築物が法別表第一(い)欄(一)項・(二)項・(四)項の用途で一定規模以上のものか確認",
+        "related_articles": ["令::A128_4:P1:I1"]
+      },
+      {
+        "id": "proc-subject-to-restriction",
+        "type": "process",
+        "title": "内装制限対象建築物",
+        "description": "建築物が令第128条の4第1項第1号の内装制限対象に該当"
+      },
+      {
+        "id": "dec-usage-category",
+        "type": "decision",
+        "title": "用途区分は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "法別表第一(い)欄(二)項", "description": "病院、診療所、ホテル、旅館、下宿、共同住宅、寄宿舎、児童福祉施設等" },
+          { "value": "その他の用途", "description": "法別表第一(い)欄(一)項、(四)項の用途" }
+        ],
+        "description": "建築物の用途が法別表第一(い)欄(二)項に該当するか確認"
+      },
+      {
+        "id": "dec-structure-type",
+        "type": "decision",
+        "title": "主要構造部は準耐火構造（又は特定主要構造部が耐火構造）か？",
+        "decision_type": "binary",
+        "description": "主要構造部が準耐火構造、又は特定主要構造部が耐火構造であるか確認"
+      },
+      {
+        "id": "dec-compartment",
+        "type": "decision",
+        "title": "100㎡（共同住宅住戸は200㎡）以内ごとに防火区画されているか？",
+        "decision_type": "binary",
+        "description": "準耐火構造の床・壁又は防火設備で所定面積以内ごとに区画されているか確認"
+      },
+      {
+        "id": "proc-room-exempt",
+        "type": "process",
+        "title": "区画された居室は内装制限除外",
+        "description": "法別表第一(い)欄(二)項用途で準耐火構造かつ所定区画がある居室は内装制限の適用除外"
+      },
+      {
+        "id": "dec-has-target-rooms",
+        "type": "decision",
+        "title": "内装制限対象の居室があるか？",
+        "decision_type": "binary",
+        "description": "除外対象を除いた後、内装制限の対象となる居室が存在するか確認"
+      },
+      {
+        "id": "dec-room-floor-level",
+        "type": "decision",
+        "title": "居室のある階は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "3階以上", "description": "天井は準不燃材料が必要" },
+          { "value": "2階以下", "description": "天井は難燃材料でよい" }
+        ],
+        "description": "当該居室がある階が3階以上か否かを確認"
+      },
+      {
+        "id": "dec-room-wall-finish-3f",
+        "type": "decision",
+        "title": "居室の壁（床面から1.2m超）の仕上げは難燃材料又は国土交通大臣認定材料か？",
+        "decision_type": "binary",
+        "description": "3階以上の居室の壁の室内に面する部分の仕上げが基準に適合するか確認"
+      },
+      {
+        "id": "dec-room-ceiling-finish-3f",
+        "type": "decision",
+        "title": "居室の天井の仕上げは準不燃材料又は国土交通大臣認定材料か？",
+        "decision_type": "binary",
+        "description": "3階以上の居室の天井の室内に面する部分の仕上げが準不燃材料基準に適合するか確認"
+      },
+      {
+        "id": "dec-room-wall-finish-2f",
+        "type": "decision",
+        "title": "居室の壁（床面から1.2m超）の仕上げは難燃材料又は国土交通大臣認定材料か？",
+        "decision_type": "binary",
+        "description": "2階以下の居室の壁の室内に面する部分の仕上げが基準に適合するか確認"
+      },
+      {
+        "id": "dec-room-ceiling-finish-2f",
+        "type": "decision",
+        "title": "居室の天井の仕上げは難燃材料又は国土交通大臣認定材料か？",
+        "decision_type": "binary",
+        "description": "2階以下の居室の天井の室内に面する部分の仕上げが難燃材料基準に適合するか確認"
+      },
+      {
+        "id": "proc-room-ok",
+        "type": "process",
+        "title": "居室の内装適合",
+        "description": "当該居室の壁・天井の仕上げが基準に適合"
+      },
+      {
+        "id": "dec-more-rooms",
+        "type": "decision",
+        "title": "他に判定対象の居室があるか？",
+        "decision_type": "binary",
+        "description": "全ての対象居室について判定が完了したか確認"
+      },
+      {
+        "id": "proc-all-rooms-ok",
+        "type": "process",
+        "title": "全居室の内装適合",
+        "description": "全ての対象居室の壁・天井の仕上げが第一号の要件に適合"
+      },
+      {
+        "id": "dec-has-corridors",
+        "type": "decision",
+        "title": "居室から地上に通ずる主たる通路があるか？",
+        "decision_type": "binary",
+        "description": "主たる廊下、階段その他の通路の有無を確認"
+      },
+      {
+        "id": "dec-corridor-wall-finish",
+        "type": "decision",
+        "title": "通路の壁の仕上げは準不燃材料又は国土交通大臣認定材料か？",
+        "decision_type": "binary",
+        "description": "通路の壁の室内に面する部分の仕上げが準不燃材料基準に適合するか確認"
+      },
+      {
+        "id": "dec-corridor-ceiling-finish",
+        "type": "decision",
+        "title": "通路の天井の仕上げは準不燃材料又は国土交通大臣認定材料か？",
+        "decision_type": "binary",
+        "description": "通路の天井の室内に面する部分の仕上げが準不燃材料基準に適合するか確認"
+      },
+      {
+        "id": "proc-corridor-ok",
+        "type": "process",
+        "title": "通路の内装適合",
+        "description": "当該通路の壁・天井の仕上げが準不燃材料基準に適合"
+      },
+      {
+        "id": "dec-more-corridors",
+        "type": "decision",
+        "title": "他に判定対象の通路があるか？",
+        "decision_type": "binary",
+        "description": "全ての対象通路について判定が完了したか確認"
+      },
+      {
+        "id": "proc-all-corridors-ok",
+        "type": "process",
+        "title": "全通路の内装適合",
+        "description": "全ての対象通路の壁・天井の仕上げが第二号の要件に適合"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令第128条の5第1項の内装制限に適合"
+      },
+      {
+        "id": "fail-room-wall",
+        "type": "terminal",
+        "title": "不適合（居室壁）",
+        "result": "fail",
+        "description": "居室の壁の仕上げが基準に不適合"
+      },
+      {
+        "id": "fail-room-ceiling",
+        "type": "terminal",
+        "title": "不適合（居室天井）",
+        "result": "fail",
+        "description": "居室の天井の仕上げが基準に不適合"
+      },
+      {
+        "id": "fail-corridor-wall",
+        "type": "terminal",
+        "title": "不適合（通路壁）",
+        "result": "fail",
+        "description": "通路の壁の仕上げが基準に不適合"
+      },
+      {
+        "id": "fail-corridor-ceiling",
+        "type": "terminal",
+        "title": "不適合（通路天井）",
+        "result": "fail",
+        "description": "通路の天井の仕上げが基準に不適合"
+      },
+      {
+        "id": "pass-not-applicable",
+        "type": "terminal",
+        "title": "適用対象外",
+        "result": "pass",
+        "description": "令第128条の4第1項第1号に該当しないため本規定は適用対象外"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-building-usage",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-building-usage",
+        "to": "proc-subject-to-restriction",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "dec-building-usage",
+        "to": "pass-not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e04",
+        "from": "proc-subject-to-restriction",
+        "to": "dec-usage-category",
+        "role": "flow"
+      },
+      {
+        "id": "e05",
+        "from": "dec-usage-category",
+        "to": "dec-structure-type",
+        "role": "option",
+        "label": "法別表第一(い)欄(二)項"
+      },
+      {
+        "id": "e06",
+        "from": "dec-usage-category",
+        "to": "dec-has-target-rooms",
+        "role": "option",
+        "label": "その他の用途"
+      },
+      {
+        "id": "e07",
+        "from": "dec-structure-type",
+        "to": "dec-compartment",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e08",
+        "from": "dec-structure-type",
+        "to": "dec-has-target-rooms",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e09",
+        "from": "dec-compartment",
+        "to": "proc-room-exempt",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e10",
+        "from": "dec-compartment",
+        "to": "dec-has-target-rooms",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e11",
+        "from": "proc-room-exempt",
+        "to": "dec-has-target-rooms",
+        "role": "flow"
+      },
+      {
+        "id": "e12",
+        "from": "dec-has-target-rooms",
+        "to": "dec-room-floor-level",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e13",
+        "from": "dec-has-target-rooms",
+        "to": "dec-has-corridors",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e14",
+        "from": "dec-room-floor-level",
+        "to": "dec-room-wall-finish-3f",
+        "role": "option",
+        "label": "3階以上"
+      },
+      {
+        "id": "e15",
+        "from": "dec-room-floor-level",
+        "to": "dec-room-wall-finish-2f",
+        "role": "option",
+        "label": "2階以下"
+      },
+      {
+        "id": "e16",
+        "from": "dec-room-wall-finish-3f",
+        "to": "dec-room-ceiling-finish-3f",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e17",
+        "from": "dec-room-wall-finish-3f",
+        "to": "fail-room-wall",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e18",
+        "from": "dec-room-ceiling-finish-3f",
+        "to": "proc-room-ok",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e19",
+        "from": "dec-room-ceiling-finish-3f",
+        "to": "fail-room-ceiling",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e20",
+        "from": "dec-room-wall-finish-2f",
+        "to": "dec-room-ceiling-finish-2f",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e21",
+        "from": "dec-room-wall-finish-2f",
+        "to": "fail-room-wall",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e22",
+        "from": "dec-room-ceiling-finish-2f",
+        "to": "proc-room-ok",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e23",
+        "from": "dec-room-ceiling-finish-2f",
+        "to": "fail-room-ceiling",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e24",
+        "from": "proc-room-ok",
+        "to": "dec-more-rooms",
+        "role": "flow"
+      },
+      {
+        "id": "e25",
+        "from": "dec-more-rooms",
+        "to": "dec-room-floor-level",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e26",
+        "from": "dec-more-rooms",
+        "to": "proc-all-rooms-ok",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e27",
+        "from": "proc-all-rooms-ok",
+        "to": "dec-has-corridors",
+        "role": "flow"
+      },
+      {
+        "id": "e28",
+        "from": "dec-has-corridors",
+        "to": "dec-corridor-wall-finish",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e29",
+        "from": "dec-has-corridors",
+        "to": "pass",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e30",
+        "from": "dec-corridor-wall-finish",
+        "to": "dec-corridor-ceiling-finish",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e31",
+        "from": "dec-corridor-wall-finish",
+        "to": "fail-corridor-wall",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e32",
+        "from": "dec-corridor-ceiling-finish",
+        "to": "proc-corridor-ok",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e33",
+        "from": "dec-corridor-ceiling-finish",
+        "to": "fail-corridor-ceiling",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e34",
+        "from": "proc-corridor-ok",
+        "to": "dec-more-corridors",
+        "role": "flow"
+      },
+      {
+        "id": "e35",
+        "from": "dec-more-corridors",
+        "to": "dec-corridor-wall-finish",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e36",
+        "from": "dec-more-corridors",
+        "to": "proc-all-corridors-ok",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e37",
+        "from": "proc-all-corridors-ok",
+        "to": "pass",
+        "role": "flow"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": [
+        "A35_2:P1",
+        "A2:P1"
+      ],
+      "description": "法第35条の2により内装制限の規定が設けられ、法第2条第9号の2ロで防火設備を定義"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": [
+        "A128_4:P1:I1"
+      ],
+      "description": "令第128条の4第1項第1号で内装制限を受ける特殊建築物の範囲を規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00+09:00",
+    "updated_at": "2026-01-26T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令",
+    "checklist_ref": "建築基準法施行令第128条の5第1項（特殊建築物等の内装）",
+    "source": "e-Gov法令API"
+  }
+}

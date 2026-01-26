@@ -1,0 +1,245 @@
+{
+  "id": "A46_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "構造耐力上必要な軸組等",
+    "target_subject": "建築物（木造）",
+    "description": "木造建築物における軸組の配置に関する適合判定フロー"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "46",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造規定",
+    "木造"
+  ],
+  "text_raw": "構造耐力上主要な部分である壁、柱及び横架材を木造とした建築物にあつては、全ての方向の水平力に対して安全であるように、各階の張り間方向及び桁行方向に、それぞれ壁を設け又は筋かいを入れた軸組を釣合い良く配置しなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "structure",
+          "value": "構造耐力上主要な部分である壁、柱及び横架材を木造とした建築物"
+        }
+      ]
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-harigane-compliance",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "ref": "info-ketayuki-compliance",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "flow_diagram": {
+    "title": "令第46条第1項 軸組配置適合判定フロー",
+    "description": "木造建築物における張り間方向及び桁行方向の軸組配置の適合判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "審査開始",
+        "result": "start"
+      },
+      {
+        "id": "dec-structure-type",
+        "type": "decision",
+        "title": "主要部分の構造種別は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "木造", "description": "壁、柱及び横架材が木造" },
+          { "value": "その他", "description": "木造以外の構造" }
+        ],
+        "description": "構造耐力上主要な部分である壁、柱及び横架材が木造であるかを判定"
+      },
+      {
+        "id": "proc-out-of-scope",
+        "type": "process",
+        "title": "適用範囲外",
+        "process_type": "mechanical",
+        "description": "本条は木造建築物のみに適用されるため、対象外"
+      },
+      {
+        "id": "end-out-of-scope",
+        "type": "terminal",
+        "title": "適用対象外",
+        "result": "end",
+        "description": "令第46条第1項は木造建築物のみに適用"
+      },
+      {
+        "id": "proc-floors-identify",
+        "type": "process",
+        "title": "各階の特定",
+        "process_type": "undefined_input",
+        "description": "判定対象となる建築物の各階を特定する"
+      },
+      {
+        "id": "dec-harigane-jiku",
+        "type": "decision",
+        "title": "張り間方向に軸組が釣合い良く配置されているか？",
+        "decision_type": "binary",
+        "description": "各階の張り間方向に壁を設け又は筋かいを入れた軸組が釣合い良く配置されているか確認"
+      },
+      {
+        "id": "proc-harigane-ok",
+        "type": "process",
+        "title": "張り間方向適合",
+        "process_type": "mechanical",
+        "description": "全ての階で張り間方向の軸組が釣合い良く配置されている"
+      },
+      {
+        "id": "dec-ketayuki-jiku",
+        "type": "decision",
+        "title": "桁行方向に軸組が釣合い良く配置されているか？",
+        "decision_type": "binary",
+        "description": "各階の桁行方向に壁を設け又は筋かいを入れた軸組が釣合い良く配置されているか確認"
+      },
+      {
+        "id": "proc-ketayuki-ok",
+        "type": "process",
+        "title": "桁行方向適合",
+        "process_type": "mechanical",
+        "description": "全ての階で桁行方向の軸組が釣合い良く配置されている"
+      },
+      {
+        "id": "proc-both-ok",
+        "type": "process",
+        "title": "両方向適合確認",
+        "process_type": "mechanical",
+        "description": "張り間方向と桁行方向の両方で軸組が釣合い良く配置されていることを確認"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令第46条第1項に適合"
+      },
+      {
+        "id": "end-fail-harigane",
+        "type": "terminal",
+        "title": "不適合（張り間方向）",
+        "result": "fail",
+        "description": "張り間方向の軸組配置が不十分"
+      },
+      {
+        "id": "end-fail-ketayuki",
+        "type": "terminal",
+        "title": "不適合（桁行方向）",
+        "result": "fail",
+        "description": "桁行方向の軸組配置が不十分"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-structure-type",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-structure-type",
+        "to": "proc-floors-identify",
+        "role": "option",
+        "label": "木造"
+      },
+      {
+        "id": "e03",
+        "from": "dec-structure-type",
+        "to": "proc-out-of-scope",
+        "role": "option",
+        "label": "その他"
+      },
+      {
+        "id": "e04",
+        "from": "proc-out-of-scope",
+        "to": "end-out-of-scope",
+        "role": "flow"
+      },
+      {
+        "id": "e05",
+        "from": "proc-floors-identify",
+        "to": "dec-harigane-jiku",
+        "role": "flow"
+      },
+      {
+        "id": "e06",
+        "from": "dec-harigane-jiku",
+        "to": "proc-harigane-ok",
+        "role": "yes"
+      },
+      {
+        "id": "e07",
+        "from": "dec-harigane-jiku",
+        "to": "end-fail-harigane",
+        "role": "no"
+      },
+      {
+        "id": "e08",
+        "from": "proc-harigane-ok",
+        "to": "dec-ketayuki-jiku",
+        "role": "flow"
+      },
+      {
+        "id": "e09",
+        "from": "dec-ketayuki-jiku",
+        "to": "proc-ketayuki-ok",
+        "role": "yes"
+      },
+      {
+        "id": "e10",
+        "from": "dec-ketayuki-jiku",
+        "to": "end-fail-ketayuki",
+        "role": "no"
+      },
+      {
+        "id": "e11",
+        "from": "proc-ketayuki-ok",
+        "to": "proc-both-ok",
+        "role": "flow"
+      },
+      {
+        "id": "e12",
+        "from": "proc-both-ok",
+        "to": "end-pass",
+        "role": "flow"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-ORDER-A46-P1",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": ["A20"],
+      "description": "法第20条の構造耐力に関する委任規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

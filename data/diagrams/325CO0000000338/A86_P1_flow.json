@@ -1,0 +1,323 @@
+{
+  "id": "A86_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "積雪荷重の計算",
+    "target_subject": "建築物",
+    "description": "積雪荷重を積雪の単位荷重、屋根の水平投影面積、垂直積雪量を乗じて計算する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "86",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造",
+    "積雪荷重"
+  ],
+  "text_raw": "積雪荷重は、積雪の単位荷重に屋根の水平投影面積及びその地方における垂直積雪量を乗じて計算しなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "building",
+          "value": "構造計算を要する建築物"
+        }
+      ],
+      "note": "積雪荷重の計算は構造計算を要する建築物に適用"
+    },
+    "judgment_rule": {
+      "operator": "GTE",
+      "lhs": {
+        "ref": "info-design-snow-load"
+      },
+      "rhs": {
+        "ref": "info-calculated-snow-load"
+      }
+    },
+    "exceptions": null
+  },
+  "flow_diagram": {
+    "title": "積雪荷重計算適合判定フロー",
+    "description": "令第86条第1項に基づく積雪荷重計算の適合判定フローチャート",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "積雪荷重計算の適合判定を開始"
+      },
+      {
+        "id": "dec-scope",
+        "type": "decision",
+        "title": "構造計算を要する建築物か？",
+        "decision_type": "binary",
+        "description": "積雪荷重の計算が適用される建築物かどうかを判定"
+      },
+      {
+        "id": "proc-identify-roof",
+        "type": "process",
+        "title": "建築物の屋根を特定",
+        "process_type": "undefined_input",
+        "description": "積雪荷重計算の対象となる屋根を特定する"
+      },
+      {
+        "id": "proc-get-roof-area",
+        "type": "process",
+        "title": "水平投影面積を取得",
+        "process_type": "undefined_input",
+        "description": "設計図書から屋根の水平投影面積(A)を読み取る"
+      },
+      {
+        "id": "info-roof-area",
+        "type": "information",
+        "title": "屋根の水平投影面積 A [m2]",
+        "symbol": "A",
+        "subject": "屋根",
+        "property": "水平投影面積",
+        "property_type": "numeric",
+        "description": "屋根の水平投影面積"
+      },
+      {
+        "id": "proc-get-unit-weight",
+        "type": "process",
+        "title": "積雪の単位荷重を取得",
+        "process_type": "undefined_input",
+        "description": "特定行政庁が定める積雪の単位荷重を確認する（令第86条第2項参照）",
+        "related_articles": ["令::A86:P2"]
+      },
+      {
+        "id": "info-unit-weight",
+        "type": "information",
+        "title": "積雪の単位荷重 w [N/m2/cm]",
+        "symbol": "w",
+        "subject": "地方",
+        "property": "積雪の単位荷重",
+        "property_type": "numeric",
+        "description": "積雪量1cmごとの1平方メートル当たりの荷重（20N/m2/cm以上）"
+      },
+      {
+        "id": "proc-get-snow-depth",
+        "type": "process",
+        "title": "垂直積雪量を取得",
+        "process_type": "undefined_input",
+        "description": "特定行政庁が規則で定める垂直積雪量を確認する（令第86条第3項参照）",
+        "related_articles": ["令::A86:P3"]
+      },
+      {
+        "id": "info-snow-depth",
+        "type": "information",
+        "title": "垂直積雪量 d [cm]",
+        "symbol": "d",
+        "subject": "地方",
+        "property": "垂直積雪量",
+        "property_type": "numeric",
+        "description": "国土交通大臣が定める基準に基づいて特定行政庁が規則で定める数値"
+      },
+      {
+        "id": "proc-calculate-snow-load",
+        "type": "process",
+        "title": "積雪荷重を計算: Sc = w × d × A",
+        "process_type": "mechanical",
+        "description": "積雪の単位荷重、垂直積雪量、屋根の水平投影面積を乗じて積雪荷重を計算"
+      },
+      {
+        "id": "info-calculated-snow-load",
+        "type": "information",
+        "title": "計算積雪荷重 Sc [N]",
+        "symbol": "Sc",
+        "subject": "屋根",
+        "property": "計算積雪荷重",
+        "property_type": "numeric",
+        "description": "令第86条第1項に基づき計算された積雪荷重"
+      },
+      {
+        "id": "proc-get-design-load",
+        "type": "process",
+        "title": "設計積雪荷重を取得",
+        "process_type": "undefined_input",
+        "description": "構造計算書から設計に用いられている積雪荷重を読み取る"
+      },
+      {
+        "id": "info-design-snow-load",
+        "type": "information",
+        "title": "設計積雪荷重 Sd [N]",
+        "symbol": "Sd",
+        "subject": "屋根",
+        "property": "設計積雪荷重",
+        "property_type": "numeric",
+        "description": "構造計算に用いられている積雪荷重"
+      },
+      {
+        "id": "dec-compliance",
+        "type": "decision",
+        "title": "Sd ≧ Sc か？",
+        "decision_type": "binary",
+        "description": "設計積雪荷重が計算積雪荷重以上であることを確認",
+        "condition": {
+          "operator": "GTE",
+          "lhs": {
+            "var": "Sd",
+            "desc": "設計積雪荷重"
+          },
+          "rhs": {
+            "var": "Sc",
+            "desc": "計算積雪荷重",
+            "unit": "N"
+          }
+        }
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令第86条第1項の積雪荷重計算規定に適合"
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "令第86条第1項の積雪荷重計算規定に不適合"
+      },
+      {
+        "id": "end-not-applicable",
+        "type": "terminal",
+        "title": "適用対象外",
+        "result": "end",
+        "description": "構造計算を要しない建築物のため本条項は適用対象外"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-scope",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-scope",
+        "to": "proc-identify-roof",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "dec-scope",
+        "to": "end-not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e04",
+        "from": "proc-identify-roof",
+        "to": "proc-get-roof-area",
+        "role": "flow"
+      },
+      {
+        "id": "e05",
+        "from": "proc-get-roof-area",
+        "to": "info-roof-area",
+        "role": "output"
+      },
+      {
+        "id": "e06",
+        "from": "info-roof-area",
+        "to": "proc-get-unit-weight",
+        "role": "flow"
+      },
+      {
+        "id": "e07",
+        "from": "proc-get-unit-weight",
+        "to": "info-unit-weight",
+        "role": "output"
+      },
+      {
+        "id": "e08",
+        "from": "info-unit-weight",
+        "to": "proc-get-snow-depth",
+        "role": "flow"
+      },
+      {
+        "id": "e09",
+        "from": "proc-get-snow-depth",
+        "to": "info-snow-depth",
+        "role": "output"
+      },
+      {
+        "id": "e10",
+        "from": "info-snow-depth",
+        "to": "proc-calculate-snow-load",
+        "role": "flow"
+      },
+      {
+        "id": "e11",
+        "from": "proc-calculate-snow-load",
+        "to": "info-calculated-snow-load",
+        "role": "output"
+      },
+      {
+        "id": "e12",
+        "from": "info-calculated-snow-load",
+        "to": "proc-get-design-load",
+        "role": "flow"
+      },
+      {
+        "id": "e13",
+        "from": "proc-get-design-load",
+        "to": "info-design-snow-load",
+        "role": "output"
+      },
+      {
+        "id": "e14",
+        "from": "info-design-snow-load",
+        "to": "dec-compliance",
+        "role": "flow"
+      },
+      {
+        "id": "e15",
+        "from": "dec-compliance",
+        "to": "end-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e16",
+        "from": "dec-compliance",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-ORDER-A86-P1",
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": [
+        "A86:P2",
+        "A86:P3"
+      ],
+      "description": "積雪の単位荷重（第2項）と垂直積雪量（第3項）の定義"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T12:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

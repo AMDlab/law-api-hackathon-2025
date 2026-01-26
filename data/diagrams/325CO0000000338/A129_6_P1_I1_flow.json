@@ -1,0 +1,293 @@
+{
+  "id": "A129_6_P1_I1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "エレベーターかご各部の衝撃安全性検証フロー",
+    "target_subject": "エレベーターのかご",
+    "description": "かご各部が国土交通大臣が定めた構造方法を用いているかの適合判定フロー"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "129_6",
+    "paragraph": "1",
+    "item": "1"
+  },
+  "labels": [
+    "エレベーター",
+    "かご",
+    "衝撃安全",
+    "告示仕様"
+  ],
+  "text_raw": "各部は、かご内の人又は物による衝撃に対して安全なものとして国土交通大臣が定めた構造方法を用いるものとすること。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "equipment_type",
+          "value": "エレベーター"
+        }
+      ],
+      "note": "法第34条第2項に規定するエレベーターに適用"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "construction_method",
+          "condition": "国土交通大臣が定めた構造方法を用いているか"
+        },
+        {
+          "type": "safety",
+          "condition": "かご内の人又は物による衝撃に対して安全か"
+        }
+      ]
+    }
+  },
+  "flow_diagram": {
+    "title": "令第129条の6第1項第1号 適合判定フロー",
+    "description": "エレベーターのかご各部が衝撃に対して安全な構造方法を用いているかの判定フロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "エレベーターのかご各部の適合判定を開始"
+      },
+      {
+        "id": "dec-elevator-exists",
+        "type": "decision",
+        "title": "エレベーターのかごが存在するか？",
+        "decision_type": "binary",
+        "description": "判定対象となるエレベーターのかごが建築物に設けられているかを確認"
+      },
+      {
+        "id": "proc-identify-parts",
+        "type": "process",
+        "title": "かご各部の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書からかごの各部（床、壁、天井、出入口等）を特定する"
+      },
+      {
+        "id": "dec-parts-identified",
+        "type": "decision",
+        "title": "各部の構成部位は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "床", "description": "かごの床部分" },
+          { "value": "壁", "description": "かごの壁部分" },
+          { "value": "天井", "description": "かごの天井部分" },
+          { "value": "出入口", "description": "かごの出入口部分" },
+          { "value": "その他", "description": "その他の部位" }
+        ],
+        "description": "特定されたかごの各部の構成部位を確認"
+      },
+      {
+        "id": "proc-identify-structure",
+        "type": "process",
+        "title": "構造方法の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書から各部に用いられている構造方法を読み取る"
+      },
+      {
+        "id": "dec-notice-compliance",
+        "type": "decision",
+        "title": "告示仕様に適合しているか？",
+        "decision_type": "binary",
+        "description": "各部が平成20年国土交通省告示第1455号に定める構造方法に適合しているか確認",
+        "related_articles": ["告示::H20国交告1455"]
+      },
+      {
+        "id": "proc-part-compliant",
+        "type": "process",
+        "title": "当該部位は適合",
+        "process_type": "mechanical",
+        "description": "当該部位が告示仕様に適合していることを記録"
+      },
+      {
+        "id": "dec-more-parts",
+        "type": "decision",
+        "title": "未確認の部位があるか？",
+        "decision_type": "binary",
+        "description": "まだ確認していない部位が残っているか確認"
+      },
+      {
+        "id": "dec-all-parts-compliant",
+        "type": "decision",
+        "title": "すべての部位が適合か？",
+        "decision_type": "binary",
+        "description": "すべてのかご各部が告示仕様に適合しているかを総合判定"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "かご各部が国土交通大臣が定めた構造方法を用いており、第1号に適合"
+      },
+      {
+        "id": "end-fail-no-elevator",
+        "type": "terminal",
+        "title": "対象外",
+        "result": "end",
+        "description": "エレベーターのかごが存在しないため、本規定の適用対象外"
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "かご各部が告示仕様に適合しておらず、第1号に不適合"
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge-start",
+        "from": "start",
+        "to": "dec-elevator-exists",
+        "role": "flow"
+      },
+      {
+        "id": "edge-no-elevator",
+        "from": "dec-elevator-exists",
+        "to": "end-fail-no-elevator",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "edge-has-elevator",
+        "from": "dec-elevator-exists",
+        "to": "proc-identify-parts",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "edge-to-parts-type",
+        "from": "proc-identify-parts",
+        "to": "dec-parts-identified",
+        "role": "flow"
+      },
+      {
+        "id": "edge-part-floor",
+        "from": "dec-parts-identified",
+        "to": "proc-identify-structure",
+        "role": "option",
+        "label": "床"
+      },
+      {
+        "id": "edge-part-wall",
+        "from": "dec-parts-identified",
+        "to": "proc-identify-structure",
+        "role": "option",
+        "label": "壁"
+      },
+      {
+        "id": "edge-part-ceiling",
+        "from": "dec-parts-identified",
+        "to": "proc-identify-structure",
+        "role": "option",
+        "label": "天井"
+      },
+      {
+        "id": "edge-part-entrance",
+        "from": "dec-parts-identified",
+        "to": "proc-identify-structure",
+        "role": "option",
+        "label": "出入口"
+      },
+      {
+        "id": "edge-part-other",
+        "from": "dec-parts-identified",
+        "to": "proc-identify-structure",
+        "role": "option",
+        "label": "その他"
+      },
+      {
+        "id": "edge-to-compliance",
+        "from": "proc-identify-structure",
+        "to": "dec-notice-compliance",
+        "role": "flow"
+      },
+      {
+        "id": "edge-compliant-part",
+        "from": "dec-notice-compliance",
+        "to": "proc-part-compliant",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "edge-not-compliant",
+        "from": "dec-notice-compliance",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "edge-check-more",
+        "from": "proc-part-compliant",
+        "to": "dec-more-parts",
+        "role": "flow"
+      },
+      {
+        "id": "edge-more-parts-yes",
+        "from": "dec-more-parts",
+        "to": "dec-parts-identified",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "edge-more-parts-no",
+        "from": "dec-more-parts",
+        "to": "dec-all-parts-compliant",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "edge-all-pass",
+        "from": "dec-all-parts-compliant",
+        "to": "end-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "edge-all-fail",
+        "from": "dec-all-parts-compliant",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-ORD-A129-6-P1-I1",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": ["A34:P2"],
+      "description": "高さ31メートル超の建築物に設けるエレベーターの規定"
+    },
+    {
+      "law_id": "告示",
+      "law_name": "平成20年国土交通省告示第1455号",
+      "law_type": "notice",
+      "relationship": "defines_detail",
+      "articles": [],
+      "description": "エレベーターのかごの各部の構造方法を定める件"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00Z",
+    "updated_at": "2026-01-26T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令",
+    "source": "kijo-diagram"
+  }
+}

@@ -1,0 +1,389 @@
+{
+  "id": "A126_6_P1_I3_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "非常用進入口の適用除外（吹抜き空間による代替）",
+    "target_subject": "階",
+    "description": "吹抜き空間と高い開放性を有する通路等の設置による非常用進入口設置義務の適用除外判定"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "126_6",
+    "paragraph": "1",
+    "item": "3"
+  },
+  "labels": [
+    "単体規定",
+    "避難",
+    "非常用進入口",
+    "適用除外",
+    "吹抜き空間"
+  ],
+  "text_raw": "三　吹抜きとなつている部分その他の一定の規模以上の空間で国土交通大臣が定めるものを確保し、当該空間から容易に各階に進入することができるよう、通路その他の部分であつて、当該空間との間に壁を有しないことその他の高い開放性を有するものとして、国土交通大臣が定めた構造方法を用いるもの又は国土交通大臣の認定を受けたものを設けている場合",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "building_attribute",
+          "value": "建築物の高さ31m以下の部分にある3階以上の階"
+        },
+        {
+          "type": "exclusion",
+          "value": "不燃性の物品の保管等の用途に供する階又は国土交通大臣が定める特別の理由により屋外からの進入を防止する必要がある階で、その直上階又は直下階から進入することができるものを除く"
+        }
+      ],
+      "note": "本文で非常用進入口の設置義務がある階を対象とする"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-space-compliance",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "ref": "info-passage-compliance",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "ref": "info-access-compliance",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "flow_diagram": {
+    "title": "令第126条の6第1項第3号 適合判定フロー",
+    "description": "吹抜き空間と高い開放性を有する通路等の設置による非常用進入口設置義務の適用除外を判定するフロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "第3号（吹抜き空間による代替）の適合判定を開始"
+      },
+      {
+        "id": "dec-floor-height",
+        "type": "decision",
+        "title": "建築物の高さ31m以下の部分に3階以上の階があるか？",
+        "decision_type": "binary",
+        "description": "非常用進入口設置義務の対象となる階の有無を確認"
+      },
+      {
+        "id": "dec-floor-exclusion",
+        "type": "decision",
+        "title": "不燃性物品保管等の用途の階で直上階又は直下階から進入可能か？",
+        "decision_type": "binary",
+        "description": "不燃性の物品の保管等の用途に供する階又は国土交通大臣が定める特別の理由により屋外からの進入を防止する必要がある階で、その直上階又は直下階から進入できる場合は対象外"
+      },
+      {
+        "id": "proc-floor-target",
+        "type": "process",
+        "title": "対象階を確定",
+        "process_type": "mechanical",
+        "description": "非常用進入口設置義務の対象となる階を確定"
+      },
+      {
+        "id": "dec-space-exists",
+        "type": "decision",
+        "title": "吹抜き空間等を確保しているか？",
+        "decision_type": "binary",
+        "description": "吹抜きとなっている部分その他の一定の規模以上の空間が確保されているか"
+      },
+      {
+        "id": "dec-space-scale",
+        "type": "decision",
+        "title": "空間は国土交通大臣が定める規模以上か？",
+        "decision_type": "binary",
+        "description": "確保した空間が国土交通大臣が定める一定の規模以上であることを確認"
+      },
+      {
+        "id": "proc-space-confirmed",
+        "type": "process",
+        "title": "空間規模を確認",
+        "process_type": "human_judgment",
+        "description": "吹抜き空間等が国土交通大臣が定める規模基準に適合することを確認"
+      },
+      {
+        "id": "dec-passage-exists",
+        "type": "decision",
+        "title": "通路等を設けているか？",
+        "decision_type": "binary",
+        "description": "空間から各階に進入するための通路その他の部分が設けられているか"
+      },
+      {
+        "id": "dec-passage-compliance-type",
+        "type": "decision",
+        "title": "通路等の適合方法は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "告示構造方法", "description": "国土交通大臣が定めた構造方法を用いるもの" },
+          { "value": "大臣認定", "description": "国土交通大臣の認定を受けたもの" },
+          { "value": "該当なし", "description": "いずれにも該当しない" }
+        ],
+        "description": "通路等が国土交通大臣が定めた構造方法又は大臣認定のいずれに該当するか"
+      },
+      {
+        "id": "dec-passage-structure",
+        "type": "decision",
+        "title": "高い開放性を有する構造方法に適合するか？",
+        "decision_type": "binary",
+        "description": "空間との間に壁を有しないことその他の高い開放性を有するものとして国土交通大臣が定めた構造方法に適合するか"
+      },
+      {
+        "id": "dec-passage-certification",
+        "type": "decision",
+        "title": "国土交通大臣の認定を受けたものか？",
+        "decision_type": "binary",
+        "description": "通路等が国土交通大臣の認定を受けたものであるか"
+      },
+      {
+        "id": "proc-passage-confirmed",
+        "type": "process",
+        "title": "通路等の適合を確認",
+        "process_type": "human_judgment",
+        "description": "通路等が高い開放性を有する構造方法又は大臣認定に適合することを確認"
+      },
+      {
+        "id": "dec-access-all-floors",
+        "type": "decision",
+        "title": "空間から容易に各対象階に進入できるか？",
+        "decision_type": "binary",
+        "description": "確保した空間から通路等を経て各対象階に容易に進入することができるかを確認"
+      },
+      {
+        "id": "proc-access-confirmed",
+        "type": "process",
+        "title": "各階進入可否を確認",
+        "process_type": "human_judgment",
+        "description": "各対象階について吹抜き空間から容易に進入できることを確認"
+      },
+      {
+        "id": "proc-item3-pass",
+        "type": "process",
+        "title": "第3号該当",
+        "process_type": "mechanical",
+        "description": "令第126条の6第1項第3号の基準に適合"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適用除外（第3号適合）",
+        "result": "pass",
+        "description": "吹抜き空間と高い開放性を有する通路等の設置により非常用進入口設置義務の適用除外"
+      },
+      {
+        "id": "end-not-applicable",
+        "type": "terminal",
+        "title": "対象外（本条の適用なし）",
+        "result": "end",
+        "description": "非常用進入口設置義務の対象とならない階のため、本号による適用除外判定は不要"
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "第3号不適合",
+        "result": "fail",
+        "description": "第3号（吹抜き空間による代替）の基準に不適合のため、他の方法による適合又は非常用進入口の設置が必要"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-floor-height",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-floor-height",
+        "to": "end-not-applicable",
+        "role": "no",
+        "label": "対象階なし"
+      },
+      {
+        "id": "e03",
+        "from": "dec-floor-height",
+        "to": "dec-floor-exclusion",
+        "role": "yes",
+        "label": "対象階あり"
+      },
+      {
+        "id": "e04",
+        "from": "dec-floor-exclusion",
+        "to": "end-not-applicable",
+        "role": "yes",
+        "label": "除外対象"
+      },
+      {
+        "id": "e05",
+        "from": "dec-floor-exclusion",
+        "to": "proc-floor-target",
+        "role": "no",
+        "label": "対象"
+      },
+      {
+        "id": "e06",
+        "from": "proc-floor-target",
+        "to": "dec-space-exists",
+        "role": "flow"
+      },
+      {
+        "id": "e07",
+        "from": "dec-space-exists",
+        "to": "end-fail",
+        "role": "no",
+        "label": "空間なし"
+      },
+      {
+        "id": "e08",
+        "from": "dec-space-exists",
+        "to": "dec-space-scale",
+        "role": "yes",
+        "label": "空間あり"
+      },
+      {
+        "id": "e09",
+        "from": "dec-space-scale",
+        "to": "end-fail",
+        "role": "no",
+        "label": "規模不足"
+      },
+      {
+        "id": "e10",
+        "from": "dec-space-scale",
+        "to": "proc-space-confirmed",
+        "role": "yes",
+        "label": "規模適合"
+      },
+      {
+        "id": "e11",
+        "from": "proc-space-confirmed",
+        "to": "dec-passage-exists",
+        "role": "flow"
+      },
+      {
+        "id": "e12",
+        "from": "dec-passage-exists",
+        "to": "end-fail",
+        "role": "no",
+        "label": "通路等なし"
+      },
+      {
+        "id": "e13",
+        "from": "dec-passage-exists",
+        "to": "dec-passage-compliance-type",
+        "role": "yes",
+        "label": "通路等あり"
+      },
+      {
+        "id": "e14",
+        "from": "dec-passage-compliance-type",
+        "to": "dec-passage-structure",
+        "role": "option",
+        "label": "告示構造方法"
+      },
+      {
+        "id": "e15",
+        "from": "dec-passage-compliance-type",
+        "to": "dec-passage-certification",
+        "role": "option",
+        "label": "大臣認定"
+      },
+      {
+        "id": "e16",
+        "from": "dec-passage-compliance-type",
+        "to": "end-fail",
+        "role": "option",
+        "label": "該当なし"
+      },
+      {
+        "id": "e17",
+        "from": "dec-passage-structure",
+        "to": "proc-passage-confirmed",
+        "role": "yes",
+        "label": "適合"
+      },
+      {
+        "id": "e18",
+        "from": "dec-passage-structure",
+        "to": "end-fail",
+        "role": "no",
+        "label": "不適合"
+      },
+      {
+        "id": "e19",
+        "from": "dec-passage-certification",
+        "to": "proc-passage-confirmed",
+        "role": "yes",
+        "label": "認定あり"
+      },
+      {
+        "id": "e20",
+        "from": "dec-passage-certification",
+        "to": "end-fail",
+        "role": "no",
+        "label": "認定なし"
+      },
+      {
+        "id": "e21",
+        "from": "proc-passage-confirmed",
+        "to": "dec-access-all-floors",
+        "role": "flow"
+      },
+      {
+        "id": "e22",
+        "from": "dec-access-all-floors",
+        "to": "proc-access-confirmed",
+        "role": "yes",
+        "label": "進入可"
+      },
+      {
+        "id": "e23",
+        "from": "dec-access-all-floors",
+        "to": "end-fail",
+        "role": "no",
+        "label": "進入不可"
+      },
+      {
+        "id": "e24",
+        "from": "proc-access-confirmed",
+        "to": "proc-item3-pass",
+        "role": "flow"
+      },
+      {
+        "id": "e25",
+        "from": "proc-item3-pass",
+        "to": "end-pass",
+        "role": "flow"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-ORDER-A126_6-P1-I3",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": ["A36"],
+      "description": "法第36条による政令への委任（避難・消火に関する技術的基準）"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

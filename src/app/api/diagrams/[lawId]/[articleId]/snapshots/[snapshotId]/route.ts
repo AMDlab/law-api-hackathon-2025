@@ -48,8 +48,9 @@ export async function POST(request: Request, { params }: RouteParams) {
       );
     }
 
+    const diagramKey = `${lawId}/${articleId}`;
     const diagram = await prisma.diagram.findUnique({
-      where: { diagramKey: articleId },
+      where: { diagramKey },
       include: {
         labels: true,
         relatedLaws: true,
@@ -63,7 +64,7 @@ export async function POST(request: Request, { params }: RouteParams) {
     }
 
     const snapshot = await prisma.diagramSnapshot.findFirst({
-      where: { id: snapshotId, diagramKey: articleId, diagramType },
+      where: { id: snapshotId, diagramKey, diagramType },
     });
 
     if (!snapshot) {

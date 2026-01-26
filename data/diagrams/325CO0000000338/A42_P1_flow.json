@@ -1,0 +1,600 @@
+{
+  "id": "A42_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "土台の設置",
+    "target_subject": "柱",
+    "description": "構造耐力上主要な部分である柱で最下階の部分に使用するものに土台を設けることを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "42",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造"
+  ],
+  "text_raw": "構造耐力上主要な部分である柱で最下階の部分に使用するものの下部には、土台を設けなければならない。ただし、次の各号のいずれかに該当する場合においては、この限りでない。一　当該柱を基礎に緊結した場合　二　平家建ての建築物（地盤が軟弱な区域として特定行政庁が国土交通大臣の定める基準に基づいて規則で指定する区域内にあるものを除く。次項において同じ。）で足固めを使用した場合　三　当該柱と基礎とをだぼ継ぎその他の国土交通大臣が定める構造方法により接合し、かつ、当該柱に構造耐力上支障のある引張応力が生じないことが国土交通大臣が定める方法によつて確かめられた場合",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "structural_member",
+          "value": "構造耐力上主要な部分である柱"
+        },
+        {
+          "type": "location",
+          "value": "最下階の部分に使用するもの"
+        }
+      ],
+      "note": "構造耐力上主要な部分である柱で最下階の部分に使用するもの"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "ref": "info-dodai-provided",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "ref": "info-exempt",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    },
+    "exceptions": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "note": "第1号: 当該柱を基礎に緊結した場合",
+          "ref": "info-kinketsu"
+        },
+        {
+          "note": "第2号: 平家建ての建築物で足固めを使用した場合（軟弱地盤区域除く）",
+          "operator": "AND",
+          "conditions": [
+            {
+              "ref": "info-stories",
+              "value": "平家建て"
+            },
+            {
+              "ref": "info-ashigatame",
+              "operator": "==",
+              "value": true
+            },
+            {
+              "ref": "info-soft-ground",
+              "operator": "==",
+              "value": false
+            }
+          ]
+        },
+        {
+          "note": "第3号: だぼ継ぎ等の構造方法で接合し、引張応力が生じないことを確認した場合",
+          "operator": "AND",
+          "conditions": [
+            {
+              "ref": "info-dabotsugi",
+              "operator": "==",
+              "value": true
+            },
+            {
+              "ref": "info-tensile-stress-check",
+              "operator": "==",
+              "value": true
+            }
+          ]
+        }
+      ],
+      "effect": "EXEMPT"
+    }
+  },
+  "flow_diagram": {
+    "title": "土台の設置 適合判定フロー",
+    "description": "構造耐力上主要な部分である柱で最下階の部分に使用するものについて、土台の設置または例外該当を判定する",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start"
+      },
+      {
+        "id": "proc-identify-pillars",
+        "type": "process",
+        "title": "柱の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の柱を特定する"
+      },
+      {
+        "id": "dec-pillars-exist",
+        "type": "decision",
+        "title": "柱が存在するか？",
+        "decision_type": "binary",
+        "description": "建築物に柱が存在するか確認"
+      },
+      {
+        "id": "proc-loop-start",
+        "type": "process",
+        "title": "各柱の判定開始",
+        "process_type": "mechanical",
+        "description": "柱に対して順次判定を行う"
+      },
+      {
+        "id": "dec-structural-member",
+        "type": "decision",
+        "title": "構造耐力上主要な部分の柱か？",
+        "decision_type": "binary",
+        "description": "当該柱が構造耐力上主要な部分であるか確認"
+      },
+      {
+        "id": "dec-lowest-floor",
+        "type": "decision",
+        "title": "最下階の部分に使用するものか？",
+        "decision_type": "binary",
+        "description": "当該柱が最下階の部分に使用するものか確認"
+      },
+      {
+        "id": "proc-scope-match",
+        "type": "process",
+        "title": "適用対象柱",
+        "process_type": "mechanical",
+        "description": "構造耐力上主要な部分である柱で最下階の部分に使用するものとして判定対象"
+      },
+      {
+        "id": "dec-dodai-provided",
+        "type": "decision",
+        "title": "土台が設けられているか？",
+        "decision_type": "binary",
+        "description": "当該柱の下部に土台が設けられているか確認",
+        "condition": {
+          "operator": "EQ",
+          "lhs": { "var": "D", "desc": "土台の設置" },
+          "rhs": { "value": true }
+        }
+      },
+      {
+        "id": "proc-dodai-ok",
+        "type": "process",
+        "title": "本則適合（土台設置）",
+        "process_type": "mechanical",
+        "description": "土台が設けられているため本則に適合"
+      },
+      {
+        "id": "dec-kinketsu",
+        "type": "decision",
+        "title": "基礎に緊結されているか？",
+        "decision_type": "binary",
+        "description": "当該柱が基礎に緊結されているか確認（第1号）",
+        "condition": {
+          "operator": "EQ",
+          "lhs": { "var": "K", "desc": "基礎への緊結" },
+          "rhs": { "value": true }
+        }
+      },
+      {
+        "id": "proc-exempt1",
+        "type": "process",
+        "title": "第1号該当",
+        "process_type": "mechanical",
+        "description": "当該柱を基礎に緊結した場合に該当"
+      },
+      {
+        "id": "dec-stories",
+        "type": "decision",
+        "title": "平家建てか？",
+        "decision_type": "binary",
+        "description": "建築物が平家建て（1階建て）か確認",
+        "condition": {
+          "operator": "EQ",
+          "lhs": { "var": "N", "desc": "階数" },
+          "rhs": { "value": 1, "unit": "階" }
+        }
+      },
+      {
+        "id": "dec-soft-ground",
+        "type": "decision",
+        "title": "軟弱地盤区域内か？",
+        "decision_type": "binary",
+        "description": "敷地が特定行政庁が規則で指定する軟弱地盤区域内にあるか確認",
+        "condition": {
+          "operator": "EQ",
+          "lhs": { "var": "G", "desc": "軟弱地盤区域該当" },
+          "rhs": { "value": true }
+        }
+      },
+      {
+        "id": "dec-ashigatame",
+        "type": "decision",
+        "title": "足固めを使用しているか？",
+        "decision_type": "binary",
+        "description": "建築物に足固めが使用されているか確認",
+        "condition": {
+          "operator": "EQ",
+          "lhs": { "var": "F", "desc": "足固めの使用" },
+          "rhs": { "value": true }
+        }
+      },
+      {
+        "id": "proc-exempt2",
+        "type": "process",
+        "title": "第2号該当",
+        "process_type": "mechanical",
+        "description": "平家建ての建築物（軟弱地盤区域除く）で足固めを使用した場合に該当"
+      },
+      {
+        "id": "dec-dabotsugi",
+        "type": "decision",
+        "title": "だぼ継ぎ等で接合しているか？",
+        "decision_type": "binary",
+        "description": "当該柱と基礎がだぼ継ぎその他の国土交通大臣が定める構造方法により接合されているか確認",
+        "condition": {
+          "operator": "EQ",
+          "lhs": { "var": "J", "desc": "だぼ継ぎ等による接合" },
+          "rhs": { "value": true }
+        }
+      },
+      {
+        "id": "dec-tensile-stress",
+        "type": "decision",
+        "title": "引張応力が生じないことを確認しているか？",
+        "decision_type": "binary",
+        "description": "構造耐力上支障のある引張応力が生じないことが国土交通大臣が定める方法によって確かめられているか確認",
+        "condition": {
+          "operator": "EQ",
+          "lhs": { "var": "T", "desc": "引張応力確認" },
+          "rhs": { "value": true }
+        }
+      },
+      {
+        "id": "proc-exempt3",
+        "type": "process",
+        "title": "第3号該当",
+        "process_type": "mechanical",
+        "description": "だぼ継ぎ等で接合し、引張応力が生じないことを確認した場合に該当"
+      },
+      {
+        "id": "proc-pillar-pass",
+        "type": "process",
+        "title": "当該柱 適合",
+        "process_type": "mechanical",
+        "description": "当該柱は土台設置または例外該当により適合"
+      },
+      {
+        "id": "proc-pillar-fail",
+        "type": "process",
+        "title": "当該柱 不適合",
+        "process_type": "mechanical",
+        "description": "当該柱は土台が設けられておらず、いずれの例外にも該当しない"
+      },
+      {
+        "id": "proc-pillar-na",
+        "type": "process",
+        "title": "当該柱 対象外",
+        "process_type": "mechanical",
+        "description": "当該柱は適用対象外（構造耐力上主要な部分でない、または最下階でない）"
+      },
+      {
+        "id": "dec-next-pillar",
+        "type": "decision",
+        "title": "未判定の柱があるか？",
+        "decision_type": "binary",
+        "description": "判定が完了していない柱が残っているか確認"
+      },
+      {
+        "id": "dec-any-target",
+        "type": "decision",
+        "title": "適用対象の柱があったか？",
+        "decision_type": "binary",
+        "description": "判定対象（構造耐力上主要な部分で最下階の柱）が存在したか確認"
+      },
+      {
+        "id": "dec-all-pass",
+        "type": "decision",
+        "title": "全ての対象柱が適合したか？",
+        "decision_type": "binary",
+        "description": "判定対象の全ての柱が適合しているか確認"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "全ての対象柱が令第42条第1項に適合"
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "一部または全ての対象柱が令第42条第1項に不適合"
+      },
+      {
+        "id": "end-na",
+        "type": "terminal",
+        "title": "対象外",
+        "result": "pass",
+        "description": "対象となる柱が存在しないため規定の適用対象外"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "proc-identify-pillars",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "proc-identify-pillars",
+        "to": "dec-pillars-exist",
+        "role": "flow"
+      },
+      {
+        "id": "e03",
+        "from": "dec-pillars-exist",
+        "to": "proc-loop-start",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e04",
+        "from": "dec-pillars-exist",
+        "to": "end-na",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e05",
+        "from": "proc-loop-start",
+        "to": "dec-structural-member",
+        "role": "flow"
+      },
+      {
+        "id": "e06",
+        "from": "dec-structural-member",
+        "to": "dec-lowest-floor",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e07",
+        "from": "dec-structural-member",
+        "to": "proc-pillar-na",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e08",
+        "from": "dec-lowest-floor",
+        "to": "proc-scope-match",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e09",
+        "from": "dec-lowest-floor",
+        "to": "proc-pillar-na",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e10",
+        "from": "proc-scope-match",
+        "to": "dec-dodai-provided",
+        "role": "flow"
+      },
+      {
+        "id": "e11",
+        "from": "dec-dodai-provided",
+        "to": "proc-dodai-ok",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e12",
+        "from": "dec-dodai-provided",
+        "to": "dec-kinketsu",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e13",
+        "from": "proc-dodai-ok",
+        "to": "proc-pillar-pass",
+        "role": "flow"
+      },
+      {
+        "id": "e14",
+        "from": "dec-kinketsu",
+        "to": "proc-exempt1",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e15",
+        "from": "dec-kinketsu",
+        "to": "dec-stories",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e16",
+        "from": "proc-exempt1",
+        "to": "proc-pillar-pass",
+        "role": "flow"
+      },
+      {
+        "id": "e17",
+        "from": "dec-stories",
+        "to": "dec-soft-ground",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e18",
+        "from": "dec-stories",
+        "to": "dec-dabotsugi",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e19",
+        "from": "dec-soft-ground",
+        "to": "dec-dabotsugi",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e20",
+        "from": "dec-soft-ground",
+        "to": "dec-ashigatame",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e21",
+        "from": "dec-ashigatame",
+        "to": "proc-exempt2",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e22",
+        "from": "dec-ashigatame",
+        "to": "dec-dabotsugi",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e23",
+        "from": "proc-exempt2",
+        "to": "proc-pillar-pass",
+        "role": "flow"
+      },
+      {
+        "id": "e24",
+        "from": "dec-dabotsugi",
+        "to": "dec-tensile-stress",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e25",
+        "from": "dec-dabotsugi",
+        "to": "proc-pillar-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e26",
+        "from": "dec-tensile-stress",
+        "to": "proc-exempt3",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e27",
+        "from": "dec-tensile-stress",
+        "to": "proc-pillar-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e28",
+        "from": "proc-exempt3",
+        "to": "proc-pillar-pass",
+        "role": "flow"
+      },
+      {
+        "id": "e29",
+        "from": "proc-pillar-pass",
+        "to": "dec-next-pillar",
+        "role": "flow"
+      },
+      {
+        "id": "e30",
+        "from": "proc-pillar-fail",
+        "to": "dec-next-pillar",
+        "role": "flow"
+      },
+      {
+        "id": "e31",
+        "from": "proc-pillar-na",
+        "to": "dec-next-pillar",
+        "role": "flow"
+      },
+      {
+        "id": "e32",
+        "from": "dec-next-pillar",
+        "to": "proc-loop-start",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e33",
+        "from": "dec-next-pillar",
+        "to": "dec-any-target",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e34",
+        "from": "dec-any-target",
+        "to": "dec-all-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e35",
+        "from": "dec-any-target",
+        "to": "end-na",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e36",
+        "from": "dec-all-pass",
+        "to": "end-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e37",
+        "from": "dec-all-pass",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSO-A42-P1",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": [
+        "A20"
+      ],
+      "description": "法第20条（構造耐力）の委任を受けた技術的基準"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T12:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令",
+    "checklist_ref": "確認審査報告書チェックリスト"
+  }
+}

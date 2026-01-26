@@ -1,0 +1,354 @@
+{
+  "id": "A20_3_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "火を使用する室における換気設備設置義務の除外",
+    "target_subject": "室",
+    "description": "法第28条第3項の規定により換気設備設置を要しない室の判定フロー"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "20の3",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "換気設備"
+  ],
+  "text_raw": "法第二十八条第三項の規定により政令で定める室は、次に掲げるものとする。\n一 火を使用する設備又は器具で直接屋外から空気を取り入れ、かつ、廃ガスその他の生成物を直接屋外に排出する構造を有するものその他室内の空気を汚染するおそれがないもの（以下この項及び次項において「密閉式燃焼器具等」という。）以外の火を使用する設備又は器具を設けていない室\n二 床面積の合計が百平方メートル以内の住宅又は住戸に設けられた調理室（発熱量の合計（密閉式燃焼器具等又は煙突を設けた設備若しくは器具に係るものを除く。次号において同じ。）が十二キロワット以下の火を使用する設備又は器具を設けたものに限る。）で、当該調理室の床面積の十分の一（〇・八平方メートル未満のときは、〇・八平方メートルとする。）以上の有効開口面積を有する窓その他の開口部を換気上有効に設けたもの\n三 発熱量の合計が六キロワット以下の火を使用する設備又は器具を設けた室（調理室を除く。）で換気上有効な開口部を設けたもの",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "law_reference",
+          "value": "法第28条第3項に定める換気設備設置義務の適用対象となる室",
+          "description": "火を使用する設備又は器具を設けた室が対象"
+        }
+      ],
+      "note": "法第28条第3項に基づく換気設備設置義務の除外規定"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "type": "exemption",
+          "item": "一号",
+          "value": "密閉式燃焼器具等以外の火使用設備・器具を設けていない室"
+        },
+        {
+          "type": "exemption",
+          "item": "二号",
+          "value": "一定条件を満たす住宅・住戸の調理室"
+        },
+        {
+          "type": "exemption",
+          "item": "三号",
+          "value": "発熱量6kW以下で換気上有効な開口部を設けた室"
+        }
+      ]
+    },
+    "exceptions": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "regulation_exemption",
+          "value": "換気設備設置義務が免除される"
+        }
+      ],
+      "effect": "EXEMPT",
+      "description": "第一号から第三号のいずれかに該当する室は換気設備設置を要しない"
+    }
+  },
+  "flow_diagram": {
+    "title": "令第20条の3第1項 換気設備設置義務除外判定フロー",
+    "description": "火を使用する室が換気設備設置義務の除外対象となるかを判定するフロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "換気設備設置義務除外判定の開始"
+      },
+      {
+        "id": "decision-equipment-type",
+        "type": "decision",
+        "title": "設備・器具の種類は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "密閉式燃焼器具等のみ" },
+          { "value": "火使用設備なし" },
+          { "value": "その他の火使用設備あり" }
+        ],
+        "description": "室に設ける火を使用する設備・器具の種類を確認",
+        "related_articles": ["令20の3:P1:I1"]
+      },
+      {
+        "id": "process-item1-satisfied",
+        "type": "process",
+        "title": "一号に該当",
+        "process_type": "mechanical",
+        "description": "密閉式燃焼器具等以外の火使用設備を設けていない室として一号に該当"
+      },
+      {
+        "id": "decision-room-use",
+        "type": "decision",
+        "title": "室の用途は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "調理室" },
+          { "value": "調理室以外" }
+        ],
+        "description": "室の用途を確認",
+        "related_articles": ["令20の3:P1:I2", "令20の3:P1:I3"]
+      },
+      {
+        "id": "decision-dwelling-area",
+        "type": "decision",
+        "title": "住宅・住戸の床面積合計 <= 100m2か？",
+        "decision_type": "binary",
+        "description": "当該室を含む住宅又は住戸の床面積合計が100m2以内か確認",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "DA", "desc": "住宅床面積合計" },
+          "rhs": { "value": 100, "unit": "m2" }
+        },
+        "related_articles": ["令20の3:P1:I2"]
+      },
+      {
+        "id": "decision-heat-output-12kw",
+        "type": "decision",
+        "title": "発熱量合計 <= 12kWか？",
+        "decision_type": "binary",
+        "description": "火を使用する設備・器具の発熱量合計が12kW以下か確認",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "H", "desc": "発熱量合計" },
+          "rhs": { "value": 12, "unit": "kW" }
+        },
+        "related_articles": ["令20の3:P1:I2"]
+      },
+      {
+        "id": "process-calc-required-opening",
+        "type": "process",
+        "title": "必要開口面積を算定",
+        "process_type": "mechanical",
+        "description": "室床面積の1/10を算定（0.8m2未満の場合は0.8m2）"
+      },
+      {
+        "id": "decision-opening-area",
+        "type": "decision",
+        "title": "有効開口面積 >= 必要開口面積か？",
+        "decision_type": "binary",
+        "description": "開口部の有効開口面積が必要開口面積以上か確認",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "OA", "desc": "有効開口面積" },
+          "rhs": { "var": "ROA", "desc": "必要開口面積" }
+        },
+        "related_articles": ["令20の3:P1:I2"]
+      },
+      {
+        "id": "process-item2-satisfied",
+        "type": "process",
+        "title": "二号に該当",
+        "process_type": "mechanical",
+        "description": "一定条件を満たす住宅・住戸の調理室として二号に該当"
+      },
+      {
+        "id": "decision-heat-output-6kw",
+        "type": "decision",
+        "title": "発熱量合計 <= 6kWか？",
+        "decision_type": "binary",
+        "description": "火を使用する設備・器具の発熱量合計が6kW以下か確認",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "H", "desc": "発熱量合計" },
+          "rhs": { "value": 6, "unit": "kW" }
+        },
+        "related_articles": ["令20の3:P1:I3"]
+      },
+      {
+        "id": "decision-ventilation-opening",
+        "type": "decision",
+        "title": "換気上有効な開口部があるか？",
+        "decision_type": "binary",
+        "description": "換気上有効な開口部が設けられているか確認",
+        "related_articles": ["令20の3:P1:I3"]
+      },
+      {
+        "id": "process-item3-satisfied",
+        "type": "process",
+        "title": "三号に該当",
+        "process_type": "mechanical",
+        "description": "発熱量6kW以下で換気上有効な開口部を設けた室として三号に該当"
+      },
+      {
+        "id": "terminal-exempt",
+        "type": "terminal",
+        "title": "換気設備設置義務免除",
+        "result": "pass",
+        "description": "一号～三号のいずれかに該当し、換気設備設置義務が免除される"
+      },
+      {
+        "id": "terminal-not-exempt",
+        "type": "terminal",
+        "title": "換気設備設置義務あり",
+        "result": "fail",
+        "description": "いずれの号にも該当せず、換気設備設置が必要"
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge-001",
+        "from": "start",
+        "to": "decision-equipment-type",
+        "role": "flow"
+      },
+      {
+        "id": "edge-002",
+        "from": "decision-equipment-type",
+        "to": "process-item1-satisfied",
+        "role": "option",
+        "label": "密閉式燃焼器具等のみ"
+      },
+      {
+        "id": "edge-003",
+        "from": "decision-equipment-type",
+        "to": "process-item1-satisfied",
+        "role": "option",
+        "label": "火使用設備なし"
+      },
+      {
+        "id": "edge-004",
+        "from": "decision-equipment-type",
+        "to": "decision-room-use",
+        "role": "option",
+        "label": "その他の火使用設備あり"
+      },
+      {
+        "id": "edge-005",
+        "from": "process-item1-satisfied",
+        "to": "terminal-exempt",
+        "role": "flow"
+      },
+      {
+        "id": "edge-006",
+        "from": "decision-room-use",
+        "to": "decision-dwelling-area",
+        "role": "option",
+        "label": "調理室"
+      },
+      {
+        "id": "edge-007",
+        "from": "decision-room-use",
+        "to": "decision-heat-output-6kw",
+        "role": "option",
+        "label": "調理室以外"
+      },
+      {
+        "id": "edge-008",
+        "from": "decision-dwelling-area",
+        "to": "decision-heat-output-12kw",
+        "role": "yes"
+      },
+      {
+        "id": "edge-009",
+        "from": "decision-dwelling-area",
+        "to": "terminal-not-exempt",
+        "role": "no"
+      },
+      {
+        "id": "edge-010",
+        "from": "decision-heat-output-12kw",
+        "to": "process-calc-required-opening",
+        "role": "yes"
+      },
+      {
+        "id": "edge-011",
+        "from": "decision-heat-output-12kw",
+        "to": "terminal-not-exempt",
+        "role": "no"
+      },
+      {
+        "id": "edge-012",
+        "from": "process-calc-required-opening",
+        "to": "decision-opening-area",
+        "role": "flow"
+      },
+      {
+        "id": "edge-013",
+        "from": "decision-opening-area",
+        "to": "process-item2-satisfied",
+        "role": "yes"
+      },
+      {
+        "id": "edge-014",
+        "from": "decision-opening-area",
+        "to": "terminal-not-exempt",
+        "role": "no"
+      },
+      {
+        "id": "edge-015",
+        "from": "process-item2-satisfied",
+        "to": "terminal-exempt",
+        "role": "flow"
+      },
+      {
+        "id": "edge-016",
+        "from": "decision-heat-output-6kw",
+        "to": "decision-ventilation-opening",
+        "role": "yes"
+      },
+      {
+        "id": "edge-017",
+        "from": "decision-heat-output-6kw",
+        "to": "terminal-not-exempt",
+        "role": "no"
+      },
+      {
+        "id": "edge-018",
+        "from": "decision-ventilation-opening",
+        "to": "process-item3-satisfied",
+        "role": "yes"
+      },
+      {
+        "id": "edge-019",
+        "from": "decision-ventilation-opening",
+        "to": "terminal-not-exempt",
+        "role": "no"
+      },
+      {
+        "id": "edge-020",
+        "from": "process-item3-satisfied",
+        "to": "terminal-exempt",
+        "role": "flow"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-KIJO-A20_3-P1",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": ["A28:P3"],
+      "description": "法第28条第3項が政令で定める室を本条で規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00Z",
+    "updated_at": "2026-01-26T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令",
+    "checklist_ref": "確認審査報告書チェックリスト"
+  }
+}

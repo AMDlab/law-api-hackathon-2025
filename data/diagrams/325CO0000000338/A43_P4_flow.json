@@ -1,0 +1,318 @@
+{
+  "id": "A43_P4_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "柱の欠き取り部分の補強",
+    "target_subject": "柱",
+    "description": "構造耐力上主要な部分である柱の所要断面積の三分の一以上を欠き取る場合の補強要件判定フロー"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "43",
+    "paragraph": "4",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造強度",
+    "木造"
+  ],
+  "text_raw": "前三項の規定による柱の小径に基づいて算定した柱の所要断面積の三分の一以上を欠き取る場合においては、その部分を補強しなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "subject_type",
+          "value": "構造耐力上主要な部分である柱"
+        },
+        {
+          "type": "condition",
+          "value": "柱の所要断面積の三分の一以上を欠き取る場合"
+        }
+      ],
+      "note": "前三項（令第43条第1項〜第3項）の規定による柱の小径に基づいて算定した所要断面積が基準"
+    },
+    "judgment_rule": {
+      "operator": "IMPLIES",
+      "lhs": {
+        "type": "proposition",
+        "value": "欠き取り面積が所要断面積の三分の一以上である"
+      },
+      "rhs": {
+        "type": "proposition",
+        "value": "その部分を補強する"
+      }
+    }
+  },
+  "flow_diagram": {
+    "title": "令第43条第4項 柱の欠き取り補強 適合判定フロー",
+    "description": "構造耐力上主要な部分である柱の欠き取り面積が所要断面積の1/3以上の場合、補強の要否を判定するフロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start"
+      },
+      {
+        "id": "dec-column-exists",
+        "type": "decision",
+        "title": "構造耐力上主要な柱が存在するか？",
+        "decision_type": "binary",
+        "description": "対象建築物に構造耐力上主要な部分である柱が存在するか確認"
+      },
+      {
+        "id": "proc-identify-column",
+        "type": "process",
+        "title": "構造耐力上主要な柱を特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から構造耐力上主要な部分である柱を特定する"
+      },
+      {
+        "id": "proc-calc-required-area",
+        "type": "process",
+        "title": "柱の所要断面積を算定",
+        "process_type": "mechanical",
+        "description": "前三項の規定による柱の小径に基づいて所要断面積 A_req = d_x × d_y を算定",
+        "related_articles": ["令第43条第1項", "令第43条第2項", "令第43条第3項"]
+      },
+      {
+        "id": "dec-notch-exists",
+        "type": "decision",
+        "title": "柱に欠き取り部分が存在するか？",
+        "decision_type": "binary",
+        "description": "対象柱に欠き取り部分が存在するか確認"
+      },
+      {
+        "id": "proc-identify-notch",
+        "type": "process",
+        "title": "欠き取り部分を特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から柱の欠き取り部分を特定し、欠き取り面積A_notchを算定"
+      },
+      {
+        "id": "proc-calc-ratio",
+        "type": "process",
+        "title": "欠き取り比率を算定",
+        "process_type": "mechanical",
+        "description": "欠き取り比率 R = A_notch / A_req を算定"
+      },
+      {
+        "id": "dec-ratio-threshold",
+        "type": "decision",
+        "title": "欠き取り比率 >= 1/3 か？",
+        "decision_type": "binary",
+        "description": "欠き取り面積が所要断面積の三分の一以上であるか判定",
+        "condition": {
+          "operator": "GTE",
+          "lhs": {
+            "var": "R",
+            "desc": "欠き取り比率"
+          },
+          "rhs": {
+            "value": 0.333,
+            "desc": "1/3"
+          }
+        }
+      },
+      {
+        "id": "proc-reinforce-required",
+        "type": "process",
+        "title": "補強が必要",
+        "process_type": "mechanical",
+        "description": "欠き取り面積が所要断面積の1/3以上のため、補強が必要と判定"
+      },
+      {
+        "id": "dec-reinforced",
+        "type": "decision",
+        "title": "欠き取り部分が補強されているか？",
+        "decision_type": "binary",
+        "description": "設計図書等から欠き取り部分に補強がなされているかを確認"
+      },
+      {
+        "id": "proc-column-pass",
+        "type": "process",
+        "title": "当該柱は適合",
+        "process_type": "mechanical",
+        "description": "当該柱について本条項の要件を満たす"
+      },
+      {
+        "id": "dec-more-columns",
+        "type": "decision",
+        "title": "他に確認すべき柱があるか？",
+        "decision_type": "binary",
+        "description": "他の構造耐力上主要な柱について確認が必要か"
+      },
+      {
+        "id": "proc-all-columns-pass",
+        "type": "process",
+        "title": "全ての柱について確認完了",
+        "process_type": "mechanical",
+        "description": "全ての構造耐力上主要な柱について適合性を確認完了"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令第43条第4項に適合"
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "欠き取り部分の補強がなされていないため、令第43条第4項に不適合"
+      },
+      {
+        "id": "end-not-applicable",
+        "type": "terminal",
+        "title": "適用除外",
+        "result": "pass",
+        "description": "構造耐力上主要な柱が存在しないため、本条項は適用されない"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-column-exists",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-column-exists",
+        "to": "proc-identify-column",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "dec-column-exists",
+        "to": "end-not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e04",
+        "from": "proc-identify-column",
+        "to": "proc-calc-required-area",
+        "role": "flow"
+      },
+      {
+        "id": "e05",
+        "from": "proc-calc-required-area",
+        "to": "dec-notch-exists",
+        "role": "flow"
+      },
+      {
+        "id": "e06",
+        "from": "dec-notch-exists",
+        "to": "proc-identify-notch",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e07",
+        "from": "dec-notch-exists",
+        "to": "proc-column-pass",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e08",
+        "from": "proc-identify-notch",
+        "to": "proc-calc-ratio",
+        "role": "flow"
+      },
+      {
+        "id": "e09",
+        "from": "proc-calc-ratio",
+        "to": "dec-ratio-threshold",
+        "role": "flow"
+      },
+      {
+        "id": "e10",
+        "from": "dec-ratio-threshold",
+        "to": "proc-reinforce-required",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e11",
+        "from": "dec-ratio-threshold",
+        "to": "proc-column-pass",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e12",
+        "from": "proc-reinforce-required",
+        "to": "dec-reinforced",
+        "role": "flow"
+      },
+      {
+        "id": "e13",
+        "from": "dec-reinforced",
+        "to": "proc-column-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e14",
+        "from": "dec-reinforced",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e15",
+        "from": "proc-column-pass",
+        "to": "dec-more-columns",
+        "role": "flow"
+      },
+      {
+        "id": "e16",
+        "from": "dec-more-columns",
+        "to": "proc-identify-column",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e17",
+        "from": "dec-more-columns",
+        "to": "proc-all-columns-pass",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e18",
+        "from": "proc-all-columns-pass",
+        "to": "end-pass",
+        "role": "flow"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "A43_P4_kijo",
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": ["第43条第1項", "第43条第2項", "第43条第3項"],
+      "description": "前三項の規定による柱の小径を参照して所要断面積を算定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00+09:00",
+    "author": "Claude",
+    "generator": "flow-generator-skill",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

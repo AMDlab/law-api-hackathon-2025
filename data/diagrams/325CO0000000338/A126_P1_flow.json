@@ -1,0 +1,352 @@
+{
+  "id": "A126_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "屋上広場等の手すり",
+    "target_subject": "屋上広場・バルコニー等",
+    "description": "屋上広場又は二階以上の階にあるバルコニー等の周囲における手すり壁等の高さ基準"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "126",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "安全",
+    "手すり"
+  ],
+  "text_raw": "屋上広場又は二階以上の階にあるバルコニーその他これに類するものの周囲には、安全上必要な高さが一・一メートル以上の手すり壁、さく又は金網を設けなければならない。",
+  "kijo_diagram_ref": "CHK-BSL-ORD-A126-P1",
+  "flow_diagram": {
+    "title": "屋上広場等の手すり適合判定フロー",
+    "description": "屋上広場又は二階以上のバルコニー等の周囲における手すり壁等の高さ基準への適合判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start"
+      },
+      {
+        "id": "dec-rooftop-exists",
+        "type": "decision",
+        "title": "屋上広場があるか？",
+        "decision_type": "binary",
+        "description": "建築物に屋上広場が設けられているかを確認"
+      },
+      {
+        "id": "proc-rooftop-identified",
+        "type": "process",
+        "title": "屋上広場を対象箇所に追加",
+        "process_type": "mechanical",
+        "description": "屋上広場を手すり設置対象箇所として記録"
+      },
+      {
+        "id": "dec-balcony-exists",
+        "type": "decision",
+        "title": "二階以上にバルコニー等があるか？",
+        "decision_type": "binary",
+        "description": "二階以上の階にバルコニーその他これに類するものがあるかを確認"
+      },
+      {
+        "id": "proc-balcony-identified",
+        "type": "process",
+        "title": "バルコニー等を対象箇所に追加",
+        "process_type": "mechanical",
+        "description": "二階以上のバルコニー等を手すり設置対象箇所として記録"
+      },
+      {
+        "id": "dec-target-exists",
+        "type": "decision",
+        "title": "対象箇所があるか？",
+        "decision_type": "binary",
+        "description": "屋上広場またはバルコニー等の対象箇所が存在するかを確認"
+      },
+      {
+        "id": "end-not-applicable",
+        "type": "terminal",
+        "title": "規定適用外",
+        "result": "pass",
+        "description": "屋上広場もバルコニー等もないため本規定は適用されない"
+      },
+      {
+        "id": "dec-handrail-exists",
+        "type": "decision",
+        "title": "対象箇所の周囲に手すり壁等があるか？",
+        "decision_type": "binary",
+        "description": "対象箇所の周囲に手すり壁、さく又は金網が設けられているかを確認"
+      },
+      {
+        "id": "end-no-handrail",
+        "type": "terminal",
+        "title": "不適合（手すり壁等なし）",
+        "result": "fail",
+        "description": "対象箇所の周囲に手すり壁等が設けられていない"
+      },
+      {
+        "id": "dec-handrail-type",
+        "type": "decision",
+        "title": "手すり壁等の種類は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "手すり壁", "description": "壁状の手すり" },
+          { "value": "さく", "description": "柵状の囲い" },
+          { "value": "金網", "description": "金属製の網" }
+        ],
+        "description": "周囲に設けられた手すり壁等の種類を確認"
+      },
+      {
+        "id": "proc-type-confirmed",
+        "type": "process",
+        "title": "手すり壁等の種類を確認",
+        "process_type": "mechanical",
+        "description": "手すり壁、さく又は金網のいずれかであることを確認"
+      },
+      {
+        "id": "dec-height-measurable",
+        "type": "decision",
+        "title": "安全上必要な高さを測定できるか？",
+        "decision_type": "binary",
+        "description": "手すり壁等の安全上必要な高さが測定可能かを確認"
+      },
+      {
+        "id": "end-unmeasurable",
+        "type": "terminal",
+        "title": "不適合（高さ測定不可）",
+        "result": "fail",
+        "description": "手すり壁等の高さを測定できない"
+      },
+      {
+        "id": "dec-height-check",
+        "type": "decision",
+        "title": "高さは1.1m以上か？",
+        "decision_type": "binary",
+        "description": "手すり壁等の安全上必要な高さが1.1m以上であるかを判定",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "H", "desc": "手すり壁等の高さ" },
+          "rhs": { "value": 1.1, "unit": "m", "desc": "最低高さ基準" }
+        }
+      },
+      {
+        "id": "end-height-fail",
+        "type": "terminal",
+        "title": "不適合（高さ不足）",
+        "result": "fail",
+        "description": "手すり壁等の高さが1.1m未満である"
+      },
+      {
+        "id": "proc-height-ok",
+        "type": "process",
+        "title": "当該箇所は高さ適合",
+        "process_type": "mechanical",
+        "description": "当該対象箇所の手すり壁等は高さ基準を満たす"
+      },
+      {
+        "id": "dec-more-locations",
+        "type": "decision",
+        "title": "未確認の対象箇所があるか？",
+        "decision_type": "binary",
+        "description": "他に確認が必要な屋上広場またはバルコニー等があるかを確認"
+      },
+      {
+        "id": "dec-all-compliant",
+        "type": "decision",
+        "title": "全対象箇所が適合か？",
+        "decision_type": "binary",
+        "description": "全ての屋上広場及びバルコニー等の手すり壁等が高さ基準を満たすかを総合判定"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "屋上広場等の手すり壁等に関する基準に適合"
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "一部の対象箇所が手すり壁等の高さ基準を満たさない"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-rooftop-exists",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-rooftop-exists",
+        "to": "proc-rooftop-identified",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "dec-rooftop-exists",
+        "to": "dec-balcony-exists",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e04",
+        "from": "proc-rooftop-identified",
+        "to": "dec-balcony-exists",
+        "role": "flow"
+      },
+      {
+        "id": "e05",
+        "from": "dec-balcony-exists",
+        "to": "proc-balcony-identified",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e06",
+        "from": "dec-balcony-exists",
+        "to": "dec-target-exists",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e07",
+        "from": "proc-balcony-identified",
+        "to": "dec-target-exists",
+        "role": "flow"
+      },
+      {
+        "id": "e08",
+        "from": "dec-target-exists",
+        "to": "dec-handrail-exists",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e09",
+        "from": "dec-target-exists",
+        "to": "end-not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e10",
+        "from": "dec-handrail-exists",
+        "to": "dec-handrail-type",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e11",
+        "from": "dec-handrail-exists",
+        "to": "end-no-handrail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e12",
+        "from": "dec-handrail-type",
+        "to": "proc-type-confirmed",
+        "role": "option",
+        "label": "手すり壁"
+      },
+      {
+        "id": "e13",
+        "from": "dec-handrail-type",
+        "to": "proc-type-confirmed",
+        "role": "option",
+        "label": "さく"
+      },
+      {
+        "id": "e14",
+        "from": "dec-handrail-type",
+        "to": "proc-type-confirmed",
+        "role": "option",
+        "label": "金網"
+      },
+      {
+        "id": "e15",
+        "from": "proc-type-confirmed",
+        "to": "dec-height-measurable",
+        "role": "flow"
+      },
+      {
+        "id": "e16",
+        "from": "dec-height-measurable",
+        "to": "dec-height-check",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e17",
+        "from": "dec-height-measurable",
+        "to": "end-unmeasurable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e18",
+        "from": "dec-height-check",
+        "to": "proc-height-ok",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e19",
+        "from": "dec-height-check",
+        "to": "end-height-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e20",
+        "from": "proc-height-ok",
+        "to": "dec-more-locations",
+        "role": "flow"
+      },
+      {
+        "id": "e21",
+        "from": "dec-more-locations",
+        "to": "dec-handrail-exists",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e22",
+        "from": "dec-more-locations",
+        "to": "dec-all-compliant",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e23",
+        "from": "dec-all-compliant",
+        "to": "end-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e24",
+        "from": "dec-all-compliant",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00+09:00",
+    "author": "Claude",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

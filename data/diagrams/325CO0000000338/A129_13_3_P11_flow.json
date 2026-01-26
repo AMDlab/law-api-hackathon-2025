@@ -1,0 +1,306 @@
+{
+  "id": "CHK-BSL-FLOW-A129_13_3-P11",
+  "version": "3.2",
+  "page_title": {
+    "title": "非常用エレベーターの定格速度",
+    "target_subject": "非常用エレベーター",
+    "description": "非常用エレベーターの籠の定格速度に関する適合判定フロー"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "129_13_3",
+    "paragraph": "11",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "建築設備",
+    "昇降機",
+    "非常用エレベーター"
+  ],
+  "text_raw": "非常用エレベーターの籠の定格速度は、六十メートル以上としなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "building_type",
+          "value": "高さ31mを超える建築物"
+        },
+        {
+          "type": "equipment",
+          "value": "非常用エレベーターを設置"
+        }
+      ],
+      "note": "法第34条第2項に基づき非常用エレベーターの設置が必要な建築物"
+    },
+    "judgment_rule": {
+      "operator": ">=",
+      "lhs": {
+        "type": "reference",
+        "value": "非常用エレベーターの籠の定格速度"
+      },
+      "rhs": {
+        "type": "value",
+        "value": "60m/分"
+      }
+    },
+    "exceptions": null
+  },
+  "flow_diagram": {
+    "title": "令第129条の13の3第11項 適合判定フロー",
+    "description": "非常用エレベーターの籠の定格速度が60m/分以上であることを確認するフロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "令第129条の13の3第11項の適合判定を開始"
+      },
+      {
+        "id": "decision-ev-exists",
+        "type": "decision",
+        "title": "非常用エレベーターがあるか？",
+        "decision_type": "binary",
+        "description": "建築物に非常用エレベーターが設置されているか確認",
+        "condition": {
+          "operator": "GT",
+          "lhs": {
+            "var": "EV_COUNT",
+            "desc": "非常用エレベーター台数"
+          },
+          "rhs": {
+            "value": 0,
+            "desc": "0台"
+          }
+        }
+      },
+      {
+        "id": "process-get-ev-list",
+        "type": "process",
+        "title": "非常用エレベーター一覧を取得",
+        "process_type": "undefined_input",
+        "description": "設計図書から非常用エレベーターの一覧を取得"
+      },
+      {
+        "id": "info-ev-list",
+        "type": "information",
+        "title": "非常用エレベーター一覧",
+        "symbol": "EV",
+        "subject": "建築物",
+        "property": "非常用エレベーターの集合",
+        "property_type": "set_definition",
+        "description": "建築物に設置される非常用エレベーターの一覧"
+      },
+      {
+        "id": "process-loop-start",
+        "type": "process",
+        "title": "各非常用エレベーターについて確認",
+        "process_type": "mechanical",
+        "description": "非常用エレベーターごとに定格速度を確認するループ開始"
+      },
+      {
+        "id": "process-get-speed",
+        "type": "process",
+        "title": "籠の定格速度を確認",
+        "process_type": "undefined_input",
+        "description": "当該非常用エレベーターの籠の定格速度を確認"
+      },
+      {
+        "id": "info-rated-speed",
+        "type": "information",
+        "title": "籠の定格速度",
+        "symbol": "V",
+        "subject": "非常用エレベーター",
+        "property": "定格速度",
+        "property_type": "numeric",
+        "description": "当該非常用エレベーターの籠の定格速度（m/分）"
+      },
+      {
+        "id": "decision-speed-check",
+        "type": "decision",
+        "title": "定格速度 >= 60m/分か？",
+        "decision_type": "binary",
+        "description": "籠の定格速度が60m/分以上であるか判定",
+        "condition": {
+          "operator": "GTE",
+          "lhs": {
+            "var": "V",
+            "desc": "籠の定格速度"
+          },
+          "rhs": {
+            "value": 60,
+            "unit": "m/分",
+            "desc": "60m/分"
+          }
+        }
+      },
+      {
+        "id": "process-mark-ok",
+        "type": "process",
+        "title": "当該エレベーター：速度要件充足",
+        "process_type": "mechanical",
+        "description": "当該非常用エレベーターは定格速度要件を満たす"
+      },
+      {
+        "id": "decision-more-ev",
+        "type": "decision",
+        "title": "未確認のエレベーターがあるか？",
+        "decision_type": "binary",
+        "description": "まだ確認していない非常用エレベーターがあるか"
+      },
+      {
+        "id": "decision-all-ok",
+        "type": "decision",
+        "title": "全てのエレベーターが要件を満たしたか？",
+        "decision_type": "binary",
+        "description": "全ての非常用エレベーターの定格速度が60m/分以上であるか最終確認",
+        "condition": {
+          "operator": "EQ",
+          "lhs": {
+            "var": "ALL_VOK",
+            "desc": "全エレベーターの速度要件充足"
+          },
+          "rhs": {
+            "value": true,
+            "desc": "全て充足"
+          }
+        }
+      },
+      {
+        "id": "terminal-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "全ての非常用エレベーターの籠の定格速度が60m/分以上であり、令第129条の13の3第11項に適合"
+      },
+      {
+        "id": "terminal-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "定格速度が60m/分未満の非常用エレベーターがあり、令第129条の13の3第11項に不適合"
+      },
+      {
+        "id": "terminal-na",
+        "type": "terminal",
+        "title": "該当なし",
+        "result": "end",
+        "description": "非常用エレベーターがないため、本項は適用されない"
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge-001",
+        "from": "start",
+        "to": "decision-ev-exists",
+        "role": "flow"
+      },
+      {
+        "id": "edge-002",
+        "from": "decision-ev-exists",
+        "to": "process-get-ev-list",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "edge-003",
+        "from": "decision-ev-exists",
+        "to": "terminal-na",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "edge-004",
+        "from": "process-get-ev-list",
+        "to": "info-ev-list",
+        "role": "output"
+      },
+      {
+        "id": "edge-005",
+        "from": "info-ev-list",
+        "to": "process-loop-start",
+        "role": "input"
+      },
+      {
+        "id": "edge-006",
+        "from": "process-loop-start",
+        "to": "process-get-speed",
+        "role": "flow"
+      },
+      {
+        "id": "edge-007",
+        "from": "process-get-speed",
+        "to": "info-rated-speed",
+        "role": "output"
+      },
+      {
+        "id": "edge-008",
+        "from": "info-rated-speed",
+        "to": "decision-speed-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-009",
+        "from": "decision-speed-check",
+        "to": "process-mark-ok",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "edge-010",
+        "from": "decision-speed-check",
+        "to": "terminal-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "edge-011",
+        "from": "process-mark-ok",
+        "to": "decision-more-ev",
+        "role": "flow"
+      },
+      {
+        "id": "edge-012",
+        "from": "decision-more-ev",
+        "to": "process-loop-start",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "edge-013",
+        "from": "decision-more-ev",
+        "to": "decision-all-ok",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "edge-014",
+        "from": "decision-all-ok",
+        "to": "terminal-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "edge-015",
+        "from": "decision-all-ok",
+        "to": "terminal-fail",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-KIJO-A129_13_3-P11",
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00Z",
+    "updated_at": "2026-01-26T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

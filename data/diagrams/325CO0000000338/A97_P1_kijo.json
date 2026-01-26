@@ -1,0 +1,472 @@
+{
+  "id": "CHK-BSL-ORDER-A97-P1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "コンクリートの材料強度",
+    "target_subject": "コンクリート",
+    "description": "コンクリートの材料強度が規定の数値に適合するかを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "97",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "構造規定",
+    "材料強度",
+    "コンクリート"
+  ],
+  "text_raw": "コンクリートの材料強度は、次の表の数値によらなければならない。ただし、異形鉄筋を用いた付着について、国土交通大臣が異形鉄筋の種類及び品質に応じて別に数値を定めた場合は、当該数値によることができる。\n材料強度（単位：一平方ミリメートルにつきニュートン）\n圧縮：F\n引張り：F/10（Fが21を超えるコンクリートについて、国土交通大臣がこれと異なる数値を定めた場合は、その定めた数値）\nせん断：F/10（同上）\n付着：2.1（軽量骨材を使用する場合にあつては、1.8）\nFは、設計基準強度（単位：一平方ミリメートルにつきニュートン）を表す。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "material",
+          "value": "コンクリートを使用する建築物"
+        }
+      ],
+      "note": "コンクリートを使用する構造部分に適用"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-compression-compliance",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "ref": "info-tension-compliance",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "ref": "info-shear-compliance",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "ref": "info-bond-compliance",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    },
+    "exceptions": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "special_provision",
+          "value": "異形鉄筋を用いた付着について国土交通大臣が定めた数値がある場合"
+        }
+      ],
+      "effect": "大臣が定めた数値による"
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-design-strength",
+        "type": "process",
+        "title": "設計基準強度の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書からコンクリートの設計基準強度Fを読み取る"
+      },
+      {
+        "id": "info-design-strength",
+        "type": "information",
+        "title": "設計基準強度",
+        "symbol": "F",
+        "subject": "コンクリート",
+        "property": "設計基準強度",
+        "property_type": "numeric",
+        "unit": "N/mm2",
+        "plurality": "single",
+        "description": "コンクリートの設計基準強度（令第91条第2項を準用）"
+      },
+      {
+        "id": "proc-aggregate-type",
+        "type": "process",
+        "title": "骨材種別の特定",
+        "process_type": "undefined_input",
+        "description": "コンクリートに使用する骨材の種別を特定"
+      },
+      {
+        "id": "info-aggregate-type",
+        "type": "information",
+        "title": "骨材種別",
+        "symbol": "AG",
+        "subject": "コンクリート",
+        "property": "骨材種別",
+        "property_type": "classification",
+        "plurality": "single",
+        "description": "軽量骨材を使用するか否か"
+      },
+      {
+        "id": "proc-rebar-type",
+        "type": "process",
+        "title": "鉄筋種別の特定",
+        "process_type": "undefined_input",
+        "description": "付着部分に使用する鉄筋の種別を特定"
+      },
+      {
+        "id": "info-rebar-type",
+        "type": "information",
+        "title": "鉄筋種別",
+        "symbol": "RB",
+        "subject": "鉄筋",
+        "property": "種別",
+        "property_type": "classification",
+        "plurality": "single",
+        "description": "異形鉄筋を使用するか否か"
+      },
+      {
+        "id": "proc-compression-strength",
+        "type": "process",
+        "title": "圧縮強度の特定",
+        "process_type": "undefined_input",
+        "description": "計画で採用するコンクリートの圧縮に対する材料強度を読み取る"
+      },
+      {
+        "id": "info-compression-strength",
+        "type": "information",
+        "title": "圧縮材料強度",
+        "symbol": "Fc",
+        "subject": "コンクリート",
+        "property": "圧縮に対する材料強度",
+        "property_type": "numeric",
+        "unit": "N/mm2",
+        "plurality": "single",
+        "description": "採用する圧縮に対する材料強度"
+      },
+      {
+        "id": "proc-compression-check",
+        "type": "process",
+        "title": "圧縮強度の適合判定",
+        "process_type": "mechanical",
+        "description": "圧縮に対する材料強度がFに適合するかを判定",
+        "logic_expression": "Fc ≤ F"
+      },
+      {
+        "id": "info-compression-compliance",
+        "type": "information",
+        "title": "圧縮強度適合",
+        "symbol": "C1",
+        "subject": "コンクリート",
+        "property": "圧縮強度適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "圧縮に対する材料強度がFに適合するか"
+      },
+      {
+        "id": "proc-tension-strength",
+        "type": "process",
+        "title": "引張り強度の特定",
+        "process_type": "undefined_input",
+        "description": "計画で採用するコンクリートの引張りに対する材料強度を読み取る"
+      },
+      {
+        "id": "info-tension-strength",
+        "type": "information",
+        "title": "引張り材料強度",
+        "symbol": "Ft",
+        "subject": "コンクリート",
+        "property": "引張りに対する材料強度",
+        "property_type": "numeric",
+        "unit": "N/mm2",
+        "plurality": "single",
+        "description": "採用する引張りに対する材料強度"
+      },
+      {
+        "id": "proc-tension-check",
+        "type": "process",
+        "title": "引張り強度の適合判定",
+        "process_type": "mechanical",
+        "description": "引張りに対する材料強度がF/10（又は大臣が定めた数値）に適合するかを判定",
+        "logic_expression": "Ft ≤ F/10（又は大臣が定めた数値）"
+      },
+      {
+        "id": "info-tension-compliance",
+        "type": "information",
+        "title": "引張り強度適合",
+        "symbol": "C2",
+        "subject": "コンクリート",
+        "property": "引張り強度適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "引張りに対する材料強度がF/10に適合するか"
+      },
+      {
+        "id": "proc-shear-strength",
+        "type": "process",
+        "title": "せん断強度の特定",
+        "process_type": "undefined_input",
+        "description": "計画で採用するコンクリートのせん断に対する材料強度を読み取る"
+      },
+      {
+        "id": "info-shear-strength",
+        "type": "information",
+        "title": "せん断材料強度",
+        "symbol": "Fs",
+        "subject": "コンクリート",
+        "property": "せん断に対する材料強度",
+        "property_type": "numeric",
+        "unit": "N/mm2",
+        "plurality": "single",
+        "description": "採用するせん断に対する材料強度"
+      },
+      {
+        "id": "proc-shear-check",
+        "type": "process",
+        "title": "せん断強度の適合判定",
+        "process_type": "mechanical",
+        "description": "せん断に対する材料強度がF/10（又は大臣が定めた数値）に適合するかを判定",
+        "logic_expression": "Fs ≤ F/10（又は大臣が定めた数値）"
+      },
+      {
+        "id": "info-shear-compliance",
+        "type": "information",
+        "title": "せん断強度適合",
+        "symbol": "C3",
+        "subject": "コンクリート",
+        "property": "せん断強度適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "せん断に対する材料強度がF/10に適合するか"
+      },
+      {
+        "id": "proc-bond-strength",
+        "type": "process",
+        "title": "付着強度の特定",
+        "process_type": "undefined_input",
+        "description": "計画で採用するコンクリートの付着に対する材料強度を読み取る"
+      },
+      {
+        "id": "info-bond-strength",
+        "type": "information",
+        "title": "付着材料強度",
+        "symbol": "Fb",
+        "subject": "コンクリート",
+        "property": "付着に対する材料強度",
+        "property_type": "numeric",
+        "unit": "N/mm2",
+        "plurality": "single",
+        "description": "採用する付着に対する材料強度"
+      },
+      {
+        "id": "proc-bond-check",
+        "type": "process",
+        "title": "付着強度の適合判定",
+        "process_type": "mechanical",
+        "description": "付着に対する材料強度が2.1（軽量骨材の場合1.8、異形鉄筋で大臣が定めた場合はその数値）に適合するかを判定",
+        "logic_expression": "Fb ≤ 2.1（軽量骨材の場合1.8、又は大臣が定めた数値）"
+      },
+      {
+        "id": "info-bond-compliance",
+        "type": "information",
+        "title": "付着強度適合",
+        "symbol": "C4",
+        "subject": "コンクリート",
+        "property": "付着強度適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "付着に対する材料強度が規定値に適合するか"
+      },
+      {
+        "id": "proc-final-judgment",
+        "type": "process",
+        "title": "材料強度適合判定",
+        "process_type": "mechanical",
+        "description": "コンクリートの各材料強度が令第97条の規定に適合するかを総合判定",
+        "logic_expression": "C1 AND C2 AND C3 AND C4"
+      },
+      {
+        "id": "info-final",
+        "type": "information",
+        "title": "令第97条適合",
+        "symbol": "R",
+        "subject": "コンクリート",
+        "property": "材料強度規定適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "令第97条第1項のコンクリートの材料強度に適合するか"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-design-strength",
+        "to": "info-design-strength",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "proc-aggregate-type",
+        "to": "info-aggregate-type",
+        "role": "output"
+      },
+      {
+        "id": "e03",
+        "from": "proc-rebar-type",
+        "to": "info-rebar-type",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "proc-compression-strength",
+        "to": "info-compression-strength",
+        "role": "output"
+      },
+      {
+        "id": "e05",
+        "from": "info-design-strength",
+        "to": "proc-compression-check",
+        "role": "input"
+      },
+      {
+        "id": "e06",
+        "from": "info-compression-strength",
+        "to": "proc-compression-check",
+        "role": "input"
+      },
+      {
+        "id": "e07",
+        "from": "proc-compression-check",
+        "to": "info-compression-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e08",
+        "from": "proc-tension-strength",
+        "to": "info-tension-strength",
+        "role": "output"
+      },
+      {
+        "id": "e09",
+        "from": "info-design-strength",
+        "to": "proc-tension-check",
+        "role": "input"
+      },
+      {
+        "id": "e10",
+        "from": "info-tension-strength",
+        "to": "proc-tension-check",
+        "role": "input"
+      },
+      {
+        "id": "e11",
+        "from": "proc-tension-check",
+        "to": "info-tension-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e12",
+        "from": "proc-shear-strength",
+        "to": "info-shear-strength",
+        "role": "output"
+      },
+      {
+        "id": "e13",
+        "from": "info-design-strength",
+        "to": "proc-shear-check",
+        "role": "input"
+      },
+      {
+        "id": "e14",
+        "from": "info-shear-strength",
+        "to": "proc-shear-check",
+        "role": "input"
+      },
+      {
+        "id": "e15",
+        "from": "proc-shear-check",
+        "to": "info-shear-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e16",
+        "from": "proc-bond-strength",
+        "to": "info-bond-strength",
+        "role": "output"
+      },
+      {
+        "id": "e17",
+        "from": "info-aggregate-type",
+        "to": "proc-bond-check",
+        "role": "input"
+      },
+      {
+        "id": "e18",
+        "from": "info-rebar-type",
+        "to": "proc-bond-check",
+        "role": "input"
+      },
+      {
+        "id": "e19",
+        "from": "info-bond-strength",
+        "to": "proc-bond-check",
+        "role": "input"
+      },
+      {
+        "id": "e20",
+        "from": "proc-bond-check",
+        "to": "info-bond-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e21",
+        "from": "info-compression-compliance",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e22",
+        "from": "info-tension-compliance",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e23",
+        "from": "info-shear-compliance",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e24",
+        "from": "info-bond-compliance",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e25",
+        "from": "proc-final-judgment",
+        "to": "info-final",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": [
+        "A91:P2"
+      ],
+      "description": "設計基準強度について第91条第2項を準用"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-23T12:00:00Z",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

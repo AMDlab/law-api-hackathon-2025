@@ -1,0 +1,288 @@
+{
+  "id": "CHK-BSL-ORDER-A125-P2",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "客用出口の戸の開き方向",
+    "target_subject": "屋外への出口の戸",
+    "description": "劇場等の客用に供する屋外への出口の戸の開き方向を判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "125",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "避難規定",
+    "出口"
+  ],
+  "text_raw": "劇場、映画館、演芸場、観覧場、公会堂又は集会場の客用に供する屋外への出口の戸は、内開きとしてはならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "use",
+          "value": "劇場、映画館、演芸場、観覧場、公会堂又は集会場"
+        }
+      ],
+      "note": "建築物の用途が劇場、映画館、演芸場、観覧場、公会堂又は集会場である場合に適用"
+    },
+    "judgment_rule": {
+      "operator": "FORALL",
+      "conditions": [
+        {
+          "ref": "info-door-compliance",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-use-identify",
+        "type": "process",
+        "title": "用途の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の用途を読み取る"
+      },
+      {
+        "id": "info-use",
+        "type": "information",
+        "title": "建築物の用途",
+        "symbol": "U",
+        "subject": "建築物",
+        "property": "用途",
+        "property_type": "classification",
+        "plurality": "single",
+        "description": "劇場、映画館、演芸場、観覧場、公会堂、集会場のいずれかに該当するか"
+      },
+      {
+        "id": "proc-doors-set-identify",
+        "type": "process",
+        "title": "出口の戸の特定",
+        "process_type": "undefined_input",
+        "description": "建築物に属する屋外への出口の戸を特定する"
+      },
+      {
+        "id": "info-doors-set",
+        "type": "information",
+        "title": "屋外への出口の戸",
+        "symbol": "DS",
+        "subject": "建築物",
+        "property": "屋外への出口の戸の集合",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "判定対象となる建築物に属する屋外への出口の戸を特定"
+      },
+      {
+        "id": "proc-guest-use-identify",
+        "type": "process",
+        "title": "客用供用の特定",
+        "process_type": "undefined_input",
+        "iteration": "iterative",
+        "description": "各出口の戸が客用に供するものかを特定する"
+      },
+      {
+        "id": "info-guest-use",
+        "type": "information",
+        "title": "客用供用",
+        "symbol": "G",
+        "subject": "屋外への出口の戸",
+        "property": "客用供用",
+        "property_type": "proposition",
+        "plurality": "multiple",
+        "description": "当該出口の戸が客用に供するものか"
+      },
+      {
+        "id": "proc-opening-direction-identify",
+        "type": "process",
+        "title": "開き方向の特定",
+        "process_type": "undefined_input",
+        "iteration": "iterative",
+        "description": "各出口の戸の開き方向を特定する"
+      },
+      {
+        "id": "info-opening-direction",
+        "type": "information",
+        "title": "戸の開き方向",
+        "symbol": "D",
+        "subject": "屋外への出口の戸",
+        "property": "開き方向",
+        "property_type": "classification",
+        "plurality": "multiple",
+        "description": "内開き、外開き、引戸等の開き方向の種別"
+      },
+      {
+        "id": "proc-applicable-check",
+        "type": "process",
+        "title": "適用対象判定",
+        "process_type": "mechanical",
+        "description": "用途が対象用途に該当し、かつ客用に供する出口の戸であるか判定",
+        "logic_expression": "U ∈ {劇場, 映画館, 演芸場, 観覧場, 公会堂, 集会場} AND G = true"
+      },
+      {
+        "id": "info-applicable",
+        "type": "information",
+        "title": "適用対象",
+        "symbol": "A",
+        "subject": "屋外への出口の戸",
+        "property": "適用対象該当",
+        "property_type": "proposition",
+        "plurality": "multiple",
+        "description": "本条項の適用対象となる戸か"
+      },
+      {
+        "id": "proc-door-compliance-check",
+        "type": "process",
+        "title": "内開き禁止判定",
+        "process_type": "mechanical",
+        "iteration": "iterative",
+        "description": "適用対象の戸について、内開きでないことを判定",
+        "logic_expression": "A = true → D ≠ 内開き"
+      },
+      {
+        "id": "info-door-compliance",
+        "type": "information",
+        "title": "開き方向適合",
+        "symbol": "C",
+        "subject": "屋外への出口の戸",
+        "property": "開き方向適合",
+        "property_type": "proposition",
+        "plurality": "multiple",
+        "description": "各戸が内開き禁止規定に適合しているか"
+      },
+      {
+        "id": "proc-final-judgment",
+        "type": "process",
+        "title": "総合適合判定",
+        "process_type": "mechanical",
+        "description": "全ての客用出口の戸が内開きでないことを確認",
+        "logic_expression": "∀d: C(d) = true"
+      },
+      {
+        "id": "info-final",
+        "type": "information",
+        "title": "令125条2項適合",
+        "symbol": "R",
+        "subject": "建築物",
+        "property": "令125条2項適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "令125条2項の客用出口の戸の開き方向規定に適合するか"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-use-identify",
+        "to": "info-use",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "proc-doors-set-identify",
+        "to": "info-doors-set",
+        "role": "output"
+      },
+      {
+        "id": "e03",
+        "from": "info-doors-set",
+        "to": "proc-guest-use-identify",
+        "role": "input"
+      },
+      {
+        "id": "e04",
+        "from": "proc-guest-use-identify",
+        "to": "info-guest-use",
+        "role": "output"
+      },
+      {
+        "id": "e05",
+        "from": "info-doors-set",
+        "to": "proc-opening-direction-identify",
+        "role": "input"
+      },
+      {
+        "id": "e06",
+        "from": "proc-opening-direction-identify",
+        "to": "info-opening-direction",
+        "role": "output"
+      },
+      {
+        "id": "e07",
+        "from": "info-use",
+        "to": "proc-applicable-check",
+        "role": "input"
+      },
+      {
+        "id": "e08",
+        "from": "info-guest-use",
+        "to": "proc-applicable-check",
+        "role": "input"
+      },
+      {
+        "id": "e09",
+        "from": "proc-applicable-check",
+        "to": "info-applicable",
+        "role": "output"
+      },
+      {
+        "id": "e10",
+        "from": "info-applicable",
+        "to": "proc-door-compliance-check",
+        "role": "input"
+      },
+      {
+        "id": "e11",
+        "from": "info-opening-direction",
+        "to": "proc-door-compliance-check",
+        "role": "input"
+      },
+      {
+        "id": "e12",
+        "from": "proc-door-compliance-check",
+        "to": "info-door-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e13",
+        "from": "info-door-compliance",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e14",
+        "from": "proc-final-judgment",
+        "to": "info-final",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": [
+        "A35_P1"
+      ],
+      "description": "法第35条の避難施設等に関する規定に基づく施行令の委任規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-23T12:00:00Z",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

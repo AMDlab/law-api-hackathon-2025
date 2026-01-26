@@ -1,0 +1,324 @@
+{
+  "id": "CHK-BSL-ORDER-A86-P4",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "屋根の積雪荷重（屋根形状係数）",
+    "target_subject": "屋根",
+    "description": "屋根の積雪荷重を屋根形状係数を用いて計算する方法を判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "86",
+    "paragraph": "4",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造規定",
+    "積雪荷重"
+  ],
+  "text_raw": "屋根の積雪荷重は、屋根に雪止めがある場合を除き、その勾配が六十度以下の場合においては、その勾配に応じて第一項の積雪荷重に次の式によつて計算した屋根形状係数（特定行政庁が屋根ふき材、雪の性状等を考慮して規則でこれと異なる数値を定めた場合においては、その定めた数値）を乗じた数値とし、その勾配が六十度を超える場合においては、零とすることができる。μｂ＝√ｃｏｓ（１．５β）（この式において、μｂ及びβは、それぞれ次の数値を表すものとする。μｂ 屋根形状係数 β 屋根勾配（単位 度））",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "exclusion",
+          "value": "屋根に雪止めがある場合を除く"
+        }
+      ],
+      "note": "屋根に雪止めがある場合は本規定の対象外"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "operator": "AND",
+          "conditions": [
+            {
+              "ref": "info-slope",
+              "operator": "<=",
+              "value": 60
+            },
+            {
+              "ref": "info-calculated-load",
+              "operator": "==",
+              "value": "第1項積雪荷重 × μb"
+            }
+          ]
+        },
+        {
+          "operator": "AND",
+          "conditions": [
+            {
+              "ref": "info-slope",
+              "operator": ">",
+              "value": 60
+            },
+            {
+              "ref": "info-calculated-load",
+              "operator": "==",
+              "value": 0
+            }
+          ]
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "info-roof-set",
+        "type": "information",
+        "title": "建築物の屋根",
+        "symbol": "RS",
+        "subject": "建築物",
+        "property": "屋根の集合",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "判定対象となる建築物に属する屋根を特定"
+      },
+      {
+        "id": "proc-snowstop-check",
+        "type": "process",
+        "title": "雪止め有無の特定",
+        "process_type": "undefined_input",
+        "target_subject": "屋根",
+        "iteration": "iterative",
+        "description": "各屋根に雪止めがあるか否かを特定"
+      },
+      {
+        "id": "info-snowstop",
+        "type": "information",
+        "title": "雪止めの有無",
+        "symbol": "SS",
+        "subject": "屋根",
+        "property": "雪止めの有無",
+        "property_type": "proposition",
+        "plurality": "multiple",
+        "description": "屋根に雪止めがあるか否か"
+      },
+      {
+        "id": "proc-slope-identify",
+        "type": "process",
+        "title": "屋根勾配の特定",
+        "process_type": "undefined_input",
+        "target_subject": "屋根",
+        "iteration": "iterative",
+        "description": "各屋根の勾配（β）を読み取る"
+      },
+      {
+        "id": "info-slope",
+        "type": "information",
+        "title": "屋根勾配",
+        "symbol": "B",
+        "subject": "屋根",
+        "property": "勾配",
+        "property_type": "numeric",
+        "unit": "度",
+        "plurality": "multiple",
+        "description": "屋根の勾配（単位：度）"
+      },
+      {
+        "id": "proc-slope-category",
+        "type": "process",
+        "title": "勾配区分判定",
+        "process_type": "mechanical",
+        "target_subject": "屋根",
+        "iteration": "iterative",
+        "description": "屋根勾配が60度以下か60度超かを判定",
+        "logic_expression": "B <= 60 or B > 60"
+      },
+      {
+        "id": "info-slope-category",
+        "type": "information",
+        "title": "勾配区分",
+        "symbol": "SC",
+        "subject": "屋根",
+        "property": "勾配区分",
+        "property_type": "classification",
+        "plurality": "multiple",
+        "description": "60度以下（係数計算適用）または60度超（零とすることができる）"
+      },
+      {
+        "id": "proc-coefficient-calc",
+        "type": "process",
+        "title": "屋根形状係数の計算",
+        "process_type": "mechanical",
+        "target_subject": "屋根",
+        "iteration": "iterative",
+        "description": "μb = √cos(1.5β)により屋根形状係数を計算（勾配60度以下の場合）。特定行政庁が規則で異なる数値を定めた場合はその値。",
+        "logic_expression": "μb = √cos(1.5 × B)",
+        "remarks": "特定行政庁が屋根ふき材、雪の性状等を考慮して規則でこれと異なる数値を定めた場合においては、その定めた数値を使用"
+      },
+      {
+        "id": "info-coefficient",
+        "type": "information",
+        "title": "屋根形状係数",
+        "symbol": "MB",
+        "subject": "屋根",
+        "property": "屋根形状係数",
+        "property_type": "numeric",
+        "plurality": "multiple",
+        "description": "勾配60度以下の場合はμb = √cos(1.5β)、60度超の場合は零とすることができる"
+      },
+      {
+        "id": "proc-load-calc",
+        "type": "process",
+        "title": "積雪荷重の計算",
+        "process_type": "mechanical",
+        "target_subject": "屋根",
+        "iteration": "iterative",
+        "description": "屋根の積雪荷重を計算（第1項積雪荷重 × 屋根形状係数）",
+        "logic_expression": "屋根積雪荷重 = 第1項積雪荷重 × μb",
+        "related_articles": ["令::A86:P1"]
+      },
+      {
+        "id": "info-calculated-load",
+        "type": "information",
+        "title": "屋根の積雪荷重",
+        "symbol": "SL",
+        "subject": "屋根",
+        "property": "積雪荷重",
+        "property_type": "numeric",
+        "unit": "N/m2",
+        "plurality": "multiple",
+        "description": "屋根形状係数を考慮した積雪荷重",
+        "related_articles": ["令::A86:P1"]
+      },
+      {
+        "id": "proc-compliance-check",
+        "type": "process",
+        "title": "積雪荷重計算適合判定",
+        "process_type": "mechanical",
+        "target_subject": "屋根",
+        "description": "屋根の積雪荷重が第4項の規定に従って計算されているか判定",
+        "logic_expression": "(雪止めなし AND 勾配60度以下 → 積雪荷重 = 第1項積雪荷重 × μb) AND (雪止めなし AND 勾配60度超 → 積雪荷重 = 0可)"
+      },
+      {
+        "id": "info-compliance",
+        "type": "information",
+        "title": "第4項適合",
+        "symbol": "R",
+        "subject": "建築物",
+        "property": "令86条4項適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "屋根の積雪荷重が第4項の規定に従って適切に計算されているか"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "info-roof-set",
+        "to": "proc-snowstop-check",
+        "role": "input"
+      },
+      {
+        "id": "e02",
+        "from": "proc-snowstop-check",
+        "to": "info-snowstop",
+        "role": "output"
+      },
+      {
+        "id": "e03",
+        "from": "info-roof-set",
+        "to": "proc-slope-identify",
+        "role": "input"
+      },
+      {
+        "id": "e04",
+        "from": "proc-slope-identify",
+        "to": "info-slope",
+        "role": "output"
+      },
+      {
+        "id": "e05",
+        "from": "info-slope",
+        "to": "proc-slope-category",
+        "role": "input"
+      },
+      {
+        "id": "e06",
+        "from": "proc-slope-category",
+        "to": "info-slope-category",
+        "role": "output"
+      },
+      {
+        "id": "e07",
+        "from": "info-slope",
+        "to": "proc-coefficient-calc",
+        "role": "input"
+      },
+      {
+        "id": "e08",
+        "from": "info-slope-category",
+        "to": "proc-coefficient-calc",
+        "role": "input"
+      },
+      {
+        "id": "e09",
+        "from": "proc-coefficient-calc",
+        "to": "info-coefficient",
+        "role": "output"
+      },
+      {
+        "id": "e10",
+        "from": "info-coefficient",
+        "to": "proc-load-calc",
+        "role": "input"
+      },
+      {
+        "id": "e11",
+        "from": "proc-load-calc",
+        "to": "info-calculated-load",
+        "role": "output"
+      },
+      {
+        "id": "e12",
+        "from": "info-snowstop",
+        "to": "proc-compliance-check",
+        "role": "input"
+      },
+      {
+        "id": "e13",
+        "from": "info-slope-category",
+        "to": "proc-compliance-check",
+        "role": "input"
+      },
+      {
+        "id": "e14",
+        "from": "info-calculated-load",
+        "to": "proc-compliance-check",
+        "role": "input"
+      },
+      {
+        "id": "e15",
+        "from": "proc-compliance-check",
+        "to": "info-compliance",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": ["A86:P1"],
+      "description": "第1項の積雪荷重の計算方法を参照"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-23T12:00:00Z",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

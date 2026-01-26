@@ -1,0 +1,301 @@
+{
+  "id": "A65_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "圧縮材の有効細長比",
+    "target_subject": "圧縮材",
+    "description": "構造耐力上主要な部分である鋼材の圧縮材の有効細長比が、柱にあっては200以下、柱以外にあっては250以下であることを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "65",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造",
+    "鋼構造"
+  ],
+  "text_raw": "構造耐力上主要な部分である鋼材の圧縮材（圧縮力を負担する部材をいう。以下同じ。）の有効細長比は、柱にあつては二百以下、柱以外のものにあつては二百五十以下としなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "structural_element",
+          "value": "構造耐力上主要な部分である鋼材の圧縮材"
+        }
+      ],
+      "note": "圧縮力を負担する部材"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "operator": "IF_THEN",
+          "condition": {
+            "ref": "info-member-category",
+            "operator": "==",
+            "value": "柱"
+          },
+          "then": {
+            "ref": "info-slenderness",
+            "operator": "<=",
+            "value": 200
+          }
+        },
+        {
+          "operator": "IF_THEN",
+          "condition": {
+            "ref": "info-member-category",
+            "operator": "==",
+            "value": "柱以外"
+          },
+          "then": {
+            "ref": "info-slenderness",
+            "operator": "<=",
+            "value": 250
+          }
+        }
+      ]
+    }
+  },
+  "flow_diagram": {
+    "title": "令第65条第1項 圧縮材の有効細長比 適合判定フロー",
+    "description": "構造耐力上主要な部分である鋼材の圧縮材について、有効細長比が規定値以下であるかを判定するフロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "審査開始",
+        "result": "start"
+      },
+      {
+        "id": "dec-has-compression-member",
+        "type": "decision",
+        "title": "構造耐力上主要な部分に鋼材の圧縮材があるか？",
+        "decision_type": "binary",
+        "description": "設計図書から、構造耐力上主要な部分である鋼材の圧縮材（圧縮力を負担する部材）の有無を確認"
+      },
+      {
+        "id": "proc-identify-members",
+        "type": "process",
+        "title": "圧縮材を列挙",
+        "process_type": "undefined_input",
+        "description": "構造耐力上主要な部分である鋼材の圧縮材をすべて特定・列挙する"
+      },
+      {
+        "id": "dec-remaining-members",
+        "type": "decision",
+        "title": "未確認の圧縮材があるか？",
+        "decision_type": "binary",
+        "description": "まだ有効細長比の確認が完了していない圧縮材があるか"
+      },
+      {
+        "id": "proc-select-member",
+        "type": "process",
+        "title": "圧縮材を1つ選択",
+        "process_type": "mechanical",
+        "description": "未確認の圧縮材から1つを選択して審査対象とする"
+      },
+      {
+        "id": "dec-member-category",
+        "type": "decision",
+        "title": "部材の区分は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "柱" },
+          { "value": "柱以外" }
+        ],
+        "description": "当該圧縮材が柱であるか、柱以外（梁、筋かい等）であるかを判定"
+      },
+      {
+        "id": "proc-column-selected",
+        "type": "process",
+        "title": "柱として判定",
+        "process_type": "mechanical",
+        "description": "当該圧縮材は柱であり、上限値200が適用される"
+      },
+      {
+        "id": "proc-other-selected",
+        "type": "process",
+        "title": "柱以外として判定",
+        "process_type": "mechanical",
+        "description": "当該圧縮材は柱以外であり、上限値250が適用される"
+      },
+      {
+        "id": "dec-column-slenderness",
+        "type": "decision",
+        "title": "有効細長比 ≤ 200 か？",
+        "decision_type": "binary",
+        "description": "柱の有効細長比が200以下であるかを確認",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "L", "desc": "有効細長比" },
+          "rhs": { "value": 200 }
+        }
+      },
+      {
+        "id": "dec-other-slenderness",
+        "type": "decision",
+        "title": "有効細長比 ≤ 250 か？",
+        "decision_type": "binary",
+        "description": "柱以外の有効細長比が250以下であるかを確認",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "L", "desc": "有効細長比" },
+          "rhs": { "value": 250 }
+        }
+      },
+      {
+        "id": "proc-member-pass",
+        "type": "process",
+        "title": "当該部材適合",
+        "process_type": "mechanical",
+        "description": "当該圧縮材の有効細長比は規定値以下であり適合"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "すべての圧縮材の有効細長比が規定値以下であり、令第65条第1項に適合"
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "有効細長比が規定値を超える圧縮材があり、令第65条第1項に不適合"
+      },
+      {
+        "id": "end-na",
+        "type": "terminal",
+        "title": "適用除外",
+        "result": "pass",
+        "description": "構造耐力上主要な部分に鋼材の圧縮材がないため、本条の適用なし"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-has-compression-member",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-has-compression-member",
+        "to": "proc-identify-members",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "dec-has-compression-member",
+        "to": "end-na",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e04",
+        "from": "proc-identify-members",
+        "to": "dec-remaining-members",
+        "role": "flow"
+      },
+      {
+        "id": "e05",
+        "from": "dec-remaining-members",
+        "to": "proc-select-member",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e06",
+        "from": "dec-remaining-members",
+        "to": "end-pass",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e07",
+        "from": "proc-select-member",
+        "to": "dec-member-category",
+        "role": "flow"
+      },
+      {
+        "id": "e08",
+        "from": "dec-member-category",
+        "to": "proc-column-selected",
+        "role": "option",
+        "label": "柱"
+      },
+      {
+        "id": "e09",
+        "from": "dec-member-category",
+        "to": "proc-other-selected",
+        "role": "option",
+        "label": "柱以外"
+      },
+      {
+        "id": "e10",
+        "from": "proc-column-selected",
+        "to": "dec-column-slenderness",
+        "role": "flow"
+      },
+      {
+        "id": "e11",
+        "from": "proc-other-selected",
+        "to": "dec-other-slenderness",
+        "role": "flow"
+      },
+      {
+        "id": "e12",
+        "from": "dec-column-slenderness",
+        "to": "proc-member-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e13",
+        "from": "dec-column-slenderness",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e14",
+        "from": "dec-other-slenderness",
+        "to": "proc-member-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e15",
+        "from": "dec-other-slenderness",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e16",
+        "from": "proc-member-pass",
+        "to": "dec-remaining-members",
+        "role": "flow"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "A65_P1_kijo",
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00+09:00",
+    "updated_at": "2026-01-26T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

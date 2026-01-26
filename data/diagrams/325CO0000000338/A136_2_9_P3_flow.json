@@ -1,0 +1,262 @@
+{
+  "id": "A136_2_9_P3_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "公益上必要な建築物の条例制限適用除外判定",
+    "target_subject": "建築物",
+    "description": "法第68条の9第1項に基づく条例の適用において、公益上必要な建築物で用途上又は構造上やむを得ないものについて、条例制限の全部又は一部の適用除外を判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "136の2の9",
+    "paragraph": "3",
+    "item": null
+  },
+  "labels": [
+    "集団規定",
+    "都市計画区域外",
+    "条例制限",
+    "適用除外"
+  ],
+  "text_raw": "法第六十八条の九第一項の規定に基づく条例には、公益上必要な建築物で用途上又は構造上やむを得ないと認められるものについて、当該条例に定める制限の全部又は一部の適用の除外に関する規定を定めるものとする。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "都道府県知事が指定する区域内"
+        },
+        {
+          "type": "condition",
+          "value": "法第68条の9第1項に基づく条例が適用される建築物"
+        }
+      ],
+      "note": "都道府県知事指定区域情報は公共データとして[処理]に含まれる"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-public-necessity",
+          "description": "公益上必要な建築物であること"
+        },
+        {
+          "ref": "info-unavoidable",
+          "description": "用途上又は構造上やむを得ないものであること"
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "flow_diagram": {
+    "title": "条例制限適用除外判定フロー",
+    "description": "公益上必要かつ用途上又は構造上やむを得ない建築物について、条例制限の適用除外該当性を判定するフロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "条例制限適用除外判定を開始"
+      },
+      {
+        "id": "proc-use-check",
+        "type": "process",
+        "title": "建築物の用途の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から当該建築物の用途を確認する"
+      },
+      {
+        "id": "proc-public-necessity-check",
+        "type": "process",
+        "title": "公益上の必要性判定",
+        "process_type": "human_judgment",
+        "description": "当該建築物が公益上必要なものであるかどうかを判定する。官公署、学校、病院等の公共的な用途かどうかを考慮する"
+      },
+      {
+        "id": "dec-public-necessity",
+        "type": "decision",
+        "title": "公益上必要な建築物か？",
+        "decision_type": "binary",
+        "description": "当該建築物が公益上必要なものであるか否かを判定",
+        "condition": {
+          "operator": "EQ",
+          "lhs": {
+            "var": "P",
+            "desc": "公益上の必要性"
+          },
+          "rhs": {
+            "value": true,
+            "desc": "公益上必要"
+          }
+        }
+      },
+      {
+        "id": "proc-structure-check",
+        "type": "process",
+        "title": "構造方法の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から当該建築物の構造方法を確認する"
+      },
+      {
+        "id": "proc-unavoidable-check",
+        "type": "process",
+        "title": "やむを得ない事情の判定",
+        "process_type": "human_judgment",
+        "description": "当該建築物が用途上又は構造上やむを得ないものかどうかを判定する。用途の性質上又は構造の特性上、条例の制限に適合させることが困難であるかどうかを考慮する"
+      },
+      {
+        "id": "dec-unavoidable",
+        "type": "decision",
+        "title": "用途上又は構造上やむを得ないか？",
+        "decision_type": "binary",
+        "description": "当該建築物が用途上又は構造上やむを得ないと認められるか否かを判定",
+        "condition": {
+          "operator": "EQ",
+          "lhs": {
+            "var": "V",
+            "desc": "やむを得ない事情"
+          },
+          "rhs": {
+            "value": true,
+            "desc": "やむを得ない"
+          }
+        }
+      },
+      {
+        "id": "proc-exemption-applicable",
+        "type": "process",
+        "title": "条例制限適用除外該当",
+        "process_type": "mechanical",
+        "description": "公益上必要かつ用途上又は構造上やむを得ない建築物として条例制限の適用除外対象となる"
+      },
+      {
+        "id": "proc-exemption-scope-check",
+        "type": "process",
+        "title": "適用除外範囲の確認",
+        "process_type": "undefined_input",
+        "description": "条例の適用除外規定に基づき、適用除外される制限の範囲（全部又は一部）を確認する"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適用除外該当",
+        "result": "pass",
+        "description": "条例制限の全部又は一部の適用除外対象となる"
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "適用除外非該当",
+        "result": "fail",
+        "description": "条例制限の適用除外対象とならない"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "proc-use-check",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "proc-use-check",
+        "to": "proc-public-necessity-check",
+        "role": "flow"
+      },
+      {
+        "id": "e03",
+        "from": "proc-public-necessity-check",
+        "to": "dec-public-necessity",
+        "role": "flow"
+      },
+      {
+        "id": "e04",
+        "from": "dec-public-necessity",
+        "to": "proc-structure-check",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e05",
+        "from": "dec-public-necessity",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e06",
+        "from": "proc-structure-check",
+        "to": "proc-unavoidable-check",
+        "role": "flow"
+      },
+      {
+        "id": "e07",
+        "from": "proc-unavoidable-check",
+        "to": "dec-unavoidable",
+        "role": "flow"
+      },
+      {
+        "id": "e08",
+        "from": "dec-unavoidable",
+        "to": "proc-exemption-applicable",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e09",
+        "from": "dec-unavoidable",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e10",
+        "from": "proc-exemption-applicable",
+        "to": "proc-exemption-scope-check",
+        "role": "flow"
+      },
+      {
+        "id": "e11",
+        "from": "proc-exemption-scope-check",
+        "to": "end-pass",
+        "role": "flow"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-ORDER-A136-2-9-P3",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": [
+        "A68_9:P1"
+      ],
+      "description": "法第68条の9第1項の都道府県知事指定区域内の建築物に対する制限"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": [
+        "A136_2_9:P1"
+      ],
+      "description": "条例で定める制限の内容に関する規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

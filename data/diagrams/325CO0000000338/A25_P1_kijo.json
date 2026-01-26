@@ -1,0 +1,271 @@
+{
+  "id": "CHK-BSO-A25-P1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "階段の手すり",
+    "target_subject": "階段",
+    "description": "階段に手すりが設けられていることを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "25",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "避難"
+  ],
+  "text_raw": "階段には、手すりを設けなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "building_element",
+          "value": "階段を有する建築物"
+        },
+        {
+          "type": "dimension",
+          "operator": ">",
+          "value": 1,
+          "unit": "m",
+          "note": "高さ1メートルを超える階段の部分（令25条4項による除外）"
+        }
+      ],
+      "note": "高さ1メートル以下の階段の部分には適用しない（令25条4項）"
+    },
+    "judgment_rule": {
+      "operator": "FORALL",
+      "conditions": [
+        {
+          "ref": "info-handrail-provided",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-stairs-set",
+        "type": "process",
+        "title": "階段の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から判定対象となる階段を特定する"
+      },
+      {
+        "id": "info-stairs-set",
+        "type": "information",
+        "title": "建築物の階段",
+        "subject": "建築物",
+        "property": "階段の集合",
+        "property_type": "set_definition",
+        "description": "判定対象となる建築物に属する階段を特定",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-stair-height",
+        "type": "process",
+        "title": "階段高さの特定",
+        "process_type": "undefined_input",
+        "target_subject": "階段",
+        "iteration": "iterative",
+        "description": "設計図書等から各階段の高さを読み取る"
+      },
+      {
+        "id": "info-stair-height",
+        "type": "information",
+        "title": "階段の高さ",
+        "symbol": "H",
+        "subject": "階段",
+        "property": "高さ",
+        "property_type": "numeric",
+        "unit": "m",
+        "description": "階段の高さ（1m以下は適用除外）",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-scope-check",
+        "type": "process",
+        "title": "適用範囲判定",
+        "process_type": "mechanical",
+        "target_subject": "階段",
+        "iteration": "iterative",
+        "description": "階段の高さが1mを超えるかを判定し、規定の適用対象となるか確認",
+        "logic_expression": "H > 1",
+        "related_articles": [
+          "令::A25:P4"
+        ]
+      },
+      {
+        "id": "info-in-scope",
+        "type": "information",
+        "title": "規定適用対象",
+        "symbol": "S",
+        "subject": "階段",
+        "property": "規定適用対象",
+        "property_type": "proposition",
+        "description": "当該階段が令25条1項の適用対象となるか（高さ1m超）",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-handrail-check",
+        "type": "process",
+        "title": "手すり設置の確認",
+        "process_type": "undefined_input",
+        "target_subject": "階段",
+        "iteration": "iterative",
+        "description": "設計図書等から階段に手すりが設けられているかを確認する"
+      },
+      {
+        "id": "info-handrail-provided",
+        "type": "information",
+        "title": "手すりの有無",
+        "symbol": "R",
+        "subject": "階段",
+        "property": "手すりの設置",
+        "property_type": "proposition",
+        "description": "階段に手すりが設けられているか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-compliance-check",
+        "type": "process",
+        "title": "適合判定",
+        "process_type": "mechanical",
+        "target_subject": "階段",
+        "iteration": "iterative",
+        "description": "各階段について、適用除外または手すり設置のいずれかを満たすことを確認",
+        "logic_expression": "(NOT S) OR R"
+      },
+      {
+        "id": "info-compliance",
+        "type": "information",
+        "title": "令25条1項適合",
+        "symbol": "C",
+        "subject": "階段",
+        "property": "令25条1項適合",
+        "property_type": "proposition",
+        "description": "当該階段が令25条1項の規定に適合するか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-all-check",
+        "type": "process",
+        "title": "全階段適合確認",
+        "process_type": "mechanical",
+        "description": "全ての階段が令25条1項に適合することを確認",
+        "logic_expression": "forall(stair in Stairs): C(stair) = true"
+      },
+      {
+        "id": "info-final",
+        "type": "information",
+        "title": "建築物の令25条1項適合",
+        "subject": "建築物",
+        "property": "令25条1項適合",
+        "property_type": "proposition",
+        "description": "建築物全体として令25条1項の規定に適合するか",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-stairs-set",
+        "to": "info-stairs-set",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "info-stairs-set",
+        "to": "proc-stair-height",
+        "role": "input"
+      },
+      {
+        "id": "e03",
+        "from": "proc-stair-height",
+        "to": "info-stair-height",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "info-stair-height",
+        "to": "proc-scope-check",
+        "role": "input"
+      },
+      {
+        "id": "e05",
+        "from": "proc-scope-check",
+        "to": "info-in-scope",
+        "role": "output"
+      },
+      {
+        "id": "e06",
+        "from": "info-stairs-set",
+        "to": "proc-handrail-check",
+        "role": "input"
+      },
+      {
+        "id": "e07",
+        "from": "proc-handrail-check",
+        "to": "info-handrail-provided",
+        "role": "output"
+      },
+      {
+        "id": "e08",
+        "from": "info-in-scope",
+        "to": "proc-compliance-check",
+        "role": "input"
+      },
+      {
+        "id": "e09",
+        "from": "info-handrail-provided",
+        "to": "proc-compliance-check",
+        "role": "input"
+      },
+      {
+        "id": "e10",
+        "from": "proc-compliance-check",
+        "to": "info-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e11",
+        "from": "info-compliance",
+        "to": "proc-all-check",
+        "role": "input"
+      },
+      {
+        "id": "e12",
+        "from": "proc-all-check",
+        "to": "info-final",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": [
+        "A25:P4"
+      ],
+      "description": "高さ1メートル以下の階段の部分には適用しない旨の規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-23T16:15:00+09:00",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

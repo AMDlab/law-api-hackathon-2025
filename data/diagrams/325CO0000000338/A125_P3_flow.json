@@ -1,0 +1,339 @@
+{
+  "id": "A125_P3_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "物品販売業店舗の屋外への出口幅",
+    "target_subject": "物品販売業を営む店舗",
+    "description": "避難階に設ける屋外への出口の幅の合計が、床面積が最大の階における床面積100平方メートルにつき60センチメートルの割合で計算した数値以上となっているかを確認"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "125",
+    "paragraph": "3",
+    "item": null
+  },
+  "labels": [
+    "避難施設",
+    "出口",
+    "単体規定",
+    "物品販売業"
+  ],
+  "text_raw": "物品販売業を営む店舗の避難階に設ける屋外への出口の幅の合計は、床面積が最大の階における床面積百平方メートルにつき六十センチメートルの割合で計算した数値以上としなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "building_use",
+          "value": "物品販売業を営む店舗"
+        }
+      ],
+      "note": "物品販売業を営む店舗が対象"
+    },
+    "judgment_rule": {
+      "operator": "GTE",
+      "lhs": {
+        "description": "避難階に設ける屋外への出口の幅の合計"
+      },
+      "rhs": {
+        "description": "床面積が最大の階における床面積(m2) x 0.6(m) / 100(m2)"
+      }
+    },
+    "exceptions": null
+  },
+  "flow_diagram": {
+    "title": "令第125条第3項 物品販売業店舗の屋外への出口幅の適合判定フロー",
+    "description": "物品販売業を営む店舗について、避難階に設ける屋外への出口の幅の合計が基準を満たすか判定するフローチャート",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "令第125条第3項の適合判定開始"
+      },
+      {
+        "id": "dec-use",
+        "type": "decision",
+        "title": "建築物の用途は物品販売業を営む店舗か？",
+        "decision_type": "binary",
+        "description": "建築物が物品販売業を営む店舗に該当するか判定",
+        "condition": {
+          "operator": "EQ",
+          "lhs": {
+            "var": "U1",
+            "desc": "建築物の用途"
+          },
+          "rhs": {
+            "value": "物品販売業を営む店舗",
+            "desc": "物品販売業店舗"
+          }
+        }
+      },
+      {
+        "id": "end-not-applicable",
+        "type": "terminal",
+        "title": "対象外",
+        "result": "pass",
+        "description": "物品販売業を営む店舗に該当しないため、本条は適用されない"
+      },
+      {
+        "id": "proc-identify-floors",
+        "type": "process",
+        "title": "建築物の各階を特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の各階を特定する"
+      },
+      {
+        "id": "proc-read-floor-areas",
+        "type": "process",
+        "title": "各階の床面積を読み取り",
+        "process_type": "undefined_input",
+        "description": "設計図書等から各階の床面積を読み取る"
+      },
+      {
+        "id": "proc-calc-max-area",
+        "type": "process",
+        "title": "最大床面積を算定",
+        "process_type": "mechanical",
+        "description": "全ての階の床面積を比較し、最大となる階の床面積（Amax）を算定"
+      },
+      {
+        "id": "info-max-area",
+        "type": "information",
+        "title": "床面積が最大の階における床面積",
+        "symbol": "Amax",
+        "subject": "建築物",
+        "property": "最大床面積",
+        "property_type": "numeric",
+        "description": "床面積が最大の階における床面積（m2）"
+      },
+      {
+        "id": "proc-identify-evacuation-floor",
+        "type": "process",
+        "title": "避難階を特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から避難階を特定する"
+      },
+      {
+        "id": "proc-identify-exits",
+        "type": "process",
+        "title": "避難階の屋外への出口を特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から避難階に設ける屋外への出口を特定する"
+      },
+      {
+        "id": "proc-read-exit-widths",
+        "type": "process",
+        "title": "各出口の幅を読み取り",
+        "process_type": "undefined_input",
+        "description": "設計図書等から各屋外への出口の幅を読み取る"
+      },
+      {
+        "id": "proc-calc-total-width",
+        "type": "process",
+        "title": "出口幅合計を算定",
+        "process_type": "mechanical",
+        "description": "避難階に設ける屋外への出口の幅の合計（Wsum）を算定"
+      },
+      {
+        "id": "info-total-width",
+        "type": "information",
+        "title": "出口幅の合計",
+        "symbol": "Wsum",
+        "subject": "避難階",
+        "property": "屋外への出口の幅の合計",
+        "property_type": "numeric",
+        "description": "避難階に設ける屋外への出口の幅の合計（m）"
+      },
+      {
+        "id": "proc-calc-required-width",
+        "type": "process",
+        "title": "必要出口幅を算定",
+        "process_type": "mechanical",
+        "description": "床面積が最大の階における床面積100m2につき60cmの割合で必要出口幅（Wreq = Amax × 0.6 / 100）を算定"
+      },
+      {
+        "id": "info-required-width",
+        "type": "information",
+        "title": "必要出口幅",
+        "symbol": "Wreq",
+        "subject": "建築物",
+        "property": "必要出口幅",
+        "property_type": "numeric",
+        "description": "床面積が最大の階における床面積100m2につき60cmの割合で計算した数値（m）"
+      },
+      {
+        "id": "dec-width-check",
+        "type": "decision",
+        "title": "出口幅合計 ≧ 必要出口幅か？",
+        "decision_type": "binary",
+        "description": "出口幅の合計が必要出口幅以上であるか判定（Wsum ≧ Wreq）",
+        "condition": {
+          "operator": "GTE",
+          "lhs": {
+            "var": "Wsum",
+            "desc": "出口幅の合計"
+          },
+          "rhs": {
+            "var": "Wreq",
+            "desc": "必要出口幅",
+            "unit": "m"
+          }
+        }
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "出口幅の合計が必要出口幅以上であり、令第125条第3項に適合"
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "出口幅の合計が必要出口幅未満であり、令第125条第3項に不適合"
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge-001",
+        "from": "start",
+        "to": "dec-use",
+        "role": "flow"
+      },
+      {
+        "id": "edge-002",
+        "from": "dec-use",
+        "to": "end-not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "edge-003",
+        "from": "dec-use",
+        "to": "proc-identify-floors",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "edge-004",
+        "from": "proc-identify-floors",
+        "to": "proc-read-floor-areas",
+        "role": "flow"
+      },
+      {
+        "id": "edge-005",
+        "from": "proc-read-floor-areas",
+        "to": "proc-calc-max-area",
+        "role": "flow"
+      },
+      {
+        "id": "edge-006",
+        "from": "proc-calc-max-area",
+        "to": "info-max-area",
+        "role": "output"
+      },
+      {
+        "id": "edge-007",
+        "from": "info-max-area",
+        "to": "proc-identify-evacuation-floor",
+        "role": "flow"
+      },
+      {
+        "id": "edge-008",
+        "from": "proc-identify-evacuation-floor",
+        "to": "proc-identify-exits",
+        "role": "flow"
+      },
+      {
+        "id": "edge-009",
+        "from": "proc-identify-exits",
+        "to": "proc-read-exit-widths",
+        "role": "flow"
+      },
+      {
+        "id": "edge-010",
+        "from": "proc-read-exit-widths",
+        "to": "proc-calc-total-width",
+        "role": "flow"
+      },
+      {
+        "id": "edge-011",
+        "from": "proc-calc-total-width",
+        "to": "info-total-width",
+        "role": "output"
+      },
+      {
+        "id": "edge-012",
+        "from": "info-total-width",
+        "to": "proc-calc-required-width",
+        "role": "flow"
+      },
+      {
+        "id": "edge-013",
+        "from": "info-max-area",
+        "to": "proc-calc-required-width",
+        "role": "input"
+      },
+      {
+        "id": "edge-014",
+        "from": "proc-calc-required-width",
+        "to": "info-required-width",
+        "role": "output"
+      },
+      {
+        "id": "edge-015",
+        "from": "info-required-width",
+        "to": "dec-width-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-016",
+        "from": "info-total-width",
+        "to": "dec-width-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-017",
+        "from": "dec-width-check",
+        "to": "end-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "edge-018",
+        "from": "dec-width-check",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-A125-P3",
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": [
+        "A124:P3"
+      ],
+      "description": "前条第3項の規定を準用（第4項による）"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00Z",
+    "updated_at": "2026-01-26T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-skill",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

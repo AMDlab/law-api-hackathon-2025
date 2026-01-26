@@ -1,0 +1,573 @@
+{
+  "id": "A130_12_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "後退距離算定から除外される建築物の部分",
+    "target_subject": "建築物の部分",
+    "description": "法第56条第2項・第4項の道路斜線制限における後退距離算定から除外される建築物の部分に該当するかを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "130の12",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "集団規定",
+    "道路斜線制限",
+    "後退距離",
+    "セットバック"
+  ],
+  "text_raw": "法第五十六条第二項及び第四項の政令で定める建築物の部分は、次に掲げるものとする。一 物置その他これに類する用途に供する建築物の部分で次に掲げる要件に該当するもの イ 軒の高さが二・三メートル以下で、かつ、床面積の合計が五平方メートル以内であること。ロ 当該部分の水平投影の前面道路に面する長さを敷地の前面道路に接する部分の水平投影の長さで除した数値が五分の一以下であること。ハ 当該部分から前面道路の境界線までの水平距離のうち最小のものが一メートル以上であること。二 ポーチその他これに類する建築物の部分で、前号ロ及びハに掲げる要件に該当し、かつ、高さが五メートル以下であるもの 三 道路に沿つて設けられる高さが二メートル以下の門又は塀（高さが一・二メートルを超えるものにあつては、当該一・二メートルを超える部分が網状その他これに類する形状であるものに限る。）四 隣地境界線に沿つて設けられる門又は塀 五 歩廊、渡り廊下その他これらに類する建築物の部分で、特定行政庁がその地方の気候若しくは風土の特殊性又は土地の状況を考慮して規則で定めたもの 六 前各号に掲げるもののほか、建築物の部分で高さが一・二メートル以下のもの",
+  "kijo_diagram_ref": "A130_12_P1_kijo",
+  "flow_diagram": {
+    "title": "後退距離算定除外判定フロー",
+    "description": "建築物の部分が令130条の12第1項各号のいずれかに該当するか判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "後退距離算定から除外される建築物の部分の判定を開始"
+      },
+      {
+        "id": "dec-use",
+        "type": "decision",
+        "title": "建築物の部分の用途は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "物置等" },
+          { "value": "ポーチ等" },
+          { "value": "門又は塀" },
+          { "value": "歩廊等" },
+          { "value": "その他" }
+        ],
+        "description": "判定対象の建築物の部分の用途を確認"
+      },
+      {
+        "id": "proc-item1-route",
+        "type": "process",
+        "title": "第1号（物置等）の判定へ",
+        "process_type": "mechanical"
+      },
+      {
+        "id": "dec-eaves-height",
+        "type": "decision",
+        "title": "軒の高さは2.3m以下か？",
+        "decision_type": "binary",
+        "description": "第1号イの要件：軒の高さ2.3m以下",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "H1", "desc": "軒の高さ" },
+          "rhs": { "value": 2.3, "unit": "m" }
+        }
+      },
+      {
+        "id": "dec-floor-area",
+        "type": "decision",
+        "title": "床面積の合計は5m2以内か？",
+        "decision_type": "binary",
+        "description": "第1号イの要件：床面積の合計5m2以内",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "A", "desc": "床面積の合計" },
+          "rhs": { "value": 5, "unit": "m2" }
+        }
+      },
+      {
+        "id": "dec-road-facing-ratio",
+        "type": "decision",
+        "title": "前面道路に面する長さ比率は1/5以下か？",
+        "decision_type": "binary",
+        "description": "第1号ロの要件：当該部分の水平投影の前面道路に面する長さを敷地の前面道路に接する部分の水平投影の長さで除した数値が1/5以下",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "R", "desc": "前面道路に面する長さ比率" },
+          "rhs": { "value": 0.2, "unit": "-" }
+        }
+      },
+      {
+        "id": "dec-road-distance",
+        "type": "decision",
+        "title": "前面道路境界線までの最小水平距離は1m以上か？",
+        "decision_type": "binary",
+        "description": "第1号ハの要件：当該部分から前面道路の境界線までの水平距離のうち最小のものが1m以上",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "D", "desc": "前面道路境界線までの最小水平距離" },
+          "rhs": { "value": 1, "unit": "m" }
+        }
+      },
+      {
+        "id": "proc-item1-pass",
+        "type": "process",
+        "title": "第1号該当",
+        "process_type": "mechanical",
+        "description": "物置等として第1号の要件を全て満たす"
+      },
+      {
+        "id": "proc-item2-route",
+        "type": "process",
+        "title": "第2号（ポーチ等）の判定へ",
+        "process_type": "mechanical"
+      },
+      {
+        "id": "dec-road-facing-ratio-2",
+        "type": "decision",
+        "title": "前面道路に面する長さ比率は1/5以下か？",
+        "decision_type": "binary",
+        "description": "第2号の要件（第1号ロを準用）",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "R", "desc": "前面道路に面する長さ比率" },
+          "rhs": { "value": 0.2, "unit": "-" }
+        }
+      },
+      {
+        "id": "dec-road-distance-2",
+        "type": "decision",
+        "title": "前面道路境界線までの最小水平距離は1m以上か？",
+        "decision_type": "binary",
+        "description": "第2号の要件（第1号ハを準用）",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "D", "desc": "前面道路境界線までの最小水平距離" },
+          "rhs": { "value": 1, "unit": "m" }
+        }
+      },
+      {
+        "id": "dec-height-5m",
+        "type": "decision",
+        "title": "高さは5m以下か？",
+        "decision_type": "binary",
+        "description": "第2号の要件：高さ5m以下",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "H2", "desc": "高さ" },
+          "rhs": { "value": 5, "unit": "m" }
+        }
+      },
+      {
+        "id": "proc-item2-pass",
+        "type": "process",
+        "title": "第2号該当",
+        "process_type": "mechanical",
+        "description": "ポーチ等として第2号の要件を全て満たす"
+      },
+      {
+        "id": "proc-item3-route",
+        "type": "process",
+        "title": "第3号・第4号（門又は塀）の判定へ",
+        "process_type": "mechanical"
+      },
+      {
+        "id": "dec-location",
+        "type": "decision",
+        "title": "設置位置は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "道路沿い" },
+          { "value": "隣地境界線沿い" }
+        ],
+        "description": "門又は塀の設置位置を確認"
+      },
+      {
+        "id": "dec-height-2m",
+        "type": "decision",
+        "title": "高さは2m以下か？",
+        "decision_type": "binary",
+        "description": "第3号の要件：高さ2m以下",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "H2", "desc": "高さ" },
+          "rhs": { "value": 2, "unit": "m" }
+        }
+      },
+      {
+        "id": "dec-height-1.2m",
+        "type": "decision",
+        "title": "高さは1.2m以下か？",
+        "decision_type": "binary",
+        "description": "高さ1.2m以下であれば網状形状の確認不要",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "H2", "desc": "高さ" },
+          "rhs": { "value": 1.2, "unit": "m" }
+        }
+      },
+      {
+        "id": "dec-mesh",
+        "type": "decision",
+        "title": "1.2m超部分は網状形状か？",
+        "decision_type": "binary",
+        "description": "高さ1.2mを超える部分が網状その他これに類する形状であるか"
+      },
+      {
+        "id": "proc-item3-pass",
+        "type": "process",
+        "title": "第3号該当",
+        "process_type": "mechanical",
+        "description": "道路沿いの門又は塀として第3号の要件を満たす"
+      },
+      {
+        "id": "proc-item4-pass",
+        "type": "process",
+        "title": "第4号該当",
+        "process_type": "mechanical",
+        "description": "隣地境界線沿いの門又は塀として第4号に該当（高さ制限なし）"
+      },
+      {
+        "id": "proc-item5-route",
+        "type": "process",
+        "title": "第5号（歩廊等）の判定へ",
+        "process_type": "mechanical"
+      },
+      {
+        "id": "dec-local-rule",
+        "type": "decision",
+        "title": "特定行政庁規則に該当するか？",
+        "decision_type": "binary",
+        "description": "特定行政庁がその地方の気候・風土の特殊性又は土地の状況を考慮して規則で定めたものに該当するか"
+      },
+      {
+        "id": "proc-item5-pass",
+        "type": "process",
+        "title": "第5号該当",
+        "process_type": "human_judgment",
+        "description": "歩廊等として特定行政庁規則に該当する"
+      },
+      {
+        "id": "proc-item6-route",
+        "type": "process",
+        "title": "第6号（高さ1.2m以下）の判定へ",
+        "process_type": "mechanical",
+        "description": "前各号に該当しない場合の判定"
+      },
+      {
+        "id": "dec-height-1.2m-item6",
+        "type": "decision",
+        "title": "高さは1.2m以下か？",
+        "decision_type": "binary",
+        "description": "第6号の要件：高さ1.2m以下",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "H2", "desc": "高さ" },
+          "rhs": { "value": 1.2, "unit": "m" }
+        }
+      },
+      {
+        "id": "proc-item6-pass",
+        "type": "process",
+        "title": "第6号該当",
+        "process_type": "mechanical",
+        "description": "高さ1.2m以下の建築物の部分として第6号に該当"
+      },
+      {
+        "id": "end-excluded",
+        "type": "terminal",
+        "title": "後退距離算定から除外",
+        "result": "pass",
+        "description": "当該建築物の部分は後退距離算定から除外される"
+      },
+      {
+        "id": "end-not-excluded",
+        "type": "terminal",
+        "title": "後退距離算定から除外されない",
+        "result": "fail",
+        "description": "当該建築物の部分は後退距離算定から除外されない"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-use",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-use",
+        "to": "proc-item1-route",
+        "role": "option",
+        "label": "物置等"
+      },
+      {
+        "id": "e03",
+        "from": "dec-use",
+        "to": "proc-item2-route",
+        "role": "option",
+        "label": "ポーチ等"
+      },
+      {
+        "id": "e04",
+        "from": "dec-use",
+        "to": "proc-item3-route",
+        "role": "option",
+        "label": "門又は塀"
+      },
+      {
+        "id": "e05",
+        "from": "dec-use",
+        "to": "proc-item5-route",
+        "role": "option",
+        "label": "歩廊等"
+      },
+      {
+        "id": "e06",
+        "from": "dec-use",
+        "to": "proc-item6-route",
+        "role": "option",
+        "label": "その他"
+      },
+      {
+        "id": "e07",
+        "from": "proc-item1-route",
+        "to": "dec-eaves-height",
+        "role": "flow"
+      },
+      {
+        "id": "e08",
+        "from": "dec-eaves-height",
+        "to": "dec-floor-area",
+        "role": "yes"
+      },
+      {
+        "id": "e09",
+        "from": "dec-eaves-height",
+        "to": "proc-item6-route",
+        "role": "no"
+      },
+      {
+        "id": "e10",
+        "from": "dec-floor-area",
+        "to": "dec-road-facing-ratio",
+        "role": "yes"
+      },
+      {
+        "id": "e11",
+        "from": "dec-floor-area",
+        "to": "proc-item6-route",
+        "role": "no"
+      },
+      {
+        "id": "e12",
+        "from": "dec-road-facing-ratio",
+        "to": "dec-road-distance",
+        "role": "yes"
+      },
+      {
+        "id": "e13",
+        "from": "dec-road-facing-ratio",
+        "to": "proc-item6-route",
+        "role": "no"
+      },
+      {
+        "id": "e14",
+        "from": "dec-road-distance",
+        "to": "proc-item1-pass",
+        "role": "yes"
+      },
+      {
+        "id": "e15",
+        "from": "dec-road-distance",
+        "to": "proc-item6-route",
+        "role": "no"
+      },
+      {
+        "id": "e16",
+        "from": "proc-item1-pass",
+        "to": "end-excluded",
+        "role": "flow"
+      },
+      {
+        "id": "e17",
+        "from": "proc-item2-route",
+        "to": "dec-road-facing-ratio-2",
+        "role": "flow"
+      },
+      {
+        "id": "e18",
+        "from": "dec-road-facing-ratio-2",
+        "to": "dec-road-distance-2",
+        "role": "yes"
+      },
+      {
+        "id": "e19",
+        "from": "dec-road-facing-ratio-2",
+        "to": "proc-item6-route",
+        "role": "no"
+      },
+      {
+        "id": "e20",
+        "from": "dec-road-distance-2",
+        "to": "dec-height-5m",
+        "role": "yes"
+      },
+      {
+        "id": "e21",
+        "from": "dec-road-distance-2",
+        "to": "proc-item6-route",
+        "role": "no"
+      },
+      {
+        "id": "e22",
+        "from": "dec-height-5m",
+        "to": "proc-item2-pass",
+        "role": "yes"
+      },
+      {
+        "id": "e23",
+        "from": "dec-height-5m",
+        "to": "proc-item6-route",
+        "role": "no"
+      },
+      {
+        "id": "e24",
+        "from": "proc-item2-pass",
+        "to": "end-excluded",
+        "role": "flow"
+      },
+      {
+        "id": "e25",
+        "from": "proc-item3-route",
+        "to": "dec-location",
+        "role": "flow"
+      },
+      {
+        "id": "e26",
+        "from": "dec-location",
+        "to": "dec-height-2m",
+        "role": "option",
+        "label": "道路沿い"
+      },
+      {
+        "id": "e27",
+        "from": "dec-location",
+        "to": "proc-item4-pass",
+        "role": "option",
+        "label": "隣地境界線沿い"
+      },
+      {
+        "id": "e28",
+        "from": "dec-height-2m",
+        "to": "dec-height-1.2m",
+        "role": "yes"
+      },
+      {
+        "id": "e29",
+        "from": "dec-height-2m",
+        "to": "proc-item6-route",
+        "role": "no"
+      },
+      {
+        "id": "e30",
+        "from": "dec-height-1.2m",
+        "to": "proc-item3-pass",
+        "role": "yes"
+      },
+      {
+        "id": "e31",
+        "from": "dec-height-1.2m",
+        "to": "dec-mesh",
+        "role": "no"
+      },
+      {
+        "id": "e32",
+        "from": "dec-mesh",
+        "to": "proc-item3-pass",
+        "role": "yes"
+      },
+      {
+        "id": "e33",
+        "from": "dec-mesh",
+        "to": "proc-item6-route",
+        "role": "no"
+      },
+      {
+        "id": "e34",
+        "from": "proc-item3-pass",
+        "to": "end-excluded",
+        "role": "flow"
+      },
+      {
+        "id": "e35",
+        "from": "proc-item4-pass",
+        "to": "end-excluded",
+        "role": "flow"
+      },
+      {
+        "id": "e36",
+        "from": "proc-item5-route",
+        "to": "dec-local-rule",
+        "role": "flow"
+      },
+      {
+        "id": "e37",
+        "from": "dec-local-rule",
+        "to": "proc-item5-pass",
+        "role": "yes"
+      },
+      {
+        "id": "e38",
+        "from": "dec-local-rule",
+        "to": "proc-item6-route",
+        "role": "no"
+      },
+      {
+        "id": "e39",
+        "from": "proc-item5-pass",
+        "to": "end-excluded",
+        "role": "flow"
+      },
+      {
+        "id": "e40",
+        "from": "proc-item6-route",
+        "to": "dec-height-1.2m-item6",
+        "role": "flow"
+      },
+      {
+        "id": "e41",
+        "from": "dec-height-1.2m-item6",
+        "to": "proc-item6-pass",
+        "role": "yes"
+      },
+      {
+        "id": "e42",
+        "from": "dec-height-1.2m-item6",
+        "to": "end-not-excluded",
+        "role": "no"
+      },
+      {
+        "id": "e43",
+        "from": "proc-item6-pass",
+        "to": "end-excluded",
+        "role": "flow"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": [
+        "A56:P2",
+        "A56:P4"
+      ],
+      "description": "法第56条第2項・第4項の道路斜線制限における後退距離算定の特例を定める"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T12:00:00Z",
+    "updated_at": "2026-01-26T12:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

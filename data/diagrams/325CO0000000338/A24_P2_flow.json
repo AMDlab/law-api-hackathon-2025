@@ -1,0 +1,266 @@
+{
+  "id": "A24_P2_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "直階段踊場の踏幅",
+    "target_subject": "直階段の踊場",
+    "description": "令第24条第1項の規定によって設ける直階段の踊場の踏幅が1.2メートル以上であることを確認"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "24",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "避難",
+    "階段"
+  ],
+  "text_raw": "前項の規定によつて設ける直階段の踊場の踏幅は、一・二メートル以上としなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "requirement",
+          "value": "令第24条第1項により踊場設置が必要な直階段を有する建築物"
+        }
+      ],
+      "note": "令第24条第1項の規定によって踊場を設けなければならない直階段に適用"
+    },
+    "judgment_rule": {
+      "operator": ">=",
+      "lhs": {
+        "ref": "info-tread-width",
+        "description": "踊場の踏幅"
+      },
+      "rhs": {
+        "value": 1.2,
+        "unit": "m"
+      }
+    }
+  },
+  "flow_diagram": {
+    "title": "直階段踊場の踏幅適合判定フロー",
+    "description": "令第24条第1項の規定によって設ける直階段の踊場の踏幅が1.2メートル以上であることを判定するフロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "直階段踊場の踏幅適合判定開始"
+      },
+      {
+        "id": "dec-has-stair",
+        "type": "decision",
+        "title": "建築物に直階段があるか？",
+        "decision_type": "binary",
+        "description": "建築物に直階段が存在するかを確認"
+      },
+      {
+        "id": "dec-p1-applicable",
+        "type": "decision",
+        "title": "令第24条第1項により踊場設置が必要な直階段か？",
+        "decision_type": "binary",
+        "description": "令第23条第1項の表（一）又は（二）該当で高さ3m超、又はその他で高さ4m超に該当するかを判定",
+        "related_articles": ["令::A24:P1", "令::A23:P1"]
+      },
+      {
+        "id": "proc-p1-applicable",
+        "type": "process",
+        "title": "第1項適用対象として記録",
+        "process_type": "mechanical",
+        "description": "令第24条第1項適用対象の直階段として記録"
+      },
+      {
+        "id": "dec-has-landing",
+        "type": "decision",
+        "title": "直階段に踊場が設けられているか？",
+        "decision_type": "binary",
+        "description": "令第24条第1項の規定によって設けられた踊場があるかを確認"
+      },
+      {
+        "id": "dec-tread-width",
+        "type": "decision",
+        "title": "踏幅が1.2m以上か？",
+        "decision_type": "binary",
+        "description": "踊場の踏幅が1.2メートル以上であるかを判定",
+        "condition": {
+          "operator": "GTE",
+          "lhs": {
+            "var": "TW",
+            "desc": "踊場の踏幅"
+          },
+          "rhs": {
+            "value": 1.2,
+            "unit": "m"
+          }
+        },
+        "related_articles": ["令::A24:P2"]
+      },
+      {
+        "id": "proc-width-compliant",
+        "type": "process",
+        "title": "踏幅基準適合として記録",
+        "process_type": "mechanical",
+        "description": "当該踊場の踏幅が基準に適合していることを記録"
+      },
+      {
+        "id": "dec-more-landings",
+        "type": "decision",
+        "title": "未判定の踊場があるか？",
+        "decision_type": "binary",
+        "description": "当該直階段に未判定の踊場があるかを確認"
+      },
+      {
+        "id": "dec-more-stairs",
+        "type": "decision",
+        "title": "未判定の直階段があるか？",
+        "decision_type": "binary",
+        "description": "建築物に未判定の直階段があるかを確認"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令第24条第2項に適合（全ての対象踊場の踏幅が1.2m以上）"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "令第24条第2項に不適合（踏幅が1.2m未満の踊場がある）"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-has-stair",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-has-stair",
+        "to": "dec-p1-applicable",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "dec-has-stair",
+        "to": "pass",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e04",
+        "from": "dec-p1-applicable",
+        "to": "proc-p1-applicable",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e05",
+        "from": "dec-p1-applicable",
+        "to": "dec-more-stairs",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e06",
+        "from": "proc-p1-applicable",
+        "to": "dec-has-landing",
+        "role": "flow"
+      },
+      {
+        "id": "e07",
+        "from": "dec-has-landing",
+        "to": "dec-tread-width",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e08",
+        "from": "dec-has-landing",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e09",
+        "from": "dec-tread-width",
+        "to": "proc-width-compliant",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e10",
+        "from": "dec-tread-width",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e11",
+        "from": "proc-width-compliant",
+        "to": "dec-more-landings",
+        "role": "flow"
+      },
+      {
+        "id": "e12",
+        "from": "dec-more-landings",
+        "to": "dec-tread-width",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e13",
+        "from": "dec-more-landings",
+        "to": "dec-more-stairs",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e14",
+        "from": "dec-more-stairs",
+        "to": "dec-p1-applicable",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e15",
+        "from": "dec-more-stairs",
+        "to": "pass",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-ORD-A24-P2",
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": ["A23:P1", "A24:P1"],
+      "description": "令第23条第1項（階段の寸法）の表（一）（二）区分、令第24条第1項（踊場の設置要件）を参照"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00+09:00",
+    "updated_at": "2026-01-26T00:00:00+09:00",
+    "author": "Claude",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

@@ -1,0 +1,231 @@
+{
+  "id": "CHK-BSL-ORD-A129_6-P1-I4",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "エレベーターのかごの非常用開口部",
+    "target_subject": "エレベーターのかご",
+    "description": "エレベーターのかごの天井部に非常救出用開口部が設けられているかの判定"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "129の6",
+    "paragraph": "1",
+    "item": "4"
+  },
+  "labels": [
+    "単体規定",
+    "建築設備",
+    "昇降機",
+    "エレベーター"
+  ],
+  "text_raw": "非常の場合においてかご内の人を安全にかご外に救出することができる開口部をかごの天井部に設けること。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "equipment",
+          "value": "エレベーターのかご"
+        }
+      ],
+      "note": "令第129条の6第1項の適用対象となるエレベーターのかご"
+    },
+    "judgment_rule": {
+      "operator": "==",
+      "lhs": {
+        "ref": "info-opening-compliance"
+      },
+      "rhs": {
+        "value": true
+      }
+    },
+    "exceptions": null
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-cage-identify",
+        "type": "process",
+        "title": "かごの特定",
+        "process_type": "undefined_input",
+        "description": "審査対象となるエレベーターのかごを特定"
+      },
+      {
+        "id": "info-cage-set",
+        "type": "information",
+        "title": "エレベーターのかご",
+        "symbol": "C",
+        "subject": "エレベーター",
+        "property": "かごの集合",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "審査対象となるエレベーターに属するかご"
+      },
+      {
+        "id": "proc-ceiling-opening-identify",
+        "type": "process",
+        "title": "天井部開口部の特定",
+        "process_type": "undefined_input",
+        "iteration": "iterative",
+        "description": "各かごの天井部に設けられた開口部を特定"
+      },
+      {
+        "id": "info-ceiling-opening-set",
+        "type": "information",
+        "title": "天井部の開口部",
+        "symbol": "O",
+        "subject": "かご",
+        "property": "天井部に設けられた開口部の集合",
+        "property_type": "set_definition",
+        "plurality": "multiple",
+        "description": "各かごの天井部に設けられた開口部"
+      },
+      {
+        "id": "proc-rescue-capability-check",
+        "type": "process",
+        "title": "救出機能の確認",
+        "process_type": "human_judgment",
+        "iteration": "iterative",
+        "description": "非常の場合においてかご内の人を安全にかご外に救出することができる開口部であるかを確認"
+      },
+      {
+        "id": "info-rescue-capability",
+        "type": "information",
+        "title": "救出機能",
+        "symbol": "R",
+        "subject": "開口部",
+        "property": "非常時救出機能",
+        "property_type": "proposition",
+        "plurality": "multiple",
+        "description": "非常の場合においてかご内の人を安全にかご外に救出することができるか"
+      },
+      {
+        "id": "proc-item4-judge",
+        "type": "process",
+        "title": "第四号適合判定",
+        "process_type": "mechanical",
+        "iteration": "iterative",
+        "description": "各かごについて天井部に非常救出用開口部が設けられているか判定",
+        "logic_expression": "EXISTS(O) AND R"
+      },
+      {
+        "id": "info-item4-each-compliance",
+        "type": "information",
+        "title": "各かごの第四号適合",
+        "symbol": "I4",
+        "subject": "かご",
+        "property": "第四号基準適合",
+        "property_type": "proposition",
+        "plurality": "multiple",
+        "description": "各かごについて天井部に非常救出用開口部を設けているか"
+      },
+      {
+        "id": "proc-final-judge",
+        "type": "process",
+        "title": "最終適合判定",
+        "process_type": "mechanical",
+        "description": "全てのかごが第四号に適合するか判定",
+        "logic_expression": "FORALL(I4)"
+      },
+      {
+        "id": "info-item4-compliance",
+        "type": "information",
+        "title": "第四号適合",
+        "symbol": "COMPLIANT",
+        "subject": "エレベーター",
+        "property": "非常用開口部規定適合性",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "令第129条の6第1項第四号の基準（非常用開口部）に適合するか"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-cage-identify",
+        "to": "info-cage-set",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "info-cage-set",
+        "to": "proc-ceiling-opening-identify",
+        "role": "input"
+      },
+      {
+        "id": "e03",
+        "from": "proc-ceiling-opening-identify",
+        "to": "info-ceiling-opening-set",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "info-ceiling-opening-set",
+        "to": "proc-rescue-capability-check",
+        "role": "input"
+      },
+      {
+        "id": "e05",
+        "from": "proc-rescue-capability-check",
+        "to": "info-rescue-capability",
+        "role": "output"
+      },
+      {
+        "id": "e06",
+        "from": "info-cage-set",
+        "to": "proc-item4-judge",
+        "role": "input"
+      },
+      {
+        "id": "e07",
+        "from": "info-ceiling-opening-set",
+        "to": "proc-item4-judge",
+        "role": "input"
+      },
+      {
+        "id": "e08",
+        "from": "info-rescue-capability",
+        "to": "proc-item4-judge",
+        "role": "input"
+      },
+      {
+        "id": "e09",
+        "from": "proc-item4-judge",
+        "to": "info-item4-each-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e10",
+        "from": "info-item4-each-compliance",
+        "to": "proc-final-judge",
+        "role": "input"
+      },
+      {
+        "id": "e11",
+        "from": "proc-final-judge",
+        "to": "info-item4-compliance",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": ["A34"],
+      "description": "法第34条による政令への委任（昇降機の構造規定）"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-25T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

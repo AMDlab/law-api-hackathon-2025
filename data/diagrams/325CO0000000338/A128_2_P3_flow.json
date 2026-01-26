@@ -1,0 +1,370 @@
+{
+  "id": "A128_2_P3_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "耐火・準耐火建築物による遮断時の通路",
+    "target_subject": "敷地内建築物群",
+    "description": "耐火建築物又は準耐火建築物が防火上有効に遮っている場合の通路設置義務（延べ面積合計3000㎡超の場合）"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "128_2",
+    "paragraph": "3",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "避難",
+    "敷地内通路",
+    "防火"
+  ],
+  "text_raw": "耐火建築物又は準耐火建築物が延べ面積の合計千平方メートル以内ごとに区画された建築物を相互に防火上有効に遮つている場合においては、これらの建築物については、前項の規定は、適用しない。ただし、これらの建築物の延べ面積の合計が三千平方メートルを超える場合においては、その延べ面積の合計三千平方メートル以内ごとに、その周囲に同項の国土交通大臣が定める基準に適合する通路を設けなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        { "type": "situation", "value": "同一敷地内に二以上の建築物がある場合" },
+        { "type": "situation", "value": "耐火建築物又は準耐火建築物が1000㎡以内ごとに区画された建築物を防火上有効に遮っている" },
+        { "type": "threshold", "value": "建築物の延べ面積の合計が3000㎡を超える" }
+      ],
+      "note": "第2項の適用除外を受けた場合で、延べ面積合計が3000㎡を超える場合のただし書き規定"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        { "type": "requirement", "value": "延べ面積の合計3000㎡以内ごとに区画" },
+        { "type": "requirement", "value": "各区画の周囲に国土交通大臣が定める基準に適合する通路を設置" }
+      ]
+    }
+  },
+  "flow_diagram": {
+    "title": "令第128条の2第3項 適合判定フロー",
+    "description": "耐火・準耐火建築物による防火遮断時の通路設置義務の適合判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start"
+      },
+      {
+        "id": "dec-multiple-buildings",
+        "type": "decision",
+        "title": "同一敷地内に2以上の建築物があるか？",
+        "decision_type": "binary",
+        "description": "同一敷地内に複数の建築物が存在するかを確認"
+      },
+      {
+        "id": "proc-na",
+        "type": "process",
+        "title": "本条非該当",
+        "process_type": "mechanical",
+        "description": "同一敷地内に複数の建築物がないため本条の対象外"
+      },
+      {
+        "id": "dec-fireproof-exists",
+        "type": "decision",
+        "title": "耐火建築物又は準耐火建築物が存在するか？",
+        "decision_type": "binary",
+        "description": "防火遮蔽用の耐火建築物又は準耐火建築物の存在を確認"
+      },
+      {
+        "id": "dec-partition-1000",
+        "type": "decision",
+        "title": "建築物は1000㎡以内ごとに区画されているか？",
+        "decision_type": "binary",
+        "description": "遮蔽される建築物が延べ面積1000㎡以内ごとに区画されているか確認"
+      },
+      {
+        "id": "dec-shielding-effective",
+        "type": "decision",
+        "title": "防火上有効に遮っているか？",
+        "decision_type": "binary",
+        "description": "耐火建築物又は準耐火建築物が区画された建築物を相互に防火上有効に遮っているか確認"
+      },
+      {
+        "id": "proc-para2-exempt",
+        "type": "process",
+        "title": "第2項適用除外確定",
+        "process_type": "mechanical",
+        "description": "防火遮蔽の条件を満たすため第2項の規定は適用されない"
+      },
+      {
+        "id": "dec-total-area-over-3000",
+        "type": "decision",
+        "title": "延べ面積の合計が3000㎡を超えるか？",
+        "decision_type": "binary",
+        "description": "防火遮蔽されている建築物群の延べ面積の合計を確認",
+        "condition": {
+          "operator": "GT",
+          "lhs": { "var": "A_total", "desc": "延べ面積の合計" },
+          "rhs": { "value": 3000, "unit": "㎡" }
+        }
+      },
+      {
+        "id": "proc-no-path-required",
+        "type": "process",
+        "title": "通路設置不要",
+        "process_type": "mechanical",
+        "description": "延べ面積合計が3000㎡以下のため通路設置義務なし"
+      },
+      {
+        "id": "proc-path-required",
+        "type": "process",
+        "title": "通路設置義務発生",
+        "process_type": "mechanical",
+        "description": "ただし書き該当：3000㎡以内ごとに通路設置が必要"
+      },
+      {
+        "id": "dec-partition-3000",
+        "type": "decision",
+        "title": "3000㎡以内ごとに区画されているか？",
+        "decision_type": "binary",
+        "description": "延べ面積の合計3000㎡以内ごとに建築物群を区画しているか確認"
+      },
+      {
+        "id": "dec-path-exists",
+        "type": "decision",
+        "title": "各区画の周囲に通路が設けられているか？",
+        "decision_type": "binary",
+        "description": "3000㎡以内ごとの各区画の周囲に通路が存在するか確認"
+      },
+      {
+        "id": "dec-path-standard",
+        "type": "decision",
+        "title": "通路は国土交通大臣基準に適合するか？",
+        "decision_type": "binary",
+        "description": "通路が避難上及び消火上有効なものとして国土交通大臣が定める基準に適合するか確認",
+        "related_articles": ["令::A128_2:P2"]
+      },
+      {
+        "id": "dec-all-partitions-checked",
+        "type": "decision",
+        "title": "全ての区画を確認したか？",
+        "decision_type": "binary",
+        "description": "3000㎡以内ごとの全ての区画について通路基準適合を確認"
+      },
+      {
+        "id": "end-pass-exempt",
+        "type": "terminal",
+        "title": "適合（第2項適用除外・通路不要）",
+        "result": "pass",
+        "description": "延べ面積合計3000㎡以下のため第2項適用除外のみで適合"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "全ての区画において通路基準を満たし適合"
+      },
+      {
+        "id": "end-fail-partition",
+        "type": "terminal",
+        "title": "不適合（区画不備）",
+        "result": "fail",
+        "description": "3000㎡以内ごとの区画が適切に設定されていない"
+      },
+      {
+        "id": "end-fail-path-missing",
+        "type": "terminal",
+        "title": "不適合（通路未設置）",
+        "result": "fail",
+        "description": "各区画の周囲に通路が設けられていない"
+      },
+      {
+        "id": "end-fail-path-standard",
+        "type": "terminal",
+        "title": "不適合（通路基準不適合）",
+        "result": "fail",
+        "description": "通路が国土交通大臣が定める基準に適合していない"
+      },
+      {
+        "id": "end-na",
+        "type": "terminal",
+        "title": "本条非該当",
+        "result": "end",
+        "description": "本条の適用対象外"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-multiple-buildings",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-multiple-buildings",
+        "to": "dec-fireproof-exists",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "dec-multiple-buildings",
+        "to": "proc-na",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e04",
+        "from": "proc-na",
+        "to": "end-na",
+        "role": "flow"
+      },
+      {
+        "id": "e05",
+        "from": "dec-fireproof-exists",
+        "to": "dec-partition-1000",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e06",
+        "from": "dec-fireproof-exists",
+        "to": "end-na",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e07",
+        "from": "dec-partition-1000",
+        "to": "dec-shielding-effective",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e08",
+        "from": "dec-partition-1000",
+        "to": "end-na",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e09",
+        "from": "dec-shielding-effective",
+        "to": "proc-para2-exempt",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e10",
+        "from": "dec-shielding-effective",
+        "to": "end-na",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e11",
+        "from": "proc-para2-exempt",
+        "to": "dec-total-area-over-3000",
+        "role": "flow"
+      },
+      {
+        "id": "e12",
+        "from": "dec-total-area-over-3000",
+        "to": "proc-path-required",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e13",
+        "from": "dec-total-area-over-3000",
+        "to": "proc-no-path-required",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e14",
+        "from": "proc-no-path-required",
+        "to": "end-pass-exempt",
+        "role": "flow"
+      },
+      {
+        "id": "e15",
+        "from": "proc-path-required",
+        "to": "dec-partition-3000",
+        "role": "flow"
+      },
+      {
+        "id": "e16",
+        "from": "dec-partition-3000",
+        "to": "dec-path-exists",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e17",
+        "from": "dec-partition-3000",
+        "to": "end-fail-partition",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e18",
+        "from": "dec-path-exists",
+        "to": "dec-path-standard",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e19",
+        "from": "dec-path-exists",
+        "to": "end-fail-path-missing",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e20",
+        "from": "dec-path-standard",
+        "to": "dec-all-partitions-checked",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e21",
+        "from": "dec-path-standard",
+        "to": "end-fail-path-standard",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e22",
+        "from": "dec-all-partitions-checked",
+        "to": "end-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e23",
+        "from": "dec-all-partitions-checked",
+        "to": "dec-path-exists",
+        "role": "no",
+        "label": "いいえ（次の区画へ）"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-ORD-A128_2-P3",
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": ["A128_2:P2"],
+      "description": "前項の通路基準を参照（国土交通大臣が定める基準）"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00+09:00",
+    "author": "Claude",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

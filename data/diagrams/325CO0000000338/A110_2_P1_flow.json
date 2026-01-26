@@ -1,0 +1,134 @@
+{
+  "id": "A110_2_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "延焼するおそれがある外壁の開口部の判定",
+    "target_subject": "外壁の開口部",
+    "description": "法第27条第1項の政令で定める外壁の開口部に該当するか判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "110の2",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": ["定義", "防火", "外壁開口部", "延焼"],
+  "text_raw": "法第二十七条第一項の政令で定める外壁の開口部は、次に掲げるものとする。一 延焼のおそれのある部分であるもの（法第八十六条の四各号のいずれかに該当する建築物の外壁の開口部を除く。）二 他の外壁の開口部から通常の火災時における火炎が到達するおそれがあるものとして国土交通大臣が定めるもの（前号に掲げるものを除く。）",
+  "kijo_diagram_ref": "CHK-BSL-ORDER-A110-2-P1",
+  "flow_diagram": {
+    "title": "令110条の2第1項適合判定フロー",
+    "description": "法第27条第1項に規定する政令で定める外壁の開口部該当性の判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start"
+      },
+      {
+        "id": "proc-identify-opening",
+        "type": "process",
+        "title": "外壁開口部の特定",
+        "process_type": "undefined_input",
+        "description": "判定対象の建築物に属する外壁の開口部を特定"
+      },
+      {
+        "id": "dec-ensho-area",
+        "type": "decision",
+        "title": "開口部は延焼のおそれのある部分に位置するか?",
+        "decision_type": "binary",
+        "description": "各開口部が延焼のおそれのある部分（法第2条第6号）に該当するか判定"
+      },
+      {
+        "id": "dec-law86-4-applicable",
+        "type": "decision",
+        "title": "建築物が法第86条の4各号のいずれかに該当するか?",
+        "decision_type": "binary",
+        "description": "法第86条の4各号（防火地域等における一定の建築物）に該当するか",
+        "related_articles": ["法::A86_4"]
+      },
+      {
+        "id": "proc-item1-applicable",
+        "type": "process",
+        "title": "第1号該当",
+        "process_type": "mechanical",
+        "description": "延焼のおそれのある部分であり、法第86条の4各号に該当しないため第1号に該当"
+      },
+      {
+        "id": "dec-minister-standard",
+        "type": "decision",
+        "title": "他の外壁開口部から火炎到達のおそれがあるか?",
+        "decision_type": "binary",
+        "description": "他の外壁の開口部から通常の火災時における火炎が到達するおそれがあるものとして国土交通大臣が定める基準に該当するか",
+        "process_type": "human_judgment"
+      },
+      {
+        "id": "proc-item2-applicable",
+        "type": "process",
+        "title": "第2号該当",
+        "process_type": "mechanical",
+        "description": "大臣基準に該当し、第1号に該当しないため第2号に該当"
+      },
+      {
+        "id": "pass-item1",
+        "type": "terminal",
+        "title": "該当（第1号）",
+        "result": "pass",
+        "description": "令第110条の2第1項第1号の外壁開口部に該当（延焼のおそれのある部分であるもの）"
+      },
+      {
+        "id": "pass-item2",
+        "type": "terminal",
+        "title": "該当（第2号）",
+        "result": "pass",
+        "description": "令第110条の2第1項第2号の外壁開口部に該当（大臣基準該当）"
+      },
+      {
+        "id": "end-not-applicable",
+        "type": "terminal",
+        "title": "非該当",
+        "result": "end",
+        "description": "令第110条の2第1項に定める外壁の開口部に非該当"
+      }
+    ],
+    "edges": [
+      {"id": "e01", "from": "start", "to": "proc-identify-opening", "role": "flow"},
+      {"id": "e02", "from": "proc-identify-opening", "to": "dec-ensho-area", "role": "flow"},
+      {"id": "e03", "from": "dec-ensho-area", "to": "dec-law86-4-applicable", "role": "yes"},
+      {"id": "e04", "from": "dec-ensho-area", "to": "dec-minister-standard", "role": "no"},
+      {"id": "e05", "from": "dec-law86-4-applicable", "to": "dec-minister-standard", "role": "yes"},
+      {"id": "e06", "from": "dec-law86-4-applicable", "to": "proc-item1-applicable", "role": "no"},
+      {"id": "e07", "from": "proc-item1-applicable", "to": "pass-item1", "role": "flow"},
+      {"id": "e08", "from": "dec-minister-standard", "to": "proc-item2-applicable", "role": "yes"},
+      {"id": "e09", "from": "dec-minister-standard", "to": "end-not-applicable", "role": "no"},
+      {"id": "e10", "from": "proc-item2-applicable", "to": "pass-item2", "role": "flow"}
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": ["A27:P1"],
+      "description": "法第27条第1項で定められる外壁開口部の定義を委任"
+    },
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A86_4"],
+      "description": "第1号の適用除外に係る法第86条の4"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00Z",
+    "generator": "claude-code-flow-generator",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

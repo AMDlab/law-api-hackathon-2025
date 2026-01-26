@@ -1,0 +1,307 @@
+{
+  "id": "A62_4_P2_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "補強コンクリートブロック造の耐力壁長さ",
+    "target_subject": "補強コンクリートブロック造の建築物",
+    "description": "各階の張り間方向及びけた行方向に配置する補強コンクリートブロック造の耐力壁の長さの合計が基準以上かを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "62の4",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造規定",
+    "補強コンクリートブロック造"
+  ],
+  "text_raw": "各階の張り間方向及びけた行方向に配置する補強コンクリートブロツク造の耐力壁の長さのそれぞれの方向についての合計は、その階の床面積一平方メートルにつき十五センチメートル以上としなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "structure",
+          "value": "補強コンクリートブロック造"
+        }
+      ],
+      "note": "補強コンクリートブロック造の建築物に適用"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-compliance-harimama",
+          "operator": "==",
+          "value": true,
+          "note": "張り間方向の耐力壁長さの合計が基準以上"
+        },
+        {
+          "ref": "info-compliance-ketayuki",
+          "operator": "==",
+          "value": true,
+          "note": "けた行方向の耐力壁長さの合計が基準以上"
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "flow_diagram": {
+    "title": "令第62条の4第2項 耐力壁長さ適合判定フロー",
+    "description": "補強コンクリートブロック造の各階における張り間方向及びけた行方向の耐力壁長さが基準（床面積×15cm/m2）以上かを判定する",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start"
+      },
+      {
+        "id": "proc-identify-floors",
+        "type": "process",
+        "title": "対象階の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書から補強コンクリートブロック造建築物の各階を特定する"
+      },
+      {
+        "id": "proc-set-floor-iteration",
+        "type": "process",
+        "title": "各階の判定開始",
+        "process_type": "mechanical",
+        "description": "全ての階について以下の判定を行う（反復処理）"
+      },
+      {
+        "id": "proc-read-floor-area",
+        "type": "process",
+        "title": "床面積の読み取り",
+        "process_type": "undefined_input",
+        "description": "設計図書から当該階の床面積を読み取る"
+      },
+      {
+        "id": "proc-calc-required-length",
+        "type": "process",
+        "title": "必要耐力壁長さの算出",
+        "process_type": "mechanical",
+        "description": "必要耐力壁長さ = 床面積 × 15cm/m2"
+      },
+      {
+        "id": "proc-read-harimama-length",
+        "type": "process",
+        "title": "張り間方向耐力壁長さの読み取り",
+        "process_type": "undefined_input",
+        "description": "設計図書から当該階の張り間方向に配置する耐力壁の長さの合計を読み取る"
+      },
+      {
+        "id": "dec-harimama-check",
+        "type": "decision",
+        "title": "張り間方向耐力壁長さ >= 必要長さか？",
+        "decision_type": "binary",
+        "description": "張り間方向の耐力壁長さの合計が必要長さ（床面積×15cm/m2）以上かを判定",
+        "condition": {
+          "operator": "GTE",
+          "lhs": {
+            "var": "Lh",
+            "desc": "張り間方向耐力壁長さ合計"
+          },
+          "rhs": {
+            "var": "Lr",
+            "desc": "必要耐力壁長さ",
+            "unit": "cm"
+          }
+        }
+      },
+      {
+        "id": "proc-harimama-pass",
+        "type": "process",
+        "title": "張り間方向基準適合",
+        "process_type": "mechanical",
+        "description": "当該階の張り間方向耐力壁長さは基準に適合"
+      },
+      {
+        "id": "proc-read-ketayuki-length",
+        "type": "process",
+        "title": "けた行方向耐力壁長さの読み取り",
+        "process_type": "undefined_input",
+        "description": "設計図書から当該階のけた行方向に配置する耐力壁の長さの合計を読み取る"
+      },
+      {
+        "id": "dec-ketayuki-check",
+        "type": "decision",
+        "title": "けた行方向耐力壁長さ >= 必要長さか？",
+        "decision_type": "binary",
+        "description": "けた行方向の耐力壁長さの合計が必要長さ（床面積×15cm/m2）以上かを判定",
+        "condition": {
+          "operator": "GTE",
+          "lhs": {
+            "var": "Lk",
+            "desc": "けた行方向耐力壁長さ合計"
+          },
+          "rhs": {
+            "var": "Lr",
+            "desc": "必要耐力壁長さ",
+            "unit": "cm"
+          }
+        }
+      },
+      {
+        "id": "proc-ketayuki-pass",
+        "type": "process",
+        "title": "けた行方向基準適合",
+        "process_type": "mechanical",
+        "description": "当該階のけた行方向耐力壁長さは基準に適合"
+      },
+      {
+        "id": "dec-all-floors-checked",
+        "type": "decision",
+        "title": "全ての階を確認したか？",
+        "decision_type": "binary",
+        "description": "全階の判定が完了したかを確認"
+      },
+      {
+        "id": "proc-next-floor",
+        "type": "process",
+        "title": "次の階へ",
+        "process_type": "mechanical",
+        "description": "次の階の判定に移行"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "全ての階において張り間方向及びけた行方向の耐力壁長さが基準以上であり、令第62条の4第2項に適合"
+      },
+      {
+        "id": "end-fail-harimama",
+        "type": "terminal",
+        "title": "不適合（張り間方向）",
+        "result": "fail",
+        "description": "張り間方向の耐力壁長さが基準に満たないため、令第62条の4第2項に不適合"
+      },
+      {
+        "id": "end-fail-ketayuki",
+        "type": "terminal",
+        "title": "不適合（けた行方向）",
+        "result": "fail",
+        "description": "けた行方向の耐力壁長さが基準に満たないため、令第62条の4第2項に不適合"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "proc-identify-floors",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "proc-identify-floors",
+        "to": "proc-set-floor-iteration",
+        "role": "flow"
+      },
+      {
+        "id": "e03",
+        "from": "proc-set-floor-iteration",
+        "to": "proc-read-floor-area",
+        "role": "flow"
+      },
+      {
+        "id": "e04",
+        "from": "proc-read-floor-area",
+        "to": "proc-calc-required-length",
+        "role": "flow"
+      },
+      {
+        "id": "e05",
+        "from": "proc-calc-required-length",
+        "to": "proc-read-harimama-length",
+        "role": "flow"
+      },
+      {
+        "id": "e06",
+        "from": "proc-read-harimama-length",
+        "to": "dec-harimama-check",
+        "role": "flow"
+      },
+      {
+        "id": "e07",
+        "from": "dec-harimama-check",
+        "to": "proc-harimama-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e08",
+        "from": "dec-harimama-check",
+        "to": "end-fail-harimama",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e09",
+        "from": "proc-harimama-pass",
+        "to": "proc-read-ketayuki-length",
+        "role": "flow"
+      },
+      {
+        "id": "e10",
+        "from": "proc-read-ketayuki-length",
+        "to": "dec-ketayuki-check",
+        "role": "flow"
+      },
+      {
+        "id": "e11",
+        "from": "dec-ketayuki-check",
+        "to": "proc-ketayuki-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e12",
+        "from": "dec-ketayuki-check",
+        "to": "end-fail-ketayuki",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e13",
+        "from": "proc-ketayuki-pass",
+        "to": "dec-all-floors-checked",
+        "role": "flow"
+      },
+      {
+        "id": "e14",
+        "from": "dec-all-floors-checked",
+        "to": "end-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e15",
+        "from": "dec-all-floors-checked",
+        "to": "proc-next-floor",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e16",
+        "from": "proc-next-floor",
+        "to": "proc-read-floor-area",
+        "role": "flow"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-ORDER-A62_4-P2",
+  "metadata": {
+    "created_at": "2026-01-26T12:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

@@ -1,0 +1,249 @@
+{
+  "id": "CHK-BSL-FLOW-A126-5-P1-I2",
+  "version": "3.2",
+  "page_title": {
+    "title": "非常用の照明装置の構造（第2号：大臣認定）適合判定フロー",
+    "target_subject": "非常用の照明装置",
+    "description": "国土交通大臣の認定を受けた非常用の照明装置の適合判定フロー"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "126_5",
+    "paragraph": "1",
+    "item": "2"
+  },
+  "labels": [
+    "単体規定",
+    "避難施設",
+    "非常用の照明装置",
+    "大臣認定"
+  ],
+  "text_raw": "火災時において、停電した場合に自動的に点灯し、かつ、避難するまでの間に、当該建築物の室内の温度が上昇した場合にあつても床面において一ルクス以上の照度を確保することができるものとして、国土交通大臣の認定を受けたものとすること。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "building_element",
+          "value": "令第126条の4第1項に規定する非常用の照明装置を設置する建築物"
+        }
+      ],
+      "note": "令第126条の5第1項第2号は第1号（仕様規定）との選択"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-minister-certification",
+          "description": "国土交通大臣の認定を受けた非常用の照明装置であること"
+        }
+      ]
+    }
+  },
+  "flow_diagram": {
+    "title": "令第126条の5第1項第2号 適合判定フロー",
+    "description": "非常用の照明装置が国土交通大臣の認定を受けたものであるかを判定するフロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "非常用の照明装置（大臣認定）の適合判定を開始"
+      },
+      {
+        "id": "proc-identify-lighting",
+        "type": "process",
+        "title": "非常用照明装置の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物に設置される非常用の照明装置を特定する"
+      },
+      {
+        "id": "info-lighting-set",
+        "type": "information",
+        "title": "非常用の照明装置",
+        "symbol": "L",
+        "subject": "建築物",
+        "property": "非常用照明装置の集合",
+        "property_type": "set_definition",
+        "description": "建築物に設置される非常用の照明装置の一覧"
+      },
+      {
+        "id": "decision-has-lighting",
+        "type": "decision",
+        "title": "非常用照明装置があるか？",
+        "decision_type": "binary",
+        "description": "建築物に非常用の照明装置が設置されているか確認",
+        "condition": {
+          "operator": "GT",
+          "lhs": { "var": "L.count", "desc": "非常用照明装置の数" },
+          "rhs": { "value": 0 }
+        }
+      },
+      {
+        "id": "proc-select-lighting",
+        "type": "process",
+        "title": "照明装置を1つ選択",
+        "process_type": "mechanical",
+        "description": "未確認の非常用照明装置を1つ選択する"
+      },
+      {
+        "id": "proc-check-certification",
+        "type": "process",
+        "title": "大臣認定の確認",
+        "process_type": "undefined_input",
+        "description": "当該照明装置が国土交通大臣の認定を受けたものであるか確認する"
+      },
+      {
+        "id": "decision-has-certification",
+        "type": "decision",
+        "title": "大臣認定を受けているか？",
+        "decision_type": "binary",
+        "description": "火災時に停電した場合に自動点灯し、室内温度上昇時にも床面で1lx以上の照度を確保できるものとして国土交通大臣の認定を受けているか",
+        "condition": {
+          "operator": "EQ",
+          "lhs": { "var": "MC", "desc": "大臣認定の有無" },
+          "rhs": { "value": true, "desc": "認定あり" }
+        }
+      },
+      {
+        "id": "decision-more-lighting",
+        "type": "decision",
+        "title": "未確認の照明装置があるか？",
+        "decision_type": "binary",
+        "description": "まだ確認していない非常用照明装置があるか",
+        "condition": {
+          "operator": "GT",
+          "lhs": { "var": "L.remaining", "desc": "未確認の照明装置数" },
+          "rhs": { "value": 0 }
+        }
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "全ての非常用照明装置が大臣認定を受けており、令第126条の5第1項第2号に適合",
+        "related_articles": ["令第126条の5第1項第2号"]
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "大臣認定を受けていない非常用照明装置があり、令第126条の5第1項第2号に不適合",
+        "related_articles": ["令第126条の5第1項第2号"]
+      },
+      {
+        "id": "end-not-applicable",
+        "type": "terminal",
+        "title": "該当なし",
+        "result": "end",
+        "description": "非常用の照明装置が設置されていないため本号は適用されない"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "proc-identify-lighting",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "proc-identify-lighting",
+        "to": "info-lighting-set",
+        "role": "output"
+      },
+      {
+        "id": "e03",
+        "from": "info-lighting-set",
+        "to": "decision-has-lighting",
+        "role": "input"
+      },
+      {
+        "id": "e04",
+        "from": "decision-has-lighting",
+        "to": "proc-select-lighting",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e05",
+        "from": "decision-has-lighting",
+        "to": "end-not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e06",
+        "from": "proc-select-lighting",
+        "to": "proc-check-certification",
+        "role": "flow"
+      },
+      {
+        "id": "e07",
+        "from": "proc-check-certification",
+        "to": "decision-has-certification",
+        "role": "flow"
+      },
+      {
+        "id": "e08",
+        "from": "decision-has-certification",
+        "to": "decision-more-lighting",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e09",
+        "from": "decision-has-certification",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e10",
+        "from": "decision-more-lighting",
+        "to": "proc-select-lighting",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e11",
+        "from": "decision-more-lighting",
+        "to": "end-pass",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-KIJO-A126-5-P1-I2",
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": ["A126_4:P1"],
+      "description": "非常用の照明装置の設置義務規定（適用範囲の参照）"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": ["A126_5:P1:I1"],
+      "description": "第1号（仕様規定）は第2号（大臣認定）との選択関係"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

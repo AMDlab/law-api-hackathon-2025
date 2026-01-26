@@ -1,0 +1,446 @@
+{
+  "id": "CHK-BSL-FLOW-A129_13_3-P2",
+  "version": "3.2",
+  "page_title": {
+    "title": "非常用エレベーターの設置数及び配置",
+    "target_subject": "非常用エレベーター",
+    "description": "高さ31mを超える部分の床面積が最大の階の床面積に応じた非常用エレベーターの必要設置数と、2基以上設置する場合の配置基準の適合判定フロー"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "129の13の3",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "昇降機",
+    "非常用エレベーター"
+  ],
+  "text_raw": "前項の非常用の昇降機であるエレベーター（以下「非常用エレベーター」という。）の数は、高さ三十一メートルを超える部分の床面積が最大の階における床面積に応じて、次の表に定める数以上とし、二以上の非常用エレベーターを設置する場合には、避難上及び消火上有効な間隔を保つて配置しなければならない。\n\n【表】高さ31mを超える部分の床面積が最大の階の床面積\n(一) 1500m2以下の場合 → 1基\n(二) 1500m2を超える場合 → 3000m2以内を増すごとに(一)の数に1を加えた数",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "building_standard",
+          "value": "法第34条第2項の規定により非常用の昇降機を設置すべき建築物"
+        }
+      ],
+      "note": "高さ31mを超える建築物で非常用エレベーターの設置が必要な場合に適用"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "quantity",
+          "operator": ">=",
+          "lhs": {
+            "variable": "設置する非常用エレベーターの数"
+          },
+          "rhs": {
+            "variable": "表に定める必要数"
+          },
+          "description": "非常用エレベーターの数が基準以上"
+        },
+        {
+          "type": "arrangement",
+          "condition": "2基以上設置する場合は避難上及び消火上有効な間隔を保って配置",
+          "description": "配置間隔の基準"
+        }
+      ]
+    }
+  },
+  "flow_diagram": {
+    "title": "非常用エレベーターの設置数及び配置の適合判定フロー",
+    "description": "令第129条の13の3第2項に基づく非常用エレベーターの設置数及び配置基準の適合判定を行うフローチャート",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "非常用エレベーターの設置数及び配置の適合判定を開始"
+      },
+      {
+        "id": "dec-applicable",
+        "type": "decision",
+        "title": "非常用エレベーター設置対象建築物か？",
+        "decision_type": "binary",
+        "description": "法第34条第2項の規定により非常用の昇降機を設置すべき建築物（高さ31mを超える建築物）に該当するか"
+      },
+      {
+        "id": "info-building",
+        "type": "information",
+        "title": "対象建築物",
+        "symbol": "B",
+        "subject": "建築物",
+        "property": "非常用エレベーター設置対象建築物",
+        "property_type": "set_definition",
+        "description": "法第34条第2項の規定により非常用エレベーターを設置すべき建築物"
+      },
+      {
+        "id": "info-floor-area",
+        "type": "information",
+        "title": "基準階床面積",
+        "symbol": "A",
+        "subject": "階",
+        "property": "床面積",
+        "property_type": "numeric",
+        "description": "高さ31mを超える部分の床面積が最大の階における床面積（m2）"
+      },
+      {
+        "id": "dec-floor-area-1500",
+        "type": "decision",
+        "title": "基準階床面積は1500m2以下か？",
+        "decision_type": "binary",
+        "description": "A <= 1500 を判定",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "A", "desc": "基準階床面積" },
+          "rhs": { "value": 1500, "unit": "m2" }
+        }
+      },
+      {
+        "id": "proc-required-1",
+        "type": "process",
+        "title": "必要設置数: 1基",
+        "process_type": "mechanical",
+        "description": "床面積1500m2以下の場合、非常用エレベーターの必要設置数は1基"
+      },
+      {
+        "id": "dec-floor-area-4500",
+        "type": "decision",
+        "title": "基準階床面積は4500m2以下か？",
+        "decision_type": "binary",
+        "description": "A <= 4500 を判定（1500m2超の場合）",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "A", "desc": "基準階床面積" },
+          "rhs": { "value": 4500, "unit": "m2" }
+        }
+      },
+      {
+        "id": "proc-required-2",
+        "type": "process",
+        "title": "必要設置数: 2基",
+        "process_type": "mechanical",
+        "description": "床面積1500m2超4500m2以下の場合、非常用エレベーターの必要設置数は2基"
+      },
+      {
+        "id": "dec-floor-area-7500",
+        "type": "decision",
+        "title": "基準階床面積は7500m2以下か？",
+        "decision_type": "binary",
+        "description": "A <= 7500 を判定（4500m2超の場合）",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "A", "desc": "基準階床面積" },
+          "rhs": { "value": 7500, "unit": "m2" }
+        }
+      },
+      {
+        "id": "proc-required-3",
+        "type": "process",
+        "title": "必要設置数: 3基",
+        "process_type": "mechanical",
+        "description": "床面積4500m2超7500m2以下の場合、非常用エレベーターの必要設置数は3基"
+      },
+      {
+        "id": "proc-required-4plus",
+        "type": "process",
+        "title": "必要設置数を算定",
+        "process_type": "mechanical",
+        "description": "床面積7500m2超の場合、N = 1 + ⌈(A - 1500) / 3000⌉ で算定"
+      },
+      {
+        "id": "info-required-count",
+        "type": "information",
+        "title": "必要設置数",
+        "symbol": "N",
+        "subject": "非常用エレベーター",
+        "property": "必要設置数",
+        "property_type": "numeric",
+        "description": "表に定める非常用エレベーターの必要設置数（基）"
+      },
+      {
+        "id": "info-actual-count",
+        "type": "information",
+        "title": "計画設置数",
+        "symbol": "M",
+        "subject": "非常用エレベーター",
+        "property": "計画設置数",
+        "property_type": "numeric",
+        "description": "計画されている非常用エレベーターの設置数（基）"
+      },
+      {
+        "id": "dec-count-sufficient",
+        "type": "decision",
+        "title": "計画設置数 M >= 必要設置数 N か？",
+        "decision_type": "binary",
+        "description": "M >= N を判定",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "M", "desc": "計画設置数" },
+          "rhs": { "var": "N", "desc": "必要設置数" }
+        }
+      },
+      {
+        "id": "dec-multiple-elevators",
+        "type": "decision",
+        "title": "計画設置数 M >= 2 か？",
+        "decision_type": "binary",
+        "description": "M >= 2 を判定（複数設置の場合は配置間隔の確認が必要）",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "M", "desc": "計画設置数" },
+          "rhs": { "value": 2, "unit": "基" }
+        }
+      },
+      {
+        "id": "dec-arrangement-valid",
+        "type": "decision",
+        "title": "配置は避難上及び消火上有効な間隔を保っているか？",
+        "decision_type": "binary",
+        "description": "2基以上設置する場合の配置間隔の適合を判定"
+      },
+      {
+        "id": "dec-final-judgment",
+        "type": "decision",
+        "title": "設置数及び配置の総合判定は適合か？",
+        "decision_type": "binary",
+        "description": "C1 AND (NOT F OR C2) を判定：設置数が適合し、かつ（1基のみ、または配置間隔も適合）"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "非常用エレベーターの設置数及び配置が令第129条の13の3第2項に適合"
+      },
+      {
+        "id": "end-fail-count",
+        "type": "terminal",
+        "title": "不適合（設置数不足）",
+        "result": "fail",
+        "description": "非常用エレベーターの設置数が必要数に満たない"
+      },
+      {
+        "id": "end-fail-arrangement",
+        "type": "terminal",
+        "title": "不適合（配置不適合）",
+        "result": "fail",
+        "description": "非常用エレベーターの配置が避難上及び消火上有効な間隔を保っていない"
+      },
+      {
+        "id": "end-not-applicable",
+        "type": "terminal",
+        "title": "適用対象外",
+        "result": "end",
+        "description": "本規定の適用対象外（非常用エレベーター設置義務なし）"
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge-001",
+        "from": "start",
+        "to": "dec-applicable",
+        "role": "flow"
+      },
+      {
+        "id": "edge-002",
+        "from": "dec-applicable",
+        "to": "end-not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "edge-003",
+        "from": "dec-applicable",
+        "to": "info-building",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "edge-004",
+        "from": "info-building",
+        "to": "info-floor-area",
+        "role": "flow"
+      },
+      {
+        "id": "edge-005",
+        "from": "info-floor-area",
+        "to": "dec-floor-area-1500",
+        "role": "flow"
+      },
+      {
+        "id": "edge-006",
+        "from": "dec-floor-area-1500",
+        "to": "proc-required-1",
+        "role": "yes",
+        "label": "はい（1500m2以下）"
+      },
+      {
+        "id": "edge-007",
+        "from": "dec-floor-area-1500",
+        "to": "dec-floor-area-4500",
+        "role": "no",
+        "label": "いいえ（1500m2超）"
+      },
+      {
+        "id": "edge-008",
+        "from": "dec-floor-area-4500",
+        "to": "proc-required-2",
+        "role": "yes",
+        "label": "はい（4500m2以下）"
+      },
+      {
+        "id": "edge-009",
+        "from": "dec-floor-area-4500",
+        "to": "dec-floor-area-7500",
+        "role": "no",
+        "label": "いいえ（4500m2超）"
+      },
+      {
+        "id": "edge-010",
+        "from": "dec-floor-area-7500",
+        "to": "proc-required-3",
+        "role": "yes",
+        "label": "はい（7500m2以下）"
+      },
+      {
+        "id": "edge-011",
+        "from": "dec-floor-area-7500",
+        "to": "proc-required-4plus",
+        "role": "no",
+        "label": "いいえ（7500m2超）"
+      },
+      {
+        "id": "edge-012",
+        "from": "proc-required-1",
+        "to": "info-required-count",
+        "role": "flow"
+      },
+      {
+        "id": "edge-013",
+        "from": "proc-required-2",
+        "to": "info-required-count",
+        "role": "flow"
+      },
+      {
+        "id": "edge-014",
+        "from": "proc-required-3",
+        "to": "info-required-count",
+        "role": "flow"
+      },
+      {
+        "id": "edge-015",
+        "from": "proc-required-4plus",
+        "to": "info-required-count",
+        "role": "flow"
+      },
+      {
+        "id": "edge-016",
+        "from": "info-required-count",
+        "to": "info-actual-count",
+        "role": "flow"
+      },
+      {
+        "id": "edge-017",
+        "from": "info-actual-count",
+        "to": "dec-count-sufficient",
+        "role": "flow"
+      },
+      {
+        "id": "edge-018",
+        "from": "dec-count-sufficient",
+        "to": "end-fail-count",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "edge-019",
+        "from": "dec-count-sufficient",
+        "to": "dec-multiple-elevators",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "edge-020",
+        "from": "dec-multiple-elevators",
+        "to": "dec-final-judgment",
+        "role": "no",
+        "label": "いいえ（1基のみ）"
+      },
+      {
+        "id": "edge-021",
+        "from": "dec-multiple-elevators",
+        "to": "dec-arrangement-valid",
+        "role": "yes",
+        "label": "はい（2基以上）"
+      },
+      {
+        "id": "edge-022",
+        "from": "dec-arrangement-valid",
+        "to": "dec-final-judgment",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "edge-023",
+        "from": "dec-arrangement-valid",
+        "to": "end-fail-arrangement",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "edge-024",
+        "from": "dec-final-judgment",
+        "to": "end-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "edge-025",
+        "from": "dec-final-judgment",
+        "to": "end-fail-count",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-KIJO-A129_13_3-P2",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": [
+        "A34:P2"
+      ],
+      "description": "非常用の昇降機の設置を定める上位規定"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": [
+        "A129_13_3:P1"
+      ],
+      "description": "非常用の昇降機はエレベーターとする旨の規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-01-26T00:00:00Z",
+    "updated_at": "2025-01-26T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

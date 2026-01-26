@@ -1,0 +1,361 @@
+{
+  "id": "A126_5_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "非常用照明装置の構造",
+    "target_subject": "非常用の照明装置",
+    "description": "非常用の照明装置が満たすべき構造要件の適合判定フロー"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "126の5",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "避難",
+    "非常用照明"
+  ],
+  "text_raw": "前条第一項の非常用の照明装置は、次の各号のいずれかに定める構造としなければならない。\n一 次に定める構造とすること。\nイ 照明は、直接照明とし、床面において一ルクス以上の照度を確保することができるものとすること。\nロ 照明器具の構造は、火災時において温度が上昇した場合であつても著しく光度が低下しないものとして国土交通大臣が定めた構造方法を用いるものとすること。\nハ 予備電源を設けること。\nニ イからハまでに定めるもののほか、非常の場合の照明を確保するために必要があるものとして国土交通大臣が定めた構造方法を用いるものとすること。\n二 火災時において、停電した場合に自動的に点灯し、かつ、避難するまでの間に、当該建築物の室内の温度が上昇した場合にあつても床面において一ルクス以上の照度を確保することができるものとして、国土交通大臣の認定を受けたものとすること。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "reference",
+          "value": "令第126条の4第1項の非常用照明が必要な建築物"
+        }
+      ],
+      "note": "令第126条の4第1項に基づき非常用照明装置の設置が必要な居室等に設置される照明装置が対象"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "id": "item1",
+          "description": "一号：告示仕様（イ〜ニすべて適合）",
+          "operator": "AND",
+          "conditions": [
+            {"id": "item1-a", "description": "直接照明、床面1ルクス以上"},
+            {"id": "item1-b", "description": "高温時でも光度低下しない大臣告示構造"},
+            {"id": "item1-c", "description": "予備電源設置"},
+            {"id": "item1-d", "description": "その他大臣告示構造"}
+          ]
+        },
+        {
+          "id": "item2",
+          "description": "二号：大臣認定（停電時自動点灯、高温時も1ルクス以上確保）"
+        }
+      ]
+    }
+  },
+  "flow_diagram": {
+    "title": "非常用照明装置の構造 適合判定フロー",
+    "description": "令第126条の5第1項に基づく非常用照明装置の構造要件の適合判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "非常用照明装置の構造要件判定を開始"
+      },
+      {
+        "id": "dec-has-lighting",
+        "type": "decision",
+        "title": "非常用照明装置があるか？",
+        "decision_type": "binary",
+        "description": "令第126条の4第1項に基づく非常用照明装置の有無を確認"
+      },
+      {
+        "id": "proc-select-lighting",
+        "type": "process",
+        "title": "非常用照明装置を1つ選択",
+        "process_type": "mechanical",
+        "description": "未判定の非常用照明装置を1つ選択"
+      },
+      {
+        "id": "dec-structure-type",
+        "type": "decision",
+        "title": "採用する構造方式は？",
+        "decision_type": "multi",
+        "description": "一号（告示仕様）または二号（大臣認定）のいずれを採用するか",
+        "options": [
+          {"value": "一号（告示仕様）", "description": "イ〜ニの告示仕様で適合を確認"},
+          {"value": "二号（大臣認定）", "description": "国土交通大臣認定で適合を確認"}
+        ]
+      },
+      {
+        "id": "dec-direct-lighting",
+        "type": "decision",
+        "title": "直接照明か？",
+        "decision_type": "binary",
+        "description": "照明が直接照明であるか確認（一号イ）"
+      },
+      {
+        "id": "dec-illuminance",
+        "type": "decision",
+        "title": "床面照度が1ルクス以上か？",
+        "decision_type": "binary",
+        "description": "床面において1ルクス以上の照度を確保できるか確認（一号イ）",
+        "condition": {
+          "operator": "GTE",
+          "lhs": {"var": "illuminance", "desc": "床面照度"},
+          "rhs": {"value": 1, "unit": "lx", "desc": "1ルクス"}
+        }
+      },
+      {
+        "id": "dec-heat-resistant",
+        "type": "decision",
+        "title": "大臣告示の耐熱構造か？",
+        "decision_type": "binary",
+        "description": "火災時の温度上昇でも著しく光度が低下しない国土交通大臣告示の構造方法か確認（一号ロ）"
+      },
+      {
+        "id": "dec-backup-power",
+        "type": "decision",
+        "title": "予備電源が設置されているか？",
+        "decision_type": "binary",
+        "description": "予備電源が設けられているか確認（一号ハ）"
+      },
+      {
+        "id": "dec-other-method",
+        "type": "decision",
+        "title": "その他大臣告示構造に適合するか？",
+        "decision_type": "binary",
+        "description": "非常時の照明確保に必要な大臣告示構造方法（その他）に適合するか確認（一号ニ）"
+      },
+      {
+        "id": "dec-certification",
+        "type": "decision",
+        "title": "大臣認定を受けたものか？",
+        "decision_type": "binary",
+        "description": "停電時自動点灯かつ高温時も床面1ルクス以上確保する国土交通大臣認定を受けているか確認（二号）"
+      },
+      {
+        "id": "info-item1-pass",
+        "type": "information",
+        "title": "一号適合",
+        "symbol": "I1",
+        "subject": "非常用照明装置",
+        "property": "一号（告示仕様）適合",
+        "property_type": "proposition",
+        "description": "当該照明装置は一号の要件を満たす"
+      },
+      {
+        "id": "info-item2-pass",
+        "type": "information",
+        "title": "二号適合",
+        "symbol": "I2",
+        "subject": "非常用照明装置",
+        "property": "二号（大臣認定）適合",
+        "property_type": "proposition",
+        "description": "当該照明装置は二号の要件を満たす"
+      },
+      {
+        "id": "dec-all-checked",
+        "type": "decision",
+        "title": "すべての非常用照明装置を確認したか？",
+        "decision_type": "binary",
+        "description": "すべての非常用照明装置について構造要件を確認したか"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令第126条の5第1項に適合",
+        "related_articles": ["令第126条の5第1項"]
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "令第126条の5第1項に不適合",
+        "related_articles": ["令第126条の5第1項"]
+      },
+      {
+        "id": "end-na",
+        "type": "terminal",
+        "title": "対象外",
+        "result": "end",
+        "description": "非常用照明装置がないため本条の対象外"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-has-lighting",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-has-lighting",
+        "to": "proc-select-lighting",
+        "role": "yes",
+        "label": "yes"
+      },
+      {
+        "id": "e03",
+        "from": "dec-has-lighting",
+        "to": "end-na",
+        "role": "no",
+        "label": "no"
+      },
+      {
+        "id": "e04",
+        "from": "proc-select-lighting",
+        "to": "dec-structure-type",
+        "role": "flow"
+      },
+      {
+        "id": "e05",
+        "from": "dec-structure-type",
+        "to": "dec-direct-lighting",
+        "role": "option",
+        "label": "一号（告示仕様）"
+      },
+      {
+        "id": "e06",
+        "from": "dec-structure-type",
+        "to": "dec-certification",
+        "role": "option",
+        "label": "二号（大臣認定）"
+      },
+      {
+        "id": "e07",
+        "from": "dec-direct-lighting",
+        "to": "dec-illuminance",
+        "role": "yes",
+        "label": "yes"
+      },
+      {
+        "id": "e08",
+        "from": "dec-direct-lighting",
+        "to": "end-fail",
+        "role": "no",
+        "label": "no"
+      },
+      {
+        "id": "e09",
+        "from": "dec-illuminance",
+        "to": "dec-heat-resistant",
+        "role": "yes",
+        "label": "yes"
+      },
+      {
+        "id": "e10",
+        "from": "dec-illuminance",
+        "to": "end-fail",
+        "role": "no",
+        "label": "no"
+      },
+      {
+        "id": "e11",
+        "from": "dec-heat-resistant",
+        "to": "dec-backup-power",
+        "role": "yes",
+        "label": "yes"
+      },
+      {
+        "id": "e12",
+        "from": "dec-heat-resistant",
+        "to": "end-fail",
+        "role": "no",
+        "label": "no"
+      },
+      {
+        "id": "e13",
+        "from": "dec-backup-power",
+        "to": "dec-other-method",
+        "role": "yes",
+        "label": "yes"
+      },
+      {
+        "id": "e14",
+        "from": "dec-backup-power",
+        "to": "end-fail",
+        "role": "no",
+        "label": "no"
+      },
+      {
+        "id": "e15",
+        "from": "dec-other-method",
+        "to": "info-item1-pass",
+        "role": "yes",
+        "label": "yes"
+      },
+      {
+        "id": "e16",
+        "from": "dec-other-method",
+        "to": "end-fail",
+        "role": "no",
+        "label": "no"
+      },
+      {
+        "id": "e17",
+        "from": "dec-certification",
+        "to": "info-item2-pass",
+        "role": "yes",
+        "label": "yes"
+      },
+      {
+        "id": "e18",
+        "from": "dec-certification",
+        "to": "end-fail",
+        "role": "no",
+        "label": "no"
+      },
+      {
+        "id": "e19",
+        "from": "info-item1-pass",
+        "to": "dec-all-checked",
+        "role": "flow"
+      },
+      {
+        "id": "e20",
+        "from": "info-item2-pass",
+        "to": "dec-all-checked",
+        "role": "flow"
+      },
+      {
+        "id": "e21",
+        "from": "dec-all-checked",
+        "to": "end-pass",
+        "role": "yes",
+        "label": "yes"
+      },
+      {
+        "id": "e22",
+        "from": "dec-all-checked",
+        "to": "proc-select-lighting",
+        "role": "no",
+        "label": "no"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-ORD-A126_5-P1",
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": ["A126_4:P1"],
+      "description": "非常用照明装置の設置対象を規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00+09:00",
+    "author": "Claude",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

@@ -1,0 +1,619 @@
+{
+  "id": "CHK-BSL-ORD-A128_5-P4",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "大規模建築物の内装制限",
+    "target_subject": "建築物",
+    "description": "階数・延べ面積に応じた大規模建築物の居室及び通路の内装制限"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "128の5",
+    "paragraph": "4",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "内装制限",
+    "防火"
+  ],
+  "text_raw": "階数が三以上で延べ面積が五百平方メートルを超える建築物、階数が二で延べ面積が千平方メートルを超える建築物又は階数が一で延べ面積が三千平方メートルを超える建築物（学校等の用途に供するものを除く。）は、居室（床面積の合計百平方メートル以内ごとに準耐火構造の床若しくは壁又は法第二条第九号の二ロに規定する防火設備で第百十二条第十九項第二号に規定する構造であるもので区画され、かつ、法別表第一（い）欄に掲げる用途に供しない部分の居室で、主要構造部を準耐火構造とした建築物の高さが三十一メートル以下の部分にあるものを除く。）の壁及び天井の室内に面する部分の仕上げを次の各号のいずれかに掲げる仕上げと、居室から地上に通ずる主たる廊下、階段その他の通路の壁及び天井の室内に面する部分の仕上げを第一項第二号に掲げる仕上げとしなければならない。ただし、同表（い）欄（二）項に掲げる用途に供する特殊建築物の高さ三十一メートル以下の部分については、この限りでない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "building_scale",
+          "operator": "OR",
+          "conditions": [
+            { "階数": ">=3", "延べ面積": ">500㎡" },
+            { "階数": "=2", "延べ面積": ">1000㎡" },
+            { "階数": "=1", "延べ面積": ">3000㎡" }
+          ]
+        },
+        {
+          "type": "use_exclusion",
+          "value": "学校等の用途に供するものを除く"
+        }
+      ],
+      "note": "階数と延べ面積の組み合わせで適用対象を判定"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "interior_finish",
+          "target": "居室の壁及び天井の室内に面する部分",
+          "requirement": "難燃材料又は国土交通大臣が定める材料の組合せ"
+        },
+        {
+          "type": "interior_finish",
+          "target": "居室から地上に通ずる主たる廊下、階段その他の通路の壁及び天井の室内に面する部分",
+          "requirement": "準不燃材料又は国土交通大臣が定める材料の組合せ（第1項第2号）"
+        }
+      ]
+    },
+    "exceptions": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "type": "room_exclusion",
+          "value": "床面積100㎡以内ごとに準耐火構造の床・壁又は防火設備で区画され、かつ、法別表第一(い)欄に掲げる用途に供しない部分の居室で、主要構造部を準耐火構造とした建築物の高さ31m以下の部分にあるもの"
+        },
+        {
+          "type": "building_exclusion",
+          "value": "法別表第一(い)欄(二)項に掲げる用途に供する特殊建築物の高さ31m以下の部分"
+        }
+      ],
+      "effect": "EXEMPT"
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-floor-count",
+        "type": "process",
+        "title": "階数の特定",
+        "process_type": "undefined_input",
+        "description": "建築物の階数を特定"
+      },
+      {
+        "id": "info-floor-count",
+        "type": "information",
+        "title": "建築物の階数",
+        "symbol": "N",
+        "subject": "建築物",
+        "property": "階数",
+        "property_type": "numeric",
+        "unit": "階",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-total-area",
+        "type": "process",
+        "title": "延べ面積の特定",
+        "process_type": "undefined_input",
+        "description": "建築物の延べ面積を特定"
+      },
+      {
+        "id": "info-total-area",
+        "type": "information",
+        "title": "建築物の延べ面積",
+        "symbol": "A",
+        "subject": "建築物",
+        "property": "延べ面積",
+        "property_type": "numeric",
+        "unit": "㎡",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-use-check",
+        "type": "process",
+        "title": "用途の特定",
+        "process_type": "undefined_input",
+        "description": "建築物の用途を特定"
+      },
+      {
+        "id": "info-building-use",
+        "type": "information",
+        "title": "建築物の用途",
+        "symbol": "U",
+        "subject": "建築物",
+        "property": "用途",
+        "property_type": "classification",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-scale-judge",
+        "type": "process",
+        "title": "規模要件判定",
+        "process_type": "mechanical",
+        "description": "階数と延べ面積の組み合わせで適用対象か判定",
+        "logic_expression": "(N>=3 AND A>500) OR (N=2 AND A>1000) OR (N=1 AND A>3000)"
+      },
+      {
+        "id": "info-scale-applicable",
+        "type": "information",
+        "title": "規模要件該当",
+        "symbol": "SC",
+        "subject": "建築物",
+        "property": "規模要件該当",
+        "property_type": "proposition",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-school-exclude",
+        "type": "process",
+        "title": "学校等除外判定",
+        "process_type": "mechanical",
+        "description": "学校等の用途に供する建築物を除外",
+        "logic_expression": "U NOT IN {学校等}"
+      },
+      {
+        "id": "info-use-applicable",
+        "type": "information",
+        "title": "用途除外非該当",
+        "symbol": "UE",
+        "subject": "建築物",
+        "property": "学校等除外非該当",
+        "property_type": "proposition",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-applicable-judge",
+        "type": "process",
+        "title": "適用対象判定",
+        "process_type": "mechanical",
+        "description": "規模要件該当かつ学校等除外非該当で適用対象を判定",
+        "logic_expression": "SC AND UE"
+      },
+      {
+        "id": "info-applicable",
+        "type": "information",
+        "title": "適用対象建築物",
+        "symbol": "AP",
+        "subject": "建築物",
+        "property": "内装制限適用対象",
+        "property_type": "proposition",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-room-set-identify",
+        "type": "process",
+        "title": "居室の特定",
+        "process_type": "undefined_input",
+        "description": "建築物の居室を特定"
+      },
+      {
+        "id": "info-room-set",
+        "type": "information",
+        "title": "建築物の居室",
+        "subject": "建築物",
+        "property": "居室の集合",
+        "property_type": "set_definition",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-corridor-set-identify",
+        "type": "process",
+        "title": "通路の特定",
+        "process_type": "undefined_input",
+        "description": "居室から地上に通ずる主たる廊下、階段その他の通路を特定"
+      },
+      {
+        "id": "info-corridor-set",
+        "type": "information",
+        "title": "主たる通路",
+        "subject": "建築物",
+        "property": "主たる通路の集合",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "居室から地上に通ずる主たる廊下、階段その他の通路"
+      },
+      {
+        "id": "proc-room-exemption",
+        "type": "process",
+        "title": "居室除外判定",
+        "process_type": "mechanical",
+        "description": "100㎡以内ごとに区画され、法別表第一(い)欄に掲げる用途に供しない部分の居室で、主要構造部を準耐火構造とした建築物の高さ31m以下の部分にある居室を除外",
+        "iteration": "iterative",
+        "logic_expression": "(区画済み AND 非別表用途 AND 準耐火構造 AND 高さ<=31m)"
+      },
+      {
+        "id": "info-target-rooms",
+        "type": "information",
+        "title": "内装制限対象居室",
+        "symbol": "TR",
+        "subject": "居室",
+        "property": "内装制限対象",
+        "property_type": "proposition",
+        "plurality": "multiple",
+        "description": "除外条件に該当しない居室"
+      },
+      {
+        "id": "proc-room-finish-check",
+        "type": "process",
+        "title": "居室内装仕上げ確認",
+        "process_type": "undefined_input",
+        "description": "居室の壁及び天井の室内に面する部分の仕上げを確認",
+        "iteration": "iterative"
+      },
+      {
+        "id": "info-room-finish",
+        "type": "information",
+        "title": "居室の内装仕上げ",
+        "symbol": "RF",
+        "subject": "居室",
+        "property": "壁・天井の仕上げ",
+        "property_type": "classification",
+        "plurality": "multiple",
+        "description": "壁（床面からの高さ1.2m以下を除く）及び天井の室内に面する部分（回り縁、窓台等を除く）の仕上げ"
+      },
+      {
+        "id": "proc-room-finish-judge",
+        "type": "process",
+        "title": "居室内装適合判定",
+        "process_type": "mechanical",
+        "description": "居室の仕上げが難燃材料又は大臣認定材料か判定",
+        "iteration": "iterative",
+        "logic_expression": "RF IN {難燃材料, 大臣認定材料}"
+      },
+      {
+        "id": "info-room-finish-ok",
+        "type": "information",
+        "title": "居室内装適合",
+        "symbol": "ROK",
+        "subject": "居室",
+        "property": "内装基準適合",
+        "property_type": "proposition",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-corridor-finish-check",
+        "type": "process",
+        "title": "通路内装仕上げ確認",
+        "process_type": "undefined_input",
+        "description": "通路の壁及び天井の室内に面する部分の仕上げを確認",
+        "iteration": "iterative"
+      },
+      {
+        "id": "info-corridor-finish",
+        "type": "information",
+        "title": "通路の内装仕上げ",
+        "symbol": "CF",
+        "subject": "通路",
+        "property": "壁・天井の仕上げ",
+        "property_type": "classification",
+        "plurality": "multiple",
+        "description": "壁及び天井の室内に面する部分の仕上げ"
+      },
+      {
+        "id": "proc-corridor-finish-judge",
+        "type": "process",
+        "title": "通路内装適合判定",
+        "process_type": "mechanical",
+        "description": "通路の仕上げが準不燃材料又は大臣認定材料か判定（第1項第2号）",
+        "iteration": "iterative",
+        "logic_expression": "CF IN {準不燃材料, 大臣認定材料}",
+        "related_articles": ["令::A128_5:P1:I2"]
+      },
+      {
+        "id": "info-corridor-finish-ok",
+        "type": "information",
+        "title": "通路内装適合",
+        "symbol": "COK",
+        "subject": "通路",
+        "property": "内装基準適合",
+        "property_type": "proposition",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-all-rooms-judge",
+        "type": "process",
+        "title": "全居室適合判定",
+        "process_type": "mechanical",
+        "description": "全ての対象居室が内装基準に適合するか判定",
+        "logic_expression": "ALL(ROK)"
+      },
+      {
+        "id": "info-all-rooms-ok",
+        "type": "information",
+        "title": "全居室適合",
+        "symbol": "AROK",
+        "subject": "建築物",
+        "property": "全居室内装適合",
+        "property_type": "proposition",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-all-corridors-judge",
+        "type": "process",
+        "title": "全通路適合判定",
+        "process_type": "mechanical",
+        "description": "全ての通路が内装基準に適合するか判定",
+        "logic_expression": "ALL(COK)"
+      },
+      {
+        "id": "info-all-corridors-ok",
+        "type": "information",
+        "title": "全通路適合",
+        "symbol": "ACOK",
+        "subject": "建築物",
+        "property": "全通路内装適合",
+        "property_type": "proposition",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-proviso-check",
+        "type": "process",
+        "title": "ただし書判定",
+        "process_type": "mechanical",
+        "description": "法別表第一(い)欄(二)項（病院、診療所等）に掲げる用途に供する特殊建築物の高さ31m以下の部分か判定",
+        "logic_expression": "(U IN {病院等}) AND (高さ<=31m)"
+      },
+      {
+        "id": "info-proviso-exempt",
+        "type": "information",
+        "title": "ただし書該当",
+        "symbol": "PE",
+        "subject": "建築物",
+        "property": "ただし書適用除外該当",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "法別表第一(い)欄(二)項の用途で高さ31m以下の部分は適用除外"
+      },
+      {
+        "id": "proc-final-judge",
+        "type": "process",
+        "title": "最終適合判定",
+        "process_type": "mechanical",
+        "description": "適用対象外、ただし書該当、又は全要件適合で適合と判定",
+        "logic_expression": "NOT(AP) OR PE OR (AROK AND ACOK)"
+      },
+      {
+        "id": "info-final-compliance",
+        "type": "information",
+        "title": "令第128条の5第4項適合",
+        "symbol": "COMPLIANT",
+        "subject": "建築物",
+        "property": "令第128条の5第4項適合性",
+        "property_type": "proposition",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-floor-count",
+        "to": "info-floor-count",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "proc-total-area",
+        "to": "info-total-area",
+        "role": "output"
+      },
+      {
+        "id": "e03",
+        "from": "proc-use-check",
+        "to": "info-building-use",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "info-floor-count",
+        "to": "proc-scale-judge",
+        "role": "input"
+      },
+      {
+        "id": "e05",
+        "from": "info-total-area",
+        "to": "proc-scale-judge",
+        "role": "input"
+      },
+      {
+        "id": "e06",
+        "from": "proc-scale-judge",
+        "to": "info-scale-applicable",
+        "role": "output"
+      },
+      {
+        "id": "e07",
+        "from": "info-building-use",
+        "to": "proc-school-exclude",
+        "role": "input"
+      },
+      {
+        "id": "e08",
+        "from": "proc-school-exclude",
+        "to": "info-use-applicable",
+        "role": "output"
+      },
+      {
+        "id": "e09",
+        "from": "info-scale-applicable",
+        "to": "proc-applicable-judge",
+        "role": "input"
+      },
+      {
+        "id": "e10",
+        "from": "info-use-applicable",
+        "to": "proc-applicable-judge",
+        "role": "input"
+      },
+      {
+        "id": "e11",
+        "from": "proc-applicable-judge",
+        "to": "info-applicable",
+        "role": "output"
+      },
+      {
+        "id": "e12",
+        "from": "proc-room-set-identify",
+        "to": "info-room-set",
+        "role": "output"
+      },
+      {
+        "id": "e13",
+        "from": "proc-corridor-set-identify",
+        "to": "info-corridor-set",
+        "role": "output"
+      },
+      {
+        "id": "e14",
+        "from": "info-room-set",
+        "to": "proc-room-exemption",
+        "role": "input"
+      },
+      {
+        "id": "e15",
+        "from": "proc-room-exemption",
+        "to": "info-target-rooms",
+        "role": "output"
+      },
+      {
+        "id": "e16",
+        "from": "info-target-rooms",
+        "to": "proc-room-finish-check",
+        "role": "input"
+      },
+      {
+        "id": "e17",
+        "from": "proc-room-finish-check",
+        "to": "info-room-finish",
+        "role": "output"
+      },
+      {
+        "id": "e18",
+        "from": "info-room-finish",
+        "to": "proc-room-finish-judge",
+        "role": "input"
+      },
+      {
+        "id": "e19",
+        "from": "proc-room-finish-judge",
+        "to": "info-room-finish-ok",
+        "role": "output"
+      },
+      {
+        "id": "e20",
+        "from": "info-corridor-set",
+        "to": "proc-corridor-finish-check",
+        "role": "input"
+      },
+      {
+        "id": "e21",
+        "from": "proc-corridor-finish-check",
+        "to": "info-corridor-finish",
+        "role": "output"
+      },
+      {
+        "id": "e22",
+        "from": "info-corridor-finish",
+        "to": "proc-corridor-finish-judge",
+        "role": "input"
+      },
+      {
+        "id": "e23",
+        "from": "proc-corridor-finish-judge",
+        "to": "info-corridor-finish-ok",
+        "role": "output"
+      },
+      {
+        "id": "e24",
+        "from": "info-room-finish-ok",
+        "to": "proc-all-rooms-judge",
+        "role": "input"
+      },
+      {
+        "id": "e25",
+        "from": "proc-all-rooms-judge",
+        "to": "info-all-rooms-ok",
+        "role": "output"
+      },
+      {
+        "id": "e26",
+        "from": "info-corridor-finish-ok",
+        "to": "proc-all-corridors-judge",
+        "role": "input"
+      },
+      {
+        "id": "e27",
+        "from": "proc-all-corridors-judge",
+        "to": "info-all-corridors-ok",
+        "role": "output"
+      },
+      {
+        "id": "e28",
+        "from": "info-building-use",
+        "to": "proc-proviso-check",
+        "role": "input"
+      },
+      {
+        "id": "e29",
+        "from": "proc-proviso-check",
+        "to": "info-proviso-exempt",
+        "role": "output"
+      },
+      {
+        "id": "e30",
+        "from": "info-applicable",
+        "to": "proc-final-judge",
+        "role": "input"
+      },
+      {
+        "id": "e31",
+        "from": "info-proviso-exempt",
+        "to": "proc-final-judge",
+        "role": "input"
+      },
+      {
+        "id": "e32",
+        "from": "info-all-rooms-ok",
+        "to": "proc-final-judge",
+        "role": "input"
+      },
+      {
+        "id": "e33",
+        "from": "info-all-corridors-ok",
+        "to": "proc-final-judge",
+        "role": "input"
+      },
+      {
+        "id": "e34",
+        "from": "proc-final-judge",
+        "to": "info-final-compliance",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A2:P1:I9_2:ロ", "別表第一"],
+      "description": "防火設備の定義及び用途区分を参照"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": ["A112:P19:I2", "A128_5:P1:I2"],
+      "description": "防火設備の構造及び通路の仕上げ基準を参照"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-01-25T00:00:00+09:00",
+    "author": "Claude",
+    "generator": "kijo-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

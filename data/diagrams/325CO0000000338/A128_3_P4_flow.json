@@ -1,0 +1,293 @@
+{
+  "id": "A128_3_P4_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "地下街各構え居室の歩行距離",
+    "target_subject": "地下街の各構えの居室",
+    "description": "居室の各部分から地下道への出入口に至る歩行距離の制限"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "128_3",
+    "paragraph": "4",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "地下街",
+    "避難",
+    "歩行距離"
+  ],
+  "text_raw": "地下街の各構えの居室の各部分から地下道（当該居室の各部分から直接地上へ通ずる通路を含む。）への出入口の一に至る歩行距離は、三十メートル以下でなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "building_type",
+          "value": "地下街の各構え"
+        }
+      ],
+      "note": "地下街の各構えの居室に適用"
+    },
+    "judgment_rule": {
+      "operator": "<=",
+      "lhs": {
+        "type": "distance",
+        "description": "居室の各部分から地下道への出入口の一に至る歩行距離"
+      },
+      "rhs": {
+        "type": "numeric",
+        "value": 30,
+        "unit": "m"
+      }
+    }
+  },
+  "flow_diagram": {
+    "title": "令第128条の3第4項 適合判定フロー",
+    "description": "地下街各構え居室の歩行距離適合判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "審査開始",
+        "result": "start"
+      },
+      {
+        "id": "dec-underground-mall",
+        "type": "decision",
+        "title": "地下街の各構えか？",
+        "decision_type": "binary",
+        "description": "判定対象が地下街の各構え（店舗等の区画）に該当するか"
+      },
+      {
+        "id": "proc-not-applicable",
+        "type": "process",
+        "title": "本条適用対象外",
+        "process_type": "mechanical",
+        "description": "地下街の各構えに該当しないため本条は適用されない"
+      },
+      {
+        "id": "dec-has-rooms",
+        "type": "decision",
+        "title": "居室があるか？",
+        "decision_type": "binary",
+        "description": "各構えに居室が存在するかを確認"
+      },
+      {
+        "id": "proc-no-rooms",
+        "type": "process",
+        "title": "居室なし",
+        "process_type": "mechanical",
+        "description": "居室がないため歩行距離の制限対象外"
+      },
+      {
+        "id": "dec-has-exit",
+        "type": "decision",
+        "title": "地下道への出入口があるか？",
+        "decision_type": "binary",
+        "description": "地下道または直接地上へ通ずる通路への出入口が存在するか"
+      },
+      {
+        "id": "proc-no-exit",
+        "type": "process",
+        "title": "出入口なし（要是正）",
+        "process_type": "mechanical",
+        "description": "地下道への出入口がない場合は避難経路として不適切"
+      },
+      {
+        "id": "proc-measure-distance",
+        "type": "process",
+        "title": "歩行距離を計測",
+        "process_type": "undefined_input",
+        "description": "居室の各部分から出入口の一に至る最短歩行距離を計測"
+      },
+      {
+        "id": "dec-distance-check",
+        "type": "decision",
+        "title": "歩行距離は30m以下か？",
+        "decision_type": "binary",
+        "description": "居室の各部分から地下道への出入口の一に至る歩行距離が30m以下か判定",
+        "condition": {
+          "operator": "LTE",
+          "lhs": {
+            "var": "D",
+            "desc": "歩行距離"
+          },
+          "rhs": {
+            "value": 30,
+            "unit": "m",
+            "desc": "基準値"
+          }
+        }
+      },
+      {
+        "id": "proc-distance-ok",
+        "type": "process",
+        "title": "歩行距離適合",
+        "process_type": "mechanical",
+        "description": "当該部分の歩行距離は基準値以下"
+      },
+      {
+        "id": "dec-all-parts-checked",
+        "type": "decision",
+        "title": "全居室の全部分を確認したか？",
+        "decision_type": "binary",
+        "description": "各構えの全ての居室の全ての部分について歩行距離を確認したか"
+      },
+      {
+        "id": "proc-next-part",
+        "type": "process",
+        "title": "次の部分を確認",
+        "process_type": "mechanical",
+        "description": "次の居室または居室部分の歩行距離を計測"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "全居室の全部分について歩行距離が30m以下であり、令第128条の3第4項に適合"
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "歩行距離が30mを超える部分があり、令第128条の3第4項に不適合"
+      },
+      {
+        "id": "end-not-applicable",
+        "type": "terminal",
+        "title": "適用除外",
+        "result": "end",
+        "description": "本条の適用対象外"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-underground-mall",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-underground-mall",
+        "to": "dec-has-rooms",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "dec-underground-mall",
+        "to": "proc-not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e04",
+        "from": "proc-not-applicable",
+        "to": "end-not-applicable",
+        "role": "flow"
+      },
+      {
+        "id": "e05",
+        "from": "dec-has-rooms",
+        "to": "dec-has-exit",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e06",
+        "from": "dec-has-rooms",
+        "to": "proc-no-rooms",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e07",
+        "from": "proc-no-rooms",
+        "to": "end-not-applicable",
+        "role": "flow"
+      },
+      {
+        "id": "e08",
+        "from": "dec-has-exit",
+        "to": "proc-measure-distance",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e09",
+        "from": "dec-has-exit",
+        "to": "proc-no-exit",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e10",
+        "from": "proc-no-exit",
+        "to": "end-fail",
+        "role": "flow"
+      },
+      {
+        "id": "e11",
+        "from": "proc-measure-distance",
+        "to": "dec-distance-check",
+        "role": "flow"
+      },
+      {
+        "id": "e12",
+        "from": "dec-distance-check",
+        "to": "proc-distance-ok",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e13",
+        "from": "dec-distance-check",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e14",
+        "from": "proc-distance-ok",
+        "to": "dec-all-parts-checked",
+        "role": "flow"
+      },
+      {
+        "id": "e15",
+        "from": "dec-all-parts-checked",
+        "to": "end-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e16",
+        "from": "dec-all-parts-checked",
+        "to": "proc-next-part",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e17",
+        "from": "proc-next-part",
+        "to": "proc-measure-distance",
+        "role": "flow"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "A128_3_P4_kijo",
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00+09:00",
+    "author": "Claude",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

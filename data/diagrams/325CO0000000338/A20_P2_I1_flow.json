@@ -1,0 +1,83 @@
+{
+  "id": "A20_P2_I1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "住居系地域の採光補正係数算定フロー",
+    "target_subject": "開口部",
+    "description": "住居系用途地域における採光補正係数の算定フロー"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "20",
+    "paragraph": "2",
+    "item": "1"
+  },
+  "labels": ["単体規定", "採光", "居室"],
+  "text_raw": "第一種低層住居専用地域、第二種低層住居専用地域、第一種中高層住居専用地域、第二種中高層住居専用地域、第一種住居地域、第二種住居地域、準住居地域又は田園住居地域\n隣地境界線（中略）又は同一敷地内の他の建築物若しくは当該建築物の他の部分に面する開口部の部分で、（中略）採光関係比率に六・〇を乗じた数値から一・四を減じて得た算定値（次のイからハまでに掲げる場合にあつては、それぞれイからハまでに定める数値）",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [{ "type": "location", "value": "住居系用途地域" }]
+    },
+    "judgment_rule": {
+      "operator": "COMPUTE",
+      "description": "C = LR × 6.0 - 1.4（特例条件により補正）"
+    }
+  },
+  "flow_diagram": {
+    "title": "令第20条第2項第一号 住居系地域採光補正係数算定フロー",
+    "description": "住居系用途地域における開口部の採光補正係数を算定",
+    "nodes": [
+      { "id": "start", "type": "terminal", "title": "算定開始", "result": "start" },
+      { "id": "proc-position", "type": "process", "title": "開口部位置を特定", "process_type": "undefined_input", "description": "開口部が道に面するか、隣地境界線等に面するかを特定" },
+      { "id": "proc-distances", "type": "process", "title": "水平距離・垂直距離を測定", "process_type": "undefined_input", "description": "D（水平距離）とV（垂直距離）を測定" },
+      { "id": "proc-ratio", "type": "process", "title": "採光関係比率を算定", "process_type": "mechanical", "description": "LR = D / V（最小値を採用）" },
+      { "id": "proc-base", "type": "process", "title": "基本算定値を計算", "process_type": "mechanical", "description": "C0 = LR × 6.0 - 1.4" },
+      { "id": "dec-faces-road", "type": "decision", "title": "開口部が道に面するか？", "decision_type": "binary", "description": "開口部が道に面するかどうか" },
+      { "id": "dec-road-under1", "type": "decision", "title": "算定値が1.0未満か？", "decision_type": "binary", "description": "C0 < 1.0 かどうか（イの条件）" },
+      { "id": "proc-case-i", "type": "process", "title": "イ適用：C = 1.0", "process_type": "mechanical", "description": "道に面し算定値1.0未満→採光補正係数1.0" },
+      { "id": "dec-dist-7m", "type": "decision", "title": "水平距離が7m以上か？", "decision_type": "binary", "description": "D ≥ 7m かどうか" },
+      { "id": "dec-not-road-under1", "type": "decision", "title": "算定値が1.0未満か？", "decision_type": "binary", "description": "C0 < 1.0 かどうか（ロの条件）" },
+      { "id": "proc-case-ro", "type": "process", "title": "ロ適用：C = 1.0", "process_type": "mechanical", "description": "道に面せず、D≥7m、算定値1.0未満→採光補正係数1.0" },
+      { "id": "dec-negative", "type": "decision", "title": "算定値が負数か？", "decision_type": "binary", "description": "C0 < 0 かどうか（ハの条件）" },
+      { "id": "proc-case-ha", "type": "process", "title": "ハ適用：C = 0", "process_type": "mechanical", "description": "道に面せず、D<7m、算定値負数→採光補正係数0" },
+      { "id": "proc-use-base", "type": "process", "title": "基本算定値を採用", "process_type": "mechanical", "description": "C = C0（特例条件に該当しない場合）" },
+      { "id": "end-result", "type": "terminal", "title": "採光補正係数確定", "result": "end", "description": "採光補正係数の算定完了" }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "proc-position", "role": "flow" },
+      { "id": "e02", "from": "proc-position", "to": "proc-distances", "role": "flow" },
+      { "id": "e03", "from": "proc-distances", "to": "proc-ratio", "role": "flow" },
+      { "id": "e04", "from": "proc-ratio", "to": "proc-base", "role": "flow" },
+      { "id": "e05", "from": "proc-base", "to": "dec-faces-road", "role": "flow" },
+      { "id": "e06", "from": "dec-faces-road", "to": "dec-road-under1", "role": "yes" },
+      { "id": "e07", "from": "dec-faces-road", "to": "dec-dist-7m", "role": "no" },
+      { "id": "e08", "from": "dec-road-under1", "to": "proc-case-i", "role": "yes" },
+      { "id": "e09", "from": "dec-road-under1", "to": "proc-use-base", "role": "no" },
+      { "id": "e10", "from": "proc-case-i", "to": "end-result", "role": "flow" },
+      { "id": "e11", "from": "dec-dist-7m", "to": "dec-not-road-under1", "role": "yes" },
+      { "id": "e12", "from": "dec-dist-7m", "to": "dec-negative", "role": "no" },
+      { "id": "e13", "from": "dec-not-road-under1", "to": "proc-case-ro", "role": "yes" },
+      { "id": "e14", "from": "dec-not-road-under1", "to": "proc-use-base", "role": "no" },
+      { "id": "e15", "from": "proc-case-ro", "to": "end-result", "role": "flow" },
+      { "id": "e16", "from": "dec-negative", "to": "proc-case-ha", "role": "yes" },
+      { "id": "e17", "from": "dec-negative", "to": "proc-use-base", "role": "no" },
+      { "id": "e18", "from": "proc-case-ha", "to": "end-result", "role": "flow" },
+      { "id": "e19", "from": "proc-use-base", "to": "end-result", "role": "flow" }
+    ]
+  },
+  "kijo_diagram_ref": "A20_P2_I1_kijo",
+  "related_laws": [
+    { "law_id": "325AC0000000201", "law_name": "建築基準法", "law_type": "act", "relationship": "delegated_from", "articles": ["A28:P1"], "description": "法第28条第1項の採光規定から委任" },
+    { "law_id": "325CO0000000338", "law_name": "建築基準法施行令", "law_type": "order", "relationship": "references", "articles": ["A20:P1"], "description": "第1項で有効面積の算定方法を規定" }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00Z",
+    "updated_at": "2026-01-26T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator"
+  }
+}

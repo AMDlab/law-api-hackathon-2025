@@ -1,0 +1,653 @@
+{
+  "id": "CHK-BSL-ORD-A126_4-P1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "非常用の照明装置の設置",
+    "target_subject": "建築物の部分",
+    "description": "特殊建築物等の居室及び通路における非常用照明装置の設置義務"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "126_4",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "避難",
+    "非常用照明"
+  ],
+  "text_raw": "法別表第一（い）欄（一）項から（四）項までに掲げる用途に供する特殊建築物の居室、階数が三以上で延べ面積が五百平方メートルを超える建築物の居室、第百十六条の二第一項第一号に該当する窓その他の開口部を有しない居室又は延べ面積が千平方メートルを超える建築物の居室及びこれらの居室から地上に通ずる廊下、階段その他の通路（採光上有効に直接外気に開放された通路を除く。）並びにこれらに類する建築物の部分で照明装置の設置を通常要する部分には、非常用の照明装置を設けなければならない。ただし、次の各号のいずれかに該当する建築物又は建築物の部分については、この限りでない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "type": "building_use",
+          "value": "法別表第一（い）欄（一）項から（四）項の特殊建築物の居室",
+          "description": "(一)劇場等、(二)病院等、(三)学校等、(四)百貨店等"
+        },
+        {
+          "type": "building_scale",
+          "value": "階数3以上かつ延べ面積500㎡超の建築物の居室"
+        },
+        {
+          "type": "windowless",
+          "value": "令116条の2第1項第1号該当の無窓居室"
+        },
+        {
+          "type": "building_scale",
+          "value": "延べ面積1000㎡超の建築物の居室"
+        }
+      ],
+      "note": "対象居室及び通路に非常用照明装置を設置"
+    },
+    "exceptions": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "type": "building_type",
+          "item": "一号",
+          "value": "一戸建住宅、長屋・共同住宅の住戸"
+        },
+        {
+          "type": "room_type",
+          "item": "二号",
+          "value": "病院の病室、下宿の宿泊室、寄宿舎の寝室等"
+        },
+        {
+          "type": "building_use",
+          "item": "三号",
+          "value": "学校等"
+        },
+        {
+          "type": "location",
+          "item": "四号",
+          "value": "避難階又は直上階・直下階の避難上支障がない居室等（大臣告示）"
+        }
+      ],
+      "effect": "EXEMPT"
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-use-check",
+        "type": "process",
+        "title": "用途の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の用途を読み取る"
+      },
+      {
+        "id": "info-use",
+        "type": "information",
+        "title": "建築物の用途",
+        "symbol": "U",
+        "subject": "建築物",
+        "property": "用途",
+        "property_type": "classification",
+        "plurality": "single",
+        "description": "建築物の用途区分"
+      },
+      {
+        "id": "proc-special-use-judge",
+        "type": "process",
+        "title": "特殊建築物該当判定",
+        "process_type": "mechanical",
+        "description": "法別表第一（い）欄（一）項〜（四）項の用途に該当するか判定",
+        "logic_expression": "U ∈ {法別表第一(い)欄(一)〜(四)項}"
+      },
+      {
+        "id": "info-special-building",
+        "type": "information",
+        "title": "特殊建築物該当",
+        "symbol": "SP",
+        "subject": "建築物",
+        "property": "法別表第一(一)〜(四)項該当",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "劇場・病院・学校・百貨店等の用途に該当"
+      },
+      {
+        "id": "proc-floors-check",
+        "type": "process",
+        "title": "階数の確認",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の階数を読み取る"
+      },
+      {
+        "id": "info-floors",
+        "type": "information",
+        "title": "階数",
+        "symbol": "N",
+        "subject": "建築物",
+        "property": "階数",
+        "property_type": "numeric",
+        "unit": "階",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-area-check",
+        "type": "process",
+        "title": "延べ面積の確認",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の延べ面積を読み取る"
+      },
+      {
+        "id": "info-area",
+        "type": "information",
+        "title": "延べ面積",
+        "symbol": "A",
+        "subject": "建築物",
+        "property": "延べ面積",
+        "property_type": "numeric",
+        "unit": "㎡",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-scale-judge",
+        "type": "process",
+        "title": "規模要件判定",
+        "process_type": "mechanical",
+        "description": "階数3以上かつ延べ面積500㎡超、または延べ面積1000㎡超か判定",
+        "logic_expression": "(N >= 3 AND A > 500) OR (A > 1000)"
+      },
+      {
+        "id": "info-scale-applicable",
+        "type": "information",
+        "title": "規模要件該当",
+        "symbol": "SC",
+        "subject": "建築物",
+        "property": "規模要件該当",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "階数・延べ面積による適用要件に該当"
+      },
+      {
+        "id": "proc-room-set-identify",
+        "type": "process",
+        "title": "居室の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の居室を特定"
+      },
+      {
+        "id": "info-room-set",
+        "type": "information",
+        "title": "居室",
+        "subject": "建築物",
+        "property": "居室の集合",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "建築物に属する居室の集合"
+      },
+      {
+        "id": "proc-windowless-check",
+        "type": "process",
+        "title": "無窓居室の判定",
+        "process_type": "sub_diagram_reference",
+        "description": "令116条の2第1項第1号該当の無窓居室か判定",
+        "sub_diagram_ref": "CHK-BSL-ORD-A116_2-P1-I1",
+        "iteration": "iterative"
+      },
+      {
+        "id": "info-windowless",
+        "type": "information",
+        "title": "無窓居室該当",
+        "symbol": "WL",
+        "subject": "居室",
+        "property": "令116条の2第1項第1号該当",
+        "property_type": "proposition",
+        "plurality": "multiple",
+        "description": "採光上有効な開口部を有しない居室"
+      },
+      {
+        "id": "proc-target-room-judge",
+        "type": "process",
+        "title": "対象居室判定",
+        "process_type": "mechanical",
+        "description": "非常用照明が必要な居室か判定",
+        "logic_expression": "SP OR SC OR WL",
+        "iteration": "iterative"
+      },
+      {
+        "id": "info-target-room",
+        "type": "information",
+        "title": "非常用照明対象居室",
+        "symbol": "TR",
+        "subject": "居室",
+        "property": "非常用照明対象",
+        "property_type": "proposition",
+        "plurality": "multiple",
+        "description": "非常用照明装置の設置が必要な居室"
+      },
+      {
+        "id": "proc-passage-identify",
+        "type": "process",
+        "title": "通路の特定",
+        "process_type": "undefined_input",
+        "description": "対象居室から地上に通ずる廊下・階段等の通路を特定（採光上有効に直接外気に開放された通路を除く）"
+      },
+      {
+        "id": "info-passage-set",
+        "type": "information",
+        "title": "対象通路",
+        "subject": "建築物",
+        "property": "通路の集合",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "非常用照明対象となる通路（廊下、階段等）の集合"
+      },
+      {
+        "id": "proc-exempt-type-check",
+        "type": "process",
+        "title": "適用除外建築物の判定",
+        "process_type": "undefined_input",
+        "description": "一戸建住宅・長屋・共同住宅の住戸に該当するか確認"
+      },
+      {
+        "id": "info-exempt-dwelling",
+        "type": "information",
+        "title": "住宅・住戸該当",
+        "symbol": "EX1",
+        "subject": "建築物",
+        "property": "住宅・住戸該当",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "一号: 一戸建住宅、長屋・共同住宅の住戸"
+      },
+      {
+        "id": "proc-exempt-room-check",
+        "type": "process",
+        "title": "適用除外居室の判定",
+        "process_type": "undefined_input",
+        "description": "病院の病室・下宿の宿泊室・寄宿舎の寝室等に該当するか確認",
+        "iteration": "iterative"
+      },
+      {
+        "id": "info-exempt-room",
+        "type": "information",
+        "title": "病室等該当",
+        "symbol": "EX2",
+        "subject": "居室",
+        "property": "病室等該当",
+        "property_type": "proposition",
+        "plurality": "multiple",
+        "description": "二号: 病院の病室、下宿の宿泊室、寄宿舎の寝室等"
+      },
+      {
+        "id": "proc-exempt-school-check",
+        "type": "process",
+        "title": "学校等の判定",
+        "process_type": "mechanical",
+        "description": "学校等に該当するか判定",
+        "logic_expression": "U ∈ {学校等}"
+      },
+      {
+        "id": "info-exempt-school",
+        "type": "information",
+        "title": "学校等該当",
+        "symbol": "EX3",
+        "subject": "建築物",
+        "property": "学校等該当",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "三号: 学校等"
+      },
+      {
+        "id": "proc-exempt-evacuation-check",
+        "type": "process",
+        "title": "避難階等居室の判定",
+        "process_type": "human_judgment",
+        "description": "避難階又は直上階・直下階の避難上支障がない居室（国土交通大臣が定めるもの）に該当するか判定",
+        "iteration": "iterative"
+      },
+      {
+        "id": "info-exempt-evacuation",
+        "type": "information",
+        "title": "避難階等居室該当",
+        "symbol": "EX4",
+        "subject": "居室",
+        "property": "避難階等居室該当",
+        "property_type": "proposition",
+        "plurality": "multiple",
+        "description": "四号: 避難階又は直上階・直下階の避難上支障がない居室等"
+      },
+      {
+        "id": "proc-exempt-judge",
+        "type": "process",
+        "title": "適用除外判定",
+        "process_type": "mechanical",
+        "description": "いずれかの適用除外条件に該当するか判定",
+        "logic_expression": "EX1 OR EX2 OR EX3 OR EX4",
+        "iteration": "iterative"
+      },
+      {
+        "id": "info-exempt",
+        "type": "information",
+        "title": "適用除外該当",
+        "symbol": "EX",
+        "subject": "居室",
+        "property": "適用除外",
+        "property_type": "proposition",
+        "plurality": "multiple",
+        "description": "ただし書きによる適用除外に該当"
+      },
+      {
+        "id": "proc-lighting-check",
+        "type": "process",
+        "title": "非常用照明装置の確認",
+        "process_type": "undefined_input",
+        "description": "対象部分に非常用照明装置が設けられているか確認",
+        "iteration": "iterative"
+      },
+      {
+        "id": "info-lighting-installed",
+        "type": "information",
+        "title": "非常用照明装置設置",
+        "symbol": "L",
+        "subject": "建築物の部分",
+        "property": "非常用照明装置設置",
+        "property_type": "proposition",
+        "plurality": "multiple",
+        "description": "非常用照明装置が設けられているか"
+      },
+      {
+        "id": "proc-final-judge",
+        "type": "process",
+        "title": "最終適合判定",
+        "process_type": "mechanical",
+        "description": "対象部分に非常用照明装置が設置されている、又は適用除外に該当するか判定",
+        "logic_expression": "EX OR ((TR OR TP) → L)",
+        "iteration": "iterative"
+      },
+      {
+        "id": "info-compliance",
+        "type": "information",
+        "title": "令第126条の4第1項適合",
+        "symbol": "COMPLIANT",
+        "subject": "建築物の部分",
+        "property": "令第126条の4第1項適合",
+        "property_type": "proposition",
+        "plurality": "multiple",
+        "description": "非常用照明装置設置規定への適合"
+      },
+      {
+        "id": "proc-all-judge",
+        "type": "process",
+        "title": "総合適合判定",
+        "process_type": "mechanical",
+        "description": "全対象部分の適合性を総合判定",
+        "logic_expression": "ALL(COMPLIANT)"
+      },
+      {
+        "id": "info-final-compliance",
+        "type": "information",
+        "title": "令第126条の4第1項総合適合",
+        "symbol": "FINAL",
+        "subject": "建築物",
+        "property": "令第126条の4第1項総合適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "建築物全体としての適合判定"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-use-check",
+        "to": "info-use",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "info-use",
+        "to": "proc-special-use-judge",
+        "role": "input"
+      },
+      {
+        "id": "e03",
+        "from": "proc-special-use-judge",
+        "to": "info-special-building",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "proc-floors-check",
+        "to": "info-floors",
+        "role": "output"
+      },
+      {
+        "id": "e05",
+        "from": "proc-area-check",
+        "to": "info-area",
+        "role": "output"
+      },
+      {
+        "id": "e06",
+        "from": "info-floors",
+        "to": "proc-scale-judge",
+        "role": "input"
+      },
+      {
+        "id": "e07",
+        "from": "info-area",
+        "to": "proc-scale-judge",
+        "role": "input"
+      },
+      {
+        "id": "e08",
+        "from": "proc-scale-judge",
+        "to": "info-scale-applicable",
+        "role": "output"
+      },
+      {
+        "id": "e09",
+        "from": "proc-room-set-identify",
+        "to": "info-room-set",
+        "role": "output"
+      },
+      {
+        "id": "e10",
+        "from": "info-room-set",
+        "to": "proc-windowless-check",
+        "role": "input"
+      },
+      {
+        "id": "e11",
+        "from": "proc-windowless-check",
+        "to": "info-windowless",
+        "role": "output"
+      },
+      {
+        "id": "e12",
+        "from": "info-special-building",
+        "to": "proc-target-room-judge",
+        "role": "input"
+      },
+      {
+        "id": "e13",
+        "from": "info-scale-applicable",
+        "to": "proc-target-room-judge",
+        "role": "input"
+      },
+      {
+        "id": "e14",
+        "from": "info-windowless",
+        "to": "proc-target-room-judge",
+        "role": "input"
+      },
+      {
+        "id": "e15",
+        "from": "proc-target-room-judge",
+        "to": "info-target-room",
+        "role": "output"
+      },
+      {
+        "id": "e16",
+        "from": "info-target-room",
+        "to": "proc-passage-identify",
+        "role": "input"
+      },
+      {
+        "id": "e17",
+        "from": "proc-passage-identify",
+        "to": "info-passage-set",
+        "role": "output"
+      },
+      {
+        "id": "e18",
+        "from": "proc-exempt-type-check",
+        "to": "info-exempt-dwelling",
+        "role": "output"
+      },
+      {
+        "id": "e19",
+        "from": "info-room-set",
+        "to": "proc-exempt-room-check",
+        "role": "input"
+      },
+      {
+        "id": "e20",
+        "from": "proc-exempt-room-check",
+        "to": "info-exempt-room",
+        "role": "output"
+      },
+      {
+        "id": "e21",
+        "from": "info-use",
+        "to": "proc-exempt-school-check",
+        "role": "input"
+      },
+      {
+        "id": "e22",
+        "from": "proc-exempt-school-check",
+        "to": "info-exempt-school",
+        "role": "output"
+      },
+      {
+        "id": "e23",
+        "from": "info-room-set",
+        "to": "proc-exempt-evacuation-check",
+        "role": "input"
+      },
+      {
+        "id": "e24",
+        "from": "proc-exempt-evacuation-check",
+        "to": "info-exempt-evacuation",
+        "role": "output"
+      },
+      {
+        "id": "e25",
+        "from": "info-exempt-dwelling",
+        "to": "proc-exempt-judge",
+        "role": "input"
+      },
+      {
+        "id": "e26",
+        "from": "info-exempt-room",
+        "to": "proc-exempt-judge",
+        "role": "input"
+      },
+      {
+        "id": "e27",
+        "from": "info-exempt-school",
+        "to": "proc-exempt-judge",
+        "role": "input"
+      },
+      {
+        "id": "e28",
+        "from": "info-exempt-evacuation",
+        "to": "proc-exempt-judge",
+        "role": "input"
+      },
+      {
+        "id": "e29",
+        "from": "proc-exempt-judge",
+        "to": "info-exempt",
+        "role": "output"
+      },
+      {
+        "id": "e30",
+        "from": "info-target-room",
+        "to": "proc-lighting-check",
+        "role": "input"
+      },
+      {
+        "id": "e31",
+        "from": "info-passage-set",
+        "to": "proc-lighting-check",
+        "role": "input"
+      },
+      {
+        "id": "e32",
+        "from": "proc-lighting-check",
+        "to": "info-lighting-installed",
+        "role": "output"
+      },
+      {
+        "id": "e33",
+        "from": "info-exempt",
+        "to": "proc-final-judge",
+        "role": "input"
+      },
+      {
+        "id": "e34",
+        "from": "info-target-room",
+        "to": "proc-final-judge",
+        "role": "input"
+      },
+      {
+        "id": "e35",
+        "from": "info-lighting-installed",
+        "to": "proc-final-judge",
+        "role": "input"
+      },
+      {
+        "id": "e36",
+        "from": "proc-final-judge",
+        "to": "info-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e37",
+        "from": "info-compliance",
+        "to": "proc-all-judge",
+        "role": "input"
+      },
+      {
+        "id": "e38",
+        "from": "proc-all-judge",
+        "to": "info-final-compliance",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "324AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["別表第一"],
+      "description": "法別表第一（い）欄（一）項から（四）項の用途を参照"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": ["A116_2:P1:I1"],
+      "description": "令116条の2第1項第1号の無窓居室要件を参照"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-23T00:00:00+09:00",
+    "author": "Claude",
+    "generator": "kijo-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

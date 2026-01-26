@@ -1,0 +1,324 @@
+{
+  "id": "CHK-BSL-ORD-A128_3-P3",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "地下街の各構えと地下道の区画",
+    "target_subject": "地下街の各構え",
+    "description": "地下街の各構えと地下道との間を耐火構造の床・壁又は特定防火設備で区画する要件"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "128_3",
+    "paragraph": "3",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "地下街",
+    "防火区画"
+  ],
+  "text_raw": "地下街の各構えは、地下道と耐火構造の床若しくは壁又は特定防火設備で第百十二条第十九項第二号に規定する構造であるもので区画しなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        { "type": "building_type", "value": "地下街の各構え" }
+      ],
+      "note": "地下街の各構えが適用対象"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        { "type": "structure", "value": "耐火構造の床で区画" },
+        { "type": "structure", "value": "耐火構造の壁で区画" },
+        { "type": "equipment", "value": "令第112条第19項第2号の特定防火設備で区画" }
+      ]
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-kamae-identify",
+        "type": "process",
+        "title": "地下街の各構えの特定",
+        "process_type": "undefined_input",
+        "description": "地下街の各構えを特定する"
+      },
+      {
+        "id": "info-kamae-set",
+        "type": "information",
+        "title": "地下街の各構え",
+        "subject": "地下街",
+        "property": "各構えの集合",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "判定対象となる地下街の各構え"
+      },
+      {
+        "id": "proc-boundary-identify",
+        "type": "process",
+        "title": "地下道との境界の特定",
+        "process_type": "undefined_input",
+        "description": "各構えと地下道との境界部分を特定する",
+        "iteration": "iterative"
+      },
+      {
+        "id": "info-boundary-set",
+        "type": "information",
+        "title": "地下道との境界",
+        "subject": "各構え",
+        "property": "地下道との境界",
+        "property_type": "geometric_surface",
+        "plurality": "multiple",
+        "description": "各構えと地下道が接する境界部分"
+      },
+      {
+        "id": "proc-partition-type-identify",
+        "type": "process",
+        "title": "区画の種類の特定",
+        "process_type": "undefined_input",
+        "description": "境界部分に設けられた区画の種類（床・壁・防火設備）を特定する",
+        "iteration": "iterative"
+      },
+      {
+        "id": "info-partition-type",
+        "type": "information",
+        "title": "区画の種類",
+        "subject": "境界",
+        "property": "区画種類",
+        "property_type": "classification",
+        "plurality": "multiple",
+        "description": "床、壁、特定防火設備のいずれか"
+      },
+      {
+        "id": "proc-floor-structure-check",
+        "type": "process",
+        "title": "床の構造確認",
+        "process_type": "undefined_input",
+        "description": "床による区画の場合、耐火構造であるか確認する",
+        "iteration": "iterative"
+      },
+      {
+        "id": "info-floor-fireproof",
+        "type": "information",
+        "title": "床の耐火構造",
+        "symbol": "F",
+        "subject": "床",
+        "property": "耐火構造",
+        "property_type": "proposition",
+        "plurality": "multiple",
+        "description": "区画に用いる床が耐火構造であるか"
+      },
+      {
+        "id": "proc-wall-structure-check",
+        "type": "process",
+        "title": "壁の構造確認",
+        "process_type": "undefined_input",
+        "description": "壁による区画の場合、耐火構造であるか確認する",
+        "iteration": "iterative"
+      },
+      {
+        "id": "info-wall-fireproof",
+        "type": "information",
+        "title": "壁の耐火構造",
+        "symbol": "W",
+        "subject": "壁",
+        "property": "耐火構造",
+        "property_type": "proposition",
+        "plurality": "multiple",
+        "description": "区画に用いる壁が耐火構造であるか"
+      },
+      {
+        "id": "proc-equipment-structure-check",
+        "type": "process",
+        "title": "特定防火設備の構造確認",
+        "process_type": "sub_diagram_reference",
+        "sub_diagram_ref": "CHK-BSL-ORD-A112-P19-I2",
+        "description": "特定防火設備による区画の場合、令第112条第19項第2号の構造要件を満たすか確認する",
+        "iteration": "iterative",
+        "related_articles": ["令::A112:P19:I2"]
+      },
+      {
+        "id": "info-equipment-compliance",
+        "type": "information",
+        "title": "特定防火設備の構造適合",
+        "symbol": "E",
+        "subject": "特定防火設備",
+        "property": "令第112条第19項第2号適合",
+        "property_type": "proposition",
+        "plurality": "multiple",
+        "description": "区画に用いる特定防火設備が令第112条第19項第2号の構造であるか",
+        "related_articles": ["令::A112:P19:I2"]
+      },
+      {
+        "id": "proc-partition-judge",
+        "type": "process",
+        "title": "区画適合判定",
+        "process_type": "mechanical",
+        "description": "各境界部分が適切な区画方法で区画されているか判定する",
+        "logic_expression": "(区画種類=床 AND F) OR (区画種類=壁 AND W) OR (区画種類=防火設備 AND E)",
+        "iteration": "iterative"
+      },
+      {
+        "id": "info-partition-compliance",
+        "type": "information",
+        "title": "境界区画適合",
+        "symbol": "P",
+        "subject": "境界",
+        "property": "区画適合",
+        "property_type": "proposition",
+        "plurality": "multiple",
+        "description": "各境界部分の区画が要件を満たすか"
+      },
+      {
+        "id": "proc-final-judge",
+        "type": "process",
+        "title": "最終適合判定",
+        "process_type": "mechanical",
+        "description": "すべての境界部分が適切に区画されているか総合判定する",
+        "logic_expression": "ALL(P)"
+      },
+      {
+        "id": "info-final-compliance",
+        "type": "information",
+        "title": "令第128条の3第3項適合",
+        "symbol": "COMPLIANT",
+        "subject": "地下街の各構え",
+        "property": "令第128条の3第3項適合性",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "地下街の各構えが地下道と適切に区画されているか"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-kamae-identify",
+        "to": "info-kamae-set",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "info-kamae-set",
+        "to": "proc-boundary-identify",
+        "role": "input"
+      },
+      {
+        "id": "e03",
+        "from": "proc-boundary-identify",
+        "to": "info-boundary-set",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "info-boundary-set",
+        "to": "proc-partition-type-identify",
+        "role": "input"
+      },
+      {
+        "id": "e05",
+        "from": "proc-partition-type-identify",
+        "to": "info-partition-type",
+        "role": "output"
+      },
+      {
+        "id": "e06",
+        "from": "info-boundary-set",
+        "to": "proc-floor-structure-check",
+        "role": "input"
+      },
+      {
+        "id": "e07",
+        "from": "proc-floor-structure-check",
+        "to": "info-floor-fireproof",
+        "role": "output"
+      },
+      {
+        "id": "e08",
+        "from": "info-boundary-set",
+        "to": "proc-wall-structure-check",
+        "role": "input"
+      },
+      {
+        "id": "e09",
+        "from": "proc-wall-structure-check",
+        "to": "info-wall-fireproof",
+        "role": "output"
+      },
+      {
+        "id": "e10",
+        "from": "info-boundary-set",
+        "to": "proc-equipment-structure-check",
+        "role": "input"
+      },
+      {
+        "id": "e11",
+        "from": "proc-equipment-structure-check",
+        "to": "info-equipment-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e12",
+        "from": "info-partition-type",
+        "to": "proc-partition-judge",
+        "role": "input"
+      },
+      {
+        "id": "e13",
+        "from": "info-floor-fireproof",
+        "to": "proc-partition-judge",
+        "role": "input"
+      },
+      {
+        "id": "e14",
+        "from": "info-wall-fireproof",
+        "to": "proc-partition-judge",
+        "role": "input"
+      },
+      {
+        "id": "e15",
+        "from": "info-equipment-compliance",
+        "to": "proc-partition-judge",
+        "role": "input"
+      },
+      {
+        "id": "e16",
+        "from": "proc-partition-judge",
+        "to": "info-partition-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e17",
+        "from": "info-partition-compliance",
+        "to": "proc-final-judge",
+        "role": "input"
+      },
+      {
+        "id": "e18",
+        "from": "proc-final-judge",
+        "to": "info-final-compliance",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": ["A112:P19:I2"],
+      "description": "特定防火設備の構造要件（竪穴区画等用）を参照"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-01-25T00:00:00+09:00",
+    "author": "Claude",
+    "generator": "kijo-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

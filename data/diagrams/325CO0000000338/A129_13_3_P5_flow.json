@@ -1,0 +1,251 @@
+{
+  "id": "FLOW-BSL-ORD-A129_13_3-P5",
+  "version": "3.2",
+  "page_title": {
+    "title": "非常用エレベーター避難階の歩行距離",
+    "target_subject": "非常用エレベーター",
+    "description": "避難階における非常用エレベーターの出入口から屋外出口までの歩行距離制限の適合判定フロー"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "129の13の3",
+    "paragraph": "5",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "避難",
+    "非常用エレベーター"
+  ],
+  "text_raw": "避難階においては、非常用エレベーターの昇降路の出入口（第三項に規定する構造の乗降ロビーを設けた場合には、その出入口）から屋外への出口（道又は道に通ずる幅員四メートル以上の通路、空地その他これらに類するものに接している部分に限る。）の一に至る歩行距離は、三十メートル以下としなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        { "type": "building_element", "value": "非常用エレベーター設置建築物" },
+        { "type": "floor", "value": "避難階" }
+      ],
+      "note": "非常用エレベーターを設置する建築物の避難階が対象"
+    },
+    "judgment_rule": {
+      "operator": "<=",
+      "lhs": { "ref": "歩行距離", "unit": "m" },
+      "rhs": { "value": 30, "unit": "m" }
+    }
+  },
+  "flow_diagram": {
+    "title": "令第129条の13の3第5項 適合判定フロー",
+    "description": "非常用エレベーター避難階の歩行距離に関する適合判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "非常用エレベーター避難階の歩行距離判定を開始"
+      },
+      {
+        "id": "proc-identify-elevator",
+        "type": "process",
+        "title": "非常用エレベーターを特定",
+        "process_type": "undefined_input",
+        "description": "建築物に設置された非常用エレベーターを特定する"
+      },
+      {
+        "id": "proc-identify-exit",
+        "type": "process",
+        "title": "有効な屋外出口を特定",
+        "process_type": "undefined_input",
+        "description": "道又は道に通ずる幅員4m以上の通路・空地等に接している屋外への出口を特定"
+      },
+      {
+        "id": "dec-lobby-exists",
+        "type": "decision",
+        "title": "乗降ロビーを設けているか？",
+        "decision_type": "binary",
+        "description": "第3項に規定する構造の乗降ロビーが設けられているか確認",
+        "condition": {
+          "operator": "EQ",
+          "lhs": { "var": "L", "desc": "乗降ロビー設置有無" },
+          "rhs": { "value": true, "desc": "設置あり" }
+        }
+      },
+      {
+        "id": "proc-start-lobby",
+        "type": "process",
+        "title": "起点を乗降ロビー出入口に設定",
+        "process_type": "mechanical",
+        "description": "歩行距離の起点を乗降ロビーの出入口とする"
+      },
+      {
+        "id": "proc-start-shaft",
+        "type": "process",
+        "title": "起点を昇降路出入口に設定",
+        "process_type": "mechanical",
+        "description": "歩行距離の起点を昇降路の出入口とする"
+      },
+      {
+        "id": "proc-measure-distance",
+        "type": "process",
+        "title": "屋外出口までの歩行距離を計測",
+        "process_type": "mechanical",
+        "description": "起点から最寄りの有効な屋外出口の一に至る歩行距離を計測"
+      },
+      {
+        "id": "dec-distance-check",
+        "type": "decision",
+        "title": "歩行距離は30m以下か？",
+        "decision_type": "binary",
+        "description": "計測した歩行距離が30m以下であるか判定",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "D", "desc": "歩行距離" },
+          "rhs": { "value": 30, "unit": "m", "desc": "制限値" }
+        }
+      },
+      {
+        "id": "proc-record-ok",
+        "type": "process",
+        "title": "当該エレベーターは歩行距離適合として記録",
+        "process_type": "mechanical",
+        "description": "当該非常用エレベーターの歩行距離が30m以下であることを記録"
+      },
+      {
+        "id": "dec-all-checked",
+        "type": "decision",
+        "title": "全ての非常用エレベーターを確認したか？",
+        "decision_type": "binary",
+        "description": "建築物内の全ての非常用エレベーターについて歩行距離を確認したか判定"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "全ての非常用エレベーターで歩行距離が30m以下のため、令第129条の13の3第5項に適合"
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "歩行距離が30mを超える非常用エレベーターがあるため、令第129条の13の3第5項に不適合"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "proc-identify-elevator",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "proc-identify-elevator",
+        "to": "proc-identify-exit",
+        "role": "flow"
+      },
+      {
+        "id": "e03",
+        "from": "proc-identify-exit",
+        "to": "dec-lobby-exists",
+        "role": "flow"
+      },
+      {
+        "id": "e04",
+        "from": "dec-lobby-exists",
+        "to": "proc-start-lobby",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e05",
+        "from": "dec-lobby-exists",
+        "to": "proc-start-shaft",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e06",
+        "from": "proc-start-lobby",
+        "to": "proc-measure-distance",
+        "role": "flow"
+      },
+      {
+        "id": "e07",
+        "from": "proc-start-shaft",
+        "to": "proc-measure-distance",
+        "role": "flow"
+      },
+      {
+        "id": "e08",
+        "from": "proc-measure-distance",
+        "to": "dec-distance-check",
+        "role": "flow"
+      },
+      {
+        "id": "e09",
+        "from": "dec-distance-check",
+        "to": "proc-record-ok",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e10",
+        "from": "dec-distance-check",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e11",
+        "from": "proc-record-ok",
+        "to": "dec-all-checked",
+        "role": "flow"
+      },
+      {
+        "id": "e12",
+        "from": "dec-all-checked",
+        "to": "end-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e13",
+        "from": "dec-all-checked",
+        "to": "dec-lobby-exists",
+        "role": "no",
+        "label": "いいえ（次のエレベーター）"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-ORD-A129_13_3-P5",
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": ["A129_13_3:P3"],
+      "description": "第3項で乗降ロビーの構造基準を規定"
+    },
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": ["A34:P2"],
+      "description": "非常用エレベーターの設置義務の委任元"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-01-26T00:00:00+09:00",
+    "author": "Claude",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

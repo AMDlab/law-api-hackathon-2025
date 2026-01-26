@@ -1,0 +1,446 @@
+{
+  "id": "A77_2_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "床版の構造 適合判定フロー",
+    "target_subject": "床版",
+    "description": "構造耐力上主要な部分である床版の構造要件適合判定を行う"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "77_2",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造",
+    "床版"
+  ],
+  "text_raw": "構造耐力上主要な部分である床版は、次に定める構造としなければならない。ただし、第八十二条第四号に掲げる構造計算によつて振動又は変形による使用上の支障が起こらないことが確かめられた場合においては、この限りでない。一 厚さは、八センチメートル以上とし、かつ、短辺方向における有効張り間長さの四十分の一以上とすること。二 最大曲げモーメントを受ける部分における引張鉄筋の間隔は、短辺方向において二十センチメートル以下、長辺方向において三十センチメートル以下で、かつ、床版の厚さの三倍以下とすること。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "structural_element",
+          "value": "構造耐力上主要な部分である床版"
+        }
+      ]
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "description": "構造計算で使用上の支障がないことが確認済み",
+          "result": "PASS (適用除外)"
+        },
+        {
+          "operator": "AND",
+          "conditions": [
+            { "ref": "第1号", "description": "厚さ要件" },
+            { "ref": "第2号", "description": "引張鉄筋間隔要件" }
+          ]
+        }
+      ]
+    },
+    "exceptions": {
+      "description": "令第82条第4号の構造計算による確認",
+      "effect": "EXEMPT"
+    }
+  },
+  "flow_diagram": {
+    "title": "令第77条の2第1項 床版の構造 適合判定フロー",
+    "description": "構造耐力上主要な部分である床版について、厚さ及び引張鉄筋間隔の要件適合を判定する",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "床版の構造要件の適合判定を開始"
+      },
+      {
+        "id": "proc-identify-slab",
+        "type": "process",
+        "title": "床版の特定",
+        "process_type": "undefined_input",
+        "description": "構造耐力上主要な部分である床版を特定する"
+      },
+      {
+        "id": "dec-has-slab",
+        "type": "decision",
+        "title": "構造耐力上主要な部分である床版があるか？",
+        "decision_type": "binary",
+        "description": "対象となる床版が存在するか確認"
+      },
+      {
+        "id": "dec-exempt",
+        "type": "decision",
+        "title": "構造計算で使用上支障なしと確認済みか？",
+        "decision_type": "binary",
+        "description": "令第82条第4号の構造計算によって振動又は変形による使用上の支障が起こらないことが確かめられたか",
+        "related_articles": ["令第82条第4号"]
+      },
+      {
+        "id": "proc-exempt-apply",
+        "type": "process",
+        "title": "ただし書き適用",
+        "process_type": "mechanical",
+        "description": "構造計算による確認がなされたため、本条の適用除外となる"
+      },
+      {
+        "id": "proc-identify-thickness",
+        "type": "process",
+        "title": "床版厚さ・有効張り間長さの特定",
+        "process_type": "undefined_input",
+        "description": "各床版の厚さ及び短辺方向における有効張り間長さを特定する"
+      },
+      {
+        "id": "dec-thickness-min",
+        "type": "decision",
+        "title": "厚さ >= 8cm か？",
+        "decision_type": "binary",
+        "description": "床版の厚さが8センチメートル以上であるか判定",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "T", "desc": "床版の厚さ" },
+          "rhs": { "value": 8, "unit": "cm" }
+        }
+      },
+      {
+        "id": "dec-thickness-span",
+        "type": "decision",
+        "title": "厚さ >= 有効張り間長さの1/40 か？",
+        "decision_type": "binary",
+        "description": "床版の厚さが短辺方向における有効張り間長さの40分の1以上であるか判定",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "T", "desc": "床版の厚さ" },
+          "rhs": { "var": "L/40", "desc": "有効張り間長さの1/40" }
+        }
+      },
+      {
+        "id": "proc-item1-pass",
+        "type": "process",
+        "title": "第1号基準適合",
+        "process_type": "mechanical",
+        "description": "当該床版は第1号の厚さ要件に適合"
+      },
+      {
+        "id": "proc-identify-rebar",
+        "type": "process",
+        "title": "引張鉄筋間隔の特定",
+        "process_type": "undefined_input",
+        "description": "最大曲げモーメントを受ける部分における引張鉄筋の間隔（短辺方向・長辺方向）を特定する"
+      },
+      {
+        "id": "dec-rebar-short",
+        "type": "decision",
+        "title": "短辺方向の引張鉄筋間隔 <= 20cm か？",
+        "decision_type": "binary",
+        "description": "短辺方向における引張鉄筋の間隔が20センチメートル以下であるか判定",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "RS", "desc": "短辺方向の引張鉄筋間隔" },
+          "rhs": { "value": 20, "unit": "cm" }
+        }
+      },
+      {
+        "id": "dec-rebar-long",
+        "type": "decision",
+        "title": "長辺方向の引張鉄筋間隔 <= 30cm か？",
+        "decision_type": "binary",
+        "description": "長辺方向における引張鉄筋の間隔が30センチメートル以下であるか判定",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "RL", "desc": "長辺方向の引張鉄筋間隔" },
+          "rhs": { "value": 30, "unit": "cm" }
+        }
+      },
+      {
+        "id": "dec-rebar-thickness-short",
+        "type": "decision",
+        "title": "短辺方向の引張鉄筋間隔 <= 床版厚さの3倍 か？",
+        "decision_type": "binary",
+        "description": "短辺方向における引張鉄筋の間隔が床版厚さの3倍以下であるか判定",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "RS", "desc": "短辺方向の引張鉄筋間隔" },
+          "rhs": { "var": "3*T", "desc": "床版厚さの3倍" }
+        }
+      },
+      {
+        "id": "dec-rebar-thickness-long",
+        "type": "decision",
+        "title": "長辺方向の引張鉄筋間隔 <= 床版厚さの3倍 か？",
+        "decision_type": "binary",
+        "description": "長辺方向における引張鉄筋の間隔が床版厚さの3倍以下であるか判定",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "RL", "desc": "長辺方向の引張鉄筋間隔" },
+          "rhs": { "var": "3*T", "desc": "床版厚さの3倍" }
+        }
+      },
+      {
+        "id": "proc-item2-pass",
+        "type": "process",
+        "title": "第2号基準適合",
+        "process_type": "mechanical",
+        "description": "当該床版は第2号の引張鉄筋間隔要件に適合"
+      },
+      {
+        "id": "dec-all-slabs-checked",
+        "type": "decision",
+        "title": "全ての床版を確認したか？",
+        "decision_type": "binary",
+        "description": "構造耐力上主要な部分である全ての床版について確認が完了したか判定"
+      },
+      {
+        "id": "proc-next-slab",
+        "type": "process",
+        "title": "次の床版を確認",
+        "process_type": "mechanical",
+        "description": "次の床版について第1号・第2号の確認を行う"
+      },
+      {
+        "id": "proc-final-pass",
+        "type": "process",
+        "title": "全床版適合確認",
+        "process_type": "mechanical",
+        "description": "全ての床版が第1号・第2号の基準に適合することを確認"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令第77条の2第1項に適合"
+      },
+      {
+        "id": "end-pass-exempt",
+        "type": "terminal",
+        "title": "適合（適用除外）",
+        "result": "pass",
+        "description": "ただし書きにより適用除外（構造計算で確認済み）"
+      },
+      {
+        "id": "end-pass-no-slab",
+        "type": "terminal",
+        "title": "適合（対象なし）",
+        "result": "pass",
+        "description": "構造耐力上主要な部分である床版がないため、本条の適用対象外"
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "令第77条の2第1項に不適合"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "proc-identify-slab",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "proc-identify-slab",
+        "to": "dec-has-slab",
+        "role": "flow"
+      },
+      {
+        "id": "e03",
+        "from": "dec-has-slab",
+        "to": "end-pass-no-slab",
+        "role": "no",
+        "label": "なし"
+      },
+      {
+        "id": "e04",
+        "from": "dec-has-slab",
+        "to": "dec-exempt",
+        "role": "yes",
+        "label": "あり"
+      },
+      {
+        "id": "e05",
+        "from": "dec-exempt",
+        "to": "proc-exempt-apply",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e06",
+        "from": "proc-exempt-apply",
+        "to": "end-pass-exempt",
+        "role": "flow"
+      },
+      {
+        "id": "e07",
+        "from": "dec-exempt",
+        "to": "proc-identify-thickness",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e08",
+        "from": "proc-identify-thickness",
+        "to": "dec-thickness-min",
+        "role": "flow"
+      },
+      {
+        "id": "e09",
+        "from": "dec-thickness-min",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e10",
+        "from": "dec-thickness-min",
+        "to": "dec-thickness-span",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e11",
+        "from": "dec-thickness-span",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e12",
+        "from": "dec-thickness-span",
+        "to": "proc-item1-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e13",
+        "from": "proc-item1-pass",
+        "to": "proc-identify-rebar",
+        "role": "flow"
+      },
+      {
+        "id": "e14",
+        "from": "proc-identify-rebar",
+        "to": "dec-rebar-short",
+        "role": "flow"
+      },
+      {
+        "id": "e15",
+        "from": "dec-rebar-short",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e16",
+        "from": "dec-rebar-short",
+        "to": "dec-rebar-long",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e17",
+        "from": "dec-rebar-long",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e18",
+        "from": "dec-rebar-long",
+        "to": "dec-rebar-thickness-short",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e19",
+        "from": "dec-rebar-thickness-short",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e20",
+        "from": "dec-rebar-thickness-short",
+        "to": "dec-rebar-thickness-long",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e21",
+        "from": "dec-rebar-thickness-long",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e22",
+        "from": "dec-rebar-thickness-long",
+        "to": "proc-item2-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e23",
+        "from": "proc-item2-pass",
+        "to": "dec-all-slabs-checked",
+        "role": "flow"
+      },
+      {
+        "id": "e24",
+        "from": "dec-all-slabs-checked",
+        "to": "proc-next-slab",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e25",
+        "from": "proc-next-slab",
+        "to": "proc-identify-thickness",
+        "role": "flow"
+      },
+      {
+        "id": "e26",
+        "from": "dec-all-slabs-checked",
+        "to": "proc-final-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e27",
+        "from": "proc-final-pass",
+        "to": "end-pass",
+        "role": "flow"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-ORDER-A77_2-P1",
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": ["A82:I4"],
+      "description": "ただし書きにおける構造計算の参照（第82条第4号）"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

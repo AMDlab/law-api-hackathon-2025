@@ -1,0 +1,98 @@
+{
+  "id": "A22_2_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "地階における住宅等の居室の技術的基準判定フロー",
+    "target_subject": "居室",
+    "description": "地階にある住宅等の居室の採光・換気・防湿措置および外壁等の防水措置に関する技術的基準の適合判定フロー"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "22の2",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": ["単体規定", "居室", "地階", "採光・換気", "防水"],
+  "text_raw": "法第二十九条（法第八十七条第三項において準用する場合を含む。）の政令で定める技術的基準は、次に掲げるものとする。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [{ "type": "location", "value": "地階における住宅等の居室" }]
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        { "type": "requirement", "value": "第一号の要件" },
+        { "type": "requirement", "value": "第二号の要件" }
+      ]
+    }
+  },
+  "flow_diagram": {
+    "title": "令第22条の2第1項 地階居室技術的基準判定フロー",
+    "description": "地階における住宅等の居室の技術的基準適合判定",
+    "nodes": [
+      { "id": "start", "type": "terminal", "title": "判定開始", "result": "start" },
+      { "id": "proc-rooms", "type": "process", "title": "地階居室を特定", "process_type": "undefined_input", "description": "地階にある住宅等の居室を特定" },
+      { "id": "dec-karabori", "type": "decision", "title": "からぼり等に面する開口部があるか？", "decision_type": "binary", "description": "第一号イ：国土交通大臣が定める開口部" },
+      { "id": "proc-item1-i", "type": "process", "title": "第一号イ該当", "process_type": "mechanical" },
+      { "id": "dec-ventilation", "type": "decision", "title": "令20条の2適合の換気設備があるか？", "decision_type": "binary", "description": "第一号ロ：換気設備" },
+      { "id": "proc-item1-ro", "type": "process", "title": "第一号ロ該当", "process_type": "mechanical" },
+      { "id": "dec-humidity", "type": "decision", "title": "湿度調節設備があるか？", "decision_type": "binary", "description": "第一号ハ：湿度調節設備" },
+      { "id": "proc-item1-ha", "type": "process", "title": "第一号ハ該当", "process_type": "mechanical" },
+      { "id": "proc-walls", "type": "process", "title": "外壁等を特定", "process_type": "undefined_input", "description": "直接土に接する外壁・床・屋根を特定" },
+      { "id": "dec-above-water", "type": "decision", "title": "常水面以上の部分か？", "decision_type": "binary", "description": "ただし書き適用判定" },
+      { "id": "dec-proviso", "type": "decision", "title": "耐水材料+防水措置を講じているか？", "decision_type": "binary", "description": "ただし書きの構造要件" },
+      { "id": "proc-proviso", "type": "process", "title": "ただし書き適用", "process_type": "mechanical" },
+      { "id": "dec-waterproof", "type": "decision", "title": "防水層を設けているか？", "decision_type": "binary", "description": "第二号イ(1)：防水層" },
+      { "id": "proc-item2-i1", "type": "process", "title": "第二号イ(1)該当", "process_type": "mechanical" },
+      { "id": "dec-gap", "type": "decision", "title": "排水設備付き空隙構造か？", "decision_type": "binary", "description": "第二号イ(2)：空隙構造（外壁・床のみ）" },
+      { "id": "proc-item2-i2", "type": "process", "title": "第二号イ(2)該当", "process_type": "mechanical" },
+      { "id": "dec-cert", "type": "decision", "title": "大臣認定構造か？", "decision_type": "binary", "description": "第二号ロ：大臣認定" },
+      { "id": "proc-item2-ro", "type": "process", "title": "第二号ロ該当", "process_type": "mechanical" },
+      { "id": "end-pass", "type": "terminal", "title": "適合", "result": "pass", "description": "令22条の2第1項の基準に適合" },
+      { "id": "end-fail", "type": "terminal", "title": "不適合", "result": "fail", "description": "令22条の2第1項の基準に不適合" }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "proc-rooms", "role": "flow" },
+      { "id": "e02", "from": "proc-rooms", "to": "dec-karabori", "role": "flow" },
+      { "id": "e03", "from": "dec-karabori", "to": "proc-item1-i", "role": "yes" },
+      { "id": "e04", "from": "dec-karabori", "to": "dec-ventilation", "role": "no" },
+      { "id": "e05", "from": "proc-item1-i", "to": "proc-walls", "role": "flow" },
+      { "id": "e06", "from": "dec-ventilation", "to": "proc-item1-ro", "role": "yes" },
+      { "id": "e07", "from": "dec-ventilation", "to": "dec-humidity", "role": "no" },
+      { "id": "e08", "from": "proc-item1-ro", "to": "proc-walls", "role": "flow" },
+      { "id": "e09", "from": "dec-humidity", "to": "proc-item1-ha", "role": "yes" },
+      { "id": "e10", "from": "dec-humidity", "to": "end-fail", "role": "no" },
+      { "id": "e11", "from": "proc-item1-ha", "to": "proc-walls", "role": "flow" },
+      { "id": "e12", "from": "proc-walls", "to": "dec-above-water", "role": "flow" },
+      { "id": "e13", "from": "dec-above-water", "to": "dec-proviso", "role": "yes" },
+      { "id": "e14", "from": "dec-above-water", "to": "dec-waterproof", "role": "no" },
+      { "id": "e15", "from": "dec-proviso", "to": "proc-proviso", "role": "yes" },
+      { "id": "e16", "from": "dec-proviso", "to": "dec-waterproof", "role": "no" },
+      { "id": "e17", "from": "proc-proviso", "to": "end-pass", "role": "flow" },
+      { "id": "e18", "from": "dec-waterproof", "to": "proc-item2-i1", "role": "yes" },
+      { "id": "e19", "from": "dec-waterproof", "to": "dec-gap", "role": "no" },
+      { "id": "e20", "from": "proc-item2-i1", "to": "end-pass", "role": "flow" },
+      { "id": "e21", "from": "dec-gap", "to": "proc-item2-i2", "role": "yes" },
+      { "id": "e22", "from": "dec-gap", "to": "dec-cert", "role": "no" },
+      { "id": "e23", "from": "proc-item2-i2", "to": "end-pass", "role": "flow" },
+      { "id": "e24", "from": "dec-cert", "to": "proc-item2-ro", "role": "yes" },
+      { "id": "e25", "from": "dec-cert", "to": "end-fail", "role": "no" },
+      { "id": "e26", "from": "proc-item2-ro", "to": "end-pass", "role": "flow" }
+    ]
+  },
+  "kijo_diagram_ref": "A22_2_P1_kijo",
+  "related_laws": [
+    { "law_id": "325AC0000000201", "law_name": "建築基準法", "law_type": "act", "relationship": "delegated_from", "articles": ["A29:P1", "A87:P3"], "description": "法第29条で地階における住宅等の居室の技術的基準を政令に委任" },
+    { "law_id": "325CO0000000338", "law_name": "建築基準法施行令", "law_type": "order", "relationship": "references", "articles": ["A20_2:P1"], "description": "第20条の2で換気設備の技術的基準を規定" }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00Z",
+    "updated_at": "2026-01-26T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator"
+  }
+}

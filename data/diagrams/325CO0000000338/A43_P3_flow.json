@@ -1,0 +1,219 @@
+{
+  "id": "A43_P3_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "条例による柱の小径規定の補足",
+    "target_subject": "条例",
+    "description": "法第41条により法第21条の規定を緩和する場合、柱の小径の割合を補足する規定の有無を確認する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "43",
+    "paragraph": "3",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造",
+    "柱の小径",
+    "条例緩和"
+  ],
+  "text_raw": "法第四十一条の規定によつて、条例で、法第二十一条第一項及び第二項の規定の全部若しくは一部を適用せず、又はこれらの規定による制限を緩和する場合においては、当該条例で、柱の小径の横架材の相互間の垂直距離に対する割合を補足する規定を設けなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "ordinance",
+          "value": "法第41条により条例で法第21条第1項・第2項の規定を適用除外または緩和している場合"
+        }
+      ],
+      "note": "条例で法第21条の規定を緩和している区域に限り適用"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-ordinance-supplement",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "flow_diagram": {
+    "title": "令第43条第3項 適合判定フロー",
+    "description": "条例で法第21条を緩和する場合の柱の小径割合補足規定の要否を判定するフロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "令第43条第3項の適合判定を開始"
+      },
+      {
+        "id": "dec-relaxation",
+        "type": "decision",
+        "title": "条例で法第21条第1項・第2項を適用除外または緩和しているか？",
+        "decision_type": "binary",
+        "description": "法第41条に基づき、条例で法第21条第1項・第2項の規定の全部若しくは一部を適用除外、または制限を緩和しているかを確認",
+        "condition": {
+          "operator": "EQ",
+          "lhs": {
+            "var": "R",
+            "desc": "法第21条緩和の有無"
+          },
+          "rhs": {
+            "value": true,
+            "desc": "緩和している"
+          }
+        },
+        "related_articles": ["法第41条", "法第21条第1項", "法第21条第2項"]
+      },
+      {
+        "id": "proc-no-relaxation",
+        "type": "process",
+        "title": "緩和なし確認",
+        "process_type": "mechanical",
+        "description": "条例による法第21条の緩和がないため、本項の規定は適用されない"
+      },
+      {
+        "id": "dec-supplement",
+        "type": "decision",
+        "title": "柱の小径割合の補足規定が設けられているか？",
+        "decision_type": "binary",
+        "description": "条例に柱の小径の横架材の相互間の垂直距離に対する割合を補足する規定が設けられているかを確認",
+        "condition": {
+          "operator": "EQ",
+          "lhs": {
+            "var": "S",
+            "desc": "柱の小径割合補足規定の有無"
+          },
+          "rhs": {
+            "value": true,
+            "desc": "補足規定あり"
+          }
+        }
+      },
+      {
+        "id": "proc-supplement-exist",
+        "type": "process",
+        "title": "補足規定あり確認",
+        "process_type": "mechanical",
+        "description": "条例に柱の小径割合の補足規定が設けられていることを確認"
+      },
+      {
+        "id": "proc-supplement-missing",
+        "type": "process",
+        "title": "補足規定なし確認",
+        "process_type": "mechanical",
+        "description": "条例に柱の小径割合の補足規定が設けられていないことを確認"
+      },
+      {
+        "id": "end-pass-not-applicable",
+        "type": "terminal",
+        "title": "適合（適用対象外）",
+        "result": "pass",
+        "description": "条例による法第21条の緩和がないため、本項は適用されず適合",
+        "related_articles": ["令第43条第3項"]
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "条例に柱の小径割合の補足規定が設けられており、令第43条第3項に適合",
+        "related_articles": ["令第43条第3項"]
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "条例で法第21条を緩和しているにもかかわらず、柱の小径割合の補足規定が設けられていないため不適合",
+        "related_articles": ["令第43条第3項"]
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-relaxation",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-relaxation",
+        "to": "proc-no-relaxation",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e03",
+        "from": "dec-relaxation",
+        "to": "dec-supplement",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e04",
+        "from": "proc-no-relaxation",
+        "to": "end-pass-not-applicable",
+        "role": "flow"
+      },
+      {
+        "id": "e05",
+        "from": "dec-supplement",
+        "to": "proc-supplement-exist",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e06",
+        "from": "dec-supplement",
+        "to": "proc-supplement-missing",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e07",
+        "from": "proc-supplement-exist",
+        "to": "end-pass",
+        "role": "flow"
+      },
+      {
+        "id": "e08",
+        "from": "proc-supplement-missing",
+        "to": "end-fail",
+        "role": "flow"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-ORDER-A43-P3",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": [
+        "A41",
+        "A21:P1",
+        "A21:P2"
+      ],
+      "description": "法第41条は条例による建築物の敷地・構造・設備の制限の付加・緩和を規定。法第21条は大規模木造建築物の主要構造部を規定。"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

@@ -1,0 +1,363 @@
+{
+  "id": "A72_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "鉄筋コンクリート造のコンクリート材料の適合判定フロー",
+    "target_subject": "鉄筋コンクリート造の建築物",
+    "description": "鉄筋コンクリート造に使用するコンクリートの材料（骨材、水、混和材料）が、令72条1項各号の要件に適合するかを判定するフロー"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "72",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造",
+    "鉄筋コンクリート造",
+    "材料"
+  ],
+  "text_raw": "鉄筋コンクリート造に使用するコンクリートの材料は、次の各号に定めるところによらなければならない。一 骨材、水及び混和材料は、鉄筋をさびさせ、又はコンクリートの凝結及び硬化を妨げるような酸、塩、有機物又は泥土を含まないこと。二 骨材は、鉄筋相互間及び鉄筋とせき板との間を容易に通る大きさであること。三 骨材は、適切な粒度及び粒形のもので、かつ、当該コンクリートに必要な強度、耐久性及び耐火性が得られるものであること。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "structure_type",
+          "value": "鉄筋コンクリート造"
+        }
+      ],
+      "note": "鉄筋コンクリート造の建築物に使用するコンクリートの材料が対象"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "item": "第1号",
+          "description": "有害物質を含まないこと"
+        },
+        {
+          "item": "第2号",
+          "description": "骨材が適切な大きさであること"
+        },
+        {
+          "item": "第3号",
+          "description": "骨材が適切な粒度・粒形で必要な性能を有すること"
+        }
+      ]
+    }
+  },
+  "flow_diagram": {
+    "title": "令72条1項 コンクリート材料適合判定フロー",
+    "description": "鉄筋コンクリート造のコンクリート材料が各号の要件を満たすか判定する",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "鉄筋コンクリート造のコンクリート材料の適合判定を開始"
+      },
+      {
+        "id": "dec-is-rc",
+        "type": "decision",
+        "title": "鉄筋コンクリート造か？",
+        "decision_type": "binary",
+        "description": "当該建築物または部分が鉄筋コンクリート造であるか確認",
+        "condition": {
+          "operator": "EQ",
+          "lhs": { "var": "structure_type", "desc": "構造種別" },
+          "rhs": { "value": "鉄筋コンクリート造" }
+        }
+      },
+      {
+        "id": "proc-identify-materials",
+        "type": "process",
+        "title": "コンクリート材料の特定",
+        "process_type": "human_judgment",
+        "description": "設計図書・仕様書等から使用するコンクリート材料（骨材、水、混和材料）を特定する"
+      },
+      {
+        "id": "dec-item1-harmful",
+        "type": "decision",
+        "title": "有害物質を含まないか？（第1号）",
+        "decision_type": "binary",
+        "description": "骨材、水及び混和材料が、鉄筋をさびさせ、又はコンクリートの凝結及び硬化を妨げるような酸、塩、有機物又は泥土を含まないか",
+        "related_articles": ["令72条1項1号"],
+        "condition": {
+          "operator": "EQ",
+          "lhs": { "var": "harmful_substances", "desc": "有害物質含有" },
+          "rhs": { "value": false, "desc": "有害物質を含まない" }
+        }
+      },
+      {
+        "id": "proc-item1-pass",
+        "type": "process",
+        "title": "第1号適合",
+        "process_type": "mechanical",
+        "description": "骨材、水、混和材料が有害物質を含まないことを確認"
+      },
+      {
+        "id": "proc-identify-aggregate",
+        "type": "process",
+        "title": "骨材の特定",
+        "process_type": "human_judgment",
+        "description": "コンクリート材料から骨材を特定する"
+      },
+      {
+        "id": "proc-identify-aggregate-size",
+        "type": "process",
+        "title": "骨材の大きさの特定",
+        "process_type": "human_judgment",
+        "description": "骨材の粒径・最大寸法を特定する"
+      },
+      {
+        "id": "proc-identify-rebar-spacing",
+        "type": "process",
+        "title": "鉄筋間隔・かぶり厚さの特定",
+        "process_type": "undefined_input",
+        "description": "設計図書から鉄筋相互間の間隔及び鉄筋とせき板との間隔を特定する"
+      },
+      {
+        "id": "dec-item2-size",
+        "type": "decision",
+        "title": "骨材が鉄筋間を通る大きさか？（第2号）",
+        "decision_type": "binary",
+        "description": "骨材の最大寸法が鉄筋相互間及び鉄筋とせき板との間を容易に通る大きさであるか",
+        "related_articles": ["令72条1項2号"],
+        "condition": {
+          "operator": "LT",
+          "lhs": { "var": "aggregate_size", "desc": "骨材の最大寸法" },
+          "rhs": { "var": "rebar_spacing", "desc": "鉄筋間隔・かぶり厚さ", "unit": "mm" }
+        }
+      },
+      {
+        "id": "proc-item2-pass",
+        "type": "process",
+        "title": "第2号適合",
+        "process_type": "mechanical",
+        "description": "骨材が鉄筋相互間及び鉄筋とせき板との間を容易に通る大きさであることを確認"
+      },
+      {
+        "id": "proc-identify-aggregate-grade",
+        "type": "process",
+        "title": "骨材の粒度・粒形の特定",
+        "process_type": "human_judgment",
+        "description": "骨材の粒度分布及び粒形（角ばり度、扁平度等）を特定する"
+      },
+      {
+        "id": "proc-identify-concrete-spec",
+        "type": "process",
+        "title": "コンクリートの要求性能の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書から当該コンクリートに必要な強度、耐久性及び耐火性を特定する"
+      },
+      {
+        "id": "dec-item3-quality",
+        "type": "decision",
+        "title": "骨材は適切な粒度・粒形で必要な性能を得られるか？（第3号）",
+        "decision_type": "binary",
+        "description": "骨材が適切な粒度及び粒形のもので、かつ、当該コンクリートに必要な強度、耐久性及び耐火性が得られるものであるか",
+        "related_articles": ["令72条1項3号"],
+        "condition": {
+          "operator": "EQ",
+          "lhs": { "var": "aggregate_quality_adequate", "desc": "骨材品質適合" },
+          "rhs": { "value": true }
+        }
+      },
+      {
+        "id": "proc-item3-pass",
+        "type": "process",
+        "title": "第3号適合",
+        "process_type": "mechanical",
+        "description": "骨材が適切な粒度・粒形で、必要な強度・耐久性・耐火性が得られることを確認"
+      },
+      {
+        "id": "dec-all-materials-checked",
+        "type": "decision",
+        "title": "全材料を確認したか？",
+        "decision_type": "binary",
+        "description": "鉄筋コンクリート造に使用する全てのコンクリート材料について判定が完了したか"
+      },
+      {
+        "id": "proc-next-material",
+        "type": "process",
+        "title": "次の材料へ",
+        "process_type": "mechanical",
+        "description": "次のコンクリート材料について判定を繰り返す"
+      },
+      {
+        "id": "terminal-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令72条1項の全号に適合（全コンクリート材料が要件を満たす）"
+      },
+      {
+        "id": "terminal-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "令72条1項のいずれかの号に不適合"
+      },
+      {
+        "id": "terminal-not-applicable",
+        "type": "terminal",
+        "title": "規定適用外",
+        "result": "end",
+        "description": "鉄筋コンクリート造でないため、令72条1項は適用されない"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-is-rc",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-is-rc",
+        "to": "proc-identify-materials",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "dec-is-rc",
+        "to": "terminal-not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e04",
+        "from": "proc-identify-materials",
+        "to": "dec-item1-harmful",
+        "role": "flow"
+      },
+      {
+        "id": "e05",
+        "from": "dec-item1-harmful",
+        "to": "proc-item1-pass",
+        "role": "yes",
+        "label": "含まない"
+      },
+      {
+        "id": "e06",
+        "from": "dec-item1-harmful",
+        "to": "terminal-fail",
+        "role": "no",
+        "label": "含む"
+      },
+      {
+        "id": "e07",
+        "from": "proc-item1-pass",
+        "to": "proc-identify-aggregate",
+        "role": "flow"
+      },
+      {
+        "id": "e08",
+        "from": "proc-identify-aggregate",
+        "to": "proc-identify-aggregate-size",
+        "role": "flow"
+      },
+      {
+        "id": "e09",
+        "from": "proc-identify-aggregate-size",
+        "to": "proc-identify-rebar-spacing",
+        "role": "flow"
+      },
+      {
+        "id": "e10",
+        "from": "proc-identify-rebar-spacing",
+        "to": "dec-item2-size",
+        "role": "flow"
+      },
+      {
+        "id": "e11",
+        "from": "dec-item2-size",
+        "to": "proc-item2-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e12",
+        "from": "dec-item2-size",
+        "to": "terminal-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e13",
+        "from": "proc-item2-pass",
+        "to": "proc-identify-aggregate-grade",
+        "role": "flow"
+      },
+      {
+        "id": "e14",
+        "from": "proc-identify-aggregate-grade",
+        "to": "proc-identify-concrete-spec",
+        "role": "flow"
+      },
+      {
+        "id": "e15",
+        "from": "proc-identify-concrete-spec",
+        "to": "dec-item3-quality",
+        "role": "flow"
+      },
+      {
+        "id": "e16",
+        "from": "dec-item3-quality",
+        "to": "proc-item3-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e17",
+        "from": "dec-item3-quality",
+        "to": "terminal-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e18",
+        "from": "proc-item3-pass",
+        "to": "dec-all-materials-checked",
+        "role": "flow"
+      },
+      {
+        "id": "e19",
+        "from": "dec-all-materials-checked",
+        "to": "terminal-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e20",
+        "from": "dec-all-materials-checked",
+        "to": "proc-next-material",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e21",
+        "from": "proc-next-material",
+        "to": "dec-item1-harmful",
+        "role": "flow"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSO-A72-P1",
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00+09:00",
+    "updated_at": "2026-01-26T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

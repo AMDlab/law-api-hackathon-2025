@@ -1,0 +1,387 @@
+{
+  "id": "CHK-BSL-ORD-A128_3-P1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "地下街の各構えと地下道の接続",
+    "target_subject": "地下街の各構え",
+    "description": "地下街の各構えは所定の基準を満たす地下道に2m以上接しなければならない"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "128の3",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "避難",
+    "地下街"
+  ],
+  "text_raw": "地下街の各構えは、次の各号に該当する地下道に二メートル以上接しなければならない。ただし、公衆便所、公衆電話所その他これらに類するものにあつては、その接する長さを二メートル未満とすることができる。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        { "type": "building_type", "value": "地下街" }
+      ],
+      "note": "地下街の各構えに適用"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "operator": "AND",
+          "conditions": [
+            { "type": "passageway_compliance", "description": "地下道が第1号〜第6号の基準に該当" },
+            { "type": "comparison", "operator": ">=", "lhs": "接する長さ", "rhs": "2m" }
+          ]
+        },
+        {
+          "type": "exception",
+          "description": "公衆便所、公衆電話所その他これらに類するもの",
+          "effect": "接する長さを2m未満とすることができる"
+        }
+      ]
+    },
+    "exceptions": {
+      "operator": "OR",
+      "conditions": [
+        { "type": "use", "value": "公衆便所" },
+        { "type": "use", "value": "公衆電話所" },
+        { "type": "use", "value": "これらに類するもの" }
+      ],
+      "effect": "REDUCED_REQUIREMENT"
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-unit-identify",
+        "type": "process",
+        "title": "各構えの特定",
+        "process_type": "undefined_input",
+        "description": "地下街における各構え（店舗等の区画単位）を特定"
+      },
+      {
+        "id": "info-unit-set",
+        "type": "information",
+        "title": "地下街の各構え",
+        "subject": "地下街",
+        "property": "各構えの集合",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "判定対象となる地下街に属する各構えを特定"
+      },
+      {
+        "id": "proc-use-check",
+        "type": "process",
+        "title": "用途の特定",
+        "process_type": "undefined_input",
+        "description": "各構えの用途を特定（公衆便所、公衆電話所等か否か）",
+        "iteration": "iterative"
+      },
+      {
+        "id": "info-use",
+        "type": "information",
+        "title": "各構えの用途",
+        "symbol": "U",
+        "subject": "各構え",
+        "property": "用途",
+        "property_type": "classification",
+        "plurality": "multiple",
+        "description": "公衆便所、公衆電話所、その他これらに類するもの、又はその他"
+      },
+      {
+        "id": "proc-exception-judge",
+        "type": "process",
+        "title": "例外該当判定",
+        "process_type": "mechanical",
+        "description": "公衆便所、公衆電話所その他これらに類するものに該当するか判定",
+        "logic_expression": "U ∈ {公衆便所, 公衆電話所, 類するもの}",
+        "iteration": "iterative"
+      },
+      {
+        "id": "info-exception",
+        "type": "information",
+        "title": "例外該当",
+        "symbol": "EX",
+        "subject": "各構え",
+        "property": "例外該当性",
+        "property_type": "proposition",
+        "plurality": "multiple",
+        "description": "ただし書きの適用対象か否か"
+      },
+      {
+        "id": "proc-passageway-identify",
+        "type": "process",
+        "title": "接続地下道の特定",
+        "process_type": "undefined_input",
+        "description": "各構えが接する地下道を特定",
+        "iteration": "iterative"
+      },
+      {
+        "id": "info-passageway-set",
+        "type": "information",
+        "title": "接続地下道",
+        "subject": "各構え",
+        "property": "接続する地下道",
+        "property_type": "set_definition",
+        "plurality": "multiple",
+        "description": "各構えが接する地下道"
+      },
+      {
+        "id": "proc-passageway-compliance-check",
+        "type": "process",
+        "title": "地下道基準適合確認",
+        "process_type": "sub_diagram_reference",
+        "sub_diagram_ref": "CHK-BSL-ORD-A128_3-P1-ITEMS",
+        "description": "接続する地下道が第1号〜第6号の基準に該当するか確認",
+        "iteration": "iterative",
+        "related_articles": [
+          "令::A128_3:P1:I1",
+          "令::A128_3:P1:I2",
+          "令::A128_3:P1:I3",
+          "令::A128_3:P1:I4",
+          "令::A128_3:P1:I5",
+          "令::A128_3:P1:I6"
+        ]
+      },
+      {
+        "id": "info-passageway-compliant",
+        "type": "information",
+        "title": "地下道基準適合",
+        "symbol": "PC",
+        "subject": "地下道",
+        "property": "第1号〜第6号基準適合",
+        "property_type": "proposition",
+        "plurality": "multiple",
+        "description": "壁・床等の耐火性能、寸法、内装、階段、出入口、設備の各基準適合"
+      },
+      {
+        "id": "proc-contact-length-measure",
+        "type": "process",
+        "title": "接する長さの測定",
+        "process_type": "undefined_input",
+        "description": "各構えと地下道が接する長さを測定",
+        "iteration": "iterative"
+      },
+      {
+        "id": "info-contact-length",
+        "type": "information",
+        "title": "接する長さ",
+        "symbol": "L",
+        "subject": "各構え",
+        "property": "地下道との接触長さ",
+        "property_type": "numeric",
+        "unit": "m",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-length-threshold-judge",
+        "type": "process",
+        "title": "接触長さ判定",
+        "process_type": "mechanical",
+        "description": "例外該当の場合は長さ要件なし、それ以外は2m以上か判定",
+        "logic_expression": "EX OR (L >= 2)",
+        "iteration": "iterative"
+      },
+      {
+        "id": "info-length-ok",
+        "type": "information",
+        "title": "接触長さ要件適合",
+        "symbol": "LOK",
+        "subject": "各構え",
+        "property": "接触長さ要件適合",
+        "property_type": "proposition",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-unit-compliance-judge",
+        "type": "process",
+        "title": "各構え適合判定",
+        "process_type": "mechanical",
+        "description": "地下道基準適合かつ接触長さ要件適合かを判定",
+        "logic_expression": "PC AND LOK",
+        "iteration": "iterative"
+      },
+      {
+        "id": "info-unit-compliant",
+        "type": "information",
+        "title": "各構え適合",
+        "symbol": "UC",
+        "subject": "各構え",
+        "property": "第1項適合",
+        "property_type": "proposition",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-all-units-judge",
+        "type": "process",
+        "title": "全構え適合判定",
+        "process_type": "mechanical",
+        "description": "すべての各構えが適合しているか判定（全称命題）",
+        "logic_expression": "∀x∈各構え: UC(x)"
+      },
+      {
+        "id": "info-final-compliance",
+        "type": "information",
+        "title": "令第128条の3第1項適合",
+        "symbol": "COMPLIANT",
+        "subject": "地下街",
+        "property": "令第128条の3第1項適合性",
+        "property_type": "proposition",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-unit-identify",
+        "to": "info-unit-set",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "info-unit-set",
+        "to": "proc-use-check",
+        "role": "input"
+      },
+      {
+        "id": "e03",
+        "from": "proc-use-check",
+        "to": "info-use",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "info-use",
+        "to": "proc-exception-judge",
+        "role": "input"
+      },
+      {
+        "id": "e05",
+        "from": "proc-exception-judge",
+        "to": "info-exception",
+        "role": "output"
+      },
+      {
+        "id": "e06",
+        "from": "info-unit-set",
+        "to": "proc-passageway-identify",
+        "role": "input"
+      },
+      {
+        "id": "e07",
+        "from": "proc-passageway-identify",
+        "to": "info-passageway-set",
+        "role": "output"
+      },
+      {
+        "id": "e08",
+        "from": "info-passageway-set",
+        "to": "proc-passageway-compliance-check",
+        "role": "input"
+      },
+      {
+        "id": "e09",
+        "from": "proc-passageway-compliance-check",
+        "to": "info-passageway-compliant",
+        "role": "output"
+      },
+      {
+        "id": "e10",
+        "from": "info-unit-set",
+        "to": "proc-contact-length-measure",
+        "role": "input"
+      },
+      {
+        "id": "e11",
+        "from": "info-passageway-set",
+        "to": "proc-contact-length-measure",
+        "role": "input"
+      },
+      {
+        "id": "e12",
+        "from": "proc-contact-length-measure",
+        "to": "info-contact-length",
+        "role": "output"
+      },
+      {
+        "id": "e13",
+        "from": "info-exception",
+        "to": "proc-length-threshold-judge",
+        "role": "input"
+      },
+      {
+        "id": "e14",
+        "from": "info-contact-length",
+        "to": "proc-length-threshold-judge",
+        "role": "input"
+      },
+      {
+        "id": "e15",
+        "from": "proc-length-threshold-judge",
+        "to": "info-length-ok",
+        "role": "output"
+      },
+      {
+        "id": "e16",
+        "from": "info-passageway-compliant",
+        "to": "proc-unit-compliance-judge",
+        "role": "input"
+      },
+      {
+        "id": "e17",
+        "from": "info-length-ok",
+        "to": "proc-unit-compliance-judge",
+        "role": "input"
+      },
+      {
+        "id": "e18",
+        "from": "proc-unit-compliance-judge",
+        "to": "info-unit-compliant",
+        "role": "output"
+      },
+      {
+        "id": "e19",
+        "from": "info-unit-compliant",
+        "to": "proc-all-units-judge",
+        "role": "input"
+      },
+      {
+        "id": "e20",
+        "from": "proc-all-units-judge",
+        "to": "info-final-compliance",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": ["A128_3:P1:I1", "A128_3:P1:I2", "A128_3:P1:I3", "A128_3:P1:I4", "A128_3:P1:I5", "A128_3:P1:I6"],
+      "description": "地下道の基準（耐火性能、寸法、内装、階段、出入口、設備）"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": ["A23:P1"],
+      "description": "直通階段の基準（第4号で参照）"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-01-25T00:00:00+09:00",
+    "author": "Claude",
+    "generator": "kijo-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

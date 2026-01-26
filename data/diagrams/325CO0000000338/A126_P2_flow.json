@@ -1,0 +1,264 @@
+{
+  "id": "A126_P2_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "百貨店の屋上広場設置義務",
+    "target_subject": "建築物",
+    "description": "5階以上の階を百貨店売場とする場合、避難用屋上広場の設置義務"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "126",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "避難",
+    "屋上広場"
+  ],
+  "text_raw": "建築物の五階以上の階を百貨店の売場の用途に供する場合においては、避難の用に供することができる屋上広場を設けなければならない。",
+  "kijo_diagram_ref": "CHK-BSL-ORD-A126-P2",
+  "flow_diagram": {
+    "title": "令第126条第2項 適合判定フロー",
+    "description": "百貨店の5階以上の売場がある場合の避難用屋上広場設置義務の適合判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start"
+      },
+      {
+        "id": "dec-building-has-floors",
+        "type": "decision",
+        "title": "建築物に階があるか？",
+        "decision_type": "binary",
+        "description": "判定対象となる建築物に階があるかを確認"
+      },
+      {
+        "id": "dec-floor-number",
+        "type": "decision",
+        "title": "最上階は何階か？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "4階以下", "description": "最上階が4階以下の建築物" },
+          { "value": "5階以上", "description": "最上階が5階以上の建築物" }
+        ],
+        "description": "建築物の最上階の階数を確認"
+      },
+      {
+        "id": "proc-no-5f",
+        "type": "process",
+        "title": "5階以上の階なし",
+        "process_type": "mechanical",
+        "description": "建築物に5階以上の階がないため適用対象外"
+      },
+      {
+        "id": "dec-5f-floor-exists",
+        "type": "decision",
+        "title": "5階以上の階が存在するか？",
+        "decision_type": "binary",
+        "description": "5階、6階、7階等の階が具体的に存在するか確認"
+      },
+      {
+        "id": "proc-identify-5f-floors",
+        "type": "process",
+        "title": "5階以上の階を抽出",
+        "process_type": "mechanical",
+        "description": "建築物から5階以上の階を抽出する"
+      },
+      {
+        "id": "dec-floor-use",
+        "type": "decision",
+        "title": "5階以上の階の用途は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "百貨店売場", "description": "百貨店の売場の用途に供する" },
+          { "value": "その他用途", "description": "百貨店売場以外の用途" }
+        ],
+        "description": "5階以上の各階の用途を確認"
+      },
+      {
+        "id": "proc-other-use",
+        "type": "process",
+        "title": "百貨店売場なし",
+        "process_type": "mechanical",
+        "description": "5階以上の階に百貨店売場がないため適用対象外"
+      },
+      {
+        "id": "proc-condition-met",
+        "type": "process",
+        "title": "適用条件該当",
+        "process_type": "mechanical",
+        "description": "5階以上の階を百貨店売場の用途に供している"
+      },
+      {
+        "id": "dec-rooftop-exists",
+        "type": "decision",
+        "title": "屋上広場があるか？",
+        "decision_type": "binary",
+        "description": "屋上広場が設けられているか"
+      },
+      {
+        "id": "dec-rooftop-evacuation",
+        "type": "decision",
+        "title": "屋上広場は避難に供せるか？",
+        "decision_type": "binary",
+        "description": "屋上広場が避難の用に供することができるかを確認"
+      },
+      {
+        "id": "proc-rooftop-ok",
+        "type": "process",
+        "title": "避難用屋上広場設置済み",
+        "process_type": "mechanical",
+        "description": "避難の用に供することができる屋上広場が設けられている"
+      },
+      {
+        "id": "end-pass-noapp",
+        "type": "terminal",
+        "title": "適合（適用対象外）",
+        "result": "pass",
+        "description": "適用条件に該当しないため、本規定は適用されない"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "避難用屋上広場が設けられており、令第126条第2項に適合"
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "5階以上の階を百貨店売場としているにもかかわらず、避難用屋上広場が設けられていない"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-building-has-floors",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-building-has-floors",
+        "to": "dec-floor-number",
+        "role": "yes"
+      },
+      {
+        "id": "e03",
+        "from": "dec-building-has-floors",
+        "to": "end-pass-noapp",
+        "role": "no"
+      },
+      {
+        "id": "e04",
+        "from": "dec-floor-number",
+        "to": "proc-no-5f",
+        "role": "option",
+        "label": "4階以下"
+      },
+      {
+        "id": "e05",
+        "from": "dec-floor-number",
+        "to": "dec-5f-floor-exists",
+        "role": "option",
+        "label": "5階以上"
+      },
+      {
+        "id": "e06",
+        "from": "proc-no-5f",
+        "to": "end-pass-noapp",
+        "role": "flow"
+      },
+      {
+        "id": "e07",
+        "from": "dec-5f-floor-exists",
+        "to": "proc-identify-5f-floors",
+        "role": "yes"
+      },
+      {
+        "id": "e08",
+        "from": "dec-5f-floor-exists",
+        "to": "end-pass-noapp",
+        "role": "no"
+      },
+      {
+        "id": "e09",
+        "from": "proc-identify-5f-floors",
+        "to": "dec-floor-use",
+        "role": "flow"
+      },
+      {
+        "id": "e10",
+        "from": "dec-floor-use",
+        "to": "proc-condition-met",
+        "role": "option",
+        "label": "百貨店売場"
+      },
+      {
+        "id": "e11",
+        "from": "dec-floor-use",
+        "to": "proc-other-use",
+        "role": "option",
+        "label": "その他用途"
+      },
+      {
+        "id": "e12",
+        "from": "proc-other-use",
+        "to": "end-pass-noapp",
+        "role": "flow"
+      },
+      {
+        "id": "e13",
+        "from": "proc-condition-met",
+        "to": "dec-rooftop-exists",
+        "role": "flow"
+      },
+      {
+        "id": "e14",
+        "from": "dec-rooftop-exists",
+        "to": "dec-rooftop-evacuation",
+        "role": "yes"
+      },
+      {
+        "id": "e15",
+        "from": "dec-rooftop-exists",
+        "to": "end-fail",
+        "role": "no"
+      },
+      {
+        "id": "e16",
+        "from": "dec-rooftop-evacuation",
+        "to": "proc-rooftop-ok",
+        "role": "yes"
+      },
+      {
+        "id": "e17",
+        "from": "dec-rooftop-evacuation",
+        "to": "end-fail",
+        "role": "no"
+      },
+      {
+        "id": "e18",
+        "from": "proc-rooftop-ok",
+        "to": "end-pass",
+        "role": "flow"
+      }
+    ]
+  },
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00+09:00",
+    "author": "Claude",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

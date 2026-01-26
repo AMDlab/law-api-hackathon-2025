@@ -1,0 +1,289 @@
+{
+  "id": "CHK-BSL-ORDER-A95-P1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "木材の材料強度",
+    "target_subject": "木材",
+    "description": "木材の繊維方向の材料強度が基準値に適合するか判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "95",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "構造規定",
+    "材料強度",
+    "木材"
+  ],
+  "text_raw": "木材の繊維方向の材料強度は、次の表の数値によらなければならない。ただし、第八十二条の五第二号の規定によつて積雪時の構造計算をするに当たつては、同表の数値に〇・八を乗じて得た数値としなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "material",
+          "value": "木材を使用する構造部材"
+        }
+      ],
+      "note": "構造計算において木材を使用する場合に適用"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-strength-compliance",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    },
+    "exceptions": {
+      "operator": "WHEN",
+      "conditions": [
+        {
+          "type": "calculation_condition",
+          "value": "令第82条の5第2号による積雪時の構造計算"
+        }
+      ],
+      "effect": "表の数値に0.8を乗じた値を適用"
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-timber-set",
+        "type": "process",
+        "title": "木材の特定",
+        "process_type": "undefined_input",
+        "description": "構造計算に用いる木材を特定"
+      },
+      {
+        "id": "info-timber-set",
+        "type": "information",
+        "title": "対象木材",
+        "symbol": "T",
+        "subject": "建築物",
+        "property": "構造計算に用いる木材の集合",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "構造計算において材料強度を確認すべき木材"
+      },
+      {
+        "id": "proc-base-strength",
+        "type": "process",
+        "title": "基準強度の特定",
+        "process_type": "undefined_input",
+        "description": "令第89条第1項の表に規定する基準強度(Fc, Ft, Fb, Fs)を特定"
+      },
+      {
+        "id": "info-base-strength",
+        "type": "information",
+        "title": "基準強度",
+        "symbol": "F",
+        "subject": "木材",
+        "property": "基準強度(Fc, Ft, Fb, Fs)",
+        "property_type": "numeric",
+        "plurality": "multiple",
+        "unit": "N/mm2",
+        "description": "令第89条第1項の表に規定する圧縮・引張り・曲げ・せん断の基準強度",
+        "related_articles": ["令::A89:P1"]
+      },
+      {
+        "id": "proc-snow-calc",
+        "type": "process",
+        "title": "積雪時計算の確認",
+        "process_type": "undefined_input",
+        "description": "令第82条の5第2号による積雪時の構造計算か確認"
+      },
+      {
+        "id": "info-snow-calc",
+        "type": "information",
+        "title": "積雪時計算該当",
+        "symbol": "S",
+        "subject": "構造計算",
+        "property": "積雪時計算該当",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "令第82条の5第2号による積雪時の構造計算に該当するか",
+        "related_articles": ["令::A82_5:I2"]
+      },
+      {
+        "id": "proc-material-strength",
+        "type": "process",
+        "title": "材料強度の算出",
+        "process_type": "mechanical",
+        "description": "材料強度を算出（通常時は基準強度、積雪時は0.8倍）",
+        "logic_expression": "S ? F × 0.8 : F"
+      },
+      {
+        "id": "info-material-strength",
+        "type": "information",
+        "title": "材料強度",
+        "symbol": "Fm",
+        "subject": "木材",
+        "property": "材料強度",
+        "property_type": "numeric",
+        "plurality": "multiple",
+        "unit": "N/mm2",
+        "description": "構造計算に用いる材料強度（積雪時は基準強度の0.8倍）"
+      },
+      {
+        "id": "proc-used-strength",
+        "type": "process",
+        "title": "使用材料強度の特定",
+        "process_type": "undefined_input",
+        "description": "構造計算で使用している材料強度を特定"
+      },
+      {
+        "id": "info-used-strength",
+        "type": "information",
+        "title": "使用材料強度",
+        "symbol": "Fu",
+        "subject": "木材",
+        "property": "構造計算で使用している材料強度",
+        "property_type": "numeric",
+        "plurality": "multiple",
+        "unit": "N/mm2",
+        "description": "構造計算書に記載された材料強度"
+      },
+      {
+        "id": "proc-strength-check",
+        "type": "process",
+        "title": "材料強度適合判定",
+        "process_type": "mechanical",
+        "iteration": "iterative",
+        "description": "使用材料強度が基準値以下であることを確認",
+        "logic_expression": "∀t ∈ T: Fu(t) ≤ Fm(t)"
+      },
+      {
+        "id": "info-strength-compliance",
+        "type": "information",
+        "title": "材料強度適合",
+        "symbol": "R",
+        "subject": "木材",
+        "property": "材料強度適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "木材の繊維方向の材料強度が令第95条第1項の基準に適合するか"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-timber-set",
+        "to": "info-timber-set",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "info-timber-set",
+        "to": "proc-base-strength",
+        "role": "input"
+      },
+      {
+        "id": "e03",
+        "from": "proc-base-strength",
+        "to": "info-base-strength",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "proc-snow-calc",
+        "to": "info-snow-calc",
+        "role": "output"
+      },
+      {
+        "id": "e05",
+        "from": "info-base-strength",
+        "to": "proc-material-strength",
+        "role": "input"
+      },
+      {
+        "id": "e06",
+        "from": "info-snow-calc",
+        "to": "proc-material-strength",
+        "role": "input"
+      },
+      {
+        "id": "e07",
+        "from": "proc-material-strength",
+        "to": "info-material-strength",
+        "role": "output"
+      },
+      {
+        "id": "e08",
+        "from": "info-timber-set",
+        "to": "proc-used-strength",
+        "role": "input"
+      },
+      {
+        "id": "e09",
+        "from": "proc-used-strength",
+        "to": "info-used-strength",
+        "role": "output"
+      },
+      {
+        "id": "e10",
+        "from": "info-timber-set",
+        "to": "proc-strength-check",
+        "role": "input"
+      },
+      {
+        "id": "e11",
+        "from": "info-material-strength",
+        "to": "proc-strength-check",
+        "role": "input"
+      },
+      {
+        "id": "e12",
+        "from": "info-used-strength",
+        "to": "proc-strength-check",
+        "role": "input"
+      },
+      {
+        "id": "e13",
+        "from": "proc-strength-check",
+        "to": "info-strength-compliance",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": ["A89:P1"],
+      "description": "基準強度(Fc, Ft, Fb, Fs)の規定"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": ["A82_5:I2"],
+      "description": "積雪時の構造計算の規定"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": ["A89:P2", "A89:P3"],
+      "description": "材料強度の準用規定（第2項による準用）"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-01-23T12:00:00Z",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

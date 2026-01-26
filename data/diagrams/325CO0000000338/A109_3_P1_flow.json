@@ -1,0 +1,269 @@
+{
+  "id": "A109_3_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "準耐火建築物同等の技術的基準（適合判定フロー）",
+    "target_subject": "建築物",
+    "description": "法第2条第9号の3ロに基づく、主要構造部を準耐火構造とした建築物と同等の耐火性能を有する建築物の技術的基準への適合を判定するフロー"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "109の3",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": ["単体規定", "防火", "構造"],
+  "text_raw": "法第二条第九号の三ロの政令で定める技術的基準は、次の各号のいずれかに掲げるものとする。\n一 外壁が耐火構造であり、かつ、屋根の構造が法第二十二条第一項に規定する構造であるほか、法第八十六条の四の場合を除き、屋根の延焼のおそれのある部分の構造が、当該部分に屋内において発生する通常の火災による火熱が加えられた場合に、加熱開始後二十分間屋外に火炎を出す原因となるき裂その他の損傷を生じないものとして、国土交通大臣が定めた構造方法を用いるもの又は国土交通大臣の認定を受けたものであること。\n二 主要構造部である柱及びはりが不燃材料で、その他の主要構造部が準不燃材料で造られ、外壁の延焼のおそれのある部分、屋根及び床が次に掲げる構造であること。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "building_classification",
+          "value": "法第2条第9号の3ロに該当する建築物"
+        }
+      ],
+      "note": "主要構造部を準耐火構造とした建築物と同等の耐火性能を有する建築物として扱われる建築物"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "note": "第一号の基準",
+          "operator": "AND",
+          "conditions": [
+            { "ref": "info-wall-fire-resistive", "operator": "==", "value": true },
+            { "ref": "info-roof-law22", "operator": "==", "value": true },
+            {
+              "operator": "OR",
+              "conditions": [
+                { "ref": "info-law86-4-exception", "operator": "==", "value": true },
+                { "ref": "info-roof-ensho-compliance", "operator": "==", "value": true }
+              ]
+            }
+          ]
+        },
+        {
+          "note": "第二号の基準",
+          "operator": "AND",
+          "conditions": [
+            { "ref": "info-column-beam-noncombustible", "operator": "==", "value": true },
+            { "ref": "info-other-structure-quasi-noncombustible", "operator": "==", "value": true },
+            { "ref": "info-wall-ensho-fireproof", "operator": "==", "value": true },
+            { "ref": "info-roof-law22-2", "operator": "==", "value": true },
+            { "ref": "info-floor-compliance", "operator": "==", "value": true }
+          ]
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "flow_diagram": {
+    "title": "令109条の3第1項 準耐火建築物同等の技術的基準 適合判定フロー",
+    "description": "法第2条第9号の3ロに規定する技術的基準（第一号または第二号のいずれか）への適合を判定する",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "法第2条第9号の3ロに該当する建築物について判定を開始"
+      },
+      {
+        "id": "dec-route-selection",
+        "type": "decision",
+        "title": "適合経路は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "第一号", "description": "外壁耐火構造＋屋根法22条構造＋屋根延焼部分基準" },
+          { "value": "第二号", "description": "柱はり不燃材料＋その他準不燃材料＋外壁・屋根・床基準" }
+        ],
+        "description": "適合を確認する基準（第一号または第二号）を選択"
+      },
+      {
+        "id": "dec-wall-fire-resistive",
+        "type": "decision",
+        "title": "外壁は耐火構造か？",
+        "decision_type": "binary",
+        "description": "全ての外壁が耐火構造であるかを判定（第一号要件）"
+      },
+      {
+        "id": "dec-roof-law22",
+        "type": "decision",
+        "title": "屋根は法22条構造か？",
+        "decision_type": "binary",
+        "description": "屋根の構造が法第22条第1項に規定する構造であるかを判定",
+        "related_articles": ["法::A22:P1"]
+      },
+      {
+        "id": "dec-law86-4",
+        "type": "decision",
+        "title": "法86条の4の場合か？",
+        "decision_type": "binary",
+        "description": "法第86条の4の場合（一団地認定等）に該当するかを確認",
+        "related_articles": ["法::A86_4"]
+      },
+      {
+        "id": "dec-roof-ensho-area",
+        "type": "decision",
+        "title": "屋根に延焼のおそれのある部分があるか？",
+        "decision_type": "binary",
+        "description": "屋根に延焼のおそれのある部分が存在するかを判定",
+        "related_articles": ["法::A2:I6"]
+      },
+      {
+        "id": "dec-roof-ensho-method",
+        "type": "decision",
+        "title": "延焼部分は大臣定め構造方法または大臣認定か？",
+        "decision_type": "binary",
+        "description": "屋根の延焼のおそれのある部分が、20分間屋外に火炎を出さない大臣定め構造方法または大臣認定を受けたものか判定"
+      },
+      {
+        "id": "proc-item1-comply",
+        "type": "process",
+        "title": "第一号適合",
+        "process_type": "mechanical",
+        "description": "第一号の全ての基準に適合"
+      },
+      {
+        "id": "dec-column-beam-noncombustible",
+        "type": "decision",
+        "title": "柱・はりは不燃材料か？",
+        "decision_type": "binary",
+        "description": "主要構造部である柱及びはりが不燃材料で造られているかを判定"
+      },
+      {
+        "id": "dec-other-structure-quasi-noncombustible",
+        "type": "decision",
+        "title": "その他主要構造部は準不燃材料以上か？",
+        "decision_type": "binary",
+        "description": "柱・はり以外の主要構造部が準不燃材料（または不燃材料）で造られているかを判定"
+      },
+      {
+        "id": "dec-wall-ensho-fireproof",
+        "type": "decision",
+        "title": "外壁延焼部分は防火構造か？",
+        "decision_type": "binary",
+        "description": "外壁の延焼のおそれのある部分が防火構造であるかを判定（第二号イ）"
+      },
+      {
+        "id": "dec-roof-law22-item2",
+        "type": "decision",
+        "title": "屋根は法22条構造か？（二号）",
+        "decision_type": "binary",
+        "description": "屋根が法第22条第1項に規定する構造であるかを判定（第二号ロ）",
+        "related_articles": ["法::A22:P1"]
+      },
+      {
+        "id": "dec-floor-material",
+        "type": "decision",
+        "title": "床は準不燃材料か？",
+        "decision_type": "binary",
+        "description": "床が準不燃材料で造られているかを判定（第二号ハ）"
+      },
+      {
+        "id": "dec-floor-level",
+        "type": "decision",
+        "title": "3階以上の床があるか？",
+        "decision_type": "binary",
+        "description": "3階以上の階に床が存在するかを判定"
+      },
+      {
+        "id": "dec-floor-ceiling-structure",
+        "type": "decision",
+        "title": "3階以上の床・天井は大臣定め構造方法または大臣認定か？",
+        "decision_type": "binary",
+        "description": "3階以上の床またはその直下の天井が、通常の火災時に30分間準耐火性能を確保する大臣定め構造方法または大臣認定を受けたものか判定"
+      },
+      {
+        "id": "proc-item2-comply",
+        "type": "process",
+        "title": "第二号適合",
+        "process_type": "mechanical",
+        "description": "第二号の全ての基準に適合"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令第109条の3第1項の技術的基準に適合"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "令第109条の3第1項の技術的基準に不適合"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "dec-route-selection", "role": "flow" },
+      { "id": "e02", "from": "dec-route-selection", "to": "dec-wall-fire-resistive", "role": "option", "label": "第一号" },
+      { "id": "e03", "from": "dec-route-selection", "to": "dec-column-beam-noncombustible", "role": "option", "label": "第二号" },
+      { "id": "e04", "from": "dec-wall-fire-resistive", "to": "dec-roof-law22", "role": "yes", "label": "はい" },
+      { "id": "e05", "from": "dec-wall-fire-resistive", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e06", "from": "dec-roof-law22", "to": "dec-law86-4", "role": "yes", "label": "はい" },
+      { "id": "e07", "from": "dec-roof-law22", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e08", "from": "dec-law86-4", "to": "proc-item1-comply", "role": "yes", "label": "はい" },
+      { "id": "e09", "from": "dec-law86-4", "to": "dec-roof-ensho-area", "role": "no", "label": "いいえ" },
+      { "id": "e10", "from": "dec-roof-ensho-area", "to": "dec-roof-ensho-method", "role": "yes", "label": "はい" },
+      { "id": "e11", "from": "dec-roof-ensho-area", "to": "proc-item1-comply", "role": "no", "label": "いいえ" },
+      { "id": "e12", "from": "dec-roof-ensho-method", "to": "proc-item1-comply", "role": "yes", "label": "はい" },
+      { "id": "e13", "from": "dec-roof-ensho-method", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e14", "from": "proc-item1-comply", "to": "pass", "role": "flow" },
+      { "id": "e15", "from": "dec-column-beam-noncombustible", "to": "dec-other-structure-quasi-noncombustible", "role": "yes", "label": "はい" },
+      { "id": "e16", "from": "dec-column-beam-noncombustible", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e17", "from": "dec-other-structure-quasi-noncombustible", "to": "dec-wall-ensho-fireproof", "role": "yes", "label": "はい" },
+      { "id": "e18", "from": "dec-other-structure-quasi-noncombustible", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e19", "from": "dec-wall-ensho-fireproof", "to": "dec-roof-law22-item2", "role": "yes", "label": "はい" },
+      { "id": "e20", "from": "dec-wall-ensho-fireproof", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e21", "from": "dec-roof-law22-item2", "to": "dec-floor-material", "role": "yes", "label": "はい" },
+      { "id": "e22", "from": "dec-roof-law22-item2", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e23", "from": "dec-floor-material", "to": "dec-floor-level", "role": "yes", "label": "はい" },
+      { "id": "e24", "from": "dec-floor-material", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e25", "from": "dec-floor-level", "to": "dec-floor-ceiling-structure", "role": "yes", "label": "はい" },
+      { "id": "e26", "from": "dec-floor-level", "to": "proc-item2-comply", "role": "no", "label": "いいえ" },
+      { "id": "e27", "from": "dec-floor-ceiling-structure", "to": "proc-item2-comply", "role": "yes", "label": "はい" },
+      { "id": "e28", "from": "dec-floor-ceiling-structure", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e29", "from": "proc-item2-comply", "to": "pass", "role": "flow" }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-ORD-A109_3-P1",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": ["A2:I9_3"],
+      "description": "法第2条第9号の3ロが本条に委任"
+    },
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A22:P1"],
+      "description": "屋根の構造基準として参照"
+    },
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A86_4"],
+      "description": "第一号の適用除外として参照"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T12:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

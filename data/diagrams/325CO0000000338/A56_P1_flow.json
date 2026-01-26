@@ -1,0 +1,505 @@
+{
+  "id": "A56_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "組積造の壁の臥梁",
+    "target_subject": "組積造の壁",
+    "description": "組積造の壁の各階の壁頂に所定の臥梁が設けられていることを判定するフロー"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "56",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造"
+  ],
+  "text_raw": "組積造の壁には、その各階の壁頂（切妻壁がある場合においては、その切妻壁の壁頂）に鉄骨造又は鉄筋コンクリート造の臥梁を設けなければならない。ただし、その壁頂に鉄筋コンクリート造の屋根版、床版等が接着する場合又は階数が一の建築物で壁の厚さが壁の高さの十分の一以上の場合若しくは壁の長さが五メートル以下の場合においては、この限りでない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "structure",
+          "value": "組積造の壁を有する建築物"
+        }
+      ],
+      "note": "組積造の壁を有する建築物が対象"
+    },
+    "judgment_rule": {
+      "operator": "FOR_ALL",
+      "conditions": [
+        {
+          "note": "各壁について、適用除外または臥梁設置",
+          "operator": "OR",
+          "conditions": [
+            { "ref": "info-exempt" },
+            { "ref": "info-garyo-installed" }
+          ]
+        }
+      ]
+    },
+    "exceptions": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "note": "壁頂にRC屋根版・床版等が接着する場合"
+        },
+        {
+          "note": "階数1かつ壁厚/壁高 >= 0.1"
+        },
+        {
+          "note": "壁の長さ <= 5m"
+        }
+      ],
+      "effect": "EXEMPT"
+    }
+  },
+  "flow_diagram": {
+    "title": "令第56条第1項 適合判定フロー",
+    "description": "組積造の壁の臥梁設置に関する適合判定フローチャート",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start"
+      },
+      {
+        "id": "dec-has-masonry-wall",
+        "type": "decision",
+        "title": "組積造の壁を有するか？",
+        "decision_type": "binary",
+        "description": "建築物が組積造の壁を有するか確認"
+      },
+      {
+        "id": "proc-not-applicable",
+        "type": "process",
+        "title": "対象外",
+        "process_type": "mechanical",
+        "description": "組積造の壁がないため、本条の適用対象外"
+      },
+      {
+        "id": "end-not-applicable",
+        "type": "terminal",
+        "title": "本条適用対象外",
+        "result": "pass",
+        "description": "組積造の壁がないため適用対象外"
+      },
+      {
+        "id": "proc-identify-walls",
+        "type": "process",
+        "title": "組積造の壁を特定",
+        "process_type": "undefined_input",
+        "description": "設計図書から判定対象となる組積造の壁を特定"
+      },
+      {
+        "id": "dec-has-walls-to-check",
+        "type": "decision",
+        "title": "未判定の壁があるか？",
+        "decision_type": "binary",
+        "description": "判定対象の組積造の壁がまだ残っているか確認"
+      },
+      {
+        "id": "proc-select-wall",
+        "type": "process",
+        "title": "次の壁を選択",
+        "process_type": "mechanical",
+        "description": "判定対象の壁を一つ選択"
+      },
+      {
+        "id": "dec-rc-slab-attached",
+        "type": "decision",
+        "title": "壁頂にRC屋根版・床版等が接着しているか？",
+        "decision_type": "binary",
+        "description": "壁頂に鉄筋コンクリート造の屋根版、床版等が接着しているか確認（ただし書き1）"
+      },
+      {
+        "id": "proc-exempt-rc-slab",
+        "type": "process",
+        "title": "適用除外（RC版接着）",
+        "process_type": "mechanical",
+        "description": "RC屋根版・床版等が接着しているため、臥梁不要"
+      },
+      {
+        "id": "dec-story-count",
+        "type": "decision",
+        "title": "建築物の階数は1か？",
+        "decision_type": "binary",
+        "description": "建築物の階数が1階のみかを確認"
+      },
+      {
+        "id": "dec-wall-thickness-known",
+        "type": "decision",
+        "title": "壁の厚さ（T）を読み取れるか？",
+        "decision_type": "binary",
+        "description": "設計図書から壁の厚さが読み取れるか確認"
+      },
+      {
+        "id": "dec-wall-height-known",
+        "type": "decision",
+        "title": "壁の高さ（H）を読み取れるか？",
+        "decision_type": "binary",
+        "description": "設計図書から壁の高さが読み取れるか確認"
+      },
+      {
+        "id": "dec-thickness-ratio",
+        "type": "decision",
+        "title": "壁厚/壁高 >= 1/10 か？",
+        "decision_type": "binary",
+        "description": "壁の厚さが壁の高さの十分の一以上か確認（ただし書き2）",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "R", "desc": "壁厚/高さ比 (T/H)" },
+          "rhs": { "value": 0.1, "desc": "1/10" }
+        }
+      },
+      {
+        "id": "proc-exempt-thickness",
+        "type": "process",
+        "title": "適用除外（厚さ条件）",
+        "process_type": "mechanical",
+        "description": "階数1かつ壁厚/壁高>=1/10のため、臥梁不要"
+      },
+      {
+        "id": "dec-wall-length-known",
+        "type": "decision",
+        "title": "壁の長さ（L）を読み取れるか？",
+        "decision_type": "binary",
+        "description": "設計図書から壁の長さが読み取れるか確認"
+      },
+      {
+        "id": "dec-wall-length",
+        "type": "decision",
+        "title": "壁の長さ <= 5m か？",
+        "decision_type": "binary",
+        "description": "壁の長さが五メートル以下か確認（ただし書き3）",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "L", "desc": "壁の長さ" },
+          "rhs": { "value": 5, "unit": "m" }
+        }
+      },
+      {
+        "id": "proc-exempt-length",
+        "type": "process",
+        "title": "適用除外（長さ条件）",
+        "process_type": "mechanical",
+        "description": "壁の長さが5m以下のため、臥梁不要"
+      },
+      {
+        "id": "dec-garyo-exists",
+        "type": "decision",
+        "title": "各階の壁頂に臥梁が設けられているか？",
+        "decision_type": "binary",
+        "description": "各階の壁頂（切妻壁がある場合はその壁頂を含む）に臥梁が設けられているか確認"
+      },
+      {
+        "id": "dec-garyo-type",
+        "type": "decision",
+        "title": "臥梁の構造種別は？",
+        "decision_type": "multi",
+        "description": "臥梁が鉄骨造または鉄筋コンクリート造であるか確認",
+        "options": [
+          { "value": "鉄骨造", "description": "鉄骨造の臥梁" },
+          { "value": "RC造", "description": "鉄筋コンクリート造の臥梁" },
+          { "value": "その他", "description": "その他の構造" }
+        ]
+      },
+      {
+        "id": "proc-garyo-ok",
+        "type": "process",
+        "title": "臥梁設置確認",
+        "process_type": "mechanical",
+        "description": "本則の臥梁設置要件を満たす"
+      },
+      {
+        "id": "proc-wall-pass",
+        "type": "process",
+        "title": "当該壁は適合",
+        "process_type": "mechanical",
+        "description": "当該組積造の壁は令56条1項に適合"
+      },
+      {
+        "id": "proc-wall-fail",
+        "type": "process",
+        "title": "当該壁は不適合",
+        "process_type": "mechanical",
+        "description": "当該組積造の壁は令56条1項に不適合"
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "令56条1項に不適合",
+        "related_articles": ["令第56条第1項"]
+      },
+      {
+        "id": "dec-all-walls-checked",
+        "type": "decision",
+        "title": "全ての壁を確認したか？",
+        "decision_type": "binary",
+        "description": "全ての組積造の壁について判定が完了したか確認"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "全ての組積造の壁が令56条1項に適合",
+        "related_articles": ["令第56条第1項"]
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-has-masonry-wall",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-has-masonry-wall",
+        "to": "proc-not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e03",
+        "from": "proc-not-applicable",
+        "to": "end-not-applicable",
+        "role": "flow"
+      },
+      {
+        "id": "e04",
+        "from": "dec-has-masonry-wall",
+        "to": "proc-identify-walls",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e05",
+        "from": "proc-identify-walls",
+        "to": "dec-has-walls-to-check",
+        "role": "flow"
+      },
+      {
+        "id": "e06",
+        "from": "dec-has-walls-to-check",
+        "to": "proc-select-wall",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e07",
+        "from": "proc-select-wall",
+        "to": "dec-rc-slab-attached",
+        "role": "flow"
+      },
+      {
+        "id": "e08",
+        "from": "dec-rc-slab-attached",
+        "to": "proc-exempt-rc-slab",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e09",
+        "from": "proc-exempt-rc-slab",
+        "to": "proc-wall-pass",
+        "role": "flow"
+      },
+      {
+        "id": "e10",
+        "from": "dec-rc-slab-attached",
+        "to": "dec-story-count",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e11",
+        "from": "dec-story-count",
+        "to": "dec-wall-thickness-known",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e12",
+        "from": "dec-wall-thickness-known",
+        "to": "dec-wall-height-known",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e13",
+        "from": "dec-wall-height-known",
+        "to": "dec-thickness-ratio",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e14",
+        "from": "dec-thickness-ratio",
+        "to": "proc-exempt-thickness",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e15",
+        "from": "proc-exempt-thickness",
+        "to": "proc-wall-pass",
+        "role": "flow"
+      },
+      {
+        "id": "e16",
+        "from": "dec-thickness-ratio",
+        "to": "dec-wall-length-known",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e17",
+        "from": "dec-wall-thickness-known",
+        "to": "dec-wall-length-known",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e18",
+        "from": "dec-wall-height-known",
+        "to": "dec-wall-length-known",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e19",
+        "from": "dec-story-count",
+        "to": "dec-wall-length-known",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e20",
+        "from": "dec-wall-length-known",
+        "to": "dec-wall-length",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e21",
+        "from": "dec-wall-length",
+        "to": "proc-exempt-length",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e22",
+        "from": "proc-exempt-length",
+        "to": "proc-wall-pass",
+        "role": "flow"
+      },
+      {
+        "id": "e23",
+        "from": "dec-wall-length",
+        "to": "dec-garyo-exists",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e24",
+        "from": "dec-wall-length-known",
+        "to": "dec-garyo-exists",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e25",
+        "from": "dec-garyo-exists",
+        "to": "dec-garyo-type",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e26",
+        "from": "dec-garyo-type",
+        "to": "proc-garyo-ok",
+        "role": "option",
+        "label": "鉄骨造"
+      },
+      {
+        "id": "e27",
+        "from": "dec-garyo-type",
+        "to": "proc-garyo-ok",
+        "role": "option",
+        "label": "RC造"
+      },
+      {
+        "id": "e28",
+        "from": "dec-garyo-type",
+        "to": "proc-wall-fail",
+        "role": "option",
+        "label": "その他"
+      },
+      {
+        "id": "e29",
+        "from": "proc-garyo-ok",
+        "to": "proc-wall-pass",
+        "role": "flow"
+      },
+      {
+        "id": "e30",
+        "from": "dec-garyo-exists",
+        "to": "proc-wall-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e31",
+        "from": "proc-wall-fail",
+        "to": "end-fail",
+        "role": "flow"
+      },
+      {
+        "id": "e32",
+        "from": "proc-wall-pass",
+        "to": "dec-all-walls-checked",
+        "role": "flow"
+      },
+      {
+        "id": "e33",
+        "from": "dec-all-walls-checked",
+        "to": "end-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e34",
+        "from": "dec-all-walls-checked",
+        "to": "dec-has-walls-to-check",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e35",
+        "from": "dec-has-walls-to-check",
+        "to": "end-pass",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSO-A56-P1",
+  "metadata": {
+    "created_at": "2026-01-26T12:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

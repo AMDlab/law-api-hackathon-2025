@@ -1,0 +1,438 @@
+{
+  "id": "FLOW-BSL-ORDER-A92_2-P1",
+  "version": "3.2",
+  "page_title": {
+    "title": "高力ボルト摩擦接合部の許容せん断応力度",
+    "target_subject": "高力ボルト摩擦接合部",
+    "description": "高力ボルト摩擦接合部の高力ボルトの軸断面に対する許容せん断応力度が表の数値によるか判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "92_2",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造",
+    "高力ボルト",
+    "許容応力度"
+  ],
+  "text_raw": "高力ボルト摩擦接合部の高力ボルトの軸断面に対する許容せん断応力度は、次の表の数値によらなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "subject",
+          "value": "高力ボルト摩擦接合部を有する建築物"
+        }
+      ],
+      "note": "高力ボルト摩擦接合を使用する場合に適用"
+    },
+    "judgment_rule": {
+      "operator": "==",
+      "lhs": {
+        "ref": "info-compliance"
+      },
+      "rhs": {
+        "value": true
+      }
+    },
+    "exceptions": null
+  },
+  "flow_diagram": {
+    "title": "高力ボルト摩擦接合部の許容せん断応力度適合判定フロー",
+    "description": "高力ボルト摩擦接合部の許容せん断応力度が令第92条の2の表の数値以下であるか判定する",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "高力ボルト摩擦接合部の許容せん断応力度適合判定を開始"
+      },
+      {
+        "id": "dec-has-joint",
+        "type": "decision",
+        "title": "高力ボルト摩擦接合部があるか？",
+        "decision_type": "binary",
+        "description": "建築物に高力ボルト摩擦接合部が存在するか確認"
+      },
+      {
+        "id": "proc-identify-joints",
+        "type": "process",
+        "title": "高力ボルト摩擦接合部を特定",
+        "process_type": "undefined_input",
+        "description": "設計図書から高力ボルト摩擦接合部を特定する"
+      },
+      {
+        "id": "info-joint-set",
+        "type": "information",
+        "title": "高力ボルト摩擦接合部一覧",
+        "symbol": "JS",
+        "subject": "建築物",
+        "property": "高力ボルト摩擦接合部の集合",
+        "property_type": "set_definition",
+        "description": "判定対象となる高力ボルト摩擦接合部の一覧"
+      },
+      {
+        "id": "proc-identify-shear-type",
+        "type": "process",
+        "title": "せん断種別を特定",
+        "process_type": "undefined_input",
+        "description": "各接合部のせん断種別（一面せん断/二面せん断）を特定する"
+      },
+      {
+        "id": "dec-shear-type",
+        "type": "decision",
+        "title": "せん断種別は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "一面せん断", "description": "一面せん断接合" },
+          { "value": "二面せん断", "description": "二面せん断接合" }
+        ],
+        "description": "接合部のせん断種別を判定"
+      },
+      {
+        "id": "info-shear-single",
+        "type": "information",
+        "title": "一面せん断",
+        "symbol": "ST1",
+        "subject": "高力ボルト摩擦接合部",
+        "property": "せん断種別",
+        "property_type": "classification",
+        "description": "一面せん断接合部"
+      },
+      {
+        "id": "info-shear-double",
+        "type": "information",
+        "title": "二面せん断",
+        "symbol": "ST2",
+        "subject": "高力ボルト摩擦接合部",
+        "property": "せん断種別",
+        "property_type": "classification",
+        "description": "二面せん断接合部"
+      },
+      {
+        "id": "proc-identify-bolt-grade",
+        "type": "process",
+        "title": "高力ボルトの品質を特定",
+        "process_type": "undefined_input",
+        "description": "高力ボルトの品質（JIS規格等）を特定し、基準張力Toを決定する"
+      },
+      {
+        "id": "info-bolt-grade",
+        "type": "information",
+        "title": "高力ボルトの品質・基準張力",
+        "symbol": "BG",
+        "subject": "高力ボルト",
+        "property": "品質・基準張力To",
+        "property_type": "numeric",
+        "description": "高力ボルトの品質に基づく基準張力To（N/mm2）"
+      },
+      {
+        "id": "proc-identify-load-duration",
+        "type": "process",
+        "title": "荷重種別を特定",
+        "process_type": "undefined_input",
+        "description": "長期荷重か短期荷重かを特定する"
+      },
+      {
+        "id": "dec-load-duration",
+        "type": "decision",
+        "title": "荷重種別は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "長期", "description": "長期に生ずる力に対する許容応力度" },
+          { "value": "短期", "description": "短期に生ずる力に対する許容応力度" }
+        ],
+        "description": "荷重種別（長期/短期）を判定"
+      },
+      {
+        "id": "proc-calc-allowable-single-long",
+        "type": "process",
+        "title": "許容せん断応力度を算定（一面・長期）",
+        "process_type": "mechanical",
+        "description": "一面せん断・長期の許容せん断応力度を算定: 0.3To"
+      },
+      {
+        "id": "proc-calc-allowable-single-short",
+        "type": "process",
+        "title": "許容せん断応力度を算定（一面・短期）",
+        "process_type": "mechanical",
+        "description": "一面せん断・短期の許容せん断応力度を算定: 0.45To（長期の1.5倍）"
+      },
+      {
+        "id": "proc-calc-allowable-double-long",
+        "type": "process",
+        "title": "許容せん断応力度を算定（二面・長期）",
+        "process_type": "mechanical",
+        "description": "二面せん断・長期の許容せん断応力度を算定: 0.6To"
+      },
+      {
+        "id": "proc-calc-allowable-double-short",
+        "type": "process",
+        "title": "許容せん断応力度を算定（二面・短期）",
+        "process_type": "mechanical",
+        "description": "二面せん断・短期の許容せん断応力度を算定: 0.9To（長期の1.5倍）"
+      },
+      {
+        "id": "info-allowable-stress",
+        "type": "information",
+        "title": "許容せん断応力度",
+        "symbol": "Fa",
+        "subject": "高力ボルト摩擦接合部",
+        "property": "許容せん断応力度",
+        "property_type": "numeric",
+        "description": "表に基づく許容せん断応力度の値（N/mm2）"
+      },
+      {
+        "id": "proc-identify-actual-stress",
+        "type": "process",
+        "title": "設計せん断応力度を読取",
+        "process_type": "undefined_input",
+        "description": "構造計算書から設計せん断応力度を読み取る"
+      },
+      {
+        "id": "info-actual-stress",
+        "type": "information",
+        "title": "設計せん断応力度",
+        "symbol": "Fs",
+        "subject": "高力ボルト摩擦接合部",
+        "property": "設計せん断応力度",
+        "property_type": "numeric",
+        "description": "構造計算で用いている許容せん断応力度の値（N/mm2）"
+      },
+      {
+        "id": "dec-stress-compare",
+        "type": "decision",
+        "title": "設計応力度 ≤ 許容応力度か？",
+        "decision_type": "binary",
+        "description": "設計で用いている許容せん断応力度が表の数値以下であるか判定",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "Fs", "desc": "設計せん断応力度" },
+          "rhs": { "var": "Fa", "desc": "許容せん断応力度" }
+        }
+      },
+      {
+        "id": "dec-all-joints-checked",
+        "type": "decision",
+        "title": "全ての接合部を判定したか？",
+        "decision_type": "binary",
+        "description": "全ての高力ボルト摩擦接合部について判定が完了したか確認"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "全ての高力ボルト摩擦接合部において許容せん断応力度が表の数値以下である"
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "許容せん断応力度が表の数値を超過している接合部がある"
+      },
+      {
+        "id": "end-not-applicable",
+        "type": "terminal",
+        "title": "対象外",
+        "result": "pass",
+        "description": "高力ボルト摩擦接合部がないため本条文は適用されない"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-has-joint",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-has-joint",
+        "to": "proc-identify-joints",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "dec-has-joint",
+        "to": "end-not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e04",
+        "from": "proc-identify-joints",
+        "to": "info-joint-set",
+        "role": "flow"
+      },
+      {
+        "id": "e05",
+        "from": "info-joint-set",
+        "to": "proc-identify-shear-type",
+        "role": "flow"
+      },
+      {
+        "id": "e06",
+        "from": "proc-identify-shear-type",
+        "to": "dec-shear-type",
+        "role": "flow"
+      },
+      {
+        "id": "e07",
+        "from": "dec-shear-type",
+        "to": "info-shear-single",
+        "role": "option",
+        "label": "一面せん断"
+      },
+      {
+        "id": "e08",
+        "from": "dec-shear-type",
+        "to": "info-shear-double",
+        "role": "option",
+        "label": "二面せん断"
+      },
+      {
+        "id": "e09",
+        "from": "info-shear-single",
+        "to": "proc-identify-bolt-grade",
+        "role": "flow"
+      },
+      {
+        "id": "e10",
+        "from": "info-shear-double",
+        "to": "proc-identify-bolt-grade",
+        "role": "flow"
+      },
+      {
+        "id": "e11",
+        "from": "proc-identify-bolt-grade",
+        "to": "info-bolt-grade",
+        "role": "flow"
+      },
+      {
+        "id": "e12",
+        "from": "info-bolt-grade",
+        "to": "proc-identify-load-duration",
+        "role": "flow"
+      },
+      {
+        "id": "e13",
+        "from": "proc-identify-load-duration",
+        "to": "dec-load-duration",
+        "role": "flow"
+      },
+      {
+        "id": "e14",
+        "from": "dec-load-duration",
+        "to": "proc-calc-allowable-single-long",
+        "role": "option",
+        "label": "長期"
+      },
+      {
+        "id": "e15",
+        "from": "dec-load-duration",
+        "to": "proc-calc-allowable-single-short",
+        "role": "option",
+        "label": "短期"
+      },
+      {
+        "id": "e16",
+        "from": "proc-calc-allowable-single-long",
+        "to": "info-allowable-stress",
+        "role": "flow"
+      },
+      {
+        "id": "e17",
+        "from": "proc-calc-allowable-single-short",
+        "to": "info-allowable-stress",
+        "role": "flow"
+      },
+      {
+        "id": "e18",
+        "from": "proc-calc-allowable-double-long",
+        "to": "info-allowable-stress",
+        "role": "flow"
+      },
+      {
+        "id": "e19",
+        "from": "proc-calc-allowable-double-short",
+        "to": "info-allowable-stress",
+        "role": "flow"
+      },
+      {
+        "id": "e20",
+        "from": "info-allowable-stress",
+        "to": "proc-identify-actual-stress",
+        "role": "flow"
+      },
+      {
+        "id": "e21",
+        "from": "proc-identify-actual-stress",
+        "to": "info-actual-stress",
+        "role": "flow"
+      },
+      {
+        "id": "e22",
+        "from": "info-actual-stress",
+        "to": "dec-stress-compare",
+        "role": "flow"
+      },
+      {
+        "id": "e23",
+        "from": "dec-stress-compare",
+        "to": "dec-all-joints-checked",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e24",
+        "from": "dec-stress-compare",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e25",
+        "from": "dec-all-joints-checked",
+        "to": "end-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e26",
+        "from": "dec-all-joints-checked",
+        "to": "proc-identify-shear-type",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-ORDER-A92_2-P1",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": ["A20"],
+      "description": "構造耐力に関する技術的基準の委任元"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T12:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

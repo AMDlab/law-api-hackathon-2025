@@ -1,0 +1,348 @@
+{
+  "id": "A24_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "踊場の位置",
+    "target_subject": "階段",
+    "description": "階段の高さに応じて踊場を設置する位置を判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "24",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "階段",
+    "踊場"
+  ],
+  "text_raw": "前条第一項の表の（一）又は（二）に該当する階段でその高さが三メートルをこえるものにあつては高さ三メートル以内ごとに、その他の階段でその高さが四メートルをこえるものにあつては高さ四メートル以内ごとに踊場を設けなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "reference",
+          "value": "令第23条第1項の表に該当する階段"
+        }
+      ]
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "note": "表(一)(二)該当階段: 高さ3m超→3m以内ごとに踊場"
+        },
+        {
+          "note": "その他の階段: 高さ4m超→4m以内ごとに踊場"
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "flow_diagram": {
+    "title": "令第24条第1項 踊場の位置 適合判定フロー",
+    "description": "階段の種別と高さに応じて、踊場の設置間隔が基準を満たすか判定する",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "令第24条第1項 適合判定開始"
+      },
+      {
+        "id": "proc-get-stairs",
+        "type": "process",
+        "title": "建築物の階段一覧を取得",
+        "process_type": "undefined_input",
+        "description": "判定対象となる建築物に属する階段を特定する"
+      },
+      {
+        "id": "dec-has-remaining-stairs",
+        "type": "decision",
+        "title": "未判定の階段があるか？",
+        "decision_type": "binary",
+        "description": "判定していない階段が残っているか確認"
+      },
+      {
+        "id": "proc-input-stair-category",
+        "type": "process",
+        "title": "階段の種別を取得",
+        "process_type": "undefined_input",
+        "description": "設計図書等から階段が令23条第1項の表のどの区分に該当するかを読み取る"
+      },
+      {
+        "id": "dec-stair-category",
+        "type": "decision",
+        "title": "階段の種別は？",
+        "decision_type": "multi",
+        "options": [
+          {
+            "value": "(一)または(二)",
+            "description": "令23条第1項の表(一)または(二)に該当"
+          },
+          {
+            "value": "(三)または(四)",
+            "description": "令23条第1項の表(三)または(四)に該当"
+          }
+        ],
+        "description": "令23条第1項の表における階段の区分",
+        "related_articles": ["令::A23:P1"]
+      },
+      {
+        "id": "proc-input-height-12",
+        "type": "process",
+        "title": "階段の高さを取得（表(一)(二)該当）",
+        "process_type": "undefined_input",
+        "description": "設計図書等から階段の高さを読み取る"
+      },
+      {
+        "id": "dec-height-over-3m",
+        "type": "decision",
+        "title": "階段の高さは3mを超えるか？",
+        "decision_type": "binary",
+        "description": "表(一)(二)該当階段の高さが3mを超えるか判定",
+        "condition": {
+          "operator": "GT",
+          "lhs": { "var": "H", "desc": "階段の高さ" },
+          "rhs": { "value": 3, "unit": "m" }
+        }
+      },
+      {
+        "id": "proc-input-landing-interval-3m",
+        "type": "process",
+        "title": "踊場の設置間隔を取得",
+        "process_type": "undefined_input",
+        "description": "設計図書等から踊場の設置間隔（高さ方向）を読み取る"
+      },
+      {
+        "id": "dec-landing-interval-3m",
+        "type": "decision",
+        "title": "踊場の設置間隔は3m以内か？",
+        "decision_type": "binary",
+        "description": "踊場が高さ3m以内ごとに設けられているか判定",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "L", "desc": "踊場の設置間隔" },
+          "rhs": { "value": 3, "unit": "m" }
+        }
+      },
+      {
+        "id": "proc-input-height-34",
+        "type": "process",
+        "title": "階段の高さを取得（表(三)(四)該当）",
+        "process_type": "undefined_input",
+        "description": "設計図書等から階段の高さを読み取る"
+      },
+      {
+        "id": "dec-height-over-4m",
+        "type": "decision",
+        "title": "階段の高さは4mを超えるか？",
+        "decision_type": "binary",
+        "description": "表(三)(四)該当階段の高さが4mを超えるか判定",
+        "condition": {
+          "operator": "GT",
+          "lhs": { "var": "H", "desc": "階段の高さ" },
+          "rhs": { "value": 4, "unit": "m" }
+        }
+      },
+      {
+        "id": "proc-input-landing-interval-4m",
+        "type": "process",
+        "title": "踊場の設置間隔を取得",
+        "process_type": "undefined_input",
+        "description": "設計図書等から踊場の設置間隔（高さ方向）を読み取る"
+      },
+      {
+        "id": "dec-landing-interval-4m",
+        "type": "decision",
+        "title": "踊場の設置間隔は4m以内か？",
+        "decision_type": "binary",
+        "description": "踊場が高さ4m以内ごとに設けられているか判定",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "L", "desc": "踊場の設置間隔" },
+          "rhs": { "value": 4, "unit": "m" }
+        }
+      },
+      {
+        "id": "proc-mark-stair-compliant",
+        "type": "process",
+        "title": "この階段を適合として記録",
+        "process_type": "mechanical",
+        "description": "この階段は踊場設置基準を満たしている（または設置義務なし）として記録し、次の階段へ"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令第24条第1項に適合（すべての階段が基準を満たす）"
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "令第24条第1項に不適合"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "proc-get-stairs",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "proc-get-stairs",
+        "to": "dec-has-remaining-stairs",
+        "role": "flow"
+      },
+      {
+        "id": "e03",
+        "from": "dec-has-remaining-stairs",
+        "to": "proc-input-stair-category",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e04",
+        "from": "dec-has-remaining-stairs",
+        "to": "end-pass",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e05",
+        "from": "proc-input-stair-category",
+        "to": "dec-stair-category",
+        "role": "flow"
+      },
+      {
+        "id": "e06",
+        "from": "dec-stair-category",
+        "to": "proc-input-height-12",
+        "role": "option",
+        "label": "(一)または(二)"
+      },
+      {
+        "id": "e07",
+        "from": "dec-stair-category",
+        "to": "proc-input-height-34",
+        "role": "option",
+        "label": "(三)または(四)"
+      },
+      {
+        "id": "e08",
+        "from": "proc-input-height-12",
+        "to": "dec-height-over-3m",
+        "role": "flow"
+      },
+      {
+        "id": "e09",
+        "from": "dec-height-over-3m",
+        "to": "proc-input-landing-interval-3m",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e10",
+        "from": "dec-height-over-3m",
+        "to": "proc-mark-stair-compliant",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e11",
+        "from": "proc-input-landing-interval-3m",
+        "to": "dec-landing-interval-3m",
+        "role": "flow"
+      },
+      {
+        "id": "e12",
+        "from": "dec-landing-interval-3m",
+        "to": "proc-mark-stair-compliant",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e13",
+        "from": "dec-landing-interval-3m",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e14",
+        "from": "proc-input-height-34",
+        "to": "dec-height-over-4m",
+        "role": "flow"
+      },
+      {
+        "id": "e15",
+        "from": "dec-height-over-4m",
+        "to": "proc-input-landing-interval-4m",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e16",
+        "from": "dec-height-over-4m",
+        "to": "proc-mark-stair-compliant",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e17",
+        "from": "proc-input-landing-interval-4m",
+        "to": "dec-landing-interval-4m",
+        "role": "flow"
+      },
+      {
+        "id": "e18",
+        "from": "dec-landing-interval-4m",
+        "to": "proc-mark-stair-compliant",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e19",
+        "from": "dec-landing-interval-4m",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e20",
+        "from": "proc-mark-stair-compliant",
+        "to": "dec-has-remaining-stairs",
+        "role": "flow"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-ORDER-A24-P1",
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": ["A23:P1"],
+      "description": "令第23条第1項の表で階段の種別を定義"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T12:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

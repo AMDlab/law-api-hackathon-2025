@@ -1,0 +1,222 @@
+{
+  "id": "CHK-BSL-ORDER-A96-P1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "鋼材等の材料強度",
+    "target_subject": "鋼材等",
+    "description": "鋼材等の材料強度が表一又は表二の数値に適合するか判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "96",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造",
+    "材料強度"
+  ],
+  "text_raw": "鋼材等の材料強度は、次の表一又は表二の数値によらなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "material",
+          "value": "鋼材等を使用する建築物"
+        }
+      ],
+      "note": "鋼材等（構造用鋼材、高力ボルト、ボルト、構造用ケーブル、リベット鋼、鋳鋼、鋳鉄、丸鋼、異形鉄筋、溶接金網）を使用する場合に適用"
+    },
+    "judgment_rule": {
+      "operator": "FORALL",
+      "conditions": [
+        {
+          "ref": "info-strength-compliance",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "info-steel-set",
+        "type": "information",
+        "title": "建築物の鋼材等",
+        "symbol": "S",
+        "subject": "建築物",
+        "property": "鋼材等の集合",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "判定対象となる建築物に使用される鋼材等を特定"
+      },
+      {
+        "id": "proc-steel-type-identify",
+        "type": "process",
+        "title": "鋼材等種類の特定",
+        "process_type": "undefined_input",
+        "target_subject": "鋼材等",
+        "iteration": "iterative",
+        "description": "各鋼材等の種類（炭素鋼構造用鋼材、ステンレス鋼、丸鋼、異形鉄筋等）を特定"
+      },
+      {
+        "id": "info-steel-type",
+        "type": "information",
+        "title": "鋼材等の種類",
+        "symbol": "T",
+        "subject": "鋼材等",
+        "property": "種類",
+        "property_type": "classification",
+        "plurality": "multiple",
+        "description": "炭素鋼（構造用鋼材、高力ボルト、ボルト黒皮/仕上げ、構造用ケーブル、リベット鋼、鋳鋼）、ステンレス鋼（構造用鋼材、高力ボルト、ボルト、構造用ケーブル、鋳鋼）、鋳鉄、丸鋼、異形鉄筋、溶接金網"
+      },
+      {
+        "id": "proc-strength-identify",
+        "type": "process",
+        "title": "材料強度の特定",
+        "process_type": "undefined_input",
+        "target_subject": "鋼材等",
+        "iteration": "iterative",
+        "description": "各鋼材等の材料強度（圧縮、引張り、曲げ、せん断）を特定"
+      },
+      {
+        "id": "info-strength-value",
+        "type": "information",
+        "title": "材料強度",
+        "symbol": "F",
+        "subject": "鋼材等",
+        "property": "材料強度",
+        "property_type": "numeric",
+        "unit": "N/mm2",
+        "plurality": "multiple",
+        "description": "各鋼材等の材料強度（圧縮、引張り、曲げ、せん断それぞれ）"
+      },
+      {
+        "id": "proc-table-check",
+        "type": "process",
+        "title": "表一/表二基準照合",
+        "process_type": "mechanical",
+        "target_subject": "鋼材等",
+        "iteration": "iterative",
+        "description": "鋼材等の種類に応じた表一又は表二の材料強度基準と照合",
+        "logic_expression": "F ≤ 表一/表二の規定値（種類・応力種別に応じた基準強度）",
+        "related_articles": [
+          "令::A90"
+        ],
+        "remarks": "表一：炭素鋼・ステンレス鋼・鋳鉄。表二：丸鋼・異形鉄筋・溶接金網。Fは令第90条の表一に規定する基準強度"
+      },
+      {
+        "id": "info-strength-compliance",
+        "type": "information",
+        "title": "材料強度基準適合",
+        "symbol": "C",
+        "subject": "鋼材等",
+        "property": "材料強度基準適合",
+        "property_type": "proposition",
+        "plurality": "multiple",
+        "description": "各鋼材等が表一又は表二の材料強度基準に適合するか"
+      },
+      {
+        "id": "proc-final-judgment",
+        "type": "process",
+        "title": "全体適合判定",
+        "process_type": "mechanical",
+        "description": "すべての鋼材等が材料強度基準に適合するか判定",
+        "logic_expression": "∀s∈S: C(s) = true"
+      },
+      {
+        "id": "info-final",
+        "type": "information",
+        "title": "令96条1項適合",
+        "symbol": "R",
+        "subject": "建築物",
+        "property": "鋼材等材料強度基準適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "令第96条第1項の材料強度基準に適合するか"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "info-steel-set",
+        "to": "proc-steel-type-identify",
+        "role": "input"
+      },
+      {
+        "id": "e02",
+        "from": "proc-steel-type-identify",
+        "to": "info-steel-type",
+        "role": "output"
+      },
+      {
+        "id": "e03",
+        "from": "info-steel-set",
+        "to": "proc-strength-identify",
+        "role": "input"
+      },
+      {
+        "id": "e04",
+        "from": "proc-strength-identify",
+        "to": "info-strength-value",
+        "role": "output"
+      },
+      {
+        "id": "e05",
+        "from": "info-steel-type",
+        "to": "proc-table-check",
+        "role": "input"
+      },
+      {
+        "id": "e06",
+        "from": "info-strength-value",
+        "to": "proc-table-check",
+        "role": "input"
+      },
+      {
+        "id": "e07",
+        "from": "proc-table-check",
+        "to": "info-strength-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e08",
+        "from": "info-strength-compliance",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e09",
+        "from": "proc-final-judgment",
+        "to": "info-final",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": [
+        "A90"
+      ],
+      "description": "令第90条に基準強度の規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-23T12:00:00Z",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

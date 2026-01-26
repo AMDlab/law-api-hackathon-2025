@@ -1,0 +1,415 @@
+{
+  "id": "A20_8_P1_I2_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "換気設備の中央管理室監視要件",
+    "target_subject": "機械換気設備/中央管理方式空気調和設備",
+    "description": "法34条2項建築物又は床面積合計1000m2超の地下街に設ける換気設備の中央管理室監視の確認"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "20_8",
+    "paragraph": "1",
+    "item": "2"
+  },
+  "labels": [
+    "換気設備",
+    "ホルムアルデヒド",
+    "中央管理室",
+    "単体規定"
+  ],
+  "text_raw": "法第三十四条第二項に規定する建築物又は各構えの床面積の合計が千平方メートルを超える地下街に設ける機械換気設備（一の居室のみに係るものを除く。）又は中央管理方式の空気調和設備にあつては、これらの制御及び作動状態の監視を中央管理室において行うことができるものとすること。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "type": "building_type",
+          "value": "法第34条第2項に規定する建築物（高さ31mを超える建築物）"
+        },
+        {
+          "type": "building_type",
+          "operator": "AND",
+          "conditions": [
+            {
+              "type": "location",
+              "value": "地下街"
+            },
+            {
+              "type": "area",
+              "operator": ">",
+              "value": 1000,
+              "unit": "m2",
+              "note": "各構えの床面積の合計"
+            }
+          ]
+        }
+      ],
+      "note": "適用対象となる建築物の条件"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "equipment",
+          "condition": "機械換気設備（一の居室のみに係るものを除く）又は中央管理方式の空気調和設備を設けている"
+        },
+        {
+          "type": "control",
+          "condition": "制御を中央管理室で行える"
+        },
+        {
+          "type": "monitoring",
+          "condition": "作動状態の監視を中央管理室で行える"
+        }
+      ]
+    }
+  },
+  "flow_diagram": {
+    "title": "令第20条の8第1項第2号 適合判定フロー",
+    "description": "換気設備の中央管理室監視要件の適合判定フローチャート",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "令第20条の8第1項第2号の適合判定を開始"
+      },
+      {
+        "id": "dec-building-height",
+        "type": "decision",
+        "title": "建築物の高さは31mを超えるか？",
+        "decision_type": "binary",
+        "description": "法第34条第2項に規定する建築物（高さ31m超）に該当するか判定",
+        "condition": {
+          "operator": "GT",
+          "lhs": { "var": "building_height", "desc": "建築物の高さ" },
+          "rhs": { "value": 31, "unit": "m" }
+        }
+      },
+      {
+        "id": "proc-height-over-31m",
+        "type": "process",
+        "title": "法34条2項建築物に該当（高さ31m超）",
+        "process_type": "mechanical",
+        "description": "高さ31mを超える建築物として適用対象と判定"
+      },
+      {
+        "id": "dec-underground-mall",
+        "type": "decision",
+        "title": "地下街に該当するか？",
+        "decision_type": "binary",
+        "description": "対象が地下街に該当するかを判定"
+      },
+      {
+        "id": "dec-floor-area",
+        "type": "decision",
+        "title": "各構えの床面積合計は1000m2を超えるか？",
+        "decision_type": "binary",
+        "description": "地下街の各構えの床面積合計が1000m2超か判定",
+        "condition": {
+          "operator": "GT",
+          "lhs": { "var": "floor_area_sum", "desc": "各構えの床面積合計" },
+          "rhs": { "value": 1000, "unit": "m2" }
+        }
+      },
+      {
+        "id": "proc-underground-mall-applicable",
+        "type": "process",
+        "title": "1000m2超の地下街として適用対象と判定",
+        "process_type": "mechanical",
+        "description": "床面積合計1000m2超の地下街として適用対象と判定"
+      },
+      {
+        "id": "end-not-applicable",
+        "type": "terminal",
+        "title": "本号適用対象外",
+        "result": "pass",
+        "description": "法34条2項建築物でも1000m2超の地下街でもないため、本号の適用対象外"
+      },
+      {
+        "id": "dec-equipment-type",
+        "type": "decision",
+        "title": "換気設備の種類は？",
+        "decision_type": "multi",
+        "description": "設置される換気設備の種類を確認",
+        "options": [
+          { "value": "機械換気設備", "description": "機械換気設備" },
+          { "value": "中央管理方式空気調和設備", "description": "中央管理方式の空気調和設備" },
+          { "value": "なし/その他", "description": "対象設備なし又はその他" }
+        ]
+      },
+      {
+        "id": "dec-room-count",
+        "type": "decision",
+        "title": "機械換気設備が係る居室の数は2以上か？",
+        "decision_type": "binary",
+        "description": "機械換気設備が一の居室のみに係るものでないか判定",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "room_count", "desc": "係る居室の数" },
+          "rhs": { "value": 2 }
+        }
+      },
+      {
+        "id": "proc-mechanical-vent-applicable",
+        "type": "process",
+        "title": "機械換気設備（複数居室）として規制対象",
+        "process_type": "mechanical",
+        "description": "2以上の居室に係る機械換気設備として中央管理室監視が必要"
+      },
+      {
+        "id": "end-single-room-exempt",
+        "type": "terminal",
+        "title": "一の居室のみに係る機械換気設備は除外",
+        "result": "pass",
+        "description": "一の居室のみに係る機械換気設備は本号の規制対象外"
+      },
+      {
+        "id": "proc-central-air-applicable",
+        "type": "process",
+        "title": "中央管理方式空気調和設備として規制対象",
+        "process_type": "mechanical",
+        "description": "中央管理方式空気調和設備として中央管理室監視が必要"
+      },
+      {
+        "id": "end-no-target-equipment",
+        "type": "terminal",
+        "title": "規制対象設備なし",
+        "result": "pass",
+        "description": "対象となる換気設備がないため本号の適用対象外"
+      },
+      {
+        "id": "dec-central-room-exists",
+        "type": "decision",
+        "title": "中央管理室が設けられているか？",
+        "decision_type": "binary",
+        "description": "建築物に中央管理室が設けられているかを確認"
+      },
+      {
+        "id": "dec-control-capable",
+        "type": "decision",
+        "title": "制御を中央管理室で行えるか？",
+        "decision_type": "binary",
+        "description": "対象換気設備の制御を中央管理室で行えるか確認"
+      },
+      {
+        "id": "dec-monitoring-capable",
+        "type": "decision",
+        "title": "作動状態の監視を中央管理室で行えるか？",
+        "decision_type": "binary",
+        "description": "対象換気設備の作動状態の監視を中央管理室で行えるか確認"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令第20条の8第1項第2号に適合"
+      },
+      {
+        "id": "end-fail-no-central-room",
+        "type": "terminal",
+        "title": "不適合（中央管理室なし）",
+        "result": "fail",
+        "description": "中央管理室が設けられていないため不適合"
+      },
+      {
+        "id": "end-fail-no-control",
+        "type": "terminal",
+        "title": "不適合（制御不可）",
+        "result": "fail",
+        "description": "制御を中央管理室で行えないため不適合"
+      },
+      {
+        "id": "end-fail-no-monitoring",
+        "type": "terminal",
+        "title": "不適合（監視不可）",
+        "result": "fail",
+        "description": "作動状態の監視を中央管理室で行えないため不適合"
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge-001",
+        "from": "start",
+        "to": "dec-building-height",
+        "role": "flow"
+      },
+      {
+        "id": "edge-002",
+        "from": "dec-building-height",
+        "to": "proc-height-over-31m",
+        "role": "yes",
+        "label": "はい（31m超）"
+      },
+      {
+        "id": "edge-003",
+        "from": "dec-building-height",
+        "to": "dec-underground-mall",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "edge-004",
+        "from": "proc-height-over-31m",
+        "to": "dec-equipment-type",
+        "role": "flow"
+      },
+      {
+        "id": "edge-005",
+        "from": "dec-underground-mall",
+        "to": "dec-floor-area",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "edge-006",
+        "from": "dec-underground-mall",
+        "to": "end-not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "edge-007",
+        "from": "dec-floor-area",
+        "to": "proc-underground-mall-applicable",
+        "role": "yes",
+        "label": "はい（1000m2超）"
+      },
+      {
+        "id": "edge-008",
+        "from": "dec-floor-area",
+        "to": "end-not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "edge-009",
+        "from": "proc-underground-mall-applicable",
+        "to": "dec-equipment-type",
+        "role": "flow"
+      },
+      {
+        "id": "edge-010",
+        "from": "dec-equipment-type",
+        "to": "dec-room-count",
+        "role": "option",
+        "label": "機械換気設備"
+      },
+      {
+        "id": "edge-011",
+        "from": "dec-equipment-type",
+        "to": "proc-central-air-applicable",
+        "role": "option",
+        "label": "中央管理方式空気調和設備"
+      },
+      {
+        "id": "edge-012",
+        "from": "dec-equipment-type",
+        "to": "end-no-target-equipment",
+        "role": "option",
+        "label": "なし/その他"
+      },
+      {
+        "id": "edge-013",
+        "from": "dec-room-count",
+        "to": "proc-mechanical-vent-applicable",
+        "role": "yes",
+        "label": "はい（2室以上）"
+      },
+      {
+        "id": "edge-014",
+        "from": "dec-room-count",
+        "to": "end-single-room-exempt",
+        "role": "no",
+        "label": "いいえ（1室のみ）"
+      },
+      {
+        "id": "edge-015",
+        "from": "proc-mechanical-vent-applicable",
+        "to": "dec-central-room-exists",
+        "role": "flow"
+      },
+      {
+        "id": "edge-016",
+        "from": "proc-central-air-applicable",
+        "to": "dec-central-room-exists",
+        "role": "flow"
+      },
+      {
+        "id": "edge-017",
+        "from": "dec-central-room-exists",
+        "to": "dec-control-capable",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "edge-018",
+        "from": "dec-central-room-exists",
+        "to": "end-fail-no-central-room",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "edge-019",
+        "from": "dec-control-capable",
+        "to": "dec-monitoring-capable",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "edge-020",
+        "from": "dec-control-capable",
+        "to": "end-fail-no-control",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "edge-021",
+        "from": "dec-monitoring-capable",
+        "to": "end-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "edge-022",
+        "from": "dec-monitoring-capable",
+        "to": "end-fail-no-monitoring",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-ORD-A20-8-P1-I2",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A34:P2"],
+      "description": "非常用昇降機設置義務建築物（高さ31mを超える建築物）の定義"
+    },
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": ["A28_2:I3"],
+      "description": "ホルムアルデヒドに関する技術的基準の委任元"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00Z",
+    "updated_at": "2026-01-26T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

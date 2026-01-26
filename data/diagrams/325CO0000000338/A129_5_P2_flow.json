@@ -1,0 +1,531 @@
+{
+  "id": "A129_5_P2_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "エレベーターかごの積載荷重の基準",
+    "target_subject": "エレベーターのかご",
+    "description": "エレベーターのかごの積載荷重を実況に応じて定め、かごの種類に応じた表の数値以上とする"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "129の5",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "建築設備",
+    "昇降機"
+  ],
+  "text_raw": "エレベーターのかごの積載荷重は、当該エレベーターの実況に応じて定めなければならない。ただし、かごの種類に応じて、次の表に定める数値（用途が特殊なエレベーターで国土交通大臣が定めるものにあつては、当該用途に応じて国土交通大臣が定める数値）を下回つてはならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "building_element",
+          "value": "エレベーターを設置する建築物"
+        }
+      ]
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "requirement",
+          "value": "実況に応じた積載荷重の設定"
+        },
+        {
+          "type": "requirement",
+          "value": "最低積載荷重以上"
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "flow_diagram": {
+    "title": "エレベーターかご積載荷重の適合判定フロー",
+    "description": "エレベーターのかごの積載荷重が基準に適合するかを判定するフローチャート",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "積載荷重基準の適合判定を開始"
+      },
+      {
+        "id": "dec-has-elevator",
+        "type": "decision",
+        "title": "建築物にエレベーターがあるか？",
+        "decision_type": "binary",
+        "description": "建築物にエレベーターが設置されているか確認"
+      },
+      {
+        "id": "proc-scope-out",
+        "type": "process",
+        "title": "規定対象外",
+        "process_type": "mechanical",
+        "description": "エレベーターがないため本規定の対象外"
+      },
+      {
+        "id": "dec-has-remaining-car",
+        "type": "decision",
+        "title": "未判定のかごがあるか？",
+        "decision_type": "binary",
+        "description": "まだ判定していないかごが残っているか確認"
+      },
+      {
+        "id": "proc-select-car",
+        "type": "process",
+        "title": "次のかごを選択",
+        "process_type": "mechanical",
+        "description": "未判定のかごから次の判定対象を選択"
+      },
+      {
+        "id": "dec-car-type",
+        "type": "decision",
+        "title": "かごの種類は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "乗用", "description": "乗用エレベーター（人荷共用含む、寝台用除く）のかご" },
+          { "value": "乗用以外", "description": "乗用エレベーター以外のかご" },
+          { "value": "自動車運搬用", "description": "自動車運搬用エレベーターのかご" },
+          { "value": "特殊用途", "description": "国土交通大臣が定める特殊な用途のエレベーター" }
+        ],
+        "description": "かごの種類を判定。乗用エレベーターは人荷共用を含み寝台用を除く"
+      },
+      {
+        "id": "proc-passenger-route",
+        "type": "process",
+        "title": "乗用エレベーター経路",
+        "process_type": "mechanical",
+        "description": "乗用エレベーターとして最低積載荷重を算定"
+      },
+      {
+        "id": "proc-non-passenger-route",
+        "type": "process",
+        "title": "乗用以外経路",
+        "process_type": "mechanical",
+        "description": "乗用以外のエレベーターとして最低積載荷重を算定"
+      },
+      {
+        "id": "proc-vehicle-route",
+        "type": "process",
+        "title": "自動車運搬用経路",
+        "process_type": "mechanical",
+        "description": "自動車運搬用として最低積載荷重を算定"
+      },
+      {
+        "id": "proc-special-route",
+        "type": "process",
+        "title": "特殊用途経路",
+        "process_type": "human_judgment",
+        "description": "国土交通大臣が定める数値を適用"
+      },
+      {
+        "id": "dec-floor-area-range-passenger",
+        "type": "decision",
+        "title": "床面積の範囲は？（乗用）",
+        "decision_type": "multi",
+        "options": [
+          { "value": "FA≦1.5", "description": "床面積が1.5m2以下" },
+          { "value": "1.5<FA≦3", "description": "床面積が1.5m2超3m2以下" },
+          { "value": "FA>3", "description": "床面積が3m2超" }
+        ],
+        "description": "乗用エレベーターのかごの床面積の範囲を判定"
+      },
+      {
+        "id": "proc-calc-small",
+        "type": "process",
+        "title": "最低荷重算定（小）",
+        "process_type": "mechanical",
+        "description": "Wmin = 3600 × FA (N)"
+      },
+      {
+        "id": "proc-calc-medium",
+        "type": "process",
+        "title": "最低荷重算定（中）",
+        "process_type": "mechanical",
+        "description": "Wmin = 4900 × (FA - 1.5) + 5400 (N)"
+      },
+      {
+        "id": "proc-calc-large",
+        "type": "process",
+        "title": "最低荷重算定（大）",
+        "process_type": "mechanical",
+        "description": "Wmin = 5900 × (FA - 3) + 13000 (N)"
+      },
+      {
+        "id": "proc-calc-non-passenger",
+        "type": "process",
+        "title": "最低荷重算定（乗用以外）",
+        "process_type": "mechanical",
+        "description": "Wmin = 2500 × FA (N)"
+      },
+      {
+        "id": "proc-calc-vehicle",
+        "type": "process",
+        "title": "最低荷重算定（自動車運搬用）",
+        "process_type": "mechanical",
+        "description": "Wmin = 1500 × FA (N)"
+      },
+      {
+        "id": "proc-get-special-value",
+        "type": "process",
+        "title": "大臣定め数値の確認",
+        "process_type": "human_judgment",
+        "description": "国土交通大臣が定める数値を確認"
+      },
+      {
+        "id": "dec-special-minister-approval",
+        "type": "decision",
+        "title": "大臣が定める数値が存在するか？",
+        "decision_type": "binary",
+        "description": "特殊用途エレベーターに対して国土交通大臣が定める数値が存在するか確認"
+      },
+      {
+        "id": "dec-design-load-available",
+        "type": "decision",
+        "title": "設計積載荷重が明示されているか？",
+        "decision_type": "binary",
+        "description": "設計図書に設計積載荷重が明示されているか確認"
+      },
+      {
+        "id": "proc-design-load-missing",
+        "type": "process",
+        "title": "設計積載荷重の確認必要",
+        "process_type": "human_judgment",
+        "description": "設計者に設計積載荷重の確認が必要"
+      },
+      {
+        "id": "dec-load-comparison",
+        "type": "decision",
+        "title": "設計積載荷重 ≧ 最低積載荷重か？",
+        "decision_type": "binary",
+        "description": "設計積載荷重が最低積載荷重以上であるかを判定",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "Wd", "desc": "設計積載荷重" },
+          "rhs": { "var": "Wmin", "desc": "最低積載荷重" }
+        }
+      },
+      {
+        "id": "proc-car-pass",
+        "type": "process",
+        "title": "当該かご適合",
+        "process_type": "mechanical",
+        "description": "このかごは積載荷重基準に適合"
+      },
+      {
+        "id": "proc-car-fail",
+        "type": "process",
+        "title": "当該かご不適合",
+        "process_type": "mechanical",
+        "description": "このかごは積載荷重基準に不適合"
+      },
+      {
+        "id": "dec-all-cars-checked",
+        "type": "decision",
+        "title": "全かごの判定が完了したか？",
+        "decision_type": "binary",
+        "description": "全てのかごの判定が完了したか確認"
+      },
+      {
+        "id": "dec-any-car-failed",
+        "type": "decision",
+        "title": "不適合のかごがあるか？",
+        "decision_type": "binary",
+        "description": "不適合と判定されたかごが1つでもあるか確認"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "全てのかごが積載荷重基準に適合"
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "積載荷重基準に不適合のかごがある"
+      },
+      {
+        "id": "end-out-of-scope",
+        "type": "terminal",
+        "title": "対象外",
+        "result": "end",
+        "description": "本規定の対象外"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e-start-to-elevator",
+        "from": "start",
+        "to": "dec-has-elevator",
+        "role": "flow"
+      },
+      {
+        "id": "e-elevator-no",
+        "from": "dec-has-elevator",
+        "to": "proc-scope-out",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e-scope-out-to-end",
+        "from": "proc-scope-out",
+        "to": "end-out-of-scope",
+        "role": "flow"
+      },
+      {
+        "id": "e-elevator-yes",
+        "from": "dec-has-elevator",
+        "to": "dec-has-remaining-car",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e-remaining-yes",
+        "from": "dec-has-remaining-car",
+        "to": "proc-select-car",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e-select-to-type",
+        "from": "proc-select-car",
+        "to": "dec-car-type",
+        "role": "flow"
+      },
+      {
+        "id": "e-type-passenger",
+        "from": "dec-car-type",
+        "to": "proc-passenger-route",
+        "role": "option",
+        "label": "乗用"
+      },
+      {
+        "id": "e-type-non-passenger",
+        "from": "dec-car-type",
+        "to": "proc-non-passenger-route",
+        "role": "option",
+        "label": "乗用以外"
+      },
+      {
+        "id": "e-type-vehicle",
+        "from": "dec-car-type",
+        "to": "proc-vehicle-route",
+        "role": "option",
+        "label": "自動車運搬用"
+      },
+      {
+        "id": "e-type-special",
+        "from": "dec-car-type",
+        "to": "proc-special-route",
+        "role": "option",
+        "label": "特殊用途"
+      },
+      {
+        "id": "e-passenger-to-area",
+        "from": "proc-passenger-route",
+        "to": "dec-floor-area-range-passenger",
+        "role": "flow"
+      },
+      {
+        "id": "e-area-small",
+        "from": "dec-floor-area-range-passenger",
+        "to": "proc-calc-small",
+        "role": "option",
+        "label": "FA≦1.5"
+      },
+      {
+        "id": "e-area-medium",
+        "from": "dec-floor-area-range-passenger",
+        "to": "proc-calc-medium",
+        "role": "option",
+        "label": "1.5<FA≦3"
+      },
+      {
+        "id": "e-area-large",
+        "from": "dec-floor-area-range-passenger",
+        "to": "proc-calc-large",
+        "role": "option",
+        "label": "FA>3"
+      },
+      {
+        "id": "e-non-passenger-to-calc",
+        "from": "proc-non-passenger-route",
+        "to": "proc-calc-non-passenger",
+        "role": "flow"
+      },
+      {
+        "id": "e-vehicle-to-calc",
+        "from": "proc-vehicle-route",
+        "to": "proc-calc-vehicle",
+        "role": "flow"
+      },
+      {
+        "id": "e-special-to-minister-check",
+        "from": "proc-special-route",
+        "to": "dec-special-minister-approval",
+        "role": "flow"
+      },
+      {
+        "id": "e-minister-yes",
+        "from": "dec-special-minister-approval",
+        "to": "proc-get-special-value",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e-minister-no",
+        "from": "dec-special-minister-approval",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e-calc-small-to-design",
+        "from": "proc-calc-small",
+        "to": "dec-design-load-available",
+        "role": "flow"
+      },
+      {
+        "id": "e-calc-medium-to-design",
+        "from": "proc-calc-medium",
+        "to": "dec-design-load-available",
+        "role": "flow"
+      },
+      {
+        "id": "e-calc-large-to-design",
+        "from": "proc-calc-large",
+        "to": "dec-design-load-available",
+        "role": "flow"
+      },
+      {
+        "id": "e-calc-non-passenger-to-design",
+        "from": "proc-calc-non-passenger",
+        "to": "dec-design-load-available",
+        "role": "flow"
+      },
+      {
+        "id": "e-calc-vehicle-to-design",
+        "from": "proc-calc-vehicle",
+        "to": "dec-design-load-available",
+        "role": "flow"
+      },
+      {
+        "id": "e-special-value-to-design",
+        "from": "proc-get-special-value",
+        "to": "dec-design-load-available",
+        "role": "flow"
+      },
+      {
+        "id": "e-design-no",
+        "from": "dec-design-load-available",
+        "to": "proc-design-load-missing",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e-missing-to-fail",
+        "from": "proc-design-load-missing",
+        "to": "end-fail",
+        "role": "flow"
+      },
+      {
+        "id": "e-design-yes",
+        "from": "dec-design-load-available",
+        "to": "dec-load-comparison",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e-comparison-yes",
+        "from": "dec-load-comparison",
+        "to": "proc-car-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e-comparison-no",
+        "from": "dec-load-comparison",
+        "to": "proc-car-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e-car-pass-to-check",
+        "from": "proc-car-pass",
+        "to": "dec-all-cars-checked",
+        "role": "flow"
+      },
+      {
+        "id": "e-car-fail-to-check",
+        "from": "proc-car-fail",
+        "to": "dec-all-cars-checked",
+        "role": "flow"
+      },
+      {
+        "id": "e-all-checked-no",
+        "from": "dec-all-cars-checked",
+        "to": "dec-has-remaining-car",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e-all-checked-yes",
+        "from": "dec-all-cars-checked",
+        "to": "dec-any-car-failed",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e-remaining-no",
+        "from": "dec-has-remaining-car",
+        "to": "dec-any-car-failed",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e-any-failed-yes",
+        "from": "dec-any-car-failed",
+        "to": "end-fail",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e-any-failed-no",
+        "from": "dec-any-car-failed",
+        "to": "end-pass",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-KIJO-A129_5-P2",
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": ["A129_5:P1"],
+      "description": "第1項でエレベーター各部の固定荷重を規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00Z",
+    "updated_at": "2026-01-26T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

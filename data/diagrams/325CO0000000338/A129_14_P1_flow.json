@@ -1,0 +1,223 @@
+{
+  "id": "A129_14_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "避雷設備の設置",
+    "target_subject": "避雷設備",
+    "description": "避雷設備が建築物の高さ20mを超える部分を雷撃から保護するように設けられていることを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "129_14",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": ["単体規定", "避雷設備", "設置基準"],
+  "text_raw": "法第三十三条の規定による避雷設備は、建築物の高さ二十メートルをこえる部分を雷撃から保護するように設けなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "note": "法第33条の適用対象となる建築物（高さ20mを超える建築物）",
+          "ref": "法::A33"
+        }
+      ]
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "note": "20m超部分が避雷設備により雷撃から保護されている",
+          "ref": "info-protected-from-lightning",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    }
+  },
+  "flow_diagram": {
+    "title": "避雷設備設置の適合判定フロー",
+    "description": "建築物の高さ20mを超える部分が避雷設備により雷撃から保護されているかを判定する",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "避雷設備の適合判定を開始"
+      },
+      {
+        "id": "dec-height-over-20",
+        "type": "decision",
+        "title": "建築物の高さは20m超か？",
+        "decision_type": "binary",
+        "description": "建築物の高さが20mを超えるか判定（法第33条の適用対象）",
+        "condition": {
+          "operator": "GT",
+          "lhs": { "var": "H", "desc": "建築物の高さ" },
+          "rhs": { "value": 20, "unit": "m" }
+        }
+      },
+      {
+        "id": "proc-scope-out",
+        "type": "process",
+        "title": "本条の適用対象外",
+        "process_type": "mechanical",
+        "description": "高さ20m以下の建築物は法第33条・令第129条の14の適用対象外"
+      },
+      {
+        "id": "proc-exceeding-part-identified",
+        "type": "process",
+        "title": "20m超部分範囲確定",
+        "process_type": "mechanical",
+        "description": "保護が必要な範囲（高さ20mを超える部分）が特定された"
+      },
+      {
+        "id": "dec-lightning-equipment-installed",
+        "type": "decision",
+        "title": "避雷設備は設置されているか？",
+        "decision_type": "binary",
+        "description": "建築物に避雷設備が設置されているか確認"
+      },
+      {
+        "id": "proc-no-equipment",
+        "type": "process",
+        "title": "避雷設備未設置",
+        "process_type": "mechanical",
+        "description": "避雷設備が設置されていない状態"
+      },
+      {
+        "id": "dec-lightning-equipment-type",
+        "type": "decision",
+        "title": "避雷設備の種別は？",
+        "decision_type": "multi",
+        "description": "設置されている避雷設備の種別を確認",
+        "options": [
+          { "value": "受雷部システム", "description": "突針、水平導体、メッシュ導体等" },
+          { "value": "棟上導体", "description": "建築物の棟に沿って設置される導体" },
+          { "value": "複合方式", "description": "複数の方式を組み合わせたもの" }
+        ]
+      },
+      {
+        "id": "proc-equipment-type-confirmed",
+        "type": "process",
+        "title": "設備種別確認済み",
+        "process_type": "mechanical",
+        "description": "避雷設備の種別が確認された"
+      },
+      {
+        "id": "dec-protection-area-calculable",
+        "type": "decision",
+        "title": "保護範囲を算定できるか？",
+        "decision_type": "binary",
+        "description": "JIS A 4201等に基づき避雷設備の保護範囲を算定できるか"
+      },
+      {
+        "id": "proc-protection-area-calculated",
+        "type": "process",
+        "title": "保護範囲算定済み",
+        "process_type": "mechanical",
+        "description": "避雷設備の保護範囲が算定された"
+      },
+      {
+        "id": "dec-20m-part-covered",
+        "type": "decision",
+        "title": "20m超部分が保護範囲に包含されるか？",
+        "decision_type": "binary",
+        "description": "建築物の高さ20mを超える部分が避雷設備の保護範囲に完全に包含されているか判定",
+        "condition": {
+          "operator": "IN",
+          "lhs": { "var": "P", "desc": "高さ20m超の部分" },
+          "rhs": { "var": "A", "desc": "避雷設備の保護範囲" }
+        }
+      },
+      {
+        "id": "proc-protected",
+        "type": "process",
+        "title": "雷撃保護確認済み",
+        "process_type": "mechanical",
+        "description": "20m超部分が避雷設備により雷撃から保護されていることを確認"
+      },
+      {
+        "id": "dec-partial-coverage",
+        "type": "decision",
+        "title": "部分的な保護か？",
+        "decision_type": "binary",
+        "description": "20m超部分の一部のみが保護範囲に含まれている状態か"
+      },
+      {
+        "id": "proc-partial-coverage",
+        "type": "process",
+        "title": "部分保護状態",
+        "process_type": "mechanical",
+        "description": "20m超部分の一部が保護されていない状態"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令第129条の14第1項に適合"
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "令第129条の14第1項に不適合"
+      },
+      {
+        "id": "end-not-applicable",
+        "type": "terminal",
+        "title": "対象外",
+        "result": "end",
+        "description": "本条の適用対象外"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "dec-height-over-20", "role": "flow" },
+      { "id": "e02", "from": "dec-height-over-20", "to": "proc-scope-out", "role": "no", "label": "いいえ" },
+      { "id": "e03", "from": "proc-scope-out", "to": "end-not-applicable", "role": "flow" },
+      { "id": "e04", "from": "dec-height-over-20", "to": "proc-exceeding-part-identified", "role": "yes", "label": "はい" },
+      { "id": "e05", "from": "proc-exceeding-part-identified", "to": "dec-lightning-equipment-installed", "role": "flow" },
+      { "id": "e06", "from": "dec-lightning-equipment-installed", "to": "proc-no-equipment", "role": "no", "label": "いいえ" },
+      { "id": "e07", "from": "proc-no-equipment", "to": "end-fail", "role": "flow" },
+      { "id": "e08", "from": "dec-lightning-equipment-installed", "to": "dec-lightning-equipment-type", "role": "yes", "label": "はい" },
+      { "id": "e09", "from": "dec-lightning-equipment-type", "to": "proc-equipment-type-confirmed", "role": "option", "label": "受雷部システム" },
+      { "id": "e10", "from": "dec-lightning-equipment-type", "to": "proc-equipment-type-confirmed", "role": "option", "label": "棟上導体" },
+      { "id": "e11", "from": "dec-lightning-equipment-type", "to": "proc-equipment-type-confirmed", "role": "option", "label": "複合方式" },
+      { "id": "e12", "from": "proc-equipment-type-confirmed", "to": "dec-protection-area-calculable", "role": "flow" },
+      { "id": "e13", "from": "dec-protection-area-calculable", "to": "end-fail", "role": "no", "label": "いいえ" },
+      { "id": "e14", "from": "dec-protection-area-calculable", "to": "proc-protection-area-calculated", "role": "yes", "label": "はい" },
+      { "id": "e15", "from": "proc-protection-area-calculated", "to": "dec-20m-part-covered", "role": "flow" },
+      { "id": "e16", "from": "dec-20m-part-covered", "to": "proc-protected", "role": "yes", "label": "はい" },
+      { "id": "e17", "from": "proc-protected", "to": "end-pass", "role": "flow" },
+      { "id": "e18", "from": "dec-20m-part-covered", "to": "dec-partial-coverage", "role": "no", "label": "いいえ" },
+      { "id": "e19", "from": "dec-partial-coverage", "to": "proc-partial-coverage", "role": "yes", "label": "はい" },
+      { "id": "e20", "from": "proc-partial-coverage", "to": "end-fail", "role": "flow" },
+      { "id": "e21", "from": "dec-partial-coverage", "to": "end-fail", "role": "no", "label": "いいえ" }
+    ]
+  },
+  "kijo_diagram_ref": "A129_14_P1_kijo",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": ["A33:P1"],
+      "description": "法第33条で避雷設備の設置義務を規定し、その設置方法の詳細を本条で定める"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

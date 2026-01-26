@@ -1,0 +1,323 @@
+{
+  "id": "A116_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "危険物の数量の限度",
+    "target_subject": "建築物",
+    "description": "建築物に貯蔵又は処理する危険物の数量が政令で定める限度を超えないことの確認"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "116",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "危険物",
+    "用途規制"
+  ],
+  "text_raw": "法第二十七条第三項第二号の規定により政令で定める危険物の数量の限度は、次の表に定めるところによるものとする。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "use",
+          "value": "危険物を貯蔵又は処理する建築物",
+          "note": "法第27条第3項第2号に該当する建築物"
+        }
+      ],
+      "note": "危険物を貯蔵又は処理する建築物が対象"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "comparison",
+          "description": "各危険物品の数量が表に定める限度以下であること"
+        }
+      ]
+    }
+  },
+  "flow_diagram": {
+    "title": "危険物の数量の限度 適合判定フロー",
+    "description": "建築物に貯蔵又は処理する危険物の数量が令第116条第1項の表に定める限度以下かを判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "危険物の数量限度の適合判定を開始"
+      },
+      {
+        "id": "dec-has-danger-goods",
+        "type": "decision",
+        "title": "建築物に危険物を貯蔵又は処理するか？",
+        "decision_type": "binary",
+        "description": "法第27条第3項第2号の適用対象かを確認"
+      },
+      {
+        "id": "proc-list-danger-goods",
+        "type": "process",
+        "title": "危険物品の一覧作成",
+        "process_type": "undefined_input",
+        "description": "建築物に貯蔵又は処理する全ての危険物品を列挙する"
+      },
+      {
+        "id": "dec-danger-goods-remain",
+        "type": "decision",
+        "title": "未判定の危険物品があるか？",
+        "decision_type": "binary",
+        "description": "全危険物品の判定が完了したかを確認"
+      },
+      {
+        "id": "proc-select-goods",
+        "type": "process",
+        "title": "次の危険物品を選択",
+        "process_type": "mechanical",
+        "description": "未判定の危険物品から1つを選択して判定対象とする"
+      },
+      {
+        "id": "dec-goods-type",
+        "type": "decision",
+        "title": "危険物品の種類は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "火薬類", "description": "火薬類取締法に規定する火薬類" },
+          { "value": "消防法危険物", "description": "消防法第2条第7項に規定する危険物" },
+          { "value": "マッチ", "description": "マッチ" },
+          { "value": "可燃性ガス", "description": "可燃性ガス" },
+          { "value": "圧縮ガス", "description": "圧縮ガス" },
+          { "value": "液化ガス", "description": "液化ガス" }
+        ],
+        "description": "令第116条第1項の表に定める危険物品の種類を特定"
+      },
+      {
+        "id": "dec-storage-type",
+        "type": "decision",
+        "title": "貯蔵形態は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "常時貯蔵", "description": "常時貯蔵する場合" },
+          { "value": "製造所等", "description": "製造所、貯蔵所又は取扱所において処理する場合" }
+        ],
+        "description": "危険物品の貯蔵又は処理の形態を特定"
+      },
+      {
+        "id": "proc-get-quantity",
+        "type": "process",
+        "title": "数量の取得",
+        "process_type": "undefined_input",
+        "description": "当該危険物品の貯蔵又は処理数量を取得"
+      },
+      {
+        "id": "proc-get-limit",
+        "type": "process",
+        "title": "数量限度の参照",
+        "process_type": "mechanical",
+        "description": "令第116条第1項の表から、種類と貯蔵形態に応じた数量限度を参照"
+      },
+      {
+        "id": "dec-quantity-within-limit",
+        "type": "decision",
+        "title": "数量が限度以下か？",
+        "decision_type": "binary",
+        "description": "Q ≤ Limit(T, S) を判定",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "Q", "desc": "当該危険物品の数量" },
+          "rhs": { "var": "Limit", "desc": "表に定める限度値" }
+        }
+      },
+      {
+        "id": "proc-mark-compliant",
+        "type": "process",
+        "title": "当該物品を適合とマーク",
+        "process_type": "mechanical",
+        "description": "当該危険物品の数量は限度内であることを記録"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "全ての危険物品の数量が表に定める限度以下である",
+        "related_articles": ["令第116条第1項"]
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "いずれかの危険物品の数量が表に定める限度を超えている",
+        "related_articles": ["令第116条第1項"]
+      },
+      {
+        "id": "end-not-applicable",
+        "type": "terminal",
+        "title": "適用除外",
+        "result": "pass",
+        "description": "危険物を貯蔵又は処理しない建築物のため本条は適用されない"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-has-danger-goods",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-has-danger-goods",
+        "to": "proc-list-danger-goods",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "dec-has-danger-goods",
+        "to": "end-not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e04",
+        "from": "proc-list-danger-goods",
+        "to": "dec-danger-goods-remain",
+        "role": "flow"
+      },
+      {
+        "id": "e05",
+        "from": "dec-danger-goods-remain",
+        "to": "proc-select-goods",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e06",
+        "from": "dec-danger-goods-remain",
+        "to": "end-pass",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e07",
+        "from": "proc-select-goods",
+        "to": "dec-goods-type",
+        "role": "flow"
+      },
+      {
+        "id": "e08",
+        "from": "dec-goods-type",
+        "to": "dec-storage-type",
+        "role": "option",
+        "label": "火薬類"
+      },
+      {
+        "id": "e09",
+        "from": "dec-goods-type",
+        "to": "dec-storage-type",
+        "role": "option",
+        "label": "消防法危険物"
+      },
+      {
+        "id": "e10",
+        "from": "dec-goods-type",
+        "to": "dec-storage-type",
+        "role": "option",
+        "label": "マッチ"
+      },
+      {
+        "id": "e11",
+        "from": "dec-goods-type",
+        "to": "dec-storage-type",
+        "role": "option",
+        "label": "可燃性ガス"
+      },
+      {
+        "id": "e12",
+        "from": "dec-goods-type",
+        "to": "dec-storage-type",
+        "role": "option",
+        "label": "圧縮ガス"
+      },
+      {
+        "id": "e13",
+        "from": "dec-goods-type",
+        "to": "dec-storage-type",
+        "role": "option",
+        "label": "液化ガス"
+      },
+      {
+        "id": "e14",
+        "from": "dec-storage-type",
+        "to": "proc-get-quantity",
+        "role": "option",
+        "label": "常時貯蔵"
+      },
+      {
+        "id": "e15",
+        "from": "dec-storage-type",
+        "to": "proc-get-quantity",
+        "role": "option",
+        "label": "製造所等"
+      },
+      {
+        "id": "e16",
+        "from": "proc-get-quantity",
+        "to": "proc-get-limit",
+        "role": "flow"
+      },
+      {
+        "id": "e17",
+        "from": "proc-get-limit",
+        "to": "dec-quantity-within-limit",
+        "role": "flow"
+      },
+      {
+        "id": "e18",
+        "from": "dec-quantity-within-limit",
+        "to": "proc-mark-compliant",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e19",
+        "from": "dec-quantity-within-limit",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e20",
+        "from": "proc-mark-compliant",
+        "to": "dec-danger-goods-remain",
+        "role": "flow"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-ORD-A116-P1",
+  "related_laws": [
+    {
+      "law_id": "324AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": ["A27:P3:I2"],
+      "description": "法第27条第3項第2号から危険物数量限度の定義を委任"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00+09:00",
+    "author": "Claude",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

@@ -1,0 +1,281 @@
+{
+  "id": "A110_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "特殊建築物の特定主要構造部の性能に関する技術的基準",
+    "target_subject": "特定主要構造部",
+    "description": "法第27条第1項の政令で定める特殊建築物の特定主要構造部の性能に関する技術的基準を判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "110",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "防火",
+    "特定主要構造部",
+    "技術的基準"
+  ],
+  "text_raw": "特定主要構造部の性能に関する法第二十七条第一項の政令で定める技術的基準は、次の各号のいずれかに掲げるものとする。一 次に掲げる基準 イ 次の表の上欄に掲げる建築物の部分にあつては、当該部分に通常の火災による火熱が加えられた場合に、加熱開始後それぞれ同表の下欄に掲げる時間において構造耐力上支障のある変形、溶融、破壊その他の損傷を生じないものであること。ロ 壁、床及び屋根の軒裏にあつては、これらに通常の火災による火熱が加えられた場合に、加熱開始後特定避難時間当該加熱面以外の面の温度が可燃物燃焼温度以上に上昇しないものであること。ハ 外壁及び屋根にあつては、これらに屋内において発生する通常の火災による火熱が加えられた場合に、加熱開始後特定避難時間屋外に火炎を出す原因となる亀裂その他の損傷を生じないものであること。二 第百九条の五各号のいずれかに掲げる基準",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "reference",
+          "value": "法第27条第1項の特殊建築物"
+        }
+      ],
+      "note": "法第27条第1項に規定する特殊建築物に適用"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "ref": "info-item1-compliance",
+          "operator": "==",
+          "value": true,
+          "note": "第1号基準（イ・ロ・ハすべて適合）"
+        },
+        {
+          "ref": "info-item2-compliance",
+          "operator": "==",
+          "value": true,
+          "note": "第2号基準（令109条の5）"
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "flow_diagram": {
+    "title": "令第110条第1項 特定主要構造部の技術的基準適合判定フロー",
+    "description": "特殊建築物の特定主要構造部が技術的基準に適合するかを判定するフローチャート",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "特定主要構造部の性能に関する技術的基準の判定を開始"
+      },
+      {
+        "id": "proc-identify-parts",
+        "type": "process",
+        "title": "特定主要構造部の特定",
+        "process_type": "undefined_input",
+        "description": "判定対象となる特殊建築物の特定主要構造部（壁、柱、床、はり、屋根、階段）を特定する"
+      },
+      {
+        "id": "proc-identify-evac-time",
+        "type": "process",
+        "title": "特定避難時間の算定",
+        "process_type": "undefined_input",
+        "description": "存する者全てが地上まで避難を終了するまでに要する時間を算定（最低45分間）"
+      },
+      {
+        "id": "decision-route",
+        "type": "decision",
+        "title": "判定ルートは？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "第1号基準", "description": "第1号イ・ロ・ハの基準で判定" },
+          { "value": "第2号基準", "description": "令第109条の5の基準で判定" }
+        ],
+        "description": "どちらの基準で判定するかを選択（いずれかに適合すればよい）"
+      },
+      {
+        "id": "decision-item1-i",
+        "type": "decision",
+        "title": "各部位が所定時間の構造耐力性能を満たすか？",
+        "decision_type": "binary",
+        "description": "各部位の加熱時間（間仕切壁・外壁・柱・床・はり:特定避難時間、屋根・階段:30分）における構造耐力維持を判定",
+        "condition": {
+          "operator": "EQ",
+          "lhs": { "var": "C1i", "desc": "第1号イ基準適合" },
+          "rhs": { "value": true, "desc": "全部位が適合" }
+        }
+      },
+      {
+        "id": "decision-item1-ro",
+        "type": "decision",
+        "title": "壁・床・軒裏が所定時間の遮熱性能を満たすか？",
+        "decision_type": "binary",
+        "description": "加熱面以外の面の温度が可燃物燃焼温度以上に上昇しないことを判定",
+        "condition": {
+          "operator": "EQ",
+          "lhs": { "var": "C1ro", "desc": "第1号ロ基準適合" },
+          "rhs": { "value": true, "desc": "全部位が適合" }
+        }
+      },
+      {
+        "id": "decision-item1-ha",
+        "type": "decision",
+        "title": "外壁・屋根が所定時間の屋外火炎防止性能を満たすか？",
+        "decision_type": "binary",
+        "description": "屋外に火炎を出す原因となる亀裂等の損傷を生じないことを判定",
+        "condition": {
+          "operator": "EQ",
+          "lhs": { "var": "C1ha", "desc": "第1号ハ基準適合" },
+          "rhs": { "value": true, "desc": "全部位が適合" }
+        }
+      },
+      {
+        "id": "proc-item2-check",
+        "type": "process",
+        "title": "令第109条の5基準の判定",
+        "process_type": "sub_diagram_reference",
+        "description": "令第109条の5各号のいずれかの基準に適合するか判定",
+        "related_articles": ["令::A109_5"]
+      },
+      {
+        "id": "decision-item2",
+        "type": "decision",
+        "title": "令第109条の5各号のいずれかに適合するか？",
+        "decision_type": "binary",
+        "description": "第2号基準として令第109条の5各号のいずれかを満たすか判定",
+        "related_articles": ["令::A109_5"]
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令第110条第1項の技術的基準に適合"
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "令第110条第1項の技術的基準に不適合"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "proc-identify-parts",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "proc-identify-parts",
+        "to": "proc-identify-evac-time",
+        "role": "flow"
+      },
+      {
+        "id": "e03",
+        "from": "proc-identify-evac-time",
+        "to": "decision-route",
+        "role": "flow"
+      },
+      {
+        "id": "e04",
+        "from": "decision-route",
+        "to": "decision-item1-i",
+        "role": "option",
+        "label": "第1号基準"
+      },
+      {
+        "id": "e05",
+        "from": "decision-route",
+        "to": "proc-item2-check",
+        "role": "option",
+        "label": "第2号基準"
+      },
+      {
+        "id": "e06",
+        "from": "decision-item1-i",
+        "to": "decision-item1-ro",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e07",
+        "from": "decision-item1-i",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e08",
+        "from": "decision-item1-ro",
+        "to": "decision-item1-ha",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e09",
+        "from": "decision-item1-ro",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e10",
+        "from": "decision-item1-ha",
+        "to": "end-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e11",
+        "from": "decision-item1-ha",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e12",
+        "from": "proc-item2-check",
+        "to": "decision-item2",
+        "role": "flow"
+      },
+      {
+        "id": "e13",
+        "from": "decision-item2",
+        "to": "end-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e14",
+        "from": "decision-item2",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-ORDER-A110-P1",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": ["A27:P1"],
+      "description": "法第27条第1項の特殊建築物の主要構造部の制限"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": ["A109_5"],
+      "description": "第2号が参照する令第109条の5の基準"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-01-26T12:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

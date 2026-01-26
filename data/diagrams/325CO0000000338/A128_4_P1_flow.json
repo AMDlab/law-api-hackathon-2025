@@ -1,0 +1,552 @@
+{
+  "id": "A128_4_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "内装制限を受ける特殊建築物の判定フロー",
+    "target_subject": "特殊建築物",
+    "description": "法第35条の2の内装制限を受ける特殊建築物かどうかを判定するフローチャート"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "128の4",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "防火",
+    "内装制限",
+    "特殊建築物"
+  ],
+  "text_raw": "法第三十五条の二の規定により政令で定める特殊建築物は、次に掲げるもの以外のものとする。一 次の表に掲げる特殊建築物 二 自動車車庫又は自動車修理工場の用途に供する特殊建築物 三 地階又は地下工作物内に設ける居室その他これらに類する居室で法別表第一（い）欄（一）項、（二）項又は（四）項に掲げる用途に供するものを有する特殊建築物",
+  "kijo_diagram_ref": "CHK-BSL-ORDER-A128_4-P1",
+  "flow_diagram": {
+    "title": "令第128条の4第1項 内装制限対象特殊建築物判定フロー",
+    "description": "第1号〜第3号のいずれかに該当すれば内装制限の対象となる",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "内装制限対象特殊建築物の判定を開始"
+      },
+      {
+        "id": "dec-use-type",
+        "type": "decision",
+        "title": "建築物の用途は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "劇場等", "description": "別表第一(い)欄(一)項：劇場、映画館、演芸場、観覧場、公会堂、集会場" },
+          { "value": "病院等", "description": "別表第一(い)欄(二)項：病院、診療所、ホテル、旅館、下宿、共同住宅、寄宿舎、児童福祉施設等" },
+          { "value": "百貨店等", "description": "別表第一(い)欄(四)項：百貨店、マーケット、展示場、キャバレー、カフェー、ナイトクラブ、バー、ダンスホール、遊技場、公衆浴場、待合、料理店、飲食店、物品販売業を営む店舗" },
+          { "value": "自動車車庫等", "description": "自動車車庫又は自動車修理工場" },
+          { "value": "その他用途", "description": "上記以外の用途" }
+        ],
+        "description": "設計図書から建築物の主たる用途を確認"
+      },
+      {
+        "id": "proc-item2-match",
+        "type": "process",
+        "title": "第2号該当",
+        "process_type": "mechanical",
+        "description": "自動車車庫又は自動車修理工場として第2号に該当"
+      },
+      {
+        "id": "dec-structure-theater",
+        "type": "decision",
+        "title": "構造種別は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "耐火1時間", "description": "耐火建築物で1時間準耐火基準適合" },
+          { "value": "準耐火", "description": "準耐火建築物（1時間準耐火基準不適合）" },
+          { "value": "その他", "description": "耐火・準耐火以外の建築物" }
+        ],
+        "description": "劇場等の場合の構造種別を確認"
+      },
+      {
+        "id": "dec-area-theater-fireproof",
+        "type": "decision",
+        "title": "客席面積400m2以上か？",
+        "decision_type": "binary",
+        "description": "耐火1時間の劇場等の客席面積を確認",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "A_seat", "desc": "客席面積" },
+          "rhs": { "value": 400, "unit": "m2" }
+        }
+      },
+      {
+        "id": "dec-area-theater-quasi",
+        "type": "decision",
+        "title": "客席面積100m2以上か？",
+        "decision_type": "binary",
+        "description": "準耐火・その他の劇場等の客席面積を確認",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "A_seat", "desc": "客席面積" },
+          "rhs": { "value": 100, "unit": "m2" }
+        }
+      },
+      {
+        "id": "proc-item1-theater-match",
+        "type": "process",
+        "title": "第1号該当（劇場等）",
+        "process_type": "mechanical",
+        "description": "劇場等として第1号の表に該当"
+      },
+      {
+        "id": "dec-structure-hospital",
+        "type": "decision",
+        "title": "構造種別は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "耐火1時間", "description": "耐火建築物で1時間準耐火基準適合" },
+          { "value": "準耐火", "description": "準耐火建築物（1時間準耐火基準不適合）" },
+          { "value": "その他", "description": "耐火・準耐火以外の建築物" }
+        ],
+        "description": "病院等の場合の構造種別を確認"
+      },
+      {
+        "id": "dec-area-hospital-fireproof",
+        "type": "decision",
+        "title": "3階以上の床面積300m2以上か？",
+        "decision_type": "binary",
+        "description": "耐火1時間の病院等の3階以上床面積を確認",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "A_3F", "desc": "3階以上の床面積" },
+          "rhs": { "value": 300, "unit": "m2" }
+        }
+      },
+      {
+        "id": "dec-area-hospital-quasi",
+        "type": "decision",
+        "title": "2階の床面積300m2以上か？",
+        "decision_type": "binary",
+        "description": "準耐火の病院等の2階床面積を確認",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "A_2F", "desc": "2階の床面積" },
+          "rhs": { "value": 300, "unit": "m2" }
+        }
+      },
+      {
+        "id": "dec-area-hospital-other",
+        "type": "decision",
+        "title": "床面積200m2以上か？",
+        "decision_type": "binary",
+        "description": "その他構造の病院等の床面積を確認",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "A", "desc": "床面積" },
+          "rhs": { "value": 200, "unit": "m2" }
+        }
+      },
+      {
+        "id": "proc-item1-hospital-match",
+        "type": "process",
+        "title": "第1号該当（病院等）",
+        "process_type": "mechanical",
+        "description": "病院等として第1号の表に該当"
+      },
+      {
+        "id": "dec-structure-store",
+        "type": "decision",
+        "title": "構造種別は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "耐火1時間", "description": "耐火建築物で1時間準耐火基準適合" },
+          { "value": "準耐火", "description": "準耐火建築物（1時間準耐火基準不適合）" },
+          { "value": "その他", "description": "耐火・準耐火以外の建築物" }
+        ],
+        "description": "百貨店等の場合の構造種別を確認"
+      },
+      {
+        "id": "dec-area-store-fireproof",
+        "type": "decision",
+        "title": "3階以上の床面積1000m2以上か？",
+        "decision_type": "binary",
+        "description": "耐火1時間の百貨店等の3階以上床面積を確認",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "A_3F", "desc": "3階以上の床面積" },
+          "rhs": { "value": 1000, "unit": "m2" }
+        }
+      },
+      {
+        "id": "dec-area-store-quasi",
+        "type": "decision",
+        "title": "2階の床面積500m2以上か？",
+        "decision_type": "binary",
+        "description": "準耐火の百貨店等の2階床面積を確認",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "A_2F", "desc": "2階の床面積" },
+          "rhs": { "value": 500, "unit": "m2" }
+        }
+      },
+      {
+        "id": "dec-area-store-other",
+        "type": "decision",
+        "title": "床面積200m2以上か？",
+        "decision_type": "binary",
+        "description": "その他構造の百貨店等の床面積を確認",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "A", "desc": "床面積" },
+          "rhs": { "value": 200, "unit": "m2" }
+        }
+      },
+      {
+        "id": "proc-item1-store-match",
+        "type": "process",
+        "title": "第1号該当（百貨店等）",
+        "process_type": "mechanical",
+        "description": "百貨店等として第1号の表に該当"
+      },
+      {
+        "id": "dec-has-basement-room",
+        "type": "decision",
+        "title": "地階又は地下工作物内に居室があるか？",
+        "decision_type": "binary",
+        "description": "設計図書から地階等の居室の有無を確認"
+      },
+      {
+        "id": "dec-basement-use",
+        "type": "decision",
+        "title": "地階等居室の用途は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "劇場等", "description": "別表第一(い)欄(一)項の用途" },
+          { "value": "病院等", "description": "別表第一(い)欄(二)項の用途" },
+          { "value": "百貨店等", "description": "別表第一(い)欄(四)項の用途" },
+          { "value": "その他", "description": "上記以外の用途" }
+        ],
+        "description": "地階等に設ける居室の用途を確認"
+      },
+      {
+        "id": "proc-item3-match",
+        "type": "process",
+        "title": "第3号該当",
+        "process_type": "mechanical",
+        "description": "地階等に特定用途居室を有するとして第3号に該当"
+      },
+      {
+        "id": "end-subject",
+        "type": "terminal",
+        "title": "内装制限対象",
+        "result": "pass",
+        "description": "法第35条の2の内装制限を受ける特殊建築物に該当"
+      },
+      {
+        "id": "end-not-subject",
+        "type": "terminal",
+        "title": "内装制限対象外",
+        "result": "fail",
+        "description": "法第35条の2の内装制限を受ける特殊建築物に該当しない"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-use-type",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-use-type",
+        "to": "dec-structure-theater",
+        "role": "option",
+        "label": "劇場等"
+      },
+      {
+        "id": "e03",
+        "from": "dec-use-type",
+        "to": "dec-structure-hospital",
+        "role": "option",
+        "label": "病院等"
+      },
+      {
+        "id": "e04",
+        "from": "dec-use-type",
+        "to": "dec-structure-store",
+        "role": "option",
+        "label": "百貨店等"
+      },
+      {
+        "id": "e05",
+        "from": "dec-use-type",
+        "to": "proc-item2-match",
+        "role": "option",
+        "label": "自動車車庫等"
+      },
+      {
+        "id": "e06",
+        "from": "dec-use-type",
+        "to": "dec-has-basement-room",
+        "role": "option",
+        "label": "その他用途"
+      },
+      {
+        "id": "e07",
+        "from": "proc-item2-match",
+        "to": "end-subject",
+        "role": "flow"
+      },
+      {
+        "id": "e08",
+        "from": "dec-structure-theater",
+        "to": "dec-area-theater-fireproof",
+        "role": "option",
+        "label": "耐火1時間"
+      },
+      {
+        "id": "e09",
+        "from": "dec-structure-theater",
+        "to": "dec-area-theater-quasi",
+        "role": "option",
+        "label": "準耐火"
+      },
+      {
+        "id": "e10",
+        "from": "dec-structure-theater",
+        "to": "dec-area-theater-quasi",
+        "role": "option",
+        "label": "その他"
+      },
+      {
+        "id": "e11",
+        "from": "dec-area-theater-fireproof",
+        "to": "proc-item1-theater-match",
+        "role": "yes"
+      },
+      {
+        "id": "e12",
+        "from": "dec-area-theater-fireproof",
+        "to": "dec-has-basement-room",
+        "role": "no"
+      },
+      {
+        "id": "e13",
+        "from": "dec-area-theater-quasi",
+        "to": "proc-item1-theater-match",
+        "role": "yes"
+      },
+      {
+        "id": "e14",
+        "from": "dec-area-theater-quasi",
+        "to": "dec-has-basement-room",
+        "role": "no"
+      },
+      {
+        "id": "e15",
+        "from": "proc-item1-theater-match",
+        "to": "end-subject",
+        "role": "flow"
+      },
+      {
+        "id": "e16",
+        "from": "dec-structure-hospital",
+        "to": "dec-area-hospital-fireproof",
+        "role": "option",
+        "label": "耐火1時間"
+      },
+      {
+        "id": "e17",
+        "from": "dec-structure-hospital",
+        "to": "dec-area-hospital-quasi",
+        "role": "option",
+        "label": "準耐火"
+      },
+      {
+        "id": "e18",
+        "from": "dec-structure-hospital",
+        "to": "dec-area-hospital-other",
+        "role": "option",
+        "label": "その他"
+      },
+      {
+        "id": "e19",
+        "from": "dec-area-hospital-fireproof",
+        "to": "proc-item1-hospital-match",
+        "role": "yes"
+      },
+      {
+        "id": "e20",
+        "from": "dec-area-hospital-fireproof",
+        "to": "dec-has-basement-room",
+        "role": "no"
+      },
+      {
+        "id": "e21",
+        "from": "dec-area-hospital-quasi",
+        "to": "proc-item1-hospital-match",
+        "role": "yes"
+      },
+      {
+        "id": "e22",
+        "from": "dec-area-hospital-quasi",
+        "to": "dec-has-basement-room",
+        "role": "no"
+      },
+      {
+        "id": "e23",
+        "from": "dec-area-hospital-other",
+        "to": "proc-item1-hospital-match",
+        "role": "yes"
+      },
+      {
+        "id": "e24",
+        "from": "dec-area-hospital-other",
+        "to": "dec-has-basement-room",
+        "role": "no"
+      },
+      {
+        "id": "e25",
+        "from": "proc-item1-hospital-match",
+        "to": "end-subject",
+        "role": "flow"
+      },
+      {
+        "id": "e26",
+        "from": "dec-structure-store",
+        "to": "dec-area-store-fireproof",
+        "role": "option",
+        "label": "耐火1時間"
+      },
+      {
+        "id": "e27",
+        "from": "dec-structure-store",
+        "to": "dec-area-store-quasi",
+        "role": "option",
+        "label": "準耐火"
+      },
+      {
+        "id": "e28",
+        "from": "dec-structure-store",
+        "to": "dec-area-store-other",
+        "role": "option",
+        "label": "その他"
+      },
+      {
+        "id": "e29",
+        "from": "dec-area-store-fireproof",
+        "to": "proc-item1-store-match",
+        "role": "yes"
+      },
+      {
+        "id": "e30",
+        "from": "dec-area-store-fireproof",
+        "to": "dec-has-basement-room",
+        "role": "no"
+      },
+      {
+        "id": "e31",
+        "from": "dec-area-store-quasi",
+        "to": "proc-item1-store-match",
+        "role": "yes"
+      },
+      {
+        "id": "e32",
+        "from": "dec-area-store-quasi",
+        "to": "dec-has-basement-room",
+        "role": "no"
+      },
+      {
+        "id": "e33",
+        "from": "dec-area-store-other",
+        "to": "proc-item1-store-match",
+        "role": "yes"
+      },
+      {
+        "id": "e34",
+        "from": "dec-area-store-other",
+        "to": "dec-has-basement-room",
+        "role": "no"
+      },
+      {
+        "id": "e35",
+        "from": "proc-item1-store-match",
+        "to": "end-subject",
+        "role": "flow"
+      },
+      {
+        "id": "e36",
+        "from": "dec-has-basement-room",
+        "to": "dec-basement-use",
+        "role": "yes"
+      },
+      {
+        "id": "e37",
+        "from": "dec-has-basement-room",
+        "to": "end-not-subject",
+        "role": "no"
+      },
+      {
+        "id": "e38",
+        "from": "dec-basement-use",
+        "to": "proc-item3-match",
+        "role": "option",
+        "label": "劇場等"
+      },
+      {
+        "id": "e39",
+        "from": "dec-basement-use",
+        "to": "proc-item3-match",
+        "role": "option",
+        "label": "病院等"
+      },
+      {
+        "id": "e40",
+        "from": "dec-basement-use",
+        "to": "proc-item3-match",
+        "role": "option",
+        "label": "百貨店等"
+      },
+      {
+        "id": "e41",
+        "from": "dec-basement-use",
+        "to": "end-not-subject",
+        "role": "option",
+        "label": "その他"
+      },
+      {
+        "id": "e42",
+        "from": "proc-item3-match",
+        "to": "end-subject",
+        "role": "flow"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": ["A35_2"],
+      "description": "法第35条の2から内装制限を受ける特殊建築物の定義を委任"
+    },
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["別表第一"],
+      "description": "法別表第一（い）欄の用途を参照"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令",
+    "source": "機序図 CHK-BSL-ORDER-A128_4-P1"
+  }
+}

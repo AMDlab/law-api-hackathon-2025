@@ -1,0 +1,339 @@
+{
+  "id": "A41_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "木材の品質",
+    "target_subject": "構造耐力上主要な部分に使用する木材",
+    "description": "構造耐力上主要な部分に使用する木材の品質が耐力上の欠点がないことを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "41",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造関係規定",
+    "木造"
+  ],
+  "text_raw": "構造耐力上主要な部分に使用する木材の品質は、節、腐れ、繊維の傾斜、丸身等による耐力上の欠点がないものでなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "building_part",
+          "value": "構造耐力上主要な部分に木材を使用する建築物"
+        }
+      ],
+      "note": "構造耐力上主要な部分に木材を使用する場合に適用"
+    },
+    "judgment_rule": {
+      "operator": "FORALL",
+      "conditions": [
+        {
+          "ref": "info-defect-free",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "kijo_diagram_ref": "CHK-BSL-ORDER-A41-P1",
+  "flow_diagram": {
+    "title": "令第41条第1項 木材の品質 適合判定フロー",
+    "description": "構造耐力上主要な部分に使用する木材の品質について、節、腐れ、繊維の傾斜、丸身等による耐力上の欠点がないことを判定するフロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start"
+      },
+      {
+        "id": "dec-uses-timber",
+        "type": "decision",
+        "title": "構造耐力上主要な部分に木材を使用しているか？",
+        "decision_type": "binary",
+        "description": "基礎、基礎ぐい、壁、柱、小屋組、土台、斜材、床版、屋根版、横架材で荷重を支える部分に木材が使用されているか確認"
+      },
+      {
+        "id": "proc-not-applicable",
+        "type": "process",
+        "title": "本条非該当",
+        "process_type": "mechanical",
+        "description": "構造耐力上主要な部分に木材を使用していないため、本条の適用対象外"
+      },
+      {
+        "id": "end-not-applicable",
+        "type": "terminal",
+        "title": "本条非該当",
+        "result": "pass",
+        "description": "構造耐力上主要な部分に木材を使用していないため、本条は適用されない"
+      },
+      {
+        "id": "proc-identify-timber-parts",
+        "type": "process",
+        "title": "木材使用部分の特定",
+        "process_type": "undefined_input",
+        "description": "構造耐力上主要な部分のうち、木材を使用している部分をすべて特定する"
+      },
+      {
+        "id": "dec-timber-parts-exist",
+        "type": "decision",
+        "title": "木材使用部分を特定できたか？",
+        "decision_type": "binary",
+        "description": "木材を使用している構造耐力上主要な部分が設計図書から特定できたか"
+      },
+      {
+        "id": "proc-init-check",
+        "type": "process",
+        "title": "未確認木材リストの作成",
+        "process_type": "mechanical",
+        "description": "確認対象となる木材のリストを作成し、順次確認を開始する"
+      },
+      {
+        "id": "dec-timber-remaining",
+        "type": "decision",
+        "title": "未確認の木材があるか？",
+        "decision_type": "binary",
+        "description": "まだ品質確認していない木材が残っているかを判定"
+      },
+      {
+        "id": "proc-select-timber",
+        "type": "process",
+        "title": "次の木材を選択",
+        "process_type": "mechanical",
+        "description": "未確認リストから次の木材を選択して確認対象とする"
+      },
+      {
+        "id": "proc-check-quality",
+        "type": "process",
+        "title": "木材品質の確認",
+        "process_type": "human_judgment",
+        "description": "選択した木材について、節、腐れ、繊維の傾斜、丸身等の状態を目視または書類で確認する"
+      },
+      {
+        "id": "dec-has-defect",
+        "type": "decision",
+        "title": "耐力上の欠点があるか？",
+        "decision_type": "binary",
+        "description": "確認した木材に、節、腐れ、繊維の傾斜、丸身等による耐力上の欠点があるかを判定",
+        "condition": {
+          "operator": "IN",
+          "lhs": {
+            "var": "timber_quality",
+            "desc": "木材の品質状態"
+          },
+          "rhs": {
+            "value": ["節による欠点", "腐れ", "繊維の傾斜", "丸身"],
+            "desc": "耐力上の欠点となる状態"
+          }
+        }
+      },
+      {
+        "id": "proc-defect-found",
+        "type": "process",
+        "title": "欠点あり木材を記録",
+        "process_type": "mechanical",
+        "description": "耐力上の欠点がある木材として記録する"
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "耐力上の欠点がある木材が存在するため、令第41条に不適合"
+      },
+      {
+        "id": "proc-mark-checked",
+        "type": "process",
+        "title": "確認済みとしてマーク",
+        "process_type": "mechanical",
+        "description": "この木材を確認済みリストに移動する"
+      },
+      {
+        "id": "proc-all-checked",
+        "type": "process",
+        "title": "全木材の確認完了",
+        "process_type": "mechanical",
+        "description": "すべての木材について品質確認が完了した"
+      },
+      {
+        "id": "dec-all-pass",
+        "type": "decision",
+        "title": "すべての木材に欠点がないか？",
+        "decision_type": "binary",
+        "description": "すべての木材について耐力上の欠点がないことを最終確認する",
+        "condition": {
+          "operator": "EQ",
+          "lhs": {
+            "var": "defect_count",
+            "desc": "欠点のある木材の数"
+          },
+          "rhs": {
+            "value": 0,
+            "desc": "欠点なし"
+          }
+        }
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "すべての木材に耐力上の欠点がないため、令第41条に適合"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-uses-timber",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-uses-timber",
+        "to": "proc-not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e03",
+        "from": "proc-not-applicable",
+        "to": "end-not-applicable",
+        "role": "flow"
+      },
+      {
+        "id": "e04",
+        "from": "dec-uses-timber",
+        "to": "proc-identify-timber-parts",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e05",
+        "from": "proc-identify-timber-parts",
+        "to": "dec-timber-parts-exist",
+        "role": "flow"
+      },
+      {
+        "id": "e06",
+        "from": "dec-timber-parts-exist",
+        "to": "proc-init-check",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e07",
+        "from": "dec-timber-parts-exist",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e08",
+        "from": "proc-init-check",
+        "to": "dec-timber-remaining",
+        "role": "flow"
+      },
+      {
+        "id": "e09",
+        "from": "dec-timber-remaining",
+        "to": "proc-select-timber",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e10",
+        "from": "proc-select-timber",
+        "to": "proc-check-quality",
+        "role": "flow"
+      },
+      {
+        "id": "e11",
+        "from": "proc-check-quality",
+        "to": "dec-has-defect",
+        "role": "flow"
+      },
+      {
+        "id": "e12",
+        "from": "dec-has-defect",
+        "to": "proc-defect-found",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e13",
+        "from": "proc-defect-found",
+        "to": "end-fail",
+        "role": "flow"
+      },
+      {
+        "id": "e14",
+        "from": "dec-has-defect",
+        "to": "proc-mark-checked",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e15",
+        "from": "proc-mark-checked",
+        "to": "dec-timber-remaining",
+        "role": "flow"
+      },
+      {
+        "id": "e16",
+        "from": "dec-timber-remaining",
+        "to": "proc-all-checked",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e17",
+        "from": "proc-all-checked",
+        "to": "dec-all-pass",
+        "role": "flow"
+      },
+      {
+        "id": "e18",
+        "from": "dec-all-pass",
+        "to": "end-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e19",
+        "from": "dec-all-pass",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": [
+        "A20"
+      ],
+      "description": "法第20条（構造耐力）の委任に基づく構造方法の技術的基準"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T12:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

@@ -1,0 +1,356 @@
+{
+  "id": "CHK-BSL-ORDER-A73-P3",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "はりの引張鉄筋の定着長さ",
+    "target_subject": "引張鉄筋",
+    "description": "柱に取り付けるはりの引張鉄筋の定着長さ基準を判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "73",
+    "paragraph": "3",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造",
+    "鉄筋コンクリート造"
+  ],
+  "text_raw": "柱に取り付けるはりの引張鉄筋は、柱の主筋に溶接する場合を除き、柱に定着される部分の長さをその径の四十倍以上としなければならない。ただし、国土交通大臣が定める基準に従つた構造計算によつて構造耐力上安全であることが確かめられた場合においては、この限りでない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "structure",
+          "value": "鉄筋コンクリート造"
+        },
+        {
+          "type": "element",
+          "value": "柱に取り付けるはりの引張鉄筋"
+        }
+      ],
+      "note": "柱の主筋に溶接する場合は適用除外"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "ref": "info-welded",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "ref": "info-anchorage-compliance",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "ref": "info-calc-safe",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    },
+    "exceptions": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "type": "condition",
+          "value": "柱の主筋に溶接する場合"
+        },
+        {
+          "type": "proviso",
+          "value": "国土交通大臣が定める基準に従つた構造計算によつて構造耐力上安全であることが確かめられた場合"
+        }
+      ],
+      "effect": "EXEMPT"
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "info-beam-set",
+        "type": "information",
+        "title": "柱に取り付けるはり",
+        "symbol": "B",
+        "subject": "柱",
+        "property": "取り付けるはりの集合",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "判定対象となる柱に取り付けるはりを特定"
+      },
+      {
+        "id": "info-rebar-set",
+        "type": "information",
+        "title": "はりの引張鉄筋",
+        "symbol": "R",
+        "subject": "はり",
+        "property": "引張鉄筋の集合",
+        "property_type": "set_definition",
+        "plurality": "multiple",
+        "description": "各はりに属する引張鉄筋を特定"
+      },
+      {
+        "id": "proc-welded-check",
+        "type": "process",
+        "title": "溶接有無の確認",
+        "process_type": "undefined_input",
+        "description": "引張鉄筋が柱の主筋に溶接されているかを確認"
+      },
+      {
+        "id": "info-welded",
+        "type": "information",
+        "title": "主筋への溶接",
+        "symbol": "W",
+        "subject": "引張鉄筋",
+        "property": "柱の主筋への溶接有無",
+        "property_type": "proposition",
+        "plurality": "multiple",
+        "description": "引張鉄筋が柱の主筋に溶接されているか"
+      },
+      {
+        "id": "proc-diameter-read",
+        "type": "process",
+        "title": "鉄筋径の特定",
+        "process_type": "undefined_input",
+        "description": "引張鉄筋の径を読み取る"
+      },
+      {
+        "id": "info-diameter",
+        "type": "information",
+        "title": "引張鉄筋の径",
+        "symbol": "D",
+        "subject": "引張鉄筋",
+        "property": "径",
+        "property_type": "numeric",
+        "unit": "mm",
+        "plurality": "multiple",
+        "description": "引張鉄筋の径"
+      },
+      {
+        "id": "proc-anchorage-read",
+        "type": "process",
+        "title": "定着長さの特定",
+        "process_type": "undefined_input",
+        "description": "柱に定着される部分の長さを読み取る"
+      },
+      {
+        "id": "info-anchorage-length",
+        "type": "information",
+        "title": "定着長さ",
+        "symbol": "L",
+        "subject": "引張鉄筋",
+        "property": "柱に定着される部分の長さ",
+        "property_type": "numeric",
+        "unit": "mm",
+        "plurality": "multiple",
+        "description": "引張鉄筋が柱に定着される部分の長さ"
+      },
+      {
+        "id": "proc-required-calc",
+        "type": "process",
+        "title": "必要定着長さの算出",
+        "process_type": "mechanical",
+        "description": "径の40倍の値を算出",
+        "logic_expression": "D × 40"
+      },
+      {
+        "id": "info-required-length",
+        "type": "information",
+        "title": "必要定着長さ",
+        "symbol": "Lreq",
+        "subject": "引張鉄筋",
+        "property": "必要定着長さ",
+        "property_type": "numeric",
+        "unit": "mm",
+        "plurality": "multiple",
+        "description": "径の40倍の値（必要定着長さ）"
+      },
+      {
+        "id": "proc-length-compare",
+        "type": "process",
+        "title": "定着長さの比較",
+        "process_type": "mechanical",
+        "iteration": "iterative",
+        "description": "定着長さが必要定着長さ以上かを判定",
+        "logic_expression": "L ≥ Lreq"
+      },
+      {
+        "id": "info-anchorage-compliance",
+        "type": "information",
+        "title": "定着長さ基準適合",
+        "symbol": "A",
+        "subject": "引張鉄筋",
+        "property": "定着長さ基準適合",
+        "property_type": "proposition",
+        "plurality": "multiple",
+        "description": "定着長さが径の40倍以上か"
+      },
+      {
+        "id": "proc-calc-check",
+        "type": "process",
+        "title": "構造計算による安全確認",
+        "process_type": "human_judgment",
+        "description": "国土交通大臣が定める基準に従った構造計算によって構造耐力上安全であることを確認"
+      },
+      {
+        "id": "info-calc-safe",
+        "type": "information",
+        "title": "構造計算による安全確認",
+        "symbol": "S",
+        "subject": "引張鉄筋",
+        "property": "構造計算による安全確認",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "国土交通大臣が定める基準に従った構造計算によって構造耐力上安全であることが確かめられたか"
+      },
+      {
+        "id": "proc-final-judgment",
+        "type": "process",
+        "title": "令73条3項適合判定",
+        "process_type": "mechanical",
+        "description": "溶接・定着長さ・構造計算のいずれかで適合か判定",
+        "logic_expression": "∀r∈R: (W(r) = true) OR (A(r) = true) OR (S = true)"
+      },
+      {
+        "id": "info-final",
+        "type": "information",
+        "title": "令73条3項適合",
+        "symbol": "C",
+        "subject": "建築物",
+        "property": "令73条3項適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "はりの引張鉄筋の定着長さ基準に適合するか"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "info-beam-set",
+        "to": "proc-welded-check",
+        "role": "input"
+      },
+      {
+        "id": "e02",
+        "from": "info-rebar-set",
+        "to": "proc-welded-check",
+        "role": "input"
+      },
+      {
+        "id": "e03",
+        "from": "proc-welded-check",
+        "to": "info-welded",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "info-rebar-set",
+        "to": "proc-diameter-read",
+        "role": "input"
+      },
+      {
+        "id": "e05",
+        "from": "proc-diameter-read",
+        "to": "info-diameter",
+        "role": "output"
+      },
+      {
+        "id": "e06",
+        "from": "info-rebar-set",
+        "to": "proc-anchorage-read",
+        "role": "input"
+      },
+      {
+        "id": "e07",
+        "from": "proc-anchorage-read",
+        "to": "info-anchorage-length",
+        "role": "output"
+      },
+      {
+        "id": "e08",
+        "from": "info-diameter",
+        "to": "proc-required-calc",
+        "role": "input"
+      },
+      {
+        "id": "e09",
+        "from": "proc-required-calc",
+        "to": "info-required-length",
+        "role": "output"
+      },
+      {
+        "id": "e10",
+        "from": "info-anchorage-length",
+        "to": "proc-length-compare",
+        "role": "input"
+      },
+      {
+        "id": "e11",
+        "from": "info-required-length",
+        "to": "proc-length-compare",
+        "role": "input"
+      },
+      {
+        "id": "e12",
+        "from": "proc-length-compare",
+        "to": "info-anchorage-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e13",
+        "from": "proc-calc-check",
+        "to": "info-calc-safe",
+        "role": "output"
+      },
+      {
+        "id": "e14",
+        "from": "info-welded",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e15",
+        "from": "info-anchorage-compliance",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e16",
+        "from": "info-calc-safe",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e17",
+        "from": "proc-final-judgment",
+        "to": "info-final",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": [
+        "A20"
+      ],
+      "description": "構造耐力の一般規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-23T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

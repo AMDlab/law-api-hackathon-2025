@@ -1,0 +1,281 @@
+{
+  "id": "A43_P6_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "柱の有効細長比の適合判定フロー",
+    "target_subject": "構造耐力上主要な部分である柱",
+    "description": "構造耐力上主要な部分である柱の有効細長比が150以下であることを判定するフロー"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "43",
+    "paragraph": "6",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造関係規定",
+    "柱",
+    "有効細長比"
+  ],
+  "text_raw": "構造耐力上主要な部分である柱の有効細長比（断面の最小二次率半径に対する座屈長さの比をいう。以下同じ。）は、百五十以下としなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "structural_element",
+          "value": "構造耐力上主要な部分である柱"
+        }
+      ],
+      "note": "構造耐力上主要な部分である柱が対象"
+    },
+    "judgment_rule": {
+      "operator": "FOR_ALL",
+      "conditions": [
+        {
+          "ref": "slenderness_ratio",
+          "operator": "<=",
+          "value": 150
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "flow_diagram": {
+    "title": "令第43条第6項 柱の有効細長比適合判定フロー",
+    "description": "構造耐力上主要な部分である柱の有効細長比が150以下であるかを判定する",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "令第43条第6項の適合判定を開始"
+      },
+      {
+        "id": "dec-has-columns",
+        "type": "decision",
+        "title": "構造耐力上主要な部分である柱があるか？",
+        "decision_type": "binary",
+        "description": "建築物に構造耐力上主要な部分である柱が存在するかを確認"
+      },
+      {
+        "id": "proc-identify-columns",
+        "type": "process",
+        "title": "柱の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書から構造耐力上主要な部分である柱を特定し、リストを作成する"
+      },
+      {
+        "id": "proc-init-loop",
+        "type": "process",
+        "title": "柱リストの反復処理開始",
+        "process_type": "mechanical",
+        "description": "特定した柱のリストに対して順次処理を開始"
+      },
+      {
+        "id": "proc-get-buckling-length",
+        "type": "process",
+        "title": "座屈長さ(Lk)の取得",
+        "process_type": "undefined_input",
+        "description": "対象柱の座屈長さを設計図書から読み取る"
+      },
+      {
+        "id": "proc-get-min-radius",
+        "type": "process",
+        "title": "最小二次率半径(r)の取得",
+        "process_type": "undefined_input",
+        "description": "対象柱の断面の最小二次率半径を設計図書から読み取る"
+      },
+      {
+        "id": "proc-calc-slenderness",
+        "type": "process",
+        "title": "有効細長比(SR)の計算",
+        "process_type": "mechanical",
+        "description": "有効細長比 SR = Lk / r を計算する"
+      },
+      {
+        "id": "dec-slenderness-check",
+        "type": "decision",
+        "title": "有効細長比 <= 150か？",
+        "decision_type": "binary",
+        "description": "計算した有効細長比が150以下であるかを判定",
+        "condition": {
+          "operator": "LTE",
+          "lhs": {
+            "var": "SR",
+            "desc": "有効細長比"
+          },
+          "rhs": {
+            "value": 150,
+            "desc": "基準値"
+          }
+        }
+      },
+      {
+        "id": "proc-column-pass",
+        "type": "process",
+        "title": "当該柱は基準適合",
+        "process_type": "mechanical",
+        "description": "当該柱の有効細長比が150以下であることを記録"
+      },
+      {
+        "id": "dec-more-columns",
+        "type": "decision",
+        "title": "未処理の柱があるか？",
+        "decision_type": "binary",
+        "description": "まだ判定していない柱が残っているかを確認"
+      },
+      {
+        "id": "dec-all-pass",
+        "type": "decision",
+        "title": "すべての柱が基準適合か？",
+        "decision_type": "binary",
+        "description": "全ての柱の有効細長比が150以下であったかを確認"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "すべての構造耐力上主要な部分である柱の有効細長比が150以下であり、令第43条第6項に適合"
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "有効細長比が150を超える柱が存在し、令第43条第6項に不適合"
+      },
+      {
+        "id": "end-na",
+        "type": "terminal",
+        "title": "規定対象外",
+        "result": "pass",
+        "description": "構造耐力上主要な部分である柱が存在しないため、本規定の適用対象外"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-has-columns",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-has-columns",
+        "to": "proc-identify-columns",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "dec-has-columns",
+        "to": "end-na",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e04",
+        "from": "proc-identify-columns",
+        "to": "proc-init-loop",
+        "role": "flow"
+      },
+      {
+        "id": "e05",
+        "from": "proc-init-loop",
+        "to": "proc-get-buckling-length",
+        "role": "flow"
+      },
+      {
+        "id": "e06",
+        "from": "proc-get-buckling-length",
+        "to": "proc-get-min-radius",
+        "role": "flow"
+      },
+      {
+        "id": "e07",
+        "from": "proc-get-min-radius",
+        "to": "proc-calc-slenderness",
+        "role": "flow"
+      },
+      {
+        "id": "e08",
+        "from": "proc-calc-slenderness",
+        "to": "dec-slenderness-check",
+        "role": "flow"
+      },
+      {
+        "id": "e09",
+        "from": "dec-slenderness-check",
+        "to": "proc-column-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e10",
+        "from": "dec-slenderness-check",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e11",
+        "from": "proc-column-pass",
+        "to": "dec-more-columns",
+        "role": "flow"
+      },
+      {
+        "id": "e12",
+        "from": "dec-more-columns",
+        "to": "proc-get-buckling-length",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e13",
+        "from": "dec-more-columns",
+        "to": "dec-all-pass",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e14",
+        "from": "dec-all-pass",
+        "to": "end-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e15",
+        "from": "dec-all-pass",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-ORDER-A43-P6",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": ["A20"],
+      "description": "法第20条の構造耐力に関する委任規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

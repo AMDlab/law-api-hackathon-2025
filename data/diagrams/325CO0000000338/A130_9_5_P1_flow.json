@@ -1,0 +1,231 @@
+{
+  "id": "A130_9_5_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "準工業地域の可燃性ガス製造",
+    "target_subject": "建築物",
+    "description": "準工業地域内で営むことができる可燃性ガスの製造の適合判定フロー"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "130の9の5",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "集団規定",
+    "用途",
+    "準工業地域"
+  ],
+  "text_raw": "法別表第二（ぬ）項第一号（十一）（法第八十七条第二項又は第三項において法第四十八条第十項の規定を準用する場合を含む。）の規定により政令で定める可燃性ガスの製造は、次に掲げるものとする。\n一　アセチレンガスの製造\n二　ガス事業法第二条第一項に規定する一般ガス事業又は同条第三項に規定する簡易ガス事業として行われる可燃性ガスの製造",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        { "type": "location", "value": "準工業地域" },
+        { "type": "use", "value": "可燃性ガスの製造を行う建築物" }
+      ],
+      "note": "準工業地域内で法別表第二（ぬ）項第一号（十一）に規定する可燃性ガスの製造を行う場合"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "id": "item1",
+          "description": "アセチレンガスの製造（第一号）"
+        },
+        {
+          "id": "item2",
+          "description": "ガス事業法に基づく一般ガス事業又は簡易ガス事業としての可燃性ガス製造（第二号）"
+        }
+      ]
+    }
+  },
+  "flow_diagram": {
+    "title": "令第130条の9の5第1項 適合判定フロー",
+    "description": "準工業地域内で営むことができる可燃性ガスの製造に該当するかを判定する",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "準工業地域内で可燃性ガスの製造を行う建築物の適合判定を開始"
+      },
+      {
+        "id": "dec-gas-type",
+        "type": "decision",
+        "title": "可燃性ガスの種類は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "アセチレンガス", "description": "アセチレンガスの製造" },
+          { "value": "その他の可燃性ガス", "description": "都市ガス等その他の可燃性ガス" }
+        ],
+        "description": "製造する可燃性ガスの種類を設計図書等から特定して判断"
+      },
+      {
+        "id": "proc-item1-match",
+        "type": "process",
+        "title": "第一号該当",
+        "process_type": "mechanical",
+        "description": "アセチレンガスの製造として第一号に該当"
+      },
+      {
+        "id": "dec-business-type",
+        "type": "decision",
+        "title": "事業形態は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "一般ガス事業", "description": "ガス事業法第2条第1項に規定する一般ガス事業" },
+          { "value": "簡易ガス事業", "description": "ガス事業法第2条第3項に規定する簡易ガス事業" },
+          { "value": "その他", "description": "上記以外の事業形態" }
+        ],
+        "description": "可燃性ガス製造の事業形態を特定",
+        "related_articles": ["ガス事業法第2条第1項", "ガス事業法第2条第3項"]
+      },
+      {
+        "id": "dec-general-gas",
+        "type": "decision",
+        "title": "一般ガス事業としての製造か？",
+        "decision_type": "binary",
+        "description": "ガス事業法第2条第1項に規定する一般ガス事業として行われる可燃性ガスの製造であるか確認"
+      },
+      {
+        "id": "proc-item2-match",
+        "type": "process",
+        "title": "第二号該当",
+        "process_type": "mechanical",
+        "description": "ガス事業法に基づく一般ガス事業又は簡易ガス事業としての製造として第二号に該当"
+      },
+      {
+        "id": "dec-simple-gas",
+        "type": "decision",
+        "title": "簡易ガス事業としての製造か？",
+        "decision_type": "binary",
+        "description": "ガス事業法第2条第3項に規定する簡易ガス事業として行われる可燃性ガスの製造であるか確認"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "準工業地域で営むことができる可燃性ガスの製造に該当"
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "準工業地域で営むことができる可燃性ガスの製造に該当しない"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-gas-type",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-gas-type",
+        "to": "proc-item1-match",
+        "role": "option",
+        "label": "アセチレンガス"
+      },
+      {
+        "id": "e03",
+        "from": "dec-gas-type",
+        "to": "dec-business-type",
+        "role": "option",
+        "label": "その他の可燃性ガス"
+      },
+      {
+        "id": "e04",
+        "from": "proc-item1-match",
+        "to": "end-pass",
+        "role": "flow"
+      },
+      {
+        "id": "e05",
+        "from": "dec-business-type",
+        "to": "dec-general-gas",
+        "role": "option",
+        "label": "一般ガス事業"
+      },
+      {
+        "id": "e06",
+        "from": "dec-business-type",
+        "to": "dec-simple-gas",
+        "role": "option",
+        "label": "簡易ガス事業"
+      },
+      {
+        "id": "e07",
+        "from": "dec-business-type",
+        "to": "end-fail",
+        "role": "option",
+        "label": "その他"
+      },
+      {
+        "id": "e08",
+        "from": "dec-general-gas",
+        "to": "proc-item2-match",
+        "role": "yes"
+      },
+      {
+        "id": "e09",
+        "from": "dec-general-gas",
+        "to": "end-fail",
+        "role": "no"
+      },
+      {
+        "id": "e10",
+        "from": "dec-simple-gas",
+        "to": "proc-item2-match",
+        "role": "yes"
+      },
+      {
+        "id": "e11",
+        "from": "dec-simple-gas",
+        "to": "end-fail",
+        "role": "no"
+      },
+      {
+        "id": "e12",
+        "from": "proc-item2-match",
+        "to": "end-pass",
+        "role": "flow"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "A130_9_5_P1_kijo",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": ["別表第二（ぬ）項第一号（十一）", "A48:P10", "A87:P2", "A87:P3"],
+      "description": "法別表第二（ぬ）項第一号（十一）の委任に基づき可燃性ガスの製造を規定"
+    },
+    {
+      "law_id": "339AC0000000051",
+      "law_name": "ガス事業法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A2:P1", "A2:P3"],
+      "description": "一般ガス事業及び簡易ガス事業の定義を参照"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00+09:00",
+    "author": "Claude",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

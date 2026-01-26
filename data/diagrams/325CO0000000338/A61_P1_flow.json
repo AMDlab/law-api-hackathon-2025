@@ -1,0 +1,344 @@
+{
+  "id": "A61_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "組積造のへいの構造基準",
+    "target_subject": "組積造のへい",
+    "description": "組積造のへいが各号の基準に適合しているか判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "61",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造規定",
+    "組積造"
+  ],
+  "text_raw": "組積造のへいは、次の各号に定めるところによらなければならない。一 高さは、一・二メートル以下とすること。二 各部分の壁の厚さは、その部分から壁頂までの垂直距離の十分の一以上とすること。三 長さ四メートル以下ごとに、壁面からその部分における壁の厚さの一・五倍以上突出した控壁（木造のものを除く。）を設けること。ただし、その部分における壁の厚さが前号の規定による壁の厚さの一・五倍以上ある場合においては、この限りでない。四 基礎の根入れの深さは、二十センチメートル以上とすること。",
+  "kijo_diagram_ref": "CHK-BSL-ORDER-A61-P1",
+  "flow_diagram": {
+    "title": "令61条第1項 組積造のへいの構造基準 適合判定フロー",
+    "description": "組積造のへいが第1号〜第4号の全ての基準に適合するか判定する",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "令61条第1項の適合判定を開始"
+      },
+      {
+        "id": "proc-height-read",
+        "type": "process",
+        "title": "へいの高さを読み取る",
+        "process_type": "undefined_input",
+        "description": "設計図書等から組積造のへいの高さHを読み取る"
+      },
+      {
+        "id": "dec-item1-height",
+        "type": "decision",
+        "title": "高さH ≦ 1.2mか？",
+        "decision_type": "binary",
+        "description": "第1号：へいの高さが1.2m以下であるか判定",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "H", "desc": "へいの高さ" },
+          "rhs": { "value": 1.2, "unit": "m" }
+        },
+        "related_articles": ["令61条第1項第1号"]
+      },
+      {
+        "id": "info-item1-ok",
+        "type": "information",
+        "title": "第1号適合",
+        "description": "高さ基準に適合"
+      },
+      {
+        "id": "proc-wall-read",
+        "type": "process",
+        "title": "各部分の壁厚・垂直距離を読み取る",
+        "process_type": "undefined_input",
+        "description": "各部分の壁の厚さTと壁頂までの垂直距離Dを読み取る"
+      },
+      {
+        "id": "dec-item2-thickness",
+        "type": "decision",
+        "title": "全部分でT ≧ D/10か？",
+        "decision_type": "binary",
+        "description": "第2号：各部分の壁の厚さが垂直距離の1/10以上であるか判定",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "T", "desc": "壁の厚さ" },
+          "rhs": { "var": "D/10", "desc": "垂直距離の1/10" }
+        },
+        "related_articles": ["令61条第1項第2号"]
+      },
+      {
+        "id": "info-item2-ok",
+        "type": "information",
+        "title": "第2号適合",
+        "description": "壁厚基準に適合"
+      },
+      {
+        "id": "proc-buttress-read",
+        "type": "process",
+        "title": "控壁の配置状況を読み取る",
+        "process_type": "undefined_input",
+        "description": "控壁の配置間隔S、突出長さP、材料Mを読み取る"
+      },
+      {
+        "id": "dec-item3-main",
+        "type": "decision",
+        "title": "4m以下ごとに適正な控壁があるか？",
+        "decision_type": "binary",
+        "description": "第3号本文：長さ4m以下ごとに壁厚の1.5倍以上突出した非木造控壁があるか（S≦4m、P≧T×1.5、M≠木造）",
+        "related_articles": ["令61条第1項第3号本文"]
+      },
+      {
+        "id": "info-item3-ok",
+        "type": "information",
+        "title": "第3号適合（本文）",
+        "description": "控壁配置基準に適合"
+      },
+      {
+        "id": "dec-item3-exception",
+        "type": "decision",
+        "title": "壁厚TL ≧ 基準厚×1.5か？",
+        "decision_type": "binary",
+        "description": "第3号ただし書：その部分の壁厚が第2号基準の1.5倍以上あるか",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "TL", "desc": "当該部分の壁厚" },
+          "rhs": { "var": "T_required * 1.5", "desc": "基準厚の1.5倍" }
+        },
+        "related_articles": ["令61条第1項第3号ただし書"]
+      },
+      {
+        "id": "info-item3-exception-ok",
+        "type": "information",
+        "title": "第3号適合（ただし書）",
+        "description": "壁厚増加による控壁省略が認められる"
+      },
+      {
+        "id": "proc-foundation-read",
+        "type": "process",
+        "title": "基礎根入れ深さを読み取る",
+        "process_type": "undefined_input",
+        "description": "設計図書等から基礎の根入れ深さFDを読み取る"
+      },
+      {
+        "id": "dec-item4-foundation",
+        "type": "decision",
+        "title": "根入れ深さFD ≧ 20cmか？",
+        "decision_type": "binary",
+        "description": "第4号：基礎の根入れ深さが20cm以上であるか判定",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "FD", "desc": "基礎の根入れ深さ" },
+          "rhs": { "value": 20, "unit": "cm" }
+        },
+        "related_articles": ["令61条第1項第4号"]
+      },
+      {
+        "id": "info-item4-ok",
+        "type": "information",
+        "title": "第4号適合",
+        "description": "基礎根入れ基準に適合"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令61条第1項の全ての号に適合"
+      },
+      {
+        "id": "end-fail-item1",
+        "type": "terminal",
+        "title": "不適合（第1号）",
+        "result": "fail",
+        "description": "高さが1.2mを超えている",
+        "related_articles": ["令61条第1項第1号"]
+      },
+      {
+        "id": "end-fail-item2",
+        "type": "terminal",
+        "title": "不適合（第2号）",
+        "result": "fail",
+        "description": "壁の厚さが不足している",
+        "related_articles": ["令61条第1項第2号"]
+      },
+      {
+        "id": "end-fail-item3",
+        "type": "terminal",
+        "title": "不適合（第3号）",
+        "result": "fail",
+        "description": "控壁の配置基準を満たさない",
+        "related_articles": ["令61条第1項第3号"]
+      },
+      {
+        "id": "end-fail-item4",
+        "type": "terminal",
+        "title": "不適合（第4号）",
+        "result": "fail",
+        "description": "基礎の根入れ深さが不足している",
+        "related_articles": ["令61条第1項第4号"]
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "proc-height-read",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "proc-height-read",
+        "to": "dec-item1-height",
+        "role": "flow"
+      },
+      {
+        "id": "e03",
+        "from": "dec-item1-height",
+        "to": "info-item1-ok",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e04",
+        "from": "dec-item1-height",
+        "to": "end-fail-item1",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e05",
+        "from": "info-item1-ok",
+        "to": "proc-wall-read",
+        "role": "flow"
+      },
+      {
+        "id": "e06",
+        "from": "proc-wall-read",
+        "to": "dec-item2-thickness",
+        "role": "flow"
+      },
+      {
+        "id": "e07",
+        "from": "dec-item2-thickness",
+        "to": "info-item2-ok",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e08",
+        "from": "dec-item2-thickness",
+        "to": "end-fail-item2",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e09",
+        "from": "info-item2-ok",
+        "to": "proc-buttress-read",
+        "role": "flow"
+      },
+      {
+        "id": "e10",
+        "from": "proc-buttress-read",
+        "to": "dec-item3-main",
+        "role": "flow"
+      },
+      {
+        "id": "e11",
+        "from": "dec-item3-main",
+        "to": "info-item3-ok",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e12",
+        "from": "dec-item3-main",
+        "to": "dec-item3-exception",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e13",
+        "from": "dec-item3-exception",
+        "to": "info-item3-exception-ok",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e14",
+        "from": "dec-item3-exception",
+        "to": "end-fail-item3",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e15",
+        "from": "info-item3-ok",
+        "to": "proc-foundation-read",
+        "role": "flow"
+      },
+      {
+        "id": "e16",
+        "from": "info-item3-exception-ok",
+        "to": "proc-foundation-read",
+        "role": "flow"
+      },
+      {
+        "id": "e17",
+        "from": "proc-foundation-read",
+        "to": "dec-item4-foundation",
+        "role": "flow"
+      },
+      {
+        "id": "e18",
+        "from": "dec-item4-foundation",
+        "to": "info-item4-ok",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e19",
+        "from": "dec-item4-foundation",
+        "to": "end-fail-item4",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e20",
+        "from": "info-item4-ok",
+        "to": "end-pass",
+        "role": "flow"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": ["A61"],
+      "description": "組積造に関する構造基準"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T12:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

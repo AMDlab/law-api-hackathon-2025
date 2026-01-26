@@ -1,0 +1,256 @@
+{
+  "id": "CHK-BSL-ORDER-A74-P1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "コンクリートの強度",
+    "target_subject": "コンクリート",
+    "description": "鉄筋コンクリート造に使用するコンクリートの強度基準を判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "74",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造規定",
+    "鉄筋コンクリート造"
+  ],
+  "text_raw": "鉄筋コンクリート造に使用するコンクリートの強度は、次に定めるものでなければならない。一 四週圧縮強度は、一平方ミリメートルにつき十二ニュートン（軽量骨材を使用する場合においては、九ニュートン）以上であること。二 設計基準強度（設計に際し採用する圧縮強度をいう。以下同じ。）との関係において国土交通大臣が安全上必要であると認めて定める基準に適合するものであること。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "structure",
+          "value": "鉄筋コンクリート造"
+        }
+      ],
+      "note": "鉄筋コンクリート造に使用するコンクリートに適用"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-item1-compliance",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "ref": "info-item2-compliance",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-aggregate-type-identify",
+        "type": "process",
+        "title": "骨材種別の特定",
+        "process_type": "undefined_input",
+        "description": "コンクリートに使用する骨材が軽量骨材か否かを特定"
+      },
+      {
+        "id": "info-aggregate-type",
+        "type": "information",
+        "title": "骨材の種別",
+        "symbol": "AG",
+        "subject": "コンクリート",
+        "property": "骨材種別",
+        "property_type": "classification",
+        "plurality": "single",
+        "description": "軽量骨材使用か、通常骨材使用か"
+      },
+      {
+        "id": "proc-four-week-strength-identify",
+        "type": "process",
+        "title": "四週圧縮強度の特定",
+        "process_type": "undefined_input",
+        "description": "コンクリートの四週圧縮強度を設計図書等から読み取る"
+      },
+      {
+        "id": "info-four-week-strength",
+        "type": "information",
+        "title": "四週圧縮強度",
+        "symbol": "F4",
+        "subject": "コンクリート",
+        "property": "四週圧縮強度",
+        "property_type": "numeric",
+        "unit": "N/mm2",
+        "plurality": "single",
+        "description": "コンクリートの四週圧縮強度の数値"
+      },
+      {
+        "id": "proc-item1-check",
+        "type": "process",
+        "title": "第1号基準判定",
+        "process_type": "mechanical",
+        "description": "四週圧縮強度が基準値以上か判定。通常骨材: 12N/mm2以上、軽量骨材: 9N/mm2以上",
+        "logic_expression": "(AG = 軽量骨材 → F4 >= 9) AND (AG != 軽量骨材 → F4 >= 12)"
+      },
+      {
+        "id": "info-item1-compliance",
+        "type": "information",
+        "title": "第1号基準適合",
+        "symbol": "C1",
+        "subject": "コンクリート",
+        "property": "第1号基準適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "四週圧縮強度が基準値以上であるか"
+      },
+      {
+        "id": "proc-design-strength-identify",
+        "type": "process",
+        "title": "設計基準強度の特定",
+        "process_type": "undefined_input",
+        "description": "設計に際し採用する圧縮強度を設計図書等から読み取る"
+      },
+      {
+        "id": "info-design-strength",
+        "type": "information",
+        "title": "設計基準強度",
+        "symbol": "Fc",
+        "subject": "コンクリート",
+        "property": "設計基準強度",
+        "property_type": "numeric",
+        "unit": "N/mm2",
+        "plurality": "single",
+        "description": "設計に際し採用する圧縮強度"
+      },
+      {
+        "id": "proc-item2-check",
+        "type": "process",
+        "title": "第2号基準判定",
+        "process_type": "human_judgment",
+        "description": "設計基準強度との関係において国土交通大臣が安全上必要であると認めて定める基準に適合するか判定",
+        "remarks": "国土交通大臣が定める基準への適合判断が必要"
+      },
+      {
+        "id": "info-item2-compliance",
+        "type": "information",
+        "title": "第2号基準適合",
+        "symbol": "C2",
+        "subject": "コンクリート",
+        "property": "第2号基準適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "国土交通大臣が定める基準に適合するか"
+      },
+      {
+        "id": "proc-final-judgment",
+        "type": "process",
+        "title": "コンクリート強度適合判定",
+        "process_type": "mechanical",
+        "description": "令74条第1項のコンクリート強度基準を満たすか判定",
+        "logic_expression": "C1 AND C2"
+      },
+      {
+        "id": "info-final",
+        "type": "information",
+        "title": "コンクリート強度適合",
+        "symbol": "R",
+        "subject": "コンクリート",
+        "property": "令74条第1項適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "令74条第1項のコンクリート強度基準に適合するか"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-aggregate-type-identify",
+        "to": "info-aggregate-type",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "proc-four-week-strength-identify",
+        "to": "info-four-week-strength",
+        "role": "output"
+      },
+      {
+        "id": "e03",
+        "from": "info-aggregate-type",
+        "to": "proc-item1-check",
+        "role": "input"
+      },
+      {
+        "id": "e04",
+        "from": "info-four-week-strength",
+        "to": "proc-item1-check",
+        "role": "input"
+      },
+      {
+        "id": "e05",
+        "from": "proc-item1-check",
+        "to": "info-item1-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e06",
+        "from": "proc-design-strength-identify",
+        "to": "info-design-strength",
+        "role": "output"
+      },
+      {
+        "id": "e07",
+        "from": "info-design-strength",
+        "to": "proc-item2-check",
+        "role": "input"
+      },
+      {
+        "id": "e08",
+        "from": "proc-item2-check",
+        "to": "info-item2-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e09",
+        "from": "info-item1-compliance",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e10",
+        "from": "info-item2-compliance",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e11",
+        "from": "proc-final-judgment",
+        "to": "info-final",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": [
+        "A20"
+      ],
+      "description": "構造耐力に関する基準"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-23T12:00:00Z",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

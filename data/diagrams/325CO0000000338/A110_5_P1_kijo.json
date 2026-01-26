@@ -1,0 +1,362 @@
+{
+  "id": "CHK-BSL-ORDER-A110_5-P1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "警報設備の技術的基準",
+    "target_subject": "建築物",
+    "description": "法第27条第1項第1号の政令で定める警報設備の技術的基準を判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "110_5",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "警報設備",
+    "技術的基準"
+  ],
+  "text_raw": "法第二十七条第一項第一号の政令で定める技術的基準は、当該建築物のいずれの室（火災の発生のおそれの少ないものとして国土交通大臣が定める室を除く。）で火災が発生した場合においても、有効かつ速やかに、当該火災の発生を感知し、当該建築物の各階に報知することができるよう、国土交通大臣が定めた構造方法を用いる警報設備が、国土交通大臣が定めるところにより適当な位置に設けられていることとする。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "reference",
+          "value": "法第27条第1項第1号に該当する建築物"
+        }
+      ],
+      "note": "法第27条第1項第1号の耐火建築物等としなければならない建築物に適用"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-alarm-structure",
+          "description": "国土交通大臣が定めた構造方法を用いていること"
+        },
+        {
+          "ref": "info-alarm-position",
+          "description": "国土交通大臣が定める適当な位置に設けられていること"
+        },
+        {
+          "ref": "info-detection-capability",
+          "description": "火災発生を有効かつ速やかに感知できること"
+        },
+        {
+          "ref": "info-notification-capability",
+          "description": "各階に報知できること"
+        }
+      ]
+    },
+    "exceptions": {
+      "operator": "NOT",
+      "conditions": [
+        {
+          "type": "room_exclusion",
+          "value": "火災の発生のおそれの少ない室として国土交通大臣が定める室"
+        }
+      ],
+      "effect": "当該室は火災感知対象から除外"
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "info-rooms-set",
+        "type": "information",
+        "title": "建築物の室",
+        "symbol": "R",
+        "subject": "建築物",
+        "property": "室の集合",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "判定対象となる建築物に属する室を特定（火災の発生のおそれの少ない室を除く）"
+      },
+      {
+        "id": "proc-rooms-identify",
+        "type": "process",
+        "title": "判定対象室の特定",
+        "process_type": "undefined_input",
+        "description": "建築物内の室のうち、火災発生のおそれの少ない室として国土交通大臣が定める室を除いた判定対象室を特定",
+        "remarks": "国土交通大臣告示により除外室を判定"
+      },
+      {
+        "id": "info-target-rooms",
+        "type": "information",
+        "title": "判定対象室",
+        "symbol": "TR",
+        "subject": "室",
+        "property": "判定対象か否か",
+        "property_type": "proposition",
+        "plurality": "multiple",
+        "description": "火災感知の対象となる室（除外室以外）"
+      },
+      {
+        "id": "proc-alarm-structure-check",
+        "type": "process",
+        "title": "警報設備構造方法の確認",
+        "process_type": "undefined_input",
+        "description": "警報設備が国土交通大臣が定めた構造方法を用いているか確認",
+        "remarks": "告示仕様への適合を確認"
+      },
+      {
+        "id": "info-alarm-structure",
+        "type": "information",
+        "title": "構造方法適合",
+        "symbol": "S",
+        "subject": "警報設備",
+        "property": "告示構造方法への適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "国土交通大臣が定めた構造方法を用いているか"
+      },
+      {
+        "id": "proc-alarm-position-check",
+        "type": "process",
+        "title": "設置位置の確認",
+        "process_type": "undefined_input",
+        "description": "警報設備が国土交通大臣が定める適当な位置に設けられているか確認",
+        "remarks": "告示に基づく設置位置要件への適合を確認"
+      },
+      {
+        "id": "info-alarm-position",
+        "type": "information",
+        "title": "設置位置適合",
+        "symbol": "P",
+        "subject": "警報設備",
+        "property": "設置位置の適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "国土交通大臣が定める適当な位置に設けられているか"
+      },
+      {
+        "id": "proc-detection-check",
+        "type": "process",
+        "title": "感知性能の判定",
+        "process_type": "mechanical",
+        "iteration": "iterative",
+        "description": "各判定対象室において、火災発生を有効かつ速やかに感知できるか判定",
+        "logic_expression": "∀r∈TR: detect(r) = true"
+      },
+      {
+        "id": "info-detection-capability",
+        "type": "information",
+        "title": "火災感知性能",
+        "symbol": "D",
+        "subject": "警報設備",
+        "property": "火災感知能力",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "いずれの室で火災が発生しても有効かつ速やかに感知できるか"
+      },
+      {
+        "id": "info-floors-set",
+        "type": "information",
+        "title": "建築物の階",
+        "symbol": "F",
+        "subject": "建築物",
+        "property": "階の集合",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "報知対象となる建築物の各階を特定"
+      },
+      {
+        "id": "proc-floors-identify",
+        "type": "process",
+        "title": "報知対象階の特定",
+        "process_type": "undefined_input",
+        "description": "建築物の各階を特定"
+      },
+      {
+        "id": "info-target-floors",
+        "type": "information",
+        "title": "各階",
+        "symbol": "TF",
+        "subject": "階",
+        "property": "報知対象",
+        "property_type": "proposition",
+        "plurality": "multiple",
+        "description": "報知対象となる各階"
+      },
+      {
+        "id": "proc-notification-check",
+        "type": "process",
+        "title": "報知性能の判定",
+        "process_type": "mechanical",
+        "iteration": "iterative",
+        "description": "各階に火災発生を報知できるか判定",
+        "logic_expression": "∀f∈TF: notify(f) = true"
+      },
+      {
+        "id": "info-notification-capability",
+        "type": "information",
+        "title": "報知性能",
+        "symbol": "N",
+        "subject": "警報設備",
+        "property": "各階報知能力",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "建築物の各階に報知できるか"
+      },
+      {
+        "id": "proc-final-judgment",
+        "type": "process",
+        "title": "技術的基準適合判定",
+        "process_type": "mechanical",
+        "description": "令110条の5の警報設備技術的基準を満たすか総合判定",
+        "logic_expression": "S AND P AND D AND N"
+      },
+      {
+        "id": "info-final",
+        "type": "information",
+        "title": "警報設備技術的基準適合",
+        "symbol": "Result",
+        "subject": "建築物",
+        "property": "警報設備技術的基準適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "令第110条の5の警報設備の技術的基準に適合するか"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "info-rooms-set",
+        "to": "proc-rooms-identify",
+        "role": "input"
+      },
+      {
+        "id": "e02",
+        "from": "proc-rooms-identify",
+        "to": "info-target-rooms",
+        "role": "output"
+      },
+      {
+        "id": "e03",
+        "from": "proc-alarm-structure-check",
+        "to": "info-alarm-structure",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "proc-alarm-position-check",
+        "to": "info-alarm-position",
+        "role": "output"
+      },
+      {
+        "id": "e05",
+        "from": "info-target-rooms",
+        "to": "proc-detection-check",
+        "role": "input"
+      },
+      {
+        "id": "e06",
+        "from": "info-alarm-structure",
+        "to": "proc-detection-check",
+        "role": "input"
+      },
+      {
+        "id": "e07",
+        "from": "info-alarm-position",
+        "to": "proc-detection-check",
+        "role": "input"
+      },
+      {
+        "id": "e08",
+        "from": "proc-detection-check",
+        "to": "info-detection-capability",
+        "role": "output"
+      },
+      {
+        "id": "e09",
+        "from": "info-floors-set",
+        "to": "proc-floors-identify",
+        "role": "input"
+      },
+      {
+        "id": "e10",
+        "from": "proc-floors-identify",
+        "to": "info-target-floors",
+        "role": "output"
+      },
+      {
+        "id": "e11",
+        "from": "info-target-floors",
+        "to": "proc-notification-check",
+        "role": "input"
+      },
+      {
+        "id": "e12",
+        "from": "info-alarm-structure",
+        "to": "proc-notification-check",
+        "role": "input"
+      },
+      {
+        "id": "e13",
+        "from": "info-alarm-position",
+        "to": "proc-notification-check",
+        "role": "input"
+      },
+      {
+        "id": "e14",
+        "from": "proc-notification-check",
+        "to": "info-notification-capability",
+        "role": "output"
+      },
+      {
+        "id": "e15",
+        "from": "info-alarm-structure",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e16",
+        "from": "info-alarm-position",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e17",
+        "from": "info-detection-capability",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e18",
+        "from": "info-notification-capability",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e19",
+        "from": "proc-final-judgment",
+        "to": "info-final",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": [
+        "A27:P1:I1"
+      ],
+      "description": "法第27条第1項第1号の耐火建築物等としなければならない建築物における警報設備の技術的基準を委任"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-23T12:00:00Z",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

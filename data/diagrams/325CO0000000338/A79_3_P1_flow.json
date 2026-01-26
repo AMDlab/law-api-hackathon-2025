@@ -1,0 +1,263 @@
+{
+  "id": "A79_3_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "鉄骨のかぶり厚さ",
+    "target_subject": "鉄骨鉄筋コンクリート造の部材",
+    "description": "鉄骨に対するコンクリートのかぶり厚さが5cm以上であることを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "79_3",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造規定",
+    "鉄骨鉄筋コンクリート造"
+  ],
+  "text_raw": "鉄骨に対するコンクリートのかぶり厚さは、五センチメートル以上としなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "structure",
+          "value": "鉄骨鉄筋コンクリート造"
+        }
+      ],
+      "note": "鉄骨鉄筋コンクリート造の建築物の部材が対象"
+    },
+    "judgment_rule": {
+      "operator": ">=",
+      "lhs": {
+        "ref": "info-cover-thickness",
+        "description": "コンクリートのかぶり厚さ"
+      },
+      "rhs": {
+        "value": 5,
+        "unit": "cm"
+      }
+    },
+    "exceptions": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "type": "designated_method",
+          "description": "国土交通大臣が定めた構造方法を用いる部材"
+        },
+        {
+          "type": "certification",
+          "description": "国土交通大臣の認定を受けた部材"
+        }
+      ],
+      "effect": "EXEMPT",
+      "note": "第2項による適用除外"
+    }
+  },
+  "flow_diagram": {
+    "title": "令第79条の3第1項 鉄骨のかぶり厚さ判定フロー",
+    "description": "鉄骨鉄筋コンクリート造部材の鉄骨に対するコンクリートのかぶり厚さが5cm以上であることを判定する",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "鉄骨のかぶり厚さ判定を開始"
+      },
+      {
+        "id": "proc-identify-parts",
+        "type": "process",
+        "title": "鉄骨鉄筋コンクリート造部材を特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から鉄骨鉄筋コンクリート造の部材を特定する"
+      },
+      {
+        "id": "decision-parts-exist",
+        "type": "decision",
+        "title": "鉄骨鉄筋コンクリート造部材があるか？",
+        "decision_type": "binary",
+        "description": "判定対象となる鉄骨鉄筋コンクリート造部材が存在するか確認"
+      },
+      {
+        "id": "proc-identify-thickness",
+        "type": "process",
+        "title": "各部材のかぶり厚さを特定",
+        "process_type": "undefined_input",
+        "description": "各部材における鉄骨に対するコンクリートのかぶり厚さを特定する"
+      },
+      {
+        "id": "info-thickness-values",
+        "type": "information",
+        "title": "かぶり厚さ",
+        "symbol": "T",
+        "subject": "鉄骨鉄筋コンクリート造部材",
+        "property": "コンクリートのかぶり厚さ",
+        "property_type": "numeric",
+        "description": "各部材における鉄骨に対するコンクリートのかぶり厚さ（cm）"
+      },
+      {
+        "id": "decision-thickness-check",
+        "type": "decision",
+        "title": "かぶり厚さ ≧ 5cm か？",
+        "decision_type": "binary",
+        "description": "各部材のかぶり厚さが5cm以上であるか判定",
+        "condition": {
+          "operator": "GTE",
+          "lhs": {
+            "var": "T",
+            "desc": "かぶり厚さ"
+          },
+          "rhs": {
+            "value": 5,
+            "unit": "cm"
+          }
+        }
+      },
+      {
+        "id": "proc-check-next-part",
+        "type": "process",
+        "title": "次の部材を確認",
+        "process_type": "mechanical",
+        "description": "未確認の部材があれば次の部材のかぶり厚さを確認する"
+      },
+      {
+        "id": "decision-all-parts-checked",
+        "type": "decision",
+        "title": "すべての部材を確認したか？",
+        "decision_type": "binary",
+        "description": "すべての鉄骨鉄筋コンクリート造部材のかぶり厚さを確認したか判定"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "すべての部材のかぶり厚さが5cm以上であり、令第79条の3第1項に適合"
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "かぶり厚さが5cm未満の部材があり、令第79条の3第1項に不適合"
+      },
+      {
+        "id": "end-not-applicable",
+        "type": "terminal",
+        "title": "対象外",
+        "result": "pass",
+        "description": "鉄骨鉄筋コンクリート造部材がないため、本規定は適用されない"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "proc-identify-parts",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "proc-identify-parts",
+        "to": "decision-parts-exist",
+        "role": "flow"
+      },
+      {
+        "id": "e03",
+        "from": "decision-parts-exist",
+        "to": "proc-identify-thickness",
+        "role": "yes",
+        "label": "あり"
+      },
+      {
+        "id": "e04",
+        "from": "decision-parts-exist",
+        "to": "end-not-applicable",
+        "role": "no",
+        "label": "なし"
+      },
+      {
+        "id": "e05",
+        "from": "proc-identify-thickness",
+        "to": "info-thickness-values",
+        "role": "output"
+      },
+      {
+        "id": "e06",
+        "from": "info-thickness-values",
+        "to": "decision-thickness-check",
+        "role": "input"
+      },
+      {
+        "id": "e07",
+        "from": "decision-thickness-check",
+        "to": "proc-check-next-part",
+        "role": "yes",
+        "label": "5cm以上"
+      },
+      {
+        "id": "e08",
+        "from": "decision-thickness-check",
+        "to": "end-fail",
+        "role": "no",
+        "label": "5cm未満"
+      },
+      {
+        "id": "e09",
+        "from": "proc-check-next-part",
+        "to": "decision-all-parts-checked",
+        "role": "flow"
+      },
+      {
+        "id": "e10",
+        "from": "decision-all-parts-checked",
+        "to": "end-pass",
+        "role": "yes",
+        "label": "すべて確認済み"
+      },
+      {
+        "id": "e11",
+        "from": "decision-all-parts-checked",
+        "to": "proc-identify-thickness",
+        "role": "no",
+        "label": "未確認あり"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-ORDER-A79_3-P1",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": [
+        "A20:P1"
+      ],
+      "description": "構造耐力に関する規定"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": [
+        "A79_3:P2"
+      ],
+      "description": "第2項による適用除外規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-01-26T12:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

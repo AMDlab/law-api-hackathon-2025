@@ -1,0 +1,220 @@
+{
+  "id": "CHK-BSL-ORDER-A130_2-P2",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "既存不適格建築物の条例適用除外規定",
+    "target_subject": "建築物",
+    "description": "法第49条の2に基づく条例における既存不適格建築物の適用除外規定への適合を判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "130_2",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": [
+    "集団規定",
+    "特定用途制限地域",
+    "既存不適格",
+    "条例"
+  ],
+  "text_raw": "法第四十九条の二の規定に基づく条例には、法第三条第二項の規定により当該条例の規定の適用を受けない建築物について、法第八十六条の七第一項の規定の例により当該条例に定める制限の適用の除外に関する規定を定めるものとする。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "特定用途制限地域内"
+        },
+        {
+          "type": "building_status",
+          "value": "法第3条第2項により条例の適用を受けない建築物（既存不適格建築物）"
+        }
+      ],
+      "note": "特定用途制限地域の区域区分は公共データのため、compliance_logicに記載"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-existing-nonconforming",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "ref": "info-exemption-compliance",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-identify-existing-status",
+        "type": "process",
+        "title": "既存不適格該当性の特定",
+        "process_type": "undefined_input",
+        "description": "当該建築物が法第3条第2項により条例の適用を受けない建築物（既存不適格建築物）に該当するかを特定"
+      },
+      {
+        "id": "info-existing-nonconforming",
+        "type": "information",
+        "title": "既存不適格建築物該当",
+        "symbol": "E",
+        "subject": "建築物",
+        "property": "既存不適格建築物該当性",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "法第3条第2項により当該条例の適用を受けない建築物に該当するか",
+        "related_articles": ["法::A3:P2"]
+      },
+      {
+        "id": "proc-identify-work-type",
+        "type": "process",
+        "title": "増改築等の行為の特定",
+        "process_type": "undefined_input",
+        "description": "既存不適格建築物に対して行う増改築、大規模修繕、大規模模様替等の行為を特定"
+      },
+      {
+        "id": "info-work-type",
+        "type": "information",
+        "title": "増改築等の行為種別",
+        "symbol": "W",
+        "subject": "建築物",
+        "property": "行為種別",
+        "property_type": "classification",
+        "plurality": "single",
+        "description": "増築、改築、大規模の修繕、大規模の模様替等の行為種別"
+      },
+      {
+        "id": "proc-check-exemption",
+        "type": "process",
+        "title": "条例適用除外規定適合判定",
+        "process_type": "human_judgment",
+        "description": "法第86条の7第1項の規定の例による条例の適用除外規定に適合するかを判定",
+        "logic_expression": "E AND (W ∈ 条例で定める適用除外対象行為)",
+        "related_articles": ["法::A86_7:P1"]
+      },
+      {
+        "id": "info-exemption-compliance",
+        "type": "information",
+        "title": "条例適用除外規定適合",
+        "symbol": "X",
+        "subject": "建築物",
+        "property": "条例適用除外規定適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "条例に定める適用除外規定に適合するか"
+      },
+      {
+        "id": "proc-final-judgment",
+        "type": "process",
+        "title": "令第130条の2第2項適合判定",
+        "process_type": "mechanical",
+        "description": "既存不適格建築物に対する条例制限の適用除外の総合判定",
+        "logic_expression": "E → X"
+      },
+      {
+        "id": "info-final",
+        "type": "information",
+        "title": "令第130条の2第2項適合",
+        "symbol": "R",
+        "subject": "建築物",
+        "property": "令第130条の2第2項適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "既存不適格建築物に対する条例適用除外規定に適合するか"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-identify-existing-status",
+        "to": "info-existing-nonconforming",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "proc-identify-work-type",
+        "to": "info-work-type",
+        "role": "output"
+      },
+      {
+        "id": "e03",
+        "from": "info-existing-nonconforming",
+        "to": "proc-check-exemption",
+        "role": "input"
+      },
+      {
+        "id": "e04",
+        "from": "info-work-type",
+        "to": "proc-check-exemption",
+        "role": "input"
+      },
+      {
+        "id": "e05",
+        "from": "proc-check-exemption",
+        "to": "info-exemption-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e06",
+        "from": "info-existing-nonconforming",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e07",
+        "from": "info-exemption-compliance",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e08",
+        "from": "proc-final-judgment",
+        "to": "info-final",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": ["A49_2"],
+      "description": "法第49条の2に基づく条例による用途制限"
+    },
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A3:P2"],
+      "description": "既存建築物等に対する制限の適用除外"
+    },
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A86_7:P1"],
+      "description": "既存不適格建築物に対する制限の緩和"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-25T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

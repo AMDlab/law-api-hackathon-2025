@@ -1,0 +1,256 @@
+{
+  "id": "A74_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "コンクリートの強度",
+    "target_subject": "コンクリート",
+    "description": "鉄筋コンクリート造に使用するコンクリートの強度基準を判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "74",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造規定",
+    "鉄筋コンクリート造"
+  ],
+  "text_raw": "鉄筋コンクリート造に使用するコンクリートの強度は、次に定めるものでなければならない。一 四週圧縮強度は、一平方ミリメートルにつき十二ニュートン（軽量骨材を使用する場合においては、九ニュートン）以上であること。二 設計基準強度（設計に際し採用する圧縮強度をいう。以下同じ。）との関係において国土交通大臣が安全上必要であると認めて定める基準に適合するものであること。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "structure",
+          "value": "鉄筋コンクリート造"
+        }
+      ],
+      "note": "鉄筋コンクリート造に使用するコンクリートに適用"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-item1-compliance",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "ref": "info-item2-compliance",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "flow_diagram": {
+    "title": "令74条第1項 コンクリート強度適合判定フロー",
+    "description": "鉄筋コンクリート造に使用するコンクリートの強度が基準を満たすか判定するフロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "令74条第1項 コンクリート強度の判定開始"
+      },
+      {
+        "id": "dec-aggregate-type",
+        "type": "decision",
+        "title": "骨材種別は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "軽量骨材", "description": "軽量骨材を使用" },
+          { "value": "通常骨材", "description": "通常骨材を使用" }
+        ],
+        "description": "コンクリートに使用する骨材の種別を確認"
+      },
+      {
+        "id": "dec-strength-lightweight",
+        "type": "decision",
+        "title": "四週圧縮強度 >= 9N/mm2か？",
+        "decision_type": "binary",
+        "description": "軽量骨材使用時: 四週圧縮強度が9N/mm2以上か判定",
+        "condition": {
+          "operator": "GTE",
+          "lhs": {
+            "var": "F4",
+            "desc": "四週圧縮強度"
+          },
+          "rhs": {
+            "value": 9,
+            "unit": "N/mm2"
+          }
+        }
+      },
+      {
+        "id": "dec-strength-normal",
+        "type": "decision",
+        "title": "四週圧縮強度 >= 12N/mm2か？",
+        "decision_type": "binary",
+        "description": "通常骨材使用時: 四週圧縮強度が12N/mm2以上か判定",
+        "condition": {
+          "operator": "GTE",
+          "lhs": {
+            "var": "F4",
+            "desc": "四週圧縮強度"
+          },
+          "rhs": {
+            "value": 12,
+            "unit": "N/mm2"
+          }
+        }
+      },
+      {
+        "id": "proc-item1-pass",
+        "type": "process",
+        "title": "第1号基準適合",
+        "process_type": "mechanical",
+        "description": "四週圧縮強度が基準値以上であり、第1号基準に適合"
+      },
+      {
+        "id": "dec-item2-minister-standard",
+        "type": "decision",
+        "title": "国土交通大臣が定める基準に適合するか？",
+        "decision_type": "binary",
+        "description": "設計基準強度との関係において国土交通大臣が安全上必要であると認めて定める基準に適合するか判定",
+        "related_articles": ["告示"]
+      },
+      {
+        "id": "proc-item2-pass",
+        "type": "process",
+        "title": "第2号基準適合",
+        "process_type": "human_judgment",
+        "description": "国土交通大臣が定める基準に適合し、第2号基準に適合"
+      },
+      {
+        "id": "proc-both-items-pass",
+        "type": "process",
+        "title": "第1号・第2号基準ともに適合",
+        "process_type": "mechanical",
+        "description": "両方の基準を満たしたことを確認"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令74条第1項の基準に適合"
+      },
+      {
+        "id": "end-fail-item1",
+        "type": "terminal",
+        "title": "不適合（第1号基準）",
+        "result": "fail",
+        "description": "四週圧縮強度が基準値未満のため不適合"
+      },
+      {
+        "id": "end-fail-item2",
+        "type": "terminal",
+        "title": "不適合（第2号基準）",
+        "result": "fail",
+        "description": "国土交通大臣が定める基準に適合しないため不適合"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-aggregate-type",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-aggregate-type",
+        "to": "dec-strength-lightweight",
+        "role": "option",
+        "label": "軽量骨材"
+      },
+      {
+        "id": "e03",
+        "from": "dec-aggregate-type",
+        "to": "dec-strength-normal",
+        "role": "option",
+        "label": "通常骨材"
+      },
+      {
+        "id": "e04",
+        "from": "dec-strength-lightweight",
+        "to": "proc-item1-pass",
+        "role": "yes"
+      },
+      {
+        "id": "e05",
+        "from": "dec-strength-lightweight",
+        "to": "end-fail-item1",
+        "role": "no"
+      },
+      {
+        "id": "e06",
+        "from": "dec-strength-normal",
+        "to": "proc-item1-pass",
+        "role": "yes"
+      },
+      {
+        "id": "e07",
+        "from": "dec-strength-normal",
+        "to": "end-fail-item1",
+        "role": "no"
+      },
+      {
+        "id": "e08",
+        "from": "proc-item1-pass",
+        "to": "dec-item2-minister-standard",
+        "role": "flow"
+      },
+      {
+        "id": "e09",
+        "from": "dec-item2-minister-standard",
+        "to": "proc-item2-pass",
+        "role": "yes"
+      },
+      {
+        "id": "e10",
+        "from": "dec-item2-minister-standard",
+        "to": "end-fail-item2",
+        "role": "no"
+      },
+      {
+        "id": "e11",
+        "from": "proc-item2-pass",
+        "to": "proc-both-items-pass",
+        "role": "flow"
+      },
+      {
+        "id": "e12",
+        "from": "proc-both-items-pass",
+        "to": "end-pass",
+        "role": "flow"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-ORDER-A74-P1",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": ["A20"],
+      "description": "構造耐力に関する基準"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T12:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

@@ -1,0 +1,431 @@
+{
+  "id": "A78_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "はりの構造",
+    "target_subject": "はり",
+    "description": "構造耐力上主要な部分であるはりの構造基準（複筋ばり・あばら筋配置）を判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "78",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造規定",
+    "鉄筋コンクリート造"
+  ],
+  "text_raw": "構造耐力上主要な部分であるはりは、複筋ばりとし、これにあばら筋をはりの丈の四分の三（臥梁にあつては、三十センチメートル）以下の間隔で配置しなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "subject",
+          "value": "構造耐力上主要な部分であるはり"
+        }
+      ],
+      "note": "構造耐力上主要な部分であるはりに適用"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-fukukin-compliance",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "ref": "info-stirrup-compliance",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "flow_diagram": {
+    "title": "令第78条第1項 はりの構造適合判定フロー",
+    "description": "構造耐力上主要な部分であるはりが複筋ばりであり、あばら筋間隔が基準以下であるかを判定するフロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "令第78条第1項の適合判定を開始"
+      },
+      {
+        "id": "info-beam-set",
+        "type": "information",
+        "title": "建築物のはり",
+        "symbol": "BS",
+        "subject": "建築物",
+        "property": "構造耐力上主要な部分であるはりの集合",
+        "property_type": "set_definition",
+        "description": "判定対象となる建築物に属する構造耐力上主要な部分であるはりを特定"
+      },
+      {
+        "id": "dec-has-beam",
+        "type": "decision",
+        "title": "構造耐力上主要な部分であるはりがあるか？",
+        "decision_type": "binary",
+        "description": "判定対象となるはりが存在するか確認"
+      },
+      {
+        "id": "proc-fukukin-identify",
+        "type": "process",
+        "title": "複筋ばり構造の確認",
+        "process_type": "undefined_input",
+        "description": "各はりが複筋ばり構造であるか確認"
+      },
+      {
+        "id": "info-fukukin-status",
+        "type": "information",
+        "title": "複筋ばり構造",
+        "symbol": "FK",
+        "subject": "はり",
+        "property": "複筋ばり構造であるか",
+        "property_type": "proposition",
+        "description": "各はりが複筋ばり構造であるか"
+      },
+      {
+        "id": "dec-all-fukukin",
+        "type": "decision",
+        "title": "全てのはりが複筋ばりか？",
+        "decision_type": "binary",
+        "description": "∀b∈BS: FK(b) = true を満たすか判定",
+        "condition": {
+          "operator": "EQ",
+          "lhs": { "var": "FK", "desc": "複筋ばり構造" },
+          "rhs": { "value": true, "desc": "全て複筋ばり" }
+        }
+      },
+      {
+        "id": "proc-beam-type-identify",
+        "type": "process",
+        "title": "はり種別の特定",
+        "process_type": "undefined_input",
+        "description": "各はりが臥梁か通常のはりかを特定"
+      },
+      {
+        "id": "info-beam-type",
+        "type": "information",
+        "title": "はりの種別",
+        "symbol": "BT",
+        "subject": "はり",
+        "property": "種別",
+        "property_type": "classification",
+        "description": "臥梁または通常のはり"
+      },
+      {
+        "id": "dec-beam-type",
+        "type": "decision",
+        "title": "はりの種別は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "臥梁", "description": "臥梁の場合" },
+          { "value": "通常のはり", "description": "臥梁以外の通常のはり" }
+        ],
+        "description": "はりが臥梁か通常のはりかで許容間隔の算定方法が異なる"
+      },
+      {
+        "id": "proc-beam-depth-identify",
+        "type": "process",
+        "title": "はりの丈の特定",
+        "process_type": "undefined_input",
+        "description": "各はりの丈を特定"
+      },
+      {
+        "id": "info-beam-depth",
+        "type": "information",
+        "title": "はりの丈",
+        "symbol": "D",
+        "subject": "はり",
+        "property": "丈",
+        "property_type": "numeric",
+        "description": "各はりの丈の寸法（単位: cm）"
+      },
+      {
+        "id": "proc-max-interval-calc-garyo",
+        "type": "process",
+        "title": "許容間隔の設定（臥梁）",
+        "process_type": "mechanical",
+        "description": "臥梁の許容間隔を30cmに設定"
+      },
+      {
+        "id": "info-max-interval-garyo",
+        "type": "information",
+        "title": "許容間隔（臥梁）",
+        "symbol": "MAX_SI",
+        "subject": "臥梁",
+        "property": "許容間隔",
+        "property_type": "numeric",
+        "description": "臥梁のあばら筋配置許容間隔: 30cm"
+      },
+      {
+        "id": "proc-max-interval-calc-normal",
+        "type": "process",
+        "title": "許容間隔の算定（通常のはり）",
+        "process_type": "mechanical",
+        "description": "通常のはりの許容間隔を丈の3/4で算定: D × 3/4"
+      },
+      {
+        "id": "info-max-interval-normal",
+        "type": "information",
+        "title": "許容間隔（通常のはり）",
+        "symbol": "MAX_SI",
+        "subject": "はり",
+        "property": "許容間隔",
+        "property_type": "numeric",
+        "description": "通常のはりのあばら筋配置許容間隔: 丈の3/4"
+      },
+      {
+        "id": "proc-stirrup-interval-identify",
+        "type": "process",
+        "title": "あばら筋間隔の特定",
+        "process_type": "undefined_input",
+        "description": "各はりのあばら筋配置間隔を特定"
+      },
+      {
+        "id": "info-stirrup-interval",
+        "type": "information",
+        "title": "あばら筋間隔",
+        "symbol": "SI",
+        "subject": "はり",
+        "property": "あばら筋の配置間隔",
+        "property_type": "numeric",
+        "description": "各はりにおけるあばら筋の配置間隔"
+      },
+      {
+        "id": "dec-stirrup-interval",
+        "type": "decision",
+        "title": "あばら筋間隔 ≤ 許容間隔か？",
+        "decision_type": "binary",
+        "description": "SI ≤ MAX_SI を満たすか判定",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "SI", "desc": "あばら筋間隔" },
+          "rhs": { "var": "MAX_SI", "desc": "許容間隔" }
+        }
+      },
+      {
+        "id": "dec-all-beams-checked",
+        "type": "decision",
+        "title": "全てのはりを確認したか？",
+        "decision_type": "binary",
+        "description": "全てのはりについてあばら筋間隔の確認が完了したか"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令第78条第1項に適合",
+        "related_articles": ["令第78条第1項"]
+      },
+      {
+        "id": "end-fail-fukukin",
+        "type": "terminal",
+        "title": "不適合（複筋ばり要件）",
+        "result": "fail",
+        "description": "複筋ばりでないはりが存在するため不適合",
+        "related_articles": ["令第78条第1項"]
+      },
+      {
+        "id": "end-fail-stirrup",
+        "type": "terminal",
+        "title": "不適合（あばら筋間隔）",
+        "result": "fail",
+        "description": "あばら筋間隔が許容値を超えるはりが存在するため不適合",
+        "related_articles": ["令第78条第1項"]
+      },
+      {
+        "id": "end-na",
+        "type": "terminal",
+        "title": "対象外",
+        "result": "end",
+        "description": "構造耐力上主要な部分であるはりが存在しないため対象外"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "info-beam-set",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "info-beam-set",
+        "to": "dec-has-beam",
+        "role": "flow"
+      },
+      {
+        "id": "e03",
+        "from": "dec-has-beam",
+        "to": "proc-fukukin-identify",
+        "role": "yes",
+        "label": "あり"
+      },
+      {
+        "id": "e04",
+        "from": "dec-has-beam",
+        "to": "end-na",
+        "role": "no",
+        "label": "なし"
+      },
+      {
+        "id": "e05",
+        "from": "proc-fukukin-identify",
+        "to": "info-fukukin-status",
+        "role": "flow"
+      },
+      {
+        "id": "e06",
+        "from": "info-fukukin-status",
+        "to": "dec-all-fukukin",
+        "role": "flow"
+      },
+      {
+        "id": "e07",
+        "from": "dec-all-fukukin",
+        "to": "proc-beam-type-identify",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e08",
+        "from": "dec-all-fukukin",
+        "to": "end-fail-fukukin",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e09",
+        "from": "proc-beam-type-identify",
+        "to": "info-beam-type",
+        "role": "flow"
+      },
+      {
+        "id": "e10",
+        "from": "info-beam-type",
+        "to": "dec-beam-type",
+        "role": "flow"
+      },
+      {
+        "id": "e11",
+        "from": "dec-beam-type",
+        "to": "proc-max-interval-calc-garyo",
+        "role": "option",
+        "label": "臥梁"
+      },
+      {
+        "id": "e12",
+        "from": "dec-beam-type",
+        "to": "proc-beam-depth-identify",
+        "role": "option",
+        "label": "通常のはり"
+      },
+      {
+        "id": "e13",
+        "from": "proc-max-interval-calc-garyo",
+        "to": "info-max-interval-garyo",
+        "role": "flow"
+      },
+      {
+        "id": "e14",
+        "from": "info-max-interval-garyo",
+        "to": "proc-stirrup-interval-identify",
+        "role": "flow"
+      },
+      {
+        "id": "e15",
+        "from": "proc-beam-depth-identify",
+        "to": "info-beam-depth",
+        "role": "flow"
+      },
+      {
+        "id": "e16",
+        "from": "info-beam-depth",
+        "to": "proc-max-interval-calc-normal",
+        "role": "flow"
+      },
+      {
+        "id": "e17",
+        "from": "proc-max-interval-calc-normal",
+        "to": "info-max-interval-normal",
+        "role": "flow"
+      },
+      {
+        "id": "e18",
+        "from": "info-max-interval-normal",
+        "to": "proc-stirrup-interval-identify",
+        "role": "flow"
+      },
+      {
+        "id": "e19",
+        "from": "proc-stirrup-interval-identify",
+        "to": "info-stirrup-interval",
+        "role": "flow"
+      },
+      {
+        "id": "e20",
+        "from": "info-stirrup-interval",
+        "to": "dec-stirrup-interval",
+        "role": "flow"
+      },
+      {
+        "id": "e21",
+        "from": "dec-stirrup-interval",
+        "to": "dec-all-beams-checked",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e22",
+        "from": "dec-stirrup-interval",
+        "to": "end-fail-stirrup",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e23",
+        "from": "dec-all-beams-checked",
+        "to": "end-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e24",
+        "from": "dec-all-beams-checked",
+        "to": "proc-beam-type-identify",
+        "role": "no",
+        "label": "いいえ（次のはりへ）"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-ORDER-A78-P1",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": ["A20"],
+      "description": "構造耐力に関する規定の委任元"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

@@ -1,0 +1,256 @@
+{
+  "id": "A64_P2_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "鋳鉄の使用制限",
+    "target_subject": "構造耐力上主要な部分",
+    "description": "鋳鉄が使用される部分における応力種別の判定フロー"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "64",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造規定",
+    "鉄骨造",
+    "材料"
+  ],
+  "text_raw": "鋳鉄は、圧縮応力又は接触応力以外の応力が存在する部分には、使用してはならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "structure",
+          "value": "鉄骨造の建築物"
+        },
+        {
+          "type": "material",
+          "value": "構造耐力上主要な部分に鋳鉄を使用"
+        }
+      ],
+      "note": "第1項により鉄骨造の建築物の構造耐力上主要な部分に鋳鉄を使用する場合に適用"
+    },
+    "judgment_rule": {
+      "operator": "FORALL",
+      "conditions": [
+        {
+          "ref": "info-stress-check",
+          "operator": "==",
+          "value": true,
+          "description": "すべての鋳鉄使用部分について、圧縮応力又は接触応力のみが存在すること"
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "flow_diagram": {
+    "title": "令64条2項 鋳鉄の応力制限判定フロー",
+    "description": "鋳鉄使用部分に存在する応力が圧縮応力又は接触応力のみかを判定する",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "鋳鉄使用部分の応力制限判定を開始"
+      },
+      {
+        "id": "dec-cast-iron-used",
+        "type": "decision",
+        "title": "構造耐力上主要な部分に鋳鉄を使用しているか？",
+        "decision_type": "binary",
+        "description": "設計図書等から鋳鉄使用箇所の有無を確認"
+      },
+      {
+        "id": "proc-identify-parts",
+        "type": "process",
+        "title": "鋳鉄使用部分を特定",
+        "process_type": "undefined_input",
+        "description": "構造耐力上主要な部分のうち、鋳鉄が使用されている部分を設計図書から読み取る"
+      },
+      {
+        "id": "proc-identify-stress",
+        "type": "process",
+        "title": "各部分の応力種別を特定",
+        "process_type": "undefined_input",
+        "description": "各鋳鉄使用部分に存在する応力の種別（圧縮、接触、引張、曲げ、せん断等）を構造計算書から読み取る"
+      },
+      {
+        "id": "dec-stress-type",
+        "type": "decision",
+        "title": "存在する応力の種別は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "圧縮応力のみ", "description": "圧縮応力のみが存在" },
+          { "value": "接触応力のみ", "description": "接触応力のみが存在" },
+          { "value": "圧縮応力と接触応力のみ", "description": "圧縮応力と接触応力の両方が存在" },
+          { "value": "その他の応力あり", "description": "引張応力、曲げ応力、せん断応力等が存在" }
+        ],
+        "description": "各鋳鉄使用部分の応力種別を確認"
+      },
+      {
+        "id": "proc-part-compliant",
+        "type": "process",
+        "title": "当該部分は応力条件を満たす",
+        "process_type": "mechanical",
+        "description": "圧縮応力又は接触応力のみなので適合"
+      },
+      {
+        "id": "dec-more-parts",
+        "type": "decision",
+        "title": "未確認の鋳鉄使用部分があるか？",
+        "decision_type": "binary",
+        "description": "他に確認すべき鋳鉄使用部分の有無"
+      },
+      {
+        "id": "dec-all-parts-compliant",
+        "type": "decision",
+        "title": "すべての鋳鉄使用部分が応力条件を満たしたか？",
+        "decision_type": "binary",
+        "description": "全部分が圧縮応力又は接触応力のみであることを確認"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "すべての鋳鉄使用部分が圧縮応力又は接触応力のみであり、令64条2項に適合"
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "圧縮応力又は接触応力以外の応力が存在する部分に鋳鉄を使用しており、令64条2項に不適合"
+      },
+      {
+        "id": "end-not-applicable",
+        "type": "terminal",
+        "title": "適用対象外",
+        "result": "pass",
+        "description": "構造耐力上主要な部分に鋳鉄を使用していないため、本項は適用されない"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-cast-iron-used",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-cast-iron-used",
+        "to": "proc-identify-parts",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "dec-cast-iron-used",
+        "to": "end-not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e04",
+        "from": "proc-identify-parts",
+        "to": "proc-identify-stress",
+        "role": "flow"
+      },
+      {
+        "id": "e05",
+        "from": "proc-identify-stress",
+        "to": "dec-stress-type",
+        "role": "flow"
+      },
+      {
+        "id": "e06",
+        "from": "dec-stress-type",
+        "to": "proc-part-compliant",
+        "role": "option",
+        "label": "圧縮応力のみ"
+      },
+      {
+        "id": "e07",
+        "from": "dec-stress-type",
+        "to": "proc-part-compliant",
+        "role": "option",
+        "label": "接触応力のみ"
+      },
+      {
+        "id": "e08",
+        "from": "dec-stress-type",
+        "to": "proc-part-compliant",
+        "role": "option",
+        "label": "圧縮応力と接触応力のみ"
+      },
+      {
+        "id": "e09",
+        "from": "dec-stress-type",
+        "to": "end-fail",
+        "role": "option",
+        "label": "その他の応力あり"
+      },
+      {
+        "id": "e10",
+        "from": "proc-part-compliant",
+        "to": "dec-more-parts",
+        "role": "flow"
+      },
+      {
+        "id": "e11",
+        "from": "dec-more-parts",
+        "to": "proc-identify-stress",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e12",
+        "from": "dec-more-parts",
+        "to": "dec-all-parts-compliant",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e13",
+        "from": "dec-all-parts-compliant",
+        "to": "end-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e14",
+        "from": "dec-all-parts-compliant",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-ORDER-A64-P2",
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": ["A64:P1"],
+      "description": "第1項で鉄骨造の構造耐力上主要な部分の材料として鋳鉄を認めている"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

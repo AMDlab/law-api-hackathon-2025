@@ -1,0 +1,494 @@
+{
+  "id": "A128_3_2_P1_I1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "無窓居室の判定フロー（床面積50m2超）",
+    "target_subject": "居室",
+    "description": "床面積50平方メートルを超える居室について、開口部面積による無窓居室該当性を判定するフローチャート"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "128の3の2",
+    "paragraph": "1",
+    "item": "1"
+  },
+  "labels": [
+    "単体規定",
+    "内装制限",
+    "無窓居室"
+  ],
+  "text_raw": "床面積が五十平方メートルを超える居室で窓その他の開口部の開放できる部分（天井又は壁（床面から天井までの垂直距離に応じて国土交通大臣が定める部分に限る。）にある部分に限る。）の面積の合計が、当該居室の床面積の五十分の一（火災時に生ずる煙を有効に排出することができるものとして国土交通大臣が定めた構造方法を用いる給気口及び排気口を有する場合にあつては、給気口の開口面積、排気口の高さ及び居室の床面積に応じて国土交通大臣が定める方法により算出した割合）未満のもの",
+  "kijo_diagram_ref": "CHK-BSL-ORD-A128_3_2-P1-I1",
+  "flow_diagram": {
+    "title": "無窓居室（床面積50m2超）該当判定フロー",
+    "description": "令第128条の3の2第1項第1号に基づく無窓居室の該当性を判定するフローチャート",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "居室ごとに無窓居室該当性を判定"
+      },
+      {
+        "id": "dec-building-identified",
+        "type": "decision",
+        "title": "判定対象建築物が明確か？",
+        "decision_type": "binary",
+        "description": "設計図書等から判定対象となる建築物が特定されているか"
+      },
+      {
+        "id": "proc-building-input",
+        "type": "process",
+        "title": "建築物情報の入力",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物情報を入力"
+      },
+      {
+        "id": "dec-rooms-identified",
+        "type": "decision",
+        "title": "居室が特定されているか？",
+        "decision_type": "binary",
+        "description": "建築物に含まれる全ての居室が特定されているか"
+      },
+      {
+        "id": "proc-rooms-input",
+        "type": "process",
+        "title": "居室情報の入力",
+        "process_type": "undefined_input",
+        "description": "設計図書等から居室情報を入力"
+      },
+      {
+        "id": "dec-floor-area-available",
+        "type": "decision",
+        "title": "居室の床面積は明らかか？",
+        "decision_type": "binary",
+        "description": "設計図書等から各居室の床面積が読み取れるか"
+      },
+      {
+        "id": "proc-floor-area-input",
+        "type": "process",
+        "title": "床面積の入力",
+        "process_type": "undefined_input",
+        "description": "設計図書等から床面積を入力"
+      },
+      {
+        "id": "dec-floor-area-over-50",
+        "type": "decision",
+        "title": "床面積 > 50m2 か？",
+        "decision_type": "binary",
+        "description": "居室の床面積が50平方メートルを超えるか判定",
+        "condition": {
+          "operator": "GT",
+          "lhs": { "var": "A_floor", "desc": "居室の床面積" },
+          "rhs": { "value": 50, "unit": "m2" }
+        }
+      },
+      {
+        "id": "proc-not-applicable-floor",
+        "type": "process",
+        "title": "本号適用対象外（床面積）",
+        "process_type": "mechanical",
+        "description": "床面積50m2以下のため本号の無窓居室に該当しない"
+      },
+      {
+        "id": "dec-ceiling-height-available",
+        "type": "decision",
+        "title": "天井高さは明らかか？",
+        "decision_type": "binary",
+        "description": "設計図書等から各居室の天井高さが読み取れるか"
+      },
+      {
+        "id": "proc-ceiling-height-input",
+        "type": "process",
+        "title": "天井高さの入力",
+        "process_type": "undefined_input",
+        "description": "設計図書等から天井高さを入力"
+      },
+      {
+        "id": "dec-ceiling-height-6m-or-less",
+        "type": "decision",
+        "title": "天井高 <= 6m か？",
+        "decision_type": "binary",
+        "description": "居室の天井高が6m以下か判定（6mを超える居室は柱書により適用除外）",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "H_ceil", "desc": "居室の天井高さ" },
+          "rhs": { "value": 6, "unit": "m" }
+        }
+      },
+      {
+        "id": "proc-not-applicable-ceiling",
+        "type": "process",
+        "title": "本号適用対象外（天井高）",
+        "process_type": "mechanical",
+        "description": "天井高6m超のため本号の無窓居室に該当しない（柱書除外規定）"
+      },
+      {
+        "id": "dec-openings-identified",
+        "type": "decision",
+        "title": "開口部が特定されているか？",
+        "decision_type": "binary",
+        "description": "居室の窓その他の開口部が特定されているか"
+      },
+      {
+        "id": "proc-openings-input",
+        "type": "process",
+        "title": "開口部情報の入力",
+        "process_type": "undefined_input",
+        "description": "設計図書等から開口部情報を入力"
+      },
+      {
+        "id": "dec-openable-area-available",
+        "type": "decision",
+        "title": "開放可能面積は明らかか？",
+        "decision_type": "binary",
+        "description": "各開口部の開放できる部分の面積が読み取れるか（天井又は壁の国交大臣が定める部分にある部分に限る）"
+      },
+      {
+        "id": "proc-openable-area-input",
+        "type": "process",
+        "title": "開放可能面積の入力",
+        "process_type": "undefined_input",
+        "description": "設計図書等から開放可能面積を入力"
+      },
+      {
+        "id": "proc-total-openable-calc",
+        "type": "process",
+        "title": "開放可能面積合計を算出",
+        "process_type": "mechanical",
+        "description": "各居室について開口部の開放可能面積の合計を算出"
+      },
+      {
+        "id": "dec-ventilation-equipment",
+        "type": "decision",
+        "title": "告示の給排気設備を有するか？",
+        "decision_type": "binary",
+        "description": "火災時に生ずる煙を有効に排出する国交大臣告示の給気口・排気口を有するか"
+      },
+      {
+        "id": "proc-ratio-standard",
+        "type": "process",
+        "title": "必要開口割合 = 1/50",
+        "process_type": "mechanical",
+        "description": "給排気設備がない場合、必要開口割合は床面積の1/50"
+      },
+      {
+        "id": "proc-ratio-kokushi",
+        "type": "process",
+        "title": "告示方法により必要開口割合を算出",
+        "process_type": "mechanical",
+        "description": "給気口の開口面積、排気口の高さ及び居室の床面積に応じて国交大臣告示の方法により算出"
+      },
+      {
+        "id": "proc-actual-ratio-calc",
+        "type": "process",
+        "title": "実開口割合を算出",
+        "process_type": "mechanical",
+        "description": "開放可能面積合計 / 床面積 により実開口割合を算出"
+      },
+      {
+        "id": "dec-ratio-compare",
+        "type": "decision",
+        "title": "実開口割合 < 必要開口割合 か？",
+        "decision_type": "binary",
+        "description": "実際の開口割合が必要開口割合未満か判定",
+        "condition": {
+          "operator": "LT",
+          "lhs": { "var": "R_act", "desc": "実開口割合" },
+          "rhs": { "var": "R_req", "desc": "必要開口割合" }
+        }
+      },
+      {
+        "id": "proc-ratio-sufficient",
+        "type": "process",
+        "title": "開口割合充足",
+        "process_type": "mechanical",
+        "description": "開口割合が必要開口割合以上のため本号の無窓居室に該当しない"
+      },
+      {
+        "id": "proc-all-conditions-met",
+        "type": "process",
+        "title": "全条件該当（本号無窓居室）",
+        "process_type": "mechanical",
+        "description": "床面積50m2超、天井高6m以下、開口割合不足の全条件を満たす"
+      },
+      {
+        "id": "end-musou",
+        "type": "terminal",
+        "title": "本号の無窓居室に該当",
+        "result": "fail",
+        "description": "令第128条の3の2第1項第1号の無窓居室に該当し、内装制限の適用対象となる"
+      },
+      {
+        "id": "end-not-musou",
+        "type": "terminal",
+        "title": "本号の無窓居室に非該当",
+        "result": "pass",
+        "description": "令第128条の3の2第1項第1号の無窓居室に該当しない"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-building-identified",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-building-identified",
+        "to": "dec-rooms-identified",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "dec-building-identified",
+        "to": "proc-building-input",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e04",
+        "from": "proc-building-input",
+        "to": "dec-rooms-identified",
+        "role": "flow"
+      },
+      {
+        "id": "e05",
+        "from": "dec-rooms-identified",
+        "to": "dec-floor-area-available",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e06",
+        "from": "dec-rooms-identified",
+        "to": "proc-rooms-input",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e07",
+        "from": "proc-rooms-input",
+        "to": "dec-floor-area-available",
+        "role": "flow"
+      },
+      {
+        "id": "e08",
+        "from": "dec-floor-area-available",
+        "to": "dec-floor-area-over-50",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e09",
+        "from": "dec-floor-area-available",
+        "to": "proc-floor-area-input",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e10",
+        "from": "proc-floor-area-input",
+        "to": "dec-floor-area-over-50",
+        "role": "flow"
+      },
+      {
+        "id": "e11",
+        "from": "dec-floor-area-over-50",
+        "to": "dec-ceiling-height-available",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e12",
+        "from": "dec-floor-area-over-50",
+        "to": "proc-not-applicable-floor",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e13",
+        "from": "proc-not-applicable-floor",
+        "to": "end-not-musou",
+        "role": "flow"
+      },
+      {
+        "id": "e14",
+        "from": "dec-ceiling-height-available",
+        "to": "dec-ceiling-height-6m-or-less",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e15",
+        "from": "dec-ceiling-height-available",
+        "to": "proc-ceiling-height-input",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e16",
+        "from": "proc-ceiling-height-input",
+        "to": "dec-ceiling-height-6m-or-less",
+        "role": "flow"
+      },
+      {
+        "id": "e17",
+        "from": "dec-ceiling-height-6m-or-less",
+        "to": "dec-openings-identified",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e18",
+        "from": "dec-ceiling-height-6m-or-less",
+        "to": "proc-not-applicable-ceiling",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e19",
+        "from": "proc-not-applicable-ceiling",
+        "to": "end-not-musou",
+        "role": "flow"
+      },
+      {
+        "id": "e20",
+        "from": "dec-openings-identified",
+        "to": "dec-openable-area-available",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e21",
+        "from": "dec-openings-identified",
+        "to": "proc-openings-input",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e22",
+        "from": "proc-openings-input",
+        "to": "dec-openable-area-available",
+        "role": "flow"
+      },
+      {
+        "id": "e23",
+        "from": "dec-openable-area-available",
+        "to": "proc-total-openable-calc",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e24",
+        "from": "dec-openable-area-available",
+        "to": "proc-openable-area-input",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e25",
+        "from": "proc-openable-area-input",
+        "to": "proc-total-openable-calc",
+        "role": "flow"
+      },
+      {
+        "id": "e26",
+        "from": "proc-total-openable-calc",
+        "to": "dec-ventilation-equipment",
+        "role": "flow"
+      },
+      {
+        "id": "e27",
+        "from": "dec-ventilation-equipment",
+        "to": "proc-ratio-kokushi",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e28",
+        "from": "dec-ventilation-equipment",
+        "to": "proc-ratio-standard",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e29",
+        "from": "proc-ratio-standard",
+        "to": "proc-actual-ratio-calc",
+        "role": "flow"
+      },
+      {
+        "id": "e30",
+        "from": "proc-ratio-kokushi",
+        "to": "proc-actual-ratio-calc",
+        "role": "flow"
+      },
+      {
+        "id": "e31",
+        "from": "proc-actual-ratio-calc",
+        "to": "dec-ratio-compare",
+        "role": "flow"
+      },
+      {
+        "id": "e32",
+        "from": "dec-ratio-compare",
+        "to": "proc-all-conditions-met",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e33",
+        "from": "dec-ratio-compare",
+        "to": "proc-ratio-sufficient",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e34",
+        "from": "proc-ratio-sufficient",
+        "to": "end-not-musou",
+        "role": "flow"
+      },
+      {
+        "id": "e35",
+        "from": "proc-all-conditions-met",
+        "to": "end-musou",
+        "role": "flow"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": ["A35_2"],
+      "description": "法第35条の2で定める内装制限の適用対象となる無窓居室の定義を本条で規定"
+    },
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A87:P3"],
+      "description": "法第87条第3項で法第35条の2を準用する場合を含む"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00+09:00",
+    "updated_at": "2026-01-26T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令",
+    "source": "kijo-diagram: CHK-BSL-ORD-A128_3_2-P1-I1"
+  }
+}

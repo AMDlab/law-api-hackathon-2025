@@ -1,0 +1,288 @@
+{
+  "id": "A57_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "組積造の壁における開口部の適合判定フロー",
+    "target_subject": "組積造の壁の開口部",
+    "description": "組積造の壁における窓、出入口その他の開口部が各号に定める基準に適合するかを判定するフローチャート"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "57",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": ["単体規定", "構造", "組積造"],
+  "text_raw": "組積造の壁における窓、出入口その他の開口部は、次の各号に定めるところによらなければならない。\n一　各階の対隣壁によつて区画されたおのおのの壁における開口部の幅の総和は、その壁の長さの二分の一以下とすること。\n二　各階における開口部の幅の総和は、その階における壁の長さの総和の三分の一以下とすること。\n三　一の開口部とその直上にある開口部との垂直距離は、六十センチメートル以上とすること。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        { "type": "structure", "value": "組積造の壁" }
+      ],
+      "note": "組積造の壁における開口部が対象"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "note": "第1号：対隣壁区画ごとの開口部幅制限",
+          "ref": "info-item1-compliance",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "note": "第2号：階ごとの開口部幅制限",
+          "ref": "info-item2-compliance",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "note": "第3号：垂直距離制限",
+          "ref": "info-item3-compliance",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    }
+  },
+  "flow_diagram": {
+    "title": "令57条1項 組積造の壁における開口部の適合判定",
+    "description": "組積造の壁における開口部が3つの号すべてに適合するかを判定する",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start"
+      },
+      {
+        "id": "dec-structure-type",
+        "type": "decision",
+        "title": "壁の構造種別は？",
+        "description": "対象の壁が組積造であるかを確認する",
+        "decision_type": "multi",
+        "options": [
+          { "value": "組積造" },
+          { "value": "その他" }
+        ]
+      },
+      {
+        "id": "proc-not-applicable",
+        "type": "process",
+        "title": "対象外（組積造以外）",
+        "description": "組積造以外の壁は本条の対象外"
+      },
+      {
+        "id": "end-not-applicable",
+        "type": "terminal",
+        "title": "対象外",
+        "result": "end",
+        "description": "本条の適用対象外"
+      },
+      {
+        "id": "proc-identify-walls",
+        "type": "process",
+        "title": "対隣壁区画ごとの壁を特定",
+        "process_type": "undefined_input",
+        "description": "各階の対隣壁によって区画されたおのおのの壁を特定する"
+      },
+      {
+        "id": "proc-get-wall-opening-width",
+        "type": "process",
+        "title": "壁ごとの開口部幅総和を取得",
+        "process_type": "undefined_input",
+        "description": "各壁における開口部（窓、出入口等）の幅の総和を読み取る"
+      },
+      {
+        "id": "proc-get-wall-length",
+        "type": "process",
+        "title": "壁の長さを取得",
+        "process_type": "undefined_input",
+        "description": "各壁の長さを読み取る"
+      },
+      {
+        "id": "dec-item1-check",
+        "type": "decision",
+        "title": "全ての壁で開口部幅総和 ≤ 壁長さ×1/2 か？",
+        "description": "第1号：各階の対隣壁によって区画されたおのおのの壁における開口部の幅の総和が、その壁の長さの1/2以下であるかを判定",
+        "decision_type": "binary",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "WO", "desc": "開口部の幅の総和" },
+          "rhs": { "desc": "壁の長さ×0.5", "unit": "m" }
+        },
+        "related_articles": ["令::A57:P1:I1"]
+      },
+      {
+        "id": "proc-item1-pass",
+        "type": "process",
+        "title": "第1号適合",
+        "description": "対隣壁区画ごとの開口部幅制限に適合"
+      },
+      {
+        "id": "proc-item1-fail",
+        "type": "process",
+        "title": "第1号不適合",
+        "description": "対隣壁区画ごとの開口部幅制限に不適合"
+      },
+      {
+        "id": "end-item1-fail",
+        "type": "terminal",
+        "title": "不適合（第1号違反）",
+        "result": "fail",
+        "description": "開口部の幅の総和が壁の長さの1/2を超えている壁がある"
+      },
+      {
+        "id": "proc-identify-floors",
+        "type": "process",
+        "title": "階の集合を特定",
+        "process_type": "undefined_input",
+        "description": "建築物に属する各階を特定する"
+      },
+      {
+        "id": "proc-get-floor-opening-width",
+        "type": "process",
+        "title": "階ごとの開口部幅総和を取得",
+        "process_type": "undefined_input",
+        "description": "各階における開口部の幅の総和を読み取る"
+      },
+      {
+        "id": "proc-get-floor-wall-length",
+        "type": "process",
+        "title": "階ごとの壁長さ総和を取得",
+        "process_type": "undefined_input",
+        "description": "各階における壁の長さの総和を読み取る"
+      },
+      {
+        "id": "dec-item2-check",
+        "type": "decision",
+        "title": "全ての階で開口部幅総和 ≤ 壁長さ総和×1/3 か？",
+        "description": "第2号：各階における開口部の幅の総和が、その階における壁の長さの総和の1/3以下であるかを判定",
+        "decision_type": "binary",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "FO", "desc": "階の開口部の幅の総和" },
+          "rhs": { "desc": "階の壁の長さの総和×1/3", "unit": "m" }
+        },
+        "related_articles": ["令::A57:P1:I2"]
+      },
+      {
+        "id": "proc-item2-pass",
+        "type": "process",
+        "title": "第2号適合",
+        "description": "階ごとの開口部幅制限に適合"
+      },
+      {
+        "id": "proc-item2-fail",
+        "type": "process",
+        "title": "第2号不適合",
+        "description": "階ごとの開口部幅制限に不適合"
+      },
+      {
+        "id": "end-item2-fail",
+        "type": "terminal",
+        "title": "不適合（第2号違反）",
+        "result": "fail",
+        "description": "開口部の幅の総和が壁の長さの総和の1/3を超えている階がある"
+      },
+      {
+        "id": "proc-identify-opening-pairs",
+        "type": "process",
+        "title": "垂直方向に隣接する開口部ペアを特定",
+        "process_type": "undefined_input",
+        "description": "一の開口部とその直上にある開口部のペアを特定する"
+      },
+      {
+        "id": "proc-get-vertical-distance",
+        "type": "process",
+        "title": "開口部間垂直距離を取得",
+        "process_type": "undefined_input",
+        "description": "一の開口部とその直上にある開口部との垂直距離を読み取る"
+      },
+      {
+        "id": "dec-item3-check",
+        "type": "decision",
+        "title": "全ての開口部ペアで垂直距離 ≥ 60cm か？",
+        "description": "第3号：一の開口部とその直上にある開口部との垂直距離が60cm以上であるかを判定",
+        "decision_type": "binary",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "VD", "desc": "垂直距離" },
+          "rhs": { "value": 60, "unit": "cm" }
+        },
+        "related_articles": ["令::A57:P1:I3"]
+      },
+      {
+        "id": "proc-item3-pass",
+        "type": "process",
+        "title": "第3号適合",
+        "description": "垂直距離制限に適合"
+      },
+      {
+        "id": "proc-item3-fail",
+        "type": "process",
+        "title": "第3号不適合",
+        "description": "垂直距離制限に不適合"
+      },
+      {
+        "id": "end-item3-fail",
+        "type": "terminal",
+        "title": "不適合（第3号違反）",
+        "result": "fail",
+        "description": "垂直距離が60cm未満の開口部ペアがある"
+      },
+      {
+        "id": "proc-final-judgment",
+        "type": "process",
+        "title": "令57条1項適合確認",
+        "description": "第1号、第2号、第3号のすべてに適合することを確認"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "組積造の壁における開口部が令57条1項の規定に適合"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "dec-structure-type", "role": "flow" },
+      { "id": "e02", "from": "dec-structure-type", "to": "proc-not-applicable", "role": "option", "label": "その他" },
+      { "id": "e03", "from": "proc-not-applicable", "to": "end-not-applicable", "role": "flow" },
+      { "id": "e04", "from": "dec-structure-type", "to": "proc-identify-walls", "role": "option", "label": "組積造" },
+      { "id": "e05", "from": "proc-identify-walls", "to": "proc-get-wall-opening-width", "role": "flow" },
+      { "id": "e06", "from": "proc-get-wall-opening-width", "to": "proc-get-wall-length", "role": "flow" },
+      { "id": "e07", "from": "proc-get-wall-length", "to": "dec-item1-check", "role": "flow" },
+      { "id": "e08", "from": "dec-item1-check", "to": "proc-item1-pass", "role": "yes" },
+      { "id": "e09", "from": "dec-item1-check", "to": "proc-item1-fail", "role": "no" },
+      { "id": "e10", "from": "proc-item1-fail", "to": "end-item1-fail", "role": "flow" },
+      { "id": "e11", "from": "proc-item1-pass", "to": "proc-identify-floors", "role": "flow" },
+      { "id": "e12", "from": "proc-identify-floors", "to": "proc-get-floor-opening-width", "role": "flow" },
+      { "id": "e13", "from": "proc-get-floor-opening-width", "to": "proc-get-floor-wall-length", "role": "flow" },
+      { "id": "e14", "from": "proc-get-floor-wall-length", "to": "dec-item2-check", "role": "flow" },
+      { "id": "e15", "from": "dec-item2-check", "to": "proc-item2-pass", "role": "yes" },
+      { "id": "e16", "from": "dec-item2-check", "to": "proc-item2-fail", "role": "no" },
+      { "id": "e17", "from": "proc-item2-fail", "to": "end-item2-fail", "role": "flow" },
+      { "id": "e18", "from": "proc-item2-pass", "to": "proc-identify-opening-pairs", "role": "flow" },
+      { "id": "e19", "from": "proc-identify-opening-pairs", "to": "proc-get-vertical-distance", "role": "flow" },
+      { "id": "e20", "from": "proc-get-vertical-distance", "to": "dec-item3-check", "role": "flow" },
+      { "id": "e21", "from": "dec-item3-check", "to": "proc-item3-pass", "role": "yes" },
+      { "id": "e22", "from": "dec-item3-check", "to": "proc-item3-fail", "role": "no" },
+      { "id": "e23", "from": "proc-item3-fail", "to": "end-item3-fail", "role": "flow" },
+      { "id": "e24", "from": "proc-item3-pass", "to": "proc-final-judgment", "role": "flow" },
+      { "id": "e25", "from": "proc-final-judgment", "to": "end-pass", "role": "flow" }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSO-A57-P1",
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

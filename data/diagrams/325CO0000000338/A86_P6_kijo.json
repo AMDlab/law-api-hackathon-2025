@@ -1,0 +1,224 @@
+{
+  "id": "CHK-BSL-KIJO-A86-P6",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "雪下ろしによる積雪荷重の軽減判定",
+    "target_subject": "建築物",
+    "description": "雪下ろし慣習地方における積雪荷重計算の軽減措置の適用判定"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "86",
+    "paragraph": "6",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造規定",
+    "積雪荷重"
+  ],
+  "text_raw": "雪下ろしを行う慣習のある地方においては、その地方における垂直積雪量が一メートルを超える場合においても、積雪荷重は、雪下ろしの実況に応じて垂直積雪量を一メートルまで減らして計算することができる。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "雪下ろしを行う慣習のある地方"
+        }
+      ],
+      "note": "雪下ろしを行う慣習のある地方に限り適用される軽減規定。地方の指定は特定行政庁が行う。"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "numeric",
+          "value": "垂直積雪量 > 1m",
+          "description": "垂直積雪量が1mを超える場合に軽減措置の適用可能"
+        },
+        {
+          "type": "requirement",
+          "value": "雪下ろしの実況に応じて垂直積雪量を1mまで減じて積雪荷重を計算",
+          "description": "雪下ろしの実施状況に基づき、積雪荷重計算に用いる垂直積雪量を軽減できる"
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "info-001",
+        "type": "information",
+        "title": "垂直積雪量",
+        "symbol": "D",
+        "subject": "建築計画地",
+        "property": "垂直積雪量",
+        "property_type": "numeric",
+        "unit": "m",
+        "plurality": "single",
+        "description": "第1項に規定する垂直積雪量。国土交通大臣が定める基準に基づき特定行政庁が規則で定める数値。",
+        "related_articles": [
+          "令::A86:P1",
+          "令::A86:P3"
+        ]
+      },
+      {
+        "id": "proc-001",
+        "type": "process",
+        "title": "垂直積雪量の特定",
+        "process_type": "undefined_input",
+        "target_subject": "建築計画地",
+        "iteration": "single",
+        "description": "設計図書等から建築計画地の垂直積雪量を読み取る",
+        "remarks": "特定行政庁が規則で定める数値を確認"
+      },
+      {
+        "id": "info-002",
+        "type": "information",
+        "title": "雪下ろしの実況",
+        "symbol": "S",
+        "subject": "建築物",
+        "property": "雪下ろし実施計画",
+        "property_type": "visual",
+        "plurality": "single",
+        "description": "雪下ろしの実施計画・頻度・方法等の実況",
+        "remarks": "雪下ろしをどの程度の頻度・規模で実施するかの計画"
+      },
+      {
+        "id": "proc-002",
+        "type": "process",
+        "title": "雪下ろしの実況の確認",
+        "process_type": "undefined_input",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "設計図書等から雪下ろしの実施計画・方法を読み取る",
+        "remarks": "雪下ろしの頻度、方法、実施可能性等を確認"
+      },
+      {
+        "id": "proc-003",
+        "type": "process",
+        "title": "軽減適用条件の判定",
+        "process_type": "mechanical",
+        "target_subject": "建築計画地",
+        "iteration": "single",
+        "description": "垂直積雪量が1mを超えるか判定",
+        "logic_expression": "D > 1",
+        "remarks": "垂直積雪量が1mを超える場合に軽減措置の適用対象となる"
+      },
+      {
+        "id": "info-003",
+        "type": "information",
+        "title": "軽減措置適用可否",
+        "symbol": "E",
+        "subject": "建築物",
+        "property": "軽減措置適用可否",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "雪下ろしによる積雪荷重軽減措置が適用できるか否か"
+      },
+      {
+        "id": "proc-004",
+        "type": "process",
+        "title": "軽減垂直積雪量の決定",
+        "process_type": "human_judgment",
+        "target_subject": "建築物",
+        "iteration": "single",
+        "description": "雪下ろしの実況に応じて軽減後の垂直積雪量を決定",
+        "logic_expression": "D' = max(D × (1 - 軽減率), 1)",
+        "remarks": "垂直積雪量は1mを下限として軽減可能"
+      },
+      {
+        "id": "info-004",
+        "type": "information",
+        "title": "軽減後の垂直積雪量",
+        "symbol": "Dr",
+        "subject": "建築物",
+        "property": "軽減後垂直積雪量",
+        "property_type": "numeric",
+        "unit": "m",
+        "plurality": "single",
+        "description": "雪下ろしの実況に応じて軽減された垂直積雪量。最小値は1m。",
+        "remarks": "この数値を用いて積雪荷重を計算する"
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge-001",
+        "from": "proc-001",
+        "to": "info-001",
+        "role": "output"
+      },
+      {
+        "id": "edge-002",
+        "from": "proc-002",
+        "to": "info-002",
+        "role": "output"
+      },
+      {
+        "id": "edge-003",
+        "from": "info-001",
+        "to": "proc-003",
+        "role": "input"
+      },
+      {
+        "id": "edge-004",
+        "from": "proc-003",
+        "to": "info-003",
+        "role": "output"
+      },
+      {
+        "id": "edge-005",
+        "from": "info-003",
+        "to": "proc-004",
+        "role": "input"
+      },
+      {
+        "id": "edge-006",
+        "from": "info-001",
+        "to": "proc-004",
+        "role": "input"
+      },
+      {
+        "id": "edge-007",
+        "from": "info-002",
+        "to": "proc-004",
+        "role": "input"
+      },
+      {
+        "id": "edge-008",
+        "from": "proc-004",
+        "to": "info-004",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": [
+        "A86:P1",
+        "A86:P3",
+        "A86:P7"
+      ],
+      "description": "第1項で積雪荷重の計算方法、第3項で垂直積雪量の決定方法を規定。第7項で軽減適用建築物の表示義務を規定。"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-23T00:00:00Z",
+    "updated_at": "2026-01-23T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "kijo-generator",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令",
+    "checklist_ref": "建築基準法施行令第86条第6項（積雪荷重の軽減）",
+    "source": "e-Gov法令API"
+  }
+}

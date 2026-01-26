@@ -1,0 +1,294 @@
+{
+  "id": "CHK-BSL-ORDER-A88-P2",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "標準せん断力係数の下限値",
+    "target_subject": "建築物",
+    "description": "地上部分の地震力計算に用いる標準せん断力係数の下限値を判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "88",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造",
+    "地震力",
+    "標準せん断力係数"
+  ],
+  "text_raw": "標準せん断力係数は、〇・二以上としなければならない。ただし、地盤が著しく軟弱な区域として特定行政庁が国土交通大臣の定める基準に基づいて規則で指定する区域内における木造の建築物（第四十六条第二項第一号に掲げる基準に適合するものを除く。）にあつては、〇・三以上としなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "TRUE",
+      "value": true,
+      "note": "地震力計算を行うすべての建築物に適用"
+    },
+    "judgment_rule": {
+      "operator": "IF_ELSE",
+      "conditions": [
+        {
+          "condition": "ただし書該当（軟弱地盤区域内の木造建築物）",
+          "requirement": "Co >= 0.3"
+        },
+        {
+          "condition": "それ以外",
+          "requirement": "Co >= 0.2"
+        }
+      ]
+    },
+    "exceptions": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "軟弱地盤区域（特定行政庁が規則で指定）"
+        },
+        {
+          "type": "building_structure",
+          "value": "木造"
+        },
+        {
+          "type": "exclusion",
+          "value": "令第46条第2項第1号の基準に適合するものを除く"
+        }
+      ],
+      "effect": "Co >= 0.3 に引上げ"
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-co-identify",
+        "type": "process",
+        "title": "標準せん断力係数の特定",
+        "process_type": "undefined_input",
+        "process_type_description": "入力情報不定処理 - 導出されるアウトプット情報を得るための情報源の所在や手続きのメカニズムも含めて人が判断する処理。インプット情報を繋がない。左側の辺を消した状態で表示。",
+        "description": "構造計算書等から標準せん断力係数Coの設計値を読み取る"
+      },
+      {
+        "id": "info-co-value",
+        "type": "information",
+        "title": "標準せん断力係数",
+        "symbol": "Co",
+        "subject": "建築物",
+        "property": "標準せん断力係数",
+        "property_type": "numeric",
+        "property_type_description": "数値 - 大小関係に位置づけられる整数値または実数値（例: 延べ面積、高さ）",
+        "plurality": "single",
+        "description": "地震力計算に用いる標準せん断力係数の設計値"
+      },
+      {
+        "id": "proc-structure-type-identify",
+        "type": "process",
+        "title": "構造種別の特定",
+        "process_type": "undefined_input",
+        "process_type_description": "入力情報不定処理 - 導出されるアウトプット情報を得るための情報源の所在や手続きのメカニズムも含めて人が判断する処理。インプット情報を繋がない。左側の辺を消した状態で表示。",
+        "description": "設計図書等から建築物の構造種別（木造/非木造）を読み取る"
+      },
+      {
+        "id": "info-structure-type",
+        "type": "information",
+        "title": "構造種別",
+        "symbol": "ST",
+        "subject": "建築物",
+        "property": "構造種別",
+        "property_type": "classification",
+        "property_type_description": "区分情報 - 既定のいくつかの区分の中のいずれかを示すもの（例: 用途地域、建物用途コード）",
+        "plurality": "single",
+        "description": "木造、鉄骨造、RC造等の構造種別"
+      },
+      {
+        "id": "proc-art46-compliance-identify",
+        "type": "process",
+        "title": "令46条2項1号適合の確認",
+        "process_type": "undefined_input",
+        "process_type_description": "入力情報不定処理 - 導出されるアウトプット情報を得るための情報源の所在や手続きのメカニズムも含めて人が判断する処理。インプット情報を繋がない。左側の辺を消した状態で表示。",
+        "description": "木造建築物が令第46条第2項第1号の壁量基準に適合するかを確認する",
+        "related_articles": [
+          "令::A46:P2:I1"
+        ]
+      },
+      {
+        "id": "info-art46-compliance",
+        "type": "information",
+        "title": "令46条2項1号適合",
+        "symbol": "A46",
+        "subject": "建築物",
+        "property": "令46条2項1号適合",
+        "property_type": "proposition",
+        "property_type_description": "命題真偽 - 真か偽かが判定可能な事実（例: 技術基準を満たすか否か）",
+        "plurality": "single",
+        "description": "令第46条第2項第1号に掲げる壁量基準に適合するか否か",
+        "related_articles": [
+          "令::A46:P2:I1"
+        ]
+      },
+      {
+        "id": "proc-proviso-check",
+        "type": "process",
+        "title": "ただし書該当判定",
+        "process_type": "mechanical",
+        "process_type_description": "機械的処理 - 自動化可能な論理演算や計算。視認情報をこれに繋ぐことはできない。水色で表示。",
+        "description": "軟弱地盤区域内の木造建築物（令46条2項1号適合を除く）に該当するかを判定",
+        "logic_expression": "(敷地 ∈ 軟弱地盤区域) AND (ST == 木造) AND (A46 == false)",
+        "remarks": "敷地の軟弱地盤区域該当は公共データとして処理に内包"
+      },
+      {
+        "id": "info-proviso-applicable",
+        "type": "information",
+        "title": "ただし書該当",
+        "symbol": "P",
+        "subject": "建築物",
+        "property": "ただし書該当",
+        "property_type": "proposition",
+        "property_type_description": "命題真偽 - 真か偽かが判定可能な事実（例: 技術基準を満たすか否か）",
+        "plurality": "single",
+        "description": "Co >= 0.3 を適用すべき建築物（軟弱地盤区域内の木造で令46条2項1号不適合）か否か"
+      },
+      {
+        "id": "proc-threshold-determine",
+        "type": "process",
+        "title": "下限値の決定",
+        "process_type": "mechanical",
+        "process_type_description": "機械的処理 - 自動化可能な論理演算や計算。視認情報をこれに繋ぐことはできない。水色で表示。",
+        "description": "ただし書該当に応じて標準せん断力係数の下限値を決定",
+        "logic_expression": "P == true → 下限値 = 0.3 / P == false → 下限値 = 0.2"
+      },
+      {
+        "id": "info-threshold",
+        "type": "information",
+        "title": "下限値",
+        "symbol": "TH",
+        "subject": "建築物",
+        "property": "標準せん断力係数下限値",
+        "property_type": "numeric",
+        "property_type_description": "数値 - 大小関係に位置づけられる整数値または実数値（例: 延べ面積、高さ）",
+        "plurality": "single",
+        "description": "標準せん断力係数の下限値（0.2または0.3）"
+      },
+      {
+        "id": "proc-compliance-check",
+        "type": "process",
+        "title": "下限値充足判定",
+        "process_type": "mechanical",
+        "process_type_description": "機械的処理 - 自動化可能な論理演算や計算。視認情報をこれに繋ぐことはできない。水色で表示。",
+        "description": "設計値が下限値以上かを判定",
+        "logic_expression": "Co >= TH"
+      },
+      {
+        "id": "info-compliance",
+        "type": "information",
+        "title": "下限値適合",
+        "symbol": "R",
+        "subject": "建築物",
+        "property": "標準せん断力係数下限値適合",
+        "property_type": "proposition",
+        "property_type_description": "命題真偽 - 真か偽かが判定可能な事実（例: 技術基準を満たすか否か）",
+        "plurality": "single",
+        "description": "標準せん断力係数が令88条2項の下限値を満たすか否か"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-co-identify",
+        "to": "info-co-value",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "proc-structure-type-identify",
+        "to": "info-structure-type",
+        "role": "output"
+      },
+      {
+        "id": "e03",
+        "from": "proc-art46-compliance-identify",
+        "to": "info-art46-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "info-structure-type",
+        "to": "proc-proviso-check",
+        "role": "input"
+      },
+      {
+        "id": "e05",
+        "from": "info-art46-compliance",
+        "to": "proc-proviso-check",
+        "role": "input"
+      },
+      {
+        "id": "e06",
+        "from": "proc-proviso-check",
+        "to": "info-proviso-applicable",
+        "role": "output"
+      },
+      {
+        "id": "e07",
+        "from": "info-proviso-applicable",
+        "to": "proc-threshold-determine",
+        "role": "input"
+      },
+      {
+        "id": "e08",
+        "from": "proc-threshold-determine",
+        "to": "info-threshold",
+        "role": "output"
+      },
+      {
+        "id": "e09",
+        "from": "info-co-value",
+        "to": "proc-compliance-check",
+        "role": "input"
+      },
+      {
+        "id": "e10",
+        "from": "info-threshold",
+        "to": "proc-compliance-check",
+        "role": "input"
+      },
+      {
+        "id": "e11",
+        "from": "proc-compliance-check",
+        "to": "info-compliance",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": [
+        "A46:P2:I1"
+      ],
+      "description": "ただし書の除外条件となる壁量基準"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": [
+        "A88:P1"
+      ],
+      "description": "地震層せん断力係数の計算式（標準せん断力係数Coを含む）"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-23T12:00:00Z",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

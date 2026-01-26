@@ -1,0 +1,276 @@
+{
+  "id": "CHK-BO-A77_2-P2-I1",
+  "version": "3.1.0",
+  "page_title": {
+    "title": "プレキャスト床版の接合部による応力伝達",
+    "target_subject": "プレキャスト鉄筋コンクリート床版の接合部",
+    "description": "プレキャスト鉄筋コンクリートで造られた床版における周囲のはり等との接合部が存在応力を伝えることができる構造であることの確認"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "77の2",
+    "paragraph": "2",
+    "item": "1"
+  },
+  "labels": ["単体規定", "構造規定", "床版", "プレキャストコンクリート"],
+  "text_raw": "周囲のはり等との接合部は、その部分の存在応力を伝えることができるものとすること。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "structural_element",
+          "value": "構造耐力上主要な部分である床版"
+        },
+        {
+          "type": "material",
+          "value": "プレキャスト鉄筋コンクリート"
+        }
+      ],
+      "note": "構造耐力上主要な部分である床版のうち、プレキャスト鉄筋コンクリートで造られたものに適用"
+    },
+    "judgment_rule": {
+      "operator": "ALL",
+      "conditions": [
+        {
+          "type": "structural_performance",
+          "description": "周囲のはり等との接合部が、その部分の存在応力を伝えることができる構造であること"
+        }
+      ]
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "info-building",
+        "type": "information",
+        "title": "判定対象建築物",
+        "subject": "建築物",
+        "property": "識別情報",
+        "property_type": "classification",
+        "plurality": "single",
+        "description": "審査対象となる建築物"
+      },
+      {
+        "id": "info-slabs-set",
+        "type": "information",
+        "title": "建築物のプレキャスト床版",
+        "subject": "建築物",
+        "property": "プレキャスト鉄筋コンクリート床版の集合",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "構造耐力上主要な部分である床版のうち、プレキャスト鉄筋コンクリートで造られた床版を特定"
+      },
+      {
+        "id": "info-joints-set",
+        "type": "information",
+        "title": "床版の周囲接合部",
+        "subject": "プレキャスト床版",
+        "property": "周囲のはり等との接合部の集合",
+        "property_type": "set_definition",
+        "plurality": "multiple",
+        "description": "各プレキャスト床版における周囲のはり等との接合部を特定"
+      },
+      {
+        "id": "info-existing-stress",
+        "type": "information",
+        "title": "接合部の存在応力",
+        "subject": "接合部",
+        "property": "存在応力",
+        "property_type": "numeric",
+        "plurality": "multiple",
+        "description": "各接合部に生じる存在応力（設計荷重時に当該部分に作用する応力）"
+      },
+      {
+        "id": "info-joint-structure",
+        "type": "information",
+        "title": "接合部の構造",
+        "subject": "接合部",
+        "property": "構造方法",
+        "property_type": "visual",
+        "plurality": "multiple",
+        "description": "各接合部の構造方法（接合金物、アンカーボルト、配筋、グラウト等の詳細）"
+      },
+      {
+        "id": "proc-stress-identify",
+        "type": "process",
+        "title": "存在応力の特定",
+        "process_type": "undefined_input",
+        "target_subject": "接合部",
+        "iteration": "iterative",
+        "description": "構造計算書等から各接合部における存在応力を読み取る"
+      },
+      {
+        "id": "proc-joint-identify",
+        "type": "process",
+        "title": "接合部構造の特定",
+        "process_type": "undefined_input",
+        "target_subject": "接合部",
+        "iteration": "iterative",
+        "description": "設計図書等から各接合部の構造方法を読み取る"
+      },
+      {
+        "id": "proc-transmission-check",
+        "type": "process",
+        "title": "応力伝達能力の判定",
+        "process_type": "human_judgment",
+        "target_subject": "接合部",
+        "iteration": "iterative",
+        "description": "接合部の構造が存在応力を伝えることができるものであるかを判定",
+        "logic_expression": "∀joint ∈ Joints: TransmitCapacity(joint) ≥ ExistingStress(joint)",
+        "remarks": "接合部が応力を確実に伝達できる構造（適切な接合金物、十分な定着長さ、グラウト充填等）であることを確認"
+      },
+      {
+        "id": "info-transmission-result",
+        "type": "information",
+        "title": "接合部の応力伝達適否",
+        "symbol": "R1",
+        "subject": "接合部",
+        "property": "応力伝達の適否",
+        "property_type": "proposition",
+        "plurality": "multiple",
+        "description": "各接合部が存在応力を伝えることができる構造であるか否かの判定結果"
+      },
+      {
+        "id": "proc-all-check",
+        "type": "process",
+        "title": "全接合部の適合判定",
+        "process_type": "mechanical",
+        "target_subject": "プレキャスト床版",
+        "iteration": "single",
+        "description": "すべての接合部について応力伝達が可能であることを確認",
+        "logic_expression": "∀joint ∈ Joints: R1(joint) = true"
+      },
+      {
+        "id": "info-compliance",
+        "type": "information",
+        "title": "令第77条の2第2項第1号適合",
+        "symbol": "C",
+        "subject": "建築物",
+        "property": "接合部応力伝達要件の適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "すべてのプレキャスト床版の接合部が存在応力を伝えることができる構造であるか否かの最終判定",
+        "related_articles": ["令::A77_2:P2:I1"]
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge-building-slabs",
+        "from": "info-building",
+        "to": "proc-stress-identify",
+        "role": "input"
+      },
+      {
+        "id": "edge-slabs-joints-stress",
+        "from": "info-slabs-set",
+        "to": "proc-stress-identify",
+        "role": "input"
+      },
+      {
+        "id": "edge-joints-stress",
+        "from": "info-joints-set",
+        "to": "proc-stress-identify",
+        "role": "input"
+      },
+      {
+        "id": "edge-stress-output",
+        "from": "proc-stress-identify",
+        "to": "info-existing-stress",
+        "role": "output"
+      },
+      {
+        "id": "edge-building-joint",
+        "from": "info-building",
+        "to": "proc-joint-identify",
+        "role": "input"
+      },
+      {
+        "id": "edge-slabs-joints-struct",
+        "from": "info-slabs-set",
+        "to": "proc-joint-identify",
+        "role": "input"
+      },
+      {
+        "id": "edge-joints-struct",
+        "from": "info-joints-set",
+        "to": "proc-joint-identify",
+        "role": "input"
+      },
+      {
+        "id": "edge-joint-output",
+        "from": "proc-joint-identify",
+        "to": "info-joint-structure",
+        "role": "output"
+      },
+      {
+        "id": "edge-stress-check",
+        "from": "info-existing-stress",
+        "to": "proc-transmission-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-struct-check",
+        "from": "info-joint-structure",
+        "to": "proc-transmission-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-transmission-result",
+        "from": "proc-transmission-check",
+        "to": "info-transmission-result",
+        "role": "output"
+      },
+      {
+        "id": "edge-result-all",
+        "from": "info-transmission-result",
+        "to": "proc-all-check",
+        "role": "input"
+      },
+      {
+        "id": "edge-compliance",
+        "from": "proc-all-check",
+        "to": "info-compliance",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "defines_detail",
+      "articles": ["A77_2:P1"],
+      "description": "床版の一般的構造規定（本項の前提条件）"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "defines_detail",
+      "articles": ["A77_2:P2:I2"],
+      "description": "プレキャスト床版の部材相互緊結要件"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": ["A82:I4"],
+      "description": "第1項ただし書きにおける構造計算による適用除外の条件"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-23T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令",
+    "checklist_ref": "確認審査報告書チェックリスト",
+    "source": "e-Gov法令API"
+  }
+}

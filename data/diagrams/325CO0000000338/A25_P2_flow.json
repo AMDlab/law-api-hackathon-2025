@@ -1,0 +1,396 @@
+{
+  "id": "A25_P2_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "階段及び踊場の側壁等の設置",
+    "target_subject": "階段及びその踊場",
+    "description": "階段及びその踊場の両側（手すりが設けられた側を除く）への側壁又はこれに代わるものの設置義務に係る適合判定フロー"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "25",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "階段"
+  ],
+  "text_raw": "階段及びその踊場の両側（手すりが設けられた側を除く。）には、側壁又はこれに代わるものを設けなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "building_element",
+          "value": "階段及びその踊場"
+        }
+      ],
+      "note": "令第25条第4項により高さ1m以下の階段部分は適用除外"
+    },
+    "judgment_rule": {
+      "operator": "FORALL",
+      "conditions": [
+        {
+          "type": "requirement",
+          "value": "両側（手すり設置側を除く）に側壁又はこれに代わるものを設ける",
+          "description": "階段及び踊場の手すりが設けられていない側には、側壁又はこれに代わるものを設けなければならない"
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "flow_diagram": {
+    "title": "令第25条第2項 適合判定フロー",
+    "description": "階段及び踊場の両側（手すり設置側を除く）に側壁又はこれに代わるものが設けられているかを判定するフロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start"
+      },
+      {
+        "id": "info-stairs",
+        "type": "information",
+        "title": "階段の集合",
+        "symbol": "ST",
+        "subject": "建築物",
+        "property": "階段の集合",
+        "property_type": "set_definition",
+        "description": "判定対象となる建築物に属する階段"
+      },
+      {
+        "id": "dec-has-stairs",
+        "type": "decision",
+        "title": "階段が存在するか？",
+        "decision_type": "binary",
+        "description": "建築物に階段が存在するか確認",
+        "condition": {
+          "operator": "GT",
+          "lhs": { "var": "ST_count", "desc": "階段の数" },
+          "rhs": { "value": 0 }
+        }
+      },
+      {
+        "id": "info-landings",
+        "type": "information",
+        "title": "踊場の集合",
+        "symbol": "LD",
+        "subject": "階段",
+        "property": "踊場の集合",
+        "property_type": "set_definition",
+        "description": "各階段に属する踊場"
+      },
+      {
+        "id": "dec-has-landings",
+        "type": "decision",
+        "title": "踊場が存在するか？",
+        "decision_type": "binary",
+        "description": "階段に踊場が存在するか確認",
+        "condition": {
+          "operator": "GT",
+          "lhs": { "var": "LD_count", "desc": "踊場の数" },
+          "rhs": { "value": 0 }
+        }
+      },
+      {
+        "id": "proc-select-stair-landing",
+        "type": "process",
+        "title": "階段・踊場を1つ選択",
+        "process_type": "mechanical",
+        "description": "未判定の階段または踊場を1つ選択"
+      },
+      {
+        "id": "info-sides",
+        "type": "information",
+        "title": "階段・踊場の側",
+        "symbol": "SD",
+        "subject": "階段・踊場",
+        "property": "側の集合",
+        "property_type": "set_definition",
+        "description": "選択した階段・踊場の両側"
+      },
+      {
+        "id": "dec-has-sides",
+        "type": "decision",
+        "title": "側を特定できるか？",
+        "decision_type": "binary",
+        "description": "選択した階段・踊場の両側が特定できるか確認"
+      },
+      {
+        "id": "proc-select-side",
+        "type": "process",
+        "title": "側を1つ選択",
+        "process_type": "mechanical",
+        "description": "未判定の側を1つ選択"
+      },
+      {
+        "id": "dec-has-handrail",
+        "type": "decision",
+        "title": "手すりが設けられているか？",
+        "decision_type": "binary",
+        "description": "選択した側に手すりが設けられているか確認",
+        "condition": {
+          "operator": "EQ",
+          "lhs": { "var": "HR", "desc": "手すり設置有無" },
+          "rhs": { "value": true }
+        }
+      },
+      {
+        "id": "proc-handrail-ok",
+        "type": "process",
+        "title": "手すり設置側（対象外）",
+        "process_type": "mechanical",
+        "description": "この側は手すりが設けられているため、側壁等の設置義務の対象外"
+      },
+      {
+        "id": "dec-is-target-side",
+        "type": "decision",
+        "title": "側壁等の設置が必要な側か？",
+        "decision_type": "binary",
+        "description": "手すりがない側は側壁等の設置が必要"
+      },
+      {
+        "id": "dec-has-sidewall",
+        "type": "decision",
+        "title": "側壁又はこれに代わるものがあるか？",
+        "decision_type": "binary",
+        "description": "手すりがない側に側壁又はこれに代わるものが設けられているか確認",
+        "condition": {
+          "operator": "EQ",
+          "lhs": { "var": "SW", "desc": "側壁等設置有無" },
+          "rhs": { "value": true }
+        }
+      },
+      {
+        "id": "proc-sidewall-ok",
+        "type": "process",
+        "title": "側壁等が設置されている",
+        "process_type": "mechanical",
+        "description": "この側には側壁又はこれに代わるものが設けられている"
+      },
+      {
+        "id": "dec-more-sides",
+        "type": "decision",
+        "title": "未判定の側があるか？",
+        "decision_type": "binary",
+        "description": "現在の階段・踊場に未判定の側が残っているか確認"
+      },
+      {
+        "id": "dec-more-stair-landing",
+        "type": "decision",
+        "title": "未判定の階段・踊場があるか？",
+        "decision_type": "binary",
+        "description": "建築物に未判定の階段または踊場が残っているか確認"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "すべての階段及び踊場の両側（手すり設置側を除く）に側壁又はこれに代わるものが設けられている",
+        "related_articles": ["令::A25:P2"]
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "側壁又はこれに代わるものが設けられていない側がある",
+        "related_articles": ["令::A25:P2"]
+      },
+      {
+        "id": "end-na",
+        "type": "terminal",
+        "title": "適用対象外",
+        "result": "pass",
+        "description": "階段が存在しないため、本条は適用されない"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e-start-info-stairs",
+        "from": "start",
+        "to": "info-stairs",
+        "role": "flow"
+      },
+      {
+        "id": "e-info-stairs-dec-has-stairs",
+        "from": "info-stairs",
+        "to": "dec-has-stairs",
+        "role": "flow"
+      },
+      {
+        "id": "e-dec-has-stairs-no",
+        "from": "dec-has-stairs",
+        "to": "end-na",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e-dec-has-stairs-yes",
+        "from": "dec-has-stairs",
+        "to": "info-landings",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e-info-landings-dec-has-landings",
+        "from": "info-landings",
+        "to": "dec-has-landings",
+        "role": "flow"
+      },
+      {
+        "id": "e-dec-has-landings-no",
+        "from": "dec-has-landings",
+        "to": "proc-select-stair-landing",
+        "role": "no",
+        "label": "いいえ（階段のみ判定）"
+      },
+      {
+        "id": "e-dec-has-landings-yes",
+        "from": "dec-has-landings",
+        "to": "proc-select-stair-landing",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e-proc-select-stair-landing-info-sides",
+        "from": "proc-select-stair-landing",
+        "to": "info-sides",
+        "role": "flow"
+      },
+      {
+        "id": "e-info-sides-dec-has-sides",
+        "from": "info-sides",
+        "to": "dec-has-sides",
+        "role": "flow"
+      },
+      {
+        "id": "e-dec-has-sides-no",
+        "from": "dec-has-sides",
+        "to": "dec-more-stair-landing",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e-dec-has-sides-yes",
+        "from": "dec-has-sides",
+        "to": "proc-select-side",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e-proc-select-side-dec-has-handrail",
+        "from": "proc-select-side",
+        "to": "dec-has-handrail",
+        "role": "flow"
+      },
+      {
+        "id": "e-dec-has-handrail-yes",
+        "from": "dec-has-handrail",
+        "to": "proc-handrail-ok",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e-dec-has-handrail-no",
+        "from": "dec-has-handrail",
+        "to": "dec-is-target-side",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e-proc-handrail-ok-dec-more-sides",
+        "from": "proc-handrail-ok",
+        "to": "dec-more-sides",
+        "role": "flow"
+      },
+      {
+        "id": "e-dec-is-target-side-yes",
+        "from": "dec-is-target-side",
+        "to": "dec-has-sidewall",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e-dec-is-target-side-no",
+        "from": "dec-is-target-side",
+        "to": "dec-more-sides",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e-dec-has-sidewall-yes",
+        "from": "dec-has-sidewall",
+        "to": "proc-sidewall-ok",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e-dec-has-sidewall-no",
+        "from": "dec-has-sidewall",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e-proc-sidewall-ok-dec-more-sides",
+        "from": "proc-sidewall-ok",
+        "to": "dec-more-sides",
+        "role": "flow"
+      },
+      {
+        "id": "e-dec-more-sides-yes",
+        "from": "dec-more-sides",
+        "to": "proc-select-side",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e-dec-more-sides-no",
+        "from": "dec-more-sides",
+        "to": "dec-more-stair-landing",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e-dec-more-stair-landing-yes",
+        "from": "dec-more-stair-landing",
+        "to": "proc-select-stair-landing",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e-dec-more-stair-landing-no",
+        "from": "dec-more-stair-landing",
+        "to": "end-pass",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-KIJO-A25-P2",
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": ["A25:P1", "A25:P4"],
+      "description": "令第25条第1項（階段の手すり）、第4項（高さ1m以下の階段部分への適用除外）"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00Z",
+    "updated_at": "2026-01-26T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

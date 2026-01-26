@@ -1,0 +1,199 @@
+{
+  "id": "A66_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "柱の脚部の緊結（適合判定フロー）",
+    "target_subject": "柱",
+    "description": "構造耐力上主要な部分である柱の脚部が基礎に適切に緊結されていることを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "66",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": ["単体規定", "構造"],
+  "text_raw": "構造耐力上主要な部分である柱の脚部は、国土交通大臣が定める基準に従つたアンカーボルトによる緊結その他の構造方法により基礎に緊結しなければならない。ただし、滑節構造である場合においては、この限りでない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        { "type": "element", "value": "構造耐力上主要な部分である柱" }
+      ],
+      "note": "鉄骨造の建築物において構造耐力上主要な部分となる柱が対象"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        { "ref": "info-fastening-method", "operator": "==", "value": "大臣基準アンカーボルト緊結" },
+        { "ref": "info-fastening-method", "operator": "==", "value": "同等の構造方法" }
+      ]
+    },
+    "exceptions": {
+      "operator": "OR",
+      "conditions": [
+        { "ref": "info-sliding-joint", "operator": "==", "value": true }
+      ],
+      "effect": "EXEMPT"
+    }
+  },
+  "flow_diagram": {
+    "title": "令66条1項 柱の脚部の緊結 適合判定フロー",
+    "description": "構造耐力上主要な柱の脚部の基礎緊結について、適用除外または大臣基準適合を判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "令66条1項の適合判定を開始"
+      },
+      {
+        "id": "proc-identify-columns",
+        "type": "process",
+        "title": "構造耐力上主要な柱の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から構造耐力上主要な部分である柱を特定する"
+      },
+      {
+        "id": "dec-columns-exist",
+        "type": "decision",
+        "title": "構造耐力上主要な柱があるか？",
+        "decision_type": "binary",
+        "description": "判定対象となる構造耐力上主要な部分である柱が存在するか判定"
+      },
+      {
+        "id": "proc-not-applicable",
+        "type": "process",
+        "title": "適用対象外",
+        "process_type": "mechanical",
+        "description": "構造耐力上主要な柱が存在しないため令66条1項の適用対象外"
+      },
+      {
+        "id": "dec-sliding-joint",
+        "type": "decision",
+        "title": "滑節構造か？",
+        "decision_type": "binary",
+        "description": "当該柱の脚部が滑節構造であるか判定"
+      },
+      {
+        "id": "proc-exempt",
+        "type": "process",
+        "title": "適用除外（滑節構造）",
+        "process_type": "mechanical",
+        "description": "滑節構造であるため、ただし書きにより適用除外"
+      },
+      {
+        "id": "dec-fastening-method",
+        "type": "decision",
+        "title": "緊結方法は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "大臣基準アンカーボルト", "description": "国土交通大臣が定める基準に従ったアンカーボルトによる緊結" },
+          { "value": "その他の構造方法", "description": "その他の構造方法により基礎に緊結" },
+          { "value": "緊結なし", "description": "基礎に緊結されていない" }
+        ],
+        "description": "柱の脚部の基礎への緊結方法を判定"
+      },
+      {
+        "id": "dec-minister-standard",
+        "type": "decision",
+        "title": "大臣基準に適合か？",
+        "decision_type": "binary",
+        "description": "国土交通大臣が定める基準に従ったアンカーボルトによる緊結であるか判定"
+      },
+      {
+        "id": "proc-anchor-comply",
+        "type": "process",
+        "title": "アンカーボルト緊結適合",
+        "process_type": "mechanical",
+        "description": "大臣基準に従ったアンカーボルトによる緊結で適合"
+      },
+      {
+        "id": "dec-equivalent-method",
+        "type": "decision",
+        "title": "同等の構造方法か？",
+        "decision_type": "binary",
+        "description": "アンカーボルト緊結と同等の構造方法により基礎に緊結されているか判定"
+      },
+      {
+        "id": "proc-equivalent-comply",
+        "type": "process",
+        "title": "同等構造方法適合",
+        "process_type": "mechanical",
+        "description": "同等の構造方法による緊結で適合"
+      },
+      {
+        "id": "dec-all-columns",
+        "type": "decision",
+        "title": "全ての柱を確認したか？",
+        "decision_type": "binary",
+        "description": "全ての構造耐力上主要な柱について確認が完了したか判定"
+      },
+      {
+        "id": "proc-next-column",
+        "type": "process",
+        "title": "次の柱の確認へ",
+        "process_type": "mechanical",
+        "description": "次の構造耐力上主要な柱の確認へ進む"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令66条1項の規定に適合"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "令66条1項の規定に不適合"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "proc-identify-columns", "role": "flow" },
+      { "id": "e02", "from": "proc-identify-columns", "to": "dec-columns-exist", "role": "flow" },
+      { "id": "e03", "from": "dec-columns-exist", "to": "dec-sliding-joint", "role": "yes", "label": "はい" },
+      { "id": "e04", "from": "dec-columns-exist", "to": "proc-not-applicable", "role": "no", "label": "いいえ" },
+      { "id": "e05", "from": "proc-not-applicable", "to": "pass", "role": "flow" },
+      { "id": "e06", "from": "dec-sliding-joint", "to": "proc-exempt", "role": "yes", "label": "はい" },
+      { "id": "e07", "from": "dec-sliding-joint", "to": "dec-fastening-method", "role": "no", "label": "いいえ" },
+      { "id": "e08", "from": "proc-exempt", "to": "dec-all-columns", "role": "flow" },
+      { "id": "e09", "from": "dec-fastening-method", "to": "dec-minister-standard", "role": "option", "label": "大臣基準アンカーボルト" },
+      { "id": "e10", "from": "dec-fastening-method", "to": "dec-equivalent-method", "role": "option", "label": "その他の構造方法" },
+      { "id": "e11", "from": "dec-fastening-method", "to": "fail", "role": "option", "label": "緊結なし" },
+      { "id": "e12", "from": "dec-minister-standard", "to": "proc-anchor-comply", "role": "yes", "label": "はい" },
+      { "id": "e13", "from": "dec-minister-standard", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e14", "from": "proc-anchor-comply", "to": "dec-all-columns", "role": "flow" },
+      { "id": "e15", "from": "dec-equivalent-method", "to": "proc-equivalent-comply", "role": "yes", "label": "はい" },
+      { "id": "e16", "from": "dec-equivalent-method", "to": "fail", "role": "no", "label": "いいえ" },
+      { "id": "e17", "from": "proc-equivalent-comply", "to": "dec-all-columns", "role": "flow" },
+      { "id": "e18", "from": "dec-all-columns", "to": "pass", "role": "yes", "label": "はい" },
+      { "id": "e19", "from": "dec-all-columns", "to": "proc-next-column", "role": "no", "label": "いいえ" },
+      { "id": "e20", "from": "proc-next-column", "to": "dec-sliding-joint", "role": "flow" }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSO-A66-P1",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": ["A20"],
+      "description": "構造耐力に関する技術的基準の根拠規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

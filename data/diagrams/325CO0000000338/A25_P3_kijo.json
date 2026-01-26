@@ -1,0 +1,384 @@
+{
+  "id": "CHK-BSO-A25-P3",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "階段の中間手すり",
+    "target_subject": "階段",
+    "description": "幅が3mを超える階段に中間手すりを設けることを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "25",
+    "paragraph": "3",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "階段"
+  ],
+  "text_raw": "階段の幅が三メートルをこえる場合においては、中間に手すりを設けなければならない。ただし、けあげが十五センチメートル以下で、かつ、踏面が三十センチメートル以上のものにあつては、この限りでない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-stair-width",
+          "operator": ">",
+          "value": 3,
+          "unit": "m"
+        }
+      ],
+      "note": "階段の幅が3mを超える場合に適用"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "ref": "info-exempt",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "ref": "info-middle-handrail",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    },
+    "exceptions": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-riser-height",
+          "operator": "<=",
+          "value": 15,
+          "unit": "cm"
+        },
+        {
+          "ref": "info-tread-depth",
+          "operator": ">=",
+          "value": 30,
+          "unit": "cm"
+        }
+      ],
+      "effect": "EXEMPT"
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-stair-set",
+        "type": "process",
+        "title": "階段の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から判定対象となる階段を特定する"
+      },
+      {
+        "id": "info-stair-set",
+        "type": "information",
+        "title": "建築物の階段",
+        "subject": "建築物",
+        "property": "階段の集合",
+        "property_type": "set_definition",
+        "description": "判定対象となる建築物に属する階段を特定",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-stair-width",
+        "type": "process",
+        "title": "階段幅の特定",
+        "process_type": "undefined_input",
+        "target_subject": "階段",
+        "iteration": "iterative",
+        "description": "設計図書等から各階段の幅を読み取る"
+      },
+      {
+        "id": "info-stair-width",
+        "type": "information",
+        "title": "階段の幅",
+        "symbol": "W",
+        "subject": "階段",
+        "property": "幅",
+        "property_type": "numeric",
+        "unit": "m",
+        "description": "階段の幅（メートル）",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-scope-check",
+        "type": "process",
+        "title": "適用対象判定",
+        "process_type": "mechanical",
+        "target_subject": "階段",
+        "iteration": "iterative",
+        "description": "階段の幅が3mを超えるかを判定し、本項の適用対象となるかを確認",
+        "logic_expression": "W > 3"
+      },
+      {
+        "id": "info-scope",
+        "type": "information",
+        "title": "本項適用対象",
+        "symbol": "S",
+        "subject": "階段",
+        "property": "本項適用対象への該当",
+        "property_type": "proposition",
+        "description": "階段の幅が3mを超え、本項の適用対象となるか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-riser-height",
+        "type": "process",
+        "title": "けあげの特定",
+        "process_type": "undefined_input",
+        "target_subject": "階段",
+        "iteration": "iterative",
+        "description": "設計図書等から各階段のけあげ（蹴上げ）寸法を読み取る"
+      },
+      {
+        "id": "info-riser-height",
+        "type": "information",
+        "title": "けあげ",
+        "symbol": "R",
+        "subject": "階段",
+        "property": "けあげ",
+        "property_type": "numeric",
+        "unit": "cm",
+        "description": "階段のけあげ（蹴上げ）寸法（センチメートル）",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-tread-depth",
+        "type": "process",
+        "title": "踏面の特定",
+        "process_type": "undefined_input",
+        "target_subject": "階段",
+        "iteration": "iterative",
+        "description": "設計図書等から各階段の踏面寸法を読み取る"
+      },
+      {
+        "id": "info-tread-depth",
+        "type": "information",
+        "title": "踏面",
+        "symbol": "T",
+        "subject": "階段",
+        "property": "踏面",
+        "property_type": "numeric",
+        "unit": "cm",
+        "description": "階段の踏面寸法（センチメートル）",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-exempt-check",
+        "type": "process",
+        "title": "適用除外判定",
+        "process_type": "mechanical",
+        "target_subject": "階段",
+        "iteration": "iterative",
+        "description": "ただし書きの適用除外（けあげ15cm以下かつ踏面30cm以上）に該当するか判定",
+        "logic_expression": "(R <= 15) AND (T >= 30)"
+      },
+      {
+        "id": "info-exempt",
+        "type": "information",
+        "title": "適用除外該当",
+        "symbol": "X",
+        "subject": "階段",
+        "property": "適用除外への該当",
+        "property_type": "proposition",
+        "description": "ただし書きによる適用除外に該当するか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-middle-handrail",
+        "type": "process",
+        "title": "中間手すり設置確認",
+        "process_type": "undefined_input",
+        "target_subject": "階段",
+        "iteration": "iterative",
+        "description": "設計図書等から階段に中間手すりが設けられているかを確認する"
+      },
+      {
+        "id": "info-middle-handrail",
+        "type": "information",
+        "title": "中間手すりの設置",
+        "symbol": "H",
+        "subject": "階段",
+        "property": "中間手すりの設置有無",
+        "property_type": "proposition",
+        "description": "階段に中間手すりが設けられているか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-final-judgment",
+        "type": "process",
+        "title": "適合判定",
+        "process_type": "mechanical",
+        "target_subject": "階段",
+        "iteration": "iterative",
+        "description": "各階段について、適用対象外・適用除外・中間手すり設置のいずれかを満たすことを確認",
+        "logic_expression": "(NOT S) OR X OR H"
+      },
+      {
+        "id": "info-compliance",
+        "type": "information",
+        "title": "令25条3項適合",
+        "symbol": "C",
+        "subject": "階段",
+        "property": "令25条3項適合",
+        "property_type": "proposition",
+        "description": "令25条3項の規定に適合するか",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-all-check",
+        "type": "process",
+        "title": "全階段適合確認",
+        "process_type": "mechanical",
+        "description": "全ての階段が令25条3項に適合することを確認",
+        "logic_expression": "forall stair in Stairs: C(stair) = true"
+      },
+      {
+        "id": "info-final",
+        "type": "information",
+        "title": "建築物の令25条3項適合",
+        "subject": "建築物",
+        "property": "令25条3項適合",
+        "property_type": "proposition",
+        "description": "建築物全体として令25条3項の規定に適合するか",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-stair-set",
+        "to": "info-stair-set",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "info-stair-set",
+        "to": "proc-stair-width",
+        "role": "input"
+      },
+      {
+        "id": "e03",
+        "from": "proc-stair-width",
+        "to": "info-stair-width",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "info-stair-width",
+        "to": "proc-scope-check",
+        "role": "input"
+      },
+      {
+        "id": "e05",
+        "from": "proc-scope-check",
+        "to": "info-scope",
+        "role": "output"
+      },
+      {
+        "id": "e06",
+        "from": "info-stair-set",
+        "to": "proc-riser-height",
+        "role": "input"
+      },
+      {
+        "id": "e07",
+        "from": "proc-riser-height",
+        "to": "info-riser-height",
+        "role": "output"
+      },
+      {
+        "id": "e08",
+        "from": "info-stair-set",
+        "to": "proc-tread-depth",
+        "role": "input"
+      },
+      {
+        "id": "e09",
+        "from": "proc-tread-depth",
+        "to": "info-tread-depth",
+        "role": "output"
+      },
+      {
+        "id": "e10",
+        "from": "info-riser-height",
+        "to": "proc-exempt-check",
+        "role": "input"
+      },
+      {
+        "id": "e11",
+        "from": "info-tread-depth",
+        "to": "proc-exempt-check",
+        "role": "input"
+      },
+      {
+        "id": "e12",
+        "from": "proc-exempt-check",
+        "to": "info-exempt",
+        "role": "output"
+      },
+      {
+        "id": "e13",
+        "from": "info-stair-set",
+        "to": "proc-middle-handrail",
+        "role": "input"
+      },
+      {
+        "id": "e14",
+        "from": "proc-middle-handrail",
+        "to": "info-middle-handrail",
+        "role": "output"
+      },
+      {
+        "id": "e15",
+        "from": "info-scope",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e16",
+        "from": "info-exempt",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e17",
+        "from": "info-middle-handrail",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e18",
+        "from": "proc-final-judgment",
+        "to": "info-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e19",
+        "from": "info-compliance",
+        "to": "proc-all-check",
+        "role": "input"
+      },
+      {
+        "id": "e20",
+        "from": "proc-all-check",
+        "to": "info-final",
+        "role": "output"
+      }
+    ]
+  },
+  "metadata": {
+    "created_at": "2026-01-23T12:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

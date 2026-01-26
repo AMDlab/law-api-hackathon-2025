@@ -1,0 +1,339 @@
+{
+  "id": "A136_2_5_P1_I15_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "建築物の構造に関する遮音上必要な制限",
+    "target_subject": "建築物",
+    "description": "沿道整備道路に接する建築物の遮音上有効な構造要件の適合判定フロー"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "136_2_5",
+    "paragraph": "1",
+    "item": "15"
+  },
+  "labels": [
+    "集団規定",
+    "地区計画",
+    "沿道地区計画",
+    "遮音"
+  ],
+  "text_raw": "十五　建築物の構造に関する遮音上必要な制限　その敷地が沿道整備道路に接する建築物（沿道整備道路に係る間口率の最低限度を超える部分を除く。）の沿道整備道路の路面の中心からの高さが五メートル未満の範囲は、空隙のない壁が設けられたものとすることその他の遮音上有効な構造としなければならないとされるものであること。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "沿道地区計画の区域内"
+        },
+        {
+          "type": "ordinance",
+          "value": "法第68条の2第1項に基づく条例で遮音上必要な制限を定めた区域"
+        }
+      ],
+      "note": "沿道地区計画において条例で建築物の構造に関する遮音上必要な制限が定められた区域"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "building_location",
+          "value": "敷地が沿道整備道路に接する建築物"
+        },
+        {
+          "type": "requirement",
+          "value": "沿道整備道路の路面の中心からの高さ5m未満の範囲は遮音上有効な構造",
+          "description": "空隙のない壁が設けられたものとすることその他の遮音上有効な構造"
+        }
+      ]
+    },
+    "exceptions": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "type": "building_part",
+          "value": "沿道整備道路に係る間口率の最低限度を超える部分"
+        }
+      ],
+      "effect": "EXEMPT",
+      "description": "間口率の最低限度を超える部分は遮音構造要件の適用対象外"
+    }
+  },
+  "flow_diagram": {
+    "title": "令第136条の2の5第1項第15号 遮音上必要な制限 適合判定フロー",
+    "description": "沿道整備道路に接する建築物の遮音構造要件の適合判定フローチャート",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "令第136条の2の5第1項第15号の適合判定を開始"
+      },
+      {
+        "id": "dec-road-contact",
+        "type": "decision",
+        "title": "敷地は沿道整備道路に接しているか？",
+        "decision_type": "binary",
+        "description": "設計図書から敷地が沿道整備道路に接しているか確認",
+        "condition": {
+          "operator": "EQ",
+          "lhs": { "var": "R", "desc": "沿道整備道路への接道有無" },
+          "rhs": { "value": true, "desc": "接している" }
+        }
+      },
+      {
+        "id": "proc-frontage-ratio",
+        "type": "process",
+        "title": "間口率を算定する",
+        "process_type": "mechanical",
+        "description": "F = L_building / L_site（建築物の沿道整備道路面の長さ ÷ 敷地の沿道整備道路接道部分の長さ）",
+        "related_articles": [
+          "令::A136_2_5:P4:I3",
+          "令::A136_2_5:P4:I4"
+        ]
+      },
+      {
+        "id": "dec-frontage-ratio",
+        "type": "decision",
+        "title": "算定した間口率は最低限度以上か？",
+        "decision_type": "binary",
+        "description": "条例で定められた間口率の最低限度と比較",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "F", "desc": "沿道整備道路に係る間口率" },
+          "rhs": { "var": "F_min", "desc": "間口率の最低限度" }
+        },
+        "related_articles": [
+          "令::A136_2_5:P1:I14"
+        ]
+      },
+      {
+        "id": "proc-identify-scope",
+        "type": "process",
+        "title": "間口率の最低限度を超える部分を除いた適用対象範囲を特定する",
+        "process_type": "mechanical",
+        "description": "間口率の最低限度を超える部分は遮音構造要件の適用対象外となるため、対象範囲を特定"
+      },
+      {
+        "id": "dec-target-height-range",
+        "type": "decision",
+        "title": "沿道整備道路路面中心から高さ5m未満の範囲があるか？",
+        "decision_type": "binary",
+        "description": "建築物の適用対象範囲内に、沿道整備道路の路面の中心からの高さが5m未満の範囲があるか確認",
+        "condition": {
+          "operator": "LT",
+          "lhs": { "var": "H", "desc": "路面中心からの高さ", "unit": "m" },
+          "rhs": { "value": 5, "desc": "5メートル", "unit": "m" }
+        }
+      },
+      {
+        "id": "proc-identify-height-range",
+        "type": "process",
+        "title": "高さ5m未満の範囲を特定する",
+        "process_type": "mechanical",
+        "description": "沿道整備道路の路面の中心からの高さが5m未満となる建築物の範囲を特定"
+      },
+      {
+        "id": "dec-sound-barrier",
+        "type": "decision",
+        "title": "対象範囲は遮音上有効な構造か？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "空隙のない壁", "description": "空隙のない壁が設けられている" },
+          { "value": "その他の遮音構造", "description": "その他の遮音上有効な構造である" },
+          { "value": "遮音構造なし", "description": "遮音上有効な構造でない" }
+        ],
+        "description": "高さ5m未満の範囲に空隙のない壁が設けられているか、その他の遮音上有効な構造であるか判定"
+      },
+      {
+        "id": "proc-wall-confirm",
+        "type": "process",
+        "title": "空隙のない壁であることを確認",
+        "process_type": "human_judgment",
+        "description": "対象範囲の壁が空隙のない壁であることを設計図書・仕様書等で確認"
+      },
+      {
+        "id": "proc-other-sound-confirm",
+        "type": "process",
+        "title": "その他の遮音上有効な構造であることを確認",
+        "process_type": "human_judgment",
+        "description": "対象範囲がその他の遮音上有効な構造であることを設計図書・仕様書等で確認"
+      },
+      {
+        "id": "end-pass-not-applicable",
+        "type": "terminal",
+        "title": "適合（対象外）",
+        "result": "pass",
+        "description": "敷地が沿道整備道路に接していないため、本号の適用対象外"
+      },
+      {
+        "id": "end-pass-exempt",
+        "type": "terminal",
+        "title": "適合（適用除外）",
+        "result": "pass",
+        "description": "間口率の最低限度を超えないため、遮音構造要件の適用除外"
+      },
+      {
+        "id": "end-pass-no-target",
+        "type": "terminal",
+        "title": "適合（対象範囲なし）",
+        "result": "pass",
+        "description": "高さ5m未満の範囲がないため、遮音構造要件の対象範囲なし"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令第136条の2の5第1項第15号に適合"
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "令第136条の2の5第1項第15号に不適合（遮音上有効な構造でない）"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-road-contact",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-road-contact",
+        "to": "proc-frontage-ratio",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "dec-road-contact",
+        "to": "end-pass-not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e04",
+        "from": "proc-frontage-ratio",
+        "to": "dec-frontage-ratio",
+        "role": "flow"
+      },
+      {
+        "id": "e05",
+        "from": "dec-frontage-ratio",
+        "to": "proc-identify-scope",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e06",
+        "from": "dec-frontage-ratio",
+        "to": "end-pass-exempt",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e07",
+        "from": "proc-identify-scope",
+        "to": "dec-target-height-range",
+        "role": "flow"
+      },
+      {
+        "id": "e08",
+        "from": "dec-target-height-range",
+        "to": "proc-identify-height-range",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e09",
+        "from": "dec-target-height-range",
+        "to": "end-pass-no-target",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e10",
+        "from": "proc-identify-height-range",
+        "to": "dec-sound-barrier",
+        "role": "flow"
+      },
+      {
+        "id": "e11",
+        "from": "dec-sound-barrier",
+        "to": "proc-wall-confirm",
+        "role": "option",
+        "label": "空隙のない壁"
+      },
+      {
+        "id": "e12",
+        "from": "dec-sound-barrier",
+        "to": "proc-other-sound-confirm",
+        "role": "option",
+        "label": "その他の遮音構造"
+      },
+      {
+        "id": "e13",
+        "from": "dec-sound-barrier",
+        "to": "end-fail",
+        "role": "option",
+        "label": "遮音構造なし"
+      },
+      {
+        "id": "e14",
+        "from": "proc-wall-confirm",
+        "to": "end-pass",
+        "role": "flow"
+      },
+      {
+        "id": "e15",
+        "from": "proc-other-sound-confirm",
+        "to": "end-pass",
+        "role": "flow"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-KIJO-A136_2_5-P1-I15",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": [
+        "A68_2:P1"
+      ],
+      "description": "法第68条の2第1項に基づく条例による建築物の制限"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": [
+        "A136_2_5:P1:I14",
+        "A136_2_5:P4:I3",
+        "A136_2_5:P4:I4"
+      ],
+      "description": "第14号で沿道整備道路に係る間口率の最低限度を規定、第4項第3号・第4号で算定方法を規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00+09:00",
+    "updated_at": "2026-01-26T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令",
+    "checklist_ref": "令第136条の2の5第1項第15号（遮音上必要な制限）"
+  }
+}

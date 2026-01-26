@@ -1,0 +1,431 @@
+{
+  "id": "CHK-BSL-ORD-A125-P1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "避難階における屋外への出口までの歩行距離",
+    "target_subject": "避難階",
+    "description": "階段から屋外への出口、居室から屋外への出口への歩行距離制限"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "125",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "避難",
+    "歩行距離"
+  ],
+  "text_raw": "避難階においては、階段から屋外への出口の一に至る歩行距離は第百二十条に規定する数値以下と、居室（避難上有効な開口部を有するものを除く。）の各部分から屋外への出口の一に至る歩行距離は同条に規定する数値の二倍以下としなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        { "type": "floor", "value": "避難階" }
+      ],
+      "note": "避難階に適用"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "description": "階段から屋外への出口の一に至る歩行距離が令第120条に規定する数値以下",
+          "lhs": { "ref": "D1", "description": "階段から屋外への出口の一に至る歩行距離" },
+          "operator": "<=",
+          "rhs": { "ref": "L1", "description": "令第120条に規定する数値" }
+        },
+        {
+          "description": "居室（避難上有効な開口部を有するものを除く）の各部分から屋外への出口の一に至る歩行距離が令第120条に規定する数値の二倍以下",
+          "lhs": { "ref": "D2", "description": "居室の各部分から屋外への出口の一に至る歩行距離" },
+          "operator": "<=",
+          "rhs": { "ref": "L2", "description": "令第120条に規定する数値の二倍" }
+        }
+      ]
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-floor-identify",
+        "type": "process",
+        "title": "避難階の特定",
+        "process_type": "undefined_input",
+        "description": "建築物における避難階を特定"
+      },
+      {
+        "id": "info-floor-set",
+        "type": "information",
+        "title": "避難階",
+        "subject": "建築物",
+        "property": "避難階",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "建築物における避難階"
+      },
+      {
+        "id": "proc-stair-identify",
+        "type": "process",
+        "title": "階段の特定",
+        "process_type": "undefined_input",
+        "description": "避難階に設ける階段を特定"
+      },
+      {
+        "id": "info-stair-set",
+        "type": "information",
+        "title": "階段",
+        "subject": "避難階",
+        "property": "階段の集合",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "避難階に設けられた階段"
+      },
+      {
+        "id": "proc-exit-identify",
+        "type": "process",
+        "title": "屋外への出口の特定",
+        "process_type": "undefined_input",
+        "description": "避難階における屋外への出口を特定"
+      },
+      {
+        "id": "info-exit-set",
+        "type": "information",
+        "title": "屋外への出口",
+        "subject": "避難階",
+        "property": "屋外への出口の集合",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "避難階における屋外への出口"
+      },
+      {
+        "id": "proc-room-identify",
+        "type": "process",
+        "title": "対象居室の特定",
+        "process_type": "undefined_input",
+        "description": "避難上有効な開口部を有しない居室を特定"
+      },
+      {
+        "id": "info-room-set",
+        "type": "information",
+        "title": "対象居室",
+        "subject": "避難階",
+        "property": "避難上有効な開口部を有しない居室の集合",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "避難上有効な開口部を有しない居室（適用対象）"
+      },
+      {
+        "id": "proc-limit-value-identify",
+        "type": "process",
+        "title": "歩行距離基準値の特定",
+        "process_type": "sub_diagram_reference",
+        "sub_diagram_ref": "CHK-BSL-ORD-A120",
+        "description": "令第120条に規定する歩行距離基準値を特定（居室の種類・構造に応じた数値）"
+      },
+      {
+        "id": "info-limit-value",
+        "type": "information",
+        "title": "歩行距離基準値",
+        "symbol": "L",
+        "subject": "建築物",
+        "property": "令第120条に規定する歩行距離数値",
+        "property_type": "numeric",
+        "unit": "m",
+        "plurality": "single",
+        "description": "居室の種類及び主要構造部の構造に応じた基準歩行距離",
+        "related_articles": ["令::A120:P1"]
+      },
+      {
+        "id": "proc-stair-dist-measure",
+        "type": "process",
+        "title": "階段から出口への歩行距離計測",
+        "process_type": "undefined_input",
+        "description": "各階段から屋外への出口の一に至る歩行距離を計測",
+        "iteration": "iterative"
+      },
+      {
+        "id": "info-stair-dist",
+        "type": "information",
+        "title": "階段から出口への歩行距離",
+        "symbol": "D1",
+        "subject": "階段",
+        "property": "屋外への出口の一に至る歩行距離",
+        "property_type": "numeric",
+        "unit": "m",
+        "plurality": "multiple",
+        "description": "各階段から屋外への出口の一に至る最短歩行距離"
+      },
+      {
+        "id": "proc-stair-dist-judge",
+        "type": "process",
+        "title": "階段からの歩行距離判定",
+        "process_type": "mechanical",
+        "description": "階段から出口への歩行距離が基準値以下か判定",
+        "logic_expression": "D1 <= L",
+        "iteration": "iterative"
+      },
+      {
+        "id": "info-stair-dist-compliance",
+        "type": "information",
+        "title": "階段からの歩行距離適合",
+        "symbol": "C1",
+        "subject": "階段",
+        "property": "歩行距離適合",
+        "property_type": "proposition",
+        "plurality": "multiple",
+        "description": "各階段について歩行距離が基準値以下"
+      },
+      {
+        "id": "proc-room-dist-measure",
+        "type": "process",
+        "title": "居室から出口への歩行距離計測",
+        "process_type": "undefined_input",
+        "description": "各居室の各部分から屋外への出口の一に至る歩行距離を計測",
+        "iteration": "iterative"
+      },
+      {
+        "id": "info-room-dist",
+        "type": "information",
+        "title": "居室から出口への歩行距離",
+        "symbol": "D2",
+        "subject": "居室",
+        "property": "各部分から屋外への出口の一に至る歩行距離",
+        "property_type": "numeric",
+        "unit": "m",
+        "plurality": "multiple",
+        "description": "各居室の各部分から屋外への出口の一に至る最長歩行距離"
+      },
+      {
+        "id": "proc-double-limit-calc",
+        "type": "process",
+        "title": "二倍基準値算出",
+        "process_type": "mechanical",
+        "description": "令第120条に規定する数値の二倍を算出",
+        "logic_expression": "L2 = L * 2"
+      },
+      {
+        "id": "info-double-limit",
+        "type": "information",
+        "title": "歩行距離基準値の二倍",
+        "symbol": "L2",
+        "subject": "建築物",
+        "property": "令第120条に規定する数値の二倍",
+        "property_type": "numeric",
+        "unit": "m",
+        "plurality": "single",
+        "description": "居室からの歩行距離に適用する基準値（基準値の二倍）"
+      },
+      {
+        "id": "proc-room-dist-judge",
+        "type": "process",
+        "title": "居室からの歩行距離判定",
+        "process_type": "mechanical",
+        "description": "居室から出口への歩行距離が基準値の二倍以下か判定",
+        "logic_expression": "D2 <= L2",
+        "iteration": "iterative"
+      },
+      {
+        "id": "info-room-dist-compliance",
+        "type": "information",
+        "title": "居室からの歩行距離適合",
+        "symbol": "C2",
+        "subject": "居室",
+        "property": "歩行距離適合",
+        "property_type": "proposition",
+        "plurality": "multiple",
+        "description": "各居室について歩行距離が基準値の二倍以下"
+      },
+      {
+        "id": "proc-final-judge",
+        "type": "process",
+        "title": "最終適合判定",
+        "process_type": "mechanical",
+        "description": "全ての階段と居室について歩行距離適合を総合判定",
+        "logic_expression": "ALL(C1) AND ALL(C2)"
+      },
+      {
+        "id": "info-final-compliance",
+        "type": "information",
+        "title": "令第125条第1項適合",
+        "symbol": "COMPLIANT",
+        "subject": "避難階",
+        "property": "令第125条第1項適合性",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "避難階における屋外への出口への歩行距離が適合"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-floor-identify",
+        "to": "info-floor-set",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "info-floor-set",
+        "to": "proc-stair-identify",
+        "role": "input"
+      },
+      {
+        "id": "e03",
+        "from": "proc-stair-identify",
+        "to": "info-stair-set",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "info-floor-set",
+        "to": "proc-exit-identify",
+        "role": "input"
+      },
+      {
+        "id": "e05",
+        "from": "proc-exit-identify",
+        "to": "info-exit-set",
+        "role": "output"
+      },
+      {
+        "id": "e06",
+        "from": "info-floor-set",
+        "to": "proc-room-identify",
+        "role": "input"
+      },
+      {
+        "id": "e07",
+        "from": "proc-room-identify",
+        "to": "info-room-set",
+        "role": "output"
+      },
+      {
+        "id": "e08",
+        "from": "proc-limit-value-identify",
+        "to": "info-limit-value",
+        "role": "output"
+      },
+      {
+        "id": "e09",
+        "from": "info-stair-set",
+        "to": "proc-stair-dist-measure",
+        "role": "input"
+      },
+      {
+        "id": "e10",
+        "from": "info-exit-set",
+        "to": "proc-stair-dist-measure",
+        "role": "input"
+      },
+      {
+        "id": "e11",
+        "from": "proc-stair-dist-measure",
+        "to": "info-stair-dist",
+        "role": "output"
+      },
+      {
+        "id": "e12",
+        "from": "info-stair-dist",
+        "to": "proc-stair-dist-judge",
+        "role": "input"
+      },
+      {
+        "id": "e13",
+        "from": "info-limit-value",
+        "to": "proc-stair-dist-judge",
+        "role": "input"
+      },
+      {
+        "id": "e14",
+        "from": "proc-stair-dist-judge",
+        "to": "info-stair-dist-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e15",
+        "from": "info-room-set",
+        "to": "proc-room-dist-measure",
+        "role": "input"
+      },
+      {
+        "id": "e16",
+        "from": "info-exit-set",
+        "to": "proc-room-dist-measure",
+        "role": "input"
+      },
+      {
+        "id": "e17",
+        "from": "proc-room-dist-measure",
+        "to": "info-room-dist",
+        "role": "output"
+      },
+      {
+        "id": "e18",
+        "from": "info-limit-value",
+        "to": "proc-double-limit-calc",
+        "role": "input"
+      },
+      {
+        "id": "e19",
+        "from": "proc-double-limit-calc",
+        "to": "info-double-limit",
+        "role": "output"
+      },
+      {
+        "id": "e20",
+        "from": "info-room-dist",
+        "to": "proc-room-dist-judge",
+        "role": "input"
+      },
+      {
+        "id": "e21",
+        "from": "info-double-limit",
+        "to": "proc-room-dist-judge",
+        "role": "input"
+      },
+      {
+        "id": "e22",
+        "from": "proc-room-dist-judge",
+        "to": "info-room-dist-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e23",
+        "from": "info-stair-dist-compliance",
+        "to": "proc-final-judge",
+        "role": "input"
+      },
+      {
+        "id": "e24",
+        "from": "info-room-dist-compliance",
+        "to": "proc-final-judge",
+        "role": "input"
+      },
+      {
+        "id": "e25",
+        "from": "proc-final-judge",
+        "to": "info-final-compliance",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": ["A120:P1"],
+      "description": "歩行距離の基準値を令第120条に委任"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-23T00:00:00+09:00",
+    "author": "Claude",
+    "generator": "kijo-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

@@ -1,0 +1,218 @@
+{
+  "id": "A23_P2_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "回り階段の踏面寸法測定位置",
+    "target_subject": "回り階段",
+    "description": "回り階段の部分における踏面の寸法を、踏面の狭い方の端から30cmの位置で測定することを規定"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "23",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "階段",
+    "測定方法"
+  ],
+  "text_raw": "回り階段の部分における踏面の寸法は、踏面の狭い方の端から三十センチメートルの位置において測るものとする。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "building_element",
+          "value": "回り階段の部分を有する階段"
+        }
+      ],
+      "note": "回り階段の部分を有する階段に適用"
+    },
+    "judgment_rule": {
+      "operator": "==",
+      "lhs": {
+        "ref": "info-measurement-position",
+        "property": "測定位置"
+      },
+      "rhs": {
+        "value": "踏面の狭い方の端から30cmの位置"
+      }
+    },
+    "exceptions": null
+  },
+  "flow_diagram": {
+    "title": "令23条2項 回り階段踏面寸法測定位置の適合判定フロー",
+    "description": "回り階段の部分における踏面寸法の測定位置が適切であるかを判定するフロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "審査開始",
+        "result": "start",
+        "description": "令23条2項の適合判定を開始"
+      },
+      {
+        "id": "dec-has-winder",
+        "type": "decision",
+        "title": "回り階段の部分を有するか？",
+        "decision_type": "binary",
+        "description": "建築物の階段に回り階段の部分があるかを判定",
+        "condition": {
+          "operator": "EQ",
+          "lhs": {
+            "var": "winder_stairs",
+            "desc": "回り階段の部分の有無"
+          },
+          "rhs": {
+            "value": true,
+            "desc": "有り"
+          }
+        }
+      },
+      {
+        "id": "proc-identify-winder",
+        "type": "process",
+        "title": "回り階段の部分を特定",
+        "process_type": "undefined_input",
+        "description": "設計図書から回り階段の部分を有する階段を特定する"
+      },
+      {
+        "id": "dec-measurement-position",
+        "type": "decision",
+        "title": "踏面寸法は狭い方の端から30cmの位置で測定されているか？",
+        "decision_type": "binary",
+        "description": "各回り階段の踏面寸法が、踏面の狭い方の端から30cmの位置で測定されているかを確認",
+        "condition": {
+          "operator": "EQ",
+          "lhs": {
+            "var": "measurement_position",
+            "desc": "踏面寸法の測定位置"
+          },
+          "rhs": {
+            "value": "踏面の狭い方の端から30cm",
+            "desc": "適切な測定位置"
+          }
+        }
+      },
+      {
+        "id": "dec-all-winder-checked",
+        "type": "decision",
+        "title": "全ての回り階段を確認したか？",
+        "decision_type": "binary",
+        "description": "全ての回り階段について踏面測定位置を確認完了したか判定",
+        "condition": {
+          "operator": "EQ",
+          "lhs": {
+            "var": "all_checked",
+            "desc": "全回り階段確認完了"
+          },
+          "rhs": {
+            "value": true,
+            "desc": "完了"
+          }
+        }
+      },
+      {
+        "id": "end-pass-no-winder",
+        "type": "terminal",
+        "title": "適合（適用対象外）",
+        "result": "pass",
+        "description": "回り階段の部分がないため、本項は適用対象外"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "全ての回り階段の踏面寸法が適切な位置で測定されている"
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "踏面寸法が狭い方の端から30cmの位置で測定されていない回り階段がある"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-has-winder",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-has-winder",
+        "to": "end-pass-no-winder",
+        "role": "no",
+        "label": "無し"
+      },
+      {
+        "id": "e03",
+        "from": "dec-has-winder",
+        "to": "proc-identify-winder",
+        "role": "yes",
+        "label": "有り"
+      },
+      {
+        "id": "e04",
+        "from": "proc-identify-winder",
+        "to": "dec-measurement-position",
+        "role": "flow"
+      },
+      {
+        "id": "e05",
+        "from": "dec-measurement-position",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e06",
+        "from": "dec-measurement-position",
+        "to": "dec-all-winder-checked",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e07",
+        "from": "dec-all-winder-checked",
+        "to": "dec-measurement-position",
+        "role": "no",
+        "label": "未完了（次の回り階段へ）"
+      },
+      {
+        "id": "e08",
+        "from": "dec-all-winder-checked",
+        "to": "end-pass",
+        "role": "yes",
+        "label": "完了"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-ORDER-A23-P2",
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": [
+        "A23:P1"
+      ],
+      "description": "第1項の表による階段寸法基準との関連"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

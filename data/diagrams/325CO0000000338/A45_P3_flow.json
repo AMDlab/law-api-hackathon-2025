@@ -1,0 +1,201 @@
+{
+  "id": "A45_P3_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "筋かいの端部緊結 適合判定フロー",
+    "target_subject": "筋かい",
+    "description": "筋かいの両端の端部が柱又は横架材に金物で緊結され、いずれか一方の端部が仕口部分で緊結されていることを判定するフロー"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "45",
+    "paragraph": "3",
+    "item": null
+  },
+  "labels": ["単体規定", "構造", "木造", "筋かい"],
+  "text_raw": "筋かいは、その両端の端部を、柱又ははりその他の横架材に、ボルト、かすがい、くぎその他の金物で緊結しなければならない。この場合において、そのいずれか一方の端部を緊結する位置は、当該柱と当該横架材との仕口の部分でなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        { "type": "general", "value": "すべての筋かい" }
+      ],
+      "note": "木造建築物に設けられる筋かいに適用される"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "description": "両端の端部が柱又は横架材に金物で緊結されている",
+          "ref": "info-fastening-compliance"
+        },
+        {
+          "description": "いずれか一方の端部が仕口部分で緊結されている",
+          "ref": "info-joint-position-compliance"
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "flow_diagram": {
+    "title": "令第45条第3項 筋かいの端部緊結 適合判定フロー",
+    "description": "筋かいの端部緊結要件（金物緊結＋仕口部分緊結）の適合判定を行うフローチャート",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "令第45条第3項の適合判定を開始"
+      },
+      {
+        "id": "proc-identify-building",
+        "type": "process",
+        "title": "建築物の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から判定対象となる木造建築物を特定する"
+      },
+      {
+        "id": "proc-identify-braces",
+        "type": "process",
+        "title": "筋かいの集合の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物に属する筋かいの集合を特定する"
+      },
+      {
+        "id": "dec-has-braces",
+        "type": "decision",
+        "title": "筋かいがあるか？",
+        "decision_type": "binary",
+        "description": "建築物に筋かいが設けられているかを確認"
+      },
+      {
+        "id": "proc-check-fastening",
+        "type": "process",
+        "title": "端部緊結方法の確認",
+        "process_type": "undefined_input",
+        "description": "各筋かいの両端の端部が柱又は横架材にボルト、かすがい、くぎその他の金物で緊結されているか確認する"
+      },
+      {
+        "id": "dec-all-fastened",
+        "type": "decision",
+        "title": "全筋かいが金物で緊結されているか？",
+        "decision_type": "binary",
+        "description": "すべての筋かいについて、両端の端部が柱又ははりその他の横架材にボルト、かすがい、くぎその他の金物で緊結されているか判定",
+        "condition": {
+          "operator": "EQ",
+          "lhs": { "var": "FM_all", "desc": "全筋かいの端部緊結状況" },
+          "rhs": { "value": true, "desc": "すべて緊結済み" }
+        }
+      },
+      {
+        "id": "proc-fastening-ok",
+        "type": "process",
+        "title": "端部緊結基準適合",
+        "process_type": "mechanical",
+        "description": "両端の端部の金物緊結要件を満たしている"
+      },
+      {
+        "id": "proc-check-joint-position",
+        "type": "process",
+        "title": "緊結位置の確認",
+        "process_type": "undefined_input",
+        "description": "各筋かいについて、いずれか一方の端部を緊結する位置が柱と横架材との仕口部分であるか確認する"
+      },
+      {
+        "id": "dec-joint-position",
+        "type": "decision",
+        "title": "全筋かいで一方端部が仕口部分で緊結されているか？",
+        "decision_type": "binary",
+        "description": "すべての筋かいについて、いずれか一方の端部を緊結する位置が当該柱と当該横架材との仕口の部分であるか判定",
+        "condition": {
+          "operator": "EQ",
+          "lhs": { "var": "JP_all", "desc": "全筋かいの仕口部分緊結状況" },
+          "rhs": { "value": true, "desc": "すべて仕口部分で緊結済み" }
+        }
+      },
+      {
+        "id": "proc-joint-ok",
+        "type": "process",
+        "title": "仕口部分緊結基準適合",
+        "process_type": "mechanical",
+        "description": "いずれか一方の端部の仕口部分緊結要件を満たしている"
+      },
+      {
+        "id": "proc-final-check",
+        "type": "process",
+        "title": "最終判定",
+        "process_type": "mechanical",
+        "description": "端部緊結基準適合かつ仕口部分緊結基準適合の両方を確認"
+      },
+      {
+        "id": "terminal-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令第45条第3項の規定に適合",
+        "related_articles": ["令45条3項"]
+      },
+      {
+        "id": "terminal-fail-fastening",
+        "type": "terminal",
+        "title": "不適合（端部緊結）",
+        "result": "fail",
+        "description": "両端の端部が金物で緊結されていない筋かいがある",
+        "related_articles": ["令45条3項"]
+      },
+      {
+        "id": "terminal-fail-joint",
+        "type": "terminal",
+        "title": "不適合（仕口部分緊結）",
+        "result": "fail",
+        "description": "いずれの端部も仕口部分で緊結されていない筋かいがある",
+        "related_articles": ["令45条3項"]
+      },
+      {
+        "id": "terminal-na",
+        "type": "terminal",
+        "title": "対象外",
+        "result": "end",
+        "description": "筋かいがないため本条は適用されない"
+      }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "proc-identify-building", "role": "flow" },
+      { "id": "e02", "from": "proc-identify-building", "to": "proc-identify-braces", "role": "flow" },
+      { "id": "e03", "from": "proc-identify-braces", "to": "dec-has-braces", "role": "flow" },
+      { "id": "e04", "from": "dec-has-braces", "to": "proc-check-fastening", "role": "yes", "label": "あり" },
+      { "id": "e05", "from": "dec-has-braces", "to": "terminal-na", "role": "no", "label": "なし" },
+      { "id": "e06", "from": "proc-check-fastening", "to": "dec-all-fastened", "role": "flow" },
+      { "id": "e07", "from": "dec-all-fastened", "to": "proc-fastening-ok", "role": "yes", "label": "はい" },
+      { "id": "e08", "from": "dec-all-fastened", "to": "terminal-fail-fastening", "role": "no", "label": "いいえ" },
+      { "id": "e09", "from": "proc-fastening-ok", "to": "proc-check-joint-position", "role": "flow" },
+      { "id": "e10", "from": "proc-check-joint-position", "to": "dec-joint-position", "role": "flow" },
+      { "id": "e11", "from": "dec-joint-position", "to": "proc-joint-ok", "role": "yes", "label": "はい" },
+      { "id": "e12", "from": "dec-joint-position", "to": "terminal-fail-joint", "role": "no", "label": "いいえ" },
+      { "id": "e13", "from": "proc-joint-ok", "to": "proc-final-check", "role": "flow" },
+      { "id": "e14", "from": "proc-final-check", "to": "terminal-pass", "role": "flow" }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSO-A45-P3",
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": ["A45:P1", "A45:P2"],
+      "description": "筋かいの材料仕様（第1項：引張力、第2項：圧縮力）を参照"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T12:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

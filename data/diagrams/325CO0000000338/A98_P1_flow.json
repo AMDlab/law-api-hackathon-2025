@@ -1,0 +1,360 @@
+{
+  "id": "A98_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "溶接継目の材料強度",
+    "target_subject": "溶接継目",
+    "description": "溶接継目ののど断面に対する材料強度が規定の数値によるか判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "98",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造規定",
+    "鋼材",
+    "溶接"
+  ],
+  "text_raw": "溶接継目ののど断面に対する材料強度は、次の表の数値によらなければならない。\n継目の形式: 突合せ - 圧縮・引張り・曲げ: F、せん断: F/√3\n継目の形式: 突合せ以外 - 圧縮・引張り・曲げ: F/√3、せん断: F/√3\nこの表において、Fは、第92条の表に規定する基準強度を表すものとする。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "structure",
+          "value": "溶接接合を用いる鋼構造建築物"
+        }
+      ],
+      "note": "溶接継目を有する建築物の構造計算に適用"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-strength-compliance",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "flow_diagram": {
+    "title": "令第98条第1項 溶接継目の材料強度 適合判定フロー",
+    "description": "溶接継目ののど断面に対する材料強度が表の数値に適合するかを判定するフローチャート",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "令第98条第1項の適合判定を開始"
+      },
+      {
+        "id": "proc-identify-weld-joints",
+        "type": "process",
+        "title": "溶接継目の特定",
+        "process_type": "undefined_input",
+        "description": "審査対象の建築物に属するすべての溶接継目を特定する"
+      },
+      {
+        "id": "dec-has-weld-joints",
+        "type": "decision",
+        "title": "溶接継目があるか？",
+        "decision_type": "binary",
+        "description": "建築物に溶接継目が存在するか判定"
+      },
+      {
+        "id": "proc-identify-base-strength",
+        "type": "process",
+        "title": "基準強度Fの特定",
+        "process_type": "undefined_input",
+        "description": "令第92条の表に規定する鋼材の基準強度Fを特定",
+        "related_articles": ["令::A92"]
+      },
+      {
+        "id": "info-base-strength",
+        "type": "information",
+        "title": "基準強度F",
+        "symbol": "F",
+        "subject": "鋼材",
+        "property": "基準強度",
+        "property_type": "numeric",
+        "description": "令第92条の表に規定する基準強度（N/mm²）"
+      },
+      {
+        "id": "proc-loop-start",
+        "type": "process",
+        "title": "各溶接継目について判定開始",
+        "process_type": "mechanical",
+        "description": "すべての溶接継目について以下の判定を繰り返す"
+      },
+      {
+        "id": "proc-identify-joint-type",
+        "type": "process",
+        "title": "継目形式の特定",
+        "process_type": "undefined_input",
+        "description": "当該溶接継目が突合せ継目か突合せ以外かを特定"
+      },
+      {
+        "id": "dec-joint-type",
+        "type": "decision",
+        "title": "継目形式は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "突合せ", "description": "突合せ継目" },
+          { "value": "突合せ以外", "description": "突合せ以外の継目（隅肉溶接等）" }
+        ],
+        "description": "溶接継目の形式を判定"
+      },
+      {
+        "id": "proc-identify-load-type-butt",
+        "type": "process",
+        "title": "荷重種類の特定（突合せ）",
+        "process_type": "undefined_input",
+        "description": "当該溶接継目に作用する荷重の種類を特定"
+      },
+      {
+        "id": "dec-load-type-butt",
+        "type": "decision",
+        "title": "荷重種類は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "圧縮・引張り・曲げ", "description": "圧縮、引張り、または曲げ応力" },
+          { "value": "せん断", "description": "せん断応力" }
+        ],
+        "description": "突合せ継目に作用する荷重の種類を判定"
+      },
+      {
+        "id": "proc-calc-required-strength-butt-f",
+        "type": "process",
+        "title": "規定材料強度＝F",
+        "process_type": "mechanical",
+        "description": "突合せ継目・圧縮/引張り/曲げの場合、規定材料強度はF"
+      },
+      {
+        "id": "proc-calc-required-strength-butt-fsqrt3",
+        "type": "process",
+        "title": "規定材料強度＝F/√3",
+        "process_type": "mechanical",
+        "description": "突合せ継目・せん断の場合、規定材料強度はF/√3"
+      },
+      {
+        "id": "proc-calc-required-strength-other",
+        "type": "process",
+        "title": "規定材料強度＝F/√3",
+        "process_type": "mechanical",
+        "description": "突合せ以外の継目の場合、すべての荷重種類で規定材料強度はF/√3"
+      },
+      {
+        "id": "proc-identify-design-strength",
+        "type": "process",
+        "title": "設計材料強度の読取り",
+        "process_type": "undefined_input",
+        "description": "構造計算書から当該溶接継目の設計材料強度を読み取る"
+      },
+      {
+        "id": "dec-strength-compliance",
+        "type": "decision",
+        "title": "設計材料強度 ≦ 規定材料強度か？",
+        "decision_type": "binary",
+        "description": "設計材料強度が規定材料強度以下であるか判定",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "Fd", "desc": "設計材料強度" },
+          "rhs": { "var": "Fr", "desc": "規定材料強度" }
+        }
+      },
+      {
+        "id": "dec-more-joints",
+        "type": "decision",
+        "title": "未判定の溶接継目があるか？",
+        "decision_type": "binary",
+        "description": "まだ判定していない溶接継目が残っているか確認"
+      },
+      {
+        "id": "terminal-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "すべての溶接継目の材料強度が令第98条の表に適合"
+      },
+      {
+        "id": "terminal-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "溶接継目の材料強度が令第98条の表に不適合"
+      },
+      {
+        "id": "terminal-not-applicable",
+        "type": "terminal",
+        "title": "適用対象外",
+        "result": "pass",
+        "description": "溶接継目がないため本規定は適用対象外"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "proc-identify-weld-joints",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "proc-identify-weld-joints",
+        "to": "dec-has-weld-joints",
+        "role": "flow"
+      },
+      {
+        "id": "e03",
+        "from": "dec-has-weld-joints",
+        "to": "terminal-not-applicable",
+        "role": "no",
+        "label": "なし"
+      },
+      {
+        "id": "e04",
+        "from": "dec-has-weld-joints",
+        "to": "proc-identify-base-strength",
+        "role": "yes",
+        "label": "あり"
+      },
+      {
+        "id": "e05",
+        "from": "proc-identify-base-strength",
+        "to": "info-base-strength",
+        "role": "output"
+      },
+      {
+        "id": "e06",
+        "from": "info-base-strength",
+        "to": "proc-loop-start",
+        "role": "flow"
+      },
+      {
+        "id": "e07",
+        "from": "proc-loop-start",
+        "to": "proc-identify-joint-type",
+        "role": "flow"
+      },
+      {
+        "id": "e08",
+        "from": "proc-identify-joint-type",
+        "to": "dec-joint-type",
+        "role": "flow"
+      },
+      {
+        "id": "e09",
+        "from": "dec-joint-type",
+        "to": "proc-identify-load-type-butt",
+        "role": "option",
+        "label": "突合せ"
+      },
+      {
+        "id": "e10",
+        "from": "dec-joint-type",
+        "to": "proc-calc-required-strength-other",
+        "role": "option",
+        "label": "突合せ以外"
+      },
+      {
+        "id": "e11",
+        "from": "proc-identify-load-type-butt",
+        "to": "dec-load-type-butt",
+        "role": "flow"
+      },
+      {
+        "id": "e12",
+        "from": "dec-load-type-butt",
+        "to": "proc-calc-required-strength-butt-f",
+        "role": "option",
+        "label": "圧縮・引張り・曲げ"
+      },
+      {
+        "id": "e13",
+        "from": "dec-load-type-butt",
+        "to": "proc-calc-required-strength-butt-fsqrt3",
+        "role": "option",
+        "label": "せん断"
+      },
+      {
+        "id": "e14",
+        "from": "proc-calc-required-strength-butt-f",
+        "to": "proc-identify-design-strength",
+        "role": "flow"
+      },
+      {
+        "id": "e15",
+        "from": "proc-calc-required-strength-butt-fsqrt3",
+        "to": "proc-identify-design-strength",
+        "role": "flow"
+      },
+      {
+        "id": "e16",
+        "from": "proc-calc-required-strength-other",
+        "to": "proc-identify-design-strength",
+        "role": "flow"
+      },
+      {
+        "id": "e17",
+        "from": "proc-identify-design-strength",
+        "to": "dec-strength-compliance",
+        "role": "flow"
+      },
+      {
+        "id": "e18",
+        "from": "dec-strength-compliance",
+        "to": "terminal-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e19",
+        "from": "dec-strength-compliance",
+        "to": "dec-more-joints",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e20",
+        "from": "dec-more-joints",
+        "to": "proc-loop-start",
+        "role": "yes",
+        "label": "あり"
+      },
+      {
+        "id": "e21",
+        "from": "dec-more-joints",
+        "to": "terminal-pass",
+        "role": "no",
+        "label": "なし"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-ORDER-A98-P1",
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": ["A92"],
+      "description": "基準強度Fの定義"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

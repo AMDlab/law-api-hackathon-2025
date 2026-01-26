@@ -1,0 +1,376 @@
+{
+  "id": "CHK-BSL-FLOW-A136-P2",
+  "version": "3.2",
+  "page_title": {
+    "title": "高さのみ限度超過建築物に対する空地割合の読替え判定フロー",
+    "target_subject": "建築物",
+    "description": "法第59条の2第1項により高さのみ限度超過とする建築物における敷地内空地割合の読替え適用を判定するフロー"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "136",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": [
+    "集団規定",
+    "敷地内空地",
+    "総合設計"
+  ],
+  "text_raw": "法第五十九条の二第一項の規定によりその各部分の高さのみを法第五十五条第一項又は法第五十六条の規定による限度を超えるものとする建築物に対する前項の規定の適用については、同項中「十分の二」とあるのは「十分の一・五」と、「十分の一・五」とあるのは「十分の一」と、「十分の六・五」とあるのは「十分の六」とする。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "legal_application",
+          "value": "法第59条の2第1項適用建築物"
+        },
+        {
+          "type": "height_exemption",
+          "value": "高さのみを法第55条第1項又は法第56条の限度を超過"
+        }
+      ],
+      "note": "総合設計制度で高さのみの緩和を受ける建築物が対象"
+    },
+    "judgment_rule": {
+      "operator": "READ_REPLACE",
+      "conditions": [
+        {
+          "type": "replacement",
+          "original": "十分の二",
+          "replaced": "十分の一・五",
+          "description": "建蔽率最高限度が定められていない場合の空地割合"
+        },
+        {
+          "type": "replacement",
+          "original": "十分の一・五",
+          "replaced": "十分の一",
+          "description": "建蔽率5/10以下の場合の加算値"
+        },
+        {
+          "type": "replacement",
+          "original": "十分の六・五",
+          "replaced": "十分の六",
+          "description": "建蔽率5/10超～5.5/10以下の場合の空地割合"
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "flow_diagram": {
+    "title": "令第136条第2項 空地割合読替え適合判定フロー",
+    "description": "高さのみ限度超過建築物に対する敷地内空地割合の読替え規定の適合判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "令第136条第2項の適合判定を開始"
+      },
+      {
+        "id": "dec-001",
+        "type": "decision",
+        "title": "法第59条の2第1項（総合設計制度）の適用を受けるか？",
+        "decision_type": "binary",
+        "description": "建築物が法第59条の2第1項の総合設計制度の適用を受けるか否か",
+        "condition": {
+          "operator": "EQ",
+          "lhs": { "var": "AP", "desc": "総合設計制度適用有無" },
+          "rhs": { "value": true, "desc": "適用あり" }
+        },
+        "related_articles": ["法::A59_2:P1"]
+      },
+      {
+        "id": "dec-002",
+        "type": "decision",
+        "title": "限度超過の種別は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "高さのみ", "description": "高さのみ超過（法第55条第1項又は法第56条）" },
+          { "value": "容積率含む", "description": "容積率超過を含む" }
+        ],
+        "description": "建築物が超過する限度の種類",
+        "related_articles": ["法::A55:P1", "法::A56:P1"]
+      },
+      {
+        "id": "proc-001",
+        "type": "process",
+        "title": "第2項読替え規定を適用",
+        "process_type": "mechanical",
+        "description": "令第136条第2項の読替え規定を適用する"
+      },
+      {
+        "id": "dec-003",
+        "type": "decision",
+        "title": "建蔽率の最高限度が定められているか？",
+        "decision_type": "binary",
+        "description": "法第53条により建蔽率の最高限度が定められているか否か",
+        "condition": {
+          "operator": "EQ",
+          "lhs": { "var": "BCR", "desc": "建蔽率最高限度の指定有無" },
+          "rhs": { "value": true, "desc": "指定あり" }
+        },
+        "related_articles": ["法::A53:P1"]
+      },
+      {
+        "id": "proc-002",
+        "type": "process",
+        "title": "必要空地割合 = 0.15（十分の一・五）",
+        "process_type": "mechanical",
+        "description": "建蔽率最高限度が定められていない場合、読替え後の必要空地割合は0.15"
+      },
+      {
+        "id": "dec-004",
+        "type": "decision",
+        "title": "建蔽率最高限度は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "5/10以下", "description": "建蔽率最高限度が5/10以下" },
+          { "value": "5/10超5.5/10以下", "description": "建蔽率最高限度が5/10を超え5.5/10以下" },
+          { "value": "5.5/10超", "description": "建蔽率最高限度が5.5/10を超える" }
+        ],
+        "description": "建蔽率最高限度の値による分岐",
+        "condition": {
+          "operator": "IN",
+          "lhs": { "var": "BCM", "desc": "建蔽率最高限度" },
+          "rhs": { "value": ["5/10以下", "5/10超5.5/10以下", "5.5/10超"], "desc": "建蔽率の区分" }
+        }
+      },
+      {
+        "id": "proc-003",
+        "type": "process",
+        "title": "必要空地割合 = (1-BCM) + 0.1",
+        "process_type": "mechanical",
+        "description": "建蔽率5/10以下の場合、読替え後の必要空地割合は(1-建蔽率)+0.1"
+      },
+      {
+        "id": "proc-004",
+        "type": "process",
+        "title": "必要空地割合 = 0.6（十分の六）",
+        "process_type": "mechanical",
+        "description": "建蔽率5/10超5.5/10以下の場合、読替え後の必要空地割合は0.6"
+      },
+      {
+        "id": "proc-005",
+        "type": "process",
+        "title": "必要空地割合 = (1-BCM) + 0.2",
+        "process_type": "mechanical",
+        "description": "建蔽率5.5/10を超える場合、読替え後の必要空地割合は(1-建蔽率)+0.2"
+      },
+      {
+        "id": "proc-006",
+        "type": "process",
+        "title": "敷地面積(SA)・空地面積(OA)を確認",
+        "process_type": "undefined_input",
+        "description": "設計図書等から敷地面積と空地面積を読み取る"
+      },
+      {
+        "id": "proc-007",
+        "type": "process",
+        "title": "空地割合(OSA) = OA / SA を算定",
+        "process_type": "mechanical",
+        "description": "空地面積を敷地面積で除して空地割合を算出"
+      },
+      {
+        "id": "dec-005",
+        "type": "decision",
+        "title": "空地割合(OSA) >= 必要空地割合(OSR) か？",
+        "decision_type": "binary",
+        "description": "実績の空地割合が読替え後の必要空地割合以上かを判定",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "OSA", "desc": "空地割合（実績）" },
+          "rhs": { "var": "OSR", "desc": "必要空地割合", "unit": "割合" }
+        }
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "空地割合が読替え後の必要空地割合を満たしている"
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "空地割合が読替え後の必要空地割合を満たしていない"
+      },
+      {
+        "id": "end-not-applicable",
+        "type": "terminal",
+        "title": "本項不適用",
+        "result": "end",
+        "description": "令第136条第2項の読替え規定の適用対象外（第1項の原則規定を適用）"
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge-001",
+        "from": "start",
+        "to": "dec-001",
+        "role": "flow"
+      },
+      {
+        "id": "edge-002",
+        "from": "dec-001",
+        "to": "dec-002",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "edge-003",
+        "from": "dec-001",
+        "to": "end-not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "edge-004",
+        "from": "dec-002",
+        "to": "proc-001",
+        "role": "option",
+        "label": "高さのみ"
+      },
+      {
+        "id": "edge-005",
+        "from": "dec-002",
+        "to": "end-not-applicable",
+        "role": "option",
+        "label": "容積率含む"
+      },
+      {
+        "id": "edge-006",
+        "from": "proc-001",
+        "to": "dec-003",
+        "role": "flow"
+      },
+      {
+        "id": "edge-007",
+        "from": "dec-003",
+        "to": "dec-004",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "edge-008",
+        "from": "dec-003",
+        "to": "proc-002",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "edge-009",
+        "from": "dec-004",
+        "to": "proc-003",
+        "role": "option",
+        "label": "5/10以下"
+      },
+      {
+        "id": "edge-010",
+        "from": "dec-004",
+        "to": "proc-004",
+        "role": "option",
+        "label": "5/10超5.5/10以下"
+      },
+      {
+        "id": "edge-011",
+        "from": "dec-004",
+        "to": "proc-005",
+        "role": "option",
+        "label": "5.5/10超"
+      },
+      {
+        "id": "edge-012",
+        "from": "proc-002",
+        "to": "proc-006",
+        "role": "flow"
+      },
+      {
+        "id": "edge-013",
+        "from": "proc-003",
+        "to": "proc-006",
+        "role": "flow"
+      },
+      {
+        "id": "edge-014",
+        "from": "proc-004",
+        "to": "proc-006",
+        "role": "flow"
+      },
+      {
+        "id": "edge-015",
+        "from": "proc-005",
+        "to": "proc-006",
+        "role": "flow"
+      },
+      {
+        "id": "edge-016",
+        "from": "proc-006",
+        "to": "proc-007",
+        "role": "flow"
+      },
+      {
+        "id": "edge-017",
+        "from": "proc-007",
+        "to": "dec-005",
+        "role": "flow"
+      },
+      {
+        "id": "edge-018",
+        "from": "dec-005",
+        "to": "end-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "edge-019",
+        "from": "dec-005",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-KIJO-A136-P2",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": [
+        "A53:P1",
+        "A55:P1",
+        "A56:P1",
+        "A59_2:P1"
+      ],
+      "description": "法第59条の2第1項の総合設計制度の適用、法第53条の建蔽率、法第55条・第56条の高さ制限を参照"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "defines_detail",
+      "articles": [
+        "A136:P1"
+      ],
+      "description": "第136条第1項の空地割合の要件を読み替えて適用"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00Z",
+    "updated_at": "2026-01-26T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令",
+    "checklist_ref": "建築基準法施行令第136条第2項（敷地内空地の読替え）"
+  }
+}

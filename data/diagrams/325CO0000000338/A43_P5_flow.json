@@ -1,0 +1,363 @@
+{
+  "id": "A43_P5_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "隅柱の通し柱",
+    "target_subject": "柱",
+    "description": "階数が二以上の建築物における隅柱又はこれに準ずる柱が通し柱であるか、又は接合部が補強されているかを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "43",
+    "paragraph": "5",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造",
+    "木造"
+  ],
+  "text_raw": "階数が二以上の建築物における隅柱又はこれに準ずる柱は、通し柱としなければならない。ただし、接合部を通し柱と同等以上の耐力を有するように補強した場合においては、この限りでない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "building",
+          "value": "階数が二以上の建築物"
+        }
+      ],
+      "note": "地階を除く階数が2以上の建築物に適用"
+    },
+    "judgment_rule": {
+      "operator": "FOR_ALL",
+      "conditions": [
+        {
+          "ref": "info-compliance",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    },
+    "exceptions": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-reinforcement",
+          "operator": "==",
+          "value": true,
+          "note": "接合部を通し柱と同等以上の耐力を有するように補強した場合"
+        }
+      ],
+      "effect": "EXEMPT"
+    }
+  },
+  "flow_diagram": {
+    "title": "令第43条第5項 隅柱の通し柱 適合判定フロー",
+    "description": "階数が二以上の建築物における隅柱又はこれに準ずる柱の通し柱・接合部補強の適合判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start"
+      },
+      {
+        "id": "proc-story-count",
+        "type": "process",
+        "title": "階数の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の階数を読み取る"
+      },
+      {
+        "id": "dec-scope",
+        "type": "decision",
+        "title": "階数は2以上か？",
+        "decision_type": "binary",
+        "description": "建築物の階数が2以上であるか判定（N >= 2）",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "N", "desc": "建築物の階数" },
+          "rhs": { "value": 2, "desc": "2階以上" }
+        }
+      },
+      {
+        "id": "info-out-of-scope",
+        "type": "information",
+        "title": "適用範囲外",
+        "subject": "建築物",
+        "property": "令43条5項適用範囲外",
+        "property_type": "proposition",
+        "description": "階数が2未満のため令43条5項の規定は適用されない"
+      },
+      {
+        "id": "proc-corner-column-identify",
+        "type": "process",
+        "title": "隅柱等の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から隅柱又はこれに準ずる柱を特定する"
+      },
+      {
+        "id": "dec-has-corner-columns",
+        "type": "decision",
+        "title": "隅柱等が存在するか？",
+        "decision_type": "binary",
+        "description": "建築物に隅柱又はこれに準ずる柱が存在するか確認"
+      },
+      {
+        "id": "info-no-corner-columns",
+        "type": "information",
+        "title": "隅柱等なし",
+        "subject": "建築物",
+        "property": "隅柱等の有無",
+        "property_type": "proposition",
+        "description": "隅柱又はこれに準ずる柱が存在しない"
+      },
+      {
+        "id": "proc-loop-start",
+        "type": "process",
+        "title": "各隅柱等の判定開始",
+        "process_type": "mechanical",
+        "description": "すべての隅柱等について順次判定を行う"
+      },
+      {
+        "id": "dec-through-column",
+        "type": "decision",
+        "title": "通し柱か？",
+        "decision_type": "binary",
+        "description": "当該柱が通し柱であるか確認（TC = true）",
+        "condition": {
+          "operator": "EQ",
+          "lhs": { "var": "TC", "desc": "通し柱であるか" },
+          "rhs": { "value": true, "desc": "通し柱である" }
+        }
+      },
+      {
+        "id": "info-is-through-column",
+        "type": "information",
+        "title": "通し柱である",
+        "subject": "柱",
+        "property": "通し柱",
+        "property_type": "proposition",
+        "description": "当該柱は通し柱であり、本文の要件を満たす"
+      },
+      {
+        "id": "proc-reinforcement-check",
+        "type": "process",
+        "title": "接合部補強の確認",
+        "process_type": "human_judgment",
+        "description": "接合部が通し柱と同等以上の耐力を有するように補強されているか確認"
+      },
+      {
+        "id": "dec-reinforcement",
+        "type": "decision",
+        "title": "接合部は補強されているか？",
+        "decision_type": "binary",
+        "description": "接合部を通し柱と同等以上の耐力を有するように補強しているか確認（R = true）",
+        "condition": {
+          "operator": "EQ",
+          "lhs": { "var": "R", "desc": "接合部の補強状況" },
+          "rhs": { "value": true, "desc": "補強されている" }
+        }
+      },
+      {
+        "id": "info-is-reinforced",
+        "type": "information",
+        "title": "接合部補強あり",
+        "subject": "柱",
+        "property": "接合部の補強",
+        "property_type": "proposition",
+        "description": "接合部を通し柱と同等以上の耐力を有するように補強している（ただし書の適用）"
+      },
+      {
+        "id": "info-column-compliant",
+        "type": "information",
+        "title": "当該柱 適合",
+        "subject": "柱",
+        "property": "令43条5項適合",
+        "property_type": "proposition",
+        "description": "当該柱は通し柱である又は接合部が補強されており、令43条5項に適合"
+      },
+      {
+        "id": "dec-more-columns",
+        "type": "decision",
+        "title": "未判定の隅柱等があるか？",
+        "decision_type": "binary",
+        "description": "まだ判定していない隅柱等が残っているか確認"
+      },
+      {
+        "id": "info-all-columns-checked",
+        "type": "information",
+        "title": "全隅柱等の判定完了",
+        "subject": "建築物",
+        "property": "全隅柱等の判定状況",
+        "property_type": "proposition",
+        "description": "すべての隅柱等について判定が完了した"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令第43条第5項に適合"
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "令第43条第5項に不適合（通し柱でなく、かつ接合部の補強も不十分な隅柱等が存在）"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "proc-story-count",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "proc-story-count",
+        "to": "dec-scope",
+        "role": "flow"
+      },
+      {
+        "id": "e03",
+        "from": "dec-scope",
+        "to": "info-out-of-scope",
+        "role": "no",
+        "label": "2未満"
+      },
+      {
+        "id": "e04",
+        "from": "info-out-of-scope",
+        "to": "end-pass",
+        "role": "flow"
+      },
+      {
+        "id": "e05",
+        "from": "dec-scope",
+        "to": "proc-corner-column-identify",
+        "role": "yes",
+        "label": "2以上"
+      },
+      {
+        "id": "e06",
+        "from": "proc-corner-column-identify",
+        "to": "dec-has-corner-columns",
+        "role": "flow"
+      },
+      {
+        "id": "e07",
+        "from": "dec-has-corner-columns",
+        "to": "info-no-corner-columns",
+        "role": "no",
+        "label": "なし"
+      },
+      {
+        "id": "e08",
+        "from": "info-no-corner-columns",
+        "to": "end-pass",
+        "role": "flow"
+      },
+      {
+        "id": "e09",
+        "from": "dec-has-corner-columns",
+        "to": "proc-loop-start",
+        "role": "yes",
+        "label": "あり"
+      },
+      {
+        "id": "e10",
+        "from": "proc-loop-start",
+        "to": "dec-through-column",
+        "role": "flow"
+      },
+      {
+        "id": "e11",
+        "from": "dec-through-column",
+        "to": "info-is-through-column",
+        "role": "yes",
+        "label": "通し柱"
+      },
+      {
+        "id": "e12",
+        "from": "info-is-through-column",
+        "to": "info-column-compliant",
+        "role": "flow"
+      },
+      {
+        "id": "e13",
+        "from": "dec-through-column",
+        "to": "proc-reinforcement-check",
+        "role": "no",
+        "label": "通し柱でない"
+      },
+      {
+        "id": "e14",
+        "from": "proc-reinforcement-check",
+        "to": "dec-reinforcement",
+        "role": "flow"
+      },
+      {
+        "id": "e15",
+        "from": "dec-reinforcement",
+        "to": "info-is-reinforced",
+        "role": "yes",
+        "label": "補強あり"
+      },
+      {
+        "id": "e16",
+        "from": "info-is-reinforced",
+        "to": "info-column-compliant",
+        "role": "flow"
+      },
+      {
+        "id": "e17",
+        "from": "dec-reinforcement",
+        "to": "end-fail",
+        "role": "no",
+        "label": "補強なし"
+      },
+      {
+        "id": "e18",
+        "from": "info-column-compliant",
+        "to": "dec-more-columns",
+        "role": "flow"
+      },
+      {
+        "id": "e19",
+        "from": "dec-more-columns",
+        "to": "proc-loop-start",
+        "role": "yes",
+        "label": "あり"
+      },
+      {
+        "id": "e20",
+        "from": "dec-more-columns",
+        "to": "info-all-columns-checked",
+        "role": "no",
+        "label": "なし"
+      },
+      {
+        "id": "e21",
+        "from": "info-all-columns-checked",
+        "to": "end-pass",
+        "role": "flow"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSO-A43-P5",
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00+09:00",
+    "updated_at": "2026-01-26T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

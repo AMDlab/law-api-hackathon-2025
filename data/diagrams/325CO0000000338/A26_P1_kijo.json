@@ -1,0 +1,254 @@
+{
+  "id": "CHK-BSO-A26-P1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "階段に代わる傾斜路の構造",
+    "target_subject": "傾斜路",
+    "description": "階段に代わる傾斜路が勾配・表面仕上げの基準を満たすことを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "26",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "階段",
+    "傾斜路"
+  ],
+  "text_raw": "階段に代わる傾斜路は、次の各号に定めるところによらなければならない。一 勾配は、八分の一をこえないこと。二 表面は、粗面とし、又はすべりにくい材料で仕上げること。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "element",
+          "value": "階段に代わる傾斜路を設ける場合"
+        }
+      ],
+      "note": "階段に代わる傾斜路を設ける建築物に適用"
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-slope-compliance",
+          "operator": "==",
+          "value": true,
+          "note": "第1号: 勾配が1/8以下"
+        },
+        {
+          "ref": "info-surface-compliance",
+          "operator": "==",
+          "value": true,
+          "note": "第2号: 表面が粗面又はすべりにくい材料"
+        }
+      ]
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "info-ramp-set",
+        "type": "information",
+        "title": "階段に代わる傾斜路",
+        "subject": "建築物",
+        "property": "階段に代わる傾斜路の集合",
+        "property_type": "set_definition",
+        "description": "判定対象となる建築物に属する階段に代わる傾斜路を特定",
+        "plurality": "single"
+      },
+      {
+        "id": "proc-slope-check",
+        "type": "process",
+        "title": "勾配の特定",
+        "process_type": "undefined_input",
+        "target_subject": "傾斜路",
+        "description": "設計図書から傾斜路の勾配を読み取る",
+        "iteration": "iterative"
+      },
+      {
+        "id": "info-slope-value",
+        "type": "information",
+        "title": "傾斜路の勾配",
+        "symbol": "G",
+        "subject": "傾斜路",
+        "property": "勾配",
+        "property_type": "numeric",
+        "description": "傾斜路の勾配（分数または比率）",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-slope-judgment",
+        "type": "process",
+        "title": "勾配基準判定",
+        "process_type": "mechanical",
+        "target_subject": "傾斜路",
+        "description": "勾配が1/8（八分の一）を超えないか判定",
+        "logic_expression": "G ≤ 1/8",
+        "iteration": "iterative"
+      },
+      {
+        "id": "info-slope-compliance",
+        "type": "information",
+        "title": "勾配基準適合",
+        "symbol": "C1",
+        "subject": "傾斜路",
+        "property": "勾配基準への適合",
+        "property_type": "proposition",
+        "description": "傾斜路の勾配が八分の一を超えないか（第1号適合）",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-surface-check",
+        "type": "process",
+        "title": "表面仕上げの特定",
+        "process_type": "undefined_input",
+        "target_subject": "傾斜路",
+        "description": "設計図書から傾斜路の表面仕上げを読み取る",
+        "iteration": "iterative"
+      },
+      {
+        "id": "info-surface-finish",
+        "type": "information",
+        "title": "傾斜路の表面仕上げ",
+        "symbol": "S",
+        "subject": "傾斜路",
+        "property": "表面仕上げ",
+        "property_type": "classification",
+        "description": "傾斜路の表面仕上げの種類（粗面、すべりにくい材料等）",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-surface-judgment",
+        "type": "process",
+        "title": "表面仕上げ基準判定",
+        "process_type": "mechanical",
+        "target_subject": "傾斜路",
+        "description": "表面が粗面であるか、又はすべりにくい材料で仕上げられているか判定",
+        "logic_expression": "(S = '粗面') OR (S = 'すべりにくい材料')",
+        "iteration": "iterative"
+      },
+      {
+        "id": "info-surface-compliance",
+        "type": "information",
+        "title": "表面仕上げ基準適合",
+        "symbol": "C2",
+        "subject": "傾斜路",
+        "property": "表面仕上げ基準への適合",
+        "property_type": "proposition",
+        "description": "傾斜路の表面が粗面又はすべりにくい材料で仕上げられているか（第2号適合）",
+        "plurality": "multiple"
+      },
+      {
+        "id": "proc-final-judgment",
+        "type": "process",
+        "title": "令26条1項適合判定",
+        "process_type": "mechanical",
+        "target_subject": "傾斜路",
+        "description": "すべての傾斜路が第1号・第2号の両方の基準を満たすか判定",
+        "logic_expression": "∀ramp: (C1(ramp) AND C2(ramp))"
+      },
+      {
+        "id": "info-compliance",
+        "type": "information",
+        "title": "令26条1項適合",
+        "subject": "建築物",
+        "property": "令26条1項適合",
+        "property_type": "proposition",
+        "description": "階段に代わる傾斜路が令26条1項の各号に定める基準に適合するか",
+        "plurality": "single"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "info-ramp-set",
+        "to": "proc-slope-check",
+        "role": "input"
+      },
+      {
+        "id": "e02",
+        "from": "proc-slope-check",
+        "to": "info-slope-value",
+        "role": "output"
+      },
+      {
+        "id": "e03",
+        "from": "info-slope-value",
+        "to": "proc-slope-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e04",
+        "from": "proc-slope-judgment",
+        "to": "info-slope-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e05",
+        "from": "info-ramp-set",
+        "to": "proc-surface-check",
+        "role": "input"
+      },
+      {
+        "id": "e06",
+        "from": "proc-surface-check",
+        "to": "info-surface-finish",
+        "role": "output"
+      },
+      {
+        "id": "e07",
+        "from": "info-surface-finish",
+        "to": "proc-surface-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e08",
+        "from": "proc-surface-judgment",
+        "to": "info-surface-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e09",
+        "from": "info-slope-compliance",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e10",
+        "from": "info-surface-compliance",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e11",
+        "from": "proc-final-judgment",
+        "to": "info-compliance",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": [],
+      "description": "建築基準法施行令として定められた傾斜路の基準"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-23T00:00:00+09:00",
+    "updated_at": "2026-01-23T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

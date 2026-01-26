@@ -1,0 +1,347 @@
+{
+  "id": "A129_5_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "エレベーターの固定荷重計算",
+    "target_subject": "エレベーター",
+    "description": "エレベーターの各部の固定荷重を実況に応じて計算しているかの適合判定フロー"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "129の5",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "昇降機"
+  ],
+  "text_raw": "エレベーターの各部の固定荷重は、当該エレベーターの実況に応じて計算しなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "facility",
+          "value": "エレベーターを設置する建築物"
+        }
+      ]
+    },
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "calculation",
+          "value": "各部の固定荷重を実況に応じて計算"
+        }
+      ]
+    }
+  },
+  "flow_diagram": {
+    "title": "令第129条の5第1項 エレベーターの固定荷重計算 適合判定フロー",
+    "description": "エレベーターの各部の固定荷重が実況に応じて計算されているかを判定するフロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "令第129条の5第1項の適合判定を開始"
+      },
+      {
+        "id": "dec-elevator-exists",
+        "type": "decision",
+        "title": "エレベーターが設置されているか？",
+        "decision_type": "binary",
+        "description": "建築物にエレベーターが設置されているかを確認"
+      },
+      {
+        "id": "proc-not-applicable",
+        "type": "process",
+        "title": "本条適用外",
+        "process_type": "mechanical",
+        "description": "エレベーターが設置されていないため本条は適用されない"
+      },
+      {
+        "id": "dec-parts-identified",
+        "type": "decision",
+        "title": "エレベーターの各部は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "かご", "description": "エレベーターのかご部分" },
+          { "value": "釣合おもり", "description": "カウンターウェイト" },
+          { "value": "巻上機", "description": "駆動装置" },
+          { "value": "ガイドレール", "description": "案内レール" },
+          { "value": "その他構成部品", "description": "その他の構成要素" }
+        ],
+        "description": "エレベーターを構成する各部を特定（複数の部品について繰り返し判定）"
+      },
+      {
+        "id": "proc-part-selected",
+        "type": "process",
+        "title": "各部の選定完了",
+        "process_type": "mechanical",
+        "description": "判定対象となるエレベーターの各部を選定"
+      },
+      {
+        "id": "dec-condition-type",
+        "type": "decision",
+        "title": "実況の種類は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "乗用", "description": "人の輸送を目的とするもの" },
+          { "value": "貨物用", "description": "貨物の輸送を目的とするもの" },
+          { "value": "寝台用", "description": "寝台の輸送を目的とするもの" },
+          { "value": "その他", "description": "その他の用途" }
+        ],
+        "description": "エレベーターの使用状況・設置環境等の実況を確認"
+      },
+      {
+        "id": "proc-condition-confirmed",
+        "type": "process",
+        "title": "実況確認完了",
+        "process_type": "mechanical",
+        "description": "エレベーターの実況（使用状況、設置環境等）を確認"
+      },
+      {
+        "id": "dec-load-calculated",
+        "type": "decision",
+        "title": "固定荷重が計算されているか？",
+        "decision_type": "binary",
+        "description": "各部の固定荷重の計算が行われているかを確認"
+      },
+      {
+        "id": "proc-load-calc-required",
+        "type": "process",
+        "title": "固定荷重計算が必要",
+        "process_type": "human_judgment",
+        "description": "各部の固定荷重の計算を行う必要がある"
+      },
+      {
+        "id": "dec-calc-method",
+        "type": "decision",
+        "title": "計算方法は実況に応じているか？",
+        "decision_type": "binary",
+        "description": "固定荷重の計算方法がエレベーターの実況を適切に反映しているか"
+      },
+      {
+        "id": "proc-calc-method-issue",
+        "type": "process",
+        "title": "計算方法の見直しが必要",
+        "process_type": "human_judgment",
+        "description": "計算方法が実況を適切に反映していないため見直しが必要"
+      },
+      {
+        "id": "dec-all-parts-checked",
+        "type": "decision",
+        "title": "全ての各部について確認済か？",
+        "decision_type": "binary",
+        "description": "エレベーターの全ての構成部品について固定荷重計算の確認が完了したか"
+      },
+      {
+        "id": "proc-next-part",
+        "type": "process",
+        "title": "次の部品を確認",
+        "process_type": "mechanical",
+        "description": "次のエレベーター構成部品の固定荷重計算を確認"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "エレベーターの各部の固定荷重が実況に応じて計算されており、令第129条の5第1項に適合"
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "エレベーターの各部の固定荷重が実況に応じて計算されておらず、令第129条の5第1項に不適合"
+      },
+      {
+        "id": "end-not-applicable",
+        "type": "terminal",
+        "title": "適用対象外",
+        "result": "end",
+        "description": "エレベーターが設置されていないため本条は適用対象外"
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge-start",
+        "from": "start",
+        "to": "dec-elevator-exists",
+        "role": "flow"
+      },
+      {
+        "id": "edge-no-elevator",
+        "from": "dec-elevator-exists",
+        "to": "proc-not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "edge-not-applicable-end",
+        "from": "proc-not-applicable",
+        "to": "end-not-applicable",
+        "role": "flow"
+      },
+      {
+        "id": "edge-has-elevator",
+        "from": "dec-elevator-exists",
+        "to": "dec-parts-identified",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "edge-part-cage",
+        "from": "dec-parts-identified",
+        "to": "proc-part-selected",
+        "role": "option",
+        "label": "かご"
+      },
+      {
+        "id": "edge-part-counterweight",
+        "from": "dec-parts-identified",
+        "to": "proc-part-selected",
+        "role": "option",
+        "label": "釣合おもり"
+      },
+      {
+        "id": "edge-part-hoist",
+        "from": "dec-parts-identified",
+        "to": "proc-part-selected",
+        "role": "option",
+        "label": "巻上機"
+      },
+      {
+        "id": "edge-part-guide",
+        "from": "dec-parts-identified",
+        "to": "proc-part-selected",
+        "role": "option",
+        "label": "ガイドレール"
+      },
+      {
+        "id": "edge-part-other",
+        "from": "dec-parts-identified",
+        "to": "proc-part-selected",
+        "role": "option",
+        "label": "その他構成部品"
+      },
+      {
+        "id": "edge-part-to-condition",
+        "from": "proc-part-selected",
+        "to": "dec-condition-type",
+        "role": "flow"
+      },
+      {
+        "id": "edge-condition-passenger",
+        "from": "dec-condition-type",
+        "to": "proc-condition-confirmed",
+        "role": "option",
+        "label": "乗用"
+      },
+      {
+        "id": "edge-condition-cargo",
+        "from": "dec-condition-type",
+        "to": "proc-condition-confirmed",
+        "role": "option",
+        "label": "貨物用"
+      },
+      {
+        "id": "edge-condition-bed",
+        "from": "dec-condition-type",
+        "to": "proc-condition-confirmed",
+        "role": "option",
+        "label": "寝台用"
+      },
+      {
+        "id": "edge-condition-other",
+        "from": "dec-condition-type",
+        "to": "proc-condition-confirmed",
+        "role": "option",
+        "label": "その他"
+      },
+      {
+        "id": "edge-condition-to-load",
+        "from": "proc-condition-confirmed",
+        "to": "dec-load-calculated",
+        "role": "flow"
+      },
+      {
+        "id": "edge-no-load-calc",
+        "from": "dec-load-calculated",
+        "to": "proc-load-calc-required",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "edge-load-calc-fail",
+        "from": "proc-load-calc-required",
+        "to": "end-fail",
+        "role": "flow"
+      },
+      {
+        "id": "edge-has-load-calc",
+        "from": "dec-load-calculated",
+        "to": "dec-calc-method",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "edge-calc-method-no",
+        "from": "dec-calc-method",
+        "to": "proc-calc-method-issue",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "edge-calc-method-fail",
+        "from": "proc-calc-method-issue",
+        "to": "end-fail",
+        "role": "flow"
+      },
+      {
+        "id": "edge-calc-method-yes",
+        "from": "dec-calc-method",
+        "to": "dec-all-parts-checked",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "edge-not-all-parts",
+        "from": "dec-all-parts-checked",
+        "to": "proc-next-part",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "edge-next-part-loop",
+        "from": "proc-next-part",
+        "to": "dec-parts-identified",
+        "role": "flow"
+      },
+      {
+        "id": "edge-all-parts-pass",
+        "from": "dec-all-parts-checked",
+        "to": "end-pass",
+        "role": "yes",
+        "label": "はい"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-KIJO-A129_5-P1",
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00Z",
+    "updated_at": "2026-01-26T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令",
+    "checklist_ref": "確認審査報告書チェックリスト"
+  }
+}

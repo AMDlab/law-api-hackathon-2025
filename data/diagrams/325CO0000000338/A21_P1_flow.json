@@ -1,0 +1,63 @@
+{
+  "id": "A21_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "居室の天井の高さ判定フロー",
+    "target_subject": "居室",
+    "description": "居室の天井の高さが2.1メートル以上であることを判定するフロー"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "21",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": ["単体規定", "衛生"],
+  "text_raw": "居室の天井の高さは、二・一メートル以上でなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [{ "type": "room_type", "value": "居室" }]
+    },
+    "judgment_rule": {
+      "operator": ">=",
+      "lhs": { "ref": "ceiling_height", "description": "天井の高さ" },
+      "rhs": { "value": 2.1, "unit": "m" }
+    }
+  },
+  "flow_diagram": {
+    "title": "令第21条第1項 天井の高さ判定フロー",
+    "description": "居室の天井の高さが基準を満たすか判定",
+    "nodes": [
+      { "id": "start", "type": "terminal", "title": "判定開始", "result": "start" },
+      { "id": "proc-rooms", "type": "process", "title": "対象居室を特定", "process_type": "undefined_input", "description": "建築物に属する居室を特定" },
+      { "id": "proc-height", "type": "process", "title": "天井の高さを特定", "process_type": "undefined_input", "description": "設計図書から天井の高さを読み取る。一室で高さが異なる部分がある場合は平均の高さ（令21条2項）" },
+      { "id": "dec-height", "type": "decision", "title": "天井の高さ≥2.1mか？", "decision_type": "binary", "description": "天井の高さが2.1メートル以上かを判定" },
+      { "id": "dec-more-rooms", "type": "decision", "title": "未判定の居室があるか？", "decision_type": "binary", "description": "全居室について判定が完了したか確認" },
+      { "id": "end-pass", "type": "terminal", "title": "適合", "result": "pass", "description": "全居室が天井高さ基準を満たす" },
+      { "id": "end-fail", "type": "terminal", "title": "不適合", "result": "fail", "description": "天井の高さが2.1m未満の居室がある" }
+    ],
+    "edges": [
+      { "id": "e01", "from": "start", "to": "proc-rooms", "role": "flow" },
+      { "id": "e02", "from": "proc-rooms", "to": "proc-height", "role": "flow" },
+      { "id": "e03", "from": "proc-height", "to": "dec-height", "role": "flow" },
+      { "id": "e04", "from": "dec-height", "to": "dec-more-rooms", "role": "yes" },
+      { "id": "e05", "from": "dec-height", "to": "end-fail", "role": "no" },
+      { "id": "e06", "from": "dec-more-rooms", "to": "proc-height", "role": "yes", "label": "次の居室へ" },
+      { "id": "e07", "from": "dec-more-rooms", "to": "end-pass", "role": "no" }
+    ]
+  },
+  "kijo_diagram_ref": "A21_P1_kijo",
+  "related_laws": [
+    { "law_id": "325AC0000000201", "law_name": "建築基準法", "law_type": "act", "relationship": "delegated_from", "articles": ["A28"], "description": "居住環境に関する基準として法28条から委任" }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00Z",
+    "updated_at": "2026-01-26T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator"
+  }
+}

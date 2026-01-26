@@ -1,0 +1,694 @@
+{
+  "id": "A121_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "二以上の直通階段の設置要否判定フロー",
+    "target_subject": "建築物の階",
+    "description": "避難階以外の階が各号のいずれかに該当する場合における二以上の直通階段設置義務の判定フロー"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "121",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "避難施設"
+  ],
+  "text_raw": "建築物の避難階以外の階が次の各号のいずれかに該当する場合においては、その階から避難階又は地上に通ずる二以上の直通階段を設けなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "building_part",
+          "value": "避難階以外の階"
+        }
+      ],
+      "note": "避難階を除くすべての階が対象"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "type": "building_use",
+          "value": "一号：劇場、映画館、演芸場、観覧場、公会堂又は集会場の用途に供する階でその階に客席、集会室等を有するもの"
+        },
+        {
+          "type": "building_use",
+          "value": "二号：物品販売業を営む店舗（床面積の合計が1500㎡超）の用途に供する階でその階に売場を有するもの"
+        },
+        {
+          "type": "building_use",
+          "value": "三号：キャバレー、ナイトクラブ等の用途に供する階でその階に客席等を有するもの（一定の除外条件あり）"
+        },
+        {
+          "type": "building_use",
+          "value": "四号：病院・診療所の病室床面積合計又は児童福祉施設等の居室床面積合計が50㎡超の階"
+        },
+        {
+          "type": "building_use",
+          "value": "五号：ホテル・旅館等の宿泊室、共同住宅の居室、寄宿舎の寝室の床面積合計が100㎡超の階"
+        },
+        {
+          "type": "building_use",
+          "value": "六号イ：6階以上の階で居室を有するもの（一定の除外条件あり）"
+        },
+        {
+          "type": "building_use",
+          "value": "六号ロ：5階以下の階で居室床面積合計が避難階直上階200㎡超、その他の階100㎡超"
+        }
+      ]
+    }
+  },
+  "flow_diagram": {
+    "title": "令第121条第1項 二以上の直通階段設置要否判定フロー",
+    "description": "避難階以外の階について、各号該当性を順次判定し、二以上の直通階段の設置義務の有無を判定するフロー",
+    "nodes": [
+      {
+        "id": "terminal-start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "二以上の直通階段設置要否の判定を開始"
+      },
+      {
+        "id": "decision-evacuation-floor",
+        "type": "decision",
+        "title": "当該階は避難階か？",
+        "decision_type": "binary",
+        "description": "判定対象の階が避難階であるかどうかを確認",
+        "condition": {
+          "operator": "EQ",
+          "lhs": { "var": "floor_type", "desc": "階の種別" },
+          "rhs": { "value": "避難階", "desc": "避難階" }
+        }
+      },
+      {
+        "id": "terminal-not-applicable",
+        "type": "terminal",
+        "title": "本条適用対象外",
+        "result": "pass",
+        "description": "避難階は本条の対象外のため、二以上の直通階段の設置義務なし"
+      },
+      {
+        "id": "decision-use-category",
+        "type": "decision",
+        "title": "当該階の主たる用途は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "劇場等", "description": "劇場、映画館、演芸場、観覧場、公会堂、集会場" },
+          { "value": "物品販売店舗", "description": "物品販売業を営む店舗" },
+          { "value": "キャバレー等", "description": "キャバレー、カフェー、ナイトクラブ、バー" },
+          { "value": "病院等", "description": "病院、診療所、児童福祉施設等" },
+          { "value": "宿泊施設等", "description": "ホテル、旅館、下宿、共同住宅、寄宿舎" },
+          { "value": "その他", "description": "上記以外の用途" }
+        ],
+        "description": "当該階の主たる用途を分類する"
+      },
+      {
+        "id": "decision-theater-seats",
+        "type": "decision",
+        "title": "当該階に客席又は集会室を有するか？",
+        "decision_type": "binary",
+        "description": "劇場等の用途の階において、客席、集会室その他これらに類するものを有するか確認",
+        "related_articles": ["令121条1項1号"]
+      },
+      {
+        "id": "terminal-required-item1",
+        "type": "terminal",
+        "title": "二以上の直通階段設置必要（一号該当）",
+        "result": "fail",
+        "description": "一号に該当するため、二以上の直通階段を設けなければならない",
+        "related_articles": ["令121条1項1号"]
+      },
+      {
+        "id": "decision-store-area",
+        "type": "decision",
+        "title": "店舗の床面積合計は1500㎡を超えるか？",
+        "decision_type": "binary",
+        "description": "物品販売業を営む店舗の床面積の合計が1500㎡を超えるか確認",
+        "condition": {
+          "operator": "GT",
+          "lhs": { "var": "store_floor_area", "desc": "店舗床面積合計" },
+          "rhs": { "value": 1500, "unit": "㎡" }
+        },
+        "related_articles": ["令121条1項2号"]
+      },
+      {
+        "id": "decision-store-sales-floor",
+        "type": "decision",
+        "title": "当該階に売場を有するか？",
+        "decision_type": "binary",
+        "description": "物品販売店舗の階において売場を有するか確認",
+        "related_articles": ["令121条1項2号"]
+      },
+      {
+        "id": "terminal-required-item2",
+        "type": "terminal",
+        "title": "二以上の直通階段設置必要（二号該当）",
+        "result": "fail",
+        "description": "二号に該当するため、二以上の直通階段を設けなければならない",
+        "related_articles": ["令121条1項2号"]
+      },
+      {
+        "id": "decision-cabaret-seats",
+        "type": "decision",
+        "title": "当該階に客席を有するか？",
+        "decision_type": "binary",
+        "description": "キャバレー等の用途の階において客席を有するか確認",
+        "related_articles": ["令121条1項3号"]
+      },
+      {
+        "id": "terminal-required-item3",
+        "type": "terminal",
+        "title": "二以上の直通階段設置必要（三号該当）",
+        "result": "fail",
+        "description": "三号に該当するため、二以上の直通階段を設けなければならない",
+        "related_articles": ["令121条1項3号"]
+      },
+      {
+        "id": "decision-hospital-type",
+        "type": "decision",
+        "title": "用途の詳細は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "病院・診療所", "description": "病院又は診療所" },
+          { "value": "児童福祉施設等", "description": "児童福祉施設等" }
+        ],
+        "description": "病院等カテゴリ内での用途詳細を確認",
+        "related_articles": ["令121条1項4号"]
+      },
+      {
+        "id": "decision-hospital-room-area",
+        "type": "decision",
+        "title": "病室の床面積合計は50㎡を超えるか？",
+        "decision_type": "binary",
+        "description": "病院・診療所の病室の床面積の合計が50㎡を超えるか確認",
+        "condition": {
+          "operator": "GT",
+          "lhs": { "var": "hospital_room_area", "desc": "病室床面積合計" },
+          "rhs": { "value": 50, "unit": "㎡" }
+        },
+        "related_articles": ["令121条1項4号"]
+      },
+      {
+        "id": "decision-welfare-room-area",
+        "type": "decision",
+        "title": "居室の床面積合計は50㎡を超えるか？",
+        "decision_type": "binary",
+        "description": "児童福祉施設等の主たる用途に供する居室の床面積の合計が50㎡を超えるか確認",
+        "condition": {
+          "operator": "GT",
+          "lhs": { "var": "welfare_room_area", "desc": "居室床面積合計" },
+          "rhs": { "value": 50, "unit": "㎡" }
+        },
+        "related_articles": ["令121条1項4号"]
+      },
+      {
+        "id": "terminal-required-item4",
+        "type": "terminal",
+        "title": "二以上の直通階段設置必要（四号該当）",
+        "result": "fail",
+        "description": "四号に該当するため、二以上の直通階段を設けなければならない",
+        "related_articles": ["令121条1項4号"]
+      },
+      {
+        "id": "decision-lodging-type",
+        "type": "decision",
+        "title": "宿泊施設等の詳細用途は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "ホテル等", "description": "ホテル、旅館、下宿" },
+          { "value": "共同住宅", "description": "共同住宅" },
+          { "value": "寄宿舎", "description": "寄宿舎" }
+        ],
+        "description": "宿泊施設等カテゴリ内での用途詳細を確認",
+        "related_articles": ["令121条1項5号"]
+      },
+      {
+        "id": "decision-hotel-room-area",
+        "type": "decision",
+        "title": "宿泊室の床面積合計は100㎡を超えるか？",
+        "decision_type": "binary",
+        "description": "ホテル、旅館又は下宿の宿泊室の床面積の合計が100㎡を超えるか確認",
+        "condition": {
+          "operator": "GT",
+          "lhs": { "var": "hotel_room_area", "desc": "宿泊室床面積合計" },
+          "rhs": { "value": 100, "unit": "㎡" }
+        },
+        "related_articles": ["令121条1項5号"]
+      },
+      {
+        "id": "decision-apartment-room-area",
+        "type": "decision",
+        "title": "居室の床面積合計は100㎡を超えるか？",
+        "decision_type": "binary",
+        "description": "共同住宅の住戸又は住室の居室の床面積の合計が100㎡を超えるか確認",
+        "condition": {
+          "operator": "GT",
+          "lhs": { "var": "apartment_room_area", "desc": "居室床面積合計" },
+          "rhs": { "value": 100, "unit": "㎡" }
+        },
+        "related_articles": ["令121条1項5号"]
+      },
+      {
+        "id": "decision-dormitory-room-area",
+        "type": "decision",
+        "title": "寝室の床面積合計は100㎡を超えるか？",
+        "decision_type": "binary",
+        "description": "寄宿舎の寝室の床面積の合計が100㎡を超えるか確認",
+        "condition": {
+          "operator": "GT",
+          "lhs": { "var": "dormitory_room_area", "desc": "寝室床面積合計" },
+          "rhs": { "value": 100, "unit": "㎡" }
+        },
+        "related_articles": ["令121条1項5号"]
+      },
+      {
+        "id": "terminal-required-item5",
+        "type": "terminal",
+        "title": "二以上の直通階段設置必要（五号該当）",
+        "result": "fail",
+        "description": "五号に該当するため、二以上の直通階段を設けなければならない",
+        "related_articles": ["令121条1項5号"]
+      },
+      {
+        "id": "decision-floor-number",
+        "type": "decision",
+        "title": "当該階は6階以上か？",
+        "decision_type": "binary",
+        "description": "当該階が6階以上であるか確認",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "floor_number", "desc": "階数" },
+          "rhs": { "value": 6 }
+        },
+        "related_articles": ["令121条1項6号"]
+      },
+      {
+        "id": "decision-has-habitable-room-6f",
+        "type": "decision",
+        "title": "当該階に居室を有するか？",
+        "decision_type": "binary",
+        "description": "6階以上の階において居室を有するか確認",
+        "related_articles": ["令121条1項6号イ"]
+      },
+      {
+        "id": "terminal-required-item6a",
+        "type": "terminal",
+        "title": "二以上の直通階段設置必要（六号イ該当）",
+        "result": "fail",
+        "description": "六号イに該当するため、二以上の直通階段を設けなければならない",
+        "related_articles": ["令121条1項6号イ"]
+      },
+      {
+        "id": "decision-floor-position",
+        "type": "decision",
+        "title": "当該階は避難階の直上階か？",
+        "decision_type": "binary",
+        "description": "当該階が避難階の直上階であるか確認",
+        "related_articles": ["令121条1項6号ロ"]
+      },
+      {
+        "id": "decision-room-area-200",
+        "type": "decision",
+        "title": "居室の床面積合計は200㎡を超えるか？",
+        "decision_type": "binary",
+        "description": "避難階の直上階において、居室の床面積の合計が200㎡を超えるか確認",
+        "condition": {
+          "operator": "GT",
+          "lhs": { "var": "habitable_room_area", "desc": "居室床面積合計" },
+          "rhs": { "value": 200, "unit": "㎡" }
+        },
+        "related_articles": ["令121条1項6号ロ"]
+      },
+      {
+        "id": "decision-room-area-100",
+        "type": "decision",
+        "title": "居室の床面積合計は100㎡を超えるか？",
+        "decision_type": "binary",
+        "description": "避難階の直上階以外の5階以下の階において、居室の床面積の合計が100㎡を超えるか確認",
+        "condition": {
+          "operator": "GT",
+          "lhs": { "var": "habitable_room_area", "desc": "居室床面積合計" },
+          "rhs": { "value": 100, "unit": "㎡" }
+        },
+        "related_articles": ["令121条1項6号ロ"]
+      },
+      {
+        "id": "terminal-required-item6b",
+        "type": "terminal",
+        "title": "二以上の直通階段設置必要（六号ロ該当）",
+        "result": "fail",
+        "description": "六号ロに該当するため、二以上の直通階段を設けなければならない",
+        "related_articles": ["令121条1項6号ロ"]
+      },
+      {
+        "id": "terminal-not-required",
+        "type": "terminal",
+        "title": "二以上の直通階段設置不要",
+        "result": "pass",
+        "description": "各号のいずれにも該当しないため、本項に基づく二以上の直通階段の設置義務なし"
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge-001",
+        "from": "terminal-start",
+        "to": "decision-evacuation-floor",
+        "role": "flow"
+      },
+      {
+        "id": "edge-002",
+        "from": "decision-evacuation-floor",
+        "to": "terminal-not-applicable",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "edge-003",
+        "from": "decision-evacuation-floor",
+        "to": "decision-use-category",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "edge-004",
+        "from": "decision-use-category",
+        "to": "decision-theater-seats",
+        "role": "option",
+        "label": "劇場等"
+      },
+      {
+        "id": "edge-005",
+        "from": "decision-use-category",
+        "to": "decision-store-area",
+        "role": "option",
+        "label": "物品販売店舗"
+      },
+      {
+        "id": "edge-006",
+        "from": "decision-use-category",
+        "to": "decision-cabaret-seats",
+        "role": "option",
+        "label": "キャバレー等"
+      },
+      {
+        "id": "edge-007",
+        "from": "decision-use-category",
+        "to": "decision-hospital-type",
+        "role": "option",
+        "label": "病院等"
+      },
+      {
+        "id": "edge-008",
+        "from": "decision-use-category",
+        "to": "decision-lodging-type",
+        "role": "option",
+        "label": "宿泊施設等"
+      },
+      {
+        "id": "edge-009",
+        "from": "decision-use-category",
+        "to": "decision-floor-number",
+        "role": "option",
+        "label": "その他"
+      },
+      {
+        "id": "edge-010",
+        "from": "decision-theater-seats",
+        "to": "terminal-required-item1",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "edge-011",
+        "from": "decision-theater-seats",
+        "to": "decision-floor-number",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "edge-012",
+        "from": "decision-store-area",
+        "to": "decision-store-sales-floor",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "edge-013",
+        "from": "decision-store-area",
+        "to": "decision-floor-number",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "edge-014",
+        "from": "decision-store-sales-floor",
+        "to": "terminal-required-item2",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "edge-015",
+        "from": "decision-store-sales-floor",
+        "to": "decision-floor-number",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "edge-016",
+        "from": "decision-cabaret-seats",
+        "to": "terminal-required-item3",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "edge-017",
+        "from": "decision-cabaret-seats",
+        "to": "decision-floor-number",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "edge-018",
+        "from": "decision-hospital-type",
+        "to": "decision-hospital-room-area",
+        "role": "option",
+        "label": "病院・診療所"
+      },
+      {
+        "id": "edge-019",
+        "from": "decision-hospital-type",
+        "to": "decision-welfare-room-area",
+        "role": "option",
+        "label": "児童福祉施設等"
+      },
+      {
+        "id": "edge-020",
+        "from": "decision-hospital-room-area",
+        "to": "terminal-required-item4",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "edge-021",
+        "from": "decision-hospital-room-area",
+        "to": "decision-floor-number",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "edge-022",
+        "from": "decision-welfare-room-area",
+        "to": "terminal-required-item4",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "edge-023",
+        "from": "decision-welfare-room-area",
+        "to": "decision-floor-number",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "edge-024",
+        "from": "decision-lodging-type",
+        "to": "decision-hotel-room-area",
+        "role": "option",
+        "label": "ホテル等"
+      },
+      {
+        "id": "edge-025",
+        "from": "decision-lodging-type",
+        "to": "decision-apartment-room-area",
+        "role": "option",
+        "label": "共同住宅"
+      },
+      {
+        "id": "edge-026",
+        "from": "decision-lodging-type",
+        "to": "decision-dormitory-room-area",
+        "role": "option",
+        "label": "寄宿舎"
+      },
+      {
+        "id": "edge-027",
+        "from": "decision-hotel-room-area",
+        "to": "terminal-required-item5",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "edge-028",
+        "from": "decision-hotel-room-area",
+        "to": "decision-floor-number",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "edge-029",
+        "from": "decision-apartment-room-area",
+        "to": "terminal-required-item5",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "edge-030",
+        "from": "decision-apartment-room-area",
+        "to": "decision-floor-number",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "edge-031",
+        "from": "decision-dormitory-room-area",
+        "to": "terminal-required-item5",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "edge-032",
+        "from": "decision-dormitory-room-area",
+        "to": "decision-floor-number",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "edge-033",
+        "from": "decision-floor-number",
+        "to": "decision-has-habitable-room-6f",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "edge-034",
+        "from": "decision-floor-number",
+        "to": "decision-floor-position",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "edge-035",
+        "from": "decision-has-habitable-room-6f",
+        "to": "terminal-required-item6a",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "edge-036",
+        "from": "decision-has-habitable-room-6f",
+        "to": "terminal-not-required",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "edge-037",
+        "from": "decision-floor-position",
+        "to": "decision-room-area-200",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "edge-038",
+        "from": "decision-floor-position",
+        "to": "decision-room-area-100",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "edge-039",
+        "from": "decision-room-area-200",
+        "to": "terminal-required-item6b",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "edge-040",
+        "from": "decision-room-area-200",
+        "to": "terminal-not-required",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "edge-041",
+        "from": "decision-room-area-100",
+        "to": "terminal-required-item6b",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "edge-042",
+        "from": "decision-room-area-100",
+        "to": "terminal-not-required",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-KIJO-A121-P1",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": [
+        "A35:P1"
+      ],
+      "description": "法第35条で建築物の避難及び消火に関する技術的基準を政令に委任"
+    },
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": [
+        "A121:P2",
+        "A121:P3",
+        "A121:P4",
+        "A122:P2",
+        "A123:P2",
+        "A123:P3",
+        "A124:P1",
+        "A125:P3"
+      ],
+      "description": "第121条第2項で準耐火構造等の場合の面積緩和、第3項で重複区間の制限、第4項で小規模建築物の適用除外を規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00Z",
+    "updated_at": "2026-01-26T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令",
+    "checklist_ref": "建築基準法施行令第121条第1項（二以上の直通階段を設ける場合）"
+  }
+}

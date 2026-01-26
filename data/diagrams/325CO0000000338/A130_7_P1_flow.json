@@ -1,0 +1,267 @@
+{
+  "id": "A130_7_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "第二種中高層住居専用地域内に建築してはならない畜舎の規模",
+    "target_subject": "畜舎",
+    "description": "床面積の合計が15㎡を超える畜舎の判定"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "130の7",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "集団規定",
+    "用途制限",
+    "第二種中高層住居専用地域"
+  ],
+  "text_raw": "法別表第二（に）項第六号（法第八十七条第二項又は第三項において法第四十八条第四項の規定を準用する場合を含む。）に規定する政令で定める規模の畜舎は、床面積の合計が十五平方メートルを超えるものとする。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        { "type": "location", "value": "第二種中高層住居専用地域内" },
+        { "type": "use", "value": "畜舎" }
+      ],
+      "note": "敷地が第二種中高層住居専用地域内にあり、畜舎を建築する場合に適用"
+    },
+    "judgment_rule": {
+      "operator": "<=",
+      "lhs": { "ref": "info-floor-area", "description": "畜舎の床面積の合計" },
+      "rhs": { "value": 15, "unit": "㎡" }
+    }
+  },
+  "flow_diagram": {
+    "title": "令第130条の7第1項 適合判定フロー",
+    "description": "第二種中高層住居専用地域内における畜舎の規模制限の判定フロー",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "令第130条の7第1項の適合判定を開始"
+      },
+      {
+        "id": "dec-location",
+        "type": "decision",
+        "title": "敷地は第二種中高層住居専用地域内か？",
+        "decision_type": "binary",
+        "description": "敷地が第二種中高層住居専用地域内に位置するか確認"
+      },
+      {
+        "id": "dec-use-type",
+        "type": "decision",
+        "title": "建築物の用途は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "畜舎", "description": "家畜を飼養する施設" },
+          { "value": "畜舎以外", "description": "畜舎以外の用途" }
+        ],
+        "description": "建築物の用途を判定（分類情報に基づく）"
+      },
+      {
+        "id": "proc-livestock-applicable",
+        "type": "process",
+        "title": "畜舎に該当",
+        "process_type": "mechanical",
+        "description": "建築物が畜舎に該当することを確認"
+      },
+      {
+        "id": "dec-floor-area-input",
+        "type": "decision",
+        "title": "床面積の合計が算定可能か？",
+        "decision_type": "binary",
+        "description": "設計図書等から畜舎の床面積の合計を読み取れるか確認"
+      },
+      {
+        "id": "proc-undefined-input",
+        "type": "process",
+        "title": "床面積の算定が必要",
+        "process_type": "undefined_input",
+        "description": "設計図書等から床面積の合計を算定する必要がある"
+      },
+      {
+        "id": "dec-floor-area-exceeds",
+        "type": "decision",
+        "title": "床面積の合計 > 15㎡か？",
+        "decision_type": "binary",
+        "condition": {
+          "operator": "GT",
+          "lhs": { "var": "A", "desc": "床面積の合計" },
+          "rhs": { "value": 15, "unit": "㎡" }
+        },
+        "description": "畜舎の床面積の合計が15㎡を超えるか判定"
+      },
+      {
+        "id": "proc-exceeds-limit",
+        "type": "process",
+        "title": "15㎡超過",
+        "process_type": "mechanical",
+        "description": "床面積の合計が15㎡を超えることを確認"
+      },
+      {
+        "id": "dec-final-compliance",
+        "type": "decision",
+        "title": "第二種中高層住居専用地域での建築制限に抵触するか？",
+        "decision_type": "binary",
+        "description": "畜舎かつ床面積15㎡超過の場合、建築制限に抵触"
+      },
+      {
+        "id": "end-not-applicable",
+        "type": "terminal",
+        "title": "本条適用対象外",
+        "result": "pass",
+        "description": "第二種中高層住居専用地域外であり、本条の適用対象外"
+      },
+      {
+        "id": "end-pass-not-livestock",
+        "type": "terminal",
+        "title": "適合（畜舎以外）",
+        "result": "pass",
+        "description": "畜舎以外の用途であり、本条の用途制限には抵触しない"
+      },
+      {
+        "id": "end-pass-within-limit",
+        "type": "terminal",
+        "title": "適合（15㎡以下）",
+        "result": "pass",
+        "description": "畜舎であるが床面積の合計が15㎡以下であり適合"
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "不適合（建築不可）",
+        "result": "fail",
+        "description": "床面積の合計が15㎡を超える畜舎は第二種中高層住居専用地域内では建築不可"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-location",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-location",
+        "to": "dec-use-type",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "dec-location",
+        "to": "end-not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e04",
+        "from": "dec-use-type",
+        "to": "proc-livestock-applicable",
+        "role": "option",
+        "label": "畜舎"
+      },
+      {
+        "id": "e05",
+        "from": "dec-use-type",
+        "to": "end-pass-not-livestock",
+        "role": "option",
+        "label": "畜舎以外"
+      },
+      {
+        "id": "e06",
+        "from": "proc-livestock-applicable",
+        "to": "dec-floor-area-input",
+        "role": "flow"
+      },
+      {
+        "id": "e07",
+        "from": "dec-floor-area-input",
+        "to": "dec-floor-area-exceeds",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e08",
+        "from": "dec-floor-area-input",
+        "to": "proc-undefined-input",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e09",
+        "from": "proc-undefined-input",
+        "to": "dec-floor-area-exceeds",
+        "role": "flow"
+      },
+      {
+        "id": "e10",
+        "from": "dec-floor-area-exceeds",
+        "to": "proc-exceeds-limit",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e11",
+        "from": "dec-floor-area-exceeds",
+        "to": "end-pass-within-limit",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e12",
+        "from": "proc-exceeds-limit",
+        "to": "dec-final-compliance",
+        "role": "flow"
+      },
+      {
+        "id": "e13",
+        "from": "dec-final-compliance",
+        "to": "end-fail",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e14",
+        "from": "dec-final-compliance",
+        "to": "end-pass-within-limit",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-ORD-A130_7-P1",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": ["別表第二(に)項第六号"],
+      "description": "法別表第二（に）項第六号で委任された政令で定める規模を規定"
+    },
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": ["A48:P4", "A87:P2", "A87:P3"],
+      "description": "第二種中高層住居専用地域の用途制限及び準用規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00+09:00",
+    "author": "Claude",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

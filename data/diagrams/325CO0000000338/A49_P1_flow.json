@@ -1,0 +1,275 @@
+{
+  "id": "A49_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "外壁内部等の防腐措置等（防水紙）（適合判定フロー）",
+    "target_subject": "外壁下地",
+    "description": "木造の外壁のうち軸組が腐りやすい構造である部分の下地に防水紙その他これに類するものを使用することを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "49",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造",
+    "木造"
+  ],
+  "text_raw": "木造の外壁のうち、鉄網モルタル塗その他軸組が腐りやすい構造である部分の下地には、防水紙その他これに類するものを使用しなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "structure",
+          "value": "木造"
+        }
+      ],
+      "note": "木造の建築物に適用"
+    },
+    "judgment_rule": {
+      "operator": "FORALL",
+      "conditions": [
+        {
+          "note": "軸組が腐りやすい構造である部分の下地には、防水紙その他これに類するものを使用",
+          "operator": "IMPLIES",
+          "lhs": {
+            "ref": "info-rot-prone",
+            "operator": "==",
+            "value": true
+          },
+          "rhs": {
+            "ref": "info-waterproof-material",
+            "operator": "==",
+            "value": true
+          }
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "flow_diagram": {
+    "title": "令49条1項 外壁内部等の防腐措置等 適合判定フロー",
+    "description": "木造の外壁のうち軸組が腐りやすい構造の部分に防水紙等を使用しているかを判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "令49条1項の適合判定を開始"
+      },
+      {
+        "id": "dec-structure-type",
+        "type": "decision",
+        "title": "構造種別は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "木造", "description": "主要構造部が木造" },
+          { "value": "その他", "description": "RC造、S造等の木造以外" }
+        ],
+        "description": "建築物の構造種別を判定"
+      },
+      {
+        "id": "proc-not-applicable",
+        "type": "process",
+        "title": "適用対象外",
+        "process_type": "mechanical",
+        "description": "木造以外の建築物は令49条1項の適用対象外"
+      },
+      {
+        "id": "dec-has-ext-wall",
+        "type": "decision",
+        "title": "外壁があるか？",
+        "decision_type": "binary",
+        "description": "判定対象となる外壁が存在するかを判定"
+      },
+      {
+        "id": "dec-each-wall-loop",
+        "type": "decision",
+        "title": "未判定の外壁があるか？",
+        "decision_type": "binary",
+        "description": "全ての外壁について判定を完了したかを確認"
+      },
+      {
+        "id": "dec-rot-prone",
+        "type": "decision",
+        "title": "軸組が腐りやすい構造か？",
+        "decision_type": "binary",
+        "description": "当該外壁が鉄網モルタル塗その他軸組が腐りやすい構造であるか判定",
+        "related_articles": ["令::A49:P1"]
+      },
+      {
+        "id": "proc-wall-exempt",
+        "type": "process",
+        "title": "当該外壁は防水紙不要",
+        "process_type": "mechanical",
+        "description": "軸組が腐りやすい構造ではないため、防水紙等は不要"
+      },
+      {
+        "id": "dec-waterproof",
+        "type": "decision",
+        "title": "下地に防水紙等を使用しているか？",
+        "decision_type": "binary",
+        "description": "軸組が腐りやすい構造である部分の下地に防水紙その他これに類するものを使用しているか判定",
+        "related_articles": ["令::A49:P1"]
+      },
+      {
+        "id": "proc-wall-comply",
+        "type": "process",
+        "title": "当該外壁適合",
+        "process_type": "mechanical",
+        "description": "当該外壁は令49条1項の要件を満たす"
+      },
+      {
+        "id": "proc-all-walls-comply",
+        "type": "process",
+        "title": "全外壁適合確認完了",
+        "process_type": "mechanical",
+        "description": "全ての外壁について令49条1項の要件を満たすことを確認"
+      },
+      {
+        "id": "pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令49条1項の規定に適合"
+      },
+      {
+        "id": "fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "令49条1項の規定に不適合（防水紙等の使用がない）"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-structure-type",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-structure-type",
+        "to": "dec-has-ext-wall",
+        "role": "option",
+        "label": "木造"
+      },
+      {
+        "id": "e03",
+        "from": "dec-structure-type",
+        "to": "proc-not-applicable",
+        "role": "option",
+        "label": "その他"
+      },
+      {
+        "id": "e04",
+        "from": "proc-not-applicable",
+        "to": "pass",
+        "role": "flow"
+      },
+      {
+        "id": "e05",
+        "from": "dec-has-ext-wall",
+        "to": "dec-each-wall-loop",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e06",
+        "from": "dec-has-ext-wall",
+        "to": "pass",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e07",
+        "from": "dec-each-wall-loop",
+        "to": "dec-rot-prone",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e08",
+        "from": "dec-each-wall-loop",
+        "to": "proc-all-walls-comply",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e09",
+        "from": "dec-rot-prone",
+        "to": "dec-waterproof",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e10",
+        "from": "dec-rot-prone",
+        "to": "proc-wall-exempt",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e11",
+        "from": "proc-wall-exempt",
+        "to": "dec-each-wall-loop",
+        "role": "flow"
+      },
+      {
+        "id": "e12",
+        "from": "dec-waterproof",
+        "to": "proc-wall-comply",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e13",
+        "from": "dec-waterproof",
+        "to": "fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e14",
+        "from": "proc-wall-comply",
+        "to": "dec-each-wall-loop",
+        "role": "flow"
+      },
+      {
+        "id": "e15",
+        "from": "proc-all-walls-comply",
+        "to": "pass",
+        "role": "flow"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSO-A49-P1",
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": [
+        "A20"
+      ],
+      "description": "構造耐力に関する規定に基づく"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00+09:00",
+    "updated_at": "2026-01-26T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

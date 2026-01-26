@@ -1,0 +1,261 @@
+{
+  "id": "CHK-BSO-A33-P1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "漏水検査",
+    "target_subject": "改良便槽・屎尿浄化槽・合併処理浄化槽",
+    "description": "改良便槽、屎尿浄化槽及び合併処理浄化槽が満水して24時間以上漏水しないことを確認する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "33",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "建築設備",
+    "便所"
+  ],
+  "text_raw": "第三十一条の改良便槽並びに前条の屎尿浄化槽及び合併処理浄化槽は、満水して二十四時間以上漏水しないことを確かめなければならない。",
+  "compliance_logic": {
+    "judgment_rule": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "ref": "info-leak-test-result",
+          "operator": "==",
+          "value": true,
+          "note": "満水して24時間以上漏水しないことが確認された"
+        }
+      ]
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "info-target-facility",
+        "type": "information",
+        "title": "検査対象設備",
+        "subject": "浄化槽等",
+        "property": "対象設備の特定",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "第31条の改良便槽、第32条の屎尿浄化槽又は合併処理浄化槽のいずれかを特定",
+        "related_articles": ["令::A31", "令::A32"]
+      },
+      {
+        "id": "proc-facility-input",
+        "type": "process",
+        "title": "対象設備の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から検査対象となる改良便槽、屎尿浄化槽又は合併処理浄化槽を特定する"
+      },
+      {
+        "id": "info-full-water-state",
+        "type": "information",
+        "title": "満水状態",
+        "subject": "浄化槽等",
+        "property": "満水状態",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "対象設備が満水状態にあること"
+      },
+      {
+        "id": "proc-full-water-confirm",
+        "type": "process",
+        "title": "満水状態の確認",
+        "process_type": "human_judgment",
+        "description": "対象設備が満水状態にあることを確認する"
+      },
+      {
+        "id": "info-test-duration",
+        "type": "information",
+        "title": "検査継続時間",
+        "subject": "漏水検査",
+        "property": "継続時間",
+        "property_type": "numeric",
+        "unit": "時間",
+        "plurality": "single",
+        "description": "満水状態を維持して検査を継続した時間"
+      },
+      {
+        "id": "proc-duration-input",
+        "type": "process",
+        "title": "検査時間の確認",
+        "process_type": "undefined_input",
+        "description": "検査記録等から検査継続時間を確認する"
+      },
+      {
+        "id": "info-duration-compliance",
+        "type": "information",
+        "title": "24時間以上検査",
+        "symbol": "D1",
+        "subject": "漏水検査",
+        "property": "24時間以上継続したか",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "検査が24時間以上継続されたことを確認"
+      },
+      {
+        "id": "proc-duration-check",
+        "type": "process",
+        "title": "検査時間判定",
+        "process_type": "mechanical",
+        "logic_expression": "T >= 24",
+        "description": "検査継続時間が24時間以上であるかを判定"
+      },
+      {
+        "id": "info-leak-presence",
+        "type": "information",
+        "title": "漏水の有無",
+        "subject": "浄化槽等",
+        "property": "漏水の有無",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "検査期間中の漏水の有無"
+      },
+      {
+        "id": "proc-leak-check",
+        "type": "process",
+        "title": "漏水確認",
+        "process_type": "human_judgment",
+        "description": "満水状態を24時間以上維持し、漏水がないことを目視等により確認する"
+      },
+      {
+        "id": "info-no-leak",
+        "type": "information",
+        "title": "漏水なし",
+        "symbol": "L1",
+        "subject": "浄化槽等",
+        "property": "漏水がないか",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "検査期間中に漏水がなかったことを確認"
+      },
+      {
+        "id": "proc-leak-judgment",
+        "type": "process",
+        "title": "漏水判定",
+        "process_type": "mechanical",
+        "logic_expression": "NOT leak_presence",
+        "description": "漏水がないことを判定"
+      },
+      {
+        "id": "info-leak-test-result",
+        "type": "information",
+        "title": "令33条1項適合",
+        "symbol": "PASS",
+        "subject": "浄化槽等",
+        "property": "漏水検査適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "満水して24時間以上漏水しないことが確認され、令33条1項に適合"
+      },
+      {
+        "id": "proc-final-judgment",
+        "type": "process",
+        "title": "総合判定",
+        "process_type": "mechanical",
+        "logic_expression": "D1 AND L1",
+        "description": "24時間以上検査を実施し、かつ漏水がなかったことを総合判定"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e001",
+        "from": "proc-facility-input",
+        "to": "info-target-facility",
+        "role": "output"
+      },
+      {
+        "id": "e002",
+        "from": "info-target-facility",
+        "to": "proc-full-water-confirm",
+        "role": "input"
+      },
+      {
+        "id": "e003",
+        "from": "proc-full-water-confirm",
+        "to": "info-full-water-state",
+        "role": "output"
+      },
+      {
+        "id": "e004",
+        "from": "proc-duration-input",
+        "to": "info-test-duration",
+        "role": "output"
+      },
+      {
+        "id": "e005",
+        "from": "info-test-duration",
+        "to": "proc-duration-check",
+        "role": "input"
+      },
+      {
+        "id": "e006",
+        "from": "proc-duration-check",
+        "to": "info-duration-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e007",
+        "from": "info-target-facility",
+        "to": "proc-leak-check",
+        "role": "input"
+      },
+      {
+        "id": "e008",
+        "from": "info-full-water-state",
+        "to": "proc-leak-check",
+        "role": "input"
+      },
+      {
+        "id": "e009",
+        "from": "proc-leak-check",
+        "to": "info-leak-presence",
+        "role": "output"
+      },
+      {
+        "id": "e010",
+        "from": "info-leak-presence",
+        "to": "proc-leak-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e011",
+        "from": "proc-leak-judgment",
+        "to": "info-no-leak",
+        "role": "output"
+      },
+      {
+        "id": "e012",
+        "from": "info-duration-compliance",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e013",
+        "from": "info-no-leak",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e014",
+        "from": "proc-final-judgment",
+        "to": "info-leak-test-result",
+        "role": "output"
+      }
+    ]
+  },
+  "metadata": {
+    "created_at": "2026-01-23T00:00:00Z",
+    "generator": "claude-code-kijo-generator",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令",
+    "checklist_ref": "確認審査報告書チェックリスト"
+  }
+}

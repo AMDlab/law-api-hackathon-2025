@@ -1,0 +1,515 @@
+{
+  "id": "A34_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "便所と井戸との距離",
+    "target_subject": "くみ取便所の便槽・井戸",
+    "description": "くみ取便所の便槽と井戸との離隔距離が基準を満たすことを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "34",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "衛生設備"
+  ],
+  "text_raw": "くみ取便所の便槽は、井戸から五メートル以上離して設けなければならない。ただし、地盤面下三メートル以上埋設した閉鎖式井戸で、その導水管が外管を有せず、かつ、不浸透質で造られている場合又はその導水管が内径二十五センチメートル以下の外管を有し、かつ、導水管及び外管が共に不浸透質で造られている場合においては、一・八メートル以上とすることができる。",
+  "kijo_diagram_ref": "CHK-BSLE-A34-P1",
+  "flow_diagram": {
+    "title": "令34条1項 便所と井戸との距離 適合判定フロー",
+    "description": "くみ取便所の便槽と井戸との離隔距離が基準を満たすかを判定するフローチャート",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "令34条1項の適合判定を開始"
+      },
+      {
+        "id": "proc-identify-bensou",
+        "type": "process",
+        "title": "便槽の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等からくみ取便所の便槽を特定する"
+      },
+      {
+        "id": "dec-bensou-exists",
+        "type": "decision",
+        "title": "くみ取便所の便槽があるか？",
+        "decision_type": "binary",
+        "description": "判定対象となるくみ取便所の便槽が存在するか確認"
+      },
+      {
+        "id": "proc-identify-well",
+        "type": "process",
+        "title": "井戸の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から井戸を特定する"
+      },
+      {
+        "id": "dec-well-exists",
+        "type": "decision",
+        "title": "井戸があるか？",
+        "decision_type": "binary",
+        "description": "判定対象となる井戸が存在するか確認"
+      },
+      {
+        "id": "proc-measure-distance",
+        "type": "process",
+        "title": "距離の算定",
+        "process_type": "mechanical",
+        "description": "便槽と井戸との距離を算定する"
+      },
+      {
+        "id": "dec-distance-5m",
+        "type": "decision",
+        "title": "距離が5m以上か？",
+        "decision_type": "binary",
+        "description": "便槽と井戸の距離が原則基準の5m以上を満たすか判定",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "distance", "desc": "便槽と井戸の距離" },
+          "rhs": { "value": 5, "unit": "m" }
+        }
+      },
+      {
+        "id": "proc-principal-pass",
+        "type": "process",
+        "title": "原則基準適合",
+        "process_type": "mechanical",
+        "description": "便槽と井戸の距離が5m以上であり、原則基準を満たす"
+      },
+      {
+        "id": "dec-well-type",
+        "type": "decision",
+        "title": "井戸の種類は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "閉鎖式井戸", "description": "閉鎖式井戸" },
+          { "value": "その他", "description": "開放式井戸など" }
+        ],
+        "description": "井戸が閉鎖式井戸かどうかを確認"
+      },
+      {
+        "id": "proc-well-type-other",
+        "type": "process",
+        "title": "閉鎖式井戸でない",
+        "process_type": "mechanical",
+        "description": "閉鎖式井戸でないため、ただし書きの緩和は適用されない"
+      },
+      {
+        "id": "proc-identify-well-depth",
+        "type": "process",
+        "title": "埋設深さの取得",
+        "process_type": "undefined_input",
+        "description": "設計図書等から井戸の埋設深さを読み取る"
+      },
+      {
+        "id": "dec-well-depth",
+        "type": "decision",
+        "title": "埋設深さが3m以上か？",
+        "decision_type": "binary",
+        "description": "井戸が地盤面下3m以上に埋設されているか判定",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "well_depth", "desc": "井戸の埋設深さ" },
+          "rhs": { "value": 3, "unit": "m" }
+        }
+      },
+      {
+        "id": "proc-depth-insufficient",
+        "type": "process",
+        "title": "埋設深さ不足",
+        "process_type": "mechanical",
+        "description": "埋設深さが3m未満のため、ただし書きの緩和は適用されない"
+      },
+      {
+        "id": "proc-identify-pipe",
+        "type": "process",
+        "title": "導水管構造の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から導水管の構造（外管の有無、材質）を読み取る"
+      },
+      {
+        "id": "dec-outer-pipe",
+        "type": "decision",
+        "title": "導水管に外管があるか？",
+        "decision_type": "binary",
+        "description": "導水管が外管を有するかどうかを確認"
+      },
+      {
+        "id": "dec-pipe-impermeable-no-outer",
+        "type": "decision",
+        "title": "導水管は不浸透質か？",
+        "decision_type": "binary",
+        "description": "外管がない場合、導水管が不浸透質で造られているか確認"
+      },
+      {
+        "id": "proc-pattern1-ok",
+        "type": "process",
+        "title": "パターン1該当",
+        "process_type": "mechanical",
+        "description": "外管なし・不浸透質のパターンに該当"
+      },
+      {
+        "id": "proc-pattern1-ng",
+        "type": "process",
+        "title": "パターン1不該当",
+        "process_type": "mechanical",
+        "description": "導水管が不浸透質でないため、ただし書きの緩和は適用されない"
+      },
+      {
+        "id": "proc-identify-outer-diameter",
+        "type": "process",
+        "title": "外管内径の取得",
+        "process_type": "undefined_input",
+        "description": "設計図書等から外管の内径を読み取る"
+      },
+      {
+        "id": "dec-outer-diameter",
+        "type": "decision",
+        "title": "外管の内径が25cm以下か？",
+        "decision_type": "binary",
+        "description": "外管の内径が25cm以下かを判定",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "outer_pipe_diameter", "desc": "外管の内径" },
+          "rhs": { "value": 25, "unit": "cm" }
+        }
+      },
+      {
+        "id": "proc-diameter-over",
+        "type": "process",
+        "title": "外管内径超過",
+        "process_type": "mechanical",
+        "description": "外管の内径が25cmを超えるため、ただし書きの緩和は適用されない"
+      },
+      {
+        "id": "dec-both-impermeable",
+        "type": "decision",
+        "title": "導水管・外管共に不浸透質か？",
+        "decision_type": "binary",
+        "description": "導水管および外管が共に不浸透質で造られているか確認"
+      },
+      {
+        "id": "proc-pattern2-ok",
+        "type": "process",
+        "title": "パターン2該当",
+        "process_type": "mechanical",
+        "description": "外管内径25cm以下・両管不浸透質のパターンに該当"
+      },
+      {
+        "id": "proc-pattern2-ng",
+        "type": "process",
+        "title": "パターン2不該当",
+        "process_type": "mechanical",
+        "description": "導水管または外管が不浸透質でないため、ただし書きの緩和は適用されない"
+      },
+      {
+        "id": "proc-proviso-applicable",
+        "type": "process",
+        "title": "ただし書き適用可",
+        "process_type": "mechanical",
+        "description": "ただし書きの条件を全て満たし、緩和基準1.8mが適用される"
+      },
+      {
+        "id": "dec-distance-1_8m",
+        "type": "decision",
+        "title": "距離が1.8m以上か？",
+        "decision_type": "binary",
+        "description": "便槽と井戸の距離が緩和基準の1.8m以上を満たすか判定",
+        "condition": {
+          "operator": "GTE",
+          "lhs": { "var": "distance", "desc": "便槽と井戸の距離" },
+          "rhs": { "value": 1.8, "unit": "m" }
+        }
+      },
+      {
+        "id": "proc-proviso-pass",
+        "type": "process",
+        "title": "緩和基準適合",
+        "process_type": "mechanical",
+        "description": "便槽と井戸の距離が1.8m以上であり、ただし書きの緩和基準を満たす"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令34条1項に適合"
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "令34条1項に不適合"
+      },
+      {
+        "id": "end-not-applicable",
+        "type": "terminal",
+        "title": "対象外",
+        "result": "end",
+        "description": "くみ取便所の便槽または井戸がないため、本規定の適用対象外"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e001",
+        "from": "start",
+        "to": "proc-identify-bensou",
+        "role": "flow"
+      },
+      {
+        "id": "e002",
+        "from": "proc-identify-bensou",
+        "to": "dec-bensou-exists",
+        "role": "flow"
+      },
+      {
+        "id": "e003",
+        "from": "dec-bensou-exists",
+        "to": "proc-identify-well",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e004",
+        "from": "dec-bensou-exists",
+        "to": "end-not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e005",
+        "from": "proc-identify-well",
+        "to": "dec-well-exists",
+        "role": "flow"
+      },
+      {
+        "id": "e006",
+        "from": "dec-well-exists",
+        "to": "proc-measure-distance",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e007",
+        "from": "dec-well-exists",
+        "to": "end-not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e008",
+        "from": "proc-measure-distance",
+        "to": "dec-distance-5m",
+        "role": "flow"
+      },
+      {
+        "id": "e009",
+        "from": "dec-distance-5m",
+        "to": "proc-principal-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e010",
+        "from": "dec-distance-5m",
+        "to": "dec-well-type",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e011",
+        "from": "proc-principal-pass",
+        "to": "end-pass",
+        "role": "flow"
+      },
+      {
+        "id": "e012",
+        "from": "dec-well-type",
+        "to": "proc-identify-well-depth",
+        "role": "option",
+        "label": "閉鎖式井戸"
+      },
+      {
+        "id": "e013",
+        "from": "dec-well-type",
+        "to": "proc-well-type-other",
+        "role": "option",
+        "label": "その他"
+      },
+      {
+        "id": "e014",
+        "from": "proc-well-type-other",
+        "to": "end-fail",
+        "role": "flow"
+      },
+      {
+        "id": "e015",
+        "from": "proc-identify-well-depth",
+        "to": "dec-well-depth",
+        "role": "flow"
+      },
+      {
+        "id": "e016",
+        "from": "dec-well-depth",
+        "to": "proc-identify-pipe",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e017",
+        "from": "dec-well-depth",
+        "to": "proc-depth-insufficient",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e018",
+        "from": "proc-depth-insufficient",
+        "to": "end-fail",
+        "role": "flow"
+      },
+      {
+        "id": "e019",
+        "from": "proc-identify-pipe",
+        "to": "dec-outer-pipe",
+        "role": "flow"
+      },
+      {
+        "id": "e020",
+        "from": "dec-outer-pipe",
+        "to": "dec-pipe-impermeable-no-outer",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e021",
+        "from": "dec-outer-pipe",
+        "to": "proc-identify-outer-diameter",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e022",
+        "from": "dec-pipe-impermeable-no-outer",
+        "to": "proc-pattern1-ok",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e023",
+        "from": "dec-pipe-impermeable-no-outer",
+        "to": "proc-pattern1-ng",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e024",
+        "from": "proc-pattern1-ok",
+        "to": "proc-proviso-applicable",
+        "role": "flow"
+      },
+      {
+        "id": "e025",
+        "from": "proc-pattern1-ng",
+        "to": "end-fail",
+        "role": "flow"
+      },
+      {
+        "id": "e026",
+        "from": "proc-identify-outer-diameter",
+        "to": "dec-outer-diameter",
+        "role": "flow"
+      },
+      {
+        "id": "e027",
+        "from": "dec-outer-diameter",
+        "to": "dec-both-impermeable",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e028",
+        "from": "dec-outer-diameter",
+        "to": "proc-diameter-over",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e029",
+        "from": "proc-diameter-over",
+        "to": "end-fail",
+        "role": "flow"
+      },
+      {
+        "id": "e030",
+        "from": "dec-both-impermeable",
+        "to": "proc-pattern2-ok",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e031",
+        "from": "dec-both-impermeable",
+        "to": "proc-pattern2-ng",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e032",
+        "from": "proc-pattern2-ok",
+        "to": "proc-proviso-applicable",
+        "role": "flow"
+      },
+      {
+        "id": "e033",
+        "from": "proc-pattern2-ng",
+        "to": "end-fail",
+        "role": "flow"
+      },
+      {
+        "id": "e034",
+        "from": "proc-proviso-applicable",
+        "to": "dec-distance-1_8m",
+        "role": "flow"
+      },
+      {
+        "id": "e035",
+        "from": "dec-distance-1_8m",
+        "to": "proc-proviso-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e036",
+        "from": "dec-distance-1_8m",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e037",
+        "from": "proc-proviso-pass",
+        "to": "end-pass",
+        "role": "flow"
+      }
+    ]
+  },
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00Z",
+    "generator": "claude-code-flow-generator",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令",
+    "checklist_ref": "確認審査報告書チェックリスト"
+  }
+}

@@ -1,0 +1,140 @@
+{
+  "id": "CHK-BSL-ORDER-A86-P2",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "積雪の単位荷重基準",
+    "target_subject": "構造計算",
+    "description": "積雪荷重の算定に用いる積雪の単位荷重が基準値以上かを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "86",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造関係",
+    "積雪荷重"
+  ],
+  "text_raw": "前項に規定する積雪の単位荷重は、積雪量一センチメートルごとに一平方メートルにつき二十ニュートン以上としなければならない。ただし、特定行政庁は、規則で、国土交通大臣が定める基準に基づいて多雪区域を指定し、その区域につきこれと異なる定めをすることができる。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "reference",
+          "value": "令第86条第1項の積雪荷重計算を行う建築物"
+        }
+      ],
+      "note": "多雪区域では特定行政庁の規則で異なる単位荷重が定められている場合がある"
+    },
+    "judgment_rule": {
+      "operator": ">=",
+      "lhs": {
+        "ref": "info-unit-load",
+        "description": "積雪の単位荷重"
+      },
+      "rhs": {
+        "value": 20,
+        "unit": "N/m²/cm",
+        "description": "基準単位荷重（又は特定行政庁が定める値）"
+      }
+    },
+    "exceptions": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "type": "location",
+          "value": "多雪区域（特定行政庁が規則で指定）"
+        }
+      ],
+      "effect": "ALTERNATIVE_STANDARD",
+      "note": "多雪区域では国土交通大臣が定める基準に基づき特定行政庁が異なる単位荷重を定めることができる"
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-unit-load-identify",
+        "type": "process",
+        "title": "単位荷重の特定",
+        "process_type": "undefined_input",
+        "description": "構造計算で用いる積雪の単位荷重を特定する"
+      },
+      {
+        "id": "info-unit-load",
+        "type": "information",
+        "title": "積雪の単位荷重",
+        "symbol": "Ws",
+        "subject": "構造計算",
+        "property": "積雪の単位荷重",
+        "property_type": "numeric",
+        "unit": "N/m²/cm",
+        "plurality": "single",
+        "description": "積雪量1cmごとに1m²につき設定された荷重値"
+      },
+      {
+        "id": "proc-threshold-check",
+        "type": "process",
+        "title": "基準値との比較",
+        "process_type": "mechanical",
+        "description": "積雪の単位荷重が20N/m²/cm以上かを判定（多雪区域では特定行政庁が定める値）",
+        "logic_expression": "Ws >= 20 (N/m²/cm)"
+      },
+      {
+        "id": "info-compliance",
+        "type": "information",
+        "title": "単位荷重基準適合",
+        "symbol": "R",
+        "subject": "構造計算",
+        "property": "単位荷重基準適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "積雪の単位荷重が令第86条第2項の基準に適合するか"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-unit-load-identify",
+        "to": "info-unit-load",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "info-unit-load",
+        "to": "proc-threshold-check",
+        "role": "input"
+      },
+      {
+        "id": "e03",
+        "from": "proc-threshold-check",
+        "to": "info-compliance",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": [
+        "A86:P1"
+      ],
+      "description": "第1項で定める積雪荷重の計算式における単位荷重"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-23T12:00:00Z",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

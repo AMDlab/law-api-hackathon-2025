@@ -43,18 +43,19 @@ export async function GET(request: Request, { params }: RouteParams) {
       );
     }
 
+    const diagramKey = `${lawId}/${articleId}`;
     const diagram = await prisma.diagram.findUnique({
-      where: { diagramKey: articleId },
+      where: { diagramKey },
       select: { lawId: true },
     });
 
-    if (!diagram || diagram.lawId !== lawId) {
+    if (!diagram) {
       return NextResponse.json({ error: "Diagram not found" }, { status: 404 });
     }
 
     const snapshots = await prisma.diagramSnapshot.findMany({
       where: {
-        diagramKey: articleId,
+        diagramKey,
         diagramType,
       },
       orderBy: { createdAt: "desc" },

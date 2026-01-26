@@ -1,0 +1,202 @@
+{
+  "id": "CHK-BSL-ORDER-A136-P1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "敷地内の空地の基準",
+    "target_subject": "敷地",
+    "description": "法第59条の2第1項で政令に委任された空地の基準を判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "136",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "集団規定",
+    "総合設計",
+    "空地"
+  ],
+  "text_raw": "法第五十九条の二第一項の規定により政令で定める空地は、法第五十三条の規定により建蔽率の最高限度が定められている場合においては、当該最高限度に応じて、当該空地の面積の敷地面積に対する割合が次の表に定める数値以上であるものとし、同条の規定により建蔽率の最高限度が定められていない場合においては、当該空地の面積の敷地面積に対する割合が十分の二以上であるものとする。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "reference",
+          "value": "法第59条の2第1項の適用を受ける建築物"
+        }
+      ],
+      "note": "敷地に適用される建蔽率の最高限度（法53条）は都市計画情報として処理に内包"
+    },
+    "judgment_rule": {
+      "operator": ">=",
+      "lhs": {
+        "ref": "info-open-space-ratio",
+        "description": "空地面積/敷地面積"
+      },
+      "rhs": {
+        "ref": "required-ratio",
+        "description": "建蔽率最高限度に応じた必要空地率"
+      }
+    },
+    "exceptions": null
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-site-area",
+        "type": "process",
+        "title": "敷地面積の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から敷地面積を読み取る"
+      },
+      {
+        "id": "info-site-area",
+        "type": "information",
+        "title": "敷地面積",
+        "symbol": "A",
+        "subject": "敷地",
+        "property": "面積",
+        "property_type": "numeric",
+        "unit": "m2",
+        "plurality": "single",
+        "description": "敷地の面積"
+      },
+      {
+        "id": "proc-open-space-area",
+        "type": "process",
+        "title": "空地面積の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から敷地内の空地面積を読み取る"
+      },
+      {
+        "id": "info-open-space-area",
+        "type": "information",
+        "title": "空地面積",
+        "symbol": "S",
+        "subject": "敷地",
+        "property": "空地の面積",
+        "property_type": "numeric",
+        "unit": "m2",
+        "plurality": "single",
+        "description": "敷地内の空地の面積"
+      },
+      {
+        "id": "proc-calc-ratio",
+        "type": "process",
+        "title": "空地割合算出",
+        "process_type": "mechanical",
+        "description": "空地面積を敷地面積で除して空地割合を算出",
+        "logic_expression": "R = S / A"
+      },
+      {
+        "id": "info-open-space-ratio",
+        "type": "information",
+        "title": "空地割合",
+        "symbol": "R",
+        "subject": "敷地",
+        "property": "空地の面積の敷地面積に対する割合",
+        "property_type": "numeric",
+        "plurality": "single",
+        "description": "空地面積/敷地面積"
+      },
+      {
+        "id": "proc-check-compliance",
+        "type": "process",
+        "title": "空地率基準判定",
+        "process_type": "mechanical",
+        "description": "建蔽率最高限度に応じた必要空地率と比較。建蔽率最高限度が定められている場合は表の数値、定められていない場合は2/10と比較",
+        "logic_expression": "IF 建蔽率最高限度あり THEN (建蔽率≤0.5: R≥1-建蔽率+0.15, 0.5<建蔽率≤0.55: R≥0.65, 建蔽率>0.55: R≥1-建蔽率+0.2) ELSE R≥0.2",
+        "remarks": "建蔽率の最高限度（法53条）は都市計画情報として処理に内包"
+      },
+      {
+        "id": "info-compliance",
+        "type": "information",
+        "title": "空地基準適合",
+        "symbol": "C",
+        "subject": "敷地",
+        "property": "空地基準適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "令第136条第1項の空地基準に適合するか"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-site-area",
+        "to": "info-site-area",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "proc-open-space-area",
+        "to": "info-open-space-area",
+        "role": "output"
+      },
+      {
+        "id": "e03",
+        "from": "info-site-area",
+        "to": "proc-calc-ratio",
+        "role": "input"
+      },
+      {
+        "id": "e04",
+        "from": "info-open-space-area",
+        "to": "proc-calc-ratio",
+        "role": "input"
+      },
+      {
+        "id": "e05",
+        "from": "proc-calc-ratio",
+        "to": "info-open-space-ratio",
+        "role": "output"
+      },
+      {
+        "id": "e06",
+        "from": "info-open-space-ratio",
+        "to": "proc-check-compliance",
+        "role": "input"
+      },
+      {
+        "id": "e07",
+        "from": "proc-check-compliance",
+        "to": "info-compliance",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": [
+        "A59_2:P1"
+      ],
+      "description": "法第59条の2第1項の総合設計制度における空地基準の委任元"
+    },
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "references",
+      "articles": [
+        "A53"
+      ],
+      "description": "建蔽率の最高限度を定める規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

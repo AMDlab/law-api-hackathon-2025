@@ -1,0 +1,338 @@
+{
+  "id": "A52_P3_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "組積造のモルタル配合基準",
+    "target_subject": "モルタル",
+    "description": "組積材の目地に使用するモルタルの配合基準を判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "52",
+    "paragraph": "3",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造規定",
+    "組積造",
+    "施工"
+  ],
+  "text_raw": "前項のモルタルは、セメントモルタルでセメントと砂との容積比が一対三のもの若しくはこれと同等以上の強度を有するもの又は石灰入りセメントモルタルでセメントと石灰と砂との容積比が一対二対五のもの若しくはこれと同等以上の強度を有するものとしなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "structure_type",
+          "value": "組積造"
+        },
+        {
+          "type": "reference",
+          "value": "令第52条第2項で使用するモルタル"
+        }
+      ],
+      "note": "組積造の目地に使用するモルタルが対象"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "ref": "info-cement-mortar-compliance",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "ref": "info-lime-cement-mortar-compliance",
+          "operator": "==",
+          "value": true
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "flow_diagram": {
+    "title": "令第52条第3項 モルタル配合基準適合判定フロー",
+    "description": "組積造の目地に使用するモルタルが、セメントモルタル（1:3配合又は同等以上の強度）又は石灰入りセメントモルタル（1:2:5配合又は同等以上の強度）の基準に適合するかを判定する",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start",
+        "description": "令第52条第3項適合判定開始"
+      },
+      {
+        "id": "dec-mortar-type",
+        "type": "decision",
+        "title": "モルタルの種別は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "セメントモルタル", "description": "セメントと砂で構成" },
+          { "value": "石灰入りセメントモルタル", "description": "セメントと石灰と砂で構成" },
+          { "value": "その他", "description": "上記以外のモルタル" }
+        ],
+        "description": "設計図書から目地に使用するモルタルの種別を確認"
+      },
+      {
+        "id": "proc-cement-mortar-route",
+        "type": "process",
+        "title": "セメントモルタル判定へ",
+        "process_type": "mechanical",
+        "description": "セメントモルタルの配合基準を確認"
+      },
+      {
+        "id": "dec-cement-ratio",
+        "type": "decision",
+        "title": "セメントと砂の容積比は1:3か？",
+        "decision_type": "binary",
+        "description": "セメントモルタルの配合比が基準（1:3）を満たすか確認",
+        "condition": {
+          "operator": "EQ",
+          "lhs": { "var": "RC", "desc": "セメントと砂の容積比" },
+          "rhs": { "value": "1:3", "desc": "基準配合比" }
+        }
+      },
+      {
+        "id": "proc-cement-ratio-ok",
+        "type": "process",
+        "title": "配合比基準適合",
+        "process_type": "mechanical",
+        "description": "セメントモルタルの配合比が1:3で基準適合"
+      },
+      {
+        "id": "dec-cement-strength",
+        "type": "decision",
+        "title": "1:3配合と同等以上の強度を有するか？",
+        "decision_type": "binary",
+        "description": "配合比が1:3でない場合、同等以上の強度を有するかを確認",
+        "condition": {
+          "operator": "EQ",
+          "lhs": { "var": "SC", "desc": "1:3配合と同等以上の強度" },
+          "rhs": { "value": true, "desc": "同等以上の強度あり" }
+        }
+      },
+      {
+        "id": "proc-cement-strength-ok",
+        "type": "process",
+        "title": "強度基準適合",
+        "process_type": "mechanical",
+        "description": "セメントモルタルが1:3配合と同等以上の強度を有し基準適合"
+      },
+      {
+        "id": "proc-lime-mortar-route",
+        "type": "process",
+        "title": "石灰入りセメントモルタル判定へ",
+        "process_type": "mechanical",
+        "description": "石灰入りセメントモルタルの配合基準を確認"
+      },
+      {
+        "id": "dec-lime-ratio",
+        "type": "decision",
+        "title": "セメントと石灰と砂の容積比は1:2:5か？",
+        "decision_type": "binary",
+        "description": "石灰入りセメントモルタルの配合比が基準（1:2:5）を満たすか確認",
+        "condition": {
+          "operator": "EQ",
+          "lhs": { "var": "RL", "desc": "セメントと石灰と砂の容積比" },
+          "rhs": { "value": "1:2:5", "desc": "基準配合比" }
+        }
+      },
+      {
+        "id": "proc-lime-ratio-ok",
+        "type": "process",
+        "title": "配合比基準適合",
+        "process_type": "mechanical",
+        "description": "石灰入りセメントモルタルの配合比が1:2:5で基準適合"
+      },
+      {
+        "id": "dec-lime-strength",
+        "type": "decision",
+        "title": "1:2:5配合と同等以上の強度を有するか？",
+        "decision_type": "binary",
+        "description": "配合比が1:2:5でない場合、同等以上の強度を有するかを確認",
+        "condition": {
+          "operator": "EQ",
+          "lhs": { "var": "SL", "desc": "1:2:5配合と同等以上の強度" },
+          "rhs": { "value": true, "desc": "同等以上の強度あり" }
+        }
+      },
+      {
+        "id": "proc-lime-strength-ok",
+        "type": "process",
+        "title": "強度基準適合",
+        "process_type": "mechanical",
+        "description": "石灰入りセメントモルタルが1:2:5配合と同等以上の強度を有し基準適合"
+      },
+      {
+        "id": "proc-other-mortar",
+        "type": "process",
+        "title": "その他のモルタル",
+        "process_type": "mechanical",
+        "description": "セメントモルタルでも石灰入りセメントモルタルでもない場合"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令第52条第3項のモルタル配合基準に適合"
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "令第52条第3項のモルタル配合基準に不適合"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-mortar-type",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-mortar-type",
+        "to": "proc-cement-mortar-route",
+        "role": "option",
+        "label": "セメントモルタル"
+      },
+      {
+        "id": "e03",
+        "from": "dec-mortar-type",
+        "to": "proc-lime-mortar-route",
+        "role": "option",
+        "label": "石灰入りセメントモルタル"
+      },
+      {
+        "id": "e04",
+        "from": "dec-mortar-type",
+        "to": "proc-other-mortar",
+        "role": "option",
+        "label": "その他"
+      },
+      {
+        "id": "e05",
+        "from": "proc-cement-mortar-route",
+        "to": "dec-cement-ratio",
+        "role": "flow"
+      },
+      {
+        "id": "e06",
+        "from": "dec-cement-ratio",
+        "to": "proc-cement-ratio-ok",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e07",
+        "from": "dec-cement-ratio",
+        "to": "dec-cement-strength",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e08",
+        "from": "proc-cement-ratio-ok",
+        "to": "end-pass",
+        "role": "flow"
+      },
+      {
+        "id": "e09",
+        "from": "dec-cement-strength",
+        "to": "proc-cement-strength-ok",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e10",
+        "from": "dec-cement-strength",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e11",
+        "from": "proc-cement-strength-ok",
+        "to": "end-pass",
+        "role": "flow"
+      },
+      {
+        "id": "e12",
+        "from": "proc-lime-mortar-route",
+        "to": "dec-lime-ratio",
+        "role": "flow"
+      },
+      {
+        "id": "e13",
+        "from": "dec-lime-ratio",
+        "to": "proc-lime-ratio-ok",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e14",
+        "from": "dec-lime-ratio",
+        "to": "dec-lime-strength",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e15",
+        "from": "proc-lime-ratio-ok",
+        "to": "end-pass",
+        "role": "flow"
+      },
+      {
+        "id": "e16",
+        "from": "dec-lime-strength",
+        "to": "proc-lime-strength-ok",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e17",
+        "from": "dec-lime-strength",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e18",
+        "from": "proc-lime-strength-ok",
+        "to": "end-pass",
+        "role": "flow"
+      },
+      {
+        "id": "e19",
+        "from": "proc-other-mortar",
+        "to": "end-fail",
+        "role": "flow"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-ORDER-A52-P3",
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": ["A52:P2"],
+      "description": "前項（第2項）のモルタルを参照"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

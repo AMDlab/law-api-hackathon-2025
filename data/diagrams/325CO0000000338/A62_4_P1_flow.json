@@ -1,0 +1,299 @@
+{
+  "id": "A62_4_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "補強コンクリートブロック造の耐力壁区画面積制限",
+    "target_subject": "耐力壁",
+    "description": "各階の補強コンクリートブロック造耐力壁の中心線で囲まれた部分の水平投影面積が60㎡以下であることを確認する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "62の4",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造関係規定",
+    "補強コンクリートブロック造"
+  ],
+  "text_raw": "各階の補強コンクリートブロツク造の耐力壁の中心線により囲まれた部分の水平投影面積は、六十平方メートル以下としなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "structural_type",
+          "value": "補強コンクリートブロック造"
+        }
+      ],
+      "note": "補強コンクリートブロック造の建築物に適用"
+    },
+    "judgment_rule": {
+      "operator": "<=",
+      "lhs": {
+        "ref": "info-area",
+        "description": "耐力壁中心線で囲まれた部分の水平投影面積"
+      },
+      "rhs": {
+        "value": 60,
+        "unit": "㎡"
+      }
+    }
+  },
+  "flow_diagram": {
+    "title": "令第62条の4第1項 適合判定フロー",
+    "description": "補強コンクリートブロック造の耐力壁区画面積制限の適合判定手順",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "審査開始",
+        "result": "start",
+        "description": "令第62条の4第1項の適合判定を開始"
+      },
+      {
+        "id": "dec-structure",
+        "type": "decision",
+        "title": "構造種別は？",
+        "decision_type": "multi",
+        "options": [
+          { "value": "補強コンクリートブロック造", "description": "補強CB造の建築物" },
+          { "value": "その他", "description": "補強CB造以外の構造" }
+        ],
+        "description": "建築物の構造種別を判定する"
+      },
+      {
+        "id": "proc-not-rcb",
+        "type": "process",
+        "title": "適用対象外",
+        "process_type": "mechanical",
+        "description": "補強コンクリートブロック造以外のため本条は適用対象外"
+      },
+      {
+        "id": "proc-rcb-apply",
+        "type": "process",
+        "title": "補強CB造該当",
+        "process_type": "mechanical",
+        "description": "補強コンクリートブロック造の建築物として本条が適用される"
+      },
+      {
+        "id": "proc-identify-floors",
+        "type": "process",
+        "title": "各階の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の各階を特定する"
+      },
+      {
+        "id": "proc-identify-walls",
+        "type": "process",
+        "title": "耐力壁の特定",
+        "process_type": "undefined_input",
+        "description": "各階の補強コンクリートブロック造耐力壁を特定する"
+      },
+      {
+        "id": "proc-identify-centerlines",
+        "type": "process",
+        "title": "中心線の特定",
+        "process_type": "undefined_input",
+        "description": "耐力壁の中心線を設計図書等から読み取る"
+      },
+      {
+        "id": "proc-enclosed-region",
+        "type": "process",
+        "title": "囲まれた領域の算定",
+        "process_type": "mechanical",
+        "description": "耐力壁の中心線により囲まれた部分を幾何学的に特定する"
+      },
+      {
+        "id": "proc-area-calc",
+        "type": "process",
+        "title": "水平投影面積の算定",
+        "process_type": "mechanical",
+        "description": "各階の中心線で囲まれた部分の水平投影面積を計算する"
+      },
+      {
+        "id": "dec-area-check",
+        "type": "decision",
+        "title": "水平投影面積 ≤ 60㎡か？",
+        "decision_type": "binary",
+        "description": "当該階の水平投影面積が60㎡以下であるかを判定",
+        "condition": {
+          "operator": "LTE",
+          "lhs": { "var": "A", "desc": "水平投影面積" },
+          "rhs": { "value": 60, "unit": "㎡" }
+        }
+      },
+      {
+        "id": "proc-floor-pass",
+        "type": "process",
+        "title": "当該階適合",
+        "process_type": "mechanical",
+        "description": "当該階は面積制限を満たしている"
+      },
+      {
+        "id": "dec-more-floors",
+        "type": "decision",
+        "title": "未確認の階があるか？",
+        "decision_type": "binary",
+        "description": "まだ確認していない階が残っているかを判定"
+      },
+      {
+        "id": "proc-next-floor",
+        "type": "process",
+        "title": "次の階へ",
+        "process_type": "mechanical",
+        "description": "次の階の確認に移る"
+      },
+      {
+        "id": "proc-all-floors-pass",
+        "type": "process",
+        "title": "全階適合確認",
+        "process_type": "mechanical",
+        "description": "すべての階において水平投影面積が60㎡以下であることを確認"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "令第62条の4第1項に適合"
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "令第62条の4第1項に不適合（水平投影面積が60㎡を超過）"
+      },
+      {
+        "id": "end-not-applicable",
+        "type": "terminal",
+        "title": "適用対象外",
+        "result": "pass",
+        "description": "補強CB造以外のため本条の適用対象外として適合扱い"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-structure",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-structure",
+        "to": "proc-not-rcb",
+        "role": "option",
+        "label": "その他"
+      },
+      {
+        "id": "e03",
+        "from": "dec-structure",
+        "to": "proc-rcb-apply",
+        "role": "option",
+        "label": "補強コンクリートブロック造"
+      },
+      {
+        "id": "e04",
+        "from": "proc-not-rcb",
+        "to": "end-not-applicable",
+        "role": "flow"
+      },
+      {
+        "id": "e05",
+        "from": "proc-rcb-apply",
+        "to": "proc-identify-floors",
+        "role": "flow"
+      },
+      {
+        "id": "e06",
+        "from": "proc-identify-floors",
+        "to": "proc-identify-walls",
+        "role": "flow"
+      },
+      {
+        "id": "e07",
+        "from": "proc-identify-walls",
+        "to": "proc-identify-centerlines",
+        "role": "flow"
+      },
+      {
+        "id": "e08",
+        "from": "proc-identify-centerlines",
+        "to": "proc-enclosed-region",
+        "role": "flow"
+      },
+      {
+        "id": "e09",
+        "from": "proc-enclosed-region",
+        "to": "proc-area-calc",
+        "role": "flow"
+      },
+      {
+        "id": "e10",
+        "from": "proc-area-calc",
+        "to": "dec-area-check",
+        "role": "flow"
+      },
+      {
+        "id": "e11",
+        "from": "dec-area-check",
+        "to": "proc-floor-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e12",
+        "from": "dec-area-check",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e13",
+        "from": "proc-floor-pass",
+        "to": "dec-more-floors",
+        "role": "flow"
+      },
+      {
+        "id": "e14",
+        "from": "dec-more-floors",
+        "to": "proc-next-floor",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e15",
+        "from": "dec-more-floors",
+        "to": "proc-all-floors-pass",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e16",
+        "from": "proc-next-floor",
+        "to": "proc-identify-walls",
+        "role": "flow"
+      },
+      {
+        "id": "e17",
+        "from": "proc-all-floors-pass",
+        "to": "end-pass",
+        "role": "flow"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSO-A62_4-P1",
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00Z",
+    "generator": "claude-code-flow-generator",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令",
+    "checklist_ref": "確認審査報告書チェックリスト"
+  }
+}

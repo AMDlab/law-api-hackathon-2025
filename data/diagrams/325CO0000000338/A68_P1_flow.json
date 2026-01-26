@@ -1,0 +1,274 @@
+{
+  "id": "A68_P1_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "高力ボルト、ボルト及びリベットの中心距離",
+    "target_subject": "接合材（高力ボルト、ボルト、リベット）",
+    "description": "高力ボルト、ボルト又はリベットの相互間の中心距離が、その径の2.5倍以上であることを判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "68",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造関係規定",
+    "鉄骨造"
+  ],
+  "text_raw": "高力ボルト、ボルト又はリベットの相互間の中心距離は、その径の二・五倍以上としなければならない。",
+  "compliance_logic": {
+    "judgment_rule": {
+      "operator": "FOR_ALL",
+      "subject": "各接合材の組み合わせ",
+      "conditions": [
+        {
+          "ref": "info-distance-compliance",
+          "operator": "==",
+          "value": true,
+          "note": "相互間の中心距離が径の2.5倍以上"
+        }
+      ]
+    }
+  },
+  "flow_diagram": {
+    "title": "令68条1項 適合判定フロー",
+    "description": "高力ボルト、ボルト又はリベットの相互間の中心距離が径の2.5倍以上かを判定",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "開始",
+        "result": "start"
+      },
+      {
+        "id": "proc-identify-fasteners",
+        "type": "process",
+        "title": "接合材の特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から対象となる高力ボルト、ボルト又はリベットを特定する"
+      },
+      {
+        "id": "dec-fasteners-exist",
+        "type": "decision",
+        "title": "高力ボルト等があるか？",
+        "decision_type": "binary",
+        "description": "建築物に高力ボルト、ボルト又はリベットが存在するか確認"
+      },
+      {
+        "id": "proc-enumerate-pairs",
+        "type": "process",
+        "title": "接合材の組み合わせ列挙",
+        "process_type": "mechanical",
+        "description": "相互間の距離を検証すべき接合材の組み合わせを全て列挙する"
+      },
+      {
+        "id": "dec-pairs-exist",
+        "type": "decision",
+        "title": "検証対象の組み合わせがあるか？",
+        "decision_type": "binary",
+        "description": "中心距離を検証すべき接合材ペアが存在するか"
+      },
+      {
+        "id": "proc-select-pair",
+        "type": "process",
+        "title": "未検証の組み合わせを選択",
+        "process_type": "mechanical",
+        "description": "次に検証する接合材ペアを選択（ループ処理）"
+      },
+      {
+        "id": "proc-get-diameter",
+        "type": "process",
+        "title": "接合材の径を取得",
+        "process_type": "undefined_input",
+        "description": "設計図書等から接合材の径(D)を読み取る"
+      },
+      {
+        "id": "proc-get-distance",
+        "type": "process",
+        "title": "中心距離を取得",
+        "process_type": "undefined_input",
+        "description": "設計図書等から接合材相互間の中心距離(L)を読み取る"
+      },
+      {
+        "id": "proc-calc-min-distance",
+        "type": "process",
+        "title": "最小中心距離を算出",
+        "process_type": "mechanical",
+        "description": "Lmin = D × 2.5 を算出する"
+      },
+      {
+        "id": "dec-distance-check",
+        "type": "decision",
+        "title": "中心距離 >= 径の2.5倍か？",
+        "decision_type": "binary",
+        "description": "L >= Lmin の判定",
+        "condition": {
+          "operator": "GTE",
+          "lhs": {
+            "var": "L",
+            "desc": "相互間の中心距離"
+          },
+          "rhs": {
+            "var": "Lmin",
+            "desc": "径の2.5倍（最小中心距離）",
+            "unit": "mm"
+          }
+        }
+      },
+      {
+        "id": "proc-pair-pass",
+        "type": "process",
+        "title": "この組み合わせは適合",
+        "process_type": "mechanical",
+        "description": "現在の接合材ペアは中心距離基準を満たす"
+      },
+      {
+        "id": "dec-more-pairs",
+        "type": "decision",
+        "title": "未検証の組み合わせがあるか？",
+        "decision_type": "binary",
+        "description": "まだ検証していない接合材ペアが残っているか"
+      },
+      {
+        "id": "terminal-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "全ての接合材の相互間中心距離が径の2.5倍以上である"
+      },
+      {
+        "id": "terminal-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "中心距離が径の2.5倍未満の接合材ペアが存在する"
+      },
+      {
+        "id": "terminal-na",
+        "type": "terminal",
+        "title": "対象外",
+        "result": "pass",
+        "description": "高力ボルト、ボルト又はリベットが存在しないため適用されない"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e001",
+        "from": "start",
+        "to": "proc-identify-fasteners",
+        "role": "flow"
+      },
+      {
+        "id": "e002",
+        "from": "proc-identify-fasteners",
+        "to": "dec-fasteners-exist",
+        "role": "flow"
+      },
+      {
+        "id": "e003",
+        "from": "dec-fasteners-exist",
+        "to": "proc-enumerate-pairs",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e004",
+        "from": "dec-fasteners-exist",
+        "to": "terminal-na",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e005",
+        "from": "proc-enumerate-pairs",
+        "to": "dec-pairs-exist",
+        "role": "flow"
+      },
+      {
+        "id": "e006",
+        "from": "dec-pairs-exist",
+        "to": "proc-select-pair",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e007",
+        "from": "dec-pairs-exist",
+        "to": "terminal-pass",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e008",
+        "from": "proc-select-pair",
+        "to": "proc-get-diameter",
+        "role": "flow"
+      },
+      {
+        "id": "e009",
+        "from": "proc-get-diameter",
+        "to": "proc-get-distance",
+        "role": "flow"
+      },
+      {
+        "id": "e010",
+        "from": "proc-get-distance",
+        "to": "proc-calc-min-distance",
+        "role": "flow"
+      },
+      {
+        "id": "e011",
+        "from": "proc-calc-min-distance",
+        "to": "dec-distance-check",
+        "role": "flow"
+      },
+      {
+        "id": "e012",
+        "from": "dec-distance-check",
+        "to": "proc-pair-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e013",
+        "from": "dec-distance-check",
+        "to": "terminal-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e014",
+        "from": "proc-pair-pass",
+        "to": "dec-more-pairs",
+        "role": "flow"
+      },
+      {
+        "id": "e015",
+        "from": "dec-more-pairs",
+        "to": "proc-select-pair",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e016",
+        "from": "dec-more-pairs",
+        "to": "terminal-pass",
+        "role": "no",
+        "label": "いいえ"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "A68_P1_kijo",
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00Z",
+    "generator": "claude-code-flow-generator",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令",
+    "checklist_ref": "確認審査報告書チェックリスト"
+  }
+}

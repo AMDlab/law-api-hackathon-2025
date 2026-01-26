@@ -1,0 +1,391 @@
+{
+  "id": "CHK-BSL-ORDER-A85-P1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "積載荷重の計算",
+    "target_subject": "建築物の各部",
+    "description": "建築物の各部の積載荷重を計算する方法を判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "85",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造規定",
+    "積載荷重"
+  ],
+  "text_raw": "建築物の各部の積載荷重は、当該建築物の実況に応じて計算しなければならない。ただし、次の表に掲げる室の床の積載荷重については、それぞれ同表の（い）、（ろ）又は（は）の欄に定める数値に床面積を乗じて計算することができる。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "subject",
+          "value": "建築物の構造計算を行う場合"
+        }
+      ],
+      "note": "構造計算が必要な建築物が対象"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "ref": "info-actual-calc-result",
+          "description": "実況に応じた計算による場合"
+        },
+        {
+          "ref": "info-table-calc-result",
+          "description": "表の数値による簡易計算の場合（表に掲げる室のみ）"
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "info-building-parts-set",
+        "type": "information",
+        "title": "建築物の各部",
+        "symbol": "P",
+        "subject": "建築物",
+        "property": "各部の集合",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "積載荷重を計算すべき建築物の各部位"
+      },
+      {
+        "id": "proc-calc-target-identify",
+        "type": "process",
+        "title": "構造計算対象の特定",
+        "process_type": "undefined_input",
+        "description": "構造計算の対象（床/大ばり・柱・基礎/地震力）を特定"
+      },
+      {
+        "id": "info-calc-target",
+        "type": "information",
+        "title": "構造計算の対象",
+        "symbol": "T",
+        "subject": "建築物の各部",
+        "property": "構造計算の対象",
+        "property_type": "classification",
+        "plurality": "single",
+        "description": "床の構造計算/大ばり・柱・基礎の構造計算/地震力計算のいずれか"
+      },
+      {
+        "id": "proc-room-set-identify",
+        "type": "process",
+        "title": "室の集合の特定",
+        "process_type": "undefined_input",
+        "description": "建築物に属する室を特定"
+      },
+      {
+        "id": "info-rooms-set",
+        "type": "information",
+        "title": "建築物に属する室",
+        "symbol": "Rs",
+        "subject": "建築物",
+        "property": "室の集合",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "建築物に属するすべての室"
+      },
+      {
+        "id": "proc-room-type-identify",
+        "type": "process",
+        "title": "室の種類の特定",
+        "process_type": "undefined_input",
+        "iteration": "iterative",
+        "description": "各室の用途種別を特定（住宅の居室、事務室、教室、百貨店売場、劇場客席、自動車車庫、廊下・玄関・階段、屋上広場・バルコニー等）"
+      },
+      {
+        "id": "info-room-types",
+        "type": "information",
+        "title": "各室の種類",
+        "symbol": "Rt",
+        "subject": "室",
+        "property": "種類",
+        "property_type": "classification",
+        "plurality": "multiple",
+        "description": "表の(一)〜(八)の区分：(一)住宅居室等、(二)事務室、(三)教室、(四)百貨店売場、(五)劇場客席等、(六)自動車車庫、(七)廊下等、(八)屋上広場等"
+      },
+      {
+        "id": "proc-floor-area-identify",
+        "type": "process",
+        "title": "床面積の特定",
+        "process_type": "undefined_input",
+        "iteration": "iterative",
+        "description": "各室の床面積を特定"
+      },
+      {
+        "id": "info-floor-areas",
+        "type": "information",
+        "title": "各室の床面積",
+        "symbol": "A",
+        "subject": "室",
+        "property": "床面積",
+        "property_type": "numeric",
+        "unit": "m2",
+        "plurality": "multiple",
+        "description": "各室の床面積"
+      },
+      {
+        "id": "proc-actual-load-identify",
+        "type": "process",
+        "title": "実況荷重の特定",
+        "process_type": "undefined_input",
+        "description": "建築物の実況に応じた積載荷重を特定"
+      },
+      {
+        "id": "info-actual-load",
+        "type": "information",
+        "title": "実況に応じた積載荷重",
+        "symbol": "La",
+        "subject": "建築物の各部",
+        "property": "実況に応じた積載荷重",
+        "property_type": "numeric",
+        "unit": "N/m2",
+        "plurality": "single",
+        "description": "当該建築物の実況に応じて計算した積載荷重"
+      },
+      {
+        "id": "proc-table-load-calc",
+        "type": "process",
+        "title": "表による積載荷重計算",
+        "process_type": "mechanical",
+        "iteration": "iterative",
+        "description": "室の種類と構造計算対象に応じて表の数値を適用し、床面積を乗じて積載荷重を計算",
+        "logic_expression": "積載荷重 = 表の数値(室種類, 計算対象) × 床面積",
+        "remarks": "表の数値：(い)欄=床の構造計算、(ろ)欄=大ばり・柱・基礎の構造計算、(は)欄=地震力計算"
+      },
+      {
+        "id": "info-table-load",
+        "type": "information",
+        "title": "表による積載荷重",
+        "symbol": "Lt",
+        "subject": "室の床",
+        "property": "表による積載荷重",
+        "property_type": "numeric",
+        "unit": "N",
+        "plurality": "multiple",
+        "description": "表の数値×床面積により計算された積載荷重"
+      },
+      {
+        "id": "proc-actual-calc-check",
+        "type": "process",
+        "title": "実況計算による適合判定",
+        "process_type": "mechanical",
+        "description": "実況に応じた計算を行っている場合の適合判定",
+        "logic_expression": "実況に応じた計算値が存在する"
+      },
+      {
+        "id": "info-actual-calc-result",
+        "type": "information",
+        "title": "実況計算適合",
+        "symbol": "Ca",
+        "subject": "建築物の各部",
+        "property": "実況計算による適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "実況に応じた計算による場合の適合"
+      },
+      {
+        "id": "proc-table-calc-check",
+        "type": "process",
+        "title": "表計算による適合判定",
+        "process_type": "mechanical",
+        "description": "表に掲げる室の床について、表の数値による計算を行っている場合の適合判定",
+        "logic_expression": "室が表の(一)〜(八)に該当 AND 表の数値×床面積による計算"
+      },
+      {
+        "id": "info-table-calc-result",
+        "type": "information",
+        "title": "表計算適合",
+        "symbol": "Ct",
+        "subject": "室の床",
+        "property": "表計算による適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "表の数値による簡易計算が適用可能な場合の適合"
+      },
+      {
+        "id": "proc-final-judgment",
+        "type": "process",
+        "title": "積載荷重計算適合判定",
+        "process_type": "mechanical",
+        "description": "積載荷重の計算方法が令85条1項に適合するか判定",
+        "logic_expression": "Ca OR (室が表の対象 AND Ct)"
+      },
+      {
+        "id": "info-final",
+        "type": "information",
+        "title": "積載荷重計算適合",
+        "symbol": "R",
+        "subject": "建築物の各部",
+        "property": "積載荷重計算適合",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "令85条1項の積載荷重計算に適合するか"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "info-building-parts-set",
+        "to": "proc-calc-target-identify",
+        "role": "input"
+      },
+      {
+        "id": "e02",
+        "from": "proc-calc-target-identify",
+        "to": "info-calc-target",
+        "role": "output"
+      },
+      {
+        "id": "e03",
+        "from": "info-building-parts-set",
+        "to": "proc-room-set-identify",
+        "role": "input"
+      },
+      {
+        "id": "e04",
+        "from": "proc-room-set-identify",
+        "to": "info-rooms-set",
+        "role": "output"
+      },
+      {
+        "id": "e05",
+        "from": "info-rooms-set",
+        "to": "proc-room-type-identify",
+        "role": "input"
+      },
+      {
+        "id": "e06",
+        "from": "proc-room-type-identify",
+        "to": "info-room-types",
+        "role": "output"
+      },
+      {
+        "id": "e07",
+        "from": "info-rooms-set",
+        "to": "proc-floor-area-identify",
+        "role": "input"
+      },
+      {
+        "id": "e08",
+        "from": "proc-floor-area-identify",
+        "to": "info-floor-areas",
+        "role": "output"
+      },
+      {
+        "id": "e09",
+        "from": "info-building-parts-set",
+        "to": "proc-actual-load-identify",
+        "role": "input"
+      },
+      {
+        "id": "e10",
+        "from": "proc-actual-load-identify",
+        "to": "info-actual-load",
+        "role": "output"
+      },
+      {
+        "id": "e11",
+        "from": "info-room-types",
+        "to": "proc-table-load-calc",
+        "role": "input"
+      },
+      {
+        "id": "e12",
+        "from": "info-calc-target",
+        "to": "proc-table-load-calc",
+        "role": "input"
+      },
+      {
+        "id": "e13",
+        "from": "info-floor-areas",
+        "to": "proc-table-load-calc",
+        "role": "input"
+      },
+      {
+        "id": "e14",
+        "from": "proc-table-load-calc",
+        "to": "info-table-load",
+        "role": "output"
+      },
+      {
+        "id": "e15",
+        "from": "info-actual-load",
+        "to": "proc-actual-calc-check",
+        "role": "input"
+      },
+      {
+        "id": "e16",
+        "from": "proc-actual-calc-check",
+        "to": "info-actual-calc-result",
+        "role": "output"
+      },
+      {
+        "id": "e17",
+        "from": "info-table-load",
+        "to": "proc-table-calc-check",
+        "role": "input"
+      },
+      {
+        "id": "e18",
+        "from": "info-room-types",
+        "to": "proc-table-calc-check",
+        "role": "input"
+      },
+      {
+        "id": "e19",
+        "from": "proc-table-calc-check",
+        "to": "info-table-calc-result",
+        "role": "output"
+      },
+      {
+        "id": "e20",
+        "from": "info-actual-calc-result",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e21",
+        "from": "info-table-calc-result",
+        "to": "proc-final-judgment",
+        "role": "input"
+      },
+      {
+        "id": "e22",
+        "from": "proc-final-judgment",
+        "to": "info-final",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325AC0000000201",
+      "law_name": "建築基準法",
+      "law_type": "act",
+      "relationship": "delegated_from",
+      "articles": [
+        "A20"
+      ],
+      "description": "法第20条の構造耐力に関する規定"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-23T12:00:00Z",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}

@@ -1,0 +1,274 @@
+{
+  "id": "A55_P2_flow",
+  "version": "3.2",
+  "page_title": {
+    "title": "組積造の壁の厚さ（各階の壁の高さに対する基準）",
+    "target_subject": "組積造の壁",
+    "description": "組積造の各階の壁の厚さが、その階の壁の高さの十五分の一以上であることを判定するフロー"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "55",
+    "paragraph": "2",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "構造規定",
+    "組積造"
+  ],
+  "text_raw": "組積造の各階の壁の厚さは、その階の壁の高さの十五分の一以上としなければならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "structure_type",
+          "value": "組積造",
+          "note": "組積造の建築物に適用"
+        }
+      ]
+    },
+    "judgment_rule": {
+      "operator": "FORALL",
+      "variable": "各階の壁",
+      "conditions": [
+        {
+          "ref": "wall-thickness-compliance",
+          "operator": "==",
+          "value": true,
+          "note": "各階の壁の厚さ≧その階の壁の高さ×1/15"
+        }
+      ]
+    },
+    "exceptions": null
+  },
+  "flow_diagram": {
+    "title": "令55条2項 組積造の壁の厚さ（各階基準）適合判定フロー",
+    "description": "組積造の各階の壁の厚さが、その階の壁の高さの1/15以上であるかを判定するフローチャート",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "terminal",
+        "title": "判定開始",
+        "result": "start",
+        "description": "令55条2項（組積造の壁の厚さ・各階基準）の適合判定を開始"
+      },
+      {
+        "id": "dec-is-masonry",
+        "type": "decision",
+        "title": "組積造の建築物か？",
+        "decision_type": "binary",
+        "description": "対象建築物が組積造であるかを確認"
+      },
+      {
+        "id": "dec-has-walls",
+        "type": "decision",
+        "title": "組積造の壁があるか？",
+        "decision_type": "binary",
+        "description": "建築物に組積造の壁が存在するかを確認"
+      },
+      {
+        "id": "proc-identify-walls",
+        "type": "process",
+        "title": "各階の組積造の壁を特定",
+        "process_type": "undefined_input",
+        "description": "設計図書等から建築物の組積造の壁を各階ごとに特定する"
+      },
+      {
+        "id": "proc-select-wall",
+        "type": "process",
+        "title": "未判定の壁を選択",
+        "process_type": "mechanical",
+        "description": "まだ厚さ判定を行っていない壁を1つ選択する"
+      },
+      {
+        "id": "dec-all-walls-checked",
+        "type": "decision",
+        "title": "全ての壁を判定済みか？",
+        "decision_type": "binary",
+        "description": "全ての組積造の壁について厚さ判定が完了したかを確認"
+      },
+      {
+        "id": "proc-get-thickness",
+        "type": "process",
+        "title": "壁の厚さTを取得",
+        "process_type": "undefined_input",
+        "description": "設計図書等から当該壁の厚さT（cm）を読み取る"
+      },
+      {
+        "id": "proc-get-height",
+        "type": "process",
+        "title": "壁の高さHを取得",
+        "process_type": "undefined_input",
+        "description": "設計図書等から当該階の壁の高さH（cm）を読み取る"
+      },
+      {
+        "id": "proc-calc-required",
+        "type": "process",
+        "title": "必要壁厚を算定（T_req = H/15）",
+        "process_type": "mechanical",
+        "description": "壁の高さHを15で除して必要最低厚さT_reqを算定する"
+      },
+      {
+        "id": "dec-thickness-check",
+        "type": "decision",
+        "title": "壁の厚さT ≧ 必要壁厚T_req（=H/15）か？",
+        "decision_type": "binary",
+        "description": "壁の厚さTが必要壁厚（高さの1/15）以上かを判定",
+        "condition": {
+          "operator": "GTE",
+          "lhs": {
+            "var": "T",
+            "desc": "壁の厚さ"
+          },
+          "rhs": {
+            "var": "T_req",
+            "desc": "必要壁厚（H/15）",
+            "unit": "cm"
+          }
+        }
+      },
+      {
+        "id": "proc-wall-pass",
+        "type": "process",
+        "title": "当該壁は厚さ基準適合",
+        "process_type": "mechanical",
+        "description": "この壁は厚さ基準（T ≧ H/15）を満たしている"
+      },
+      {
+        "id": "end-pass",
+        "type": "terminal",
+        "title": "適合",
+        "result": "pass",
+        "description": "組積造の全ての階の壁が厚さ基準（各階の壁の高さの1/15以上）を満たす"
+      },
+      {
+        "id": "end-fail",
+        "type": "terminal",
+        "title": "不適合",
+        "result": "fail",
+        "description": "壁の厚さが基準（その階の壁の高さの1/15以上）を満たさない壁がある"
+      },
+      {
+        "id": "end-not-applicable",
+        "type": "terminal",
+        "title": "対象外",
+        "result": "end",
+        "description": "組積造の建築物でないため本条項は適用されない"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "start",
+        "to": "dec-is-masonry",
+        "role": "flow"
+      },
+      {
+        "id": "e02",
+        "from": "dec-is-masonry",
+        "to": "dec-has-walls",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e03",
+        "from": "dec-is-masonry",
+        "to": "end-not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e04",
+        "from": "dec-has-walls",
+        "to": "proc-identify-walls",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e05",
+        "from": "dec-has-walls",
+        "to": "end-not-applicable",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e06",
+        "from": "proc-identify-walls",
+        "to": "dec-all-walls-checked",
+        "role": "flow"
+      },
+      {
+        "id": "e07",
+        "from": "dec-all-walls-checked",
+        "to": "end-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e08",
+        "from": "dec-all-walls-checked",
+        "to": "proc-select-wall",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e09",
+        "from": "proc-select-wall",
+        "to": "proc-get-thickness",
+        "role": "flow"
+      },
+      {
+        "id": "e10",
+        "from": "proc-get-thickness",
+        "to": "proc-get-height",
+        "role": "flow"
+      },
+      {
+        "id": "e11",
+        "from": "proc-get-height",
+        "to": "proc-calc-required",
+        "role": "flow"
+      },
+      {
+        "id": "e12",
+        "from": "proc-calc-required",
+        "to": "dec-thickness-check",
+        "role": "flow"
+      },
+      {
+        "id": "e13",
+        "from": "dec-thickness-check",
+        "to": "proc-wall-pass",
+        "role": "yes",
+        "label": "はい"
+      },
+      {
+        "id": "e14",
+        "from": "dec-thickness-check",
+        "to": "end-fail",
+        "role": "no",
+        "label": "いいえ"
+      },
+      {
+        "id": "e15",
+        "from": "proc-wall-pass",
+        "to": "dec-all-walls-checked",
+        "role": "flow"
+      }
+    ]
+  },
+  "kijo_diagram_ref": "CHK-BSL-ORDER-A55-P2",
+  "metadata": {
+    "created_at": "2026-01-26T00:00:00Z",
+    "author": "Claude Code",
+    "generator": "flow-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令",
+    "checklist_ref": "確認審査報告書チェックリスト"
+  }
+}

@@ -1,0 +1,416 @@
+{
+  "id": "CHK-BSL-ORDER-A121_2-P1",
+  "version": "3.0.0",
+  "page_title": {
+    "title": "屋外階段の構造",
+    "target_subject": "屋外直通階段",
+    "description": "令第120条・第121条の規定による直通階段で屋外に設けるものの構造制限を判定する"
+  },
+  "legal_ref": {
+    "law_id": "325CO0000000338",
+    "law_type": "order",
+    "law_name": "建築基準法施行令",
+    "law_abbrev": "令",
+    "article": "121の2",
+    "paragraph": "1",
+    "item": null
+  },
+  "labels": [
+    "単体規定",
+    "避難",
+    "直通階段",
+    "屋外階段",
+    "構造制限"
+  ],
+  "text_raw": "前二条の規定による直通階段で屋外に設けるものは、木造（準耐火構造のうち有効な防腐措置を講じたものを除く。）としてはならない。",
+  "compliance_logic": {
+    "scope_condition": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "reference",
+          "value": "令第120条又は令第121条の規定による直通階段"
+        },
+        {
+          "type": "location",
+          "value": "屋外に設けるもの"
+        }
+      ],
+      "note": "令第120条（直通階段の設置）又は令第121条（二以上の直通階段を設ける場合）の規定による直通階段で、屋外に設けるもの"
+    },
+    "judgment_rule": {
+      "operator": "OR",
+      "conditions": [
+        {
+          "ref": "info-not-wood",
+          "operator": "==",
+          "value": true,
+          "note": "木造以外の構造"
+        },
+        {
+          "ref": "info-exempt",
+          "operator": "==",
+          "value": true,
+          "note": "準耐火構造で有効な防腐措置あり"
+        }
+      ]
+    },
+    "exceptions": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "structure",
+          "value": "準耐火構造"
+        },
+        {
+          "type": "measure",
+          "value": "有効な防腐措置"
+        }
+      ],
+      "effect": "EXEMPT",
+      "note": "準耐火構造のうち有効な防腐措置を講じたものは木造でも可"
+    }
+  },
+  "kijo_diagram": {
+    "nodes": [
+      {
+        "id": "proc-stair-identify",
+        "type": "process",
+        "title": "直通階段の特定",
+        "process_type": "undefined_input",
+        "description": "令第120条・第121条の規定による直通階段を特定"
+      },
+      {
+        "id": "info-stair-set",
+        "type": "information",
+        "title": "直通階段",
+        "symbol": "S",
+        "subject": "建築物",
+        "property": "直通階段の集合",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "令第120条・第121条の規定による直通階段",
+        "related_articles": ["令::A120", "令::A121"]
+      },
+      {
+        "id": "proc-location-check",
+        "type": "process",
+        "title": "設置位置の特定",
+        "process_type": "undefined_input",
+        "description": "直通階段が屋外に設けられているか確認",
+        "iteration": "iterative"
+      },
+      {
+        "id": "info-location",
+        "type": "information",
+        "title": "設置位置",
+        "symbol": "L",
+        "subject": "直通階段",
+        "property": "設置位置",
+        "property_type": "classification",
+        "plurality": "multiple",
+        "description": "屋外か屋内か"
+      },
+      {
+        "id": "proc-outdoor-filter",
+        "type": "process",
+        "title": "屋外階段の抽出",
+        "process_type": "mechanical",
+        "description": "屋外に設ける直通階段を抽出",
+        "logic_expression": "L == 屋外"
+      },
+      {
+        "id": "info-outdoor-stair-set",
+        "type": "information",
+        "title": "屋外直通階段",
+        "symbol": "S_out",
+        "subject": "建築物",
+        "property": "屋外直通階段の集合",
+        "property_type": "set_definition",
+        "plurality": "single",
+        "description": "屋外に設ける直通階段の集合"
+      },
+      {
+        "id": "proc-structure-check",
+        "type": "process",
+        "title": "構造種別の特定",
+        "process_type": "undefined_input",
+        "description": "屋外直通階段の構造種別を特定",
+        "iteration": "iterative"
+      },
+      {
+        "id": "info-structure",
+        "type": "information",
+        "title": "構造種別",
+        "symbol": "ST",
+        "subject": "屋外直通階段",
+        "property": "構造種別",
+        "property_type": "classification",
+        "plurality": "multiple",
+        "description": "木造、鉄骨造、RC造等の構造種別"
+      },
+      {
+        "id": "proc-wood-check",
+        "type": "process",
+        "title": "木造判定",
+        "process_type": "mechanical",
+        "description": "構造種別が木造であるか判定",
+        "logic_expression": "ST == 木造",
+        "iteration": "iterative"
+      },
+      {
+        "id": "info-is-wood",
+        "type": "information",
+        "title": "木造該当",
+        "symbol": "W",
+        "subject": "屋外直通階段",
+        "property": "木造該当",
+        "property_type": "proposition",
+        "plurality": "multiple",
+        "description": "木造であるか否か"
+      },
+      {
+        "id": "proc-fire-resistance-check",
+        "type": "process",
+        "title": "準耐火構造確認",
+        "process_type": "undefined_input",
+        "description": "木造の場合、準耐火構造であるか確認",
+        "iteration": "iterative"
+      },
+      {
+        "id": "info-fire-resistance",
+        "type": "information",
+        "title": "準耐火構造",
+        "symbol": "FR",
+        "subject": "屋外直通階段",
+        "property": "準耐火構造",
+        "property_type": "proposition",
+        "plurality": "multiple",
+        "description": "準耐火構造であるか否か"
+      },
+      {
+        "id": "proc-preservative-check",
+        "type": "process",
+        "title": "防腐措置確認",
+        "process_type": "undefined_input",
+        "description": "有効な防腐措置を講じているか確認",
+        "iteration": "iterative"
+      },
+      {
+        "id": "info-preservative",
+        "type": "information",
+        "title": "防腐措置",
+        "symbol": "P",
+        "subject": "屋外直通階段",
+        "property": "有効な防腐措置",
+        "property_type": "proposition",
+        "plurality": "multiple",
+        "description": "有効な防腐措置を講じているか否か"
+      },
+      {
+        "id": "proc-exempt-judge",
+        "type": "process",
+        "title": "除外判定",
+        "process_type": "mechanical",
+        "description": "準耐火構造かつ有効な防腐措置で木造禁止の例外に該当するか判定",
+        "logic_expression": "FR AND P",
+        "iteration": "iterative"
+      },
+      {
+        "id": "info-exempt",
+        "type": "information",
+        "title": "例外該当",
+        "symbol": "EX",
+        "subject": "屋外直通階段",
+        "property": "例外該当",
+        "property_type": "proposition",
+        "plurality": "multiple",
+        "description": "準耐火構造のうち有効な防腐措置を講じたものに該当するか"
+      },
+      {
+        "id": "proc-compliance-judge",
+        "type": "process",
+        "title": "適合判定",
+        "process_type": "mechanical",
+        "description": "各屋外直通階段の構造適合性を判定",
+        "logic_expression": "NOT(W) OR EX",
+        "iteration": "iterative"
+      },
+      {
+        "id": "info-each-compliance",
+        "type": "information",
+        "title": "各階段適合",
+        "symbol": "C",
+        "subject": "屋外直通階段",
+        "property": "構造適合",
+        "property_type": "proposition",
+        "plurality": "multiple",
+        "description": "各屋外直通階段が構造基準に適合するか"
+      },
+      {
+        "id": "proc-final-judge",
+        "type": "process",
+        "title": "最終適合判定",
+        "process_type": "mechanical",
+        "description": "全屋外直通階段の適合性を総合判定",
+        "logic_expression": "ALL(C)"
+      },
+      {
+        "id": "info-final-compliance",
+        "type": "information",
+        "title": "令第121条の2適合",
+        "symbol": "COMPLIANT",
+        "subject": "建築物",
+        "property": "令第121条の2第1項適合性",
+        "property_type": "proposition",
+        "plurality": "single",
+        "description": "屋外階段の構造基準に適合するか"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e01",
+        "from": "proc-stair-identify",
+        "to": "info-stair-set",
+        "role": "output"
+      },
+      {
+        "id": "e02",
+        "from": "info-stair-set",
+        "to": "proc-location-check",
+        "role": "input"
+      },
+      {
+        "id": "e03",
+        "from": "proc-location-check",
+        "to": "info-location",
+        "role": "output"
+      },
+      {
+        "id": "e04",
+        "from": "info-location",
+        "to": "proc-outdoor-filter",
+        "role": "input"
+      },
+      {
+        "id": "e05",
+        "from": "proc-outdoor-filter",
+        "to": "info-outdoor-stair-set",
+        "role": "output"
+      },
+      {
+        "id": "e06",
+        "from": "info-outdoor-stair-set",
+        "to": "proc-structure-check",
+        "role": "input"
+      },
+      {
+        "id": "e07",
+        "from": "proc-structure-check",
+        "to": "info-structure",
+        "role": "output"
+      },
+      {
+        "id": "e08",
+        "from": "info-structure",
+        "to": "proc-wood-check",
+        "role": "input"
+      },
+      {
+        "id": "e09",
+        "from": "proc-wood-check",
+        "to": "info-is-wood",
+        "role": "output"
+      },
+      {
+        "id": "e10",
+        "from": "info-is-wood",
+        "to": "proc-fire-resistance-check",
+        "role": "input"
+      },
+      {
+        "id": "e11",
+        "from": "proc-fire-resistance-check",
+        "to": "info-fire-resistance",
+        "role": "output"
+      },
+      {
+        "id": "e12",
+        "from": "info-fire-resistance",
+        "to": "proc-preservative-check",
+        "role": "input"
+      },
+      {
+        "id": "e13",
+        "from": "proc-preservative-check",
+        "to": "info-preservative",
+        "role": "output"
+      },
+      {
+        "id": "e14",
+        "from": "info-fire-resistance",
+        "to": "proc-exempt-judge",
+        "role": "input"
+      },
+      {
+        "id": "e15",
+        "from": "info-preservative",
+        "to": "proc-exempt-judge",
+        "role": "input"
+      },
+      {
+        "id": "e16",
+        "from": "proc-exempt-judge",
+        "to": "info-exempt",
+        "role": "output"
+      },
+      {
+        "id": "e17",
+        "from": "info-is-wood",
+        "to": "proc-compliance-judge",
+        "role": "input"
+      },
+      {
+        "id": "e18",
+        "from": "info-exempt",
+        "to": "proc-compliance-judge",
+        "role": "input"
+      },
+      {
+        "id": "e19",
+        "from": "proc-compliance-judge",
+        "to": "info-each-compliance",
+        "role": "output"
+      },
+      {
+        "id": "e20",
+        "from": "info-each-compliance",
+        "to": "proc-final-judge",
+        "role": "input"
+      },
+      {
+        "id": "e21",
+        "from": "proc-final-judge",
+        "to": "info-final-compliance",
+        "role": "output"
+      }
+    ]
+  },
+  "related_laws": [
+    {
+      "law_id": "325CO0000000338",
+      "law_name": "建築基準法施行令",
+      "law_type": "order",
+      "relationship": "references",
+      "articles": ["A120", "A121"],
+      "description": "直通階段の設置規定（令第120条）及び二以上の直通階段を設ける場合（令第121条）を参照"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-01-23T00:00:00+09:00",
+    "author": "Claude Code",
+    "generator": "kijo-generator-v1",
+    "law_id": "325CO0000000338",
+    "law_name": "建築基準法施行令"
+  }
+}
