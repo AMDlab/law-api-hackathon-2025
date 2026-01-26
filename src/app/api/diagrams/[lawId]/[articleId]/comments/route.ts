@@ -43,8 +43,9 @@ export async function GET(request: Request, { params }: RouteParams) {
       );
     }
 
+    const diagramKey = `${lawId}/${articleId}`;
     const diagram = await prisma.diagram.findUnique({
-      where: { diagramKey: articleId },
+      where: { diagramKey },
       select: { lawId: true },
     });
     if (!diagram || diagram.lawId !== lawId) {
@@ -52,7 +53,7 @@ export async function GET(request: Request, { params }: RouteParams) {
     }
 
     const threads = await prisma.diagramCommentThread.findMany({
-      where: { diagramKey: articleId, diagramType, isDeleted: false },
+      where: { diagramKey, diagramType, isDeleted: false },
       include: {
         comments: {
           where: { isDeleted: false },
@@ -100,8 +101,9 @@ export async function POST(request: Request, { params }: RouteParams) {
       );
     }
 
+    const diagramKey = `${lawId}/${articleId}`;
     const diagram = await prisma.diagram.findUnique({
-      where: { diagramKey: articleId },
+      where: { diagramKey },
       select: { lawId: true },
     });
     if (!diagram || diagram.lawId !== lawId) {
@@ -147,7 +149,7 @@ export async function POST(request: Request, { params }: RouteParams) {
 
     const thread = await prisma.diagramCommentThread.create({
       data: {
-        diagramKey: articleId,
+        diagramKey,
         diagramType,
         targetType,
         targetId,

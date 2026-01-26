@@ -55,13 +55,21 @@ type RawDiagram = {
 };
 
 function getDiagramType(diagramKey: string): DiagramType | null {
-  if (diagramKey.endsWith("_kijo")) return DiagramType.kijo;
-  if (diagramKey.endsWith("_flow")) return DiagramType.flow;
+  // diagramKey format: "{lawId}/{baseName}" e.g., "325CO0000000338/A19_P2_kijo"
+  const baseName = diagramKey.includes("/")
+    ? diagramKey.split("/")[1]
+    : diagramKey;
+  if (baseName.endsWith("_kijo")) return DiagramType.kijo;
+  if (baseName.endsWith("_flow")) return DiagramType.flow;
   return null;
 }
 
 function getBaseArticleId(diagramKey: string): string {
-  return diagramKey.replace(/_(kijo|flow)$/, "");
+  // diagramKey format: "{lawId}/{baseName}" e.g., "325CO0000000338/A19_P2_kijo"
+  const baseName = diagramKey.includes("/")
+    ? diagramKey.split("/")[1]
+    : diagramKey;
+  return baseName.replace(/_(kijo|flow)$/, "");
 }
 
 async function listDiagramFiles(): Promise<
@@ -81,7 +89,8 @@ async function listDiagramFiles(): Promise<
     const files = await fs.readdir(lawDir, { withFileTypes: true });
     for (const file of files) {
       if (!file.isFile() || !file.name.endsWith(".json")) continue;
-      const diagramKey = file.name.replace(/\.json$/, "");
+      const baseName = file.name.replace(/\.json$/, "");
+      const diagramKey = `${lawId}/${baseName}`;
       results.push({
         lawId,
         diagramKey,
@@ -134,18 +143,40 @@ async function main() {
   const files = await listDiagramFiles();
   console.info(`Found ${files.length} diagram files.`);
 
-  await prisma.diagramEdge.deleteMany();
-  await prisma.diagramNode.deleteMany();
-  await prisma.diagramLabel.deleteMany();
-  await prisma.relatedLaw.deleteMany();
-  await prisma.diagram.deleteMany();
+  // Get existing diagram keys from DB
+  const existingDiagrams = await prisma.diagram.findMany({
+    select: { diagramKey: true },
+  });
+  const existingKeys = new Set(existingDiagrams.map((d) => d.diagramKey));
+  console.info(`Found ${existingKeys.size} existing diagrams in DB.`);
 
-  for (const file of files) {
+  // Filter to only new files
+  const newFiles = files.filter((f) => !existingKeys.has(f.diagramKey));
+  console.info(`${newFiles.length} new diagrams to add.`);
+
+  if (newFiles.length === 0) {
+    console.info("Nothing to do.");
+    return;
+  }
+
+  let added = 0;
+  let skipped = 0;
+  for (const file of newFiles) {
     const raw = await fs.readFile(file.filePath, "utf-8");
     const json = JSON.parse(raw) as RawDiagram;
     const diagramType = getDiagramType(file.diagramKey);
     if (!diagramType) {
       console.warn(`Skipping file with unknown type: ${file.filePath}`);
+      continue;
+    }
+
+    // Check if already exists (in case of race condition)
+    const exists = await prisma.diagram.findUnique({
+      where: { diagramKey: file.diagramKey },
+      select: { diagramKey: true },
+    });
+    if (exists) {
+      skipped++;
       continue;
     }
 
@@ -226,7 +257,14 @@ async function main() {
         data: parseEdges(diagramEdges, file.diagramKey),
       });
     }
+
+    added++;
+    if (added % 100 === 0) {
+      console.info(`Added ${added}/${newFiles.length} diagrams...`);
+    }
   }
+
+  console.info(`Done. Added ${added} new diagrams. Skipped ${skipped} existing.`);
 }
 
 main()

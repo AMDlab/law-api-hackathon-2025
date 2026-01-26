@@ -44,8 +44,9 @@ export async function POST(request: Request, { params }: RouteParams) {
       );
     }
 
+    const diagramKey = `${lawId}/${articleId}`;
     const diagram = await prisma.diagram.findUnique({
-      where: { diagramKey: articleId },
+      where: { diagramKey },
       select: { lawId: true },
     });
     if (!diagram || diagram.lawId !== lawId) {
@@ -72,7 +73,7 @@ export async function POST(request: Request, { params }: RouteParams) {
     });
     if (
       !thread ||
-      thread.diagramKey !== articleId ||
+      thread.diagramKey !== diagramKey ||
       thread.diagramType !== diagramType ||
       thread.isDeleted
     ) {
@@ -149,8 +150,9 @@ export async function PATCH(request: Request, { params }: RouteParams) {
       );
     }
 
+    const diagramKey = `${lawId}/${articleId}`;
     const diagram = await prisma.diagram.findUnique({
-      where: { diagramKey: articleId },
+      where: { diagramKey },
       select: { lawId: true },
     });
     if (!diagram || diagram.lawId !== lawId) {
@@ -171,7 +173,7 @@ export async function PATCH(request: Request, { params }: RouteParams) {
     });
     if (
       !thread ||
-      thread.diagramKey !== articleId ||
+      thread.diagramKey !== diagramKey ||
       thread.diagramType !== diagramType
     ) {
       return NextResponse.json({ error: "Thread not found" }, { status: 404 });
